@@ -3,11 +3,11 @@
 Evotechly’s **all-in-one sales OS**: one workspace, one login, four rooms.
 
 1. **Desk** — **[EvoDesk](https://github.com/Mohamedbeghanem/evodesk)** (Chatwoot Community, MIT) at `EVOSALES_INBOX_URL` (default `https://desk.evotechly.com`). The Desk nav item opens that URL in the same window. EvoSales does **not** vendor Chatwoot, does **not** copy Chatwoot CSS/assets, and the Laravel page is **not** a Chatwoot clone. A lightweight **conversation history** list stays in CRM as contact ↔ deal context synced from the desk.
-2. **CRM** — companies, contacts, leads, deals + stages, qualify, kanban.
+2. **CRM (Sales Hub)** — list + detail + associations sidebar. Activity timeline (notes/tasks/calls/meetings), owners, Algeria city/wilaya lists, custom attributes, light quotes, light reports. Not a contact list.
 3. **Ads Center** — Meta ad accounts, campaigns, click-to-WhatsApp, lead forms.
 4. **Outbound Center** — SMTP mailboxes, sequences, official WhatsApp Cloud templates, quiet hours, unsubscribe, suppression.
 
-This is **slice 2**: a sales rep can run a week in the seeded workspace (Home KPIs, CRM CRUD/kanban, outbound enroll, Ads empty-state when Meta env is empty).
+This is **slice 2 + Sales Hub**: a sales rep lives in CRM the way they live in Chatwoot inbox — without cloning Chatwoot. Desk remains EvoDesk.
 
 Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotechly**.
 

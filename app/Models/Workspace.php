@@ -85,4 +85,14 @@ class Workspace extends Model
             ? (string) $this->inbox_url
             : (string) config('evosales.inbox_url');
     }
+
+    public function savedFilters(): HasMany
+    {
+        return $this->hasMany(SavedFilter::class);
+    }
+
+    public function customAttributeDefinitions(): HasMany
+    {
+        return $this->hasMany(CustomAttributeDefinition::class);
+    }
 }

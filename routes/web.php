@@ -1,11 +1,15 @@
 <?php
 
 use App\Http\Controllers\Ads\AdsCenterController;
+use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Http\Controllers\Crm\DealController;
 use App\Http\Controllers\Crm\LeadController;
+use App\Http\Controllers\Crm\QuoteController;
+use App\Http\Controllers\Crm\ReportController;
+use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Desk\InboxController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Outbound\MailboxController;
@@ -15,6 +19,7 @@ use App\Http\Controllers\Outbound\SuppressionController;
 use App\Http\Controllers\Outbound\TemplateController;
 use App\Http\Controllers\Public\UnsubscribeController;
 use App\Http\Controllers\Settings\ChannelSettingsController;
+use App\Http\Controllers\Settings\CustomAttributeController;
 use App\Http\Controllers\Settings\EvolutionSettingsController;
 use App\Http\Controllers\Settings\MetaSettingsController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
@@ -35,6 +40,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
     Route::post('/desk/threads/{thread}/reply', [InboxController::class, 'reply'])->name('desk.reply');
     Route::get('/conversations', [ConversationHistoryController::class, 'index'])->name('crm.conversations');
+
+    Route::get('/crm/reports', [ReportController::class, 'index'])->name('crm.reports');
+    Route::post('/crm/activities', [ActivityController::class, 'store'])->name('crm.activities.store');
+    Route::post('/crm/activities/{activity}/complete', [ActivityController::class, 'complete'])->name('crm.activities.complete');
+    Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');
+    Route::post('/crm/deals/{deal}/quotes', [QuoteController::class, 'store'])->name('crm.quotes.store');
+    Route::put('/crm/quotes/{quote}', [QuoteController::class, 'update'])->name('crm.quotes.update');
 
     Route::get('/crm/companies', [CompanyController::class, 'index'])->name('crm.companies.index');
     Route::post('/crm/companies', [CompanyController::class, 'store'])->name('crm.companies.store');
@@ -83,6 +95,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/meta', [MetaSettingsController::class, 'edit'])->name('settings.meta');
     Route::get('/settings/channels', [ChannelSettingsController::class, 'edit'])->name('settings.channels');
     Route::post('/settings/channels', [ChannelSettingsController::class, 'update'])->name('settings.channels.update');
+    Route::get('/settings/attributes', [CustomAttributeController::class, 'edit'])->name('settings.attributes');
+    Route::post('/settings/attributes', [CustomAttributeController::class, 'store'])->name('settings.attributes.store');
 });
 
 require __DIR__.'/settings.php';

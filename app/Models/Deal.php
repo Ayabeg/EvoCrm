@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use InvalidArgumentException;
 
 #[Fillable([
@@ -22,6 +23,12 @@ use InvalidArgumentException;
     'currency',
     'closed_at',
     'next_activity_at',
+    'owner_id',
+    'source',
+    'lost_reason',
+    'close_date',
+    'next_step',
+    'last_activity_at',
 ])]
 class Deal extends Model
 {
@@ -33,7 +40,14 @@ class Deal extends Model
         return [
             'closed_at' => 'datetime',
             'next_activity_at' => 'datetime',
+            'close_date' => 'date',
+            'last_activity_at' => 'datetime',
         ];
+    }
+
+    public function amountDzd(): float
+    {
+        return round(((int) $this->amount_cents) / 100, 2);
     }
 
     public function contact(): BelongsTo
@@ -61,14 +75,45 @@ class Deal extends Model
         return $this->belongsTo(Stage::class);
     }
 
-    public function moveTo(Stage $stage): void
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(Activity::class)->latest();
+    }
+
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class)->latest();
+    }
+
+    public function moveTo(Stage $stage, ?User $actor = null): void
     {
         if ((int) $stage->pipeline_id !== (int) $this->pipeline_id) {
             throw new InvalidArgumentException('Stage does not belong to this deal pipeline.');
         }
 
+        $from = $this->stage?->name ?? $this->stage_id;
+
         $this->stage()->associate($stage);
         $this->closed_at = $stage->isTerminal() ? now() : null;
+        $this->last_activity_at = now();
         $this->save();
+
+        Activity::query()->create([
+            'workspace_id' => $this->workspace_id,
+            'type' => 'stage_change',
+            'subject' => "Stage → {$stage->name}",
+            'body' => "Moved from {$from} to {$stage->name}.",
+            'actor_id' => $actor?->id,
+            'owner_id' => $this->owner_id,
+            'contact_id' => $this->contact_id,
+            'deal_id' => $this->id,
+            'company_id' => $this->company_id,
+            'meta' => ['stage_id' => $stage->id, 'stage_slug' => $stage->slug],
+        ]);
     }
 }

@@ -48,12 +48,23 @@ class LeadController extends Controller
     {
         abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
 
+        $lead->load(['contact.company', 'contact.threads', 'contact.enrollments.sequence', 'contact.deals.stage', 'company', 'deal.stage']);
+
         return Inertia::render('crm/leads/show', [
-            'lead' => $lead->load(['contact', 'company', 'deal.stage']),
+            'lead' => $lead,
+            'associations' => [
+                'contact' => $lead->contact,
+                'company' => $lead->company,
+                'deal' => $lead->deal,
+                'threads' => $lead->contact?->threads ?? [],
+                'enrollments' => $lead->contact?->enrollments ?? [],
+                'deals' => $lead->contact?->deals ?? [],
+            ],
             'contacts' => Contact::query()
                 ->forWorkspace($request->user()->workspace)
                 ->orderBy('first_name')
                 ->get(['id', 'first_name', 'last_name']),
+            'deskUrl' => $request->user()->workspace->inboxUrl(),
         ]);
     }
 

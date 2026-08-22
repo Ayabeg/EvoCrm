@@ -41,6 +41,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/channels',
         icon: null,
     },
+    {
+        title: 'Custom attributes',
+        href: '/settings/attributes',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {

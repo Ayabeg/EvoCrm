@@ -45,11 +45,14 @@ class ContactIdentity
         return Contact::query()->create([
             'workspace_id' => $workspace->id,
             'company_id' => $attributes['company_id'] ?? null,
+            'owner_id' => $attributes['owner_id'] ?? null,
             'first_name' => $attributes['first_name'] ?? 'Contact',
             'last_name' => $attributes['last_name'] ?? null,
             'email' => $email,
             'phone' => $attributes['phone'] ?? $phone,
             'phone_e164' => $phone,
+            'city' => $attributes['city'] ?? null,
+            'wilaya' => $attributes['wilaya'] ?? null,
             'source' => $attributes['source'] ?? null,
             'meta' => $attributes['meta'] ?? null,
         ]);

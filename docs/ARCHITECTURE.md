@@ -36,7 +36,7 @@ flowchart LR
 | Context | Responsibility |
 | --- | --- |
 | **Identity** | Workspace, User, RBAC (`owner` / `admin` / `member`) |
-| **CRM** | Company, Contact, Lead, Deal, Pipeline / Stage |
+| **CRM** | Sales Hub: Company, Contact, Lead, Deal, Activity timeline, custom attributes, saved lists, quotes, reports. Operational density is the product — not a contact list. |
 | **Desk** | Sold product: EvoDesk / Chatwoot Community. In EvoSales: Channel, Thread, Message as conversation history synced for CRM context + optional composer |
 | **Ads** | AdAccount, AdCampaign, AdLead, Meta env settings |
 | **Outbound** | Mailbox, Sequence, SequenceStep, Enrollment, OutboundMessage, Suppression, QuietHours |
@@ -78,12 +78,12 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 
 ## Left-nav IA
 
-- Home
+- Home (open pipeline value + open tasks as next steps)
 - Desk → `EVOSALES_INBOX_URL` (same window; default `https://desk.evotechly.com`)
-- CRM → Companies / Contacts / Leads / Deals / Conversations (history only)
+- CRM → Companies / Contacts / Leads / Deals (list + detail + associations sidebar) / Unassigned / Reports / Conversations (history only)
 - Ads
 - Outbound → Mailboxes / Sequences / Templates / Suppression / Quiet hours
-- Settings → Evolution / Meta / Channels (`EVOSALES_INBOX_URL`) (plus profile / security / appearance)
+- Settings → Evolution / Meta / Channels / Custom attributes (plus profile / security / appearance)
 
 ## Security
 

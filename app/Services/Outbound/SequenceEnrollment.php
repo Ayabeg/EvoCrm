@@ -6,11 +6,15 @@ use App\Models\Contact;
 use App\Models\Enrollment;
 use App\Models\Sequence;
 use App\Models\Workspace;
+use App\Services\Crm\ActivityRecorder;
 use Illuminate\Validation\ValidationException;
 
 class SequenceEnrollment
 {
-    public function __construct(private SuppressionService $suppressions) {}
+    public function __construct(
+        private SuppressionService $suppressions,
+        private ActivityRecorder $activities,
+    ) {}
 
     public function enroll(Workspace $workspace, Sequence $sequence, Contact $contact): Enrollment
     {
@@ -32,7 +36,7 @@ class SequenceEnrollment
             ]);
         }
 
-        return Enrollment::query()->updateOrCreate(
+        $enrollment = Enrollment::query()->updateOrCreate(
             [
                 'workspace_id' => $workspace->id,
                 'sequence_id' => $sequence->id,
@@ -44,5 +48,16 @@ class SequenceEnrollment
                 'next_run_at' => now(),
             ]
         );
+
+        $this->activities->record($workspace, [
+            'type' => 'sequence',
+            'subject' => "Enrolled in {$sequence->name}",
+            'body' => "Sequence {$sequence->name} ({$sequence->channel}).",
+            'contact_id' => $contact->id,
+            'company_id' => $contact->company_id,
+            'meta' => ['sequence_id' => $sequence->id, 'enrollment_id' => $enrollment->id],
+        ]);
+
+        return $enrollment;
     }
 }

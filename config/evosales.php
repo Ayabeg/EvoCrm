@@ -22,6 +22,22 @@ return [
 
     'roles' => ['owner', 'admin', 'member'],
 
+    'cities' => [
+        'Alger', 'Oran', 'Constantine', 'Annaba', 'Sétif', 'Tlemcen',
+        'Blida', 'Béjaïa', 'Batna', 'Tizi Ouzou', 'Ouargla', 'Mostaganem',
+    ],
+
+    'wilayas' => [
+        'Alger', 'Oran', 'Constantine', 'Annaba', 'Sétif', 'Tlemcen',
+        'Blida', 'Béjaïa', 'Batna', 'Tizi Ouzou', 'Ouargla', 'Mostaganem',
+    ],
+
+    'activity_types' => ['note', 'task', 'call', 'meeting', 'stage_change', 'sequence'],
+
+    'quote_statuses' => ['draft', 'sent', 'accepted'],
+
+    'attribute_types' => ['text', 'number', 'list'],
+
     'pipeline' => [
         ['name' => 'New', 'slug' => 'new', 'position' => 1, 'is_won' => false, 'is_lost' => false],
         ['name' => 'Qualified', 'slug' => 'qualified', 'position' => 2, 'is_won' => false, 'is_lost' => false],

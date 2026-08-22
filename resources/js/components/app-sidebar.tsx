@@ -8,11 +8,13 @@ import {
     Home,
     Inbox,
     Mail,
+    ListFilter,
     Megaphone,
     MessageCircle,
     MessagesSquare,
     Settings2,
     Target,
+    UserMinus,
     Workflow,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -43,6 +45,8 @@ export function AppSidebar() {
         { title: 'Contacts', href: '/crm/contacts', icon: Contact },
         { title: 'Leads', href: '/crm/leads', icon: Target },
         { title: 'Deals', href: '/crm/deals', icon: Handshake },
+        { title: 'Unassigned', href: '/crm/deals?unassigned=1', icon: UserMinus },
+        { title: 'Reports', href: '/crm/reports', icon: ListFilter },
         {
             title: 'Conversations',
             href: '/conversations',
@@ -62,6 +66,7 @@ export function AppSidebar() {
     const settingsItems: NavItem[] = [
         { title: 'Evolution / WhatsApp', href: '/settings/evolution', icon: Settings2 },
         { title: 'Channels', href: '/settings/channels', icon: Settings2 },
+        { title: 'Custom attributes', href: '/settings/attributes', icon: Settings2 },
     ];
 
     return (

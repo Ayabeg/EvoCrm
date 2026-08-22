@@ -7,18 +7,24 @@ All domain rows are scoped by `workspace_id` unless noted.
 | Object | Notes |
 | --- | --- |
 | **Workspace** | Evotechly tenant. Timezone `Africa/Algiers`, dial code `213`. `inbox_url` is the sold EvoDesk URL (default `https://desk.evotechly.com`). Stores last Evolution webhook timestamp/event. |
-| **User** | Fortify-authenticated. `role`: owner / admin / member. Belongs to one workspace in this slice. |
+| **User** | Fortify-authenticated. `role`: owner / admin / member. Owns Contacts and Deals (`owner_id`). Unassigned queue = `owner_id` null. |
 
-## CRM
+## CRM (Sales Hub)
 
 | Object | Notes |
 | --- | --- |
-| **Company** | Account. Algeria-first city/country. |
-| **Contact** | Canonical person. Unique per workspace on `phone_e164` and on `email`. Phone normalized to E.164 with default country 213. |
+| **Company** | Account. Algeria-first `city` / `wilaya` / country. Optional owner. |
+| **Contact** | Canonical person. Unique per workspace on `phone_e164` and on `email`. `owner_id`, `city`, `wilaya`, `last_activity_at`, `unanswered`. |
 | **Lead** | Pre-pipeline interest. `qualify()` sets `qualified_at`. |
 | **Pipeline** | Default “Sales” pipeline per workspace. |
 | **Stage** | New → Qualified → Demo → Proposal → Won / Lost. |
-| **Deal** | Points at Contact (and optional Company + Lead). `moveTo(Stage)` enforces same pipeline. `next_activity_at` drives Home next steps. |
+| **Deal** | Sales Hub record: amount (cents, display DZD), currency default DZD, `close_date`, `next_step`, `owner_id`, `source`, `lost_reason`. `moveTo(Stage)` writes a `stage_change` activity. |
+| **Activity** | Timeline spine: `note`, `task`, `call`, `meeting`, `stage_change`, `sequence`. Tasks have `due_at`, `owner_id`, `done`. Home next steps = open tasks. |
+| **CustomAttributeDefinition** | Workspace-defined field (text / number / list) on contact, company, or deal. |
+| **CustomAttributeValue** | Value for one entity + definition. |
+| **SavedFilter** | Named list: stage, owner, city, wilaya, last activity, unanswered, unassigned. |
+| **Quote** | Light quote on a Deal. Status `draft` / `sent` / `accepted`. Currency DZD. |
+| **QuoteItem** | Line: name, quantity, unit cents, line total. Quote `total_cents` is the sum. |
 
 ## Desk
 
@@ -35,7 +41,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **Mailbox** | SMTP credentials. `password` encrypted at rest. |
 | **Sequence** | Email or `whatsapp_cloud`. |
 | **SequenceStep** | Delay + body or official WA template name. |
-| **Enrollment** | Contact progressing through a sequence. |
+| **Enrollment** | Contact progressing through a sequence. Enroll writes a `sequence` activity. |
 | **OutboundMessage** | Send attempt + status. |
 | **Suppression** | Unique workspace + type + value. Written by `/unsubscribe`. |
 | **QuietHours** | Default 21:00–08:00 Africa/Algiers. |
@@ -57,10 +63,13 @@ All domain rows are scoped by `workspace_id` unless noted.
 ## Identity of a person
 
 ```
-Contact 1─* Thread (Desk)
+Contact 1─* Thread (Desk history)
 Contact 1─* Deal   (CRM)
 Contact 1─* Lead
 Contact 1─* Enrollment
+Contact 1─* Activity
+Deal    1─* Quote
+Deal    1─* Activity
 ```
 
-Click-to-WA and lead forms resolve through `ContactIdentity::findOrCreate` so Desk and CRM stay on the same person.
+Click-to-WA and lead forms resolve through `ContactIdentity::findOrCreate` so Desk and CRM stay on the same person. “Open in Desk” leaves EvoSales for `EVOSALES_INBOX_URL`.

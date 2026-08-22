@@ -3,12 +3,15 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-export default function LeadShow({ lead }: { lead: any }) {
+export default function LeadShow({ lead, associations, deskUrl }: { lead: any; associations?: any; deskUrl?: string }) {
     return (
         <>
             <Head title={lead.title} />
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title={lead.title} description={`Status: ${lead.status}`}>
+                    {deskUrl ? (
+                        <a href={deskUrl} className="rounded bg-teal-700 px-3 py-1 text-sm text-white">Open in Desk</a>
+                    ) : null}
                     {lead.status !== 'qualified' ? (
                         <Form action={`/crm/leads/${lead.id}/qualify`} method="post">
                             {({ processing }) => (
@@ -54,6 +57,32 @@ export default function LeadShow({ lead }: { lead: any }) {
                             </>
                         )}
                     </Form>
+                </Card>
+                <Card className="space-y-2 p-4 text-sm">
+                    <h2 className="font-medium">Associations</h2>
+                    {associations?.contact ? (
+                        <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-teal-700">
+                            Contact · {associations.contact.first_name} {associations.contact.last_name}
+                        </Link>
+                    ) : null}
+                    {associations?.company ? (
+                        <Link href={`/crm/companies/${associations.company.id}`} className="block text-teal-700">
+                            Company · {associations.company.name}
+                        </Link>
+                    ) : null}
+                    {associations?.deal ? (
+                        <Link href={`/crm/deals/${associations.deal.id}`} className="block text-teal-700">
+                            Deal · {associations.deal.title}
+                        </Link>
+                    ) : null}
+                    {(associations?.threads ?? []).map((thread: any) => (
+                        <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-teal-700">
+                            Desk history · {thread.subject ?? thread.id}
+                        </Link>
+                    ))}
+                    {(associations?.enrollments ?? []).map((enrollment: any) => (
+                        <p key={enrollment.id}>Enrollment · {enrollment.sequence?.name ?? enrollment.id}</p>
+                    ))}
                 </Card>
             </div>
         </>

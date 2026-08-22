@@ -14,14 +14,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'workspace_id',
     'company_id',
+    'owner_id',
     'first_name',
     'last_name',
     'email',
     'phone',
     'phone_e164',
     'whatsapp_jid',
+    'city',
+    'wilaya',
     'source',
     'meta',
+    'last_activity_at',
+    'unanswered',
 ])]
 class Contact extends Model
 {
@@ -32,6 +37,8 @@ class Contact extends Model
     {
         return [
             'meta' => 'array',
+            'last_activity_at' => 'datetime',
+            'unanswered' => 'boolean',
         ];
     }
 
@@ -52,6 +59,11 @@ class Contact extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
     public function threads(): HasMany
     {
         return $this->hasMany(Thread::class);
@@ -65,6 +77,16 @@ class Contact extends Model
     public function leads(): HasMany
     {
         return $this->hasMany(Lead::class);
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(Activity::class)->latest();
     }
 
     public function displayName(): string

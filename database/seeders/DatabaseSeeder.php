@@ -4,19 +4,25 @@ namespace Database\Seeders;
 
 use App\Enums\ChannelType;
 use App\Enums\WorkspaceRole;
+use App\Models\Activity;
 use App\Models\AdAccount;
 use App\Models\AdCampaign;
 use App\Models\AdLead;
 use App\Models\Company;
 use App\Models\Contact;
+use App\Models\CustomAttributeDefinition;
+use App\Models\CustomAttributeValue;
 use App\Models\Deal;
 use App\Models\Enrollment;
 use App\Models\Lead;
 use App\Models\Mailbox;
 use App\Models\Message;
+use App\Models\Quote;
+use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\Thread;
 use App\Models\User;
+use App\Services\Crm\QuoteTotals;
 use App\Services\Identity\WorkspaceProvisioner;
 use Illuminate\Database\Seeder;
 
@@ -27,12 +33,21 @@ class DatabaseSeeder extends Seeder
         $provisioner = app(WorkspaceProvisioner::class);
         $workspace = $provisioner->provision('Evotechly');
 
-        User::query()->create([
+        $owner = User::query()->create([
             'workspace_id' => $workspace->id,
             'name' => 'Evotechly Owner',
             'email' => 'owner@evosales.local',
             'password' => 'password',
             'role' => WorkspaceRole::Owner,
+            'email_verified_at' => now(),
+        ]);
+
+        $rep = User::query()->create([
+            'workspace_id' => $workspace->id,
+            'name' => 'Sara Khelifi',
+            'email' => 'sara@evosales.local',
+            'password' => 'password',
+            'role' => WorkspaceRole::Member,
             'email_verified_at' => now(),
         ]);
 
@@ -47,9 +62,11 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Port Béjaïa Logistics', 'domain' => 'bejaia-log.dz', 'city' => 'Béjaïa', 'phone' => '+213 34 20 30 40'],
             ['name' => 'Batna Textile', 'domain' => 'batna-textile.dz', 'city' => 'Batna', 'phone' => '+213 33 55 66 77'],
             ['name' => 'Tizi Ouzou Retail', 'domain' => 'tizi-retail.dz', 'city' => 'Tizi Ouzou', 'phone' => '+213 26 11 22 33'],
-        ])->map(fn (array $row) => Company::query()->create([
+        ])->map(fn (array $row, int $index) => Company::query()->create([
             ...$row,
             'workspace_id' => $workspace->id,
+            'wilaya' => $row['city'],
+            'owner_id' => $index % 3 === 0 ? $owner->id : ($index % 3 === 1 ? $rep->id : null),
             'country' => 'DZ',
         ]));
 
@@ -78,17 +95,22 @@ class DatabaseSeeder extends Seeder
             ['Dounia', 'Ferhat', 'labo-oran.dz', 1],
         ];
 
-        $contacts = collect($people)->values()->map(function (array $person, int $index) use ($workspace, $companies) {
+        $contacts = collect($people)->values()->map(function (array $person, int $index) use ($workspace, $companies, $owner, $rep) {
             [$first, $last, $domain, $companyIndex] = $person;
             $n = str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT);
 
+            $company = $companies[$companyIndex];
+
             return Contact::query()->create([
                 'workspace_id' => $workspace->id,
-                'company_id' => $companies[$companyIndex]->id,
+                'company_id' => $company->id,
+                'owner_id' => $index % 5 === 0 ? null : ($index % 2 === 0 ? $owner->id : $rep->id),
                 'first_name' => $first,
                 'last_name' => $last,
                 'email' => strtolower($first).'.'.$last.'@'.$domain,
                 'phone' => '0550100'.$n,
+                'city' => $company->city,
+                'wilaya' => $company->wilaya,
                 'source' => $index % 3 === 0 ? 'whatsapp_cloud' : 'seed',
             ]);
         });
@@ -140,11 +162,17 @@ class DatabaseSeeder extends Seeder
                 'lead_id' => $lead->id,
                 'pipeline_id' => $pipeline->id,
                 'stage_id' => $stages[$stageSlug]->id,
+                'owner_id' => $contact->owner_id,
                 'title' => $title,
                 'amount_cents' => $amount,
                 'currency' => 'DZD',
+                'source' => $contact->source,
+                'lost_reason' => $stageSlug === 'lost' ? 'Budget / timing' : null,
+                'close_date' => $next?->toDateString(),
+                'next_step' => $stageSlug === 'won' || $stageSlug === 'lost' ? null : 'Relancer le décideur',
                 'closed_at' => in_array($stageSlug, ['won', 'lost'], true) ? now()->subDay() : null,
                 'next_activity_at' => $next,
+                'last_activity_at' => now()->subHours($contactIndex + 1),
             ]);
         }
 
@@ -198,6 +226,11 @@ class DatabaseSeeder extends Seeder
                     'created_at' => now()->subHours($contactIndex + 1),
                 ]);
             }
+
+            $contact->forceFill([
+                'unanswered' => $unread > 0,
+                'last_activity_at' => now()->subHours($contactIndex + 1),
+            ])->save();
         }
 
         $nurture = Sequence::query()->create([
@@ -316,5 +349,144 @@ class DatabaseSeeder extends Seeder
         ]);
 
         unset($ctwa);
+
+        $sector = CustomAttributeDefinition::query()->create([
+            'workspace_id' => $workspace->id,
+            'entity' => 'company',
+            'key' => 'sector',
+            'label' => 'Sector',
+            'type' => 'list',
+            'options' => ['santé', 'éducation', 'logistique', 'retail', 'agri'],
+        ]);
+        $beds = CustomAttributeDefinition::query()->create([
+            'workspace_id' => $workspace->id,
+            'entity' => 'contact',
+            'key' => 'beds',
+            'label' => 'Beds / size',
+            'type' => 'number',
+        ]);
+        $competitor = CustomAttributeDefinition::query()->create([
+            'workspace_id' => $workspace->id,
+            'entity' => 'deal',
+            'key' => 'competitor',
+            'label' => 'Competitor',
+            'type' => 'text',
+        ]);
+
+        CustomAttributeValue::query()->create([
+            'workspace_id' => $workspace->id,
+            'definition_id' => $sector->id,
+            'entity_type' => 'company',
+            'entity_id' => $companies[0]->id,
+            'value' => 'santé',
+        ]);
+        CustomAttributeValue::query()->create([
+            'workspace_id' => $workspace->id,
+            'definition_id' => $beds->id,
+            'entity_type' => 'contact',
+            'entity_id' => $contacts[0]->id,
+            'value' => '80',
+        ]);
+        $firstDeal = Deal::query()->where('workspace_id', $workspace->id)->first();
+        if ($firstDeal) {
+            CustomAttributeValue::query()->create([
+                'workspace_id' => $workspace->id,
+                'definition_id' => $competitor->id,
+                'entity_type' => 'deal',
+                'entity_id' => $firstDeal->id,
+                'value' => 'Kommo',
+            ]);
+
+            $quote = Quote::query()->create([
+                'workspace_id' => $workspace->id,
+                'deal_id' => $firstDeal->id,
+                'status' => 'sent',
+                'currency' => 'DZD',
+                'notes' => 'Clinic workspace + desk handoff',
+            ]);
+            app(QuoteTotals::class)->sync($quote, [
+                ['name' => 'EvoSales workspace', 'quantity' => 1, 'unit_dzd' => 180000],
+                ['name' => 'Onboarding', 'quantity' => 1, 'unit_dzd' => 40000],
+            ]);
+        }
+
+        $clinicDeal = Deal::query()->where('title', 'Clinic website intake')->first();
+        Activity::query()->create([
+            'workspace_id' => $workspace->id,
+            'type' => 'note',
+            'subject' => 'Décideur = directeur médical',
+            'body' => 'Amine veut un devis avant fin du mois.',
+            'actor_id' => $owner->id,
+            'owner_id' => $owner->id,
+            'contact_id' => $contacts[0]->id,
+            'deal_id' => $clinicDeal?->id,
+            'company_id' => $companies[0]->id,
+        ]);
+        Activity::query()->create([
+            'workspace_id' => $workspace->id,
+            'type' => 'task',
+            'subject' => 'Relancer Amine pour démo',
+            'body' => 'Appeler avant 17h Africa/Algiers.',
+            'due_at' => now()->addHours(6),
+            'done' => false,
+            'actor_id' => $owner->id,
+            'owner_id' => $rep->id,
+            'contact_id' => $contacts[0]->id,
+            'deal_id' => $clinicDeal?->id,
+            'company_id' => $companies[0]->id,
+        ]);
+        Activity::query()->create([
+            'workspace_id' => $workspace->id,
+            'type' => 'call',
+            'subject' => 'Call Oran lab',
+            'body' => '15 min — intéressés par le desk EvoDesk.',
+            'done' => true,
+            'completed_at' => now()->subDay(),
+            'actor_id' => $rep->id,
+            'owner_id' => $rep->id,
+            'contact_id' => $contacts[2]->id,
+            'company_id' => $companies[1]->id,
+        ]);
+        Activity::query()->create([
+            'workspace_id' => $workspace->id,
+            'type' => 'meeting',
+            'subject' => 'Démo Constantine',
+            'body' => 'Présenter CRM Sales Hub + Open in Desk.',
+            'due_at' => now()->addDays(2),
+            'done' => false,
+            'actor_id' => $owner->id,
+            'owner_id' => $owner->id,
+            'contact_id' => $contacts[4]->id,
+        ]);
+        Activity::query()->create([
+            'workspace_id' => $workspace->id,
+            'type' => 'sequence',
+            'subject' => 'Enrolled in Clinic email nurture',
+            'body' => 'Sequence clinic nurture (email).',
+            'contact_id' => $contacts[1]->id,
+            'company_id' => $contacts[1]->company_id,
+        ]);
+
+        SavedFilter::query()->create([
+            'workspace_id' => $workspace->id,
+            'user_id' => $owner->id,
+            'name' => 'Unassigned Alger',
+            'entity' => 'contact',
+            'filters' => ['city' => 'Alger', 'unassigned' => true],
+        ]);
+        SavedFilter::query()->create([
+            'workspace_id' => $workspace->id,
+            'user_id' => $owner->id,
+            'name' => 'Open pipeline',
+            'entity' => 'deal',
+            'filters' => ['stage' => 'proposal'],
+        ]);
+        SavedFilter::query()->create([
+            'workspace_id' => $workspace->id,
+            'user_id' => $rep->id,
+            'name' => 'Unanswered desk',
+            'entity' => 'contact',
+            'filters' => ['unanswered' => true],
+        ]);
     }
 }
