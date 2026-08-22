@@ -65,7 +65,9 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: any[] }) {
                     {mailboxes.length === 0 ? <p className="text-muted-foreground">No mailbox — SMTP is disabled.</p> : null}
                     {mailboxes.map((box) => (
                         <p key={box.id}>
-                            {box.name} · {box.from_address} · {box.host}:{box.port} · password {box.password_set ? 'encrypted' : 'missing'}
+                            {box.name} · {box.from_address} · {box.host}:{box.port} ·{' '}
+                            {box.enabled ? 'connected' : 'disconnected (demo)'} · password{' '}
+                            {box.password_set ? 'encrypted' : 'missing'}
                         </p>
                     ))}
                 </Card>

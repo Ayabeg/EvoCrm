@@ -4,6 +4,12 @@ return [
 
     'company' => env('EVOSALES_COMPANY', 'Evotechly'),
 
+    /*
+    | Sold Desk is EvoDesk (Chatwoot Community MIT), not a Laravel inbox clone.
+    | Default: https://desk.evotechly.com
+    */
+    'inbox_url' => env('EVOSALES_INBOX_URL', env('EVODESK_URL', 'https://desk.evotechly.com')),
+
     'timezone' => env('APP_TIMEZONE', 'Africa/Algiers'),
 
     'default_country_code' => '213',

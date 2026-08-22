@@ -65,6 +65,21 @@ class DealController extends Controller
         ]);
     }
 
+    public function update(Request $request, Deal $deal): RedirectResponse
+    {
+        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:180'],
+            'amount_cents' => ['nullable', 'integer', 'min:0'],
+            'next_activity_at' => ['nullable', 'date'],
+        ]);
+
+        $deal->update($data);
+
+        return back();
+    }
+
     public function move(Request $request, Deal $deal): RedirectResponse
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);

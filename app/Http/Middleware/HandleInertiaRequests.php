@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'workspace' => $request->user()?->workspace,
+            'deskUrl' => $request->user()?->workspace?->inboxUrl() ?? config('evosales.inbox_url'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

@@ -50,7 +50,26 @@ class LeadController extends Controller
 
         return Inertia::render('crm/leads/show', [
             'lead' => $lead->load(['contact', 'company', 'deal.stage']),
+            'contacts' => Contact::query()
+                ->forWorkspace($request->user()->workspace)
+                ->orderBy('first_name')
+                ->get(['id', 'first_name', 'last_name']),
         ]);
+    }
+
+    public function update(Request $request, Lead $lead): RedirectResponse
+    {
+        abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:180'],
+            'source' => ['nullable', 'string', 'max:80'],
+            'status' => ['nullable', 'in:new,working,qualified,disqualified'],
+        ]);
+
+        $lead->update($data);
+
+        return back();
     }
 
     public function qualify(Request $request, Lead $lead): RedirectResponse

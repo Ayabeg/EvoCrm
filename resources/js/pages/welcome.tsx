@@ -33,12 +33,12 @@ export default function Welcome() {
                     </h1>
                     <p className="mt-4 max-w-2xl text-slate-300">
                         Official WhatsApp Cloud API only, through Evolution API in Business API mode.
-                        Not Baileys. Not a Kommo clone. Not an Instantly clone. Not Chatwoot Enterprise.
+                        Desk is EvoDesk (Chatwoot Community). Not Baileys. Not a Kommo clone. Not an Instantly clone.
                     </p>
                     <div className="mt-10 grid gap-4 md:grid-cols-4">
                         {[
-                            ['Desk', 'Three-pane inbox. Click-to-WA lands as a thread on a Contact.'],
-                            ['CRM', 'Companies, contacts, leads, deals. New → Won/Lost.'],
+                            ['Desk', 'EvoDesk / Chatwoot Community at desk.evotechly.com. Open from the nav — not a Laravel clone.'],
+                            ['CRM', 'Companies, contacts, leads, deals. Conversation history synced from the desk.'],
                             ['Ads', 'Meta accounts, campaigns, lead forms. Env-driven credentials.'],
                             ['Outbound', 'SMTP, sequences, Cloud templates, quiet hours, suppression.'],
                         ].map(([title, copy]) => (

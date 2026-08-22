@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'subject',
     'status',
     'last_message_at',
+    'unread_count',
 ])]
 class Thread extends Model
 {
@@ -28,6 +29,7 @@ class Thread extends Model
     {
         return [
             'last_message_at' => 'datetime',
+            'unread_count' => 'integer',
         ];
     }
 

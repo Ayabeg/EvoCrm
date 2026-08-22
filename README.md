@@ -2,10 +2,12 @@
 
 Evotechly’s **all-in-one sales OS**: one workspace, one login, four rooms.
 
-1. **Desk** — conversation inbox (Chatwoot Community–inspired three-pane). We do not sell the name Chatwoot. No Chatwoot CSS/assets. No vendored Chatwoot tree.
-2. **CRM** — companies, contacts, leads, deals + stages, qualify.
+1. **Desk** — **[EvoDesk](https://github.com/Mohamedbeghanem/evodesk)** (Chatwoot Community, MIT) at `EVOSALES_INBOX_URL` (default `https://desk.evotechly.com`). The Desk nav item opens that URL in the same window. EvoSales does **not** vendor Chatwoot, does **not** copy Chatwoot CSS/assets, and the Laravel page is **not** a Chatwoot clone. A lightweight **conversation history** list stays in CRM as contact ↔ deal context synced from the desk.
+2. **CRM** — companies, contacts, leads, deals + stages, qualify, kanban.
 3. **Ads Center** — Meta ad accounts, campaigns, click-to-WhatsApp, lead forms.
 4. **Outbound Center** — SMTP mailboxes, sequences, official WhatsApp Cloud templates, quiet hours, unsubscribe, suppression.
+
+This is **slice 2**: a sales rep can run a week in the seeded workspace (Home KPIs, CRM CRUD/kanban, outbound enroll, Ads empty-state when Meta env is empty).
 
 Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotechly**.
 
@@ -14,7 +16,7 @@ Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotech
 - **Not Baileys.** Official WhatsApp Cloud API only, via Evolution API in Cloud / Business API mode (`WHATSAPP-BUSINESS`). No QR login, Linked-devices, OpenWA, or consumer-WhatsApp takeover.
 - **Not a Kommo / amoCRM clone.**
 - **Not an Instantly clone.**
-- **Not Chatwoot Enterprise.** EvoDesk (sibling Chatwoot Community MIT repo) is an optional integration target.
+- **Not a Laravel Chatwoot clone.** The sold desk is EvoDesk / Chatwoot Community MIT. The in-app thread list is CRM history only.
 
 ## Stack
 
@@ -34,7 +36,7 @@ Local seed login (local only):
 - Email: `owner@evosales.local`
 - Password: `password`
 
-Then open `/dashboard`. Empty Evolution / Meta env vars show a clear **not connected** state.
+Then open `/dashboard`. Empty Evolution / Meta env vars show a clear **not connected** state. Desk opens `https://desk.evotechly.com` unless you change **Settings → Channels**.
 
 ```bash
 composer test
@@ -66,4 +68,4 @@ No secrets in git. Configure `.env` from `.env.example` only.
 
 ## Later work
 
-Meta Tech Provider / Embedded Signup, IMAP reply poller (stub only today), EvoOutreach mail server, Evoleads scraper, live Meta OAuth.
+Meta Tech Provider / Embedded Signup, IMAP reply poller (stub only today), EvoOutreach mail server, Evoleads scraper, live Meta OAuth, Chatwoot/EvoDesk webhook sync beyond the local history list.

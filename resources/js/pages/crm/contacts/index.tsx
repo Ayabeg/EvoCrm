@@ -27,7 +27,7 @@ export default function ContactsIndex({
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Contacts"
-                    description="One person, one Contact. Desk threads and Deals both point here."
+                    description="One person, one Contact. Conversation history and Deals both point here."
                 />
                 <Card className="p-4">
                     <Form
@@ -54,16 +54,20 @@ export default function ContactsIndex({
                                     <Label>Email</Label>
                                     <Input name="email" type="email" />
                                 </div>
+                                <div>
+                                    <Label>Company</Label>
+                                    <select name="company_id" className="h-9 w-full rounded-md border bg-background px-2 text-sm">
+                                        <option value="">None</option>
+                                        {companies.map((company) => (
+                                            <option key={company.id} value={company.id}>
+                                                {company.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <div className="flex items-end">
                                     <Button disabled={processing}>Add</Button>
                                 </div>
-                                <input type="hidden" name="company_id" />
-                                {companies.length > 0 ? (
-                                    <p className="text-xs text-muted-foreground md:col-span-5">
-                                        Optional company attach happens on the
-                                        record after create.
-                                    </p>
-                                ) : null}
                             </>
                         )}
                     </Form>

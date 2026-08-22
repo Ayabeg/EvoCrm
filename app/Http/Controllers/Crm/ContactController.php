@@ -46,6 +46,35 @@ class ContactController extends Controller
 
         return Inertia::render('crm/contacts/show', [
             'contact' => $contact,
+            'companies' => Company::query()->forWorkspace($request->user()->workspace)->orderBy('name')->get(['id', 'name']),
+            'deskUrl' => $request->user()->workspace->inboxUrl(),
         ]);
+    }
+
+    public function update(Request $request, Contact $contact): RedirectResponse
+    {
+        abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'first_name' => ['required', 'string', 'max:120'],
+            'last_name' => ['nullable', 'string', 'max:120'],
+            'email' => ['nullable', 'email'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'company_id' => ['nullable', 'integer'],
+        ]);
+
+        if (! empty($data['company_id'])) {
+            Company::query()->forWorkspace($request->user()->workspace)->findOrFail($data['company_id']);
+        }
+
+        $contact->fill([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'] ?? null,
+            'email' => $data['email'] ?? null,
+            'phone' => $data['phone'] ?? $contact->phone,
+            'company_id' => $data['company_id'] ?? null,
+        ])->save();
+
+        return back();
     }
 }

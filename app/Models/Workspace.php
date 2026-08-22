@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
     'timezone',
     'country_code',
     'default_dial_code',
+    'inbox_url',
     'evolution_last_webhook_at',
     'evolution_last_event',
 ])]
@@ -76,5 +77,12 @@ class Workspace extends Model
     public function activeQuietHours(): ?QuietHours
     {
         return $this->quietHours()->where('enabled', true)->first();
+    }
+
+    public function inboxUrl(): string
+    {
+        return filled($this->inbox_url)
+            ? (string) $this->inbox_url
+            : (string) config('evosales.inbox_url');
     }
 }

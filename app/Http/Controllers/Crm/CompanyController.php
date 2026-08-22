@@ -49,4 +49,21 @@ class CompanyController extends Controller
             'company' => $company->load(['contacts', 'deals.stage']),
         ]);
     }
+
+    public function update(Request $request, Company $company): RedirectResponse
+    {
+        abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:180'],
+            'domain' => ['nullable', 'string', 'max:180'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'city' => ['nullable', 'string', 'max:120'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        $company->update($data);
+
+        return back();
+    }
 }

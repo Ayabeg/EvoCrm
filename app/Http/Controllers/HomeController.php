@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contact;
+use App\Models\AdLead;
 use App\Models\Deal;
-use App\Models\Lead;
+use App\Models\Enrollment;
 use App\Models\Thread;
 use App\Services\Evolution\EvolutionCloudService;
 use Illuminate\Http\Request;
@@ -17,15 +17,31 @@ class HomeController extends Controller
     {
         $workspace = $request->user()->workspace;
 
+        $openDeals = Deal::query()
+            ->forWorkspace($workspace)
+            ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false));
+
         return Inertia::render('home', [
             'stats' => [
-                'contacts' => Contact::query()->forWorkspace($workspace)->count(),
-                'leads' => Lead::query()->forWorkspace($workspace)->count(),
-                'deals' => Deal::query()->forWorkspace($workspace)->count(),
-                'open_threads' => Thread::query()->forWorkspace($workspace)->where('status', 'open')->count(),
+                'open_deals' => (clone $openDeals)->count(),
+                'inbox_unread' => (int) Thread::query()->forWorkspace($workspace)->sum('unread_count'),
+                'sequences_enrolled' => Enrollment::query()->forWorkspace($workspace)->where('status', 'active')->count(),
+                'ads_leads_today' => AdLead::query()
+                    ->forWorkspace($workspace)
+                    ->whereDate('created_at', now('Africa/Algiers')->toDateString())
+                    ->count(),
             ],
+            'nextSteps' => Deal::query()
+                ->forWorkspace($workspace)
+                ->with(['contact', 'company', 'stage'])
+                ->whereNull('next_activity_at')
+                ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false))
+                ->latest()
+                ->limit(12)
+                ->get(),
             'evolution' => $evolution->health($workspace),
             'meta_connected' => filled(config('meta.access_token')) && filled(config('meta.ad_account_id')),
+            'deskUrl' => $workspace->inboxUrl(),
         ]);
     }
 }

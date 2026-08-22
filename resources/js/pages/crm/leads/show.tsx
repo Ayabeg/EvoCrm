@@ -27,6 +27,34 @@ export default function LeadShow({ lead }: { lead: any }) {
                     <p>Source: {lead.source ?? '—'}</p>
                     <p>Qualified at: {lead.qualified_at ?? '—'}</p>
                 </Card>
+                <Card className="p-4">
+                    <Form action={`/crm/leads/${lead.id}`} method="put" className="grid gap-3 md:grid-cols-3">
+                        {({ processing }) => (
+                            <>
+                                <div>
+                                    <label className="text-sm font-medium">Title</label>
+                                    <input
+                                        name="title"
+                                        defaultValue={lead.title}
+                                        required
+                                        className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium">Source</label>
+                                    <input
+                                        name="source"
+                                        defaultValue={lead.source ?? ''}
+                                        className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+                                    />
+                                </div>
+                                <div className="flex items-end">
+                                    <Button disabled={processing}>Save lead</Button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                </Card>
             </div>
         </>
     );

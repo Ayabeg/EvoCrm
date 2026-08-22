@@ -22,6 +22,7 @@ class WorkspaceFactory extends Factory
             'timezone' => 'Africa/Algiers',
             'country_code' => 'DZ',
             'default_dial_code' => '213',
+            'inbox_url' => 'https://desk.evotechly.com',
         ];
     }
 

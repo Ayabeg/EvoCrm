@@ -21,6 +21,7 @@ use InvalidArgumentException;
     'amount_cents',
     'currency',
     'closed_at',
+    'next_activity_at',
 ])]
 class Deal extends Model
 {
@@ -31,6 +32,7 @@ class Deal extends Model
     {
         return [
             'closed_at' => 'datetime',
+            'next_activity_at' => 'datetime',
         ];
     }
 

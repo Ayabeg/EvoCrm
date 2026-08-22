@@ -6,7 +6,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 
 | Object | Notes |
 | --- | --- |
-| **Workspace** | Evotechly tenant. Timezone `Africa/Algiers`, dial code `213`. Stores last Evolution webhook timestamp/event. |
+| **Workspace** | Evotechly tenant. Timezone `Africa/Algiers`, dial code `213`. `inbox_url` is the sold EvoDesk URL (default `https://desk.evotechly.com`). Stores last Evolution webhook timestamp/event. |
 | **User** | Fortify-authenticated. `role`: owner / admin / member. Belongs to one workspace in this slice. |
 
 ## CRM
@@ -18,15 +18,15 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **Lead** | Pre-pipeline interest. `qualify()` sets `qualified_at`. |
 | **Pipeline** | Default “Sales” pipeline per workspace. |
 | **Stage** | New → Qualified → Demo → Proposal → Won / Lost. |
-| **Deal** | Points at Contact (and optional Company + Lead). `moveTo(Stage)` enforces same pipeline. |
+| **Deal** | Points at Contact (and optional Company + Lead). `moveTo(Stage)` enforces same pipeline. `next_activity_at` drives Home next steps. |
 
 ## Desk
 
 | Object | Notes |
 | --- | --- |
 | **Channel** | `whatsapp_cloud` (Evolution), `email`, `telegram` (later stub). |
-| **Thread** | One open conversation per channel + contact. |
-| **Message** | Inbound/outbound. Outbound via Evolution Cloud `sendText` or stored `failed` with a reason. |
+| **Thread** | Conversation history synced from EvoDesk for CRM (contact ↔ deal). Not the Chatwoot UI. `unread_count` feeds Home. |
+| **Message** | Inbound/outbound log. Optional CRM composer uses Evolution Cloud `sendText` or stores `failed` with a reason. |
 
 ## Outbound
 

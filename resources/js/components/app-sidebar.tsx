@@ -1,6 +1,8 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
+    Ban,
     Building2,
+    Clock3,
     Contact,
     Handshake,
     Home,
@@ -8,6 +10,7 @@ import {
     Mail,
     Megaphone,
     MessageCircle,
+    MessagesSquare,
     Settings2,
     Target,
     Workflow,
@@ -26,30 +29,41 @@ import {
 } from '@/components/ui/sidebar';
 import type { NavItem } from '@/types';
 
-const homeItems: NavItem[] = [
-    { title: 'Home', href: '/dashboard', icon: Home },
-    { title: 'Desk', href: '/desk', icon: Inbox },
-];
-
-const crmItems: NavItem[] = [
-    { title: 'Companies', href: '/crm/companies', icon: Building2 },
-    { title: 'Contacts', href: '/crm/contacts', icon: Contact },
-    { title: 'Leads', href: '/crm/leads', icon: Target },
-    { title: 'Deals', href: '/crm/deals', icon: Handshake },
-];
-
-const growthItems: NavItem[] = [
-    { title: 'Ads Center', href: '/ads', icon: Megaphone },
-    { title: 'Mailboxes', href: '/outbound/mailboxes', icon: Mail },
-    { title: 'Sequences', href: '/outbound/sequences', icon: Workflow },
-    { title: 'WA Templates', href: '/outbound/templates', icon: MessageCircle },
-];
-
-const settingsItems: NavItem[] = [
-    { title: 'Evolution / WhatsApp', href: '/settings/evolution', icon: Settings2 },
-];
-
 export function AppSidebar() {
+    const { deskUrl } = usePage<{ deskUrl?: string }>().props;
+    const inbox = deskUrl || 'https://desk.evotechly.com';
+
+    const homeItems: NavItem[] = [
+        { title: 'Home', href: '/dashboard', icon: Home },
+        { title: 'Desk', href: inbox, icon: Inbox, external: true },
+    ];
+
+    const crmItems: NavItem[] = [
+        { title: 'Companies', href: '/crm/companies', icon: Building2 },
+        { title: 'Contacts', href: '/crm/contacts', icon: Contact },
+        { title: 'Leads', href: '/crm/leads', icon: Target },
+        { title: 'Deals', href: '/crm/deals', icon: Handshake },
+        {
+            title: 'Conversations',
+            href: '/conversations',
+            icon: MessagesSquare,
+        },
+    ];
+
+    const growthItems: NavItem[] = [
+        { title: 'Ads Center', href: '/ads', icon: Megaphone },
+        { title: 'Mailboxes', href: '/outbound/mailboxes', icon: Mail },
+        { title: 'Sequences', href: '/outbound/sequences', icon: Workflow },
+        { title: 'WA Templates', href: '/outbound/templates', icon: MessageCircle },
+        { title: 'Suppression', href: '/outbound/suppressions', icon: Ban },
+        { title: 'Quiet hours', href: '/outbound/quiet-hours', icon: Clock3 },
+    ];
+
+    const settingsItems: NavItem[] = [
+        { title: 'Evolution / WhatsApp', href: '/settings/evolution', icon: Settings2 },
+        { title: 'Channels', href: '/settings/channels', icon: Settings2 },
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

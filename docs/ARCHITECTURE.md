@@ -2,7 +2,7 @@
 
 EvoSales is Evotechly’s single sales OS: **one workspace, one login, four rooms**.
 
-It is the product control plane. Evolution API is the native WhatsApp Cloud connector. [EvoDesk](https://github.com/Mohamedbeghanem/evodesk) (Chatwoot Community, MIT) is an optional sibling desk and a documented integration target — this repo does not vendor Chatwoot and does not sell that name.
+It is the product control plane. Evolution API is the native WhatsApp Cloud connector. The **sold Desk** is [EvoDesk](https://github.com/Mohamedbeghanem/evodesk) (Chatwoot Community, MIT) at `EVOSALES_INBOX_URL` / `https://desk.evotechly.com`. This repo does not vendor Chatwoot, does not copy Chatwoot CSS/assets, and does not treat the Laravel inbox as the Chatwoot clone. EvoSales keeps only a lightweight conversation-history list as CRM context (contact ↔ deal).
 
 Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotechly**.
 
@@ -37,7 +37,7 @@ flowchart LR
 | --- | --- |
 | **Identity** | Workspace, User, RBAC (`owner` / `admin` / `member`) |
 | **CRM** | Company, Contact, Lead, Deal, Pipeline / Stage |
-| **Desk** | Channel, Thread, Message — three-pane inbox |
+| **Desk** | Sold product: EvoDesk / Chatwoot Community. In EvoSales: Channel, Thread, Message as conversation history synced for CRM context + optional composer |
 | **Ads** | AdAccount, AdCampaign, AdLead, Meta env settings |
 | **Outbound** | Mailbox, Sequence, SequenceStep, Enrollment, OutboundMessage, Suppression, QuietHours |
 | **Evolution** | Cloud-only instance lifecycle, session text, template send, webhook ingest |
@@ -79,11 +79,11 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 ## Left-nav IA
 
 - Home
-- Desk
-- CRM → Companies / Contacts / Leads / Deals
+- Desk → `EVOSALES_INBOX_URL` (same window; default `https://desk.evotechly.com`)
+- CRM → Companies / Contacts / Leads / Deals / Conversations (history only)
 - Ads
-- Outbound → Mailboxes / Sequences / Templates
-- Settings → Evolution / Meta / Channels (plus profile / security / appearance)
+- Outbound → Mailboxes / Sequences / Templates / Suppression / Quiet hours
+- Settings → Evolution / Meta / Channels (`EVOSALES_INBOX_URL`) (plus profile / security / appearance)
 
 ## Security
 

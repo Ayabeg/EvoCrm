@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Outbound;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contact;
 use App\Models\Sequence;
+use App\Services\Outbound\SequenceEnrollment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -55,6 +57,47 @@ class SequenceController extends Controller
 
         return Inertia::render('outbound/sequences/show', [
             'sequence' => $sequence->load(['steps', 'enrollments.contact']),
+            'contacts' => Contact::query()
+                ->forWorkspace($request->user()->workspace)
+                ->orderBy('first_name')
+                ->get(['id', 'first_name', 'last_name', 'email', 'phone_e164']),
         ]);
+    }
+
+    public function addStep(Request $request, Sequence $sequence): RedirectResponse
+    {
+        abort_unless((int) $sequence->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'delay_hours' => ['required', 'integer', 'min:0'],
+            'channel' => ['required', 'in:email,whatsapp_cloud'],
+            'subject' => ['nullable', 'string', 'max:180'],
+            'body' => ['nullable', 'string'],
+            'wa_template_name' => ['nullable', 'string', 'max:120'],
+            'wa_template_language' => ['nullable', 'string', 'max:12'],
+        ]);
+
+        $sequence->steps()->create([
+            ...$data,
+            'position' => ($sequence->steps()->max('position') ?? 0) + 1,
+        ]);
+
+        return back();
+    }
+
+    public function enroll(Request $request, Sequence $sequence, SequenceEnrollment $enrollment): RedirectResponse
+    {
+        abort_unless((int) $sequence->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'contact_id' => ['required', 'integer'],
+        ]);
+
+        $workspace = $request->user()->workspace;
+        $contact = Contact::query()->forWorkspace($workspace)->findOrFail($data['contact_id']);
+
+        $enrollment->enroll($workspace, $sequence, $contact);
+
+        return back();
     }
 }
