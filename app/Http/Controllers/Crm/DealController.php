@@ -44,7 +44,7 @@ class DealController extends Controller
 
         $workspace = $request->user()->workspace;
         $pipeline = $workspace->defaultPipeline();
-        $stage = $data['stage_id']
+        $stage = filled($data['stage_id'] ?? null)
             ? Stage::query()->where('pipeline_id', $pipeline->id)->findOrFail($data['stage_id'])
             : $pipeline->stageBySlug('new');
 
