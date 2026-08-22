@@ -1,0 +1,51 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      APP_NAME: EvoSales
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:${PORT:-8000}
+      APP_TIMEZONE: Africa/Algiers
+      PORT: 8000
+      DB_CONNECTION: sqlite
+      EVOLUTION_BASE_URL: ${EVOLUTION_BASE_URL:-}
+      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-}
+      EVOLUTION_INSTANCE: ${EVOLUTION_INSTANCE:-evosales}
+      EVOLUTION_WEBHOOK_URL: ${EVOLUTION_WEBHOOK_URL:-}
+      WA_BUSINESS_TOKEN: ${WA_BUSINESS_TOKEN:-}
+      WA_BUSINESS_PHONE_NUMBER_ID: ${WA_BUSINESS_PHONE_NUMBER_ID:-}
+      WA_BUSINESS_WABA_ID: ${WA_BUSINESS_WABA_ID:-}
+      WA_BUSINESS_GRAPH_VERSION: ${WA_BUSINESS_GRAPH_VERSION:-v21.0}
+      WA_BUSINESS_TOKEN_WEBHOOK: ${WA_BUSINESS_TOKEN_WEBHOOK:-}
+      META_APP_ID: ${META_APP_ID:-}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      META_AD_ACCOUNT_ID: ${META_AD_ACCOUNT_ID:-}
+    volumes:
+      - .:/var/www/html
+    command: >
+      sh -c "php artisan serve --host=0.0.0.0 --port=$${PORT:-8000}"
+
+  # Optional. Cloud / Business API credentials only.
+  # Do not create Baileys or QR instances against this service.
+  evolution:
+    image: evoapicloud/evolution-api:v2.2.3
+    profiles: ["evolution"]
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_URL: http://localhost:8080
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-changeme}
+      WA_BUSINESS_TOKEN_WEBHOOK: ${WA_BUSINESS_TOKEN_WEBHOOK:-}
+      WA_BUSINESS_URL: ${WA_BUSINESS_URL:-https://graph.facebook.com}
+      WA_BUSINESS_VERSION: ${WA_BUSINESS_GRAPH_VERSION:-v21.0}
+      WA_BUSINESS_LANGUAGE: ${WA_BUSINESS_LANGUAGE:-fr}
+      # Product constraint: EvoSales will only create WHATSAPP-BUSINESS instances.
+      # Do not set session/QR/Baileys connection defaults here.
+    volumes:
+      - evolution_data:/evolution/instances
+
+volumes:
+  evolution_data:
