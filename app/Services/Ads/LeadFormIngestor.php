@@ -98,7 +98,7 @@ class LeadFormIngestor
             }
 
             if (is_string($key)) {
-                $mapped[$key] = is_scalar($value) ? (string) $value : json_encode($value) ?: '';
+                $mapped[$key] = is_scalar($value) ? (string) $value : (json_encode($value) ?: '');
             }
         }
 
