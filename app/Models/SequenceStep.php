@@ -11,8 +11,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'position',
     'delay_hours',
     'channel',
+    'mailbox_id',
     'subject',
     'body',
+    'template_id',
     'wa_template_name',
     'wa_template_language',
 ])]
@@ -21,5 +23,15 @@ class SequenceStep extends Model
     public function sequence(): BelongsTo
     {
         return $this->belongsTo(Sequence::class);
+    }
+
+    public function mailbox(): BelongsTo
+    {
+        return $this->belongsTo(Mailbox::class);
+    }
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(OutboundTemplate::class);
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['workspace_id', 'name', 'subject', 'body'])]
+#[Fillable(['workspace_id', 'name', 'subject', 'body', 'body_html'])]
 class OutboundTemplate extends Model
 {
     /** @use HasFactory<OutboundTemplateFactory> */

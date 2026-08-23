@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
     'contact_id',
     'mailbox_id',
     'sequence_id',
+    'campaign_id',
     'channel',
     'direction',
     'to_address',
@@ -21,12 +22,17 @@ use Illuminate\Support\Str;
     'in_reply_to',
     'subject',
     'body',
+    'body_html',
     'status',
     'failure_reason',
+    'deferred_until',
+    'defer_reason',
     'sent_at',
     'replied_at',
     'opened_at',
     'open_count',
+    'clicked_at',
+    'click_count',
     'track_token',
 ])]
 class OutboundMessage extends Model
@@ -40,6 +46,9 @@ class OutboundMessage extends Model
             'replied_at' => 'datetime',
             'opened_at' => 'datetime',
             'open_count' => 'integer',
+            'clicked_at' => 'datetime',
+            'click_count' => 'integer',
+            'deferred_until' => 'datetime',
         ];
     }
 
@@ -65,6 +74,22 @@ class OutboundMessage extends Model
     public function sequence(): BelongsTo
     {
         return $this->belongsTo(Sequence::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(OutboundCampaign::class, 'campaign_id');
+    }
+
+    /**
+     * Queued but held back by quiet hours or the mailbox daily cap — the
+     * runner retries once deferred_until passes.
+     */
+    public function deferred(): bool
+    {
+        return $this->status === 'queued'
+            && $this->deferred_until !== null
+            && $this->deferred_until->isFuture();
     }
 
     public function parent(): BelongsTo
