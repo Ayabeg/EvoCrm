@@ -27,7 +27,7 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Apps',
+        title: 'Integrations',
         href: '/settings/apps',
         icon: null,
     },
