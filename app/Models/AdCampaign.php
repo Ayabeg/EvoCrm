@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'name',
     'objective',
     'status',
+    'daily_budget_cents',
     'click_to_whatsapp',
     'lead_form',
 ])]
@@ -27,6 +28,7 @@ class AdCampaign extends Model
         return [
             'click_to_whatsapp' => 'boolean',
             'lead_form' => 'boolean',
+            'daily_budget_cents' => 'integer',
         ];
     }
 
@@ -35,8 +37,45 @@ class AdCampaign extends Model
         return $this->belongsTo(AdAccount::class, 'ad_account_id');
     }
 
+    public function adSets(): HasMany
+    {
+        return $this->hasMany(AdSet::class);
+    }
+
+    public function stats(): HasMany
+    {
+        return $this->hasMany(AdCampaignStat::class);
+    }
+
     public function adLeads(): HasMany
     {
         return $this->hasMany(AdLead::class);
+    }
+
+    public function threads(): HasMany
+    {
+        return $this->hasMany(Thread::class);
+    }
+
+    public function leads(): HasMany
+    {
+        return $this->hasMany(Lead::class);
+    }
+
+    public function kind(): string
+    {
+        if ($this->click_to_whatsapp && $this->lead_form) {
+            return 'CTWA + Lead form';
+        }
+
+        if ($this->click_to_whatsapp) {
+            return 'Click-to-WhatsApp';
+        }
+
+        if ($this->lead_form) {
+            return 'Lead form';
+        }
+
+        return 'Traffic';
     }
 }

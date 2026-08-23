@@ -29,16 +29,6 @@ class LeadFormIngestor
             'source' => 'meta_lead_form',
         ]);
 
-        $lead = Lead::query()->create([
-            'workspace_id' => $workspace->id,
-            'contact_id' => $contact->id,
-            'company_id' => $contact->company_id,
-            'title' => $payload['title'] ?? ('Meta lead — '.$contact->displayName()),
-            'status' => 'new',
-            'source' => 'meta_lead_form',
-            'payload' => $payload,
-        ]);
-
         $account = null;
         if (! empty($payload['ad_account_id']) || ! empty($payload['account_id'])) {
             $external = (string) ($payload['ad_account_id'] ?? $payload['account_id']);
@@ -55,20 +45,31 @@ class LeadFormIngestor
         }
 
         $campaign = null;
-        if ($account && ! empty($payload['campaign_id'])) {
+        if (! empty($payload['campaign_id'])) {
             $campaign = AdCampaign::query()->firstOrCreate(
                 [
                     'workspace_id' => $workspace->id,
                     'external_id' => (string) $payload['campaign_id'],
                 ],
                 [
-                    'ad_account_id' => $account->id,
+                    'ad_account_id' => $account?->id ?? $this->fallbackAccount($workspace)->id,
                     'name' => $payload['campaign_name'] ?? 'Lead form campaign',
                     'lead_form' => true,
                     'status' => 'active',
                 ]
             );
         }
+
+        $lead = Lead::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contact->id,
+            'company_id' => $contact->company_id,
+            'ad_campaign_id' => $campaign?->id,
+            'title' => $payload['title'] ?? ('Meta lead — '.$contact->displayName()),
+            'status' => 'new',
+            'source' => 'meta_lead_form',
+            'payload' => $payload,
+        ]);
 
         return AdLead::query()->create([
             'workspace_id' => $workspace->id,
@@ -80,6 +81,18 @@ class LeadFormIngestor
             'form_id' => $payload['form_id'] ?? null,
             'fields' => $mapped,
         ]);
+    }
+
+    /**
+     * Leadgen webhooks that carry a campaign but no ad account still need an
+     * account row for the campaign FK.
+     */
+    protected function fallbackAccount(Workspace $workspace): AdAccount
+    {
+        return AdAccount::query()->firstOrCreate(
+            ['workspace_id' => $workspace->id, 'external_id' => null],
+            ['name' => 'Meta ad account', 'status' => 'connected'],
+        );
     }
 
     /**

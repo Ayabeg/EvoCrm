@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'workspace_id',
     'contact_id',
     'channel_id',
+    'ad_campaign_id',
     'external_id',
     'subject',
     'status',
@@ -41,6 +42,11 @@ class Thread extends Model
     public function channel(): BelongsTo
     {
         return $this->belongsTo(Channel::class);
+    }
+
+    public function adCampaign(): BelongsTo
+    {
+        return $this->belongsTo(AdCampaign::class);
     }
 
     public function messages(): HasMany

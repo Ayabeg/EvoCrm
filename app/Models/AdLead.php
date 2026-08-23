@@ -28,6 +28,11 @@ class AdLead extends Model
         ];
     }
 
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(AdCampaign::class, 'ad_campaign_id');
+    }
+
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
