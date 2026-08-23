@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
+import type { Auth } from '@/types/auth';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -55,6 +56,24 @@ const sidebarNavItems: NavItem[] = [
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
+    const { auth, component } = usePage<{
+        auth: Auth;
+        component: string;
+    }>().props;
+
+    // People manages workspace members — owner/admin only. The routes 403
+    // for members; the nav item simply stays hidden for them.
+    const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
+    const items = canManageSettings
+        ? [
+              ...sidebarNavItems.slice(0, 3),
+              { title: 'People', href: '/settings/people', icon: null },
+              ...sidebarNavItems.slice(3),
+          ]
+        : sidebarNavItems;
+
+    // The People table needs more room than the settings forms.
+    const wide = component === 'settings/people';
 
     return (
         <div className="px-4 py-6">
@@ -69,7 +88,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         className="flex flex-col space-y-1 space-x-0"
                         aria-label="Settings"
                     >
-                        {sidebarNavItems.map((item, index) => (
+                        {items.map((item, index) => (
                             <Button
                                 key={`${toUrl(item.href)}-${index}`}
                                 size="sm"
@@ -92,8 +111,13 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                 <Separator className="my-6 lg:hidden" />
 
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
+                <div className={cn('flex-1', wide ? '' : 'md:max-w-2xl')}>
+                    <section
+                        className={cn(
+                            'space-y-12',
+                            wide ? 'max-w-4xl' : 'max-w-xl',
+                        )}
+                    >
                         {children}
                     </section>
                 </div>

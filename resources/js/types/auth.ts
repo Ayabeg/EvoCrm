@@ -1,7 +1,10 @@
+export type WorkspaceRole = 'owner' | 'admin' | 'member';
+
 export type User = {
     id: number;
     name: string;
     email: string;
+    role: WorkspaceRole;
     avatar?: string;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
