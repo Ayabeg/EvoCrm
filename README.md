@@ -2,10 +2,10 @@
 
 Evotechly’s **all-in-one sales OS**: one workspace, one login, four rooms.
 
-1. **Desk** — **[EvoDesk](https://github.com/Mohamedbeghanem/evodesk)** (Chatwoot Community, MIT) at `EVOSALES_INBOX_URL` (default `https://desk.evotechly.com`). The Desk nav item opens that URL in the same window. EvoSales does **not** vendor Chatwoot, does **not** copy Chatwoot CSS/assets, and the Laravel page is **not** a Chatwoot clone. A lightweight **conversation history** list stays in CRM as contact ↔ deal context synced from the desk.
+1. **Desk** — **[EvoDesk](https://github.com/Mohamedbeghanem/evodesk)** (Chatwoot Community, MIT) **embedded at `/inbox`**. The iframe source is `EVOSALES_INBOX_URL` (default `https://desk.evotechly.com`) plus optional `EVOSALES_INBOX_EMBED_PATH` (default `/`; Chatwoot serves the agent app at `/app`). Operators never leave the CRM hostname — there is no "Open Desk" eject. If EvoDesk sends `X-Frame-Options`, allow-frame the CRM origin on the desk; clearing the workspace inbox URL makes `/inbox` serve the native CRM conversation desk instead. EvoSales does **not** vendor Chatwoot, does **not** copy Chatwoot CSS/assets, and the Laravel page is **not** a Chatwoot clone. A lightweight **conversation history** list stays in CRM as contact ↔ deal context synced from the desk.
 2. **CRM (Sales Hub)** — list + detail + associations sidebar. Activity timeline (notes/tasks/calls/meetings), owners, Algeria city/wilaya lists, custom attributes, light quotes, light reports. Not a contact list.
-3. **Ads Center** — Meta ad accounts, campaigns, click-to-WhatsApp, lead forms.
-4. **Outbound Center** — SMTP mailboxes, sequences, official WhatsApp Cloud templates, quiet hours, unsubscribe, suppression.
+3. **Ads Hub** — Meta ad accounts, campaigns, ad sets, ads, and a per-campaign funnel board: Impressions → Clicks → Conversations/Leads → Qualified → Deals → Won. Official Marketing API sync when `META_*` env is set (`POST /ads/sync`); demo seed data otherwise. Click-to-WhatsApp and lead-form campaigns only — lead forms ingest via `/webhooks/meta/leads` into CRM contacts/leads/deals.
+4. **Outbound Center** — SMTP + IMAP mailboxes (warmup status, daily limit, test send), email sequences with `{{variables}}` templates, enrollment pause/resume, outbox, IMAP replies, honest reports (sent / pixel opens / IMAP replies; bounces need ESP webhooks), quiet hours, unsubscribe, suppression. `outbound:run` dispatches due steps every minute; `outbound:poll-replies` reads IMAP.
 
 This is **slice 2 + Sales Hub**: a sales rep lives in CRM the way they live in Chatwoot inbox — without cloning Chatwoot. Desk remains EvoDesk.
 
@@ -47,7 +47,7 @@ Local seed login (local only):
 - Email: `owner@evosales.local`
 - Password: `password`
 
-Then open `/dashboard`. Empty Evolution / Meta env vars show a clear **not connected** state. Desk opens `https://desk.evotechly.com` unless you change **Settings → Channels**.
+Then open `/dashboard`. Empty Evolution / Meta env vars show a clear **not connected** state. My Inbox (`/inbox`) embeds `https://desk.evotechly.com` unless you change **Settings → Channels**; clear that URL to use the native CRM desk instead.
 
 ```bash
 composer test
@@ -79,4 +79,4 @@ No secrets in git. Configure `.env` from `.env.example` only.
 
 ## Later work
 
-Meta Tech Provider / Embedded Signup, IMAP reply poller (stub only today), EvoOutreach mail server, Evoleads scraper, live Meta OAuth, Chatwoot/EvoDesk webhook sync beyond the local history list.
+Meta Tech Provider / Embedded Signup, EvoOutreach mail server, Evoleads scraper, live Meta OAuth, ESP bounce webhooks, Chatwoot/EvoDesk webhook sync beyond the local history list.

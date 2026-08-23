@@ -5,9 +5,12 @@ namespace Database\Seeders;
 use App\Enums\ChannelType;
 use App\Enums\WorkspaceRole;
 use App\Models\Activity;
+use App\Models\Ad;
 use App\Models\AdAccount;
 use App\Models\AdCampaign;
+use App\Models\AdCampaignStat;
 use App\Models\AdLead;
+use App\Models\AdSet;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\CustomAttributeDefinition;
@@ -17,6 +20,8 @@ use App\Models\Enrollment;
 use App\Models\Lead;
 use App\Models\Mailbox;
 use App\Models\Message;
+use App\Models\OutboundMessage;
+use App\Models\OutboundTemplate;
 use App\Models\Quote;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
@@ -283,7 +288,25 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        Mailbox::query()->create([
+        // Mixed enrollment states so the UI shows the full lifecycle.
+        Enrollment::query()->create([
+            'workspace_id' => $workspace->id,
+            'sequence_id' => $followUp->id,
+            'contact_id' => $contacts[5]->id,
+            'status' => 'paused',
+            'next_step' => 2,
+            'next_run_at' => now()->addDay(),
+        ]);
+        Enrollment::query()->create([
+            'workspace_id' => $workspace->id,
+            'sequence_id' => $followUp->id,
+            'contact_id' => $contacts[9]->id,
+            'status' => 'finished',
+            'next_step' => 3,
+            'next_run_at' => null,
+        ]);
+
+        $demoMailbox = Mailbox::query()->create([
             'workspace_id' => $workspace->id,
             'name' => 'Evotechly SMTP (demo)',
             'from_name' => 'Evotechly',
@@ -293,9 +316,133 @@ class DatabaseSeeder extends Seeder
             'encryption' => 'tls',
             'username' => 'demo',
             'password' => 'not-a-real-password',
+            'imap_host' => 'imap.evotechly.example',
+            'imap_port' => 993,
+            'imap_encryption' => 'ssl',
+            'imap_username' => 'hello@evotechly.com',
+            'imap_password' => 'not-a-real-password',
             'is_default' => true,
             'enabled' => false,
+            'status' => 'disabled',
+            'daily_limit' => 50,
         ]);
+
+        Mailbox::query()->create([
+            'workspace_id' => $workspace->id,
+            'name' => 'Sales — Sara (demo)',
+            'from_name' => 'Sara Khelifi',
+            'from_address' => 'sara@evotechly.com',
+            'host' => 'smtp.evotechly.example',
+            'port' => 465,
+            'encryption' => 'ssl',
+            'username' => 'sara@evotechly.com',
+            'password' => 'not-a-real-password',
+            'is_default' => false,
+            'enabled' => false,
+            'status' => 'disabled',
+            'daily_limit' => 30,
+        ]);
+
+        $templates = collect([
+            [
+                'name' => 'Clinic intro — FR',
+                'subject' => 'EvoSales pour {{company}}',
+                'body' => "Bonjour {{first_name}},\n\nJe suis Amine d'Evotechly. Les cliniques à {{city}} utilisent EvoSales pour répondre sur WhatsApp et suivre leurs devis.\n\n15 minutes cette semaine ?",
+            ],
+            [
+                'name' => 'Demo recap',
+                'subject' => 'Récap démo EvoSales',
+                'body' => "Bonjour {{first_name}},\n\nMerci pour la démo. Récap : desk EvoDesk intégré, CRM, Ads Hub, séquences email.\n\nProchaine étape : devis.",
+            ],
+            [
+                'name' => 'Relance douce',
+                'subject' => 'Toujours d’actualité, {{first_name}} ?',
+                'body' => "Bonjour {{first_name}},\n\nJe me permets de revenir vers vous. EvoSales reste disponible pour {{company}}.\n\nRépondez STOP pour ne plus être contacté.",
+            ],
+        ])->map(fn (array $row) => OutboundTemplate::query()->create([
+            ...$row,
+            'workspace_id' => $workspace->id,
+        ]));
+
+        // Outbox demo rows: sent (one opened, one replied), one failed, one queued.
+        $sentOne = OutboundMessage::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contacts[1]->id,
+            'mailbox_id' => $demoMailbox->id,
+            'sequence_id' => $nurture->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $contacts[1]->email,
+            'subject' => 'Bienvenue Evotechly',
+            'body' => 'Merci pour votre intérêt.',
+            'status' => 'sent',
+            'sent_at' => now()->subDays(2),
+            'opened_at' => now()->subDays(2)->addHours(3),
+            'open_count' => 2,
+        ]);
+
+        $sentTwo = OutboundMessage::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contacts[3]->id,
+            'mailbox_id' => $demoMailbox->id,
+            'sequence_id' => $nurture->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $contacts[3]->email,
+            'subject' => 'Démo desk + CRM',
+            'body' => 'Le desk est EvoDesk. CRM reste ici.',
+            'status' => 'sent',
+            'sent_at' => now()->subDay(),
+            'opened_at' => now()->subDay()->addHours(1),
+            'open_count' => 1,
+            'replied_at' => now()->subDay()->addHours(2),
+        ]);
+
+        OutboundMessage::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contacts[3]->id,
+            'mailbox_id' => $demoMailbox->id,
+            'sequence_id' => $nurture->id,
+            'channel' => 'email',
+            'direction' => 'in',
+            'to_address' => 'hello@evotechly.com',
+            'in_reply_to' => $sentTwo->id,
+            'subject' => 'Re: Démo desk + CRM',
+            'body' => 'Merci — on veut une démo mardi 10h.',
+            'status' => 'received',
+            'created_at' => now()->subDay()->addHours(2),
+        ]);
+
+        OutboundMessage::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contacts[7]->id,
+            'mailbox_id' => $demoMailbox->id,
+            'sequence_id' => $nurture->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $contacts[7]->email,
+            'subject' => 'Bienvenue Evotechly',
+            'body' => 'Merci pour votre intérêt.',
+            'status' => 'failed',
+            'failure_reason' => 'No mailbox configured. SMTP send is disabled until a mailbox is added.',
+            'created_at' => now()->subHours(6),
+        ]);
+
+        OutboundMessage::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contacts[5]->id,
+            'mailbox_id' => $demoMailbox->id,
+            'sequence_id' => $followUp->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $contacts[5]->email,
+            'subject' => 'Recap démo',
+            'body' => 'Voici le recap.',
+            'status' => 'queued',
+            'created_at' => now()->subHour(),
+        ]);
+
+        unset($sentOne);
 
         $account = AdAccount::query()->create([
             'workspace_id' => $workspace->id,
@@ -311,7 +458,8 @@ class DatabaseSeeder extends Seeder
             'external_id' => 'camp_ctwa_demo',
             'name' => 'CTWA clinics Alger',
             'objective' => 'MESSAGES',
-            'status' => 'demo',
+            'status' => 'active',
+            'daily_budget_cents' => 450_000,
             'click_to_whatsapp' => true,
             'lead_form' => false,
         ]);
@@ -322,16 +470,95 @@ class DatabaseSeeder extends Seeder
             'external_id' => 'camp_leadform_demo',
             'name' => 'Lead form Oran labs',
             'objective' => 'LEAD_GENERATION',
-            'status' => 'demo',
+            'status' => 'active',
+            'daily_budget_cents' => 300_000,
             'click_to_whatsapp' => false,
             'lead_form' => true,
         ]);
+
+        $ctwaSouth = AdCampaign::query()->create([
+            'workspace_id' => $workspace->id,
+            'ad_account_id' => $account->id,
+            'external_id' => 'camp_ctwa_constantine_demo',
+            'name' => 'CTWA Constantine digital',
+            'objective' => 'MESSAGES',
+            'status' => 'paused',
+            'daily_budget_cents' => 200_000,
+            'click_to_whatsapp' => true,
+            'lead_form' => false,
+        ]);
+
+        // Ad sets + ads under each campaign.
+        $setPlan = [
+            [$ctwa, [['Alger — santé', 250_000, ['CTWA image — clinique', 'CTWA vidéo — desk']], ['Alger — lookalike', 200_000, ['CTWA carousel — CRM']]]],
+            [$form, [['Oran — laboratoires', 300_000, ['Form — analyse labo', 'Form — devis rapide']]]],
+            [$ctwaSouth, [['Constantine — écoles', 200_000, ['CTWA image — inscription']]]],
+        ];
+
+        foreach ($setPlan as [$campaign, $sets]) {
+            foreach ($sets as [$setName, $budget, $adNames]) {
+                $set = AdSet::query()->create([
+                    'workspace_id' => $workspace->id,
+                    'ad_campaign_id' => $campaign->id,
+                    'name' => $setName,
+                    'status' => $campaign->status === 'active' ? 'active' : 'paused',
+                    'daily_budget_cents' => $budget,
+                ]);
+
+                foreach ($adNames as $adName) {
+                    Ad::query()->create([
+                        'workspace_id' => $workspace->id,
+                        'ad_set_id' => $set->id,
+                        'name' => $adName,
+                        'status' => $set->status,
+                        'kind' => str_contains($adName, 'vidéo') ? 'video' : (str_contains($adName, 'Form') ? 'lead_form' : 'image'),
+                    ]);
+                }
+            }
+        }
+
+        // 21 days of insights per campaign so the funnel board is full.
+        $statsPlan = [
+            [$ctwa, 12_000, 0.041, 34],
+            [$form, 8_500, 0.052, 29],
+            [$ctwaSouth, 5_200, 0.038, 31],
+        ];
+
+        foreach ($statsPlan as [$campaign, $baseImpressions, $ctr, $cpcDzd]) {
+            for ($day = 20; $day >= 0; $day--) {
+                $wave = 1 + (sin($day / 3) * 0.18);
+                $impressions = (int) round($baseImpressions * $wave);
+                $clicks = (int) round($impressions * $ctr);
+
+                AdCampaignStat::query()->create([
+                    'workspace_id' => $workspace->id,
+                    'ad_campaign_id' => $campaign->id,
+                    'date' => now()->subDays($day)->toDateString(),
+                    'impressions' => $impressions,
+                    'clicks' => $clicks,
+                    'spend_cents' => $clicks * $cpcDzd,
+                ]);
+            }
+        }
+
+        // CRM-side attribution: CTWA conversations and form leads → campaigns,
+        // so Impressions → … → Won has real counts on first login.
+        Thread::query()
+            ->where('workspace_id', $workspace->id)
+            ->whereIn('contact_id', [$contacts[0]->id, $contacts[6]->id])
+            ->update(['ad_campaign_id' => $ctwa->id]);
+
+        Thread::query()
+            ->where('workspace_id', $workspace->id)
+            ->where('contact_id', $contacts[4]->id)
+            ->update(['ad_campaign_id' => $ctwaSouth->id]);
 
         $formContact = $contacts[2];
         $formLead = Lead::query()->create([
             'workspace_id' => $workspace->id,
             'contact_id' => $formContact->id,
             'company_id' => $formContact->company_id,
+            'ad_campaign_id' => $form->id,
             'title' => 'Meta lead form — Oran lab',
             'status' => 'new',
             'source' => 'meta_lead_form',
@@ -348,7 +575,53 @@ class DatabaseSeeder extends Seeder
             'fields' => ['city' => 'Oran', 'interest' => 'EvoSales'],
         ]);
 
-        unset($ctwa);
+        // More form leads down-funnel: qualified → deal → won.
+        $formLeadPlan = [
+            [3, $form, 'qualified', now()->subDays(6)],
+            [7, $ctwa, 'qualified', now()->subDays(4)],
+            [18, $ctwa, 'qualified', now()->subDays(9)],
+        ];
+
+        foreach ($formLeadPlan as [$contactIndex, $campaign, $status, $qualifiedAt]) {
+            $contact = $contacts[$contactIndex];
+            $existingDeal = Deal::query()
+                ->where('workspace_id', $workspace->id)
+                ->where('contact_id', $contact->id)
+                ->first();
+
+            $lead = $existingDeal?->lead_id
+                ? Lead::query()->find($existingDeal->lead_id)
+                : null;
+
+            if (! $lead) {
+                $lead = Lead::query()->create([
+                    'workspace_id' => $workspace->id,
+                    'contact_id' => $contact->id,
+                    'company_id' => $contact->company_id,
+                    'title' => 'Meta — '.$contact->displayName(),
+                    'status' => $status,
+                    'source' => $campaign->lead_form ? 'meta_lead_form' : 'ctwa',
+                    'qualified_at' => $qualifiedAt,
+                ]);
+            }
+
+            $lead->forceFill([
+                'ad_campaign_id' => $campaign->id,
+                'status' => $status,
+                'qualified_at' => $qualifiedAt,
+            ])->save();
+
+            AdLead::query()->create([
+                'workspace_id' => $workspace->id,
+                'ad_account_id' => $account->id,
+                'ad_campaign_id' => $campaign->id,
+                'contact_id' => $contact->id,
+                'lead_id' => $lead->id,
+                'external_id' => 'lead_demo_'.$contactIndex,
+                'form_id' => $campaign->lead_form ? 'form_oran_labs' : null,
+                'fields' => ['city' => $contact->city, 'interest' => 'EvoSales'],
+            ]);
+        }
 
         $sector = CustomAttributeDefinition::query()->create([
             'workspace_id' => $workspace->id,

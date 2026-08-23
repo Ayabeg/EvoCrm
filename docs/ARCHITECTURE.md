@@ -2,7 +2,7 @@
 
 EvoSales is Evotechly’s single sales OS: **one workspace, one login, four rooms**.
 
-It is the product control plane. Evolution API is the native WhatsApp Cloud connector. The **sold Desk** is [EvoDesk](https://github.com/Mohamedbeghanem/evodesk) (Chatwoot Community, MIT) at `EVOSALES_INBOX_URL` / `https://desk.evotechly.com`. This repo does not vendor Chatwoot, does not copy Chatwoot CSS/assets, and does not treat the Laravel inbox as the Chatwoot clone. EvoSales keeps only a lightweight conversation-history list as CRM context (contact ↔ deal).
+It is the product control plane. Evolution API is the native WhatsApp Cloud connector. The **sold Desk** is [EvoDesk](https://github.com/Mohamedbeghanem/evodesk) (Chatwoot Community, MIT), **embedded inside the CRM at `/inbox`** — the iframe source is `EVOSALES_INBOX_URL` + optional `EVOSALES_INBOX_EMBED_PATH` (default `https://desk.evotechly.com` + `/`). Operators never leave the CRM hostname. If the desk deployment sends `X-Frame-Options: DENY`, allow-frame the CRM origin on the desk; clearing the workspace inbox URL makes `/inbox` serve the native CRM conversation desk instead (never an "Open Desk" eject to another host). This repo does not vendor Chatwoot, does not copy Chatwoot CSS/assets, and does not treat the Laravel inbox as the Chatwoot clone. EvoSales keeps only a lightweight conversation-history list as CRM context (contact ↔ deal).
 
 Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotechly**.
 
@@ -37,11 +37,11 @@ flowchart LR
 | --- | --- |
 | **Identity** | Workspace, User, RBAC (`owner` / `admin` / `member`) |
 | **CRM** | Sales Hub: Company, Contact, Lead, Deal, Activity timeline, custom attributes, saved lists, quotes, reports. Operational density is the product — not a contact list. |
-| **Desk** | Sold product: EvoDesk / Chatwoot Community. In EvoSales: Channel, Thread, Message as conversation history synced for CRM context + optional composer |
-| **Ads** | AdAccount, AdCampaign, AdLead, Meta env settings |
-| **Outbound** | Mailbox, Sequence, SequenceStep, Enrollment, OutboundMessage, Suppression, QuietHours |
+| **Desk** | Sold product: EvoDesk / Chatwoot Community, embedded at `/inbox`. In EvoSales: Channel, Thread, Message as conversation history synced for CRM context + optional composer |
+| **Ads** | AdAccount, AdCampaign, AdSet, Ad, AdCampaignStat (daily insights), AdLead. Funnel: Impressions → Clicks → Conversations/Leads → Qualified → Deals → Won, attributed via `threads.ad_campaign_id` / `leads.ad_campaign_id`. `MetaAdsService` syncs the official Marketing API when `META_*` is set; demo seed data otherwise |
+| **Outbound** | Mailbox (SMTP + IMAP, warmup status, daily limit), OutboundTemplate (`{{variables}}`), Sequence, SequenceStep, Enrollment (active/paused/finished/cancelled), OutboundMessage (out + in, open pixel, replied_at), Suppression, QuietHours. `outbound:run` sends due steps every minute; `outbound:poll-replies` reads IMAP replies |
 | **Evolution** | Cloud-only instance lifecycle, session text, template send, webhook ingest |
-| **Integrations** | Env-driven Meta + optional EvoDesk URL; later Embedded Signup / IMAP |
+| **Integrations** | Env-driven Meta + embedded EvoDesk URL; later Embedded Signup |
 
 ## Canonical objects
 
@@ -79,10 +79,11 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 ## Left-nav IA
 
 - Home (open pipeline value + open tasks as next steps)
-- Desk → `EVOSALES_INBOX_URL` (same window; default `https://desk.evotechly.com`)
-- CRM → Companies / Contacts / Leads / Deals (list + detail + associations sidebar) / Unassigned / Reports / Conversations (history only)
-- Ads
-- Outbound → Mailboxes / Sequences / Templates / Suppression / Quiet hours
+- My Inbox → `/inbox` (EvoDesk embedded in the CRM chrome; native CRM desk fallback)
+- Conversations → history only (CRM context)
+- CRM → Companies / Contacts / Leads / Deals (list + detail + associations sidebar) / Reports
+- Campaigns → Ads Hub (`/ads` funnel board + campaign detail)
+- Outbound → Sequences / Mailboxes / Templates / Outbox / Suppression / Quiet hours (+ overview `/outbound`, Replies, Reports)
 - Settings → Evolution / Meta / Channels / Custom attributes (plus profile / security / appearance)
 
 ## Security
@@ -98,8 +99,8 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 ## Later work (explicitly not this slice)
 
 - Meta Tech Provider / Embedded Signup
-- IMAP reply poller (class exists as a stub: `ImapReplyPoller`)
 - EvoOutreach mail server
 - Evoleads scraper
 - Live Meta OAuth
+- Bounce tracking via ESP webhooks (reports page is honest about this)
 - Telegram channel (status `later`)
