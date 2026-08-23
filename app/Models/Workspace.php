@@ -104,6 +104,16 @@ class Workspace extends Model
         return rtrim($base, '/').($path === '/' ? '/' : $path);
     }
 
+    public function integrations(): HasMany
+    {
+        return $this->hasMany(Integration::class);
+    }
+
+    public function integration(string $provider): ?Integration
+    {
+        return $this->integrations()->where('provider', $provider)->first();
+    }
+
     public function savedFilters(): HasMany
     {
         return $this->hasMany(SavedFilter::class);

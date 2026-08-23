@@ -3,7 +3,7 @@
 Evotechly’s **all-in-one sales OS**: one workspace, one login, four rooms.
 
 1. **Desk** — **[EvoDesk](https://github.com/Mohamedbeghanem/evodesk)** (Chatwoot Community, MIT) **embedded at `/inbox`**. The iframe source is `EVOSALES_INBOX_URL` (default `https://desk.evotechly.com`) plus optional `EVOSALES_INBOX_EMBED_PATH` (default `/`; Chatwoot serves the agent app at `/app`). Operators never leave the CRM hostname — there is no "Open Desk" eject. If EvoDesk sends `X-Frame-Options`, allow-frame the CRM origin on the desk; clearing the workspace inbox URL makes `/inbox` serve the native CRM conversation desk instead. EvoSales does **not** vendor Chatwoot, does **not** copy Chatwoot CSS/assets, and the Laravel page is **not** a Chatwoot clone. A lightweight **conversation history** list stays in CRM as contact ↔ deal context synced from the desk.
-2. **CRM (Sales Hub)** — list + detail + associations sidebar. Activity timeline (notes/tasks/calls/meetings), owners, Algeria city/wilaya lists, custom attributes, light quotes, light reports. Not a contact list.
+2. **CRM (Sales Hub)** — list + detail + associations sidebar. Activity timeline (notes/tasks/calls/meetings), owners, Algeria city/wilaya lists, custom attributes, light quotes, light reports. Not a contact list. **`/leads` is the Kommo-style pipeline board**: horizontal stages (New → Qualified → Demo → Proposal → Won / Lost) with colored underlines, cards showing contact/company, DZD amount, and next task; quick-add on the first column; a top strip for Active / tasks due today / without tasks / overdue / new today; search. Dragging a card between stages updates the deal (`POST /crm/deals/{deal}/move`). It is the same deal engine as `/crm/deals` — no parallel pipeline.
 3. **Ads Hub** — Meta ad accounts, campaigns, ad sets, ads, and a per-campaign funnel board: Impressions → Clicks → Conversations/Leads → Qualified → Deals → Won. Official Marketing API sync when `META_*` env is set (`POST /ads/sync`); demo seed data otherwise. Click-to-WhatsApp and lead-form campaigns only — lead forms ingest via `/webhooks/meta/leads` into CRM contacts/leads/deals.
 4. **Outbound Center** — the full email department at `/outbound`: SMTP + IMAP mailboxes (warmup status, daily limit, test send, full edit), sending domains with an SPF/DKIM/DMARC checklist (records stored for the operator to publish; manual verified mark — no DNS API), HTML+text templates with `{{variables}}` and a rendered preview, email sequences (per-step delay/mailbox/template, enroll contacts or whole CRM lists, pause/resume), **broadcast campaigns** (one-shot newsletter to all contacts with email or a saved contact list, scheduled or send-now, every recipient logged as an OutboundMessage), outbox with deferred states, IMAP replies, honest reports (sent / pixel opens / link clicks / IMAP replies; bounces need ESP webhooks), quiet hours, unsubscribe, suppression. `outbound:run` dispatches due sequence steps and campaign messages every minute; `outbound:poll-replies` reads IMAP. The unsubscribe link and all tracking URLs stay on the CRM hostname.
 
@@ -44,6 +44,31 @@ php artisan serve --host=0.0.0.0 --port="${PORT:-8000}"
 ```
 
 `composer setup` installs PHP/JS deps, copies `.env.example`, generates `APP_KEY`, migrates SQLite, seeds, and builds Vite assets.
+
+### Apps marketplace (Settings → Apps)
+
+`/settings/apps` is the mini-app marketplace. First wave only, every tile real:
+
+1. **Meta** — one official Facebook Login OAuth (Laravel Socialite) unlocks **Facebook Page, Instagram, WhatsApp Cloud, and Ads**. Tokens are stored on the workspace, **encrypted** (`integrations` table), long-lived via `fb_exchange_token`, and the granted scope list is read back from `/me/permissions` — declined permissions show as not granted. Connected Meta/IG/WA chips appear on the rail footer only while the connection exists.
+2. **Google** — sign-in (below). The card says Connected for sign-in; Calendar sync is later work and is not faked.
+3. **Email / SMTP** — the native outbound mailboxes. The card links to `/outbound/mailboxes` and, when `WEBMAIL_URL` is set, to webmail (e.g. Roundcube). Not OAuth.
+
+#### Meta OAuth setup
+
+1. Meta App Dashboard → your app → **Facebook Login → Settings → Valid OAuth Redirect URIs**: add `https://crm.evotechly.com/auth/meta/callback`.
+2. Set `.env`:
+
+```bash
+META_APP_ID=
+META_APP_SECRET=
+META_REDIRECT_URI=https://crm.evotechly.com/auth/meta/callback
+```
+
+3. Settings → Apps → Meta → **Connect**. Routes: `GET /auth/meta` (redirect) and `GET /auth/meta/callback`. Leave the vars empty and Connect stays disabled with setup copy — the routes 404, never 500.
+
+Requested scopes: `public_profile`, `email`, `pages_show_list`, `pages_manage_metadata`, `instagram_basic`, `instagram_manage_messages`, `whatsapp_business_management`, `whatsapp_business_messaging`, `ads_management`, `business_management`.
+
+**Meta Business Verification (and App Review advanced access on the Ads/WhatsApp scopes) is still required before live Ads spend or WhatsApp Cloud messaging.** Until then the connection works in development mode with app-role users.
 
 ### Google sign-in
 
@@ -101,4 +126,4 @@ No secrets in git. Configure `.env` from `.env.example` only.
 
 ## Later work
 
-Meta Tech Provider / Embedded Signup, Evoleads scraper, live Meta OAuth, ESP bounce webhooks, Chatwoot/EvoDesk webhook sync beyond the local history list. (No EvoOutreach/BillionMail mail server — outbound email is the native `/outbound` department over official SMTP + IMAP.)
+Meta Tech Provider / Embedded Signup, Evoleads scraper, Google Calendar sync, ESP bounce webhooks, Chatwoot/EvoDesk webhook sync beyond the local history list. (No EvoOutreach/BillionMail mail server — outbound email is the native `/outbound` department over official SMTP + IMAP.)

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\FacebookProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        // Meta workspace OAuth rides Socialite's official Facebook provider
+        // under the "meta" driver name, configured from META_* env vars.
+        Socialite::extend('meta', function ($app) {
+            return Socialite::buildProvider(FacebookProvider::class, $app['config']['services.meta']);
+        });
 
         Event::listen(Authenticated::class, function (Authenticated $event): void {
             $user = $event->user;

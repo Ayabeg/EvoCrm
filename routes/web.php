@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Ads\AdsCenterController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\MetaController;
 use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Http\Controllers\Crm\DealController;
+use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\ReportController;
@@ -27,6 +29,7 @@ use App\Http\Controllers\Outbound\SuppressionController;
 use App\Http\Controllers\Outbound\TemplateController;
 use App\Http\Controllers\Public\TrackingController;
 use App\Http\Controllers\Public\UnsubscribeController;
+use App\Http\Controllers\Settings\AppsController;
 use App\Http\Controllers\Settings\ChannelSettingsController;
 use App\Http\Controllers\Settings\CustomAttributeController;
 use App\Http\Controllers\Settings\EvolutionSettingsController;
@@ -52,6 +55,12 @@ Route::post('/webhooks/meta/leads', [MetaLeadWebhookController::class, 'handle']
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
+
+    // Meta workspace OAuth (Facebook Login). 404 unless META_* env is set.
+    Route::get('/auth/meta', [MetaController::class, 'redirect'])->name('auth.meta');
+    Route::get('/auth/meta/callback', [MetaController::class, 'callback'])->name('auth.meta.callback');
+
+    Route::get('/leads', [LeadBoardController::class, 'index'])->name('leads.index');
 
     Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
@@ -146,6 +155,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/outbound/templates/{template}', [TemplateController::class, 'update'])->name('outbound.templates.update');
     Route::delete('/outbound/templates/{template}', [TemplateController::class, 'destroy'])->name('outbound.templates.destroy');
     Route::post('/outbound/templates/send', [TemplateController::class, 'send'])->name('outbound.templates.send');
+
+    Route::get('/settings/apps', [AppsController::class, 'index'])->name('settings.apps');
+    Route::get('/settings/apps/meta', [AppsController::class, 'meta'])->name('settings.apps.meta');
+    Route::delete('/settings/apps/meta', [AppsController::class, 'destroyMeta'])->name('settings.apps.meta.destroy');
 
     Route::get('/settings/evolution', [EvolutionSettingsController::class, 'edit'])->name('settings.evolution');
     Route::post('/settings/evolution/sync', [EvolutionSettingsController::class, 'sync'])->name('settings.evolution.sync');

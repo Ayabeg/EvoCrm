@@ -45,4 +45,24 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', 'https://crm.evotechly.com/auth/google/callback'),
     ],
 
+    /*
+    | Meta workspace connection (Facebook Login via Socialite's Facebook
+    | provider, registered as the "meta" driver). Leave empty to disable
+    | Connect on Settings → Apps without breaking the marketplace page.
+    */
+    'meta' => [
+        'client_id' => env('META_APP_ID'),
+        'client_secret' => env('META_APP_SECRET'),
+        'redirect' => env('META_REDIRECT_URI', 'https://crm.evotechly.com/auth/meta/callback'),
+    ],
+
+    /*
+    | Optional webmail (e.g. Roundcube) URL surfaced on the Email / SMTP app
+    | card. Empty hides the link — mailboxes are managed natively at
+    | /outbound/mailboxes either way.
+    */
+    'webmail' => [
+        'url' => env('WEBMAIL_URL'),
+    ],
+
 ];

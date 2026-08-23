@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Stage;
+use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,10 +30,11 @@ class DealController extends Controller
         return $this->hub($request, $filter, $hub, $deal);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, ContactIdentity $identity): RedirectResponse
     {
         $data = $request->validate([
-            'contact_id' => ['required', 'integer'],
+            'contact_id' => ['required_without:contact_name', 'nullable', 'integer'],
+            'contact_name' => ['required_without:contact_id', 'nullable', 'string', 'max:180'],
             'title' => ['required', 'string', 'max:180'],
             'amount_cents' => ['nullable', 'integer', 'min:0'],
             'amount_dzd' => ['nullable', 'numeric', 'min:0'],
@@ -48,7 +51,14 @@ class DealController extends Controller
             ? Stage::query()->where('pipeline_id', $pipeline->id)->findOrFail($data['stage_id'])
             : $pipeline->stageBySlug('new');
 
-        $contact = Contact::query()->forWorkspace($workspace)->findOrFail($data['contact_id']);
+        // Kommo-style quick-add: a bare contact name creates the person inline.
+        $contact = filled($data['contact_id'] ?? null)
+            ? Contact::query()->forWorkspace($workspace)->findOrFail($data['contact_id'])
+            : $identity->findOrCreate($workspace, [
+                'first_name' => Str::before($data['contact_name'], ' '),
+                'last_name' => filled(Str::after($data['contact_name'], ' ')) ? Str::after($data['contact_name'], ' ') : null,
+                'source' => 'quick_add',
+            ]);
 
         Deal::query()->create([
             'workspace_id' => $workspace->id,

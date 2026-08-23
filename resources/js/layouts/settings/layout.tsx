@@ -27,6 +27,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Apps',
+        href: '/settings/apps',
+        icon: null,
+    },
+    {
         title: 'Evolution / WhatsApp Cloud',
         href: '/settings/evolution',
         icon: null,
@@ -55,7 +60,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         <div className="px-4 py-6">
             <Heading
                 title="Settings"
-                description="Workspace profile plus Evolution Cloud, Meta, and channels"
+                description="Workspace profile, the apps marketplace, Evolution Cloud, Meta, and channels"
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     AtSign,
     Bolt,
@@ -7,9 +7,11 @@ import {
     ChartSpline,
     ClockAlert,
     Contact,
+    Facebook,
     Globe,
     Handshake,
     Inbox,
+    Instagram,
     LibraryBig,
     Mail,
     Mailbox,
@@ -21,9 +23,11 @@ import {
     Send,
     SendHorizonal,
     ShieldOff,
+    SquareKanban,
     Target,
     UserRoundCheck,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { ChatwootNav, NavGroup } from '@/components/nav-main';
 import type { NavGroupItem } from '@/components/nav-main';
@@ -36,6 +40,73 @@ import { cn } from '@/lib/utils';
  * Dark charcoal rail, Evotechly wordmark, search + compose, expandable
  * Conversations group, footer profile. Content stays Light Cabinet.
  */
+/**
+ * Kommo-style channel chips on the rail footer — rendered only for
+ * connections that actually exist on the workspace (granted Meta scopes).
+ */
+function ChannelChips({ collapsed }: { collapsed: boolean }) {
+    const { integrations } = usePage().props;
+    const meta = integrations?.meta;
+
+    if (!meta?.connected) {
+        return null;
+    }
+
+    const scopes = meta.scopes ?? [];
+    const chips: {
+        key: string;
+        label: string;
+        icon: LucideIcon;
+        scopes: string[];
+    }[] = [
+        {
+            key: 'facebook',
+            label: 'Facebook Page connected',
+            icon: Facebook,
+            scopes: ['pages_show_list'],
+        },
+        {
+            key: 'instagram',
+            label: 'Instagram connected',
+            icon: Instagram,
+            scopes: ['instagram_basic'],
+        },
+        {
+            key: 'whatsapp',
+            label: 'WhatsApp Cloud connected',
+            icon: MessageCircle,
+            scopes: [
+                'whatsapp_business_messaging',
+                'whatsapp_business_management',
+            ],
+        },
+    ].filter((chip) => chip.scopes.some((scope) => scopes.includes(scope)));
+
+    if (chips.length === 0) {
+        return null;
+    }
+
+    return (
+        <div
+            className={cn(
+                'z-50 flex w-full items-center gap-1.5 px-2 pb-1.5',
+                collapsed ? 'flex-col' : 'flex-row',
+            )}
+        >
+            {chips.map((chip) => (
+                <Link
+                    key={chip.key}
+                    href="/settings/apps"
+                    title={chip.label}
+                    className="grid size-7 place-content-center rounded-lg bg-sidebar-well outline-1 outline-sidebar-border transition-colors hover:bg-sidebar-well-hover"
+                >
+                    <chip.icon className="size-3.5 text-sidebar-mute" />
+                </Link>
+            ))}
+        </div>
+    );
+}
+
 export function AppSidebar() {
     const { state, isMobile } = useSidebar();
     const collapsed = state === 'collapsed' && !isMobile;
@@ -46,6 +117,12 @@ export function AppSidebar() {
             label: 'My Inbox',
             icon: Inbox,
             href: '/inbox',
+        },
+        {
+            name: 'leads',
+            label: 'Leads',
+            icon: SquareKanban,
+            href: '/leads',
         },
         {
             name: 'conversations',
@@ -318,6 +395,7 @@ export function AppSidebar() {
 
             <section className="relative flex flex-shrink-0 flex-col items-center justify-between gap-1">
                 <div className="pointer-events-none absolute inset-x-0 -top-[1.938rem] h-8 bg-gradient-to-t from-sidebar to-transparent" />
+                <ChannelChips collapsed={collapsed} />
                 <div
                     className={cn(
                         'z-50 flex w-full flex-shrink-0 items-center gap-2 border-t border-sidebar-border px-1 py-1.5 shadow-[0px_-2px_4px_0px_rgba(27,28,29,0.02)]',
