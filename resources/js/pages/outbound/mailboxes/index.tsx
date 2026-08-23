@@ -43,7 +43,11 @@ function statusVariant(status: string): 'default' | 'secondary' | 'outline' {
     return 'outline';
 }
 
-export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] }) {
+export default function MailboxesIndex({
+    mailboxes,
+}: {
+    mailboxes: MailboxRow[];
+}) {
     return (
         <>
             <Head title="Mailboxes" />
@@ -55,36 +59,72 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
 
                 <Card className="p-4">
                     <h2 className="mb-3 font-medium">Add mailbox</h2>
-                    <Form action="/outbound/mailboxes" method="post" className="grid gap-3 md:grid-cols-4" resetOnSuccess>
+                    <Form
+                        action="/outbound/mailboxes"
+                        method="post"
+                        className="grid gap-3 md:grid-cols-4"
+                        resetOnSuccess
+                    >
                         {({ processing }) => (
                             <>
                                 <div>
                                     <Label>Name</Label>
-                                    <Input name="name" required placeholder="Sales — Amine" />
+                                    <Input
+                                        name="name"
+                                        required
+                                        placeholder="Sales — Amine"
+                                    />
                                 </div>
                                 <div>
                                     <Label>From name</Label>
-                                    <Input name="from_name" required placeholder="Amine · Evotechly" />
+                                    <Input
+                                        name="from_name"
+                                        required
+                                        placeholder="Amine · Evotechly"
+                                    />
                                 </div>
                                 <div>
                                     <Label>From address</Label>
-                                    <Input name="from_address" type="email" required placeholder="amine@evotechly.com" />
+                                    <Input
+                                        name="from_address"
+                                        type="email"
+                                        required
+                                        placeholder="amine@evotechly.com"
+                                    />
                                 </div>
                                 <div>
                                     <Label>Daily limit</Label>
-                                    <Input name="daily_limit" type="number" min={0} defaultValue={50} />
+                                    <Input
+                                        name="daily_limit"
+                                        type="number"
+                                        min={0}
+                                        defaultValue={50}
+                                    />
                                 </div>
                                 <div>
                                     <Label>SMTP host</Label>
-                                    <Input name="host" required placeholder="smtp.evotechly.com" />
+                                    <Input
+                                        name="host"
+                                        required
+                                        placeholder="smtp.evotechly.com"
+                                    />
                                 </div>
                                 <div>
                                     <Label>SMTP port</Label>
-                                    <Input name="port" type="number" defaultValue={587} required />
+                                    <Input
+                                        name="port"
+                                        type="number"
+                                        defaultValue={587}
+                                        required
+                                    />
                                 </div>
                                 <div>
                                     <Label>SMTP encryption</Label>
-                                    <select name="encryption" className="h-9 w-full rounded-md border bg-background px-2 text-sm" defaultValue="tls">
+                                    <select
+                                        name="encryption"
+                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                        defaultValue="tls"
+                                    >
                                         <option value="tls">tls</option>
                                         <option value="ssl">ssl</option>
                                         <option value="none">none</option>
@@ -96,19 +136,34 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
                                 </div>
                                 <div>
                                     <Label>SMTP password</Label>
-                                    <Input name="password" type="password" required />
+                                    <Input
+                                        name="password"
+                                        type="password"
+                                        required
+                                    />
                                 </div>
                                 <div>
                                     <Label>IMAP host (replies)</Label>
-                                    <Input name="imap_host" placeholder="imap.evotechly.com" />
+                                    <Input
+                                        name="imap_host"
+                                        placeholder="imap.evotechly.com"
+                                    />
                                 </div>
                                 <div>
                                     <Label>IMAP port</Label>
-                                    <Input name="imap_port" type="number" defaultValue={993} />
+                                    <Input
+                                        name="imap_port"
+                                        type="number"
+                                        defaultValue={993}
+                                    />
                                 </div>
                                 <div>
                                     <Label>IMAP encryption</Label>
-                                    <select name="imap_encryption" className="h-9 w-full rounded-md border bg-background px-2 text-sm" defaultValue="ssl">
+                                    <select
+                                        name="imap_encryption"
+                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                        defaultValue="ssl"
+                                    >
                                         <option value="ssl">ssl</option>
                                         <option value="tls">tls</option>
                                         <option value="none">none</option>
@@ -120,10 +175,15 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
                                 </div>
                                 <div>
                                     <Label>IMAP password</Label>
-                                    <Input name="imap_password" type="password" />
+                                    <Input
+                                        name="imap_password"
+                                        type="password"
+                                    />
                                 </div>
                                 <div className="flex items-end">
-                                    <Button disabled={processing}>Save mailbox</Button>
+                                    <Button disabled={processing}>
+                                        Save mailbox
+                                    </Button>
                                 </div>
                             </>
                         )}
@@ -140,17 +200,34 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
                         <Card key={box.id} className="space-y-3 p-4 text-sm">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-medium">{box.name}</span>
-                                <Badge variant={statusVariant(box.effective_status)}>{box.effective_status}</Badge>
-                                {box.is_default ? <Badge variant="secondary">default</Badge> : null}
-                                {box.imap_configured ? <Badge variant="secondary">IMAP replies on</Badge> : null}
+                                <Badge
+                                    variant={statusVariant(
+                                        box.effective_status,
+                                    )}
+                                >
+                                    {box.effective_status}
+                                </Badge>
+                                {box.is_default ? (
+                                    <Badge variant="secondary">default</Badge>
+                                ) : null}
+                                {box.imap_configured ? (
+                                    <Badge variant="secondary">
+                                        IMAP replies on
+                                    </Badge>
+                                ) : null}
                                 <span className="ms-auto text-xs text-muted-foreground">
-                                    {box.sent_today}/{box.daily_limit} sent today
-                                    {box.last_tested_at ? ` · tested ${box.last_tested_at}` : ''}
+                                    {box.sent_today}/{box.daily_limit} sent
+                                    today
+                                    {box.last_tested_at
+                                        ? ` · tested ${box.last_tested_at}`
+                                        : ''}
                                 </span>
                             </div>
                             <p className="text-muted-foreground">
-                                {box.from_name} &lt;{box.from_address}&gt; · SMTP {box.host}:{box.port} ({box.encryption}) ·
-                                password {box.password_set ? 'encrypted' : 'missing'}
+                                {box.from_name} &lt;{box.from_address}&gt; ·
+                                SMTP {box.host}:{box.port} ({box.encryption}) ·
+                                password{' '}
+                                {box.password_set ? 'encrypted' : 'missing'}
                                 {box.imap_host
                                     ? ` · IMAP ${box.imap_host}:${box.imap_port ?? 993} (${box.imap_encryption ?? 'ssl'})`
                                     : ' · IMAP not set — replies off'}
@@ -159,7 +236,11 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => router.post(`/outbound/mailboxes/${box.id}/toggle`)}
+                                    onClick={() =>
+                                        router.post(
+                                            `/outbound/mailboxes/${box.id}/toggle`,
+                                        )
+                                    }
                                 >
                                     {box.enabled ? 'Disable' : 'Enable'}
                                 </Button>
@@ -167,7 +248,11 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => router.post(`/outbound/mailboxes/${box.id}/default`)}
+                                        onClick={() =>
+                                            router.post(
+                                                `/outbound/mailboxes/${box.id}/default`,
+                                            )
+                                        }
                                     >
                                         Make default
                                     </Button>
@@ -180,8 +265,20 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
                                 >
                                     {({ processing }) => (
                                         <>
-                                            <Input name="to" type="email" placeholder="test@you.dz" required className="h-8 w-48" />
-                                            <Button variant="outline" size="sm" disabled={processing || !box.enabled}>
+                                            <Input
+                                                name="to"
+                                                type="email"
+                                                placeholder="test@you.dz"
+                                                required
+                                                className="h-8 w-48"
+                                            />
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={
+                                                    processing || !box.enabled
+                                                }
+                                            >
                                                 Send test
                                             </Button>
                                         </>
@@ -192,14 +289,228 @@ export default function MailboxesIndex({ mailboxes }: { mailboxes: MailboxRow[] 
                                     size="sm"
                                     className="text-brand"
                                     onClick={() => {
-                                        if (window.confirm(`Delete mailbox ${box.name}?`)) {
-                                            router.delete(`/outbound/mailboxes/${box.id}`);
+                                        if (
+                                            window.confirm(
+                                                `Delete mailbox ${box.name}?`,
+                                            )
+                                        ) {
+                                            router.delete(
+                                                `/outbound/mailboxes/${box.id}`,
+                                            );
                                         }
                                     }}
                                 >
                                     Delete
                                 </Button>
                             </div>
+
+                            <details className="rounded-md border border-hairline px-3 py-2">
+                                <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
+                                    Edit mailbox
+                                </summary>
+                                <Form
+                                    action={`/outbound/mailboxes/${box.id}`}
+                                    method="put"
+                                    className="mt-3 grid gap-3 md:grid-cols-4"
+                                >
+                                    {({ processing }) => (
+                                        <>
+                                            <div>
+                                                <Label>Name</Label>
+                                                <Input
+                                                    name="name"
+                                                    required
+                                                    defaultValue={box.name}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>From name</Label>
+                                                <Input
+                                                    name="from_name"
+                                                    required
+                                                    defaultValue={box.from_name}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>From address</Label>
+                                                <Input
+                                                    name="from_address"
+                                                    type="email"
+                                                    required
+                                                    defaultValue={
+                                                        box.from_address
+                                                    }
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>Daily limit</Label>
+                                                <Input
+                                                    name="daily_limit"
+                                                    type="number"
+                                                    min={0}
+                                                    defaultValue={
+                                                        box.daily_limit
+                                                    }
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>SMTP host</Label>
+                                                <Input
+                                                    name="host"
+                                                    required
+                                                    defaultValue={box.host}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>SMTP port</Label>
+                                                <Input
+                                                    name="port"
+                                                    type="number"
+                                                    required
+                                                    defaultValue={box.port}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>SMTP encryption</Label>
+                                                <select
+                                                    name="encryption"
+                                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                                    defaultValue={
+                                                        box.encryption
+                                                    }
+                                                >
+                                                    <option value="tls">
+                                                        tls
+                                                    </option>
+                                                    <option value="ssl">
+                                                        ssl
+                                                    </option>
+                                                    <option value="none">
+                                                        none
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <Label>SMTP username</Label>
+                                                <Input
+                                                    name="username"
+                                                    required
+                                                    defaultValue={box.username}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>
+                                                    SMTP password (blank = keep)
+                                                </Label>
+                                                <Input
+                                                    name="password"
+                                                    type="password"
+                                                    placeholder={
+                                                        box.password_set
+                                                            ? '••••••••'
+                                                            : ''
+                                                    }
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>
+                                                    IMAP host (replies)
+                                                </Label>
+                                                <Input
+                                                    name="imap_host"
+                                                    defaultValue={
+                                                        box.imap_host ?? ''
+                                                    }
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>IMAP port</Label>
+                                                <Input
+                                                    name="imap_port"
+                                                    type="number"
+                                                    defaultValue={
+                                                        box.imap_port ?? 993
+                                                    }
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>IMAP encryption</Label>
+                                                <select
+                                                    name="imap_encryption"
+                                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                                    defaultValue={
+                                                        box.imap_encryption ??
+                                                        'ssl'
+                                                    }
+                                                >
+                                                    <option value="ssl">
+                                                        ssl
+                                                    </option>
+                                                    <option value="tls">
+                                                        tls
+                                                    </option>
+                                                    <option value="none">
+                                                        none
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <Label>IMAP username</Label>
+                                                <Input
+                                                    name="imap_username"
+                                                    defaultValue={
+                                                        box.imap_username ?? ''
+                                                    }
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>
+                                                    IMAP password (blank = keep)
+                                                </Label>
+                                                <Input
+                                                    name="imap_password"
+                                                    type="password"
+                                                    placeholder={
+                                                        box.imap_password_set
+                                                            ? '••••••••'
+                                                            : ''
+                                                    }
+                                                />
+                                            </div>
+                                            {box.enabled ? (
+                                                <div>
+                                                    <Label>Warmup status</Label>
+                                                    <select
+                                                        name="status"
+                                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                                        defaultValue={
+                                                            box.effective_status ===
+                                                            'active'
+                                                                ? 'active'
+                                                                : 'warming'
+                                                        }
+                                                    >
+                                                        <option value="warming">
+                                                            warming
+                                                        </option>
+                                                        <option value="active">
+                                                            active
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            ) : null}
+                                            <div className="flex items-end">
+                                                <Button
+                                                    size="sm"
+                                                    disabled={processing}
+                                                >
+                                                    Save changes
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+                                </Form>
+                            </details>
                         </Card>
                     ))}
                 </div>

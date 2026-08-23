@@ -1,5 +1,6 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import PageHeader from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,7 @@ type TemplateRow = {
     name: string;
     subject?: string | null;
     body: string;
+    body_html?: string | null;
     created_at: string;
 };
 
@@ -28,36 +30,63 @@ export default function TemplatesIndex({
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Email templates"
-                    description="Reusable subject + body with {{first_name}}, {{last_name}}, {{name}}, {{email}}, {{phone}}, {{company}}, {{city}}, {{wilaya}}. Sequence steps can prefill from these."
+                    description="Reusable subject + text/HTML body with {{first_name}}, {{last_name}}, {{name}}, {{email}}, {{phone}}, {{company}}, {{city}}, {{wilaya}}, {{unsub}}. Sequence steps and campaigns prefill from these. The unsubscribe link always points at this CRM host."
                 />
 
                 <Card className="p-4">
                     <h2 className="mb-3 font-medium">New template</h2>
-                    <Form action="/outbound/templates" method="post" className="grid gap-3" resetOnSuccess>
+                    <Form
+                        action="/outbound/templates"
+                        method="post"
+                        className="grid gap-3"
+                        resetOnSuccess
+                    >
                         {({ processing }) => (
                             <>
                                 <div className="grid gap-3 md:grid-cols-2">
                                     <div>
                                         <Label>Name</Label>
-                                        <Input name="name" required placeholder="Clinic intro — FR" />
+                                        <Input
+                                            name="name"
+                                            required
+                                            placeholder="Clinic intro — FR"
+                                        />
                                     </div>
                                     <div>
                                         <Label>Subject</Label>
-                                        <Input name="subject" placeholder="EvoSales pour {{company}}" />
+                                        <Input
+                                            name="subject"
+                                            placeholder="EvoSales pour {{company}}"
+                                        />
                                     </div>
                                 </div>
                                 <div>
-                                    <Label>Body</Label>
+                                    <Label>Body (text)</Label>
                                     <textarea
                                         name="body"
                                         rows={5}
                                         required
-                                        placeholder={'Bonjour {{first_name}},\n\n…'}
+                                        placeholder={
+                                            'Bonjour {{first_name}},\n\n…\n\nSe désabonner : {{unsub}}'
+                                        }
                                         className="w-full rounded-md border bg-background px-3 py-2 text-sm"
                                     />
                                 </div>
                                 <div>
-                                    <Button disabled={processing}>Save template</Button>
+                                    <Label>Body (HTML, optional)</Label>
+                                    <textarea
+                                        name="body_html"
+                                        rows={4}
+                                        placeholder={
+                                            '<p>Bonjour {{first_name}},</p><p>…</p>'
+                                        }
+                                        className="w-full rounded-md border bg-background px-3 py-2 font-mono text-xs"
+                                    />
+                                </div>
+                                <div>
+                                    <Button disabled={processing}>
+                                        Save template
+                                    </Button>
                                 </div>
                             </>
                         )}
@@ -66,27 +95,39 @@ export default function TemplatesIndex({
 
                 <div className="grid gap-3 lg:grid-cols-2">
                     {templates.length === 0 ? (
-                        <Card className="p-6 text-sm text-muted-foreground">No templates yet.</Card>
+                        <Card className="p-6 text-sm text-muted-foreground">
+                            No templates yet.
+                        </Card>
                     ) : null}
                     {templates.map((template) => (
-                        <Card key={template.id} className="space-y-2 p-4 text-sm">
+                        <Card
+                            key={template.id}
+                            className="space-y-2 p-4 text-sm"
+                        >
                             <div className="flex items-center justify-between">
-                                <p className="font-medium">{template.name}</p>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-brand"
-                                    onClick={() => {
-                                        if (window.confirm(`Delete template ${template.name}?`)) {
-                                            router.delete(`/outbound/templates/${template.id}`);
-                                        }
-                                    }}
+                                <p className="font-medium">
+                                    {template.name}
+                                    {template.body_html ? (
+                                        <Badge
+                                            variant="secondary"
+                                            className="ms-2"
+                                        >
+                                            HTML
+                                        </Badge>
+                                    ) : null}
+                                </p>
+                                <Link
+                                    href={`/outbound/templates/${template.id}`}
                                 >
-                                    Delete
-                                </Button>
+                                    <Button variant="outline" size="sm">
+                                        Edit & preview
+                                    </Button>
+                                </Link>
                             </div>
-                            <p className="text-muted-foreground">Subject: {template.subject ?? '—'}</p>
-                            <p className="whitespace-pre-wrap rounded-md bg-canvas-soft p-3 text-muted-foreground">
+                            <p className="text-muted-foreground">
+                                Subject: {template.subject ?? '—'}
+                            </p>
+                            <p className="rounded-md bg-canvas-soft p-3 whitespace-pre-wrap text-muted-foreground">
                                 {template.body}
                             </p>
                         </Card>
@@ -94,32 +135,55 @@ export default function TemplatesIndex({
                 </div>
 
                 <Card className="p-4">
-                    <h2 className="mb-1 font-medium">Official WhatsApp Cloud template send</h2>
+                    <h2 className="mb-1 font-medium">
+                        Official WhatsApp Cloud template send
+                    </h2>
                     <p className="mb-3 text-sm text-muted-foreground">{note}</p>
-                    <Form action="/outbound/templates/send" method="post" className="grid gap-3 md:grid-cols-4">
+                    <Form
+                        action="/outbound/templates/send"
+                        method="post"
+                        className="grid gap-3 md:grid-cols-4"
+                    >
                         {({ processing }) => (
                             <>
                                 <div>
                                     <Label>Contact</Label>
-                                    <select name="contact_id" className="h-9 w-full rounded-md border bg-background px-2 text-sm" required>
+                                    <select
+                                        name="contact_id"
+                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                        required
+                                    >
                                         <option value="">Select</option>
                                         {contacts.map((contact) => (
-                                            <option key={contact.id} value={contact.id}>
-                                                {contact.first_name} {contact.phone_e164}
+                                            <option
+                                                key={contact.id}
+                                                value={contact.id}
+                                            >
+                                                {contact.first_name}{' '}
+                                                {contact.phone_e164}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
                                     <Label>Template name</Label>
-                                    <Input name="wa_template_name" placeholder="hello_world" required />
+                                    <Input
+                                        name="wa_template_name"
+                                        placeholder="hello_world"
+                                        required
+                                    />
                                 </div>
                                 <div>
                                     <Label>Language</Label>
-                                    <Input name="wa_template_language" defaultValue="fr" />
+                                    <Input
+                                        name="wa_template_language"
+                                        defaultValue="fr"
+                                    />
                                 </div>
                                 <div className="flex items-end">
-                                    <Button disabled={processing}>Send via Evolution Cloud</Button>
+                                    <Button disabled={processing}>
+                                        Send via Evolution Cloud
+                                    </Button>
                                 </div>
                             </>
                         )}
