@@ -15,8 +15,7 @@ it('uses the Evotechly mark as the favicon', function () {
     expect(file_get_contents($favicon))->toContain('#EC6025');
 });
 
-it('renders welcome and login with the Evotechly lockup', function () {
-    $this->get('/')->assertOk()->assertSee('EvoSales', false)->assertSee('Evotechly', false);
+it('renders login with the Evotechly lockup', function () {
     $this->get(route('login'))->assertOk()->assertSee('EvoSales', false);
 });
 

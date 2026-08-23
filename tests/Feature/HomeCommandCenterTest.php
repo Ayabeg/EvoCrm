@@ -276,8 +276,11 @@ it('redirects signed-in users from / to the command center', function () {
         ->assertRedirect(route('dashboard', absolute: false));
 });
 
-it('keeps the welcome page for guests at /', function () {
-    $this->get('/')
+it('sends guests from / to the login screen, never the command center', function () {
+    $this->get('/')->assertRedirect(route('login'));
+
+    $this->followingRedirects()
+        ->get('/')
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('welcome'));
+        ->assertInertia(fn ($page) => $page->component('auth/login'));
 });

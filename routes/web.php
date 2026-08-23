@@ -37,12 +37,11 @@ use App\Http\Controllers\Settings\MetaSettingsController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')
-        : Inertia::render('welcome');
+        : redirect()->route('login');
 })->name('home');
 
 Route::middleware('guest')->group(function () {
