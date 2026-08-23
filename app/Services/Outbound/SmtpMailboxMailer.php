@@ -6,8 +6,8 @@ use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Services\Outbound\Contracts\OutboundMailer;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
@@ -39,21 +39,29 @@ class SmtpMailboxMailer implements OutboundMailer
                 ->from(new Address($this->mailbox->from_address, $this->mailbox->from_name))
                 ->to($message->to_address)
                 ->subject($message->subject ?: 'EvoSales')
-                ->text((string) $message->body);
+                ->text((string) $message->body)
+                ->html($this->htmlBody($message));
 
             if (app()->environment('testing') || config('mail.default') === 'array') {
                 Mail::raw((string) $message->body, function ($mail) use ($message): void {
                     $mail->to($message->to_address)->subject($message->subject ?: 'EvoSales');
                 });
-            } else {
-                (new Mailer(Transport::fromDsn($dsn)))->send($email);
-            }
 
-            $message->forceFill([
-                'status' => 'sent',
-                'sent_at' => now(),
-                'failure_reason' => null,
-            ])->save();
+                $message->forceFill([
+                    'status' => 'sent',
+                    'sent_at' => now(),
+                    'failure_reason' => null,
+                ])->save();
+            } else {
+                $sent = (new Mailer(Transport::fromDsn($dsn)))->send($email);
+
+                $message->forceFill([
+                    'status' => 'sent',
+                    'sent_at' => now(),
+                    'failure_reason' => null,
+                    'message_id' => $sent->getMessageId() ?: null,
+                ])->save();
+            }
         } catch (\Throwable $e) {
             $message->forceFill([
                 'status' => 'failed',
@@ -62,5 +70,22 @@ class SmtpMailboxMailer implements OutboundMailer
         }
 
         return $message;
+    }
+
+    /**
+     * HTML twin of the plain body with a 1px open beacon. Opens are only
+     * tracked when the recipient's client loads remote images — the reports
+     * page says so.
+     */
+    protected function htmlBody(OutboundMessage $message): string
+    {
+        $html = nl2br(e((string) $message->body));
+
+        if ($message->track_token) {
+            $pixel = route('outbound.track.open', $message->track_token);
+            $html .= '<img src="'.$pixel.'" width="1" height="1" alt="" style="display:none" />';
+        }
+
+        return $html;
     }
 }

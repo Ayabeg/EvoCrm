@@ -3,6 +3,7 @@
 namespace App\Services\Outbound;
 
 use App\Models\Contact;
+use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Models\Sequence;
 use App\Models\Workspace;
@@ -15,6 +16,7 @@ class OutboundDispatcher
         private SuppressionService $suppressions,
         private QuietHoursGuard $quietHours,
         private EvolutionCloudService $evolution,
+        private TemplateRenderer $templates,
     ) {}
 
     /**
@@ -33,9 +35,10 @@ class OutboundDispatcher
             'mailbox_id' => $attributes['mailbox_id'] ?? null,
             'sequence_id' => $attributes['sequence_id'] ?? null,
             'channel' => $channel,
+            'direction' => 'out',
             'to_address' => $to,
-            'subject' => $attributes['subject'] ?? null,
-            'body' => $attributes['body'] ?? null,
+            'subject' => $this->templates->render($attributes['subject'] ?? null, $contact),
+            'body' => $this->templates->render($attributes['body'] ?? null, $contact),
             'status' => 'queued',
         ]);
 
@@ -61,7 +64,18 @@ class OutboundDispatcher
             return $this->sendWhatsAppTemplate($message, $contact, $attributes);
         }
 
-        return $this->mailers->for($workspace)->send($message);
+        $mailbox = $this->mailers->resolve(
+            $workspace,
+            ! empty($attributes['mailbox_id'])
+                ? Mailbox::query()->forWorkspace($workspace)->find($attributes['mailbox_id'])
+                : null,
+        );
+
+        if ($mailbox && (int) $message->mailbox_id !== (int) $mailbox->id) {
+            $message->forceFill(['mailbox_id' => $mailbox->id])->save();
+        }
+
+        return $this->mailers->for($workspace, $mailbox)->send($message);
     }
 
     /**

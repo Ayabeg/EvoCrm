@@ -1,18 +1,32 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 import PageHeader from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function SequencesIndex({ sequences }: { sequences: any[] }) {
+type SequenceRow = {
+    id: number;
+    name: string;
+    channel: string;
+    active: boolean;
+    description?: string | null;
+    steps: { id: number }[];
+    enrollments_count: number;
+    enrollments_active: number;
+    enrollments_paused: number;
+    enrollments_finished: number;
+};
+
+export default function SequencesIndex({ sequences }: { sequences: SequenceRow[] }) {
     return (
         <>
             <Head title="Sequences" />
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Sequences"
-                    description="Quiet hours (Africa/Algiers) and suppression apply before every automated send."
+                    description="Email steps with {{variables}}. Quiet hours (Africa/Algiers) defer sends; suppression cancels enrollment. WhatsApp steps use official Cloud templates only."
                 />
                 <Card className="p-4">
                     <Form action="/outbound/sequences" method="post" className="grid gap-3 md:grid-cols-3" resetOnSuccess>
@@ -20,7 +34,7 @@ export default function SequencesIndex({ sequences }: { sequences: any[] }) {
                             <>
                                 <div>
                                     <Label>Name</Label>
-                                    <Input name="name" required />
+                                    <Input name="name" required placeholder="Clinic email nurture" />
                                 </div>
                                 <div>
                                     <Label>Channel</Label>
@@ -43,20 +57,55 @@ export default function SequencesIndex({ sequences }: { sequences: any[] }) {
                                 <th className="px-4 py-2">Sequence</th>
                                 <th className="px-4 py-2">Channel</th>
                                 <th className="px-4 py-2">Steps</th>
+                                <th className="px-4 py-2">Enrolled</th>
+                                <th className="px-4 py-2">Active</th>
+                                <th className="px-4 py-2">Paused</th>
+                                <th className="px-4 py-2">Finished</th>
+                                <th className="px-4 py-2">State</th>
+                                <th className="px-4 py-2"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {sequences.map((sequence) => (
-                                <tr key={sequence.id} className="border-t">
-                                    <td className="px-4 py-2">
-                                        <Link href={`/outbound/sequences/${sequence.id}`} className="text-brand">
-                                            {sequence.name}
-                                        </Link>
+                            {sequences.length === 0 ? (
+                                <tr>
+                                    <td className="px-4 py-6 text-muted-foreground" colSpan={9}>
+                                        No sequences yet.
                                     </td>
-                                    <td className="px-4 py-2">{sequence.channel}</td>
-                                    <td className="px-4 py-2">{sequence.steps?.length ?? 0}</td>
                                 </tr>
-                            ))}
+                            ) : (
+                                sequences.map((sequence) => (
+                                    <tr key={sequence.id} className="border-t border-hairline">
+                                        <td className="px-4 py-2">
+                                            <Link href={`/outbound/sequences/${sequence.id}`} className="font-medium text-brand">
+                                                {sequence.name}
+                                            </Link>
+                                            {sequence.description ? (
+                                                <p className="text-xs text-muted-foreground">{sequence.description}</p>
+                                            ) : null}
+                                        </td>
+                                        <td className="px-4 py-2">{sequence.channel}</td>
+                                        <td className="px-4 py-2">{sequence.steps?.length ?? 0}</td>
+                                        <td className="px-4 py-2">{sequence.enrollments_count}</td>
+                                        <td className="px-4 py-2">{sequence.enrollments_active}</td>
+                                        <td className="px-4 py-2">{sequence.enrollments_paused}</td>
+                                        <td className="px-4 py-2">{sequence.enrollments_finished}</td>
+                                        <td className="px-4 py-2">
+                                            <Badge variant={sequence.active ? 'default' : 'outline'}>
+                                                {sequence.active ? 'active' : 'draft'}
+                                            </Badge>
+                                        </td>
+                                        <td className="px-4 py-2 text-right">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => router.post(`/outbound/sequences/${sequence.id}/toggle`)}
+                                            >
+                                                {sequence.active ? 'Pause' : 'Activate'}
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </Card>

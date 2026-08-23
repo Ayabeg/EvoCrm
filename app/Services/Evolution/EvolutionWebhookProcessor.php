@@ -4,7 +4,6 @@ namespace App\Services\Evolution;
 
 use App\Enums\ChannelType;
 use App\Models\Channel;
-use App\Models\Contact;
 use App\Models\EvolutionEvent;
 use App\Models\Message;
 use App\Models\Thread;

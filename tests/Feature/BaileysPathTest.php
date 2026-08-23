@@ -1,6 +1,8 @@
 <?php
 
 use App\Exceptions\UnofficialWhatsAppRefused;
+use App\Models\Mailbox;
+use App\Models\Workspace;
 use App\Services\Evolution\EvolutionCloudService;
 use App\Services\Outbound\ImapReplyPoller;
 
@@ -35,7 +37,27 @@ it('keeps Cloud-only literals in the Evolution service source', function () {
     expect($source)->not->toContain("'qrcode' => true");
 });
 
-it('leaves IMAP reply polling as a later stub', function () {
-    expect(fn () => app(ImapReplyPoller::class)->poll())
-        ->toThrow(RuntimeException::class);
+it('polls IMAP replies only for configured mailboxes, and fails loudly without ext-imap', function () {
+    $workspace = Workspace::factory()->create();
+
+    // No IMAP-configured mailboxes → nothing to poll, no error.
+    expect(app(ImapReplyPoller::class)->poll($workspace))->toBe([]);
+
+    // A mailbox with IMAP settings but no ext-imap on the worker fails loudly.
+    Mailbox::factory()->create([
+        'workspace_id' => $workspace->id,
+        'imap_host' => 'imap.example.test',
+        'imap_username' => 'hello@example.test',
+        'imap_password' => 'secret',
+    ]);
+
+    if (function_exists('imap_open')) {
+        // With ext-imap present, an unreachable host returns an error row.
+        $result = app(ImapReplyPoller::class)->poll($workspace);
+        expect($result)->toHaveCount(1);
+        expect($result[0]['error'])->not->toBeNull();
+    } else {
+        expect(fn () => app(ImapReplyPoller::class)->poll($workspace))
+            ->toThrow(RuntimeException::class, 'ext-imap');
+    }
 });

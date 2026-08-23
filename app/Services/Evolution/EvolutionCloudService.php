@@ -3,6 +3,7 @@
 namespace App\Services\Evolution;
 
 use App\Exceptions\UnofficialWhatsAppRefused;
+use App\Models\Workspace;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -24,7 +25,7 @@ class EvolutionCloudService
     /**
      * @return array{connected: bool, reason: string|null, instance: string, last_webhook_at: mixed, last_event: mixed, mode: string}
      */
-    public function health(?\App\Models\Workspace $workspace = null): array
+    public function health(?Workspace $workspace = null): array
     {
         if (! $this->configured()) {
             return [

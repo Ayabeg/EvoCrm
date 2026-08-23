@@ -2,9 +2,12 @@
 
 namespace App\Services\Crm;
 
+use App\Models\Contact;
+use App\Models\Deal;
 use App\Models\SavedFilter;
 use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class CrmFilter
@@ -37,7 +40,7 @@ class CrmFilter
     }
 
     /**
-     * @param  Builder<\App\Models\Contact>  $query
+     * @param  Builder<Contact>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyToContacts(Builder $query, array $filters): Builder
@@ -74,7 +77,7 @@ class CrmFilter
     }
 
     /**
-     * @param  Builder<\App\Models\Deal>  $query
+     * @param  Builder<Deal>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyToDeals(Builder $query, array $filters): Builder
@@ -115,7 +118,7 @@ class CrmFilter
     }
 
     /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @param  Builder<Model>  $query
      */
     protected function applyLastActivity(Builder $query, mixed $window): void
     {

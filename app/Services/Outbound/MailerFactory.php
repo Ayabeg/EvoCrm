@@ -10,16 +10,21 @@ class MailerFactory
 {
     public function for(Workspace $workspace, ?Mailbox $mailbox = null): OutboundMailer
     {
-        $mailbox ??= Mailbox::query()
-            ->forWorkspace($workspace)
-            ->where('enabled', true)
-            ->orderByDesc('is_default')
-            ->first();
+        $mailbox = $this->resolve($workspace, $mailbox);
 
         if (! $mailbox) {
             return new DisabledMailer;
         }
 
         return new SmtpMailboxMailer($mailbox);
+    }
+
+    public function resolve(Workspace $workspace, ?Mailbox $mailbox = null): ?Mailbox
+    {
+        return $mailbox ?? Mailbox::query()
+            ->forWorkspace($workspace)
+            ->where('enabled', true)
+            ->orderByDesc('is_default')
+            ->first();
     }
 }

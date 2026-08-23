@@ -26,11 +26,13 @@ class Enrollment extends Model
         ];
     }
 
+    /** @return BelongsTo<Sequence, $this> */
     public function sequence(): BelongsTo
     {
         return $this->belongsTo(Sequence::class);
     }
 
+    /** @return BelongsTo<Contact, $this> */
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);

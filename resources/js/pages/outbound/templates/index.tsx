@@ -1,23 +1,101 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, router } from '@inertiajs/react';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+type TemplateRow = {
+    id: number;
+    name: string;
+    subject?: string | null;
+    body: string;
+    created_at: string;
+};
+
 export default function TemplatesIndex({
+    templates,
     contacts,
     note,
 }: {
+    templates: TemplateRow[];
     contacts: any[];
     note: string;
 }) {
     return (
         <>
-            <Head title="WhatsApp templates" />
+            <Head title="Templates" />
             <div className="flex-1 space-y-6 p-6">
-                <PageHeader title="Official WhatsApp Cloud templates" description={note} />
+                <PageHeader
+                    title="Email templates"
+                    description="Reusable subject + body with {{first_name}}, {{last_name}}, {{name}}, {{email}}, {{phone}}, {{company}}, {{city}}, {{wilaya}}. Sequence steps can prefill from these."
+                />
+
                 <Card className="p-4">
+                    <h2 className="mb-3 font-medium">New template</h2>
+                    <Form action="/outbound/templates" method="post" className="grid gap-3" resetOnSuccess>
+                        {({ processing }) => (
+                            <>
+                                <div className="grid gap-3 md:grid-cols-2">
+                                    <div>
+                                        <Label>Name</Label>
+                                        <Input name="name" required placeholder="Clinic intro — FR" />
+                                    </div>
+                                    <div>
+                                        <Label>Subject</Label>
+                                        <Input name="subject" placeholder="EvoSales pour {{company}}" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Body</Label>
+                                    <textarea
+                                        name="body"
+                                        rows={5}
+                                        required
+                                        placeholder={'Bonjour {{first_name}},\n\n…'}
+                                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <Button disabled={processing}>Save template</Button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                </Card>
+
+                <div className="grid gap-3 lg:grid-cols-2">
+                    {templates.length === 0 ? (
+                        <Card className="p-6 text-sm text-muted-foreground">No templates yet.</Card>
+                    ) : null}
+                    {templates.map((template) => (
+                        <Card key={template.id} className="space-y-2 p-4 text-sm">
+                            <div className="flex items-center justify-between">
+                                <p className="font-medium">{template.name}</p>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-brand"
+                                    onClick={() => {
+                                        if (window.confirm(`Delete template ${template.name}?`)) {
+                                            router.delete(`/outbound/templates/${template.id}`);
+                                        }
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                            </div>
+                            <p className="text-muted-foreground">Subject: {template.subject ?? '—'}</p>
+                            <p className="whitespace-pre-wrap rounded-md bg-canvas-soft p-3 text-muted-foreground">
+                                {template.body}
+                            </p>
+                        </Card>
+                    ))}
+                </div>
+
+                <Card className="p-4">
+                    <h2 className="mb-1 font-medium">Official WhatsApp Cloud template send</h2>
+                    <p className="mb-3 text-sm text-muted-foreground">{note}</p>
                     <Form action="/outbound/templates/send" method="post" className="grid gap-3 md:grid-cols-4">
                         {({ processing }) => (
                             <>
