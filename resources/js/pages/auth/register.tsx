@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import GoogleAuthButton from '@/components/google-auth-button';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -11,12 +12,16 @@ import { store } from '@/routes/register';
 
 type Props = {
     passwordRules: string;
+    canLoginWithGoogle: boolean;
 };
 
-export default function Register({ passwordRules }: Props) {
+export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
     return (
         <>
             <Head title="Register" />
+            {canLoginWithGoogle && (
+                <GoogleAuthButton separator="Or register with email" />
+            )}
             <Form
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
