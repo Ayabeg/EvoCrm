@@ -34,11 +34,13 @@ class OutboundDispatcher
             'contact_id' => $contact->id,
             'mailbox_id' => $attributes['mailbox_id'] ?? null,
             'sequence_id' => $attributes['sequence_id'] ?? null,
+            'campaign_id' => $attributes['campaign_id'] ?? null,
             'channel' => $channel,
             'direction' => 'out',
             'to_address' => $to,
-            'subject' => $this->templates->render($attributes['subject'] ?? null, $contact),
-            'body' => $this->templates->render($attributes['body'] ?? null, $contact),
+            'subject' => $this->templates->render($attributes['subject'] ?? null, $contact, $workspace),
+            'body' => $this->templates->render($attributes['body'] ?? null, $contact, $workspace),
+            'body_html' => $this->templates->render($attributes['body_html'] ?? null, $contact, $workspace),
             'status' => 'queued',
         ]);
 

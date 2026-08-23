@@ -42,6 +42,11 @@ class SmtpMailboxMailer implements OutboundMailer
                 ->text((string) $message->body)
                 ->html($this->htmlBody($message));
 
+            $unsubscribe = app(EmailHtml::class)->unsubscribeUrl($message);
+            if ($unsubscribe) {
+                $email->getHeaders()->addTextHeader('List-Unsubscribe', '<'.$unsubscribe.'>');
+            }
+
             if (app()->environment('testing') || config('mail.default') === 'array') {
                 Mail::raw((string) $message->body, function ($mail) use ($message): void {
                     $mail->to($message->to_address)->subject($message->subject ?: 'EvoSales');
@@ -73,19 +78,13 @@ class SmtpMailboxMailer implements OutboundMailer
     }
 
     /**
-     * HTML twin of the plain body with a 1px open beacon. Opens are only
-     * tracked when the recipient's client loads remote images — the reports
-     * page says so.
+     * HTML part with click-tracked links, an unsubscribe footer on the CRM
+     * hostname, and the 1px open beacon. Opens/clicks only count recipients
+     * whose client loads remote images or follows a link — the reports page
+     * says so.
      */
     protected function htmlBody(OutboundMessage $message): string
     {
-        $html = nl2br(e((string) $message->body));
-
-        if ($message->track_token) {
-            $pixel = route('outbound.track.open', $message->track_token);
-            $html .= '<img src="'.$pixel.'" width="1" height="1" alt="" style="display:none" />';
-        }
-
-        return $html;
+        return app(EmailHtml::class)->build($message);
     }
 }

@@ -4,26 +4,29 @@ namespace App\Console\Commands;
 
 use App\Models\Enrollment;
 use App\Models\Mailbox;
+use App\Services\Outbound\CampaignService;
 use App\Services\Outbound\OutboundDispatcher;
 use App\Services\Outbound\QuietHoursGuard;
 use App\Services\Outbound\SuppressionService;
 use Illuminate\Console\Command;
 
 /**
- * Sends due sequence steps. Quiet hours defer (never fail), suppression
- * cancels the enrollment, and a missing/disabled mailbox fails the message
- * honestly in the outbox. WhatsApp steps stay official-Cloud only.
+ * Sends due sequence steps and due broadcast-campaign messages. Quiet hours
+ * defer (never fail), suppression cancels the enrollment / fails the single
+ * message, and a missing/disabled mailbox fails the message honestly in the
+ * outbox. WhatsApp steps stay official-Cloud only.
  */
 class RunOutboundSequences extends Command
 {
     protected $signature = 'outbound:run {--limit=100}';
 
-    protected $description = 'Dispatch due sequence steps (email + official WhatsApp Cloud)';
+    protected $description = 'Dispatch due sequence steps and campaign messages (email + official WhatsApp Cloud)';
 
     public function handle(
         OutboundDispatcher $dispatcher,
         QuietHoursGuard $quietHours,
         SuppressionService $suppressions,
+        CampaignService $campaigns,
     ): int {
         $due = Enrollment::query()
             ->where('status', 'active')
@@ -77,7 +80,11 @@ class RunOutboundSequences extends Command
 
             $mailbox = null;
             if ($step->channel === 'email') {
-                $mailbox = Mailbox::query()
+                // A step can pin a mailbox; otherwise the workspace default.
+                $mailbox = $step->mailbox_id
+                    ? Mailbox::query()->forWorkspace($workspace)->where('enabled', true)->find($step->mailbox_id)
+                    : null;
+                $mailbox ??= Mailbox::query()
                     ->forWorkspace($workspace)
                     ->where('enabled', true)
                     ->orderByDesc('is_default')
@@ -120,7 +127,19 @@ class RunOutboundSequences extends Command
             }
         }
 
-        $this->info("outbound:run — {$sent} sent, {$deferred} deferred, {$failed} failed/cancelled.");
+        $expanded = $campaigns->expandDue();
+        $campaignTotals = $campaigns->sendDueMessages(max(1, (int) $this->option('limit') - $sent));
+
+        $this->info(sprintf(
+            'outbound:run — %d sent, %d deferred, %d failed/cancelled. Campaigns: %d expanded, %d sent, %d deferred, %d failed.',
+            $sent,
+            $deferred,
+            $failed,
+            $expanded,
+            $campaignTotals['sent'],
+            $campaignTotals['deferred'],
+            $campaignTotals['failed'],
+        ));
 
         return self::SUCCESS;
     }

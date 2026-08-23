@@ -1,0 +1,216 @@
+<?php
+
+namespace App\Services\Outbound;
+
+use App\Models\Contact;
+use App\Models\Mailbox;
+use App\Models\OutboundCampaign;
+use App\Models\OutboundMessage;
+use App\Models\SavedFilter;
+use App\Models\Workspace;
+use App\Services\Crm\CrmFilter;
+use Illuminate\Support\Collection;
+
+/**
+ * Broadcast campaigns — the newsletter path. A campaign targets a CRM
+ * audience (all contacts with email, or a saved contact filter), renders
+ * one OutboundMessage per recipient, and sends through the same guards as
+ * sequences: suppression, quiet hours, and the mailbox daily cap.
+ */
+class CampaignService
+{
+    public function __construct(
+        private SuppressionService $suppressions,
+        private QuietHoursGuard $quietHours,
+        private TemplateRenderer $templates,
+        private MailerFactory $mailers,
+        private CrmFilter $crmFilter,
+    ) {}
+
+    /**
+     * The CRM audience for a campaign: workspace contacts that have an email
+     * address, narrowed by the saved contact filter when one is attached.
+     *
+     * @return Collection<int, Contact>
+     */
+    public function audience(Workspace $workspace, ?SavedFilter $filter): Collection
+    {
+        $query = Contact::query()
+            ->forWorkspace($workspace)
+            ->whereNotNull('email')
+            ->with('company');
+
+        if ($filter && (int) $filter->workspace_id === (int) $workspace->id && $filter->entity === 'contact') {
+            $this->crmFilter->applyToContacts($query, $filter->filters ?? []);
+        }
+
+        return $query->orderBy('id')->get();
+    }
+
+    /**
+     * Materialize the campaign into queued OutboundMessages. Suppressed
+     * contacts are skipped up front (counted honestly on the campaign) and
+     * re-checked at send time in case the list changed.
+     */
+    public function expand(OutboundCampaign $campaign): OutboundCampaign
+    {
+        if (! $campaign->editable()) {
+            return $campaign;
+        }
+
+        $workspace = $campaign->workspace;
+        $audience = $this->audience($workspace, $campaign->savedFilter);
+
+        $suppressed = 0;
+        $queued = 0;
+
+        foreach ($audience as $contact) {
+            if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
+                $suppressed++;
+
+                continue;
+            }
+
+            OutboundMessage::query()->create([
+                'workspace_id' => $workspace->id,
+                'contact_id' => $contact->id,
+                'mailbox_id' => $campaign->mailbox_id,
+                'campaign_id' => $campaign->id,
+                'channel' => 'email',
+                'direction' => 'out',
+                'to_address' => $contact->email,
+                'subject' => $this->templates->render($campaign->subject, $contact, $workspace),
+                'body' => $this->templates->render($campaign->body, $contact, $workspace),
+                'body_html' => $this->templates->render($campaign->body_html, $contact, $workspace),
+                'status' => 'queued',
+            ]);
+            $queued++;
+        }
+
+        $campaign->forceFill([
+            'status' => OutboundCampaign::STATUS_SENDING,
+            'started_at' => $campaign->started_at ?? now(),
+            'scheduled_at' => $campaign->scheduled_at ?? now(),
+            'audience_count' => $audience->count(),
+            'suppressed_count' => $suppressed,
+        ])->save();
+
+        return $campaign;
+    }
+
+    /**
+     * Expand campaigns whose schedule is due.
+     */
+    public function expandDue(): int
+    {
+        $due = OutboundCampaign::query()
+            ->where('status', OutboundCampaign::STATUS_SCHEDULED)
+            ->whereNotNull('scheduled_at')
+            ->where('scheduled_at', '<=', now())
+            ->with(['workspace', 'savedFilter'])
+            ->get();
+
+        foreach ($due as $campaign) {
+            $this->expand($campaign);
+        }
+
+        return $due->count();
+    }
+
+    /**
+     * Send due campaign messages. Quiet hours and the mailbox daily cap
+     * defer (never fail); suppression fails the single message honestly.
+     *
+     * @return array{sent: int, deferred: int, failed: int}
+     */
+    public function sendDueMessages(int $limit = 100): array
+    {
+        $messages = OutboundMessage::query()
+            ->where('direction', 'out')
+            ->where('status', 'queued')
+            ->whereNotNull('campaign_id')
+            ->where(fn ($query) => $query->whereNull('deferred_until')->orWhere('deferred_until', '<=', now()))
+            ->with(['contact.company', 'workspace', 'campaign'])
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
+
+        $totals = ['sent' => 0, 'deferred' => 0, 'failed' => 0];
+
+        foreach ($messages as $message) {
+            $campaign = $message->campaign;
+            $workspace = $message->workspace;
+            $contact = $message->contact;
+
+            if (! $campaign || ! $workspace || ! $contact || $campaign->status !== OutboundCampaign::STATUS_SENDING) {
+                continue;
+            }
+
+            if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
+                $message->forceFill([
+                    'status' => 'failed',
+                    'failure_reason' => 'Recipient is on the suppression list.',
+                    'deferred_until' => null,
+                    'defer_reason' => null,
+                ])->save();
+                $totals['failed']++;
+
+                continue;
+            }
+
+            if ($this->quietHours->blocks($workspace)) {
+                $hours = $workspace->activeQuietHours();
+                $message->forceFill([
+                    'deferred_until' => $hours ? $hours->nextAllowedAt() : now()->addHour(),
+                    'defer_reason' => 'quiet_hours',
+                ])->save();
+                $totals['deferred']++;
+
+                continue;
+            }
+
+            $mailbox = $message->mailbox_id
+                ? Mailbox::query()->forWorkspace($workspace)->where('enabled', true)->find($message->mailbox_id)
+                : null;
+            $mailbox ??= Mailbox::query()
+                ->forWorkspace($workspace)
+                ->where('enabled', true)
+                ->orderByDesc('is_default')
+                ->first();
+
+            if ($mailbox && $mailbox->overDailyLimit()) {
+                $message->forceFill([
+                    'deferred_until' => now()->addHour(),
+                    'defer_reason' => 'daily_cap',
+                ])->save();
+                $totals['deferred']++;
+
+                continue;
+            }
+
+            if ($mailbox && (int) $message->mailbox_id !== (int) $mailbox->id) {
+                $message->forceFill(['mailbox_id' => $mailbox->id])->save();
+            }
+
+            $message->forceFill(['deferred_until' => null, 'defer_reason' => null])->save();
+
+            $sent = $this->mailers->for($workspace, $mailbox)->send($message);
+            $totals[$sent->status === 'sent' ? 'sent' : 'failed']++;
+        }
+
+        $this->completeFinishedCampaigns();
+
+        return $totals;
+    }
+
+    /**
+     * A sending campaign with nothing left queued is done.
+     */
+    protected function completeFinishedCampaigns(): void
+    {
+        OutboundCampaign::query()
+            ->where('status', OutboundCampaign::STATUS_SENDING)
+            ->whereDoesntHave('messages', fn ($query) => $query->where('direction', 'out')->where('status', 'queued'))
+            ->update(['status' => OutboundCampaign::STATUS_SENT, 'sent_at' => now()]);
+    }
+}
