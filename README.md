@@ -89,6 +89,10 @@ GOOGLE_REDIRECT_URI=https://crm.evotechly.com/auth/google/callback
 
 Leave the vars empty and the "Continue with Google" button stays hidden (the routes return 404, never 500). For local dev, also add `http://localhost:8000` as a JS origin and `http://localhost:8000/auth/google/callback` as a redirect URI on the same OAuth client, and point `GOOGLE_REDIRECT_URI` at the local callback.
 
+### People (Settings → People)
+
+`/settings/people` manages who can sign in to the workspace — owner/admin only (members get 403 and never see the nav item). The table lists name, email, role, last login / invited, and status (active vs invite pending). Invites take name + email + role (**admin|member only** — one owner by default; a second owner needs a real transfer) and send a **login email through the workspace's default enabled SMTP mailbox** (the `SmtpMailboxMailer` path) with a single-use Fortify set-password link on `https://crm.evotechly.com` — never a standing password in the mail. Setting a password through that link marks the email verified and flips the person to active. Rows support resend-invite (pending only), role change (the last owner can't be demoted, and nobody below owner touches an owner), and remove (not yourself, not the last owner). With no enabled mailbox the invite is created as pending and the failure is reported honestly — resend it after enabling a mailbox under Outbound → Mailboxes.
+
 Local seed login (local only):
 
 - Email: `owner@evosales.local`

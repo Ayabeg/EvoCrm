@@ -100,3 +100,28 @@ it('marks the message failed when the transport throws', function () {
     expect($result->failure_reason)->toContain('timed out');
     expect($result->sent_at)->toBeNull();
 });
+
+it('ships an ad-hoc email through the mailbox transport', function () {
+    $mailbox = Mailbox::factory()->create(['enabled' => true]);
+
+    smtpMailerStub($mailbox)->sendAdHoc(
+        'invitee@evotechly.com',
+        'You are invited',
+        'Plain body',
+        '<p>HTML body</p>',
+    );
+
+    // No exception means the transport accepted the mail.
+    expect(true)->toBeTrue();
+});
+
+it('refuses to send ad-hoc email from a disabled mailbox', function () {
+    $mailbox = Mailbox::factory()->create(['enabled' => false]);
+
+    smtpMailerStub($mailbox)->sendAdHoc(
+        'invitee@evotechly.com',
+        'You are invited',
+        'Plain body',
+        '<p>HTML body</p>',
+    );
+})->throws(RuntimeException::class, 'disabled');
