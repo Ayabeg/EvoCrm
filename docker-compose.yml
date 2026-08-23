@@ -1,6 +1,10 @@
 services:
   app:
     build: .
+    # Pin the outbound SMTP host to its origin IPv4 — resolving it through
+    # Cloudflare gives an IPv6 anycast address where port 587 times out.
+    extra_hosts:
+      - "outbound.evotechly.com:169.58.75.34" # pragma: allowlist secret
     ports:
       - "${PORT:-8000}:8000"
     environment:
