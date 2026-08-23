@@ -25,6 +25,29 @@ return [
     */
     'inbox_embed_path' => env('EVOSALES_INBOX_EMBED_PATH', '/'),
 
+    /*
+    | Live mail stack (EvoOutreach) at outbound.evotechly.com. The CRM uses
+    | it for three things only: SMTP send, IMAP reply polling, and Roundcube
+    | webmail. Mailbox records sync from its HTTP API when api_token is set
+    | (outbound:sync-mailboxes, every 15 minutes). The stack's own marketing
+    | dashboard is never linked or embedded — campaigns live in the CRM.
+    */
+    'mail_stack' => [
+        'api_url' => env('EVOSALES_MAIL_API_URL', 'https://outbound.evotechly.com'),
+        'api_token' => env('EVOSALES_MAIL_API_TOKEN'),
+        'smtp' => [
+            'host' => env('EVOSALES_SMTP_HOST', 'outbound.evotechly.com'),
+            'port' => (int) env('EVOSALES_SMTP_PORT', 587),
+            'encryption' => env('EVOSALES_SMTP_ENCRYPTION', 'tls'),
+        ],
+        'imap' => [
+            'host' => env('EVOSALES_IMAP_HOST', 'outbound.evotechly.com'),
+            'port' => (int) env('EVOSALES_IMAP_PORT', 993),
+            'encryption' => env('EVOSALES_IMAP_ENCRYPTION', 'ssl'),
+        ],
+        'roundcube_url' => env('EVOSALES_ROUNDCUBE_URL', 'https://outbound.evotechly.com/roundcube/'),
+    ],
+
     'timezone' => env('APP_TIMEZONE', 'Africa/Algiers'),
 
     'default_country_code' => '213',
