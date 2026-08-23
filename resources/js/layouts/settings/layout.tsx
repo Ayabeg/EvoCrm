@@ -56,10 +56,8 @@ const sidebarNavItems: NavItem[] = [
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
-    const { auth, component } = usePage<{
-        auth: Auth;
-        component: string;
-    }>().props;
+    const page = usePage<{ auth: Auth }>();
+    const { auth } = page.props;
 
     // People manages workspace members — owner/admin only. The routes 403
     // for members; the nav item simply stays hidden for them.
@@ -73,7 +71,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         : sidebarNavItems;
 
     // The People table needs more room than the settings forms.
-    const wide = component === 'settings/people';
+    const wide = page.component === 'settings/people';
 
     return (
         <div className="px-4 py-6">
