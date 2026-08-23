@@ -25,8 +25,8 @@ EvoSales is **white + black + orange**. Do not invent more.
 - Company mark: `public/brand/evotechly/mark.svg` (artwork fill `#EC6025`, do not recolor). Favicon is the mark.
 - Tokens in `resources/css/app.css`: canvas `#FFFFFF`, canvas-soft `#F7F7F6` (page wash only), ink `#111111`, mute `#525252`, hairline `#E5E5E5`, mark/brand `#EC6025`, Geist, Light Cabinet face.
 - Orange `#EC6025` is the only action color: CTAs, links, active sidebar pip, Open Desk button, action badges.
-- **Light only.** The dark kit is removed — `.dark` is never applied and no dark tokens exist.
-- Default product face: Light Cabinet (~240px labeled white sidebar, black labels, orange left-pip active, white cards + hairlines, ~52px topbar).
+- **Light content.** `.dark` is never applied to the app. Single exception: the authenticated left rail is the EvoDesk (Chatwoot Community) dark sidebar (`#151718`, n-slate/n-alpha tokens) by design; its tokens are sidebar-scoped and never leak into content.
+- Default product face: Light Cabinet (Chatwoot dark rail on the left, white cards + hairlines, ~52px topbar).
 - Titles and auth mail: **EvoSales · Evotechly**.
 
 ## Stack

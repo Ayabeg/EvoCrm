@@ -14,7 +14,9 @@
  * Canvas #FFFFFF, soft white #F7F7F6 (page wash only), ink #111111,
  * mute #525252, hairline #E5E5E5, Evotechly mark orange #EC6025.
  * Orange is the only action color: CTAs, links, active pip, action badges.
- * Light Cabinet is the only face — there is no dark kit.
+ * Light Cabinet is the product face. Single exception: the authenticated
+ * left rail is the EvoDesk (Chatwoot) dark sidebar — its tokens live below
+ * and never leak into content.
  */
 :root {
     --evosales-canvas: #ffffff;
@@ -84,6 +86,22 @@
     --color-canvas: var(--evosales-canvas);
     --color-canvas-soft: var(--evosales-canvas-soft);
     --color-hairline: var(--evosales-hairline);
+
+    /*
+     * EvoDesk (Chatwoot Community) next-sidebar dark rail tokens.
+     * Sidebar-only: text n-slate-11/12, hover/active n-alpha-2, tree line
+     * n-slate-4, search/compose well n-button-color, online dot n-teal-10.
+     */
+    --color-sidebar-ink: #edeff0;
+    --color-sidebar-mute: #b0b4ba;
+    --color-sidebar-faint: #777b84;
+    --color-sidebar-well: #2a2b33;
+    --color-sidebar-well-hover: #1d1e24;
+    --color-sidebar-line: #272a2d;
+    --color-sidebar-strong: #2e2d32;
+    --color-sidebar-hover: #212225;
+    --color-sidebar-overlay: rgba(35, 36, 42, 0.8);
+    --color-sidebar-online: #0eb39e;
 }
 
 :root {
@@ -113,14 +131,15 @@
     --chart-4: var(--evosales-hairline);
     --chart-5: var(--evosales-canvas-soft);
     --radius: 0.5rem;
-    --sidebar: var(--evosales-canvas);
-    --sidebar-foreground: var(--evosales-ink);
-    --sidebar-primary: var(--evosales-mark);
-    --sidebar-primary-foreground: var(--evosales-canvas);
-    --sidebar-accent: var(--evosales-canvas-soft);
-    --sidebar-accent-foreground: var(--evosales-ink);
-    --sidebar-border: var(--evosales-hairline);
-    --sidebar-ring: var(--evosales-mark);
+    /* Chatwoot dark rail (explicit override of the light chrome, rail only). */
+    --sidebar: #151718;
+    --sidebar-foreground: #b0b4ba;
+    --sidebar-primary: #edeff0;
+    --sidebar-primary-foreground: #151718;
+    --sidebar-accent: rgba(147, 153, 176, 0.12);
+    --sidebar-accent-foreground: #edeff0;
+    --sidebar-border: #1f1f25;
+    --sidebar-ring: #43484e;
 }
 
 @layer base {
@@ -138,5 +157,14 @@
         font-variant-numeric: tabular-nums;
         font-feature-settings: 'tnum';
         letter-spacing: 0;
+    }
+
+    .no-scrollbar {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
     }
 }
