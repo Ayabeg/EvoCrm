@@ -40,6 +40,8 @@ export type NavGroupItem = {
     icon: LucideIcon;
     href?: string;
     external?: boolean;
+    /** Extra paths that also mark this item active (e.g. / for Home). */
+    activePaths?: string[];
     children?: NavLeaf[];
 };
 
@@ -182,6 +184,9 @@ export function NavGroup({ item }: { item: NavGroupItem }) {
         ? pathMatches(
               current.pathname,
               new URL(item.href, current.origin).pathname,
+          ) ||
+          (item.activePaths ?? []).some((path) =>
+              pathMatches(current.pathname, path),
           )
         : false;
     const isExpanded = nav?.expandedItem === item.name;

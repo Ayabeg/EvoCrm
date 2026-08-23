@@ -284,3 +284,16 @@ it('sends guests from / to the login screen, never the command center', function
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('auth/login'));
 });
+
+it('puts Home first on the rail, pointing at the command center', function () {
+    $sidebar = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+
+    expect($sidebar)
+        ->toContain("label: 'Home'")
+        ->toContain("href: '/dashboard'")
+        ->toContain("activePaths: ['/']");
+
+    // Home leads the rail — ahead of My Inbox.
+    expect(strpos($sidebar, "label: 'Home'"))
+        ->toBeLessThan(strpos($sidebar, "label: 'My Inbox'"));
+});

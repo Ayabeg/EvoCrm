@@ -10,6 +10,7 @@ import {
     Facebook,
     Globe,
     Handshake,
+    House,
     Inbox,
     Instagram,
     LibraryBig,
@@ -112,6 +113,13 @@ export function AppSidebar() {
     const collapsed = state === 'collapsed' && !isMobile;
 
     const menuItems: NavGroupItem[] = [
+        {
+            name: 'home',
+            label: 'Home',
+            icon: House,
+            href: '/dashboard',
+            activePaths: ['/'],
+        },
         {
             name: 'inbox',
             label: 'My Inbox',
