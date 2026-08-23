@@ -42,7 +42,6 @@ class ConversationHistoryController extends Controller
         return Inertia::render('crm/conversations', [
             'threads' => $threads,
             'selected' => $selected,
-            'deskUrl' => $workspace->inboxUrl(),
         ]);
     }
 }

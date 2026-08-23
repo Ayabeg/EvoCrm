@@ -178,7 +178,6 @@ class DealController extends Controller
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
             'openPipelineCents' => $openCents,
-            'deskUrl' => $workspace->inboxUrl(),
         ]);
     }
 }

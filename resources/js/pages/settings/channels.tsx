@@ -1,4 +1,4 @@
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -14,8 +14,6 @@ export default function ChannelSettings({
     evolution: { connected: boolean };
     inboxUrl: string;
 }) {
-    const desk = usePage<{ deskUrl?: string }>().props.deskUrl || inboxUrl;
-
     return (
         <>
             <Head title="Channels" />
@@ -27,26 +25,26 @@ export default function ChannelSettings({
                     </p>
                 </div>
                 <Card className="space-y-3 p-4">
-                    <h2 className="font-medium">Desk URL</h2>
+                    <h2 className="font-medium">Desk embed source</h2>
                     <p className="text-sm text-muted-foreground">
-                        The Desk nav item opens this URL in the same window. Default{' '}
-                        <a href="https://desk.evotechly.com" className="underline">
-                            https://desk.evotechly.com
-                        </a>
-                        .
+                        This URL is embedded inside EvoSales at <Link href="/inbox" className="underline">My Inbox</Link>{' '}
+                        — operators stay on this CRM hostname. Default{' '}
+                        <span className="font-medium">https://desk.evotechly.com</span>. If the desk sends
+                        X-Frame-Options, allow-frame this origin on the desk, or clear the URL to use the native
+                        CRM desk at /inbox. Optional path: <code>EVOSALES_INBOX_EMBED_PATH</code>.
                     </p>
                     <Form action="/settings/channels" method="post" className="grid gap-3">
                         {({ processing }) => (
                             <>
                                 <div>
                                     <Label htmlFor="inbox_url">EVOSALES_INBOX_URL</Label>
-                                    <Input id="inbox_url" name="inbox_url" type="url" defaultValue={inboxUrl} required />
+                                    <Input id="inbox_url" name="inbox_url" type="url" defaultValue={inboxUrl} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Button disabled={processing}>Save Desk URL</Button>
-                                    <a href={desk} className="text-sm font-medium text-brand">
-                                        Open Desk
-                                    </a>
+                                    <Link href="/inbox" className="text-sm font-medium text-brand">
+                                        Open inbox
+                                    </Link>
                                 </div>
                             </>
                         )}

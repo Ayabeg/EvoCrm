@@ -86,6 +86,24 @@ class Workspace extends Model
             : (string) config('evosales.inbox_url');
     }
 
+    /**
+     * Embed source for the in-app desk at /inbox. Null when no desk URL is
+     * configured — the /inbox page then renders the native CRM desk instead
+     * of an iframe, so operators never leave the CRM hostname.
+     */
+    public function inboxEmbedUrl(): ?string
+    {
+        $base = $this->inboxUrl();
+
+        if (! filled($base)) {
+            return null;
+        }
+
+        $path = '/'.ltrim((string) config('evosales.inbox_embed_path', '/'), '/');
+
+        return rtrim($base, '/').($path === '/' ? '/' : $path);
+    }
+
     public function savedFilters(): HasMany
     {
         return $this->hasMany(SavedFilter::class);

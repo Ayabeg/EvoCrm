@@ -28,10 +28,10 @@ class ChannelSettingsController extends Controller
         $workspace = $request->user()->workspace;
 
         $data = $request->validate([
-            'inbox_url' => ['required', 'url', 'max:255'],
+            'inbox_url' => ['nullable', 'url', 'max:255'],
         ]);
 
-        $workspace->update(['inbox_url' => $data['inbox_url']]);
+        $workspace->update(['inbox_url' => $data['inbox_url'] ?? null]);
 
         return back();
     }

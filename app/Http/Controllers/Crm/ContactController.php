@@ -118,7 +118,6 @@ class ContactController extends Controller
             'activeFilters' => $filters,
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
-            'deskUrl' => $workspace->inboxUrl(),
         ]);
     }
 }

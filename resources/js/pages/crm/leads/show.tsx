@@ -3,15 +3,15 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-export default function LeadShow({ lead, associations, deskUrl }: { lead: any; associations?: any; deskUrl?: string }) {
+export default function LeadShow({ lead, associations }: { lead: any; associations?: any }) {
     return (
         <>
             <Head title={lead.title} />
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title={lead.title} description={`Status: ${lead.status}`}>
-                    {deskUrl ? (
-                        <a href={deskUrl} className="rounded bg-brand px-3 py-1 text-sm text-canvas">Open in Desk</a>
-                    ) : null}
+                    <Link href="/inbox" className="rounded bg-brand px-3 py-1 text-sm text-canvas">
+                        Open in Inbox
+                    </Link>
                     {lead.status !== 'qualified' ? (
                         <Form action={`/crm/leads/${lead.id}/qualify`} method="post">
                             {({ processing }) => (

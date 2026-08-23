@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     AtSign,
     Bolt,
@@ -10,10 +10,15 @@ import {
     Handshake,
     Inbox,
     LibraryBig,
+    Mail,
+    Mailbox,
     Megaphone,
     MessageCircle,
+    MoonStar,
     PenLine,
     Search,
+    Send,
+    ShieldOff,
     Target,
     UserRoundCheck,
 } from 'lucide-react';
@@ -30,8 +35,6 @@ import { cn } from '@/lib/utils';
  * Conversations group, footer profile. Content stays Light Cabinet.
  */
 export function AppSidebar() {
-    const { deskUrl } = usePage<{ deskUrl?: string }>().props;
-    const inbox = deskUrl || 'https://desk.evotechly.com';
     const { state, isMobile } = useSidebar();
     const collapsed = state === 'collapsed' && !isMobile;
 
@@ -40,8 +43,7 @@ export function AppSidebar() {
             name: 'inbox',
             label: 'My Inbox',
             icon: Inbox,
-            href: inbox,
-            external: true,
+            href: '/inbox',
         },
         {
             name: 'conversations',
@@ -120,6 +122,68 @@ export function AppSidebar() {
             href: '/ads',
         },
         {
+            name: 'outbound',
+            label: 'Outbound',
+            icon: Send,
+            children: [
+                {
+                    name: 'outbound-overview',
+                    label: 'Overview',
+                    href: '/outbound',
+                    icon: ChartSpline,
+                    exact: true,
+                },
+                {
+                    name: 'outbound-sequences',
+                    label: 'Sequences',
+                    href: '/outbound/sequences',
+                    icon: Mail,
+                },
+                {
+                    name: 'outbound-mailboxes',
+                    label: 'Mailboxes',
+                    href: '/outbound/mailboxes',
+                    icon: Mailbox,
+                },
+                {
+                    name: 'outbound-templates',
+                    label: 'Templates',
+                    href: '/outbound/templates',
+                    icon: PenLine,
+                },
+                {
+                    name: 'outbound-outbox',
+                    label: 'Outbox',
+                    href: '/outbound/outbox',
+                    icon: Send,
+                },
+                {
+                    name: 'outbound-replies',
+                    label: 'Replies',
+                    href: '/outbound/replies',
+                    icon: MessageCircle,
+                },
+                {
+                    name: 'outbound-reports',
+                    label: 'Reports',
+                    href: '/outbound/reports',
+                    icon: ChartSpline,
+                },
+                {
+                    name: 'outbound-suppressions',
+                    label: 'Suppression',
+                    href: '/outbound/suppressions',
+                    icon: ShieldOff,
+                },
+                {
+                    name: 'outbound-quiet-hours',
+                    label: 'Quiet hours',
+                    href: '/outbound/quiet-hours',
+                    icon: MoonStar,
+                },
+            ],
+        },
+        {
             name: 'help',
             label: 'Help Center',
             icon: LibraryBig,
@@ -186,13 +250,13 @@ export function AppSidebar() {
                             >
                                 <Search className="size-4 text-sidebar-mute" />
                             </Link>
-                            <a
-                                href={inbox}
+                            <Link
+                                href="/inbox"
                                 title="New conversation"
                                 className="flex size-8 items-center justify-center rounded-lg bg-sidebar-well text-sidebar-mute outline outline-1 outline-sidebar-border transition-all duration-100 ease-out hover:bg-sidebar-well-hover"
                             >
                                 <PenLine className="size-4" />
-                            </a>
+                            </Link>
                         </>
                     ) : (
                         <>
@@ -206,13 +270,13 @@ export function AppSidebar() {
                                     Search...
                                 </span>
                             </Link>
-                            <a
-                                href={inbox}
+                            <Link
+                                href="/inbox"
                                 title="New conversation"
                                 className="inline-flex h-7 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-sidebar-well p-0 text-sidebar-mute outline outline-1 outline-sidebar-border transition-all duration-100 ease-out hover:bg-sidebar-well-hover active:scale-[0.97]"
                             >
                                 <PenLine className="size-4 flex-shrink-0" />
-                            </a>
+                            </Link>
                         </>
                     )}
                 </div>

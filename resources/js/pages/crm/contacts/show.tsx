@@ -1,4 +1,4 @@
-import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -8,14 +8,10 @@ import { Label } from '@/components/ui/label';
 export default function ContactShow({
     contact,
     companies,
-    deskUrl,
 }: {
     contact: any;
     companies: { id: number; name: string }[];
-    deskUrl: string;
 }) {
-    const sharedDesk = usePage<{ deskUrl?: string }>().props.deskUrl || deskUrl;
-
     return (
         <>
             <Head title={contact.first_name} />
@@ -25,7 +21,7 @@ export default function ContactShow({
                     description="Canonical person record. Conversation history and Deals attach here."
                 >
                     <Button asChild variant="secondary">
-                        <a href={sharedDesk}>Open Desk</a>
+                        <Link href="/inbox">Open inbox</Link>
                     </Button>
                 </PageHeader>
                 <Card className="p-4">

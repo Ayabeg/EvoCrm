@@ -98,7 +98,6 @@ class CompanyController extends Controller
             'members' => $hub->members($workspace),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
-            'deskUrl' => $workspace->inboxUrl(),
         ]);
     }
 }

@@ -12,11 +12,17 @@ use App\Http\Controllers\Crm\ReportController;
 use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Desk\InboxController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Outbound\EnrollmentController;
 use App\Http\Controllers\Outbound\MailboxController;
+use App\Http\Controllers\Outbound\OutboundController;
+use App\Http\Controllers\Outbound\OutboundReportController;
+use App\Http\Controllers\Outbound\OutboxController;
 use App\Http\Controllers\Outbound\QuietHoursController;
+use App\Http\Controllers\Outbound\ReplyController;
 use App\Http\Controllers\Outbound\SequenceController;
 use App\Http\Controllers\Outbound\SuppressionController;
 use App\Http\Controllers\Outbound\TemplateController;
+use App\Http\Controllers\Public\TrackingController;
 use App\Http\Controllers\Public\UnsubscribeController;
 use App\Http\Controllers\Settings\ChannelSettingsController;
 use App\Http\Controllers\Settings\CustomAttributeController;
@@ -29,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
+Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
 
 Route::get('/webhooks/evolution', [EvolutionWebhookController::class, 'verify'])->name('webhooks.evolution.verify');
 Route::post('/webhooks/evolution', [EvolutionWebhookController::class, 'handle'])->name('webhooks.evolution');
@@ -37,6 +44,7 @@ Route::post('/webhooks/meta/leads', [MetaLeadWebhookController::class, 'handle']
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
 
+    Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
     Route::post('/desk/threads/{thread}/reply', [InboxController::class, 'reply'])->name('desk.reply');
     Route::get('/conversations', [ConversationHistoryController::class, 'index'])->name('crm.conversations');
@@ -71,15 +79,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/deals/{deal}/move', [DealController::class, 'move'])->name('crm.deals.move');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
+    Route::get('/ads/campaigns/{campaign}', [AdsCenterController::class, 'show'])->name('ads.campaigns.show');
+    Route::post('/ads/sync', [AdsCenterController::class, 'sync'])->name('ads.sync');
+
+    Route::get('/outbound', [OutboundController::class, 'index'])->name('outbound.index');
 
     Route::get('/outbound/mailboxes', [MailboxController::class, 'index'])->name('outbound.mailboxes.index');
     Route::post('/outbound/mailboxes', [MailboxController::class, 'store'])->name('outbound.mailboxes.store');
+    Route::post('/outbound/mailboxes/{mailbox}/toggle', [MailboxController::class, 'toggle'])->name('outbound.mailboxes.toggle');
+    Route::post('/outbound/mailboxes/{mailbox}/default', [MailboxController::class, 'setDefault'])->name('outbound.mailboxes.default');
+    Route::post('/outbound/mailboxes/{mailbox}/test', [MailboxController::class, 'sendTest'])->name('outbound.mailboxes.test');
+    Route::delete('/outbound/mailboxes/{mailbox}', [MailboxController::class, 'destroy'])->name('outbound.mailboxes.destroy');
 
     Route::get('/outbound/sequences', [SequenceController::class, 'index'])->name('outbound.sequences.index');
     Route::post('/outbound/sequences', [SequenceController::class, 'store'])->name('outbound.sequences.store');
     Route::get('/outbound/sequences/{sequence}', [SequenceController::class, 'show'])->name('outbound.sequences.show');
+    Route::post('/outbound/sequences/{sequence}/toggle', [SequenceController::class, 'toggle'])->name('outbound.sequences.toggle');
     Route::post('/outbound/sequences/{sequence}/steps', [SequenceController::class, 'addStep'])->name('outbound.sequences.steps.store');
+    Route::delete('/outbound/sequences/{sequence}/steps/{step}', [SequenceController::class, 'removeStep'])->name('outbound.sequences.steps.destroy');
     Route::post('/outbound/sequences/{sequence}/enroll', [SequenceController::class, 'enroll'])->name('outbound.sequences.enroll');
+
+    Route::post('/outbound/enrollments/{enrollment}/pause', [EnrollmentController::class, 'pause'])->name('outbound.enrollments.pause');
+    Route::post('/outbound/enrollments/{enrollment}/resume', [EnrollmentController::class, 'resume'])->name('outbound.enrollments.resume');
+    Route::post('/outbound/enrollments/{enrollment}/cancel', [EnrollmentController::class, 'cancel'])->name('outbound.enrollments.cancel');
+
+    Route::get('/outbound/outbox', [OutboxController::class, 'index'])->name('outbound.outbox.index');
+    Route::get('/outbound/replies', [ReplyController::class, 'index'])->name('outbound.replies.index');
+    Route::get('/outbound/reports', [OutboundReportController::class, 'index'])->name('outbound.reports.index');
 
     Route::get('/outbound/suppressions', [SuppressionController::class, 'index'])->name('outbound.suppressions.index');
     Route::post('/outbound/suppressions', [SuppressionController::class, 'store'])->name('outbound.suppressions.store');
@@ -88,6 +114,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/outbound/quiet-hours', [QuietHoursController::class, 'update'])->name('outbound.quiet-hours.update');
 
     Route::get('/outbound/templates', [TemplateController::class, 'index'])->name('outbound.templates.index');
+    Route::post('/outbound/templates', [TemplateController::class, 'store'])->name('outbound.templates.store');
+    Route::delete('/outbound/templates/{template}', [TemplateController::class, 'destroy'])->name('outbound.templates.destroy');
     Route::post('/outbound/templates/send', [TemplateController::class, 'send'])->name('outbound.templates.send');
 
     Route::get('/settings/evolution', [EvolutionSettingsController::class, 'edit'])->name('settings.evolution');

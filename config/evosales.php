@@ -9,8 +9,21 @@ return [
     /*
     | Sold Desk is EvoDesk (Chatwoot Community MIT), not a Laravel inbox clone.
     | Default: https://desk.evotechly.com
+    |
+    | The desk is embedded inside the CRM at /inbox (iframe src = inbox_url +
+    | inbox_embed_path). Operators stay on the CRM hostname. If the desk
+    | deployment sends X-Frame-Options: DENY, either allow-frame the CRM
+    | origin on the desk, or leave inbox_url empty to serve the native
+    | CRM conversation desk at /inbox instead.
     */
     'inbox_url' => env('EVOSALES_INBOX_URL', env('EVODESK_URL', 'https://desk.evotechly.com')),
+
+    /*
+    | Path appended to inbox_url for the embedded desk frame. Chatwoot serves
+    | the agent app under /app — set EVOSALES_INBOX_EMBED_PATH=/app if your
+    | EvoDesk does not redirect there itself.
+    */
+    'inbox_embed_path' => env('EVOSALES_INBOX_EMBED_PATH', '/'),
 
     'timezone' => env('APP_TIMEZONE', 'Africa/Algiers'),
 

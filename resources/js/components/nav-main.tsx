@@ -30,6 +30,8 @@ export type NavLeaf = {
     activePaths?: string[];
     /** Query params that must be absent for the leaf to stay active. */
     absentParams?: string[];
+    /** Match the full path only — no prefix match (e.g. /outbound overview). */
+    exact?: boolean;
 };
 
 export type NavGroupItem = {
@@ -95,11 +97,12 @@ function pathMatches(currentPath: string, hrefPath: string): boolean {
 
 function leafIsActive(leaf: NavLeaf, current: URL): boolean {
     const href = new URL(leaf.href, current.origin);
-    const pathHit =
-        pathMatches(current.pathname, href.pathname) ||
-        (leaf.activePaths ?? []).some((path) =>
-            pathMatches(current.pathname, path),
-        );
+    const pathHit = leaf.exact
+        ? current.pathname === href.pathname
+        : pathMatches(current.pathname, href.pathname) ||
+          (leaf.activePaths ?? []).some((path) =>
+              pathMatches(current.pathname, path),
+          );
 
     if (!pathHit) {
         return false;

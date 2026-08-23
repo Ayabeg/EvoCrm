@@ -1,4 +1,4 @@
-import { Form, Head, Link, router, usePage } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,9 +17,7 @@ export default function DealHub({
     cities,
     wilayas,
     openPipelineCents,
-    deskUrl,
 }: any) {
-    const sharedDesk = usePage<{ deskUrl?: string }>().props.deskUrl || deskUrl;
 
     return (
         <>
@@ -121,15 +119,16 @@ export default function DealHub({
                                         <span className="money">{formatDzd(selected.amount_cents)}</span> · {selected.stage?.name} · {selected.next_step ?? 'No next step'}
                                     </p>
                                 </div>
-                                <a href={sharedDesk} className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
-                                    Open in Desk
-                                </a>
+                                <Link href="/inbox" className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
+                                    Open in Inbox
+                                </Link>
                             </header>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
                                 <div className="grid grid-cols-6 gap-1">
                                     {stages.map((stage: any) => {
                                         const column = deals.filter((deal: any) => deal.stage_id === stage.id);
                                         const sum = column.reduce((acc: number, deal: any) => acc + (deal.amount_cents ?? 0), 0);
+
                                         return (
                                             <div key={stage.id} className="rounded border border-hairline bg-canvas-soft p-1">
                                                 <p className="text-[10px] font-semibold">{stage.name}</p>

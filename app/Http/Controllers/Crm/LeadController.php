@@ -64,7 +64,6 @@ class LeadController extends Controller
                 ->forWorkspace($request->user()->workspace)
                 ->orderBy('first_name')
                 ->get(['id', 'first_name', 'last_name']),
-            'deskUrl' => $request->user()->workspace->inboxUrl(),
         ]);
     }
 

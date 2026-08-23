@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { formatDzd } from '@/components/crm/hub-chrome';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -32,12 +32,9 @@ type Props = {
         mode: string;
     };
     meta_connected: boolean;
-    deskUrl: string;
 };
 
-export default function Home({ stats, nextSteps, evolution, meta_connected, deskUrl }: Props) {
-    const sharedDesk = usePage<{ deskUrl?: string }>().props.deskUrl || deskUrl;
-
+export default function Home({ stats, nextSteps, evolution, meta_connected }: Props) {
     return (
         <>
             <Head title="Home" />
@@ -47,7 +44,7 @@ export default function Home({ stats, nextSteps, evolution, meta_connected, desk
                     description="Live in CRM the way you live in EvoDesk. Next steps are open tasks."
                 >
                     <Button asChild>
-                        <a href={sharedDesk}>Open Desk</a>
+                        <Link href="/inbox">Open inbox</Link>
                     </Button>
                 </PageHeader>
 

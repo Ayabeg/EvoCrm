@@ -3,18 +3,59 @@
 namespace App\Http\Controllers\Desk;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Models\Thread;
 use App\Services\Desk\DeskComposer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Response;
 
 class InboxController extends Controller
 {
-    public function index(Request $request, ConversationHistoryController $history): Response
+    /**
+     * Legacy /desk path — the desk now lives inside the CRM at /inbox.
+     */
+    public function index(): RedirectResponse
     {
-        return $history->index($request);
+        return redirect()->route('desk.inbox');
+    }
+
+    /**
+     * My Inbox: the EvoDesk (Chatwoot Community) UI embedded in the CRM
+     * chrome. Operators stay on the CRM hostname; the iframe src is the
+     * workspace desk URL + EVOSALES_INBOX_EMBED_PATH. When no desk URL is
+     * configured, the page falls back to the native CRM conversation desk
+     * (same threads as /conversations) instead of ejecting to another host.
+     */
+    public function inbox(Request $request): Response
+    {
+        $workspace = $request->user()->workspace;
+
+        $threads = Thread::query()
+            ->forWorkspace($workspace)
+            ->with([
+                'contact:id,first_name,last_name,phone_e164,email,company_id',
+                'contact.company:id,name',
+                'channel:id,name,type',
+                'messages' => fn ($q) => $q->latest()->limit(1),
+            ])
+            ->orderByDesc('last_message_at')
+            ->limit(50)
+            ->get();
+
+        $selected = null;
+        if ($threadId = $request->integer('thread')) {
+            $selected = Thread::query()
+                ->forWorkspace($workspace)
+                ->with(['contact.company', 'channel', 'messages.user'])
+                ->find($threadId);
+        }
+
+        return Inertia::render('desk/inbox', [
+            'embedUrl' => $workspace->inboxEmbedUrl(),
+            'threads' => $threads,
+            'selected' => $selected,
+        ]);
     }
 
     public function reply(Request $request, Thread $thread, DeskComposer $composer): RedirectResponse

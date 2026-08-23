@@ -1,4 +1,4 @@
-import { Form, Head, Link, router, usePage } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,9 +15,7 @@ export default function ContactHub({
     activeFilters,
     cities,
     wilayas,
-    deskUrl,
 }: any) {
-    const sharedDesk = usePage<{ deskUrl?: string }>().props.deskUrl || deskUrl;
 
     return (
         <>
@@ -108,9 +106,9 @@ export default function ContactHub({
                                         {selected.phone_e164 ?? 'No phone'} · {selected.email ?? 'No email'} · {selected.city ?? selected.company?.city ?? '—'}
                                     </p>
                                 </div>
-                                <a href={sharedDesk} className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
-                                    Open in Desk
-                                </a>
+                                <Link href="/inbox" className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
+                                    Open in Inbox
+                                </Link>
                             </header>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
                                 <Form action={`/crm/contacts/${selected.id}`} method="put" className="grid grid-cols-2 gap-2 border-b pb-3">

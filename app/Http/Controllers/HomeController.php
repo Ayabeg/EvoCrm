@@ -49,7 +49,6 @@ class HomeController extends Controller
                 ->get(),
             'evolution' => $evolution->health($workspace),
             'meta_connected' => filled(config('meta.access_token')) && filled(config('meta.ad_account_id')),
-            'deskUrl' => $workspace->inboxUrl(),
         ]);
     }
 }

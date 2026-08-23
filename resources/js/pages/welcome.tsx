@@ -64,7 +64,7 @@ export default function Welcome() {
                     {[
                         [
                             'Desk',
-                            'EvoDesk / Chatwoot Community at desk.evotechly.com. Open from the nav — not a Laravel clone.',
+                            'EvoDesk / Chatwoot Community embedded at My Inbox — the desk never leaves this CRM. Not a Laravel clone.',
                         ],
                         [
                             'CRM',

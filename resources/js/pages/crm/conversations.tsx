@@ -1,4 +1,4 @@
-import { Form, Head, Link, router, usePage } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,6 @@ type Thread = {
 type Props = {
     threads: Thread[];
     selected: Thread | null;
-    deskUrl: string;
 };
 
 function nameOf(contact?: Contact | null) {
@@ -47,9 +46,7 @@ function nameOf(contact?: Contact | null) {
     return `${contact.first_name} ${contact.last_name ?? ''}`.trim();
 }
 
-export default function ConversationHistory({ threads, selected, deskUrl }: Props) {
-    const sharedDesk = usePage<{ deskUrl?: string }>().props.deskUrl || deskUrl;
-
+export default function ConversationHistory({ threads, selected }: Props) {
     return (
         <>
             <Head title="Conversation history" />
@@ -59,17 +56,18 @@ export default function ConversationHistory({ threads, selected, deskUrl }: Prop
                     description="CRM context only — threads synced from the sold Desk (EvoDesk / Chatwoot Community). This is not the Chatwoot clone."
                 >
                     <Button asChild>
-                        <a href={sharedDesk}>Open Desk</a>
+                        <Link href="/inbox">Open inbox</Link>
                     </Button>
                 </PageHeader>
 
                 <Card className="border-hairline bg-canvas p-4 text-sm">
                     <p>
-                        The product inbox lives at{' '}
-                        <a href={sharedDesk} className="font-medium text-brand underline">
-                            {sharedDesk}
-                        </a>
-                        . Use this list to see which Contact and Deal a conversation belongs to.
+                        The live desk is embedded at{' '}
+                        <Link href="/inbox" className="font-medium text-brand underline">
+                            My Inbox
+                        </Link>{' '}
+                        — it never leaves EvoSales. Use this list to see which Contact and Deal a conversation
+                        belongs to.
                     </p>
                 </Card>
 
