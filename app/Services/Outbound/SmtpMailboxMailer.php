@@ -6,7 +6,7 @@ use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Services\Outbound\Contracts\OutboundMailer;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -47,7 +47,7 @@ class SmtpMailboxMailer implements OutboundMailer
                 $email->getHeaders()->addTextHeader('List-Unsubscribe', '<'.$unsubscribe.'>');
             }
 
-            if (app()->environment('testing') || config('mail.default') === 'array') {
+            if ($this->shouldFakeSend()) {
                 Mail::raw((string) $message->body, function ($mail) use ($message): void {
                     $mail->to($message->to_address)->subject($message->subject ?: 'EvoSales');
                 });
@@ -58,13 +58,17 @@ class SmtpMailboxMailer implements OutboundMailer
                     'failure_reason' => null,
                 ])->save();
             } else {
-                $sent = (new Mailer(Transport::fromDsn($dsn)))->send($email);
+                // A send that does not throw is a success. TransportInterface::send()
+                // may return null even when the server accepted the mail (and the
+                // Mailer wrapper discards the SentMessage entirely), so the message
+                // id is read null-safely and the message is marked sent.
+                $sent = $this->deliver($dsn, $email);
 
                 $message->forceFill([
                     'status' => 'sent',
                     'sent_at' => now(),
                     'failure_reason' => null,
-                    'message_id' => $sent->getMessageId() ?: null,
+                    'message_id' => $sent?->getMessageId() ?: null,
                 ])->save();
             }
         } catch (\Throwable $e) {
@@ -75,6 +79,23 @@ class SmtpMailboxMailer implements OutboundMailer
         }
 
         return $message;
+    }
+
+    /**
+     * Tests and the array mailer never open a real SMTP connection.
+     */
+    protected function shouldFakeSend(): bool
+    {
+        return app()->environment('testing') || config('mail.default') === 'array';
+    }
+
+    /**
+     * Send through the transport directly: Mailer::send() returns void, so
+     * only the transport exposes the SentMessage (and it may still be null).
+     */
+    protected function deliver(string $dsn, Email $email): ?SentMessage
+    {
+        return Transport::fromDsn($dsn)->send($email);
     }
 
     /**
