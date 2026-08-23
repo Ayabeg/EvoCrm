@@ -27,6 +27,7 @@ use App\Http\Controllers\Outbound\ReplyController;
 use App\Http\Controllers\Outbound\SequenceController;
 use App\Http\Controllers\Outbound\SuppressionController;
 use App\Http\Controllers\Outbound\TemplateController;
+use App\Http\Controllers\Outbound\WarmupController;
 use App\Http\Controllers\Public\TrackingController;
 use App\Http\Controllers\Public\UnsubscribeController;
 use App\Http\Controllers\Settings\AppsController;
@@ -114,6 +115,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/outbound/mailboxes/{mailbox}/default', [MailboxController::class, 'setDefault'])->name('outbound.mailboxes.default');
     Route::post('/outbound/mailboxes/{mailbox}/test', [MailboxController::class, 'sendTest'])->name('outbound.mailboxes.test');
     Route::delete('/outbound/mailboxes/{mailbox}', [MailboxController::class, 'destroy'])->name('outbound.mailboxes.destroy');
+
+    Route::get('/outbound/warmup', [WarmupController::class, 'index'])->name('outbound.warmup.index');
+    Route::post('/outbound/warmup/{mailbox}/toggle', [WarmupController::class, 'toggle'])->name('outbound.warmup.toggle');
+    Route::put('/outbound/warmup/{mailbox}', [WarmupController::class, 'update'])->name('outbound.warmup.update');
+    Route::post('/outbound/warmup/{mailbox}/include', [WarmupController::class, 'include'])->name('outbound.warmup.include');
 
     Route::get('/outbound/domains', [DomainController::class, 'index'])->name('outbound.domains.index');
     Route::post('/outbound/domains', [DomainController::class, 'store'])->name('outbound.domains.store');

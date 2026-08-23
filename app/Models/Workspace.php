@@ -74,6 +74,11 @@ class Workspace extends Model
         return $this->hasMany(QuietHours::class);
     }
 
+    public function mailboxes(): HasMany
+    {
+        return $this->hasMany(Mailbox::class);
+    }
+
     public function activeQuietHours(): ?QuietHours
     {
         return $this->quietHours()->where('enabled', true)->first();

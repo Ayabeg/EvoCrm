@@ -308,6 +308,8 @@ class DatabaseSeeder extends Seeder
             'next_run_at' => null,
         ]);
 
+        // The main box is mid-warmup: day 3 of the ramp (cap 18 of a 40
+        // ceiling), peer pings on with Sara's active box as its only peer.
         $demoMailbox = Mailbox::query()->create([
             'workspace_id' => $workspace->id,
             'name' => 'Evotechly SMTP (demo)',
@@ -324,9 +326,15 @@ class DatabaseSeeder extends Seeder
             'imap_username' => 'hello@evotechly.com',
             'imap_password' => 'not-a-real-password',
             'is_default' => true,
-            'enabled' => false,
-            'status' => 'disabled',
-            'daily_limit' => 50,
+            'enabled' => true,
+            'status' => 'warming',
+            'daily_limit' => 18,
+            'warmup_day' => 3,
+            'warmup_ceiling' => 40,
+            'warmup_previous_limit' => 50,
+            'warmup_started_at' => now()->subDays(2)->startOfDay()->addHours(9),
+            'warmup_last_advanced_on' => now('Africa/Algiers')->toDateString(),
+            'warmup_peers' => true,
         ]);
 
         Mailbox::query()->create([
@@ -340,9 +348,28 @@ class DatabaseSeeder extends Seeder
             'username' => 'sara@evotechly.com',
             'password' => 'not-a-real-password',
             'is_default' => false,
+            'enabled' => true,
+            'status' => 'active',
+            'daily_limit' => 30,
+            'warmup_ceiling' => 30,
+            'warmup_peers' => true,
+        ]);
+
+        // System roles stay out of warmup unless the operator opts them in.
+        Mailbox::query()->create([
+            'workspace_id' => $workspace->id,
+            'name' => 'Postmaster (demo)',
+            'from_name' => 'Evotechly Postmaster',
+            'from_address' => 'postmaster@evotechly.com',
+            'host' => 'smtp.evotechly.example',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => 'postmaster@evotechly.com',
+            'password' => 'not-a-real-password',
+            'is_default' => false,
             'enabled' => false,
             'status' => 'disabled',
-            'daily_limit' => 30,
+            'daily_limit' => 20,
         ]);
 
         $templates = collect([
@@ -426,7 +453,7 @@ class DatabaseSeeder extends Seeder
             'subject' => 'Bienvenue Evotechly',
             'body' => 'Merci pour votre intérêt.',
             'status' => 'failed',
-            'failure_reason' => 'No mailbox configured. SMTP send is disabled until a mailbox is added.',
+            'failure_reason' => 'SMTP timeout talking to smtp.evotechly.example:587.',
             'created_at' => now()->subHours(6),
         ]);
 
@@ -442,6 +469,48 @@ class DatabaseSeeder extends Seeder
             'body' => 'Voici le recap.',
             'status' => 'queued',
             'created_at' => now()->subHour(),
+        ]);
+
+        // Warmup history for the demo box: the ramp climbed 8 → 12 → 18 over
+        // the last three Algiers days, and sends stayed under each day's cap.
+        $warmupSends = [
+            [2, 5],   // day 1 of the ramp: 6 sent incl. $sentOne, cap 8
+            [1, 9],   // day 2: 10 sent incl. $sentTwo, cap 12
+            [0, 4],   // today so far, cap 18
+        ];
+
+        foreach ($warmupSends as [$daysAgo, $count]) {
+            foreach (range(1, $count) as $n) {
+                $contact = $contacts[($daysAgo * 5 + $n) % $contacts->count()];
+
+                OutboundMessage::query()->create([
+                    'workspace_id' => $workspace->id,
+                    'contact_id' => $contact->id,
+                    'mailbox_id' => $demoMailbox->id,
+                    'channel' => 'email',
+                    'direction' => 'out',
+                    'to_address' => $contact->email,
+                    'subject' => 'Warmup touch — '.$contact->company?->name,
+                    'body' => 'Bonjour '.$contact->first_name.', …',
+                    'status' => 'sent',
+                    'sent_at' => now()->subDays($daysAgo)->subHours(3 + $n),
+                ]);
+            }
+        }
+
+        // One honest failure inside the warmup window (fail rate > 0).
+        OutboundMessage::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contacts[8]->id,
+            'mailbox_id' => $demoMailbox->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $contacts[8]->email,
+            'subject' => 'Warmup touch — '.$contacts[8]->company?->name,
+            'body' => 'Bonjour '.$contacts[8]->first_name.', …',
+            'status' => 'failed',
+            'failure_reason' => 'SMTP timeout talking to smtp.evotechly.example:587.',
+            'created_at' => now()->subDay(),
         ]);
 
         unset($sentOne);

@@ -8,6 +8,7 @@ import {
     ClockAlert,
     Contact,
     Facebook,
+    Flame,
     Globe,
     Handshake,
     House,
@@ -226,6 +227,12 @@ export function AppSidebar() {
                     label: 'Mailboxes',
                     href: '/outbound/mailboxes',
                     icon: Mailbox,
+                },
+                {
+                    name: 'outbound-warmup',
+                    label: 'Warmup',
+                    href: '/outbound/warmup',
+                    icon: Flame,
                 },
                 {
                     name: 'outbound-domains',

@@ -46,6 +46,27 @@ function ChartFrame({
                     </p>
                 ) : null}
             </div>
+            {payload.series.length > 1 ? (
+                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                    {payload.series.map((series, i) => (
+                        <span
+                            key={series.name}
+                            className="flex items-center gap-1.5 text-[11px] text-muted-foreground"
+                        >
+                            <span
+                                className="size-2 shrink-0 rounded-full"
+                                style={{
+                                    backgroundColor: evovizSeriesColor(
+                                        series,
+                                        i,
+                                    ),
+                                }}
+                            />
+                            {series.name}
+                        </span>
+                    ))}
+                </div>
+            ) : null}
             <div className="mt-2">{children}</div>
         </div>
     );
@@ -129,21 +150,7 @@ function LineChart({
     payload: EvoVizPayload;
     filled: boolean;
 }) {
-    const series = payload.series[0];
-    const color = evovizSeriesColor(series, 0);
-    const max = Math.max(...series.data, 1);
-    const points = pointsFor(series.data, payload.labels.length, max);
-    const path = points
-        .map(
-            (p, i) =>
-                `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`,
-        )
-        .join(' ');
-    const areaPath = `${path} L${points[points.length - 1].x.toFixed(1)},${(
-        PAD_TOP + PLOT_H
-    ).toFixed(
-        1,
-    )} L${points[0].x.toFixed(1)},${(PAD_TOP + PLOT_H).toFixed(1)} Z`;
+    const max = Math.max(...payload.series.flatMap((series) => series.data), 1);
     const every = Math.max(1, Math.ceil(payload.labels.length / 7));
 
     return (
@@ -153,17 +160,45 @@ function LineChart({
             role="img"
             aria-label={payload.title}
         >
-            {filled ? (
-                <path d={areaPath} fill={color} fillOpacity={0.12} />
-            ) : null}
-            <path
-                d={path}
-                fill="none"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinejoin="round"
-                strokeLinecap="round"
-            />
+            {payload.series.map((series, seriesIndex) => {
+                const color = evovizSeriesColor(series, seriesIndex);
+                const points = pointsFor(
+                    series.data,
+                    payload.labels.length,
+                    max,
+                );
+                const path = points
+                    .map(
+                        (p, i) =>
+                            `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`,
+                    )
+                    .join(' ');
+                const areaPath = `${path} L${points[points.length - 1].x.toFixed(1)},${(
+                    PAD_TOP + PLOT_H
+                ).toFixed(
+                    1,
+                )} L${points[0].x.toFixed(1)},${(PAD_TOP + PLOT_H).toFixed(1)} Z`;
+
+                return (
+                    <g key={series.name}>
+                        {filled ? (
+                            <path
+                                d={areaPath}
+                                fill={color}
+                                fillOpacity={0.12}
+                            />
+                        ) : null}
+                        <path
+                            d={path}
+                            fill="none"
+                            stroke={color}
+                            strokeWidth={2}
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                        />
+                    </g>
+                );
+            })}
             <Baseline />
             <XLabels labels={payload.labels} every={every} />
         </svg>

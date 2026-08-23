@@ -28,6 +28,13 @@ use Illuminate\Database\Eloquent\Model;
     'enabled',
     'status',
     'daily_limit',
+    'warmup_day',
+    'warmup_ceiling',
+    'warmup_previous_limit',
+    'warmup_started_at',
+    'warmup_last_advanced_on',
+    'warmup_peers',
+    'warmup_opted_in',
     'last_tested_at',
 ])]
 #[Hidden(['password', 'imap_password'])]
@@ -44,6 +51,13 @@ class Mailbox extends Model
             'is_default' => 'boolean',
             'enabled' => 'boolean',
             'daily_limit' => 'integer',
+            'warmup_day' => 'integer',
+            'warmup_ceiling' => 'integer',
+            'warmup_previous_limit' => 'integer',
+            'warmup_started_at' => 'datetime',
+            'warmup_last_advanced_on' => 'date',
+            'warmup_peers' => 'boolean',
+            'warmup_opted_in' => 'boolean',
             'last_tested_at' => 'datetime',
         ];
     }
@@ -79,5 +93,38 @@ class Mailbox extends Model
     public function overDailyLimit(): bool
     {
         return $this->daily_limit > 0 && $this->sentToday() >= $this->daily_limit;
+    }
+
+    public function warming(): bool
+    {
+        return $this->enabled && $this->effectiveStatus() === 'warming';
+    }
+
+    public function remainingToday(): int
+    {
+        return max(0, $this->daily_limit - $this->sentToday());
+    }
+
+    /**
+     * Bounce/fail rate over a trailing window, from this workspace's own
+     * OutboundMessage log — failures divided by dispatch attempts.
+     */
+    public function failRate(int $days = 14): float
+    {
+        $attempts = OutboundMessage::query()
+            ->where('mailbox_id', $this->id)
+            ->where('direction', 'out')
+            ->whereIn('status', ['sent', 'failed'])
+            ->where('created_at', '>=', now()->subDays($days));
+
+        $total = (clone $attempts)->count();
+
+        if ($total === 0) {
+            return 0.0;
+        }
+
+        $failed = (clone $attempts)->where('status', 'failed')->count();
+
+        return round($failed / $total * 100, 1);
     }
 }
