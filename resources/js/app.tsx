@@ -33,9 +33,9 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#0F4C5C',
+        color: '#EC6025',
     },
 });
 
-// This will set light / dark mode on load...
+// Light Cabinet only — strips any stale dark preference on load.
 initializeTheme();

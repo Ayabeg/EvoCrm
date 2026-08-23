@@ -64,7 +64,7 @@ export default function ContactHub({
                             </Form>
                             <div className="mt-1 flex flex-wrap gap-1">
                                 {savedFilters.map((filter: any) => (
-                                    <Link key={filter.id} href={`/crm/contacts?filter_id=${filter.id}`} className="rounded bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] text-ink">
+                                    <Link key={filter.id} href={`/crm/contacts?filter_id=${filter.id}`} className="rounded bg-canvas-soft px-1.5 py-0.5 text-[10px] text-ink">
                                         {filter.name}
                                     </Link>
                                 ))}
@@ -81,7 +81,7 @@ export default function ContactHub({
                                         <span className="truncate font-medium">
                                             {contact.first_name} {contact.last_name}
                                         </span>
-                                        {contact.unanswered ? <span className="text-[10px] text-amber-700">Unanswered</span> : null}
+                                        {contact.unanswered ? <span className="text-[10px] text-brand">Unanswered</span> : null}
                                     </div>
                                     <p className="truncate text-[11px] text-muted-foreground">
                                         {contact.company?.name ?? 'No company'} · {contact.owner?.name ?? 'Unassigned'}

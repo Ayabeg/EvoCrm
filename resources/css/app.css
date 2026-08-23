@@ -9,24 +9,20 @@
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
-@custom-variant dark (&:is(.dark *));
-
 /*
- * Aurora 1.1.0 tokens copied from Mohamedbeghanem/Brandbook DESIGN.md
- * frontmatter. Do not invent hex. No EvoSales product ramp (docs/23 has none).
- * Brand teal + voltage are for interactive CTAs only.
+ * EvoSales palette — white + black + orange. Do not invent more.
+ * Canvas #FFFFFF, soft white #F7F7F6 (page wash only), ink #111111,
+ * mute #525252, hairline #E5E5E5, Evotechly mark orange #EC6025.
+ * Orange is the only action color: CTAs, links, active pip, action badges.
+ * Light Cabinet is the only face — there is no dark kit.
  */
 :root {
-    --aurora-brand: #0f4c5c;
-    --aurora-voltage: #4f46e5;
-    --aurora-ink: #0d1b24;
-    --aurora-canvas: #ffffff;
-    --aurora-canvas-soft: #f0f5fa;
-    --aurora-hairline: #e3e8ee;
-    --aurora-active-pill: #f1f5f9;
-    --aurora-mark: #ec6025;
-    /* Listed tokens only: brand → ink. */
-    --aurora-hero: linear-gradient(160deg, #0f4c5c 0%, #0d1b24 100%);
+    --evosales-canvas: #ffffff;
+    --evosales-canvas-soft: #f7f7f6;
+    --evosales-ink: #111111;
+    --evosales-mute: #525252;
+    --evosales-hairline: #e5e5e5;
+    --evosales-mark: #ec6025;
 }
 
 @theme {
@@ -82,84 +78,49 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
-    --color-brand: var(--aurora-brand);
-    --color-voltage: var(--aurora-voltage);
-    --color-ink: var(--aurora-ink);
-    --color-canvas: var(--aurora-canvas);
-    --color-canvas-soft: var(--aurora-canvas-soft);
-    --color-hairline: var(--aurora-hairline);
+    --color-brand: var(--evosales-mark);
+    --color-ink: var(--evosales-ink);
+    --color-mute: var(--evosales-mute);
+    --color-canvas: var(--evosales-canvas);
+    --color-canvas-soft: var(--evosales-canvas-soft);
+    --color-hairline: var(--evosales-hairline);
 }
 
 :root {
-    --background: var(--aurora-canvas-soft);
-    --foreground: var(--aurora-ink);
-    --card: var(--aurora-canvas);
-    --card-foreground: var(--aurora-ink);
-    --popover: var(--aurora-canvas);
-    --popover-foreground: var(--aurora-ink);
-    --primary: var(--aurora-brand);
-    --primary-foreground: var(--aurora-canvas);
-    --secondary: var(--aurora-active-pill);
-    --secondary-foreground: var(--aurora-ink);
-    --muted: var(--aurora-active-pill);
-    --muted-foreground: color-mix(in srgb, var(--aurora-ink) 62%, var(--aurora-canvas));
-    --accent: var(--aurora-active-pill);
-    --accent-foreground: var(--aurora-ink);
-    /* Not in DESIGN.md frontmatter — keep framework default, not a brand ramp. */
+    --background: var(--evosales-canvas-soft);
+    --foreground: var(--evosales-ink);
+    --card: var(--evosales-canvas);
+    --card-foreground: var(--evosales-ink);
+    --popover: var(--evosales-canvas);
+    --popover-foreground: var(--evosales-ink);
+    --primary: var(--evosales-mark);
+    --primary-foreground: var(--evosales-canvas);
+    --secondary: var(--evosales-canvas-soft);
+    --secondary-foreground: var(--evosales-ink);
+    --muted: var(--evosales-canvas-soft);
+    --muted-foreground: var(--evosales-mute);
+    --accent: var(--evosales-canvas-soft);
+    --accent-foreground: var(--evosales-ink);
+    /* Framework semantic, not a brand color — delete/destructive flows only. */
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: var(--aurora-hairline);
-    --input: var(--aurora-hairline);
-    --ring: var(--aurora-voltage);
-    --chart-1: var(--aurora-brand);
-    --chart-2: var(--aurora-voltage);
-    --chart-3: var(--aurora-ink);
-    --chart-4: color-mix(in srgb, var(--aurora-brand) 55%, var(--aurora-canvas));
-    --chart-5: color-mix(in srgb, var(--aurora-voltage) 45%, var(--aurora-ink));
+    --border: var(--evosales-hairline);
+    --input: var(--evosales-hairline);
+    --ring: var(--evosales-mark);
+    --chart-1: var(--evosales-mark);
+    --chart-2: var(--evosales-ink);
+    --chart-3: var(--evosales-mute);
+    --chart-4: var(--evosales-hairline);
+    --chart-5: var(--evosales-canvas-soft);
     --radius: 0.5rem;
-    --sidebar: var(--aurora-canvas);
-    --sidebar-foreground: var(--aurora-ink);
-    --sidebar-primary: var(--aurora-brand);
-    --sidebar-primary-foreground: var(--aurora-canvas);
-    --sidebar-accent: var(--aurora-active-pill);
-    --sidebar-accent-foreground: var(--aurora-ink);
-    --sidebar-border: var(--aurora-hairline);
-    --sidebar-ring: var(--aurora-voltage);
-}
-
-.dark {
-    --background: var(--aurora-ink);
-    --foreground: var(--aurora-canvas);
-    --card: var(--aurora-ink);
-    --card-foreground: var(--aurora-canvas);
-    --popover: var(--aurora-ink);
-    --popover-foreground: var(--aurora-canvas);
-    --primary: var(--aurora-brand);
-    --primary-foreground: var(--aurora-canvas);
-    --secondary: color-mix(in srgb, var(--aurora-canvas) 10%, var(--aurora-ink));
-    --secondary-foreground: var(--aurora-canvas);
-    --muted: color-mix(in srgb, var(--aurora-canvas) 10%, var(--aurora-ink));
-    --muted-foreground: color-mix(in srgb, var(--aurora-canvas) 68%, var(--aurora-ink));
-    --accent: color-mix(in srgb, var(--aurora-canvas) 10%, var(--aurora-ink));
-    --accent-foreground: var(--aurora-canvas);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: color-mix(in srgb, var(--aurora-canvas) 14%, var(--aurora-ink));
-    --input: color-mix(in srgb, var(--aurora-canvas) 14%, var(--aurora-ink));
-    --ring: var(--aurora-voltage);
-    --chart-1: var(--aurora-brand);
-    --chart-2: var(--aurora-voltage);
-    --chart-3: var(--aurora-canvas);
-    --chart-4: color-mix(in srgb, var(--aurora-brand) 70%, var(--aurora-canvas));
-    --chart-5: color-mix(in srgb, var(--aurora-voltage) 70%, var(--aurora-canvas));
-    --sidebar: var(--aurora-ink);
-    --sidebar-foreground: var(--aurora-canvas);
-    --sidebar-primary: var(--aurora-brand);
-    --sidebar-primary-foreground: var(--aurora-canvas);
-    --sidebar-accent: color-mix(in srgb, var(--aurora-canvas) 10%, var(--aurora-ink));
-    --sidebar-accent-foreground: var(--aurora-canvas);
-    --sidebar-border: color-mix(in srgb, var(--aurora-canvas) 14%, var(--aurora-ink));
-    --sidebar-ring: var(--aurora-voltage);
+    --sidebar: var(--evosales-canvas);
+    --sidebar-foreground: var(--evosales-ink);
+    --sidebar-primary: var(--evosales-mark);
+    --sidebar-primary-foreground: var(--evosales-canvas);
+    --sidebar-accent: var(--evosales-canvas-soft);
+    --sidebar-accent-foreground: var(--evosales-ink);
+    --sidebar-border: var(--evosales-hairline);
+    --sidebar-ring: var(--evosales-mark);
 }
 
 @layer base {
@@ -173,10 +134,6 @@
 }
 
 @layer utilities {
-    .aurora-hero {
-        background-image: var(--aurora-hero);
-    }
-
     .money {
         font-variant-numeric: tabular-nums;
         font-feature-settings: 'tnum';

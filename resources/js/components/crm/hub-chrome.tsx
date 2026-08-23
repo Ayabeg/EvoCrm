@@ -34,7 +34,9 @@ export function HubListRow({
             type="button"
             onClick={onClick}
             className={`w-full border-b px-3 py-2 text-left ${
-                active ? 'bg-[#F1F5F9]' : 'hover:bg-canvas-soft'
+                active
+                    ? 'bg-canvas-soft shadow-[inset_2px_0_0_0_var(--color-brand)]'
+                    : 'hover:bg-canvas-soft'
             }`}
         >
             {children}

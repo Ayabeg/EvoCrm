@@ -29,7 +29,7 @@ export default function AdsIndex({
                         </Badge>
                     </div>
                     {meta.reason ? (
-                        <p className="mt-2 text-sm text-amber-700 dark:text-amber-300">{meta.reason}</p>
+                        <p className="mt-2 text-sm text-brand">{meta.reason}</p>
                     ) : null}
                     {!meta.connected ? (
                         <p className="mt-3 text-sm text-muted-foreground">

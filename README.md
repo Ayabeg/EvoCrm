@@ -20,12 +20,13 @@ Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotech
 
 ## Brand
 
-Visual source of truth is **[Aurora 1.1.0 / Brandbook](https://github.com/Mohamedbeghanem/Brandbook)** — not a git submodule. Logo SVGs and DESIGN.md tokens are copied into this repo.
+EvoSales is **white + black + orange**. Do not invent more.
 
 - Company mark: `public/brand/evotechly/mark.svg` (artwork fill `#EC6025`, do not recolor). Favicon is the mark.
-- Tokens in `resources/css/app.css`: brand `#0F4C5C`, voltage `#4F46E5`, ink `#0D1B24`, canvas `#FFFFFF`, canvas-soft `#F0F5FA`, hairline `#E3E8EE`, Geist, Light Cabinet face.
-- There is **no EvoSales product ramp** in Brandbook docs/23. Brand teal + voltage are for interactive CTAs only. Do not invent tokens or rainbow the UI.
-- Default product face: Light Cabinet (~240px labeled sidebar, soft active pill `#F1F5F9`, white cards + hairlines, ~52px topbar).
+- Tokens in `resources/css/app.css`: canvas `#FFFFFF`, canvas-soft `#F7F7F6` (page wash only), ink `#111111`, mute `#525252`, hairline `#E5E5E5`, mark/brand `#EC6025`, Geist, Light Cabinet face.
+- Orange `#EC6025` is the only action color: CTAs, links, active sidebar pip, Open Desk button, action badges.
+- **Light only.** The dark kit is removed — `.dark` is never applied and no dark tokens exist.
+- Default product face: Light Cabinet (~240px labeled white sidebar, black labels, orange left-pip active, white cards + hairlines, ~52px topbar).
 - Titles and auth mail: **EvoSales · Evotechly**.
 
 ## Stack

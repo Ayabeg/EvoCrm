@@ -44,7 +44,7 @@ export default function EvolutionSettings({
                         {config.waba_id_set ? 'set' : 'empty'}
                     </p>
                     {health.reason ? (
-                        <p className="text-amber-700 dark:text-amber-300">{health.reason}</p>
+                        <p className="text-brand">{health.reason}</p>
                     ) : null}
                     <Form action="/settings/evolution/sync" method="post">
                         {({ processing }) => (

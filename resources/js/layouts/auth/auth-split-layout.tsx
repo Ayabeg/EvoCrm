@@ -12,19 +12,18 @@ export default function AuthSplitLayout({
 
     return (
         <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="relative hidden h-full flex-col p-10 text-canvas lg:flex">
-                <div className="aurora-hero absolute inset-0" />
+            <div className="relative hidden h-full flex-col border-r border-hairline bg-canvas-soft p-10 text-ink lg:flex">
                 <Link
                     href={home()}
                     className="relative z-20 flex items-center gap-2 text-lg font-medium"
                 >
                     <AppLogoIcon className="size-8" />
                     <span>EvoSales</span>
-                    <span className="text-sm font-normal text-canvas/70">
+                    <span className="text-sm font-normal text-mute">
                         · Evotechly
                     </span>
                 </Link>
-                <div className="relative z-20 mt-auto max-w-sm text-sm text-canvas/80">
+                <div className="relative z-20 mt-auto max-w-sm text-sm text-mute">
                     {name} is Evotechly’s sales OS. Desk, CRM, Ads, and
                     Outbound — one login.
                 </div>

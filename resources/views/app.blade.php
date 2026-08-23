@@ -1,33 +1,18 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'light') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- Light Cabinet is the default product face. Dark only if the user chose it. --}}
+        {{-- Light Cabinet is the only product face. The dark kit is gone: never apply .dark. --}}
         <script>
-            (function() {
-                const appearance = '{{ $appearance ?? "light" }}';
-
-                if (appearance === 'dark') {
-                    document.documentElement.classList.add('dark');
-                } else if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
-                    }
-                }
-            })();
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
         </script>
 
         <style>
             html {
-                background-color: #F0F5FA;
-            }
-
-            html.dark {
-                background-color: #0D1B24;
+                background-color: #F7F7F6;
             }
         </style>
 

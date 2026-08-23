@@ -123,7 +123,7 @@ export default function Home({ stats, nextSteps, evolution, meta_connected, desk
                             Mode {evolution.mode}. Baileys, QR, and Linked-devices are refused.
                         </p>
                         {evolution.reason ? (
-                            <p className="text-amber-700 dark:text-amber-300">{evolution.reason}</p>
+                            <p className="text-brand">{evolution.reason}</p>
                         ) : null}
                         <Link href="/settings/evolution" className="text-brand">
                             Open Evolution settings

@@ -32,7 +32,7 @@ export default function MetaSettings({
                     <p>App ID: {app_id_set ? 'set' : 'empty'}</p>
                     <p>Ad account ID: {ad_account_id_set ? 'set' : 'empty'}</p>
                     <p>Graph version: {graph_version}</p>
-                    {reason ? <p className="text-amber-700 dark:text-amber-300">{reason}</p> : null}
+                    {reason ? <p className="text-brand">{reason}</p> : null}
                 </Card>
             </div>
         </>

@@ -30,7 +30,7 @@ export default function DealHub({
                         <div className="border-b px-3 py-2">
                             <div className="flex items-center justify-between">
                                 <h1 className="text-sm font-semibold">Deals</h1>
-                                <span className="money text-[11px] text-brand">{formatDzd(openPipelineCents)}</span>
+                                <span className="money text-[11px] text-ink">{formatDzd(openPipelineCents)}</span>
                             </div>
                             <Form action="/crm/deals" method="get" className="mt-2 grid grid-cols-2 gap-1">
                                 <select name="stage" defaultValue={activeFilters.stage ?? ''} className="h-7 rounded border bg-background px-1 text-[11px]">
@@ -73,7 +73,7 @@ export default function DealHub({
                             </Form>
                             <div className="mt-1 flex flex-wrap gap-1">
                                 {savedFilters.map((filter: any) => (
-                                    <Link key={filter.id} href={`/crm/deals?filter_id=${filter.id}`} className="rounded bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] text-ink">
+                                    <Link key={filter.id} href={`/crm/deals?filter_id=${filter.id}`} className="rounded bg-canvas-soft px-1.5 py-0.5 text-[10px] text-ink">
                                         {filter.name}
                                     </Link>
                                 ))}
@@ -133,7 +133,7 @@ export default function DealHub({
                                         return (
                                             <div key={stage.id} className="rounded border border-hairline bg-canvas-soft p-1">
                                                 <p className="text-[10px] font-semibold">{stage.name}</p>
-                                                <p className="money text-[10px] text-brand">{formatDzd(sum)}</p>
+                                                <p className="money text-[10px] text-ink">{formatDzd(sum)}</p>
                                                 <p className="text-[10px] text-muted-foreground">{column.length}</p>
                                             </div>
                                         );
