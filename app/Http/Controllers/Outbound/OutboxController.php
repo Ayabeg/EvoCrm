@@ -15,11 +15,17 @@ class OutboxController extends Controller
         $workspace = $request->user()->workspace;
         $status = $request->string('status')->toString();
 
-        $messages = OutboundMessage::query()
+        $base = fn () => OutboundMessage::query()
             ->forWorkspace($workspace)
-            ->where('direction', 'out')
-            ->when($status !== '', fn ($q) => $q->where('status', $status))
-            ->with(['contact:id,first_name,last_name,email', 'mailbox:id,name,from_address', 'sequence:id,name'])
+            ->where('direction', 'out');
+
+        $messages = $base()
+            ->when($status === 'deferred', fn ($q) => $q
+                ->where('status', 'queued')
+                ->whereNotNull('deferred_until')
+                ->where('deferred_until', '>', now()))
+            ->when($status !== '' && $status !== 'deferred', fn ($q) => $q->where('status', $status))
+            ->with(['contact:id,first_name,last_name,email', 'mailbox:id,name,from_address', 'sequence:id,name', 'campaign:id,name'])
             ->latest()
             ->limit(100)
             ->get();
@@ -28,9 +34,15 @@ class OutboxController extends Controller
             'messages' => $messages,
             'status' => $status,
             'counts' => [
-                'queued' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'queued')->count(),
-                'sent' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'sent')->count(),
-                'failed' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'failed')->count(),
+                'queued' => $base()->where('status', 'queued')
+                    ->where(fn ($q) => $q->whereNull('deferred_until')->orWhere('deferred_until', '<=', now()))
+                    ->count(),
+                'deferred' => $base()->where('status', 'queued')
+                    ->whereNotNull('deferred_until')
+                    ->where('deferred_until', '>', now())
+                    ->count(),
+                'sent' => $base()->where('status', 'sent')->count(),
+                'failed' => $base()->where('status', 'failed')->count(),
             ],
         ]);
     }

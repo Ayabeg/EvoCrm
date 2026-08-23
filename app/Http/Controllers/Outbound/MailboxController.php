@@ -8,6 +8,7 @@ use App\Models\Mailbox;
 use App\Services\Outbound\OutboundDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -60,6 +61,54 @@ class MailboxController extends Controller
             'status' => 'disabled',
             'daily_limit' => $data['daily_limit'] ?? 50,
         ]);
+
+        return back();
+    }
+
+    /**
+     * Full edit. Passwords are write-only: leave blank to keep the stored
+     * one. Warmup status is operator-managed (warming → active).
+     */
+    public function update(Request $request, Mailbox $mailbox): RedirectResponse
+    {
+        abort_unless((int) $mailbox->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'from_name' => ['required', 'string', 'max:120'],
+            'from_address' => ['required', 'email'],
+            'host' => ['required', 'string', 'max:180'],
+            'port' => ['required', 'integer', 'min:1'],
+            'encryption' => ['required', 'in:tls,ssl,none'],
+            'username' => ['required', 'string', 'max:180'],
+            'password' => ['nullable', 'string', 'max:255'],
+            'imap_host' => ['nullable', 'string', 'max:180'],
+            'imap_port' => ['nullable', 'integer', 'min:1'],
+            'imap_encryption' => ['nullable', 'in:tls,ssl,none'],
+            'imap_username' => ['nullable', 'string', 'max:180'],
+            'imap_password' => ['nullable', 'string', 'max:255'],
+            'daily_limit' => ['nullable', 'integer', 'min:0', 'max:10000'],
+            'status' => ['nullable', 'in:warming,active'],
+        ]);
+
+        $mailbox->forceFill([
+            ...Arr::except($data, ['password', 'imap_password', 'status']),
+            'daily_limit' => $data['daily_limit'] ?? $mailbox->daily_limit,
+        ]);
+
+        if (filled($data['password'] ?? null)) {
+            $mailbox->password = $data['password'];
+        }
+
+        if (filled($data['imap_password'] ?? null)) {
+            $mailbox->imap_password = $data['imap_password'];
+        }
+
+        if ($mailbox->enabled && filled($data['status'] ?? null)) {
+            $mailbox->status = $data['status'];
+        }
+
+        $mailbox->save();
 
         return back();
     }

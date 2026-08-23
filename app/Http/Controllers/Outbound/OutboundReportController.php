@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Outbound;
 
 use App\Http\Controllers\Controller;
+use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
 use App\Models\Sequence;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class OutboundReportController extends Controller
             'sent' => (clone $out)->where('status', 'sent')->count(),
             'failed' => (clone $out)->where('status', 'failed')->count(),
             'opened' => (clone $out)->whereNotNull('opened_at')->count(),
+            'clicked' => (clone $out)->whereNotNull('clicked_at')->count(),
             'replied' => (clone $out)->whereNotNull('replied_at')->count(),
             'bounced' => (clone $out)->where('failure_reason', 'like', '%bounce%')->count(),
         ];
@@ -62,6 +64,20 @@ class OutboundReportController extends Controller
                     ->count(),
             ]);
 
+        $perCampaign = OutboundCampaign::query()
+            ->forWorkspace($workspace)
+            ->latest()
+            ->limit(20)
+            ->get()
+            ->map(fn (OutboundCampaign $campaign) => [
+                'id' => $campaign->id,
+                'name' => $campaign->name,
+                'status' => $campaign->status,
+                'audience_count' => $campaign->audience_count,
+                'suppressed_count' => $campaign->suppressed_count,
+                ...$campaign->messageCounts(),
+            ]);
+
         $daily = OutboundMessage::query()
             ->forWorkspace($workspace)
             ->where('direction', 'out')
@@ -75,10 +91,12 @@ class OutboundReportController extends Controller
         return Inertia::render('outbound/reports', [
             'totals' => $totals,
             'perSequence' => $perSequence,
+            'perCampaign' => $perCampaign,
             'daily' => $daily,
             'tracking' => [
                 'sent' => 'Logged for every dispatch attempt.',
                 'opened' => 'Tracked with a 1px image — only counts recipients whose mail client loads remote images.',
+                'clicked' => 'Tracked by rewriting links through a redirect on this host — only counts recipients who follow a link.',
                 'replied' => 'Tracked when the IMAP poller matches an inbound mail to a contact. Requires mailbox IMAP settings + ext-imap.',
                 'bounced' => 'Not tracked yet — needs ESP webhooks or bounce-box parsing. Counts shown are failures mentioning a bounce.',
             ],

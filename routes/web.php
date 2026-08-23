@@ -13,6 +13,8 @@ use App\Http\Controllers\Crm\ReportController;
 use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Desk\InboxController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Outbound\CampaignController;
+use App\Http\Controllers\Outbound\DomainController;
 use App\Http\Controllers\Outbound\EnrollmentController;
 use App\Http\Controllers\Outbound\MailboxController;
 use App\Http\Controllers\Outbound\OutboundController;
@@ -42,6 +44,7 @@ Route::middleware('guest')->group(function () {
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
+Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])->name('outbound.track.click');
 
 Route::get('/webhooks/evolution', [EvolutionWebhookController::class, 'verify'])->name('webhooks.evolution.verify');
 Route::post('/webhooks/evolution', [EvolutionWebhookController::class, 'handle'])->name('webhooks.evolution');
@@ -92,16 +95,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/outbound/mailboxes', [MailboxController::class, 'index'])->name('outbound.mailboxes.index');
     Route::post('/outbound/mailboxes', [MailboxController::class, 'store'])->name('outbound.mailboxes.store');
+    Route::put('/outbound/mailboxes/{mailbox}', [MailboxController::class, 'update'])->name('outbound.mailboxes.update');
     Route::post('/outbound/mailboxes/{mailbox}/toggle', [MailboxController::class, 'toggle'])->name('outbound.mailboxes.toggle');
     Route::post('/outbound/mailboxes/{mailbox}/default', [MailboxController::class, 'setDefault'])->name('outbound.mailboxes.default');
     Route::post('/outbound/mailboxes/{mailbox}/test', [MailboxController::class, 'sendTest'])->name('outbound.mailboxes.test');
     Route::delete('/outbound/mailboxes/{mailbox}', [MailboxController::class, 'destroy'])->name('outbound.mailboxes.destroy');
 
+    Route::get('/outbound/domains', [DomainController::class, 'index'])->name('outbound.domains.index');
+    Route::post('/outbound/domains', [DomainController::class, 'store'])->name('outbound.domains.store');
+    Route::put('/outbound/domains/{domain}', [DomainController::class, 'update'])->name('outbound.domains.update');
+    Route::post('/outbound/domains/{domain}/verify', [DomainController::class, 'toggleVerified'])->name('outbound.domains.verify');
+    Route::delete('/outbound/domains/{domain}', [DomainController::class, 'destroy'])->name('outbound.domains.destroy');
+
+    Route::get('/outbound/campaigns', [CampaignController::class, 'index'])->name('outbound.campaigns.index');
+    Route::post('/outbound/campaigns', [CampaignController::class, 'store'])->name('outbound.campaigns.store');
+    Route::get('/outbound/campaigns/{campaign}', [CampaignController::class, 'show'])->name('outbound.campaigns.show');
+    Route::post('/outbound/campaigns/{campaign}/send-now', [CampaignController::class, 'sendNow'])->name('outbound.campaigns.send-now');
+    Route::post('/outbound/campaigns/{campaign}/schedule', [CampaignController::class, 'schedule'])->name('outbound.campaigns.schedule');
+    Route::post('/outbound/campaigns/{campaign}/cancel', [CampaignController::class, 'cancel'])->name('outbound.campaigns.cancel');
+    Route::delete('/outbound/campaigns/{campaign}', [CampaignController::class, 'destroy'])->name('outbound.campaigns.destroy');
+
     Route::get('/outbound/sequences', [SequenceController::class, 'index'])->name('outbound.sequences.index');
     Route::post('/outbound/sequences', [SequenceController::class, 'store'])->name('outbound.sequences.store');
     Route::get('/outbound/sequences/{sequence}', [SequenceController::class, 'show'])->name('outbound.sequences.show');
+    Route::put('/outbound/sequences/{sequence}', [SequenceController::class, 'update'])->name('outbound.sequences.update');
     Route::post('/outbound/sequences/{sequence}/toggle', [SequenceController::class, 'toggle'])->name('outbound.sequences.toggle');
     Route::post('/outbound/sequences/{sequence}/steps', [SequenceController::class, 'addStep'])->name('outbound.sequences.steps.store');
+    Route::put('/outbound/sequences/{sequence}/steps/{step}', [SequenceController::class, 'updateStep'])->name('outbound.sequences.steps.update');
     Route::delete('/outbound/sequences/{sequence}/steps/{step}', [SequenceController::class, 'removeStep'])->name('outbound.sequences.steps.destroy');
     Route::post('/outbound/sequences/{sequence}/enroll', [SequenceController::class, 'enroll'])->name('outbound.sequences.enroll');
 
@@ -115,12 +135,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/outbound/suppressions', [SuppressionController::class, 'index'])->name('outbound.suppressions.index');
     Route::post('/outbound/suppressions', [SuppressionController::class, 'store'])->name('outbound.suppressions.store');
+    Route::delete('/outbound/suppressions/{suppression}', [SuppressionController::class, 'destroy'])->name('outbound.suppressions.destroy');
 
     Route::get('/outbound/quiet-hours', [QuietHoursController::class, 'edit'])->name('outbound.quiet-hours.edit');
     Route::post('/outbound/quiet-hours', [QuietHoursController::class, 'update'])->name('outbound.quiet-hours.update');
 
     Route::get('/outbound/templates', [TemplateController::class, 'index'])->name('outbound.templates.index');
     Route::post('/outbound/templates', [TemplateController::class, 'store'])->name('outbound.templates.store');
+    Route::get('/outbound/templates/{template}', [TemplateController::class, 'show'])->name('outbound.templates.show');
+    Route::put('/outbound/templates/{template}', [TemplateController::class, 'update'])->name('outbound.templates.update');
     Route::delete('/outbound/templates/{template}', [TemplateController::class, 'destroy'])->name('outbound.templates.destroy');
     Route::post('/outbound/templates/send', [TemplateController::class, 'send'])->name('outbound.templates.send');
 

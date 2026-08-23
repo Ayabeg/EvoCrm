@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Outbound;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
+use App\Services\Outbound\EmailHtml;
 use App\Services\Outbound\OutboundDispatcher;
+use App\Services\Outbound\TemplateRenderer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -31,12 +34,59 @@ class TemplateController extends Controller
         ]);
     }
 
+    /**
+     * Edit page with an honest preview: variables rendered against a real
+     * workspace contact, through the same HTML builder the mailer uses
+     * (unsubscribe footer included; tracking disabled in preview).
+     */
+    public function show(Request $request, OutboundTemplate $template, TemplateRenderer $renderer, EmailHtml $html): Response
+    {
+        abort_unless((int) $template->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $workspace = $request->user()->workspace;
+
+        $sample = Contact::query()
+            ->forWorkspace($workspace)
+            ->whereNotNull('email')
+            ->with('company')
+            ->first()
+            ?? new Contact([
+                'first_name' => 'Amine',
+                'last_name' => 'Benali',
+                'email' => 'amine@example.dz',
+                'city' => 'Alger',
+                'wilaya' => 'Alger',
+            ]);
+
+        $message = new OutboundMessage([
+            'workspace_id' => $workspace->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $sample->email ?? 'amine@example.dz',
+            'subject' => $renderer->render($template->subject, $sample, $workspace),
+            'body' => $renderer->render($template->body, $sample, $workspace),
+            'body_html' => $renderer->render($template->body_html, $sample, $workspace),
+        ]);
+        $message->setRelation('contact', $sample);
+        $message->setRelation('workspace', $workspace);
+
+        return Inertia::render('outbound/templates/show', [
+            'template' => $template,
+            'preview' => [
+                'contact' => $sample->displayName().' <'.($sample->email ?? 'no-email').'>',
+                'subject' => $message->subject,
+                'html' => $html->build($message, preview: true),
+            ],
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
             'subject' => ['nullable', 'string', 'max:180'],
             'body' => ['required', 'string'],
+            'body_html' => ['nullable', 'string'],
         ]);
 
         OutboundTemplate::query()->create([
@@ -47,13 +97,29 @@ class TemplateController extends Controller
         return back();
     }
 
+    public function update(Request $request, OutboundTemplate $template): RedirectResponse
+    {
+        abort_unless((int) $template->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:160'],
+            'subject' => ['nullable', 'string', 'max:180'],
+            'body' => ['required', 'string'],
+            'body_html' => ['nullable', 'string'],
+        ]);
+
+        $template->forceFill($data)->save();
+
+        return back();
+    }
+
     public function destroy(Request $request, OutboundTemplate $template): RedirectResponse
     {
         abort_unless((int) $template->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $template->delete();
 
-        return back();
+        return redirect()->route('outbound.templates.index');
     }
 
     public function send(Request $request, OutboundDispatcher $dispatcher): RedirectResponse

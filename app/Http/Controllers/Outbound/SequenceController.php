@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Outbound;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\Mailbox;
 use App\Models\OutboundTemplate;
+use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\SequenceStep;
+use App\Services\Crm\CrmFilter;
 use App\Services\Outbound\SequenceEnrollment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -67,7 +70,7 @@ class SequenceController extends Controller
         $workspace = $request->user()->workspace;
 
         return Inertia::render('outbound/sequences/show', [
-            'sequence' => $sequence->load(['steps', 'enrollments.contact']),
+            'sequence' => $sequence->load(['steps.mailbox:id,name', 'enrollments.contact']),
             'contacts' => Contact::query()
                 ->forWorkspace($workspace)
                 ->orderBy('first_name')
@@ -76,7 +79,31 @@ class SequenceController extends Controller
                 ->forWorkspace($workspace)
                 ->orderBy('name')
                 ->get(['id', 'name', 'subject', 'body']),
+            'mailboxes' => Mailbox::query()
+                ->forWorkspace($workspace)
+                ->where('enabled', true)
+                ->orderByDesc('is_default')
+                ->get(['id', 'name', 'from_address']),
+            'filters' => SavedFilter::query()
+                ->forWorkspace($workspace)
+                ->where('entity', 'contact')
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
+    }
+
+    public function update(Request $request, Sequence $sequence): RedirectResponse
+    {
+        abort_unless((int) $sequence->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:160'],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        $sequence->forceFill($data)->save();
+
+        return back();
     }
 
     public function toggle(Request $request, Sequence $sequence): RedirectResponse
@@ -95,6 +122,7 @@ class SequenceController extends Controller
         $data = $request->validate([
             'delay_hours' => ['required', 'integer', 'min:0'],
             'channel' => ['required', 'in:email,whatsapp_cloud'],
+            'mailbox_id' => ['nullable', 'integer'],
             'subject' => ['nullable', 'string', 'max:180'],
             'body' => ['nullable', 'string'],
             'template_id' => ['nullable', 'integer'],
@@ -103,23 +131,51 @@ class SequenceController extends Controller
         ]);
 
         // Picking a saved template prefills subject/body (still editable next time).
-        if (! empty($data['template_id']) && blank($data['body'] ?? null)) {
+        $template = null;
+        if (! empty($data['template_id'])) {
             $template = OutboundTemplate::query()
                 ->forWorkspace($request->user()->workspace)
                 ->find($data['template_id']);
 
-            if ($template) {
+            if ($template && blank($data['body'] ?? null)) {
                 $data['subject'] = $data['subject'] ?: $template->subject;
                 $data['body'] = $template->body;
             }
         }
 
-        unset($data['template_id']);
+        if (! empty($data['mailbox_id'])) {
+            Mailbox::query()->forWorkspace($request->user()->workspace)->findOrFail($data['mailbox_id']);
+        }
 
         $sequence->steps()->create([
             ...$data,
+            'template_id' => $template?->id,
             'position' => ($sequence->steps()->max('position') ?? 0) + 1,
         ]);
+
+        return back();
+    }
+
+    public function updateStep(Request $request, Sequence $sequence, SequenceStep $step): RedirectResponse
+    {
+        abort_unless((int) $sequence->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless((int) $step->sequence_id === (int) $sequence->id, 404);
+
+        $data = $request->validate([
+            'delay_hours' => ['required', 'integer', 'min:0'],
+            'channel' => ['required', 'in:email,whatsapp_cloud'],
+            'mailbox_id' => ['nullable', 'integer'],
+            'subject' => ['nullable', 'string', 'max:180'],
+            'body' => ['nullable', 'string'],
+            'wa_template_name' => ['nullable', 'string', 'max:120'],
+            'wa_template_language' => ['nullable', 'string', 'max:12'],
+        ]);
+
+        if (! empty($data['mailbox_id'])) {
+            Mailbox::query()->forWorkspace($request->user()->workspace)->findOrFail($data['mailbox_id']);
+        }
+
+        $step->forceFill($data)->save();
 
         return back();
     }
@@ -134,7 +190,7 @@ class SequenceController extends Controller
         return back();
     }
 
-    public function enroll(Request $request, Sequence $sequence, SequenceEnrollment $enrollment): RedirectResponse
+    public function enroll(Request $request, Sequence $sequence, SequenceEnrollment $enrollment, CrmFilter $crmFilter): RedirectResponse
     {
         abort_unless((int) $sequence->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -142,14 +198,29 @@ class SequenceController extends Controller
             'contact_id' => ['nullable', 'integer'],
             'contact_ids' => ['nullable', 'array'],
             'contact_ids.*' => ['integer'],
+            'saved_filter_id' => ['nullable', 'integer'],
         ]);
 
         $workspace = $request->user()->workspace;
 
         $ids = collect($data['contact_ids'] ?? [])
-            ->when(! empty($data['contact_id']), fn ($c) => $c->push($data['contact_id']))
-            ->unique()
-            ->values();
+            ->when(! empty($data['contact_id']), fn ($c) => $c->push($data['contact_id']));
+
+        // Enroll from a CRM list: the saved contact filter resolves to ids.
+        if (! empty($data['saved_filter_id'])) {
+            $filter = SavedFilter::query()
+                ->forWorkspace($workspace)
+                ->where('entity', 'contact')
+                ->find($data['saved_filter_id']);
+
+            if ($filter) {
+                $query = Contact::query()->forWorkspace($workspace);
+                $crmFilter->applyToContacts($query, $filter->filters ?? []);
+                $ids = $ids->merge($query->pluck('id'));
+            }
+        }
+
+        $ids = $ids->unique()->values();
 
         if ($ids->isEmpty()) {
             return back()->withErrors(['contact_id' => 'Pick at least one contact.']);

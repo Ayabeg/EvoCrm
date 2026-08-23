@@ -40,4 +40,13 @@ class SuppressionController extends Controller
 
         return back();
     }
+
+    public function destroy(Request $request, Suppression $suppression): RedirectResponse
+    {
+        abort_unless((int) $suppression->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $suppression->delete();
+
+        return back();
+    }
 }
