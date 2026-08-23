@@ -20,6 +20,8 @@ use App\Models\Enrollment;
 use App\Models\Lead;
 use App\Models\Mailbox;
 use App\Models\Message;
+use App\Models\OutboundCampaign;
+use App\Models\OutboundDomain;
 use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
 use App\Models\Quote;
@@ -444,6 +446,79 @@ class DatabaseSeeder extends Seeder
 
         unset($sentOne);
 
+        // Sending domains: one verified, one still collecting DNS records.
+        OutboundDomain::query()->create([
+            'workspace_id' => $workspace->id,
+            'domain' => 'evotechly.com',
+            'status' => 'verified',
+            'spf_record' => 'v=spf1 include:smtp-provider.example ~all',
+            'dkim_selector' => 'default',
+            'dkim_record' => 'v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCdemo',
+            'dmarc_record' => 'v=DMARC1; p=quarantine; rua=mailto:postmaster@evotechly.com',
+            'notes' => 'Main sales domain. Records published at the registrar.',
+            'verified_at' => now()->subDays(10),
+        ]);
+        OutboundDomain::query()->create([
+            'workspace_id' => $workspace->id,
+            'domain' => 'mail.evotechly.dz',
+            'status' => 'unverified',
+            'spf_record' => 'v=spf1 mx ~all',
+            'dkim_selector' => 'default',
+            'dmarc_record' => 'v=DMARC1; p=quarantine; rua=mailto:postmaster@mail.evotechly.dz',
+            'notes' => 'Warmup domain — DKIM key still missing from the SMTP provider.',
+        ]);
+
+        // Broadcast campaigns: one sent newsletter, one draft.
+        $newsletter = OutboundCampaign::query()->create([
+            'workspace_id' => $workspace->id,
+            'name' => 'August clinic newsletter',
+            'status' => 'sent',
+            'template_id' => $templates->first()->id,
+            'mailbox_id' => $demoMailbox->id,
+            'subject' => 'EvoSales pour {{company}}',
+            'body' => "Bonjour {{first_name}},\n\nLes cliniques à {{city}} utilisent EvoSales. Détails : https://evotechly.com/evosales\n\nSe désabonner : {{unsub}}",
+            'scheduled_at' => now()->subDays(3),
+            'started_at' => now()->subDays(3),
+            'sent_at' => now()->subDays(3)->addMinutes(4),
+            'audience_count' => 4,
+            'suppressed_count' => 0,
+            'created_by' => $owner->id,
+        ]);
+
+        $newsletterMessages = [
+            [$contacts[0], ['sent_at' => now()->subDays(3), 'opened_at' => now()->subDays(3)->addHours(2), 'open_count' => 1]],
+            [$contacts[2], ['sent_at' => now()->subDays(3), 'opened_at' => now()->subDays(3)->addHours(3), 'open_count' => 2, 'clicked_at' => now()->subDays(3)->addHours(3)->addMinutes(5), 'click_count' => 1]],
+            [$contacts[4], ['sent_at' => now()->subDays(3), 'opened_at' => now()->subDays(3)->addHours(4), 'open_count' => 1, 'replied_at' => now()->subDays(3)->addHours(5)]],
+            [$contacts[6], ['sent_at' => now()->subDays(3)]],
+        ];
+
+        foreach ($newsletterMessages as [$contact, $state]) {
+            OutboundMessage::query()->create([
+                'workspace_id' => $workspace->id,
+                'contact_id' => $contact->id,
+                'mailbox_id' => $demoMailbox->id,
+                'campaign_id' => $newsletter->id,
+                'channel' => 'email',
+                'direction' => 'out',
+                'to_address' => $contact->email,
+                'subject' => 'EvoSales pour '.$contact->company?->name,
+                'body' => 'Bonjour '.$contact->first_name.', …',
+                'status' => 'sent',
+                ...$state,
+            ]);
+        }
+
+        OutboundCampaign::query()->create([
+            'workspace_id' => $workspace->id,
+            'name' => 'September re-engagement',
+            'status' => 'draft',
+            'template_id' => $templates->last()->id,
+            'mailbox_id' => $demoMailbox->id,
+            'subject' => 'Toujours d’actualité, {{first_name}} ?',
+            'body' => "Bonjour {{first_name}},\n\nJe me permets de revenir vers vous.\n\nSe désabonner : {{unsub}}",
+            'created_by' => $rep->id,
+        ]);
+
         $account = AdAccount::query()->create([
             'workspace_id' => $workspace->id,
             'external_id' => 'act_demo_evotechly',
@@ -761,5 +836,16 @@ class DatabaseSeeder extends Seeder
             'entity' => 'contact',
             'filters' => ['unanswered' => true],
         ]);
+
+        // Point the draft campaign at a CRM list now that filters exist.
+        OutboundCampaign::query()
+            ->where('workspace_id', $workspace->id)
+            ->where('name', 'September re-engagement')
+            ->update([
+                'saved_filter_id' => SavedFilter::query()
+                    ->where('workspace_id', $workspace->id)
+                    ->where('name', 'Unanswered desk')
+                    ->first()?->id,
+            ]);
     }
 }
