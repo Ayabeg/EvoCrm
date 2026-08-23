@@ -9,8 +9,12 @@ use App\Models\Integration;
 use App\Models\Lead;
 use App\Models\OutboundMessage;
 use App\Models\Thread;
+use App\Models\Workspace;
 use App\Support\Integrations;
+use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -89,6 +93,148 @@ class HomeController extends Controller
                 ['key' => 'outbound', 'name' => 'Outbound', 'href' => '/outbound', 'value' => $sentToday, 'value_label' => 'sent today'],
                 ['key' => 'integrations', 'name' => 'Integrations', 'href' => '/settings/apps', 'value' => $connectedApps, 'value_label' => 'of '.count($integrations).' connected'],
             ],
+            'charts' => $this->evoVizCharts($workspace),
         ]);
+    }
+
+    /**
+     * EvoViz payloads (contract: resources/js/evoviz/contract.ts). Every
+     * series comes from an existing model; a chart whose series is all
+     * zeros is omitted instead of drawing a fake shape.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function evoVizCharts(Workspace $workspace): array
+    {
+        return collect([
+            $this->pipelineByStageChart($workspace),
+            $this->leadsAreaChart($workspace),
+            $this->outboundSparkChart($workspace),
+            $this->dealOutcomeChart($workspace),
+        ])->filter()->values()->all();
+    }
+
+    /** evoviz.bar — open pipeline stages by live deal count. */
+    private function pipelineByStageChart(Workspace $workspace): ?array
+    {
+        $stages = $workspace->defaultPipeline()->stages()
+            ->where('is_won', false)
+            ->where('is_lost', false)
+            ->withCount('deals')
+            ->get();
+
+        if ($stages->sum('deals_count') === 0) {
+            return null;
+        }
+
+        return [
+            'id' => 'evoviz.bar',
+            'title' => 'Pipeline by stage',
+            'labels' => $stages->pluck('name')->all(),
+            'series' => [['name' => 'Deals', 'data' => $stages->pluck('deals_count')->all()]],
+            'total' => (int) $stages->sum('deals_count'),
+            'href' => '/leads',
+        ];
+    }
+
+    /** evoviz.area — leads created per day over the last 14 days. */
+    private function leadsAreaChart(Workspace $workspace): ?array
+    {
+        [$labels, $data] = $this->dailySeries(
+            Lead::query()->forWorkspace($workspace)
+                ->where('created_at', '>=', $this->windowStart())
+                ->get(['created_at'])
+                ->map(fn (Lead $lead) => $lead->created_at),
+        );
+
+        if (array_sum($data) === 0) {
+            return null;
+        }
+
+        return [
+            'id' => 'evoviz.area',
+            'title' => 'New leads — last 14 days',
+            'labels' => $labels,
+            'series' => [['name' => 'New leads', 'data' => $data]],
+            'total' => array_sum($data),
+            'href' => '/leads',
+        ];
+    }
+
+    /** evoviz.kpi-spark — outbound messages sent per day, last 14 days. */
+    private function outboundSparkChart(Workspace $workspace): ?array
+    {
+        [$labels, $data] = $this->dailySeries(
+            OutboundMessage::query()->forWorkspace($workspace)
+                ->where('direction', 'out')
+                ->where('status', 'sent')
+                ->where('sent_at', '>=', $this->windowStart())
+                ->get(['sent_at'])
+                ->map(fn (OutboundMessage $message) => $message->sent_at),
+        );
+
+        if (array_sum($data) === 0) {
+            return null;
+        }
+
+        return [
+            'id' => 'evoviz.kpi-spark',
+            'title' => 'Outbound sent — last 14 days',
+            'labels' => $labels,
+            'series' => [['name' => 'Sent', 'data' => $data]],
+            'total' => array_sum($data),
+            'href' => '/outbound',
+        ];
+    }
+
+    /** evoviz.donut — every deal by open / won / lost outcome. */
+    private function dealOutcomeChart(Workspace $workspace): ?array
+    {
+        $deals = fn () => Deal::query()->forWorkspace($workspace);
+
+        $open = $deals()->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false))->count();
+        $won = $deals()->whereHas('stage', fn ($q) => $q->where('is_won', true))->count();
+        $lost = $deals()->whereHas('stage', fn ($q) => $q->where('is_lost', true))->count();
+
+        if ($open + $won + $lost === 0) {
+            return null;
+        }
+
+        return [
+            'id' => 'evoviz.donut',
+            'title' => 'Deals by outcome',
+            'labels' => ['Open', 'Won', 'Lost'],
+            'series' => [['name' => 'Deals', 'data' => [$open, $won, $lost]]],
+            'total' => $open + $won + $lost,
+            'valueLabel' => 'deals',
+            'href' => '/crm/deals',
+        ];
+    }
+
+    private function windowStart(): CarbonInterface
+    {
+        return now('Africa/Algiers')->subDays(13)->startOfDay();
+    }
+
+    /**
+     * Bucket datetimes into the last 14 Algiers days, oldest first.
+     *
+     * @param  Collection<int, CarbonInterface|null>  $dates
+     * @return array{0: array<int, string>, 1: array<int, int>}
+     */
+    private function dailySeries($dates): array
+    {
+        $days = collect(range(13, 0))
+            ->map(fn (int $ago) => now('Africa/Algiers')->subDays($ago)->toDateString());
+
+        $counts = $dates
+            ->filter()
+            ->map(fn (CarbonInterface $date) => $date->copy()->setTimezone('Africa/Algiers')->toDateString())
+            ->countBy();
+
+        return [
+            $days->map(fn (string $day) => Carbon::parse($day)->format('d/m'))->all(),
+            $days->map(fn (string $day) => (int) $counts->get($day, 0))->all(),
+        ];
     }
 }

@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import PageHeader from '@/components/page-header';
+import { EvoVizChart } from '@/evoviz';
+import type { EvoVizPayload } from '@/evoviz';
 
 type TodayTile = {
     key: string;
@@ -43,6 +45,7 @@ type Props = {
     today: TodayTile[];
     nextSteps: Task[];
     departments: Department[];
+    charts: EvoVizPayload[];
 };
 
 const DEPARTMENT_ICONS: Record<string, LucideIcon> = {
@@ -88,7 +91,7 @@ function formatDue(dueAt: string): { label: string; overdue: boolean } {
     };
 }
 
-export default function Home({ today, nextSteps, departments }: Props) {
+export default function Home({ today, nextSteps, departments, charts }: Props) {
     const tiles = today.filter((tile) => tile.value !== null);
 
     return (
@@ -116,6 +119,19 @@ export default function Home({ today, nextSteps, departments }: Props) {
                                             {tile.value}
                                         </p>
                                     </div>
+                                ))}
+                            </div>
+                        </section>
+                    ) : null}
+
+                    {charts.length > 0 ? (
+                        <section className="mt-8" aria-label="Charts">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {charts.map((chart) => (
+                                    <EvoVizChart
+                                        key={`${chart.id}-${chart.title}`}
+                                        payload={chart}
+                                    />
                                 ))}
                             </div>
                         </section>

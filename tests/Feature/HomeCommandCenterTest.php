@@ -37,6 +37,7 @@ it('serves the command center to the owner without the old warning wall', functi
             ->has('today', 6)
             ->has('departments', 6)
             ->has('nextSteps')
+            ->has('charts')
             ->missing('evolution')
             ->missing('meta_connected')
             ->missing('stats')
@@ -82,6 +83,7 @@ it('never ejects to desk.evotechly.com or outbound.evotechly.com from home', fun
         'today' => $props['today'],
         'nextSteps' => $props['nextSteps'],
         'departments' => $props['departments'],
+        'charts' => $props['charts'],
     ]);
     expect($home)
         ->not->toContain('desk.evotechly.com')
