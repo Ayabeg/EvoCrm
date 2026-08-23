@@ -200,7 +200,8 @@ export function AppSidebar() {
             name: 'reports',
             label: 'Reports',
             icon: ChartSpline,
-            href: '/crm/reports',
+            href: '/reports',
+            activePaths: ['/crm/reports'],
         },
         {
             name: 'campaigns',

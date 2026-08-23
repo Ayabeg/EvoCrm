@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/desk/threads/{thread}/reply', [InboxController::class, 'reply'])->name('desk.reply');
     Route::get('/conversations', [ConversationHistoryController::class, 'index'])->name('crm.conversations');
 
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/crm/reports', [ReportController::class, 'index'])->name('crm.reports');
     Route::post('/crm/activities', [ActivityController::class, 'store'])->name('crm.activities.store');
     Route::post('/crm/activities/{activity}/complete', [ActivityController::class, 'complete'])->name('crm.activities.complete');
