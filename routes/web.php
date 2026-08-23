@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Ads\AdsCenterController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
@@ -33,6 +34,11 @@ use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
+});
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');

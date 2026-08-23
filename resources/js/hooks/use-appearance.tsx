@@ -1,7 +1,7 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
-export type ResolvedAppearance = 'light';
-export type Appearance = ResolvedAppearance;
+export type Appearance = 'light' | 'dark' | 'system';
+export type ResolvedAppearance = 'light' | 'dark';
 
 export type UseAppearanceReturn = {
     readonly appearance: Appearance;
@@ -10,6 +10,15 @@ export type UseAppearanceReturn = {
 };
 
 const listeners = new Set<() => void>();
+
+let appearance: Appearance = 'system';
+
+const prefersDark = (): boolean =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+const resolveAppearance = (value: Appearance): ResolvedAppearance =>
+    value === 'system' ? (prefersDark() ? 'dark' : 'light') : value;
 
 const setCookie = (name: string, value: string, days = 365): void => {
     if (typeof document === 'undefined') {
@@ -20,13 +29,31 @@ const setCookie = (name: string, value: string, days = 365): void => {
     document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
-const applyLightTheme = (): void => {
+const applyTheme = (value: Appearance): void => {
     if (typeof document === 'undefined') {
         return;
     }
 
-    document.documentElement.classList.remove('dark');
-    document.documentElement.style.colorScheme = 'light';
+    const isDark = resolveAppearance(value) === 'dark';
+
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+};
+
+const readStoredAppearance = (): Appearance => {
+    if (typeof window === 'undefined') {
+        return 'system';
+    }
+
+    const stored = window.localStorage.getItem('appearance');
+
+    return stored === 'light' || stored === 'dark' || stored === 'system'
+        ? stored
+        : 'system';
+};
+
+const notify = (): void => {
+    listeners.forEach((listener) => listener());
 };
 
 const subscribe = (callback: () => void) => {
@@ -36,36 +63,52 @@ const subscribe = (callback: () => void) => {
 };
 
 /**
- * EvoSales ships Light Cabinet only — white canvas, black ink, orange actions.
- * Any stored dark/system preference is cleared on load so the dark kit can
- * never resurface for a default user.
+ * EvoSales ships Light Cabinet and a true-black Dark. The choice persists in
+ * localStorage + the `appearance` cookie (read server-side by app.blade.php
+ * to stamp class="dark" on <html> before first paint).
  */
 export function initializeTheme(): void {
     if (typeof window === 'undefined') {
         return;
     }
 
-    localStorage.setItem('appearance', 'light');
-    setCookie('appearance', 'light');
-    applyLightTheme();
+    appearance = readStoredAppearance();
+    applyTheme(appearance);
+
+    window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', () => {
+            if (appearance === 'system') {
+                applyTheme('system');
+                notify();
+            }
+        });
 }
 
 export function useAppearance(): UseAppearanceReturn {
-    const appearance: Appearance = useSyncExternalStore(
+    const current = useSyncExternalStore(
         subscribe,
-        () => 'light',
-        () => 'light',
+        () => appearance,
+        () => 'system' as Appearance,
     );
 
-    const updateAppearance = (): void => {
-        localStorage.setItem('appearance', 'light');
-        setCookie('appearance', 'light');
-        applyLightTheme();
-    };
+    const resolved = useSyncExternalStore(
+        subscribe,
+        () => resolveAppearance(appearance),
+        () => 'light' as ResolvedAppearance,
+    );
+
+    const updateAppearance = useCallback((mode: Appearance): void => {
+        appearance = mode;
+        window.localStorage.setItem('appearance', mode);
+        setCookie('appearance', mode);
+        applyTheme(mode);
+        notify();
+    }, []);
 
     return {
-        appearance,
-        resolvedAppearance: 'light',
+        appearance: current,
+        resolvedAppearance: resolved,
         updateAppearance,
     } as const;
 }

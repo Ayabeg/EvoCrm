@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    /*
+    | Google sign-in (Laravel Socialite). Leave the client credentials empty
+    | to hide the "Continue with Google" button and disable the routes.
+    */
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', 'https://crm.evotechly.com/auth/google/callback'),
+    ],
+
 ];

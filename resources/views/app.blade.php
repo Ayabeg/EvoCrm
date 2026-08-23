@@ -1,18 +1,35 @@
+@php
+    $appearance = request()->cookie('appearance', 'system');
+    $appearance = in_array($appearance, ['light', 'dark', 'system'], true) ? $appearance : 'system';
+@endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => $appearance === 'dark'])>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- Light Cabinet is the only product face. The dark kit is gone: never apply .dark. --}}
+        {{-- class="dark" is stamped server-side only for an explicit Dark choice.
+             System followers get it here before first paint to avoid a flash. --}}
         <script>
-            document.documentElement.classList.remove('dark');
-            document.documentElement.style.colorScheme = 'light';
+            (function () {
+                const appearance = @json($appearance);
+                const dark =
+                    appearance === 'dark' ||
+                    (appearance === 'system' &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+                document.documentElement.classList.toggle('dark', dark);
+                document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+            })();
         </script>
 
         <style>
             html {
-                background-color: #F7F7F6;
+                background-color: #f7f7f6;
+            }
+
+            html.dark {
+                background-color: #000000;
             }
         </style>
 
