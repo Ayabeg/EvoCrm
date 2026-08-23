@@ -30,7 +30,8 @@ it('creates a task on a contact timeline and lists it as a home next step', func
         ->get('/dashboard')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->where('stats.open_tasks', 1)
+            ->where('today.1.key', 'tasks_due')
+            ->where('today.1.value', 1)
             ->has('nextSteps', 1)
         );
 });

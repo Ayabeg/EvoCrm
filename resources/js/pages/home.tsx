@@ -1,143 +1,259 @@
 import { Head, Link } from '@inertiajs/react';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import {
+    Bolt,
+    Contact as ContactIcon,
+    Inbox,
+    Megaphone,
+    Send,
+    SquareKanban,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import PageHeader from '@/components/page-header';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+
+type TodayTile = {
+    key: string;
+    label: string;
+    value: number | null;
+};
 
 type Task = {
     id: number;
     subject?: string | null;
     body?: string | null;
     due_at?: string | null;
-    contact?: { id: number; first_name: string; last_name?: string | null };
-    deal?: { id: number; title: string; stage?: { name: string } };
-    owner?: { name: string };
+    contact?: {
+        id: number;
+        first_name: string;
+        last_name?: string | null;
+    } | null;
+    deal?: { id: number; title: string } | null;
+    owner?: { name: string } | null;
+};
+
+type Department = {
+    key: string;
+    name: string;
+    href: string;
+    value?: number;
+    value_label?: string;
+    connected?: boolean;
 };
 
 type Props = {
-    stats: {
-        open_deals: number;
-        open_pipeline_cents: number;
-        inbox_unread: number;
-        sequences_enrolled: number;
-        ads_leads_today: number;
-        open_tasks: number;
-    };
+    today: TodayTile[];
     nextSteps: Task[];
-    evolution: {
-        connected: boolean;
-        reason: string | null;
-        instance: string;
-        mode: string;
-    };
-    meta_connected: boolean;
+    departments: Department[];
 };
 
-export default function Home({ stats, nextSteps, evolution, meta_connected }: Props) {
+const DEPARTMENT_ICONS: Record<string, LucideIcon> = {
+    inbox: Inbox,
+    leads: SquareKanban,
+    contacts: ContactIcon,
+    ads: Megaphone,
+    outbound: Send,
+    integrations: Bolt,
+};
+
+const ALGIERS = 'Africa/Algiers';
+
+function algiersDay(date: Date): string {
+    return new Intl.DateTimeFormat('en-CA', {
+        timeZone: ALGIERS,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).format(date);
+}
+
+function formatDue(dueAt: string): { label: string; overdue: boolean } {
+    const date = new Date(dueAt);
+    const now = new Date();
+    const overdue = date.getTime() < now.getTime();
+
+    if (algiersDay(date) === algiersDay(now)) {
+        return {
+            label: `Today ${new Intl.DateTimeFormat('en-GB', { timeZone: ALGIERS, hour: '2-digit', minute: '2-digit' }).format(date)}`,
+            overdue,
+        };
+    }
+
+    return {
+        label: new Intl.DateTimeFormat('en-GB', {
+            timeZone: ALGIERS,
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+        }).format(date),
+        overdue,
+    };
+}
+
+export default function Home({ today, nextSteps, departments }: Props) {
+    const tiles = today.filter((tile) => tile.value !== null);
+
     return (
         <>
             <Head title="Home" />
-            <div className="flex h-full flex-1 flex-col gap-4 bg-canvas-soft p-5 text-[13px]">
-                <PageHeader
-                    title="Sales Hub"
-                    description="Live in CRM the way you live in EvoDesk. Next steps are open tasks."
-                >
-                    <Button asChild>
-                        <Link href="/inbox">Open inbox</Link>
-                    </Button>
-                </PageHeader>
+            <div className="flex h-full flex-1 flex-col bg-canvas-soft text-[13px] text-ink">
+                <div className="mx-auto w-full max-w-4xl px-5 py-8">
+                    <PageHeader
+                        title="EvoSales"
+                        description="Evotechly — what needs you, and where to go."
+                    />
 
-                <div className="grid gap-3 md:grid-cols-5">
-                    {[
-                        ['Open deals', String(stats.open_deals), '/crm/deals'],
-                        ['Open pipeline', formatDzd(stats.open_pipeline_cents), '/crm/reports'],
-                        ['Open tasks', String(stats.open_tasks), '/dashboard'],
-                        ['Unread (synced)', String(stats.inbox_unread), '/conversations'],
-                        ['Enrolled', String(stats.sequences_enrolled), '/outbound/sequences'],
-                    ].map(([label, value, href]) => (
-                        <Link key={label} href={href}>
-                            <Card className="rounded-none p-3">
-                                <p className="text-[11px] uppercase text-muted-foreground">{label}</p>
-                                <p className={`mt-1 text-xl font-semibold ${label === 'Open pipeline' ? 'money' : ''}`}>{value}</p>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-
-                <Card className="rounded-none p-4">
-                    <h2 className="font-medium">Today’s next steps</h2>
-                    <p className="mt-1 text-[12px] text-muted-foreground">
-                        Open tasks with due dates. Create them from a contact or deal sidebar.
-                    </p>
-                    {nextSteps.length === 0 ? (
-                        <p className="mt-4 text-sm text-muted-foreground">No open tasks.</p>
-                    ) : (
-                        <table className="mt-3 w-full">
-                            <thead className="text-left text-[11px] uppercase text-muted-foreground">
-                                <tr>
-                                    <th className="py-1">Task</th>
-                                    <th className="py-1">Contact / deal</th>
-                                    <th className="py-1">Due</th>
-                                    <th className="py-1">Owner</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {nextSteps.map((task) => (
-                                    <tr key={task.id} className="border-t">
-                                        <td className="py-1.5">{task.subject ?? task.body}</td>
-                                        <td className="py-1.5">
-                                            {task.deal ? (
-                                                <Link href={`/crm/deals/${task.deal.id}`} className="text-brand">
-                                                    {task.deal.title}
-                                                </Link>
-                                            ) : task.contact ? (
-                                                <Link href={`/crm/contacts/${task.contact.id}`} className="text-brand">
-                                                    {task.contact.first_name} {task.contact.last_name}
-                                                </Link>
-                                            ) : (
-                                                '—'
-                                            )}
-                                        </td>
-                                        <td className="py-1.5">{task.due_at ?? '—'}</td>
-                                        <td className="py-1.5">{task.owner?.name ?? '—'}</td>
-                                    </tr>
+                    {tiles.length > 0 ? (
+                        <section aria-label="Today">
+                            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-3 xl:grid-cols-6">
+                                {tiles.map((tile) => (
+                                    <div
+                                        key={tile.key}
+                                        className="bg-canvas px-4 py-3"
+                                    >
+                                        <p className="text-[11px] tracking-wide text-muted-foreground uppercase">
+                                            {tile.label}
+                                        </p>
+                                        <p className="money mt-1 text-xl font-semibold">
+                                            {tile.value}
+                                        </p>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
-                    )}
-                </Card>
+                            </div>
+                        </section>
+                    ) : null}
 
-                <div className="grid gap-3 md:grid-cols-2">
-                    <Card className="space-y-2 rounded-none p-4">
-                        <div className="flex items-center justify-between">
-                            <h2 className="font-medium">Evolution / WhatsApp Cloud</h2>
-                            <Badge variant={evolution.connected ? 'default' : 'secondary'}>
-                                {evolution.connected ? 'Connected' : 'Not connected'}
-                            </Badge>
+                    <section className="mt-8" aria-label="Next steps">
+                        <div className="mb-2 flex items-baseline justify-between">
+                            <h2 className="text-sm font-medium">Next steps</h2>
+                            <span className="text-[12px] text-muted-foreground">
+                                Open tasks, soonest first
+                            </span>
                         </div>
-                        <p className="text-muted-foreground">
-                            Mode {evolution.mode}. Baileys, QR, and Linked-devices are refused.
-                        </p>
-                        {evolution.reason ? (
-                            <p className="text-brand">{evolution.reason}</p>
-                        ) : null}
-                        <Link href="/settings/evolution" className="text-brand">
-                            Open Evolution settings
-                        </Link>
-                    </Card>
-                    <Card className="space-y-2 rounded-none p-4">
-                        <div className="flex items-center justify-between">
-                            <h2 className="font-medium">Meta Ads</h2>
-                            <Badge variant={meta_connected ? 'default' : 'secondary'}>
-                                {meta_connected ? 'Connected' : 'Not connected'}
-                            </Badge>
+                        <div className="overflow-hidden rounded-lg border border-hairline bg-canvas">
+                            {nextSteps.length === 0 ? (
+                                <p className="px-4 py-6 text-sm text-muted-foreground">
+                                    Nothing due. Add tasks from a contact or a
+                                    deal.
+                                </p>
+                            ) : (
+                                <ul className="divide-y divide-hairline">
+                                    {nextSteps.map((task) => {
+                                        const due = task.due_at
+                                            ? formatDue(task.due_at)
+                                            : null;
+
+                                        return (
+                                            <li
+                                                key={task.id}
+                                                className="flex items-center gap-3 px-4 py-2.5"
+                                            >
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate text-[13px]">
+                                                        {task.subject ??
+                                                            task.body ??
+                                                            'Task'}
+                                                    </p>
+                                                    <p className="truncate text-[12px] text-muted-foreground">
+                                                        {task.deal ? (
+                                                            <Link
+                                                                href={`/crm/deals/${task.deal.id}`}
+                                                                className="text-brand"
+                                                            >
+                                                                {
+                                                                    task.deal
+                                                                        .title
+                                                                }
+                                                            </Link>
+                                                        ) : task.contact ? (
+                                                            <Link
+                                                                href={`/crm/contacts/${task.contact.id}`}
+                                                                className="text-brand"
+                                                            >
+                                                                {[
+                                                                    task.contact
+                                                                        .first_name,
+                                                                    task.contact
+                                                                        .last_name,
+                                                                ]
+                                                                    .filter(
+                                                                        Boolean,
+                                                                    )
+                                                                    .join(' ')}
+                                                            </Link>
+                                                        ) : (
+                                                            (task.owner?.name ??
+                                                            'No link')
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                <span
+                                                    className={`shrink-0 text-[12px] ${
+                                                        due?.overdue
+                                                            ? 'text-brand'
+                                                            : 'text-muted-foreground'
+                                                    }`}
+                                                >
+                                                    {due?.label ?? 'No date'}
+                                                </span>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
                         </div>
-                        <p className="text-muted-foreground">Env-driven. Ads leads today: {stats.ads_leads_today}.</p>
-                        <Link href="/ads" className="text-brand">
-                            Open Ads Center
-                        </Link>
-                    </Card>
+                    </section>
+
+                    <section className="mt-8" aria-label="Departments">
+                        <h2 className="mb-2 text-sm font-medium">
+                            Departments
+                        </h2>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {departments.map((department) => {
+                                const Icon =
+                                    DEPARTMENT_ICONS[department.key] ?? Bolt;
+
+                                return (
+                                    <Link
+                                        key={department.key}
+                                        href={department.href}
+                                        className="group rounded-lg border border-hairline bg-canvas px-4 py-3 transition-colors hover:border-ink/25 hover:bg-canvas-soft"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <Icon className="size-4 text-muted-foreground transition-colors group-hover:text-brand" />
+                                            <span className="text-[13px] font-medium">
+                                                {department.name}
+                                            </span>
+                                        </div>
+                                        <p className="mt-2 flex items-baseline gap-1.5">
+                                            {department.connected !==
+                                            undefined ? (
+                                                <span className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                                                    <span
+                                                        className={`size-1.5 rounded-full ${
+                                                            department.connected
+                                                                ? 'bg-brand'
+                                                                : 'bg-muted-foreground/40'
+                                                        }`}
+                                                    />
+                                                    {department.connected
+                                                        ? 'Connected'
+                                                        : 'Not connected'}
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <span className="money text-lg font-semibold">
+                                                        {department.value ?? 0}
+                                                    </span>
+                                                    <span className="text-[12px] text-muted-foreground">
+                                                        {department.value_label}
+                                                    </span>
+                                                </>
+                                            )}
+                                        </p>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </section>
                 </div>
             </div>
         </>

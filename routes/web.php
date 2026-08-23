@@ -37,8 +37,13 @@ use App\Http\Controllers\Settings\MetaSettingsController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-Route::inertia('/', 'welcome')->name('home');
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : Inertia::render('welcome');
+})->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
