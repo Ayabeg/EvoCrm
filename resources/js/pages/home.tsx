@@ -41,7 +41,7 @@ export default function Home({ stats, nextSteps, evolution, meta_connected, desk
     return (
         <>
             <Head title="Home" />
-            <div className="flex h-full flex-1 flex-col gap-4 bg-[#f6f4ef] p-5 text-[13px] dark:bg-slate-950">
+            <div className="flex h-full flex-1 flex-col gap-4 bg-canvas-soft p-5 text-[13px]">
                 <PageHeader
                     title="Sales Hub"
                     description="Live in CRM the way you live in EvoDesk. Next steps are open tasks."
@@ -62,7 +62,7 @@ export default function Home({ stats, nextSteps, evolution, meta_connected, desk
                         <Link key={label} href={href}>
                             <Card className="rounded-none p-3">
                                 <p className="text-[11px] uppercase text-muted-foreground">{label}</p>
-                                <p className="mt-1 text-xl font-semibold">{value}</p>
+                                <p className={`mt-1 text-xl font-semibold ${label === 'Open pipeline' ? 'money' : ''}`}>{value}</p>
                             </Card>
                         </Link>
                     ))}
@@ -91,11 +91,11 @@ export default function Home({ stats, nextSteps, evolution, meta_connected, desk
                                         <td className="py-1.5">{task.subject ?? task.body}</td>
                                         <td className="py-1.5">
                                             {task.deal ? (
-                                                <Link href={`/crm/deals/${task.deal.id}`} className="text-teal-800">
+                                                <Link href={`/crm/deals/${task.deal.id}`} className="text-brand">
                                                     {task.deal.title}
                                                 </Link>
                                             ) : task.contact ? (
-                                                <Link href={`/crm/contacts/${task.contact.id}`} className="text-teal-800">
+                                                <Link href={`/crm/contacts/${task.contact.id}`} className="text-brand">
                                                     {task.contact.first_name} {task.contact.last_name}
                                                 </Link>
                                             ) : (
@@ -125,7 +125,7 @@ export default function Home({ stats, nextSteps, evolution, meta_connected, desk
                         {evolution.reason ? (
                             <p className="text-amber-700 dark:text-amber-300">{evolution.reason}</p>
                         ) : null}
-                        <Link href="/settings/evolution" className="text-teal-800">
+                        <Link href="/settings/evolution" className="text-brand">
                             Open Evolution settings
                         </Link>
                     </Card>
@@ -137,7 +137,7 @@ export default function Home({ stats, nextSteps, evolution, meta_connected, desk
                             </Badge>
                         </div>
                         <p className="text-muted-foreground">Env-driven. Ads leads today: {stats.ads_leads_today}.</p>
-                        <Link href="/ads" className="text-teal-800">
+                        <Link href="/ads" className="text-brand">
                             Open Ads Center
                         </Link>
                     </Card>

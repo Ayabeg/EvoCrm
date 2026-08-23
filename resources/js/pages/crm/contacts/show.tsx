@@ -77,7 +77,7 @@ export default function ContactShow({
                             <Link
                                 key={lead.id}
                                 href={`/crm/leads/${lead.id}`}
-                                className="block text-teal-700 dark:text-teal-300"
+                                className="block text-brand"
                             >
                                 {lead.title} · {lead.status}
                             </Link>
@@ -89,7 +89,7 @@ export default function ContactShow({
                             <Link
                                 key={deal.id}
                                 href={`/crm/deals/${deal.id}`}
-                                className="block text-teal-700 dark:text-teal-300"
+                                className="block text-brand"
                             >
                                 {deal.title} · {deal.stage?.name}
                             </Link>
@@ -105,7 +105,7 @@ export default function ContactShow({
                                 <Link
                                     key={thread.id}
                                     href={`/conversations?thread=${thread.id}`}
-                                    className="block text-teal-700 dark:text-teal-300"
+                                    className="block text-brand"
                                 >
                                     {thread.subject ?? 'Thread'} · {thread.status}
                                 </Link>

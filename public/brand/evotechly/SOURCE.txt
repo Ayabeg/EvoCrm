@@ -1,0 +1,6 @@
+Evotechly company mark
+Copied from Brandbook assets/logos/evotechly/mark.svg (and the live
+evotechly.com /evotechly.svg artwork). Artwork fill is #EC6025 — do not recolor.
+
+Brand tokens live in resources/css/app.css (Aurora 1.1.0 / DESIGN.md).
+Do not invent product ramps. There is no EvoSales color ramp in Brandbook docs/23.

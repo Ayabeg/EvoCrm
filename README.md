@@ -18,9 +18,19 @@ Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotech
 - **Not an Instantly clone.**
 - **Not a Laravel Chatwoot clone.** The sold desk is EvoDesk / Chatwoot Community MIT. The in-app thread list is CRM history only.
 
+## Brand
+
+Visual source of truth is **[Aurora 1.1.0 / Brandbook](https://github.com/Mohamedbeghanem/Brandbook)** — not a git submodule. Logo SVGs and DESIGN.md tokens are copied into this repo.
+
+- Company mark: `public/brand/evotechly/mark.svg` (artwork fill `#EC6025`, do not recolor). Favicon is the mark.
+- Tokens in `resources/css/app.css`: brand `#0F4C5C`, voltage `#4F46E5`, ink `#0D1B24`, canvas `#FFFFFF`, canvas-soft `#F0F5FA`, hairline `#E3E8EE`, Geist, Light Cabinet face.
+- There is **no EvoSales product ramp** in Brandbook docs/23. Brand teal + voltage are for interactive CTAs only. Do not invent tokens or rainbow the UI.
+- Default product face: Light Cabinet (~240px labeled sidebar, soft active pill `#F1F5F9`, white cards + hairlines, ~52px topbar).
+- Titles and auth mail: **EvoSales · Evotechly**.
+
 ## Stack
 
-Laravel 13 · PHP 8.3+ · Inertia 3 · React 19 · TypeScript · Tailwind 4 · Fortify · Pest · Vite. SQLite locally, MySQL-ready.
+Laravel 13 · PHP 8.3+ · Inertia 3 · React 19 · TypeScript · Tailwind 4 · Fortify · Pest · Vite. SQLite locally, MySQL-ready. Geist via `@fontsource/geist-sans` (Bunny Geist as well).
 
 ## Run locally
 

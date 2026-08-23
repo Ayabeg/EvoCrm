@@ -63,10 +63,10 @@ export default function ConversationHistory({ threads, selected, deskUrl }: Prop
                     </Button>
                 </PageHeader>
 
-                <Card className="border-teal-500/30 bg-teal-50/40 p-4 text-sm dark:bg-teal-950/20">
+                <Card className="border-hairline bg-canvas p-4 text-sm">
                     <p>
                         The product inbox lives at{' '}
-                        <a href={sharedDesk} className="font-medium text-teal-700 underline dark:text-teal-300">
+                        <a href={sharedDesk} className="font-medium text-brand underline">
                             {sharedDesk}
                         </a>
                         . Use this list to see which Contact and Deal a conversation belongs to.
@@ -176,7 +176,7 @@ export default function ConversationHistory({ threads, selected, deskUrl }: Prop
                                             <Link
                                                 key={deal.id}
                                                 href={`/crm/deals/${deal.id}`}
-                                                className="block text-teal-700 dark:text-teal-300"
+                                                className="block text-brand"
                                             >
                                                 {deal.title} · {deal.stage?.name}
                                             </Link>
@@ -184,7 +184,7 @@ export default function ConversationHistory({ threads, selected, deskUrl }: Prop
                                     )}
                                     <Link
                                         href={`/crm/contacts/${selected.contact.id}`}
-                                        className="inline-block text-teal-700 dark:text-teal-300"
+                                        className="inline-block text-brand"
                                     >
                                         Open CRM record
                                     </Link>

@@ -49,7 +49,7 @@ export default function SequencesIndex({ sequences }: { sequences: any[] }) {
                             {sequences.map((sequence) => (
                                 <tr key={sequence.id} className="border-t">
                                     <td className="px-4 py-2">
-                                        <Link href={`/outbound/sequences/${sequence.id}`} className="text-teal-700 dark:text-teal-300">
+                                        <Link href={`/outbound/sequences/${sequence.id}`} className="text-brand">
                                             {sequence.name}
                                         </Link>
                                     </td>

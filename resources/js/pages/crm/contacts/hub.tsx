@@ -64,7 +64,7 @@ export default function ContactHub({
                             </Form>
                             <div className="mt-1 flex flex-wrap gap-1">
                                 {savedFilters.map((filter: any) => (
-                                    <Link key={filter.id} href={`/crm/contacts?filter_id=${filter.id}`} className="rounded bg-teal-100 px-1.5 py-0.5 text-[10px] text-teal-900">
+                                    <Link key={filter.id} href={`/crm/contacts?filter_id=${filter.id}`} className="rounded bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] text-ink">
                                         {filter.name}
                                     </Link>
                                 ))}
@@ -108,7 +108,7 @@ export default function ContactHub({
                                         {selected.phone_e164 ?? 'No phone'} · {selected.email ?? 'No email'} · {selected.city ?? selected.company?.city ?? '—'}
                                     </p>
                                 </div>
-                                <a href={sharedDesk} className="rounded bg-teal-700 px-3 py-1 text-[12px] text-white">
+                                <a href={sharedDesk} className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
                                     Open in Desk
                                 </a>
                             </header>
@@ -157,7 +157,7 @@ export default function ContactHub({
                                     <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
                                     <div className="space-y-2">
                                         {timeline.map((item: any) => (
-                                            <div key={item.id} className="border-l-2 border-teal-600 pl-3">
+                                            <div key={item.id} className="border-l-2 border-brand pl-3">
                                                 <p className="text-[11px] uppercase text-muted-foreground">{item.type}</p>
                                                 <p className="font-medium">{item.subject ?? item.body}</p>
                                                 {item.body && item.subject ? <p className="text-muted-foreground">{item.body}</p> : null}
@@ -205,7 +205,7 @@ export default function ContactHub({
                                 <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Associations</h3>
                                 <p className="text-[11px] text-muted-foreground">Company</p>
                                 {associations?.company ? (
-                                    <Link href={`/crm/companies/${associations.company.id}`} className="block text-teal-800">
+                                    <Link href={`/crm/companies/${associations.company.id}`} className="block text-brand">
                                         {associations.company.name}
                                     </Link>
                                 ) : (
@@ -213,13 +213,13 @@ export default function ContactHub({
                                 )}
                                 <p className="mt-2 text-[11px] text-muted-foreground">Deals</p>
                                 {(associations?.deals ?? []).map((deal: any) => (
-                                    <Link key={deal.id} href={`/crm/deals/${deal.id}`} className="block text-teal-800">
+                                    <Link key={deal.id} href={`/crm/deals/${deal.id}`} className="block text-brand">
                                         {deal.title} · {deal.stage?.name}
                                     </Link>
                                 ))}
                                 <p className="mt-2 text-[11px] text-muted-foreground">Desk history</p>
                                 {(associations?.threads ?? []).map((thread: any) => (
-                                    <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-teal-800">
+                                    <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-brand">
                                         {thread.subject ?? 'Thread'} · {thread.status}
                                     </Link>
                                 ))}

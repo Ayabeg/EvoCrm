@@ -14,7 +14,7 @@ export default function DealShow({ deal }: { deal: any }) {
                 <Card className="space-y-3 p-4 text-sm">
                     <p>
                         Contact:{' '}
-                        <Link href={`/crm/contacts/${deal.contact_id}`} className="text-teal-700 dark:text-teal-300">
+                        <Link href={`/crm/contacts/${deal.contact_id}`} className="text-brand">
                             {deal.contact?.first_name} {deal.contact?.last_name}
                         </Link>
                     </p>

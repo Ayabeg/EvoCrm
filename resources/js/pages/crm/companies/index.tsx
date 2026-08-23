@@ -47,7 +47,7 @@ export default function CompaniesIndex({ companies }: { companies: any[] }) {
                             {companies.map((company) => (
                                 <tr key={company.id} className="border-t">
                                     <td className="px-4 py-2">
-                                        <Link href={`/crm/companies/${company.id}`} className="font-medium text-teal-700 dark:text-teal-300">
+                                        <Link href={`/crm/companies/${company.id}`} className="font-medium text-brand">
                                             {company.name}
                                         </Link>
                                     </td>

@@ -79,7 +79,7 @@ export default function DealsIndex({
                                         <div key={deal.id} className="rounded-md border bg-background p-2 text-sm">
                                             <Link
                                                 href={`/crm/deals/${deal.id}`}
-                                                className="font-medium text-teal-700 dark:text-teal-300"
+                                                className="font-medium text-brand"
                                             >
                                                 {deal.title}
                                             </Link>
@@ -126,7 +126,7 @@ export default function DealsIndex({
                             {deals.map((deal) => (
                                 <tr key={deal.id} className="border-t">
                                     <td className="px-4 py-2">
-                                        <Link href={`/crm/deals/${deal.id}`} className="font-medium text-teal-700 dark:text-teal-300">
+                                        <Link href={`/crm/deals/${deal.id}`} className="font-medium text-brand">
                                             {deal.title}
                                         </Link>
                                     </td>

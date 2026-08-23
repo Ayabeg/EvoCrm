@@ -54,7 +54,7 @@ export default function LeadsIndex({ leads, contacts }: { leads: any[]; contacts
                             {leads.map((lead) => (
                                 <tr key={lead.id} className="border-t">
                                     <td className="px-4 py-2">
-                                        <Link href={`/crm/leads/${lead.id}`} className="font-medium text-teal-700 dark:text-teal-300">
+                                        <Link href={`/crm/leads/${lead.id}`} className="font-medium text-brand">
                                             {lead.title}
                                         </Link>
                                     </td>

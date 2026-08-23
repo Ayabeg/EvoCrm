@@ -6,10 +6,11 @@ import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'EvoSales';
+const appName = 'EvoSales · Evotechly';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) =>
+        title && title !== appName ? `${title} · ${appName}` : appName,
     layout: (name) => {
         switch (true) {
             case name === 'welcome':
@@ -32,7 +33,7 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#0F4C5C',
     },
 });
 

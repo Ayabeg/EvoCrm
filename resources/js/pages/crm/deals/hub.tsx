@@ -30,7 +30,7 @@ export default function DealHub({
                         <div className="border-b px-3 py-2">
                             <div className="flex items-center justify-between">
                                 <h1 className="text-sm font-semibold">Deals</h1>
-                                <span className="text-[11px] text-teal-800">{formatDzd(openPipelineCents)}</span>
+                                <span className="money text-[11px] text-brand">{formatDzd(openPipelineCents)}</span>
                             </div>
                             <Form action="/crm/deals" method="get" className="mt-2 grid grid-cols-2 gap-1">
                                 <select name="stage" defaultValue={activeFilters.stage ?? ''} className="h-7 rounded border bg-background px-1 text-[11px]">
@@ -73,7 +73,7 @@ export default function DealHub({
                             </Form>
                             <div className="mt-1 flex flex-wrap gap-1">
                                 {savedFilters.map((filter: any) => (
-                                    <Link key={filter.id} href={`/crm/deals?filter_id=${filter.id}`} className="rounded bg-teal-100 px-1.5 py-0.5 text-[10px] text-teal-900">
+                                    <Link key={filter.id} href={`/crm/deals?filter_id=${filter.id}`} className="rounded bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] text-ink">
                                         {filter.name}
                                     </Link>
                                 ))}
@@ -91,7 +91,7 @@ export default function DealHub({
                                         <span className="text-[10px]">{deal.stage?.name}</span>
                                     </div>
                                     <p className="text-[11px] text-muted-foreground">
-                                        {formatDzd(deal.amount_cents)} · {deal.owner?.name ?? 'Unassigned'}
+                                        <span className="money">{formatDzd(deal.amount_cents)}</span> · {deal.owner?.name ?? 'Unassigned'}
                                     </p>
                                 </HubListRow>
                             ))}
@@ -118,10 +118,10 @@ export default function DealHub({
                                 <div>
                                     <h2 className="text-base font-semibold">{selected.title}</h2>
                                     <p className="text-[11px] text-muted-foreground">
-                                        {formatDzd(selected.amount_cents)} · {selected.stage?.name} · {selected.next_step ?? 'No next step'}
+                                        <span className="money">{formatDzd(selected.amount_cents)}</span> · {selected.stage?.name} · {selected.next_step ?? 'No next step'}
                                     </p>
                                 </div>
-                                <a href={sharedDesk} className="rounded bg-teal-700 px-3 py-1 text-[12px] text-white">
+                                <a href={sharedDesk} className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
                                     Open in Desk
                                 </a>
                             </header>
@@ -131,9 +131,9 @@ export default function DealHub({
                                         const column = deals.filter((deal: any) => deal.stage_id === stage.id);
                                         const sum = column.reduce((acc: number, deal: any) => acc + (deal.amount_cents ?? 0), 0);
                                         return (
-                                            <div key={stage.id} className="rounded border bg-[#faf8f4] p-1 dark:bg-slate-900">
+                                            <div key={stage.id} className="rounded border border-hairline bg-canvas-soft p-1">
                                                 <p className="text-[10px] font-semibold">{stage.name}</p>
-                                                <p className="text-[10px] text-teal-800">{formatDzd(sum)}</p>
+                                                <p className="money text-[10px] text-brand">{formatDzd(sum)}</p>
                                                 <p className="text-[10px] text-muted-foreground">{column.length}</p>
                                             </div>
                                         );
@@ -174,7 +174,7 @@ export default function DealHub({
                                     <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
                                     <div className="space-y-2">
                                         {timeline.map((item: any) => (
-                                            <div key={item.id} className="border-l-2 border-teal-600 pl-3">
+                                            <div key={item.id} className="border-l-2 border-brand pl-3">
                                                 <p className="text-[11px] uppercase text-muted-foreground">{item.type}</p>
                                                 <p className="font-medium">{item.subject ?? item.body}</p>
                                                 {item.body && item.subject ? <p className="text-muted-foreground">{item.body}</p> : null}
@@ -222,18 +222,18 @@ export default function DealHub({
                             <section>
                                 <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Associations</h3>
                                 {associations?.contact ? (
-                                    <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-teal-800">
+                                    <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-brand">
                                         {associations.contact.first_name} {associations.contact.last_name}
                                     </Link>
                                 ) : null}
                                 {associations?.company ? (
-                                    <Link href={`/crm/companies/${associations.company.id}`} className="block text-teal-800">
+                                    <Link href={`/crm/companies/${associations.company.id}`} className="block text-brand">
                                         {associations.company.name}
                                     </Link>
                                 ) : null}
                                 <p className="mt-2 text-[11px] text-muted-foreground">Desk history</p>
                                 {(associations?.threads ?? []).map((thread: any) => (
-                                    <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-teal-800">
+                                    <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-brand">
                                         {thread.subject ?? 'Thread'}
                                     </Link>
                                 ))}
@@ -246,7 +246,7 @@ export default function DealHub({
                                 <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Quote</h3>
                                 {(associations?.quotes ?? []).map((quote: any) => (
                                     <p key={quote.id}>
-                                        {quote.status} · {formatDzd(quote.total_cents)}
+                                        {quote.status} · <span className="money">{formatDzd(quote.total_cents)}</span>
                                     </p>
                                 ))}
                                 <Form action={`/crm/deals/${selected.id}/quotes`} method="post" className="mt-2 space-y-1">

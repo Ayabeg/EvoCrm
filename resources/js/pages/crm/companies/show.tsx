@@ -42,7 +42,7 @@ export default function CompanyShow({ company }: { company: any }) {
                     <Card className="p-4 text-sm">
                         <h2 className="mb-2 font-medium">Contacts</h2>
                         {(company.contacts ?? []).map((contact: any) => (
-                            <Link key={contact.id} href={`/crm/contacts/${contact.id}`} className="block text-teal-700 dark:text-teal-300">
+                            <Link key={contact.id} href={`/crm/contacts/${contact.id}`} className="block text-brand">
                                 {contact.first_name} {contact.last_name}
                             </Link>
                         ))}
@@ -50,7 +50,7 @@ export default function CompanyShow({ company }: { company: any }) {
                     <Card className="p-4 text-sm">
                         <h2 className="mb-2 font-medium">Deals</h2>
                         {(company.deals ?? []).map((deal: any) => (
-                            <Link key={deal.id} href={`/crm/deals/${deal.id}`} className="block text-teal-700 dark:text-teal-300">
+                            <Link key={deal.id} href={`/crm/deals/${deal.id}`} className="block text-brand">
                                 {deal.title} · {deal.stage?.name}
                             </Link>
                         ))}

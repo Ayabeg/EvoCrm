@@ -44,7 +44,7 @@ export default function ChannelSettings({
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Button disabled={processing}>Save Desk URL</Button>
-                                    <a href={desk} className="text-sm font-medium text-teal-700 dark:text-teal-300">
+                                    <a href={desk} className="text-sm font-medium text-brand">
                                         Open Desk
                                     </a>
                                 </div>

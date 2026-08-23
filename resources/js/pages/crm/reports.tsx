@@ -11,7 +11,7 @@ export default function Reports({
     return (
         <>
             <Head title="Reports" />
-            <div className="flex-1 space-y-4 bg-[#f6f4ef] p-6 text-[13px] dark:bg-slate-950">
+            <div className="flex-1 space-y-4 bg-canvas-soft p-6 text-[13px]">
                 <h1 className="text-lg font-semibold">Sales reports</h1>
                 <p className="text-muted-foreground">Light operational view — not a BI tool. Currency DZD. Africa/Algiers month.</p>
                 <div className="grid gap-3 md:grid-cols-4">
@@ -21,15 +21,15 @@ export default function Reports({
                         ['Open pipeline', formatDzd(openPipelineCents)],
                         ['Activities completed', String(activitiesCompleted)],
                     ].map(([label, value]) => (
-                        <div key={label} className="border bg-white p-3 dark:bg-slate-900">
+                        <div key={label} className="border border-hairline bg-canvas p-3">
                             <p className="text-[11px] uppercase text-muted-foreground">{label}</p>
-                            <p className="mt-1 text-base font-semibold">{value}</p>
+                            <p className="money mt-1 text-base font-semibold">{value}</p>
                         </div>
                     ))}
                 </div>
-                <div className="border bg-white dark:bg-slate-900">
+                <div className="border border-hairline bg-canvas">
                     <table className="w-full">
-                        <thead className="bg-[#faf8f4] text-left text-[11px] uppercase text-muted-foreground dark:bg-slate-800">
+                        <thead className="bg-canvas-soft text-left text-[11px] uppercase text-muted-foreground">
                             <tr>
                                 <th className="px-3 py-2">Stage</th>
                                 <th className="px-3 py-2">Deals</th>
@@ -41,7 +41,7 @@ export default function Reports({
                                 <tr key={stage} className="border-t">
                                     <td className="px-3 py-2">{stage}</td>
                                     <td className="px-3 py-2">{row.count}</td>
-                                    <td className="px-3 py-2">{formatDzd(row.amount_cents)}</td>
+                                    <td className="money px-3 py-2">{formatDzd(row.amount_cents)}</td>
                                 </tr>
                             ))}
                         </tbody>

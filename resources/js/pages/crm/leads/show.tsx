@@ -10,7 +10,7 @@ export default function LeadShow({ lead, associations, deskUrl }: { lead: any; a
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title={lead.title} description={`Status: ${lead.status}`}>
                     {deskUrl ? (
-                        <a href={deskUrl} className="rounded bg-teal-700 px-3 py-1 text-sm text-white">Open in Desk</a>
+                        <a href={deskUrl} className="rounded bg-brand px-3 py-1 text-sm text-canvas">Open in Desk</a>
                     ) : null}
                     {lead.status !== 'qualified' ? (
                         <Form action={`/crm/leads/${lead.id}/qualify`} method="post">
@@ -23,7 +23,7 @@ export default function LeadShow({ lead, associations, deskUrl }: { lead: any; a
                 <Card className="space-y-2 p-4 text-sm">
                     <p>
                         Contact:{' '}
-                        <Link href={`/crm/contacts/${lead.contact_id}`} className="text-teal-700 dark:text-teal-300">
+                        <Link href={`/crm/contacts/${lead.contact_id}`} className="text-brand">
                             {lead.contact?.first_name} {lead.contact?.last_name}
                         </Link>
                     </p>
@@ -61,22 +61,22 @@ export default function LeadShow({ lead, associations, deskUrl }: { lead: any; a
                 <Card className="space-y-2 p-4 text-sm">
                     <h2 className="font-medium">Associations</h2>
                     {associations?.contact ? (
-                        <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-teal-700">
+                        <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-brand">
                             Contact · {associations.contact.first_name} {associations.contact.last_name}
                         </Link>
                     ) : null}
                     {associations?.company ? (
-                        <Link href={`/crm/companies/${associations.company.id}`} className="block text-teal-700">
+                        <Link href={`/crm/companies/${associations.company.id}`} className="block text-brand">
                             Company · {associations.company.name}
                         </Link>
                     ) : null}
                     {associations?.deal ? (
-                        <Link href={`/crm/deals/${associations.deal.id}`} className="block text-teal-700">
+                        <Link href={`/crm/deals/${associations.deal.id}`} className="block text-brand">
                             Deal · {associations.deal.title}
                         </Link>
                     ) : null}
                     {(associations?.threads ?? []).map((thread: any) => (
-                        <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-teal-700">
+                        <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-brand">
                             Desk history · {thread.subject ?? thread.id}
                         </Link>
                     ))}

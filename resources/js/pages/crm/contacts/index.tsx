@@ -88,7 +88,7 @@ export default function ContactsIndex({
                                     <td className="px-4 py-2">
                                         <Link
                                             href={`/crm/contacts/${contact.id}`}
-                                            className="font-medium text-teal-700 dark:text-teal-300"
+                                            className="font-medium text-brand"
                                         >
                                             {contact.first_name}{' '}
                                             {contact.last_name}
