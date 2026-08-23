@@ -83,7 +83,7 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 - Conversations → history only (CRM context)
 - CRM → Companies / Contacts / Leads / Deals (list + detail + associations sidebar) / Reports
 - Campaigns → Ads Hub (`/ads` funnel board + campaign detail)
-- Outbound → Sequences / Mailboxes / Templates / Outbox / Suppression / Quiet hours (+ overview `/outbound`, Replies, Reports)
+- Outbound → Overview / Mailboxes / Domains / Templates / Sequences / Campaigns / Outbox / Replies / Suppressions / Quiet hours / Reports — all under `/outbound` on the CRM hostname
 - Settings → Evolution / Meta / Channels / Custom attributes (plus profile / security / appearance)
 
 ## Security
@@ -99,8 +99,9 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 ## Later work (explicitly not this slice)
 
 - Meta Tech Provider / Embedded Signup
-- EvoOutreach mail server
 - Evoleads scraper
 - Live Meta OAuth
 - Bounce tracking via ESP webhooks (reports page is honest about this)
 - Telegram channel (status `later`)
+
+Retired: the BillionMail deployment on `outbound.evotechly.com` (EvoOutreach). Broadcast campaigns and drip sequences are native to EvoSales at `/outbound`; there is no second contact database and no mail server to run.
