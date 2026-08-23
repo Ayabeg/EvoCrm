@@ -35,6 +35,11 @@ type Thread = {
 type Props = {
     /** EvoDesk (Chatwoot) embed source — same-window iframe, never a new tab. */
     embedUrl: string | null;
+    /** ok = frame it; blocked/unreachable/no-url = native CRM desk instead. */
+    embedState: 'ok' | 'blocked' | 'unreachable' | 'no-url';
+    embedReason: string | null;
+    /** The configured desk URL even when framing is refused (for the banner). */
+    configuredUrl: string | null;
     threads: Thread[];
     selected: Thread | null;
 };
@@ -53,7 +58,7 @@ function nameOf(contact?: Contact | null) {
  * refuses framing), the native CRM conversation desk below keeps the
  * operator on this hostname instead of ejecting to desk.evotechly.com.
  */
-export default function DeskInbox({ embedUrl, threads, selected }: Props) {
+export default function DeskInbox({ embedUrl, embedState, embedReason, configuredUrl, threads, selected }: Props) {
     return (
         <>
             <Head title="My Inbox" />
@@ -81,7 +86,13 @@ export default function DeskInbox({ embedUrl, threads, selected }: Props) {
                         allow="clipboard-write; microphone; camera"
                     />
                 ) : (
-                    <NativeDesk threads={threads} selected={selected} />
+                    <NativeDesk
+                        threads={threads}
+                        selected={selected}
+                        embedState={embedState}
+                        embedReason={embedReason}
+                        configuredUrl={configuredUrl}
+                    />
                 )}
             </div>
         </>
@@ -92,17 +103,37 @@ DeskInbox.layout = {
     breadcrumbs: [{ title: 'My Inbox', href: '/inbox' }],
 };
 
-function NativeDesk({ threads, selected }: { threads: Thread[]; selected: Thread | null }) {
+function NativeDesk({
+    threads,
+    selected,
+    embedState,
+    embedReason,
+    configuredUrl,
+}: {
+    threads: Thread[];
+    selected: Thread | null;
+    embedState: Props['embedState'];
+    embedReason: string | null;
+    configuredUrl: string | null;
+}) {
     return (
         <div className="grid min-h-0 flex-1 gap-0 overflow-hidden lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
             <div className="min-h-0 overflow-y-auto border-r border-hairline">
                 <Card className="m-3 border-hairline bg-canvas-soft p-3 text-xs text-muted-foreground">
-                    <p>
-                        <span className="font-medium text-foreground">Native desk fallback.</span> Set{' '}
-                        <code>EVOSALES_INBOX_URL</code> (and optionally <code>EVOSALES_INBOX_EMBED_PATH</code>) to
-                        embed the live EvoDesk UI here. If EvoDesk sends X-Frame-Options, allow-frame this CRM
-                        origin on the desk — the operator still never leaves EvoSales.
-                    </p>
+                    {embedState === 'no-url' ? (
+                        <p>
+                            <span className="font-medium text-foreground">Native CRM desk.</span> Set{' '}
+                            <code>EVOSALES_INBOX_URL</code> (and optionally <code>EVOSALES_INBOX_EMBED_PATH</code>)
+                            to embed the live EvoDesk UI here instead.
+                        </p>
+                    ) : (
+                        <p>
+                            <span className="font-medium text-foreground">
+                                EvoDesk at {configuredUrl} is not framed here.
+                            </span>{' '}
+                            {embedReason} You keep working — this is the full CRM desk, not a link out.
+                        </p>
+                    )}
                 </Card>
                 <table className="w-full text-sm">
                     <tbody>

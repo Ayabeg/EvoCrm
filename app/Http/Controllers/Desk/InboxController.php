@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Desk;
 use App\Http\Controllers\Controller;
 use App\Models\Thread;
 use App\Services\Desk\DeskComposer;
+use App\Services\Desk\DeskEmbedProbe;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,7 +28,7 @@ class InboxController extends Controller
      * configured, the page falls back to the native CRM conversation desk
      * (same threads as /conversations) instead of ejecting to another host.
      */
-    public function inbox(Request $request): Response
+    public function inbox(Request $request, DeskEmbedProbe $probe): Response
     {
         $workspace = $request->user()->workspace;
 
@@ -51,8 +52,20 @@ class InboxController extends Controller
                 ->find($threadId);
         }
 
+        $embedUrl = $workspace->inboxEmbedUrl();
+
+        // Probe the desk's framing headers: if EvoDesk refuses embedding
+        // (Chatwoot's default X-Frame-Options: SAMEORIGIN), serve the native
+        // CRM desk with a fix-it banner instead of a broken frame.
+        $embed = $embedUrl
+            ? $probe->check($embedUrl, (string) config('app.url'))
+            : ['state' => 'no-url', 'reason' => null];
+
         return Inertia::render('desk/inbox', [
-            'embedUrl' => $workspace->inboxEmbedUrl(),
+            'embedUrl' => $embed['state'] === 'ok' ? $embedUrl : null,
+            'embedState' => $embed['state'],
+            'embedReason' => $embed['reason'],
+            'configuredUrl' => $embedUrl,
             'threads' => $threads,
             'selected' => $selected,
         ]);
