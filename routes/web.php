@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/outbound/mailboxes', [MailboxController::class, 'index'])->name('outbound.mailboxes.index');
     Route::post('/outbound/mailboxes', [MailboxController::class, 'store'])->name('outbound.mailboxes.store');
+    Route::post('/outbound/mailboxes/sync', [MailboxController::class, 'sync'])->name('outbound.mailboxes.sync');
     Route::put('/outbound/mailboxes/{mailbox}', [MailboxController::class, 'update'])->name('outbound.mailboxes.update');
     Route::post('/outbound/mailboxes/{mailbox}/toggle', [MailboxController::class, 'toggle'])->name('outbound.mailboxes.toggle');
     Route::post('/outbound/mailboxes/{mailbox}/default', [MailboxController::class, 'setDefault'])->name('outbound.mailboxes.default');

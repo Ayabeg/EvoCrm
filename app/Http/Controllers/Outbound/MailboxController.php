@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Outbound;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Mailbox;
+use App\Services\Outbound\MailboxSync;
 use App\Services\Outbound\OutboundDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ use Inertia\Response;
 
 class MailboxController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, MailboxSync $sync): Response
     {
         return Inertia::render('outbound/mailboxes/index', [
             'mailboxes' => Mailbox::query()
@@ -29,7 +30,33 @@ class MailboxController extends Controller
                     'effective_status' => $box->effectiveStatus(),
                     'sent_today' => $box->sentToday(),
                 ]),
+            'mail_stack' => [
+                'configured' => $sync->configured(),
+                'roundcube_url' => config('evosales.mail_stack.roundcube_url'),
+            ],
         ]);
+    }
+
+    /**
+     * Pull the mailbox list from the live mail stack right now. The same
+     * sync also runs on the scheduler every 15 minutes.
+     */
+    public function sync(Request $request, MailboxSync $sync): RedirectResponse
+    {
+        $result = $sync->sync($request->user()->workspace);
+
+        if (! $result['ok']) {
+            Inertia::flash('toast', ['type' => 'error', 'message' => $result['reason'] ?? 'Mail stack sync failed.']);
+
+            return back();
+        }
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => "Mail stack sync: {$result['total']} mailbox(es) — {$result['created']} added, {$result['updated']} updated.",
+        ]);
+
+        return back();
     }
 
     public function store(Request $request): RedirectResponse
@@ -183,6 +210,15 @@ class MailboxController extends Controller
     public function destroy(Request $request, Mailbox $mailbox): RedirectResponse
     {
         abort_unless((int) $mailbox->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        if ($mailbox->isMailStack()) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'This mailbox is synced from the mail stack — remove it on the stack and it disappears here on the next sync.',
+            ]);
+
+            return back();
+        }
 
         $mailbox->delete();
 
