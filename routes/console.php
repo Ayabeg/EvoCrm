@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('outbound:run')->everyMinute()->withoutOverlapping();
 Schedule::command('outbound:poll-replies')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('outbound:sync-mailboxes')->everyFifteenMinutes()->withoutOverlapping();
