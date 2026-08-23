@@ -25,9 +25,11 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
  * @property string|null $remember_token
+ * @property Carbon|null $last_login_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Workspace|null $workspace
+ * @property WorkspaceRole $role
  */
 #[Fillable(['workspace_id', 'name', 'email', 'password', 'role'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
@@ -48,6 +50,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => WorkspaceRole::class,
             'two_factor_confirmed_at' => 'datetime',
+            'last_login_at' => 'datetime',
         ];
     }
 

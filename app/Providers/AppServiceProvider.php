@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\Identity\WorkspaceProvisioner;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Authenticated;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -35,6 +36,15 @@ class AppServiceProvider extends ServiceProvider
             $user = $event->user;
             if ($user instanceof User && ! $user->workspace_id) {
                 app(WorkspaceProvisioner::class)->forUser($user);
+            }
+        });
+
+        // Real logins only (password, Google OAuth) — not session re-auth.
+        // Settings → People shows this as "Last login".
+        Event::listen(Login::class, function (Login $event): void {
+            $user = $event->user;
+            if ($user instanceof User) {
+                $user->forceFill(['last_login_at' => now()])->save();
             }
         });
     }

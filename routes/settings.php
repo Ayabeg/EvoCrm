@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\PeopleController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -24,4 +25,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('user-password.update');
 
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
+
+    Route::middleware('can-manage-settings')->group(function () {
+        Route::get('settings/people', [PeopleController::class, 'index'])->name('settings.people');
+        Route::post('settings/people', [PeopleController::class, 'store'])->name('settings.people.store');
+        Route::post('settings/people/{user}/resend', [PeopleController::class, 'resend'])->name('settings.people.resend');
+        Route::put('settings/people/{user}/role', [PeopleController::class, 'updateRole'])->name('settings.people.role');
+        Route::delete('settings/people/{user}', [PeopleController::class, 'destroy'])->name('settings.people.destroy');
+    });
 });

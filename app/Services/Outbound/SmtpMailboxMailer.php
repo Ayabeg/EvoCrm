@@ -27,13 +27,7 @@ class SmtpMailboxMailer implements OutboundMailer
         }
 
         try {
-            $dsn = sprintf(
-                'smtp://%s:%s@%s:%d',
-                rawurlencode($this->mailbox->username),
-                rawurlencode((string) $this->mailbox->password),
-                $this->mailbox->host,
-                $this->mailbox->port,
-            );
+            $dsn = $this->dsn();
 
             $email = (new Email)
                 ->from(new Address($this->mailbox->from_address, $this->mailbox->from_name))
@@ -79,6 +73,38 @@ class SmtpMailboxMailer implements OutboundMailer
         }
 
         return $message;
+    }
+
+    /**
+     * Send a one-off email that is not an OutboundMessage (workspace invites,
+     * first-login links) through this mailbox's SMTP transport. Throws on
+     * failure — the caller decides how to report it.
+     */
+    public function sendAdHoc(string $to, string $subject, string $text, string $html): void
+    {
+        if (! $this->enabled()) {
+            throw new \RuntimeException("Mailbox [{$this->mailbox->name}] is disabled.");
+        }
+
+        $email = (new Email)
+            ->from(new Address($this->mailbox->from_address, $this->mailbox->from_name))
+            ->to($to)
+            ->subject($subject)
+            ->text($text)
+            ->html($html);
+
+        $this->deliver($this->dsn(), $email);
+    }
+
+    protected function dsn(): string
+    {
+        return sprintf(
+            'smtp://%s:%s@%s:%d',
+            rawurlencode($this->mailbox->username),
+            rawurlencode((string) $this->mailbox->password),
+            $this->mailbox->host,
+            $this->mailbox->port,
+        );
     }
 
     /**
