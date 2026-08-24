@@ -9,7 +9,7 @@ use App\Models\Product;
 class DealLineTotals
 {
     /**
-     * @param  array{product_id?: int, name?: string, sku?: string, quantity?: int, unit_cents?: int, unit_dzd?: float|int}  $item
+     * @param  array<string, mixed>  $item
      */
     public function add(Deal $deal, array $item, ?Product $product = null): DealLineItem
     {
@@ -17,13 +17,13 @@ class DealLineTotals
         $unit = $this->unitCents($item, $product);
         $name = filled($item['name'] ?? null)
             ? (string) $item['name']
-            : (string) ($product?->name ?? 'Line item');
+            : ($product instanceof Product ? $product->name : 'Line item');
         $sku = filled($item['sku'] ?? null)
             ? (string) $item['sku']
-            : $product?->sku;
+            : ($product instanceof Product ? $product->sku : null);
 
         $line = $deal->lineItems()->create([
-            'product_id' => $product?->id ?? ($item['product_id'] ?? null),
+            'product_id' => $product instanceof Product ? $product->id : ($item['product_id'] ?? null),
             'name' => $name,
             'sku' => $sku,
             'quantity' => $quantity,
@@ -61,18 +61,18 @@ class DealLineTotals
     }
 
     /**
-     * @param  array{unit_cents?: int, unit_dzd?: float|int}  $item
+     * @param  array<string, mixed>  $item
      */
     protected function unitCents(array $item, ?Product $product): int
     {
-        if (array_key_exists('unit_cents', $item) && $item['unit_cents'] !== null) {
+        if (isset($item['unit_cents'])) {
             return (int) $item['unit_cents'];
         }
 
-        if (array_key_exists('unit_dzd', $item) && $item['unit_dzd'] !== null) {
+        if (isset($item['unit_dzd'])) {
             return (int) round(((float) $item['unit_dzd']) * 100);
         }
 
-        return (int) ($product?->unit_cents ?? 0);
+        return $product instanceof Product ? (int) $product->unit_cents : 0;
     }
 }

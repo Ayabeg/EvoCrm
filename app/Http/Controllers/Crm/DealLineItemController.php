@@ -26,7 +26,8 @@ class DealLineItemController extends Controller
         $product = Product::query()
             ->forWorkspace($deal->workspace_id)
             ->active()
-            ->findOrFail($data['product_id']);
+            ->whereKey($data['product_id'])
+            ->firstOrFail();
 
         $totals->add($deal, $data, $product);
 

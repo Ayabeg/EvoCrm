@@ -14,11 +14,13 @@ class DealLineItem extends Model
     /** @use HasFactory<DealLineItemFactory> */
     use HasFactory;
 
+    /** @return BelongsTo<Deal, $this> */
     public function deal(): BelongsTo
     {
         return $this->belongsTo(Deal::class);
     }
 
+    /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

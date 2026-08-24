@@ -90,6 +90,7 @@ class Deal extends Model
         return $this->hasMany(Quote::class)->latest();
     }
 
+    /** @return HasMany<DealLineItem, $this> */
     public function lineItems(): HasMany
     {
         return $this->hasMany(DealLineItem::class)->orderBy('id');

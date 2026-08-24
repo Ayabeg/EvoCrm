@@ -24,8 +24,10 @@ class QuoteTotals
             $total += $line;
 
             $quote->items()->create([
-                'product_id' => $product?->id,
-                'name' => filled($item['name'] ?? null) ? $item['name'] : ($product?->name ?? 'Line item'),
+                'product_id' => $product instanceof Product ? $product->id : null,
+                'name' => filled($item['name'] ?? null)
+                    ? (string) $item['name']
+                    : ($product instanceof Product ? $product->name : 'Line item'),
                 'quantity' => $quantity,
                 'unit_cents' => $unit,
                 'total_cents' => $line,
@@ -63,18 +65,18 @@ class QuoteTotals
     }
 
     /**
-     * @param  array{unit_cents?: int, unit_dzd?: float|int}  $item
+     * @param  array<string, mixed>  $item
      */
     protected function unitCents(array $item, ?Product $product): int
     {
-        if (array_key_exists('unit_cents', $item) && $item['unit_cents'] !== null) {
+        if (isset($item['unit_cents'])) {
             return (int) $item['unit_cents'];
         }
 
-        if (array_key_exists('unit_dzd', $item) && $item['unit_dzd'] !== null) {
+        if (isset($item['unit_dzd'])) {
             return (int) round(((float) $item['unit_dzd']) * 100);
         }
 
-        return (int) ($product?->unit_cents ?? 0);
+        return $product instanceof Product ? (int) $product->unit_cents : 0;
     }
 }

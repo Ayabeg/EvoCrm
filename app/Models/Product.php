@@ -37,11 +37,13 @@ class Product extends Model
         return $query->where('active', true);
     }
 
+    /** @return HasMany<DealLineItem, $this> */
     public function lineItems(): HasMany
     {
         return $this->hasMany(DealLineItem::class);
     }
 
+    /** @return HasMany<QuoteItem, $this> */
     public function quoteItems(): HasMany
     {
         return $this->hasMany(QuoteItem::class);
