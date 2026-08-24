@@ -41,6 +41,18 @@ export default function MetaApp({
         <>
             <Head title="Meta" />
             <div className="space-y-6">
+                <div className="rounded-md border border-hairline bg-canvas p-4">
+                    <ol className="flex flex-wrap gap-2 text-[12px]">
+                        {['Connect Meta', 'Pick pages', 'Verify scopes', 'Finish'].map((step, index) => (
+                            <li
+                                key={step}
+                                className={`rounded-full px-3 py-1 ${index === 0 ? 'bg-brand text-primary-foreground' : 'bg-canvas-soft text-muted-foreground'}`}
+                            >
+                                {index + 1}. {step}
+                            </li>
+                        ))}
+                    </ol>
+                </div>
                 <div>
                     <Link
                         href="/settings/apps"
@@ -59,7 +71,7 @@ export default function MetaApp({
                     </p>
                 </div>
 
-                <Card className="space-y-2 p-4 text-sm">
+                <Card className="space-y-2 border-hairline bg-canvas p-4 text-sm shadow-none">
                     <p>
                         <span className="text-muted-foreground">Account:</span>{' '}
                         {integration.account_name ?? '—'}
