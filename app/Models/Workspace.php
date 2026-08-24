@@ -154,4 +154,10 @@ class Workspace extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    /** @return HasMany<ConversionFunnel, $this> */
+    public function conversionFunnels(): HasMany
+    {
+        return $this->hasMany(ConversionFunnel::class);
+    }
 }
