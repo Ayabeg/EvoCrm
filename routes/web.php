@@ -103,6 +103,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
 
     Route::get('/crm/deals', [DealController::class, 'index'])->name('crm.deals.index');
+    Route::get('/crm/deals/board', [DealController::class, 'board'])->name('crm.deals.board');
     Route::post('/crm/deals', [DealController::class, 'store'])->name('crm.deals.store');
     Route::get('/crm/deals/{deal}', [DealController::class, 'show'])->name('crm.deals.show');
     Route::put('/crm/deals/{deal}', [DealController::class, 'update'])->name('crm.deals.update');

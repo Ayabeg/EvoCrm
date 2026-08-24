@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Crm;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
+use App\Services\Crm\DealBoardForecast;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,6 +41,7 @@ class DealController extends Controller
             'amount_cents' => ['nullable', 'integer', 'min:0'],
             'amount_dzd' => ['nullable', 'numeric', 'min:0'],
             'stage_id' => ['nullable', 'integer'],
+            'pipeline_id' => ['nullable', 'integer'],
             'owner_id' => ['nullable', 'integer'],
             'source' => ['nullable', 'string', 'max:80'],
             'close_date' => ['nullable', 'date'],
@@ -46,7 +49,9 @@ class DealController extends Controller
         ]);
 
         $workspace = $request->user()->workspace;
-        $pipeline = $workspace->defaultPipeline();
+        $pipeline = filled($data['pipeline_id'] ?? null)
+            ? Pipeline::query()->forWorkspace($workspace)->findOrFail($data['pipeline_id'])
+            : $workspace->defaultPipeline();
         $stage = filled($data['stage_id'] ?? null)
             ? Stage::query()->where('pipeline_id', $pipeline->id)->findOrFail($data['stage_id'])
             : $pipeline->stageBySlug('new');
@@ -131,6 +136,79 @@ class DealController extends Controller
         $deal->moveTo($stage, $request->user());
 
         return back();
+    }
+
+    public function board(Request $request): Response
+    {
+        $workspace = $request->user()->workspace;
+        $pipelines = $workspace->pipelines()->orderByDesc('is_default')->orderBy('name')->get();
+
+        $requestedId = $request->integer('pipeline');
+        $pipeline = $requestedId > 0
+            ? $pipelines->firstWhere('id', $requestedId)
+            : $pipelines->firstWhere('is_default', true) ?? $pipelines->first();
+
+        abort_unless($pipeline instanceof Pipeline, 404);
+
+        $pipeline->load('stages');
+
+        $deals = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->with(['contact.company', 'company', 'stage', 'owner'])
+            ->orderByDesc('last_activity_at')
+            ->orderByDesc('id')
+            ->limit(200)
+            ->get();
+
+        $stages = $pipeline->stages->map(function (Stage $stage) use ($deals) {
+            $column = $deals->where('stage_id', $stage->id);
+            $amountCents = (int) $column->sum('amount_cents');
+            $probability = $stage->winProbability();
+
+            return [
+                'id' => $stage->id,
+                'name' => $stage->name,
+                'slug' => $stage->slug,
+                'position' => $stage->position,
+                'is_won' => $stage->is_won,
+                'is_lost' => $stage->is_lost,
+                'probability' => $probability,
+                'count' => $column->count(),
+                'amount_cents' => $amountCents,
+                'weighted_cents' => DealBoardForecast::weightedCents($amountCents, $probability),
+            ];
+        })->values();
+
+        return Inertia::render('crm/deals/board', [
+            'pipeline' => [
+                'id' => $pipeline->id,
+                'name' => $pipeline->name,
+            ],
+            'pipelines' => $pipelines->map(fn (Pipeline $row) => [
+                'id' => $row->id,
+                'name' => $row->name,
+                'is_default' => $row->is_default,
+            ])->values(),
+            'stages' => $stages,
+            'deals' => $deals->map(fn (Deal $deal) => [
+                'id' => $deal->id,
+                'title' => $deal->title,
+                'amount_cents' => (int) $deal->amount_cents,
+                'currency' => $deal->currency ?? 'DZD',
+                'stage_id' => $deal->stage_id,
+                'contact_name' => $deal->contact?->displayName(),
+                'company_name' => $deal->company?->name ?? $deal->contact?->company?->name,
+                'owner_name' => $deal->owner?->name,
+                'close_date' => $deal->close_date?->toDateString(),
+                'url' => "/crm/deals/{$deal->id}",
+            ])->values(),
+            'forecast' => [
+                'count' => $deals->count(),
+                'amount_cents' => (int) $stages->sum('amount_cents'),
+                'weighted_cents' => (int) $stages->sum('weighted_cents'),
+            ],
+        ]);
     }
 
     /**

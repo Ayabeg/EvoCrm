@@ -17,7 +17,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **Contact** | Canonical person. Unique per workspace on `phone_e164` and on `email`. `owner_id`, `city`, `wilaya`, `last_activity_at`, `unanswered`. |
 | **Lead** | Pre-pipeline interest. `qualify()` sets `qualified_at`. |
 | **Pipeline** | Default “Sales” pipeline per workspace. |
-| **Stage** | New → Qualified → Demo → Proposal → Won / Lost. |
+| **Stage** | New → Qualified → Demo → Proposal → Won / Lost. Optional `probability` (0–100) for board forecast; if missing: New 10, Qualified 25, Demo 50, Proposal 75, Won 100, Lost 0 (unknown open 20). |
 | **Deal** | Sales Hub record: amount (cents, display DZD), currency default DZD, `close_date`, `next_step`, `owner_id`, `source`, `lost_reason`. `moveTo(Stage)` writes a `stage_change` activity. |
 | **Activity** | Timeline spine: `note`, `task`, `call`, `meeting`, `stage_change`, `sequence`. Tasks have `due_at`, `owner_id`, `done`. Home next steps = open tasks. |
 | **CustomAttributeDefinition** | Workspace-defined field (text / number / list) on contact, company, or deal. |
