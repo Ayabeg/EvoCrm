@@ -23,7 +23,7 @@ it('filters the contacts list to the current user on the My saved view', functio
         ->get('/crm/contacts?view=my')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/contacts/hub')
+            ->component('crm/contacts/index')
             ->has('contacts', 1)
             ->where('contacts.0.id', $mine->id)
             ->where('activeFilters.view', 'my')
@@ -60,7 +60,7 @@ it('filters the deals list to the current user on the My saved view', function (
         ->get('/crm/deals?view=my')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/deals/hub')
+            ->component('crm/deals/index')
             ->has('deals', 1)
             ->where('deals.0.id', $mine->id)
             ->where('activeFilters.view', 'my')

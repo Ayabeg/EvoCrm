@@ -1,6 +1,7 @@
 import ColumnFilterRow from '@/components/crm/column-filter-row';
 import ColumnChooser from '@/components/crm/column-chooser';
 import FilterBuilder from '@/components/crm/filter-builder';
+import { crmListHref, filterFields } from '@/components/crm/list-query';
 import SavedViewTabs from '@/components/crm/saved-view-tabs';
 import { StagePills, type StagePill } from '@/components/crm/stage-pills';
 import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
@@ -30,6 +31,8 @@ export default function ListToolbar({
     stages = [],
     stagePills = [],
     exportHref,
+    columns: controlledColumns,
+    onColumnsChange,
 }: {
     entity: 'contact' | 'company' | 'deal';
     basePath: string;
@@ -45,15 +48,25 @@ export default function ListToolbar({
     stages?: Stage[];
     stagePills?: StagePill[];
     exportHref?: string;
+    columns?: ListViewColumn[];
+    onColumnsChange?: (columns: ListViewColumn[]) => void;
 }) {
     const { auth } = usePage().props as { auth: { user: { role: string } } };
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
-    const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
+    const [internalColumns, setInternalColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
+    const columns = controlledColumns ?? internalColumns;
+    const setColumns = onColumnsChange ?? setInternalColumns;
     const [filterGroups, setFilterGroups] = useState<ListViewFilters>(() => filterGroupsFromActive(activeFilters));
 
     useEffect(() => {
         setFilterGroups(filterGroupsFromActive(activeFilters));
     }, [activeFilters]);
+
+    useEffect(() => {
+        if (controlledColumns === undefined) {
+            setInternalColumns(listView?.columns ?? []);
+        }
+    }, [controlledColumns, listView?.columns]);
 
     return (
         <div className="border-b border-hairline bg-canvas">
@@ -110,10 +123,11 @@ export default function ListToolbar({
             />
             {entity === 'deal' ? (
                 <StagePills
-                    pills={stagePills}
-                    activeStage={typeof activeFilters.stage === 'string' ? activeFilters.stage : null}
-                    basePath={basePath}
-                    activeFilters={activeFilters}
+                    stages={stagePills}
+                    activeSlug={typeof activeFilters.stage === 'string' ? activeFilters.stage : null}
+                    hrefFor={(slug) =>
+                        crmListHref(basePath, filterFields(activeFilters), { stage: slug })
+                    }
                 />
             ) : null}
         </div>

@@ -57,24 +57,28 @@ export default function CompaniesIndex({
                 cities={cities}
                 wilayas={wilayas}
             >
-                {companies.length === 0 ? (
-                    <CrmEmptyState
-                        line="No companies in this view."
-                        actionLabel="Add company"
-                        onAction={() => setDrawer(true)}
-                    />
-                ) : (
-                    <div className="min-h-0 flex-1 overflow-auto">
-                        <ListViewTable
-                            entity="company"
-                            rows={companies}
-                            columnDefs={listView.columnDefs}
-                            columns={listView.columns}
-                            basePath="/crm/companies"
-                        />
-                    </div>
+                {(columns) => (
+                    <>
+                        {companies.length === 0 ? (
+                            <CrmEmptyState
+                                line="No companies in this view."
+                                actionLabel="Add company"
+                                onAction={() => setDrawer(true)}
+                            />
+                        ) : (
+                            <div className="min-h-0 flex-1 overflow-auto">
+                                <ListViewTable
+                                    entity="company"
+                                    rows={companies}
+                                    columnDefs={listView.columnDefs}
+                                    columns={columns}
+                                    basePath="/crm/companies"
+                                />
+                            </div>
+                        )}
+                        <CrmListFooter count={companies.length} noun="companies" />
+                    </>
                 )}
-                <CrmListFooter count={companies.length} noun="companies" />
             </CrmListShell>
 
             <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create company">

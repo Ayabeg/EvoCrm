@@ -33,7 +33,7 @@ it('creates a contact from the create drawer and can add another', function () {
         ->get('/crm/contacts')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/contacts/hub')
+            ->component('crm/contacts/index')
             ->has('members')
             ->has('companies')
         );

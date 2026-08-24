@@ -76,24 +76,28 @@ export default function DealsIndex({
                 stages={stages}
                 stagePills={stagePills}
             >
-                {deals.length === 0 ? (
-                    <CrmEmptyState
-                        line="No deals in this view."
-                        actionLabel="Create deal"
-                        onAction={() => setDrawer(true)}
-                    />
-                ) : (
-                    <div className="min-h-0 flex-1 overflow-auto">
-                        <ListViewTable
-                            entity="deal"
-                            rows={deals}
-                            columnDefs={listView.columnDefs}
-                            columns={listView.columns}
-                            basePath="/crm/deals"
-                        />
-                    </div>
+                {(columns) => (
+                    <>
+                        {deals.length === 0 ? (
+                            <CrmEmptyState
+                                line="No deals in this view."
+                                actionLabel="Create deal"
+                                onAction={() => setDrawer(true)}
+                            />
+                        ) : (
+                            <div className="min-h-0 flex-1 overflow-auto">
+                                <ListViewTable
+                                    entity="deal"
+                                    rows={deals}
+                                    columnDefs={listView.columnDefs}
+                                    columns={columns}
+                                    basePath="/crm/deals"
+                                />
+                            </div>
+                        )}
+                        <CrmListFooter count={deals.length} noun="deals" />
+                    </>
                 )}
-                <CrmListFooter count={deals.length} noun="deals" />
             </CrmListShell>
 
             <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create deal">

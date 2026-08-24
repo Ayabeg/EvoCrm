@@ -24,7 +24,7 @@ it('exposes colored stage pills with counts above the deals board', function () 
         ->get('/crm/deals')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/deals/hub')
+            ->component('crm/deals/index')
             ->has('stagePills', 6)
             ->where('stagePills.0.name', 'New')
             ->where('stagePills.0.slug', 'new')

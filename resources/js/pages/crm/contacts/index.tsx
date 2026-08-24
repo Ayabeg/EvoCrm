@@ -79,24 +79,28 @@ export default function ContactsIndex({
                     ) : null
                 }
             >
-                {contacts.length === 0 ? (
-                    <CrmEmptyState
-                        line="No contacts in this view."
-                        actionLabel="Add contacts"
-                        onAction={() => setDrawer(true)}
-                    />
-                ) : (
-                    <div className="min-h-0 flex-1 overflow-auto">
-                        <ListViewTable
-                            entity="contact"
-                            rows={contacts}
-                            columnDefs={listView.columnDefs}
-                            columns={listView.columns}
-                            basePath="/crm/contacts"
-                        />
-                    </div>
+                {(columns) => (
+                    <>
+                        {contacts.length === 0 ? (
+                            <CrmEmptyState
+                                line="No contacts in this view."
+                                actionLabel="Add contacts"
+                                onAction={() => setDrawer(true)}
+                            />
+                        ) : (
+                            <div className="min-h-0 flex-1 overflow-auto">
+                                <ListViewTable
+                                    entity="contact"
+                                    rows={contacts}
+                                    columnDefs={listView.columnDefs}
+                                    columns={columns}
+                                    basePath="/crm/contacts"
+                                />
+                            </div>
+                        )}
+                        <CrmListFooter count={contacts.length} noun="contacts" exportHref="/crm/contacts/export" />
+                    </>
                 )}
-                <CrmListFooter count={contacts.length} noun="contacts" exportHref="/crm/contacts/export" />
             </CrmListShell>
 
             <CreateDrawer
