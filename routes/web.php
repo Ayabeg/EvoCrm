@@ -247,6 +247,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/settings/attributes/{definition}', [CustomAttributeController::class, 'update'])->name('settings.attributes.update');
     Route::delete('/settings/attributes/{definition}', [CustomAttributeController::class, 'destroy'])->name('settings.attributes.destroy');
     Route::get('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'index'])->name('settings.pipelines');
+    Route::get('/settings/permissions', [\App\Http\Controllers\Settings\PermissionsController::class, 'index'])->name('settings.permissions');
     Route::middleware('can-manage-settings')->group(function () {
         Route::post('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'store'])->name('settings.pipelines.store');
         Route::patch('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'update'])->name('settings.pipelines.update');
