@@ -1,9 +1,9 @@
 import ColumnFilterRow from '@/components/crm/column-filter-row';
 import ColumnChooser from '@/components/crm/column-chooser';
-import CreateDrawer from '@/components/crm/create-drawer';
+import { CreateDrawer } from '@/components/crm/create-drawer';
 import FilterBuilder from '@/components/crm/filter-builder';
 import SavedViewTabs from '@/components/crm/saved-view-tabs';
-import StagePills, { type StagePill } from '@/components/crm/stage-pills';
+import { StagePills, type StagePill } from '@/components/crm/stage-pills';
 import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { usePage } from '@inertiajs/react';
