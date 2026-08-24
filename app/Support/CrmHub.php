@@ -80,6 +80,7 @@ class CrmHub
             'owner',
             'lead',
             'quotes.items',
+            'lineItems.product',
         ]);
 
         return [
@@ -89,6 +90,7 @@ class CrmHub
             'threads' => $deal->contact?->threads ?? [],
             'enrollments' => $deal->contact?->enrollments ?? [],
             'quotes' => $deal->quotes,
+            'line_items' => $deal->lineItems,
         ];
     }
 

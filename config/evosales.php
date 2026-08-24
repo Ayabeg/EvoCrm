@@ -55,6 +55,18 @@ return [
 
     'quote_statuses' => ['draft', 'sent', 'accepted'],
 
+    /*
+    | Local product catalog (stand-in until Evostock sync). Prices are DZD.
+    | SKU is the join key Evostock can match later. unit_cents = DZD × 100.
+    */
+    'catalog' => [
+        ['sku' => 'EVO-SALES-WS', 'name' => 'EvoSales workspace', 'unit_dzd' => 180000],
+        ['sku' => 'EVO-DESK-SEAT', 'name' => 'EvoDesk agent seat', 'unit_dzd' => 45000],
+        ['sku' => 'EVO-ONBOARD', 'name' => 'Onboarding', 'unit_dzd' => 40000],
+        ['sku' => 'EVO-WA-CLOUD', 'name' => 'WhatsApp Cloud connect', 'unit_dzd' => 25000],
+        ['sku' => 'EVO-OUTBOUND', 'name' => 'Outbound sequences pack', 'unit_dzd' => 60000],
+    ],
+
     'attribute_types' => ['text', 'number', 'list'],
 
     /*

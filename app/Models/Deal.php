@@ -90,6 +90,11 @@ class Deal extends Model
         return $this->hasMany(Quote::class)->latest();
     }
 
+    public function lineItems(): HasMany
+    {
+        return $this->hasMany(DealLineItem::class)->orderBy('id');
+    }
+
     public function moveTo(Stage $stage, ?User $actor = null): void
     {
         if ((int) $stage->pipeline_id !== (int) $this->pipeline_id) {

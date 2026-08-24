@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Pipeline;
+use App\Models\Product;
 use App\Models\Stage;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\DealBoardForecast;
+use App\Services\Crm\DealLineTotals;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -83,7 +85,7 @@ class DealController extends Controller
         return back();
     }
 
-    public function update(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
+    public function update(Request $request, Deal $deal, CustomAttributes $attributes, DealLineTotals $lineTotals): RedirectResponse
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -100,9 +102,13 @@ class DealController extends Controller
             'attributes' => ['nullable', 'array'],
         ]);
 
+        $amount = $deal->lineItems()->exists()
+            ? (int) $deal->amount_cents
+            : $this->toCents($data, (int) $deal->amount_cents);
+
         $deal->update([
             'title' => $data['title'],
-            'amount_cents' => $this->toCents($data, (int) $deal->amount_cents),
+            'amount_cents' => $amount,
             'next_activity_at' => $data['next_activity_at'] ?? $deal->next_activity_at,
             'owner_id' => array_key_exists('owner_id', $data) ? $data['owner_id'] : $deal->owner_id,
             'source' => $data['source'] ?? $deal->source,
@@ -110,6 +116,8 @@ class DealController extends Controller
             'close_date' => $data['close_date'] ?? $deal->close_date,
             'next_step' => $data['next_step'] ?? $deal->next_step,
         ]);
+
+        $lineTotals->rollup($deal);
 
         if (isset($data['attributes'])) {
             $attributes->saveValues($request->user()->workspace, 'deal', $deal->id, $data['attributes']);
@@ -288,8 +296,13 @@ class DealController extends Controller
 
         return Inertia::render('crm/deals/hub', [
             'deals' => $deals,
-            'selected' => $selected?->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items']),
+            'selected' => $selected?->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items', 'lineItems.product']),
             'associations' => $selected ? $hub->dealAssociations($selected) : null,
+            'products' => Product::query()
+                ->forWorkspace($workspace)
+                ->active()
+                ->orderBy('name')
+                ->get(['id', 'sku', 'name', 'unit_cents', 'currency', 'active']),
             'timeline' => $selected ? $hub->timeline(deal: $selected) : [],
             'catchUp' => $selected ? $hub->catchUp(deal: $selected) : ['inbound' => [], 'outbound' => []],
             'attributes' => $selected ? $hub->attributeBag($workspace, 'deal', $selected->id) : ['definitions' => [], 'values' => []],
