@@ -31,7 +31,7 @@ export function CrmListHeader({
             <div className="flex items-start justify-between gap-4">
                 <button
                     type="button"
-                    className="inline-flex items-center gap-1 text-[22px] font-semibold tracking-tight text-ink"
+                    className="inline-flex items-center gap-1 text-page-title text-ink"
                 >
                     {title}
                     <ChevronDown className="size-4 text-muted-foreground" />
