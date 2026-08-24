@@ -59,7 +59,7 @@ const PRIMARY: NavLeaf[] = [
     { id: 'outbound', label: 'Outbound', href: '/outbound', icon: Send, exact: true },
     { id: 'ads', label: 'Ads', href: '/ads', icon: Megaphone },
     { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users },
-    { id: 'reports', label: 'Reports', href: '/reports', icon: ChartSpline, activePaths: ['/crm/reports'] },
+    { id: 'reports', label: 'Reports', href: '/reports', icon: ChartSpline, activePaths: ['/crm/reports', '/reports/funnels'] },
 ];
 
 const MORE_ITEMS: MoreItem[] = [
@@ -85,6 +85,7 @@ const MORE_ITEMS: MoreItem[] = [
     { id: 'outbound-quiet-hours', label: 'Quiet hours', href: '/outbound/quiet-hours', icon: MoonStar, category: 'Outbound' },
     { id: 'ads', label: 'Ads', href: '/ads', icon: Megaphone, category: 'Ads' },
     { id: 'reports', label: 'Reports', href: '/reports', icon: ChartSpline, category: 'Reports' },
+    { id: 'conversion-funnels', label: 'Conversion funnels', href: '/reports/funnels', icon: ChartSpline, category: 'Reports' },
     { id: 'report-builder', label: 'Report builder', href: '/crm/report-builder', icon: PenLine, category: 'Reports' },
     { id: 'outbound-reports', label: 'Outbound reports', href: '/outbound/reports', icon: LibraryBig, category: 'Reports' },
     { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users, category: 'Reports' },
