@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'workspace_id',
+    'source',
     'name',
     'from_name',
     'from_address',
@@ -42,6 +43,10 @@ class Mailbox extends Model
 {
     /** @use HasFactory<MailboxFactory> */
     use BelongsToWorkspace, HasFactory;
+
+    public const SOURCE_MANUAL = 'manual';
+
+    public const SOURCE_MAIL_STACK = 'mail_stack';
 
     protected function casts(): array
     {
@@ -78,6 +83,16 @@ class Mailbox extends Model
     public function imapConfigured(): bool
     {
         return filled($this->imap_host) && filled($this->imap_username);
+    }
+
+    /**
+     * Synced from the live mail stack. Operators edit warmup/limits here but
+     * cannot delete the record — remove the mailbox on the stack instead,
+     * otherwise the next sync brings it back.
+     */
+    public function isMailStack(): bool
+    {
+        return $this->source === self::SOURCE_MAIL_STACK;
     }
 
     public function sentToday(): int

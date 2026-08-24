@@ -425,7 +425,12 @@ it('shows deferred, suppressed, and mailbox health on the overview', function ()
         );
 });
 
-it('keeps the retired outbound hostname and BillionMail out of the UI', function () {
+it('keeps the BillionMail dashboard out of the UI and the stack host config-driven', function () {
+    // The live mail stack is reachable from the product only through
+    // config('evosales.mail_stack.*'): SMTP/IMAP hostnames and the Roundcube
+    // URL. No source file may hardcode the stack host or name the marketing
+    // dashboard — so the only outbound.evotechly.com URL the UI can render
+    // is the Roundcube one from env.
     $roots = [
         base_path('resources/js'),
         base_path('resources/views'),

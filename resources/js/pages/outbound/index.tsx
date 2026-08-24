@@ -30,6 +30,15 @@ type MailboxHealth = {
     last_tested_at?: string | null;
 };
 
+type MailStack = {
+    configured: boolean;
+    smtp_host: string;
+    smtp_port: number;
+    imap_host: string;
+    imap_port: number;
+    roundcube_url: string;
+};
+
 type Message = {
     id: number;
     direction: string;
@@ -65,10 +74,12 @@ export default function OutboundIndex({
     stats,
     mailboxHealth,
     recent,
+    mail_stack,
 }: {
     stats: Stats;
     mailboxHealth: MailboxHealth[];
     recent: Message[];
+    mail_stack: MailStack;
 }) {
     return (
         <>
@@ -78,6 +89,29 @@ export default function OutboundIndex({
                     title="Outbound"
                     description="The email department lives here on the CRM host: mailboxes, sending domains, templates, sequences, broadcast campaigns, suppression, and quiet hours. WhatsApp stays official Cloud templates only."
                 />
+
+                <Card className="flex flex-wrap items-center gap-3 p-4 text-sm">
+                    <div>
+                        <h2 className="font-medium">Live mail stack</h2>
+                        <p className="text-muted-foreground">
+                            SMTP {mail_stack.smtp_host}:{mail_stack.smtp_port} ·
+                            IMAP {mail_stack.imap_host}:{mail_stack.imap_port} ·
+                            webmail is Roundcube on the same host.{' '}
+                            {mail_stack.configured
+                                ? 'Mailboxes sync from the stack automatically.'
+                                : 'Set EVOSALES_MAIL_API_TOKEN to sync mailboxes automatically.'}{' '}
+                            Campaigns and sequences live here in the CRM.
+                        </p>
+                    </div>
+                    <a
+                        className="ms-auto text-brand"
+                        href={mail_stack.roundcube_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Open Roundcube
+                    </a>
+                </Card>
 
                 <div className="grid gap-3 md:grid-cols-4">
                     {[

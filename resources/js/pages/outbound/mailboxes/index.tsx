@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 
 type MailboxRow = {
     id: number;
+    source: string;
     name: string;
     from_name: string;
     from_address: string;
@@ -31,6 +32,11 @@ type MailboxRow = {
     imap_password_set: boolean;
 };
 
+type MailStack = {
+    configured: boolean;
+    roundcube_url: string;
+};
+
 function statusVariant(status: string): 'default' | 'secondary' | 'outline' {
     if (status === 'active') {
         return 'default';
@@ -45,8 +51,10 @@ function statusVariant(status: string): 'default' | 'secondary' | 'outline' {
 
 export default function MailboxesIndex({
     mailboxes,
+    mail_stack,
 }: {
     mailboxes: MailboxRow[];
+    mail_stack: MailStack;
 }) {
     return (
         <>
@@ -56,6 +64,48 @@ export default function MailboxesIndex({
                     title="SMTP mailboxes"
                     description="Passwords are encrypted at rest. New mailboxes start disabled — enable one, warm it up, then sequences send through it. Without an enabled mailbox, outbound email uses the Disabled provider and fails honestly in the outbox."
                 />
+
+                {mail_stack.configured ? (
+                    <Card className="flex flex-wrap items-center gap-3 p-4 text-sm">
+                        <div>
+                            <h2 className="font-medium">Mail stack sync</h2>
+                            <p className="text-muted-foreground">
+                                Every mailbox on the live mail stack lands here
+                                automatically — the sync runs every 15 minutes.
+                                Webmail is Roundcube on the same host; campaigns
+                                and sequences stay in the CRM.
+                            </p>
+                        </div>
+                        <Button
+                            className="ms-auto"
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                                router.post('/outbound/mailboxes/sync')
+                            }
+                        >
+                            Sync now
+                        </Button>
+                    </Card>
+                ) : (
+                    <Card className="p-4 text-sm">
+                        <h2 className="font-medium">Connect the mail stack</h2>
+                        <p className="mt-1 text-muted-foreground">
+                            Set{' '}
+                            <code className="text-foreground">
+                                EVOSALES_MAIL_API_TOKEN
+                            </code>{' '}
+                            (and optionally{' '}
+                            <code className="text-foreground">
+                                EVOSALES_MAIL_API_URL
+                            </code>
+                            ) in the environment and every mailbox on the live
+                            mail stack appears here automatically — SMTP send,
+                            IMAP replies, and Roundcube webmail. Until then, add
+                            a mailbox manually below.
+                        </p>
+                    </Card>
+                )}
 
                 <Card className="p-4">
                     <h2 className="mb-3 font-medium">Add mailbox</h2>
@@ -210,6 +260,11 @@ export default function MailboxesIndex({
                                 {box.is_default ? (
                                     <Badge variant="secondary">default</Badge>
                                 ) : null}
+                                {box.source === 'mail_stack' ? (
+                                    <Badge variant="secondary">
+                                        Mail stack
+                                    </Badge>
+                                ) : null}
                                 {box.imap_configured ? (
                                     <Badge variant="secondary">
                                         IMAP replies on
@@ -284,24 +339,40 @@ export default function MailboxesIndex({
                                         </>
                                     )}
                                 </Form>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-brand"
-                                    onClick={() => {
-                                        if (
-                                            window.confirm(
-                                                `Delete mailbox ${box.name}?`,
-                                            )
-                                        ) {
-                                            router.delete(
-                                                `/outbound/mailboxes/${box.id}`,
-                                            );
-                                        }
-                                    }}
-                                >
-                                    Delete
+                                <Button variant="outline" size="sm" asChild>
+                                    <a
+                                        href={mail_stack.roundcube_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Open Roundcube
+                                    </a>
                                 </Button>
+                                {box.source === 'mail_stack' ? (
+                                    <span className="text-xs text-muted-foreground">
+                                        Synced from the mail stack — remove it
+                                        there, not here.
+                                    </span>
+                                ) : (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-brand"
+                                        onClick={() => {
+                                            if (
+                                                window.confirm(
+                                                    `Delete mailbox ${box.name}?`,
+                                                )
+                                            ) {
+                                                router.delete(
+                                                    `/outbound/mailboxes/${box.id}`,
+                                                );
+                                            }
+                                        }}
+                                    >
+                                        Delete
+                                    </Button>
+                                )}
                             </div>
 
                             <details className="rounded-md border border-hairline px-3 py-2">

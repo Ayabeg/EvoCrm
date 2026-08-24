@@ -12,6 +12,7 @@ Schedule::command('outbound:run')->everyMinute()->withoutOverlapping();
 Schedule::command('workflow:run')->everyMinute()->withoutOverlapping();
 Schedule::command('reports:deliver')->dailyAt('08:00')->timezone('Africa/Algiers')->withoutOverlapping();
 Schedule::command('outbound:poll-replies')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('outbound:sync-mailboxes')->everyFifteenMinutes()->withoutOverlapping();
 // Warmup advances once per Africa/Algiers day, just after the default quiet
 // hours end, so peer pings (when opted in) are allowed to send immediately.
 Schedule::command('outbound:warmup')->dailyAt('08:05')->timezone('Africa/Algiers')->withoutOverlapping();

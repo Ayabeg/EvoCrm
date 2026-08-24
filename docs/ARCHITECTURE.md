@@ -104,4 +104,4 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 - Bounce tracking via ESP webhooks (reports page is honest about this)
 - Telegram channel (status `later`)
 
-Retired: the BillionMail deployment on `outbound.evotechly.com` (EvoOutreach). Broadcast campaigns and drip sequences are native to EvoSales at `/outbound`; there is no second contact database and no mail server to run.
+Live mail stack: `outbound.evotechly.com` (EvoOutreach) is used for SMTP send, IMAP reply polling, and Roundcube webmail only. Mailboxes sync from its HTTP API (`GET /api/mailbox/all`, Bearer token) via `outbound:sync-mailboxes` into `mailboxes` rows marked `source = mail_stack`; synced rows cannot be deleted in the CRM. The stack's BillionMail marketing dashboard is never linked or embedded — broadcast campaigns and drip sequences are native to EvoSales at `/outbound`; there is no second contact database and no mail server to run.

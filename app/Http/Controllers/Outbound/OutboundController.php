@@ -10,19 +10,28 @@ use App\Models\OutboundDomain;
 use App\Models\OutboundMessage;
 use App\Models\Sequence;
 use App\Models\Suppression;
+use App\Services\Outbound\MailboxSync;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class OutboundController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, MailboxSync $sync): Response
     {
         $workspace = $request->user()->workspace;
 
         $outbound = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out');
 
         return Inertia::render('outbound/index', [
+            'mail_stack' => [
+                'configured' => $sync->configured(),
+                'smtp_host' => config('evosales.mail_stack.smtp.host'),
+                'smtp_port' => config('evosales.mail_stack.smtp.port'),
+                'imap_host' => config('evosales.mail_stack.imap.host'),
+                'imap_port' => config('evosales.mail_stack.imap.port'),
+                'roundcube_url' => config('evosales.mail_stack.roundcube_url'),
+            ],
             'stats' => [
                 'mailboxes' => Mailbox::query()->forWorkspace($workspace)->count(),
                 'mailboxes_enabled' => Mailbox::query()->forWorkspace($workspace)->where('enabled', true)->count(),
