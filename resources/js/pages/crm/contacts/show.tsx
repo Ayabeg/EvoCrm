@@ -1,5 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import CatchUpBlock from '@/components/crm/catch-up-block';
+import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
 import {
     ActivityTabs,
     AssociationCard,
@@ -33,6 +36,11 @@ export default function ContactShow({
     contact,
     associations,
     timeline,
+    attributes,
+    askEvo,
+    contactEngagement,
+    proactiveSummary,
+    catchUp,
 }: {
     contact: Contact;
     associations: {
@@ -40,6 +48,11 @@ export default function ContactShow({
         deals?: { id: number; title: string; stage?: { name: string } }[];
     } | null;
     timeline: Activity[];
+    attributes?: AttributeBag;
+    askEvo?: AskEvoPayload | null;
+    contactEngagement?: { score: number; label: string; reason: string } | null;
+    proactiveSummary?: string | null;
+    catchUp?: { inbound?: unknown[]; outbound?: unknown[] } | null;
 }) {
     const [tab, setTab] = useState('catchup');
     const [railOpen, setRailOpen] = useState(true);
@@ -97,9 +110,23 @@ export default function ContactShow({
                     )}
                 >
                     <aside className="min-h-0 overflow-y-auto border-r border-hairline p-4">
-                        <h2 className="mb-3 text-[13px] font-semibold">
-                            Key information
-                        </h2>
+                        <AskEvoPanel action={`/crm/contacts/${contact.id}/ask`} insight={askEvo} />
+                        {contactEngagement ? (
+                            <div className="mt-4 rounded border border-hairline bg-canvas-soft p-3">
+                                <p className="text-section-label text-muted-foreground">Engagement</p>
+                                <p className="mt-1 text-[13px] font-medium">
+                                    {contactEngagement.label}{' '}
+                                    <span className="text-muted-foreground">({contactEngagement.score}/100)</span>
+                                </p>
+                                <p className="mt-1 text-[12px] text-muted-foreground">{contactEngagement.reason}</p>
+                            </div>
+                        ) : null}
+                        {proactiveSummary ? (
+                            <p className="mt-3 rounded border border-hairline bg-canvas-soft px-3 py-2 text-[12px] text-muted-foreground">
+                                {proactiveSummary}
+                            </p>
+                        ) : null}
+                        <h2 className="mb-3 mt-4 text-[13px] font-semibold">Key information</h2>
                         <Field label="Email" value={contact.email ?? '—'} />
                         <Field label="Phone" value={contact.phone_e164 ?? '—'} />
                         <Field label="Preferred channels" value="WhatsApp Cloud, Email" />
@@ -113,9 +140,7 @@ export default function ContactShow({
                             }
                         />
                         <div className="mt-4 space-y-2">
-                            <p className="text-[11px] font-semibold uppercase text-muted-foreground">
-                                Actions
-                            </p>
+                            <p className="text-section-label text-muted-foreground">Actions</p>
                             <Link href="/inbox" className="block text-brand">
                                 Open in Desk
                             </Link>
@@ -123,6 +148,14 @@ export default function ContactShow({
                                 Email via Outbound
                             </Link>
                         </div>
+                        {attributes ? (
+                            <div className="mt-4">
+                                <RecordProperties
+                                    action={`/crm/contacts/${contact.id}/attributes`}
+                                    attributes={attributes}
+                                />
+                            </div>
+                        ) : null}
                     </aside>
 
                     <section className="min-h-0 overflow-y-auto p-5">
@@ -135,6 +168,9 @@ export default function ContactShow({
                             onChange={setTab}
                         />
                         {tab === 'catchup' ? (
+                            catchUp ? (
+                                <CatchUpBlock inbound={catchUp.inbound} outbound={catchUp.outbound} />
+                            ) : (
                             <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 <div>
                                     <h3 className="mb-2 text-[12px] font-semibold uppercase text-muted-foreground">
@@ -171,6 +207,7 @@ export default function ContactShow({
                                     Schedule meeting
                                 </Link>
                             </div>
+                            )
                         ) : (
                             <div className="mt-4 space-y-3">
                                 {timeline.map((item) => (

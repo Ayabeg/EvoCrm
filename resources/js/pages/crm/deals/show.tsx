@@ -1,5 +1,7 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
 import { formatDzd } from '@/components/crm/hub-chrome';
 import {
     ActivityTabs,
@@ -40,6 +42,8 @@ export default function DealShow({
     associations,
     timeline,
     stages,
+    attributes,
+    askEvo,
 }: {
     deal: Deal;
     associations: {
@@ -48,6 +52,8 @@ export default function DealShow({
     } | null;
     timeline: Activity[];
     stages: { id: number; name: string }[];
+    attributes?: AttributeBag;
+    askEvo?: AskEvoPayload | null;
 }) {
     const [tab, setTab] = useState('all');
     const initials = deal.title
@@ -121,6 +127,7 @@ export default function DealShow({
                 <RecordShell
                     left={
                         <div className="space-y-4">
+                            <AskEvoPanel action={`/crm/deals/${deal.id}/ask`} insight={askEvo} />
                             <h2 className="text-[13px] font-semibold">About this deal</h2>
                             <Field label="Deal owner" value={deal.owner?.name ?? 'Unassigned'} />
                             <Field
@@ -153,6 +160,12 @@ export default function DealShow({
                                     ))}
                                 </div>
                             </Form>
+                            {attributes ? (
+                                <RecordProperties
+                                    action={`/crm/deals/${deal.id}/attributes`}
+                                    attributes={attributes}
+                                />
+                            ) : null}
                         </div>
                     }
                     center={

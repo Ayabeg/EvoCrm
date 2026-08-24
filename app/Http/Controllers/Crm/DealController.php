@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Stage;
-use App\Services\Crm\ContactIdentity;
+use App\Services\Ai\RecordInsight;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
@@ -72,7 +72,7 @@ class DealController extends Controller
         ]);
     }
 
-    public function show(Request $request, Deal $deal, CrmHub $hub): Response
+    public function show(Request $request, Deal $deal, CrmHub $hub, RecordInsight $insight): Response
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -83,9 +83,11 @@ class DealController extends Controller
             'deal' => $deal,
             'associations' => $hub->dealAssociations($deal),
             'timeline' => $hub->timeline(deal: $deal),
+            'catchUp' => $hub->catchUp($deal),
             'attributes' => $hub->attributeBag($workspace, 'deal', $deal->id),
             'stages' => $deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages,
             'members' => $hub->members($workspace),
+            'askEvo' => $insight->forDeal($deal),
         ]);
     }
 
