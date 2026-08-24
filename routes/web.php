@@ -44,6 +44,7 @@ use App\Http\Controllers\Settings\ConnectorController;
 use App\Http\Controllers\Settings\CustomAttributeController;
 use App\Http\Controllers\Settings\EvolutionSettingsController;
 use App\Http\Controllers\Settings\MetaSettingsController;
+use App\Http\Controllers\Settings\OAuthSetupController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -227,6 +228,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/outbound/templates/send', [TemplateController::class, 'send'])->name('outbound.templates.send');
 
     Route::get('/settings/apps', [AppsController::class, 'index'])->name('settings.apps');
+    Route::get('/settings/setup/{provider}', [OAuthSetupController::class, 'show'])->name('settings.setup.show');
     Route::get('/settings/apps/meta', [AppsController::class, 'meta'])->name('settings.apps.meta');
     Route::delete('/settings/apps/meta', [AppsController::class, 'destroyMeta'])->name('settings.apps.meta.destroy');
 
