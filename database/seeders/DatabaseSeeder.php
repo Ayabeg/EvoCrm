@@ -24,11 +24,13 @@ use App\Models\OutboundCampaign;
 use App\Models\OutboundDomain;
 use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
+use App\Models\Product;
 use App\Models\Quote;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\Thread;
 use App\Models\User;
+use App\Services\Crm\DealLineTotals;
 use App\Services\Crm\QuoteTotals;
 use App\Services\Identity\WorkspaceProvisioner;
 use Illuminate\Database\Seeder;
@@ -824,10 +826,27 @@ class DatabaseSeeder extends Seeder
                 'currency' => 'DZD',
                 'notes' => 'Clinic workspace + desk handoff',
             ]);
+            $workspaceProduct = Product::query()
+                ->forWorkspace($workspace)
+                ->where('sku', 'EVO-SALES-WS')
+                ->first();
+            $onboardProduct = Product::query()
+                ->forWorkspace($workspace)
+                ->where('sku', 'EVO-ONBOARD')
+                ->first();
+
             app(QuoteTotals::class)->sync($quote, [
-                ['name' => 'EvoSales workspace', 'quantity' => 1, 'unit_dzd' => 180000],
-                ['name' => 'Onboarding', 'quantity' => 1, 'unit_dzd' => 40000],
+                ['product_id' => $workspaceProduct?->id, 'name' => 'EvoSales workspace', 'quantity' => 1, 'unit_dzd' => 180000],
+                ['product_id' => $onboardProduct?->id, 'name' => 'Onboarding', 'quantity' => 1, 'unit_dzd' => 40000],
             ]);
+
+            $lineTotals = app(DealLineTotals::class);
+            if ($workspaceProduct) {
+                $lineTotals->add($firstDeal, ['quantity' => 1], $workspaceProduct);
+            }
+            if ($onboardProduct) {
+                $lineTotals->add($firstDeal, ['quantity' => 1], $onboardProduct);
+            }
         }
 
         $clinicDeal = Deal::query()->where('title', 'Clinic website intake')->first();

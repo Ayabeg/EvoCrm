@@ -1,6 +1,7 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
+import DealLineItems from '@/components/crm/deal-line-items';
 import { formatDzd } from '@/components/crm/hub-chrome';
 import RecordActionRow from '@/components/crm/record-action-row';
 import { RecordFact, RecordFacts } from '@/components/crm/record-workspace';
@@ -14,10 +15,12 @@ export default function DealShow({
     deal,
     associations,
     catchUp,
+    products,
 }: {
     deal: any;
     associations?: any;
     catchUp?: { inbound?: any[]; outbound?: any[] };
+    products?: any[];
 }) {
     return (
         <>
@@ -44,6 +47,11 @@ export default function DealShow({
                 />
                 <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                 <AssociationsCard associations={associations ?? { contact: deal.contact, company: deal.company }} />
+                <DealLineItems
+                    dealId={deal.id}
+                    items={deal.line_items ?? associations?.line_items ?? []}
+                    products={products}
+                />
                 <Card className="space-y-3 p-4 text-sm">
                     <Form action={`/crm/deals/${deal.id}/move`} method="post" className="flex flex-wrap gap-2">
                         {(deal.pipeline?.stages ?? []).map((stage: any) => (

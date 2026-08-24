@@ -36,7 +36,7 @@ flowchart LR
 | Context | Responsibility |
 | --- | --- |
 | **Identity** | Workspace, User, RBAC (`owner` / `admin` / `member`) |
-| **CRM** | Sales Hub: Company, Contact, Lead, Deal, Activity timeline, custom attributes, saved lists, quotes, reports. Operational density is the product — not a contact list. |
+| **CRM** | Sales Hub: Company, Contact, Lead, Deal, Activity timeline, custom attributes, saved lists, quotes, local Product catalog + deal line items (DZD; Evostock later), reports. Operational density is the product — not a contact list. |
 | **Desk** | Sold product: EvoDesk / Chatwoot Community, embedded at `/inbox`. In EvoSales: Channel, Thread, Message as conversation history synced for CRM context + optional composer |
 | **Ads** | AdAccount, AdCampaign, AdSet, Ad, AdCampaignStat (daily insights), AdLead. Funnel: Impressions → Clicks → Conversations/Leads → Qualified → Deals → Won, attributed via `threads.ad_campaign_id` / `leads.ad_campaign_id`. `MetaAdsService` syncs the official Marketing API when `META_*` is set; demo seed data otherwise |
 | **Outbound** | Mailbox (SMTP + IMAP, warmup status, daily limit), OutboundTemplate (`{{variables}}`), Sequence, SequenceStep, Enrollment (active/paused/finished/cancelled), OutboundMessage (out + in, open pixel, replied_at), Suppression, QuietHours. `outbound:run` sends due steps every minute; `outbound:poll-replies` reads IMAP replies |

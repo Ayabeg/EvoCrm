@@ -2,6 +2,7 @@ import { Form, Head, Link, router } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
+import DealLineItems from '@/components/crm/deal-line-items';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import RecordProperties from '@/components/crm/record-properties';
 import ListToolbar from '@/components/crm/list-toolbar';
@@ -26,6 +27,7 @@ export default function DealHub({
     openPipelineCents,
     stagePills,
     catchUp,
+    products,
 }: any) {
 
     return (
@@ -197,6 +199,11 @@ export default function DealHub({
                                     <Input name="lost_reason" defaultValue={selected.lost_reason ?? ''} placeholder="Lost reason" className="col-span-2 h-8" />
                                     <Button className="col-span-2 h-8">Save deal</Button>
                                 </Form>
+                                <DealLineItems
+                                    dealId={selected.id}
+                                    items={selected.line_items ?? associations?.line_items ?? []}
+                                    products={products}
+                                />
                                 <RecordProperties
                                     action={`/crm/deals/${selected.id}/attributes`}
                                     attributes={attributes}
@@ -272,7 +279,15 @@ export default function DealHub({
                                     </p>
                                 ))}
                                 <Form action={`/crm/deals/${selected.id}/quotes`} method="post" className="mt-2 space-y-1">
-                                    <Input name="items[0][name]" placeholder="Line item" required className="h-7" />
+                                    <select name="items[0][product_id]" className="h-7 w-full rounded border bg-background px-1 text-[11px]">
+                                        <option value="">Catalog product…</option>
+                                        {(products ?? []).map((product: any) => (
+                                            <option key={product.id} value={product.id}>
+                                                {product.name} · {product.sku}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <Input name="items[0][name]" placeholder="Line item (or pick a product)" className="h-7" />
                                     <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-7" />
                                     <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="Unit DZD" className="h-7" />
                                     <select name="status" className="h-7 w-full rounded border bg-background px-1">

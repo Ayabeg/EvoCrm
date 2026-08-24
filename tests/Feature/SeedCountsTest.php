@@ -4,6 +4,8 @@ use App\Models\AdCampaign;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\DealLineItem;
+use App\Models\Product;
 use App\Models\Mailbox;
 use App\Models\Sequence;
 use App\Models\Thread;
@@ -18,6 +20,8 @@ it('seeds a week of Algeria-first sales-OS data', function () {
         ->and(Company::query()->count())->toBeGreaterThanOrEqual(10)
         ->and(Contact::query()->count())->toBeGreaterThanOrEqual(20)
         ->and(Deal::query()->count())->toBeGreaterThanOrEqual(12)
+        ->and(Product::query()->where('sku', 'EVO-SALES-WS')->exists())->toBeTrue()
+        ->and(DealLineItem::query()->count())->toBeGreaterThanOrEqual(2)
         ->and(Thread::query()->count())->toBeGreaterThanOrEqual(6)
         ->and(Sequence::query()->count())->toBeGreaterThanOrEqual(3)
         ->and(Sequence::query()->where('channel', 'whatsapp_cloud')->exists())->toBeTrue()

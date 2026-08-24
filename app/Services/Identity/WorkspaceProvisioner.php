@@ -6,6 +6,7 @@ use App\Enums\ChannelType;
 use App\Enums\WorkspaceRole;
 use App\Models\Channel;
 use App\Models\Pipeline;
+use App\Models\Product;
 use App\Models\QuietHours;
 use App\Models\User;
 use App\Models\Workspace;
@@ -80,6 +81,33 @@ class WorkspaceProvisioner
                 'enabled' => true,
             ]
         );
+
+        $this->seedCatalog($workspace);
+    }
+
+    /**
+     * Local Evotechly catalog until Evostock sync. Idempotent on sku.
+     */
+    public function seedCatalog(Workspace $workspace): void
+    {
+        foreach (config('evosales.catalog', []) as $row) {
+            $sku = (string) ($row['sku'] ?? '');
+            $name = (string) ($row['name'] ?? '');
+
+            if ($sku === '' || $name === '') {
+                continue;
+            }
+
+            Product::query()->firstOrCreate(
+                ['workspace_id' => $workspace->id, 'sku' => $sku],
+                [
+                    'name' => $name,
+                    'unit_cents' => (int) round(((float) ($row['unit_dzd'] ?? 0)) * 100),
+                    'currency' => 'DZD',
+                    'active' => true,
+                ]
+            );
+        }
     }
 
     public function forUser(User $user): Workspace

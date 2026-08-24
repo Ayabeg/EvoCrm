@@ -9,6 +9,7 @@ use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
+use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\QuoteController;
@@ -132,6 +133,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/crm/deals/{deal}', [DealController::class, 'update'])->name('crm.deals.update');
     Route::put('/crm/deals/{deal}/attributes', [DealController::class, 'updateAttributes'])->name('crm.deals.attributes');
     Route::post('/crm/deals/{deal}/move', [DealController::class, 'move'])->name('crm.deals.move');
+    Route::post('/crm/deals/{deal}/line-items', [DealLineItemController::class, 'store'])->name('crm.deals.line-items.store');
+    Route::delete('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'destroy'])->name('crm.deals.line-items.destroy');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
     Route::get('/ads/campaigns/{campaign}', [AdsCenterController::class, 'show'])->name('ads.campaigns.show');
