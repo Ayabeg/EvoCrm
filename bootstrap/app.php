@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\UnofficialWhatsAppRefused;
 use App\Http\Middleware\EnsureUserCanManageSettings;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -34,4 +35,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (UnofficialWhatsAppRefused $e) {
+            return response($e->getMessage(), 422);
+        });
     })->create();

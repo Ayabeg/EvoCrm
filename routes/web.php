@@ -15,6 +15,7 @@ use App\Http\Controllers\Crm\ReportController;
 use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Crm\SegmentController;
 use App\Http\Controllers\Crm\WorkflowController;
+use App\Http\Controllers\Desk\DeskConnectorController;
 use App\Http\Controllers\Desk\InboxController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Outbound\CampaignController;
@@ -34,6 +35,7 @@ use App\Http\Controllers\Public\TrackingController;
 use App\Http\Controllers\Public\UnsubscribeController;
 use App\Http\Controllers\Settings\AppsController;
 use App\Http\Controllers\Settings\ChannelSettingsController;
+use App\Http\Controllers\Settings\ConnectorController;
 use App\Http\Controllers\Settings\CustomAttributeController;
 use App\Http\Controllers\Settings\EvolutionSettingsController;
 use App\Http\Controllers\Settings\MetaSettingsController;
@@ -49,8 +51,12 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
-    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 });
+
+// Shared Google callback: guests sign in; authenticated users complete a
+// Gmail / Calendar reconnect on the same OAuth client. Extra scopes are
+// never requested from the login button.
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
@@ -72,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
     Route::post('/desk/threads/{thread}/reply', [InboxController::class, 'reply'])->name('desk.reply');
+    Route::post('/desk/connectors', [DeskConnectorController::class, 'store'])->name('desk.connectors.store');
     Route::get('/conversations', [ConversationHistoryController::class, 'index'])->name('crm.conversations');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
@@ -188,6 +195,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/apps', [AppsController::class, 'index'])->name('settings.apps');
     Route::get('/settings/apps/meta', [AppsController::class, 'meta'])->name('settings.apps.meta');
     Route::delete('/settings/apps/meta', [AppsController::class, 'destroyMeta'])->name('settings.apps.meta.destroy');
+
+    Route::get('/settings/connectors', [ConnectorController::class, 'index'])->name('settings.connectors');
+    Route::post('/settings/connectors', [ConnectorController::class, 'store'])->name('settings.connectors.store');
+    Route::get('/settings/connectors/google/{provider}', [ConnectorController::class, 'reconnectGoogle'])->name('settings.connectors.google');
 
     Route::get('/settings/evolution', [EvolutionSettingsController::class, 'edit'])->name('settings.evolution');
     Route::post('/settings/evolution/sync', [EvolutionSettingsController::class, 'sync'])->name('settings.evolution.sync');

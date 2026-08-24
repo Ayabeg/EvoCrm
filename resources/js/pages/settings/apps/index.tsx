@@ -116,7 +116,8 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                     {app.key === 'google' && app.connected && (
                         <p className="mt-2 text-xs text-muted-foreground">
                             Sign-in with Google is live on the login screen.
-                            Nothing else is claimed — no fake Calendar sync.
+                            Gmail and Calendar reuse that same OAuth client —
+                            they never add a second Google login.
                         </p>
                     )}
 

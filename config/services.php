@@ -43,6 +43,14 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI', 'https://crm.evotechly.com/auth/google/callback'),
+        /*
+        | Extra scopes on the SAME OAuth client as sign-in. Leave empty when
+        | the current client does not have Gmail / Calendar APIs enabled —
+        | Settings → Connectors then shows a reconnect empty state and login
+        | never requests these scopes.
+        */
+        'gmail_scope' => env('GOOGLE_GMAIL_SCOPE'),
+        'calendar_scope' => env('GOOGLE_CALENDAR_SCOPE'),
     ],
 
     /*
