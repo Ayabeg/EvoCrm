@@ -2,8 +2,15 @@ import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { formatDzd } from '@/components/crm/hub-chrome';
 import PageHeader from '@/components/page-header';
-import { EvoVizChart } from '@/evoviz';
-import type { EvoVizPayload } from '@/evoviz';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { EvoVizChart, WidgetPicker } from '@/evoviz';
+import type { EvoVizPayload, ReportWidgetCatalogItem } from '@/evoviz';
 
 type KpiFormat = 'number' | 'money' | 'percent';
 
@@ -35,6 +42,32 @@ type ReportCategory = {
     table: ReportTable | null;
 };
 
+type DashboardOwner = {
+    id: number;
+    name: string | null;
+};
+
+type DashboardSummary = {
+    id: number;
+    name: string;
+    owner: DashboardOwner;
+    widget_count: number;
+};
+
+type DashboardWidget = {
+    key: string;
+    title: string;
+    room: string;
+    chart: EvoVizPayload | null;
+};
+
+type OpenDashboard = {
+    id: number;
+    name: string;
+    owner: DashboardOwner;
+    widgets: DashboardWidget[];
+};
+
 type Props = {
     window: {
         from: string;
@@ -42,8 +75,13 @@ type Props = {
         days: number;
         timezone: string;
         custom: boolean;
+        owner_id: number | null;
     };
     categories: ReportCategory[];
+    owners: { id: number; name: string }[];
+    dashboards: DashboardSummary[];
+    dashboard: OpenDashboard | null;
+    widgetCatalog: ReportWidgetCatalogItem[];
 };
 
 const NUMBER = new Intl.NumberFormat('en-US');
@@ -182,37 +220,161 @@ function CategorySection({ category }: { category: ReportCategory }) {
     );
 }
 
-export default function Reports({ window, categories }: Props) {
+function filterQuery(
+    from: string,
+    to: string,
+    owner: string,
+    dashboardId?: number,
+): Record<string, string | number> {
+    return {
+        from,
+        to,
+        ...(owner ? { owner } : {}),
+        ...(dashboardId ? { dashboard: dashboardId } : {}),
+    };
+}
+
+export default function Reports({
+    window,
+    categories,
+    owners,
+    dashboards,
+    dashboard,
+    widgetCatalog,
+}: Props) {
     const [from, setFrom] = useState(window.from);
     const [to, setTo] = useState(window.to);
+    const [owner, setOwner] = useState(
+        window.owner_id ? String(window.owner_id) : '',
+    );
+    const [newOpen, setNewOpen] = useState(false);
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [newName, setNewName] = useState('');
 
     const apply = (event: React.FormEvent) => {
         event.preventDefault();
-        router.get('/reports', { from, to }, { preserveState: true });
+        router.get('/reports', filterQuery(from, to, owner, dashboard?.id), {
+            preserveState: true,
+        });
     };
 
     const reset = () => {
-        router.get('/reports', {}, { preserveState: true });
+        router.get(
+            '/reports',
+            {
+                ...(owner ? { owner } : {}),
+                ...(dashboard ? { dashboard: dashboard.id } : {}),
+            },
+            { preserveState: true },
+        );
     };
+
+    const openRooms = () => {
+        router.get('/reports', filterQuery(from, to, owner), {
+            preserveState: true,
+        });
+    };
+
+    const openDashboard = (id: number) => {
+        router.get('/reports', filterQuery(from, to, owner, id), {
+            preserveState: true,
+        });
+    };
+
+    const createDashboard = (event: React.FormEvent) => {
+        event.preventDefault();
+        router.post(
+            '/reports/dashboards',
+            {
+                name: newName,
+                from,
+                to,
+                ...(owner ? { owner } : {}),
+            },
+            {
+                onSuccess: () => {
+                    setNewOpen(false);
+                    setNewName('');
+                },
+            },
+        );
+    };
+
+    const addWidget = (key: string) => {
+        if (!dashboard) {
+            return;
+        }
+
+        router.post(
+            `/reports/dashboards/${dashboard.id}/widgets`,
+            { key },
+            { preserveScroll: true },
+        );
+    };
+
+    const removeWidget = (key: string) => {
+        if (!dashboard) {
+            return;
+        }
+
+        router.delete(`/reports/dashboards/${dashboard.id}/widgets`, {
+            data: { key },
+            preserveScroll: true,
+        });
+    };
+
+    const deleteDashboard = () => {
+        if (!dashboard) {
+            return;
+        }
+
+        router.delete(`/reports/dashboards/${dashboard.id}`, {
+            data: filterQuery(from, to, owner),
+        });
+    };
+
+    const title = dashboard?.name ?? 'Reports';
 
     return (
         <>
-            <Head title="Reports" />
+            <Head title={title} />
             <div className="flex-1 bg-canvas-soft text-[13px] text-ink">
                 <div className="mx-auto w-full max-w-6xl px-5 py-8">
                     <PageHeader
-                        title="Reports"
+                        title={title}
                         description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only — empty categories stay hidden.`}
                     >
                         <form
                             onSubmit={apply}
-                            className="flex items-end gap-2"
-                            aria-label="Date window"
+                            className="flex flex-wrap items-end gap-2"
+                            aria-label="Dashboard filters"
                         >
+                            <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
+                                Owner
+                                <select
+                                    value={owner}
+                                    onChange={(event) =>
+                                        setOwner(event.target.value)
+                                    }
+                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
+                                    aria-label="Owner"
+                                >
+                                    <option value="">All owners</option>
+                                    {owners.map((person) => (
+                                        <option
+                                            key={person.id}
+                                            value={person.id}
+                                        >
+                                            {person.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
                             <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
                                 From
                                 <input
                                     type="date"
+                                    name="from"
                                     value={from}
                                     max={to}
                                     onChange={(event) =>
@@ -225,6 +387,7 @@ export default function Reports({ window, categories }: Props) {
                                 To
                                 <input
                                     type="date"
+                                    name="to"
                                     value={to}
                                     min={from}
                                     onChange={(event) =>
@@ -251,7 +414,119 @@ export default function Reports({ window, categories }: Props) {
                         </form>
                     </PageHeader>
 
-                    {categories.length === 0 ? (
+                    <nav
+                        aria-label="Dashboards"
+                        className="mb-8 flex flex-wrap items-center gap-2"
+                    >
+                        <button
+                            type="button"
+                            onClick={openRooms}
+                            className={`h-8 rounded-md px-3 text-[13px] ${
+                                dashboard
+                                    ? 'border border-hairline bg-canvas text-muted-foreground hover:text-ink'
+                                    : 'bg-brand text-white'
+                            }`}
+                        >
+                            Rooms
+                        </button>
+                        {dashboards.map((board) => (
+                            <button
+                                key={board.id}
+                                type="button"
+                                onClick={() => openDashboard(board.id)}
+                                className={`h-8 rounded-md px-3 text-[13px] ${
+                                    dashboard?.id === board.id
+                                        ? 'bg-brand text-white'
+                                        : 'border border-hairline bg-canvas text-muted-foreground hover:text-ink'
+                                }`}
+                            >
+                                {board.name}
+                            </button>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => setNewOpen(true)}
+                            className="h-8 rounded-md border border-dashed border-hairline bg-canvas px-3 text-[13px] text-muted-foreground hover:text-ink"
+                        >
+                            New dashboard
+                        </button>
+                    </nav>
+
+                    {dashboard ? (
+                        <section aria-label={dashboard.name}>
+                            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                                <p className="text-[12px] text-muted-foreground">
+                                    {dashboard.owner.name
+                                        ? `Owned by ${dashboard.owner.name}`
+                                        : 'Saved dashboard'}
+                                    {` · ${dashboard.widgets.length} widgets`}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setPickerOpen(true)}
+                                        className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                                    >
+                                        Add widget
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={deleteDashboard}
+                                        className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-muted-foreground hover:text-ink"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+
+                            {dashboard.widgets.length === 0 ? (
+                                <div className="rounded-lg border border-hairline bg-canvas px-4 py-10 text-center">
+                                    <p className="text-sm font-medium">
+                                        No widgets on this dashboard
+                                    </p>
+                                    <p className="mt-1 text-[13px] text-muted-foreground">
+                                        Add an existing EvoViz chart from the
+                                        rooms — pipeline, leads, outbound, ads,
+                                        desk, or activity.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                    {dashboard.widgets.map((widget) => (
+                                        <div
+                                            key={widget.key}
+                                            className="relative"
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeWidget(widget.key)
+                                                }
+                                                className="absolute top-2 right-2 z-10 rounded-md border border-hairline bg-canvas px-2 py-0.5 text-[11px] text-muted-foreground hover:text-ink"
+                                                aria-label={`Remove ${widget.title}`}
+                                            >
+                                                Remove
+                                            </button>
+                                            {widget.chart ? (
+                                                <EvoVizChart
+                                                    payload={widget.chart}
+                                                />
+                                            ) : (
+                                                <div className="rounded-lg border border-hairline bg-canvas px-4 py-8 text-center">
+                                                    <p className="text-[13px] font-medium text-ink">
+                                                        {widget.title}
+                                                    </p>
+                                                    <p className="mt-1 text-[12px] text-muted-foreground">
+                                                        No rows in this window
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                    ) : categories.length === 0 ? (
                         <div className="rounded-lg border border-hairline bg-canvas px-4 py-10 text-center">
                             <p className="text-sm font-medium">
                                 Nothing to report in this window
@@ -272,6 +547,57 @@ export default function Reports({ window, categories }: Props) {
                     )}
                 </div>
             </div>
+
+            <Dialog open={newOpen} onOpenChange={setNewOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>New dashboard</DialogTitle>
+                        <DialogDescription>
+                            A saved board on top of the rooms. Add existing
+                            EvoViz charts after you create it.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={createDashboard} className="grid gap-3">
+                        <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
+                            Name
+                            <input
+                                name="name"
+                                required
+                                value={newName}
+                                onChange={(event) =>
+                                    setNewName(event.target.value)
+                                }
+                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
+                            />
+                        </label>
+                        <button
+                            type="submit"
+                            className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white"
+                        >
+                            Create
+                        </button>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+                <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Add widget</DialogTitle>
+                        <DialogDescription>
+                            Existing EvoViz charts from the report rooms. No new
+                            chart types.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <WidgetPicker
+                        catalog={widgetCatalog}
+                        addedKeys={
+                            dashboard?.widgets.map((widget) => widget.key) ?? []
+                        }
+                        onAdd={addWidget}
+                    />
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

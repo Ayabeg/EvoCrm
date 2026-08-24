@@ -62,10 +62,33 @@ it('serves an empty category list when no rows exist', function () {
         ->assertInertia(fn ($page) => $page
             ->component('crm/reports')
             ->has('categories', 0)
+            ->has('dashboards', 0)
+            ->has('widgetCatalog')
+            ->where('dashboard', null)
             ->where('window.days', 30)
             ->where('window.timezone', 'Africa/Algiers')
             ->where('window.custom', false)
+            ->where('window.owner_id', null)
         );
+});
+
+it('scopes pipeline rooms to the selected owner', function () {
+    $user = User::factory()->create();
+    $other = User::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    reportDeal($user, 'new', ['owner_id' => $user->id, 'amount_cents' => 200_000]);
+    reportDeal($user, 'qualified', ['owner_id' => $other->id, 'amount_cents' => 400_000]);
+
+    $mine = reportCategory($this->actingAs($user)->get('/reports?owner='.$user->id), 'pipeline');
+    expect(collect($mine['kpis'])->pluck('value', 'label')->all())
+        ->toMatchArray([
+            'Open deals' => 1,
+            'Open pipeline' => 200_000,
+        ]);
+
+    $theirs = reportCategory($this->actingAs($user)->get('/reports?owner='.$other->id), 'pipeline');
+    expect(collect($theirs['kpis'])->firstWhere('label', 'Open deals')['value'])->toBe(1)
+        ->and(collect($theirs['kpis'])->firstWhere('label', 'Open pipeline')['value'])->toBe(400_000);
 });
 
 it('keeps /crm/reports as an alias of the analytics room', function () {

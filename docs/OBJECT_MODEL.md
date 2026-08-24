@@ -23,6 +23,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **CustomAttributeDefinition** | Workspace-defined field (text / number / list) on contact, company, or deal. |
 | **CustomAttributeValue** | Value for one entity + definition. |
 | **SavedFilter** | Named list: stage, owner, city, wilaya, last activity, unanswered, unassigned. |
+| **Dashboard** | Saved Reports board on top of the default rooms. `name`, `owner_id`, `widgets` JSON (keys into existing EvoViz charts). Workspace-scoped. |
 | **Workflow** | Additive Automation MVP. Trigger `contact.created` or `deal.stage_changed` (optional target stage). Action: create a Task on the record, or enroll the contact in an existing Outbound Sequence. Runs synchronously from Eloquent observers. |
 | **Quote** | Light quote on a Deal. Status `draft` / `sent` / `accepted`. Currency DZD. |
 | **QuoteItem** | Line: name, quantity, unit cents, line total. Quote `total_cents` is the sum. |

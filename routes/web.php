@@ -7,6 +7,7 @@ use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
+use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
 use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
@@ -76,6 +77,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/crm/reports', [ReportController::class, 'index'])->name('crm.reports');
+    Route::post('/reports/dashboards', [DashboardController::class, 'store'])->name('reports.dashboards.store');
+    Route::put('/reports/dashboards/{dashboard}', [DashboardController::class, 'update'])->name('reports.dashboards.update');
+    Route::delete('/reports/dashboards/{dashboard}', [DashboardController::class, 'destroy'])->name('reports.dashboards.destroy');
+    Route::post('/reports/dashboards/{dashboard}/widgets', [DashboardController::class, 'addWidget'])->name('reports.dashboards.widgets.store');
+    Route::delete('/reports/dashboards/{dashboard}/widgets', [DashboardController::class, 'removeWidget'])->name('reports.dashboards.widgets.destroy');
     Route::post('/crm/activities', [ActivityController::class, 'store'])->name('crm.activities.store');
     Route::post('/crm/activities/{activity}/complete', [ActivityController::class, 'complete'])->name('crm.activities.complete');
     Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');

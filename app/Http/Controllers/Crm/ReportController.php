@@ -7,16 +7,22 @@ use App\Models\Activity;
 use App\Models\AdCampaign;
 use App\Models\AdCampaignStat;
 use App\Models\AdLead;
+use App\Models\Dashboard;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\Message;
 use App\Models\OutboundMessage;
 use App\Models\Thread;
+use App\Models\User;
 use App\Models\Workspace;
+use App\Support\ReportWidgets;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,12 +33,18 @@ use Inertia\Response;
  * Africa/Algiers window (default: last 30 days, optional ?from=&to=).
  * A category with no rows behind it is omitted; a chart whose series is
  * all zeros is omitted — nothing is invented.
+ *
+ * Additive on the same page: saved dashboards (name / owner / widgets
+ * JSON) and a global owner filter that scopes every room and the open
+ * dashboard to a workspace teammate.
  */
 class ReportController extends Controller
 {
     private const TZ = 'Africa/Algiers';
 
     private const MAX_DAYS = 92;
+
+    private ?int $ownerId = null;
 
     public function index(Request $request): Response
     {
@@ -41,7 +53,11 @@ class ReportController extends Controller
         $validated = $request->validate([
             'from' => ['nullable', 'date_format:Y-m-d'],
             'to' => ['nullable', 'date_format:Y-m-d'],
+            'owner' => ['nullable', 'integer', Rule::exists('users', 'id')->where('workspace_id', $workspace->id)],
+            'dashboard' => ['nullable', 'integer'],
         ]);
+
+        $this->ownerId = isset($validated['owner']) ? (int) $validated['owner'] : null;
 
         $to = isset($validated['to'])
             ? Carbon::parse($validated['to'], self::TZ)->endOfDay()
@@ -67,6 +83,16 @@ class ReportController extends Controller
             $this->activityCategory($workspace, $from, $to),
         ])->filter()->values()->all();
 
+        $open = null;
+
+        if ($request->filled('dashboard')) {
+            $open = Dashboard::query()
+                ->forWorkspace($workspace)
+                ->with('owner')
+                ->find($request->integer('dashboard'));
+            abort_unless($open !== null, 404);
+        }
+
         return Inertia::render('crm/reports', [
             'window' => [
                 'from' => $from->toDateString(),
@@ -74,8 +100,33 @@ class ReportController extends Controller
                 'days' => (int) $from->diffInDays($to) + 1,
                 'timezone' => self::TZ,
                 'custom' => $request->filled('from') || $request->filled('to'),
+                'owner_id' => $this->ownerId,
             ],
             'categories' => $categories,
+            'owners' => User::query()
+                ->where('workspace_id', $workspace->id)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (User $user) => ['id' => $user->id, 'name' => $user->name])
+                ->values()
+                ->all(),
+            'dashboards' => Dashboard::query()
+                ->forWorkspace($workspace)
+                ->with('owner')
+                ->orderBy('name')
+                ->get()
+                ->map(fn (Dashboard $dashboard) => [
+                    'id' => $dashboard->id,
+                    'name' => $dashboard->name,
+                    'owner' => [
+                        'id' => $dashboard->owner_id,
+                        'name' => $dashboard->owner?->name,
+                    ],
+                    'widget_count' => count($dashboard->widgetKeys()),
+                ])
+                ->all(),
+            'dashboard' => $this->presentDashboard($open, $categories),
+            'widgetCatalog' => ReportWidgets::catalog(),
         ]);
     }
 
@@ -87,7 +138,7 @@ class ReportController extends Controller
     private function pipelineCategory(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): ?array
     {
         $stages = $workspace->defaultPipeline()->stages()->orderBy('position')->get();
-        $deals = Deal::query()->forWorkspace($workspace)->with('stage')->get();
+        $deals = $this->constrainOwner(Deal::query()->forWorkspace($workspace)->with('stage'))->get();
 
         if ($deals->isEmpty()) {
             return null;
@@ -184,13 +235,14 @@ class ReportController extends Controller
     /** @return array<string, mixed>|null */
     private function leadsCategory(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): ?array
     {
-        $created = Lead::query()->forWorkspace($workspace)
-            ->whereBetween('created_at', [$from, $to])
-            ->get();
-        $qualified = Lead::query()->forWorkspace($workspace)
-            ->whereNotNull('qualified_at')
-            ->whereBetween('qualified_at', [$from, $to])
-            ->get();
+        $created = $this->constrainContactOwner(
+            Lead::query()->forWorkspace($workspace)->whereBetween('created_at', [$from, $to])
+        )->get();
+        $qualified = $this->constrainContactOwner(
+            Lead::query()->forWorkspace($workspace)
+                ->whereNotNull('qualified_at')
+                ->whereBetween('qualified_at', [$from, $to])
+        )->get();
 
         if ($created->isEmpty() && $qualified->isEmpty()) {
             return null;
@@ -274,16 +326,18 @@ class ReportController extends Controller
     /** @return array<string, mixed>|null */
     private function outboundCategory(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): ?array
     {
-        $sent = OutboundMessage::query()->forWorkspace($workspace)
-            ->where('direction', 'out')
-            ->where('status', 'sent')
-            ->whereBetween('sent_at', [$from, $to])
-            ->get();
-        $failed = OutboundMessage::query()->forWorkspace($workspace)
-            ->where('direction', 'out')
-            ->where('status', 'failed')
-            ->whereBetween('created_at', [$from, $to])
-            ->count();
+        $sent = $this->constrainContactOwner(
+            OutboundMessage::query()->forWorkspace($workspace)
+                ->where('direction', 'out')
+                ->where('status', 'sent')
+                ->whereBetween('sent_at', [$from, $to])
+        )->get();
+        $failed = $this->constrainContactOwner(
+            OutboundMessage::query()->forWorkspace($workspace)
+                ->where('direction', 'out')
+                ->where('status', 'failed')
+                ->whereBetween('created_at', [$from, $to])
+        )->count();
 
         if ($sent->isEmpty() && $failed === 0) {
             return null;
@@ -373,9 +427,9 @@ class ReportController extends Controller
         $stats = AdCampaignStat::query()->forWorkspace($workspace)
             ->whereBetween('date', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
             ->get();
-        $adLeads = AdLead::query()->forWorkspace($workspace)
-            ->whereBetween('created_at', [$from, $to])
-            ->get();
+        $adLeads = $this->constrainContactOwner(
+            AdLead::query()->forWorkspace($workspace)->whereBetween('created_at', [$from, $to])
+        )->get();
         $campaigns = AdCampaign::query()->forWorkspace($workspace)->get();
 
         $impressions = (int) $stats->sum('impressions');
@@ -462,10 +516,12 @@ class ReportController extends Controller
     /** @return array<string, mixed>|null */
     private function deskCategory(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): ?array
     {
-        $threads = Thread::query()->forWorkspace($workspace)->with('channel')->get();
-        $messages = Message::query()->forWorkspace($workspace)
-            ->whereBetween('created_at', [$from, $to])
-            ->get();
+        $threads = $this->constrainContactOwner(
+            Thread::query()->forWorkspace($workspace)->with('channel')
+        )->get();
+        $messages = $this->constrainContactOwner(
+            Message::query()->forWorkspace($workspace)->whereBetween('created_at', [$from, $to])
+        )->get();
 
         if ($threads->isEmpty() && $messages->isEmpty()) {
             return null;
@@ -540,7 +596,9 @@ class ReportController extends Controller
     /** @return array<string, mixed>|null */
     private function activityCategory(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): ?array
     {
-        $all = Activity::query()->forWorkspace($workspace)->with('owner')->get();
+        $all = $this->constrainOwner(
+            Activity::query()->forWorkspace($workspace)->with('owner')
+        )->get();
 
         if ($all->isEmpty()) {
             return null;
@@ -665,5 +723,81 @@ class ReportController extends Controller
     private function dzd(int|float $cents): string
     {
         return number_format($cents / 100, 0, '.', ' ').' DZD';
+    }
+
+    /**
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
+    private function constrainOwner(Builder $query, string $column = 'owner_id'): Builder
+    {
+        if ($this->ownerId !== null) {
+            $query->where($column, $this->ownerId);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
+    private function constrainContactOwner(Builder $query): Builder
+    {
+        if ($this->ownerId !== null) {
+            $query->whereHas('contact', fn (Builder $contact) => $contact->where('owner_id', $this->ownerId));
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $categories
+     * @return array<string, mixed>|null
+     */
+    private function presentDashboard(?Dashboard $dashboard, array $categories): ?array
+    {
+        if ($dashboard === null) {
+            return null;
+        }
+
+        $chartsByRoom = collect($categories)->mapWithKeys(
+            fn (array $category) => [
+                $category['key'] => collect($category['charts'] ?? [])->keyBy('id'),
+            ],
+        );
+
+        $widgets = collect($dashboard->widgetKeys())
+            ->map(function (string $key) use ($chartsByRoom) {
+                $meta = ReportWidgets::get($key);
+
+                if ($meta === null) {
+                    return null;
+                }
+
+                return [
+                    'key' => $key,
+                    'title' => $meta['title'],
+                    'room' => $meta['room'],
+                    'chart' => $chartsByRoom[$meta['room']][$meta['id']] ?? null,
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        return [
+            'id' => $dashboard->id,
+            'name' => $dashboard->name,
+            'owner' => [
+                'id' => $dashboard->owner_id,
+                'name' => $dashboard->owner?->name,
+            ],
+            'widgets' => $widgets,
+        ];
     }
 }
