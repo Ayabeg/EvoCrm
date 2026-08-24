@@ -41,6 +41,7 @@ export default function DealHub({
     pipeline,
     pipelines = [],
     forecast,
+    forecastBand,
 }: any) {
 
     return (

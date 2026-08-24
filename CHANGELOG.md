@@ -1,5 +1,16 @@
 # Changelog
 
+## EvoCell 3 — Sequences depth (2026-08-25)
+
+### Added
+- Sequence step types: `email`, `call`, `meeting` with `meeting_url` field
+- A/B variants via `variant_key` on steps and enrollments (random assign at enroll)
+- Reply branches: `on_reply_step` jumps enrollment when IMAP reply detected
+- Call/meeting steps create CRM activities instead of outbound messages
+
+### HubSpot comparison
+HubSpot Sequences include A/B tests, call steps, and meeting links with reply branching. This ships variant assignment, activity-based call/meeting steps, meeting URLs, and reply-driven step jumps — extending the outbound moat without HubSpot's full analytics tier.
+
 ## EvoCell 2 — Automation spine (2026-08-25)
 
 ### Added

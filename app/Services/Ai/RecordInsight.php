@@ -7,10 +7,13 @@ use App\Models\AiInsight;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Models\User;
+use App\Models\Workspace;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\DealBoardForecast;
+use App\Services\Crm\PipelineManager;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -92,7 +95,7 @@ class RecordInsight
         $facts = $record instanceof Deal
             ? $this->dealFacts($record)
             : $this->contactFacts($record);
-        $activities = $this->recentActivities($record);
+        $activities = $this->retrieveRelevantActivities($record, $question);
 
         $stub = $this->stubAnswer($question, $facts, $summary, $activities);
         $live = $this->llm->complete($this->systemPrompt(), $this->userPrompt($kind, $facts, $activities, $question, $summary));
@@ -114,6 +117,84 @@ class RecordInsight
             'source' => $source,
             'summary' => $summary,
         ];
+    }
+
+    /**
+     * AI-assisted forecast band for a pipeline (deterministic range + optional LLM narrative).
+     *
+     * @return array{
+     *     weighted_cents: int,
+     *     low_cents: int,
+     *     high_cents: int,
+     *     band_label: string,
+     *     narrative: string|null,
+     *     source: string
+     * }
+     */
+    public function pipelineForecastBand(Workspace $workspace, Pipeline $pipeline): array
+    {
+        $manager = app(PipelineManager::class);
+        $forecast = $manager->forecast($workspace, $pipeline);
+        $weighted = (int) $forecast['weighted_cents'];
+        $open = (int) ($forecast['open_cents'] ?? $forecast['amount_cents']);
+
+        $low = (int) round($weighted * 0.75);
+        $high = (int) round(min($open, $weighted * 1.35));
+
+        $facts = sprintf(
+            'Open pipeline %s DZD, weighted forecast %s DZD, %d deals.',
+            number_format($open / 100, 0, ',', ' '),
+            number_format($weighted / 100, 0, ',', ' '),
+            (int) $forecast['count'],
+        );
+
+        $live = $this->llm->complete(
+            'You are Evo, Evotechly\'s CRM assistant. Give a one-sentence forecast band commentary from the numbers only. Never invent data.',
+            $facts.' Provide a conservative-to-upside forecast band comment for the sales team.',
+        );
+
+        $bandLabel = $high > $weighted * 1.1 ? 'Upside likely' : ($low < $weighted * 0.85 ? 'Conservative' : 'On track');
+
+        return [
+            'weighted_cents' => $weighted,
+            'low_cents' => $low,
+            'high_cents' => $high,
+            'band_label' => $bandLabel,
+            'narrative' => $live['text'] ?? null,
+            'source' => $live['source'] ?? 'math',
+        ];
+    }
+
+    /**
+     * RAG-lite: keyword-ranked activities beyond the default recent window.
+     *
+     * @return Collection<int, Activity>
+     */
+    protected function retrieveRelevantActivities(Contact|Deal $record, string $question): Collection
+    {
+        $recent = $this->recentActivities($record, 30);
+        $terms = collect(preg_split('/\s+/', Str::lower($question)))
+            ->filter(fn (string $term) => strlen($term) >= 4)
+            ->values();
+
+        if ($terms->isEmpty()) {
+            return $recent->take(8);
+        }
+
+        return $recent
+            ->sortByDesc(function (Activity $activity) use ($terms) {
+                $haystack = Str::lower(trim(($activity->subject ?? '').' '.($activity->body ?? '').' '.$activity->type));
+                $score = 0;
+                foreach ($terms as $term) {
+                    if (str_contains($haystack, $term)) {
+                        $score++;
+                    }
+                }
+
+                return $score;
+            })
+            ->take(12)
+            ->values();
     }
 
     /**
@@ -267,9 +348,9 @@ class RecordInsight
     /**
      * @return Collection<int, Activity>
      */
-    protected function recentActivities(Contact|Deal $record): Collection
+    protected function recentActivities(Contact|Deal $record, int $limit = 8): Collection
     {
-        $query = Activity::query()->latest('id')->limit(8);
+        $query = Activity::query()->latest('id')->limit($limit);
 
         if ($record instanceof Deal) {
             $query->where(function ($q) use ($record): void {

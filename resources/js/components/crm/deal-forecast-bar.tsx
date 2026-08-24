@@ -7,7 +7,22 @@ type Forecast = {
     open_cents?: number;
 };
 
-export default function DealForecastBar({ forecast }: { forecast: Forecast }) {
+type ForecastBand = {
+    weighted_cents: number;
+    low_cents: number;
+    high_cents: number;
+    band_label: string;
+    narrative?: string | null;
+    source: string;
+};
+
+export default function DealForecastBar({
+    forecast,
+    forecastBand,
+}: {
+    forecast: Forecast;
+    forecastBand?: ForecastBand | null;
+}) {
     return (
         <div
             className="flex flex-wrap items-center gap-4 rounded-lg border border-hairline bg-canvas-soft px-3 py-2 text-sm"
@@ -29,6 +44,17 @@ export default function DealForecastBar({ forecast }: { forecast: Forecast }) {
                 <div>
                     <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Open pipeline</p>
                     <p className="money font-semibold text-ink">{formatDzd(forecast.open_cents)}</p>
+                </div>
+            ) : null}
+            {forecastBand ? (
+                <div className="min-w-[140px]">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">AI band · {forecastBand.band_label}</p>
+                    <p className="money text-xs text-ink">
+                        {formatDzd(forecastBand.low_cents)} – {formatDzd(forecastBand.high_cents)}
+                    </p>
+                    {forecastBand.narrative ? (
+                        <p className="mt-0.5 text-[10px] text-muted-foreground">{forecastBand.narrative}</p>
+                    ) : null}
                 </div>
             ) : null}
         </div>

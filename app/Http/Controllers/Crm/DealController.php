@@ -168,7 +168,7 @@ class DealController extends Controller
         return back();
     }
 
-    public function board(Request $request, PipelineManager $pipelines): Response
+    public function board(Request $request, PipelineManager $pipelines, RecordInsight $insight): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
@@ -183,6 +183,7 @@ class DealController extends Controller
             'stages' => $board['stages'],
             'deals' => $board['deals'],
             'forecast' => $board['forecast'],
+            'forecastBand' => $insight->pipelineForecastBand($workspace, $pipeline),
         ]);
     }
 
@@ -264,6 +265,7 @@ class DealController extends Controller
             ],
             'pipelines' => PipelineResource::collection($pipelines->options($workspace))->resolve(),
             'forecast' => $forecast,
+            'forecastBand' => $insight->pipelineForecastBand($workspace, $pipeline),
             'stages' => $pipeline->stages,
             'stagePills' => $stagePills,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
