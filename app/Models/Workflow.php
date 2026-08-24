@@ -8,7 +8,22 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $workspace_id
+ * @property string $name
+ * @property string $trigger
+ * @property int|null $trigger_stage_id
+ * @property string $action
+ * @property array<string, mixed>|null $action_config
+ * @property bool $active
+ * @property string|null $template_key
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Stage|null $triggerStage
+ */
 #[Fillable([
     'workspace_id',
     'name',
@@ -62,6 +77,7 @@ class Workflow extends Model
         ];
     }
 
+    /** @return BelongsTo<Stage, $this> */
     public function triggerStage(): BelongsTo
     {
         return $this->belongsTo(Stage::class, 'trigger_stage_id');
@@ -72,6 +88,8 @@ class Workflow extends Model
      */
     public function config(): array
     {
-        return is_array($this->action_config) ? $this->action_config : [];
+        $config = $this->getAttribute('action_config');
+
+        return is_array($config) ? $config : [];
     }
 }

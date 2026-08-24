@@ -30,7 +30,7 @@ class WorkflowRunner
 
     public function handleDealStageChanged(Deal $deal): void
     {
-        $deal->loadMissing(['contact', 'workspace']);
+        $deal->loadMissing(['workspace']);
 
         $workspace = $deal->workspace ?? Workspace::query()->find($deal->workspace_id);
 
@@ -38,7 +38,11 @@ class WorkflowRunner
             return;
         }
 
-        $this->run($workspace, Workflow::TRIGGER_DEAL_STAGE_CHANGED, $deal->contact, $deal);
+        $contact = $deal->contact_id
+            ? Contact::query()->find($deal->contact_id)
+            : null;
+
+        $this->run($workspace, Workflow::TRIGGER_DEAL_STAGE_CHANGED, $contact, $deal);
     }
 
     private function run(Workspace $workspace, string $trigger, ?Contact $contact, ?Deal $deal): void
@@ -91,10 +95,10 @@ class WorkflowRunner
                 $deal,
             ),
             'due_at' => now()->addDays(max($dueInDays, 0)),
-            'owner_id' => $deal?->owner_id ?? $contact?->owner_id,
+            'owner_id' => $deal !== null ? $deal->owner_id : $contact?->owner_id,
             'contact_id' => $contact?->id,
             'deal_id' => $deal?->id,
-            'company_id' => $deal?->company_id ?? $contact?->company_id,
+            'company_id' => $deal !== null ? $deal->company_id : $contact?->company_id,
             'meta' => [
                 'workflow_id' => $workflow->id,
                 'source' => 'workflow',
