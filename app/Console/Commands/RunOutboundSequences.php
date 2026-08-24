@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Enrollment;
 use App\Models\Enrollment;
 use App\Models\Mailbox;
+use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\WorkflowRunner;
 use App\Services\Outbound\CampaignService;
 use App\Services\Outbound\OutboundDispatcher;
@@ -30,6 +31,7 @@ class RunOutboundSequences extends Command
         SuppressionService $suppressions,
         CampaignService $campaigns,
         WorkflowRunner $workflows,
+        ActivityRecorder $activities,
     ): int {
         $due = Enrollment::query()
             ->where('status', 'active')
@@ -56,10 +58,51 @@ class RunOutboundSequences extends Command
                 continue;
             }
 
-            $step = $sequence->steps->firstWhere('position', $enrollment->next_step);
+            $stepsForVariant = $sequence->steps
+                ->when($enrollment->variant_key, fn ($steps) => $steps->where('variant_key', $enrollment->variant_key)->values());
+
+            $step = $stepsForVariant->firstWhere('position', $enrollment->next_step);
 
             if (! $step) {
                 $enrollment->forceFill(['status' => 'finished', 'next_run_at' => null])->save();
+
+                continue;
+            }
+
+            if (in_array($step->step_type ?? 'email', ['call', 'meeting'], true)) {
+                $activities->record($workspace, [
+                    'type' => $step->step_type,
+                    'subject' => $step->subject ?: ucfirst($step->step_type).' step · '.$sequence->name,
+                    'body' => $step->body ?: ($step->meeting_url ? 'Meeting link: '.$step->meeting_url : null),
+                    'due_at' => now(),
+                    'contact_id' => $contact->id,
+                    'company_id' => $contact->company_id,
+                    'meta' => [
+                        'sequence_id' => $sequence->id,
+                        'enrollment_id' => $enrollment->id,
+                        'step_id' => $step->id,
+                        'meeting_url' => $step->meeting_url,
+                    ],
+                ]);
+
+                $next = $stepsForVariant->firstWhere('position', $enrollment->next_step + 1);
+                $wasFinished = $enrollment->status === 'finished';
+
+                $enrollment->forceFill($next
+                    ? [
+                        'next_step' => $next->position,
+                        'next_run_at' => now()->addHours($next->delay_hours),
+                    ]
+                    : [
+                        'status' => 'finished',
+                        'next_run_at' => null,
+                    ])->save();
+
+                if (! $wasFinished && $enrollment->status === 'finished') {
+                    $workflows->handleEnrollmentFinished($enrollment);
+                }
+
+                $sent++;
 
                 continue;
             }
@@ -111,7 +154,7 @@ class RunOutboundSequences extends Command
             ]);
 
             if ($message->status === 'sent') {
-                $next = $sequence->steps->firstWhere('position', $enrollment->next_step + 1);
+                $next = $stepsForVariant->firstWhere('position', $enrollment->next_step + 1);
 
                 $wasFinished = $enrollment->status === 'finished';
 

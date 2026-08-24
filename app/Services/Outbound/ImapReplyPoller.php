@@ -3,6 +3,7 @@
 namespace App\Services\Outbound;
 
 use App\Models\Contact;
+use App\Models\Enrollment;
 use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Models\Workspace;
@@ -129,7 +130,37 @@ class ImapReplyPoller
 
         if ($lastOutbound && ! $lastOutbound->replied_at) {
             $lastOutbound->forceFill(['replied_at' => now()])->save();
+            $this->branchEnrollmentOnReply($contact, $lastOutbound);
         }
+    }
+
+    protected function branchEnrollmentOnReply(Contact $contact, OutboundMessage $outbound): void
+    {
+        if (! $outbound->sequence_id) {
+            return;
+        }
+
+        $enrollment = Enrollment::query()
+            ->where('contact_id', $contact->id)
+            ->where('sequence_id', $outbound->sequence_id)
+            ->where('status', 'active')
+            ->first();
+
+        if (! $enrollment) {
+            return;
+        }
+
+        $step = $enrollment->sequence?->steps->firstWhere('position', $enrollment->next_step - 1)
+            ?? $enrollment->sequence?->steps->firstWhere('position', $enrollment->next_step);
+
+        if (! $step?->on_reply_step) {
+            return;
+        }
+
+        $enrollment->forceFill([
+            'next_step' => (int) $step->on_reply_step,
+            'next_run_at' => now(),
+        ])->save();
     }
 
     protected function senderAddress(mixed $stream, int $uid): ?string
