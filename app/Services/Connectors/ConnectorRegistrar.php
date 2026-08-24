@@ -26,6 +26,11 @@ class ConnectorRegistrar
 
         $status = $this->resolveStatus($workspace, $provider);
         $existing = $this->existing($workspace, $provider);
+        $mergedConfig = array_merge(
+            $existing instanceof Connector ? ($existing->config ?? []) : [],
+            $config,
+            ['reason' => $this->reason($status, $provider)],
+        );
 
         return Connector::query()->updateOrCreate(
             [
@@ -35,16 +40,19 @@ class ConnectorRegistrar
             [
                 'intent' => $provider->intent(),
                 'status' => $status,
-                'config' => array_merge($existing?->config ?? [], $config, [
-                    'reason' => $this->reason($status, $provider),
-                ]),
+                'config' => $mergedConfig,
                 'connected_at' => $status === ConnectorStatus::Connected
-                    ? ($existing?->connected_at ?? now())
+                    ? ($existing instanceof Connector && $existing->connected_at !== null
+                        ? $existing->connected_at
+                        : now())
                     : null,
             ]
         );
     }
 
+    /**
+     * @param  array<string, mixed>  $config
+     */
     public function markGoogleConnected(Workspace $workspace, ConnectorProvider $provider, array $config = []): Connector
     {
         if (! $provider->isGoogle()) {
@@ -103,7 +111,7 @@ class ConnectorRegistrar
             ->get()
             ->keyBy(fn (Connector $connector) => $connector->provider->value);
 
-        return array_values(array_map(function (ConnectorProvider $provider) use ($rows): array {
+        return array_map(function (ConnectorProvider $provider) use ($rows): array {
             $row = $rows->get($provider->value);
 
             return [
@@ -115,7 +123,7 @@ class ConnectorRegistrar
                 'connected_at' => $row?->connected_at?->toIso8601String(),
                 'reason' => $row?->config['reason'] ?? null,
             ];
-        }, $providers));
+        }, $providers);
     }
 
     private function existing(Workspace $workspace, ConnectorProvider $provider): ?Connector

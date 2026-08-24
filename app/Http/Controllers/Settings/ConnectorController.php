@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class ConnectorController extends Controller
@@ -76,8 +75,6 @@ class ConnectorController extends Controller
 
         $request->session()->put('google_connector_intent', $enum->value);
 
-        return Socialite::driver('google')
-            ->scopes(GoogleAuth::connectorScopes($enum))
-            ->redirect();
+        return GoogleAuth::redirectForConnector($enum);
     }
 }
