@@ -32,7 +32,7 @@ it('renders the deals board next to the list hub with existing stage names', fun
     $this->actingAs($user)
         ->get('/crm/deals')
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('crm/deals/hub'));
+        ->assertInertia(fn ($page) => $page->component('crm/deals/index'));
 
     $this->actingAs($user)
         ->get('/crm/deals/board')

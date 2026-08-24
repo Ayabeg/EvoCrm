@@ -1,6 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 import {
     ActivityTabs,
     AssociationCard,

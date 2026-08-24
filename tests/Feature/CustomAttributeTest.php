@@ -86,7 +86,7 @@ it('creates a typed contact property and shows the saved value on the record', f
         ->get("/crm/contacts/{$contact->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/contacts/hub')
+            ->component('crm/contacts/show')
             ->where('attributes.values.opened_on', '2026-03-15')
             ->where('attributes.values.sector', 'santé')
             ->has('attributes.definitions', 2)
@@ -131,7 +131,7 @@ it('creates a deal property and shows the value on the deal record', function ()
         ->get("/crm/deals/{$deal->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/deals/hub')
+            ->component('crm/deals/show')
             ->where('attributes.values.competitor', 'Kommo')
             ->has('attributes.definitions', 1)
             ->where('attributes.definitions.0.label', 'Competitor')

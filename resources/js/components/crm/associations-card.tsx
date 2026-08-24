@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 
 type Named = {
     id: number;

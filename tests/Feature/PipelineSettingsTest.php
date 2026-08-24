@@ -39,7 +39,7 @@ it('scopes the deals list hub to the selected pipeline', function () {
         ->get('/crm/deals?pipeline='.$enterprise->id)
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/deals/hub')
+            ->component('crm/deals/index')
             ->where('pipeline.id', $enterprise->id)
             ->has('deals', 1)
             ->where('deals.0.title', 'Enterprise list card')

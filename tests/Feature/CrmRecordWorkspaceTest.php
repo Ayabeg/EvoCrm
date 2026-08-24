@@ -59,7 +59,7 @@ it('loads the contact show workspace with associations and catch-up', function (
         ->get("/crm/contacts/{$contact->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/contacts/hub')
+            ->component('crm/contacts/show')
             ->has('associations.company')
             ->has('associations.deals', 1)
             ->has('associations.threads', 1)
@@ -123,7 +123,7 @@ it('loads the deal show workspace with associations and catch-up', function () {
         ->get("/crm/deals/{$deal->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/deals/hub')
+            ->component('crm/deals/show')
             ->has('associations.contact')
             ->has('associations.company')
             ->has('associations.threads', 1)
@@ -149,7 +149,7 @@ it('loads the company show workspace with associations', function () {
         ->get("/crm/companies/{$company->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/companies/hub')
+            ->component('crm/companies/show')
             ->has('associations.contacts', 1)
             ->has('associations.deals')
             ->where('selected.contacts_count', 1)

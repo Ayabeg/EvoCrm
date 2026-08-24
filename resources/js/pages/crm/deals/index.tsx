@@ -1,7 +1,7 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 import {
     ColumnFilter,
     CrmEmptyState,

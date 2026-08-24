@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 import PageHeader from '@/components/page-header';
 import {
     Dialog,

@@ -1,4 +1,4 @@
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 
 type Forecast = {
     count: number;
