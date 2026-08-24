@@ -1,4 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import RecordActionRow from '@/components/crm/record-action-row';
@@ -14,11 +15,13 @@ export default function ContactShow({
     companies,
     associations,
     catchUp,
+    askEvo,
 }: {
     contact: any;
     companies: { id: number; name: string }[];
     associations?: any;
     catchUp?: { inbound?: any[]; outbound?: any[] };
+    askEvo?: any;
 }) {
     return (
         <>
@@ -45,6 +48,7 @@ export default function ContactShow({
                     companyId={contact.company_id}
                     ownerId={contact.owner_id}
                 />
+                <AskEvoPanel action={`/crm/contacts/${contact.id}/ask`} insight={askEvo} />
                 <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                 <AssociationsCard associations={associations ?? { company: contact.company, deals: contact.deals, leads: contact.leads, threads: contact.threads }} />
                 <Card className="p-4">

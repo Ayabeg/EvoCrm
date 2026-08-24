@@ -73,4 +73,20 @@ return [
         'url' => env('WEBMAIL_URL'),
     ],
 
+    /*
+    | Optional Ask Evo live completion. Empty keys keep RecordInsight on the
+    | deterministic field stub so tests and local setups never need a vendor.
+    */
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+        'timeout' => 8,
+    ],
+
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-3-5-haiku-latest'),
+        'timeout' => 8,
+    ],
+
 ];

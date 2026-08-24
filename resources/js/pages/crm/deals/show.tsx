@@ -1,6 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
+import DealHealthPill from '@/components/crm/deal-health-pill';
 import DealLineItems from '@/components/crm/deal-line-items';
 import { formatDzd } from '@/components/crm/hub-chrome';
 import RecordActionRow from '@/components/crm/record-action-row';
@@ -16,11 +18,15 @@ export default function DealShow({
     associations,
     catchUp,
     products,
+    askEvo,
+    dealHealth,
 }: {
     deal: any;
     associations?: any;
     catchUp?: { inbound?: any[]; outbound?: any[] };
     products?: any[];
+    askEvo?: any;
+    dealHealth?: any;
 }) {
     return (
         <>
@@ -45,6 +51,8 @@ export default function DealShow({
                     companyId={deal.company_id}
                     ownerId={deal.owner_id}
                 />
+                <DealHealthPill health={dealHealth} />
+                <AskEvoPanel action={`/crm/deals/${deal.id}/ask`} insight={askEvo} />
                 <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                 <AssociationsCard associations={associations ?? { contact: deal.contact, company: deal.company }} />
                 <DealLineItems

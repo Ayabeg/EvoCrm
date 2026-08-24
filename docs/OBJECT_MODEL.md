@@ -29,6 +29,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **Workflow** | Additive Automation MVP. Trigger `contact.created` or `deal.stage_changed` (optional target stage). Action: create a Task on the record, or enroll the contact in an existing Outbound Sequence. Runs synchronously from Eloquent observers. |
 | **Quote** | Light quote on a Deal. Status `draft` / `sent` / `accepted`. Currency DZD. |
 | **QuoteItem** | Line: optional `product_id` from the same catalog, name, quantity, unit cents, line total. Quote `total_cents` is the sum. |
+| **AiInsight** (`record_insights`) | Last Ask Evo Q&A on a contact or deal. Source `fields` / `openai` / `anthropic`. Deal health is computed live (stage probability + recency + amount), not stored here. |
 
 ## Desk
 

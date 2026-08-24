@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Crm;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Contact;
+use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
@@ -17,16 +18,16 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContactController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight): Response
     {
-        return $this->hub($request, $filter, $hub, null);
+        return $this->hub($request, $filter, $hub, $insight, null);
     }
 
-    public function show(Request $request, Contact $contact, CrmFilter $filter, CrmHub $hub): Response
+    public function show(Request $request, Contact $contact, CrmFilter $filter, CrmHub $hub, RecordInsight $insight): Response
     {
         abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        return $this->hub($request, $filter, $hub, $contact);
+        return $this->hub($request, $filter, $hub, $insight, $contact);
     }
 
     public function export(Request $request, CrmFilter $filter): StreamedResponse
@@ -146,7 +147,7 @@ class ContactController extends Controller
         return back();
     }
 
-    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, ?Contact $selected): Response
+    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, ?Contact $selected): Response
     {
         $workspace = $request->user()->workspace;
         $filters = $filter->resolve($request, $workspace, 'contact');
@@ -172,6 +173,7 @@ class ContactController extends Controller
             'associations' => $selected ? $hub->contactAssociations($selected) : null,
             'timeline' => $selected ? $hub->timeline(contact: $selected) : [],
             'catchUp' => $selected ? $hub->catchUp($selected) : ['inbound' => [], 'outbound' => []],
+            'askEvo' => $selected ? $insight->forContact($selected) : null,
             'attributes' => $selected ? $hub->attributeBag($workspace, 'contact', $selected->id) : ['definitions' => [], 'values' => []],
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name', 'city', 'wilaya']),
             'members' => $hub->members($workspace),

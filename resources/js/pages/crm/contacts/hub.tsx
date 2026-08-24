@@ -1,4 +1,5 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
+import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
@@ -22,6 +23,7 @@ export default function ContactHub({
     cities,
     wilayas,
     catchUp,
+    askEvo,
 }: any) {
 
     return (
@@ -142,6 +144,7 @@ export default function ContactHub({
                                     companyId={selected.company_id}
                                     ownerId={selected.owner_id}
                                 />
+                                <AskEvoPanel action={`/crm/contacts/${selected.id}/ask`} insight={askEvo} />
                                 <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                                 <AssociationsCard associations={associations} />
                                 <Form action={`/crm/contacts/${selected.id}`} method="put" className="grid grid-cols-2 gap-2 border-b pb-3">

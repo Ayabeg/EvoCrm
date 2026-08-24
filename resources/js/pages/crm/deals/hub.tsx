@@ -1,6 +1,8 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
+import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
+import DealHealthPill from '@/components/crm/deal-health-pill';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import DealLineItems from '@/components/crm/deal-line-items';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
@@ -28,6 +30,8 @@ export default function DealHub({
     stagePills,
     catchUp,
     products,
+    askEvo,
+    dealHealth,
 }: any) {
 
     return (
@@ -168,6 +172,8 @@ export default function DealHub({
                                     companyId={selected.company_id}
                                     ownerId={selected.owner_id}
                                 />
+                                <DealHealthPill health={dealHealth} />
+                                <AskEvoPanel action={`/crm/deals/${selected.id}/ask`} insight={askEvo} />
                                 <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                                 <AssociationsCard associations={associations} />
                                 <div className="grid grid-cols-6 gap-1">
