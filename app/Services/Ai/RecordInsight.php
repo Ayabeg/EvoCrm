@@ -4,8 +4,11 @@ namespace App\Services\Ai;
 
 use App\Models\Activity;
 use App\Models\AiInsight;
+use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Stage;
+use App\Models\User;
 use App\Services\Crm\DealBoardForecast;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -42,8 +45,9 @@ class RecordInsight
     {
         $deal->loadMissing('stage');
 
-        $probability = $deal->stage
-            ? DealBoardForecast::probabilityFor($deal->stage)
+        $stage = $this->stageOf($deal);
+        $probability = $stage
+            ? DealBoardForecast::probabilityFor($stage)
             : (int) config('evosales.stage_probability_fallback', 20);
         $days = $this->daysSince($deal->last_activity_at);
         $hasAmount = (int) $deal->amount_cents > 0;
@@ -58,8 +62,8 @@ class RecordInsight
         $band = $score >= 70 ? 'healthy' : ($score >= 40 ? 'watch' : 'risk');
         $label = $score >= 70 ? 'Healthy' : ($score >= 40 ? 'Watch' : 'At risk');
 
-        $stageBit = $deal->stage
-            ? $deal->stage->name.' at '.$probability.'%'
+        $stageBit = $stage
+            ? $stage->name.' at '.$probability.'%'
             : 'stage at '.$probability.'%';
         $activityBit = $days === null
             ? 'no activity yet'
@@ -122,12 +126,14 @@ class RecordInsight
             ->latest('id')
             ->first();
 
+        $insight = $latest instanceof AiInsight ? $latest : null;
+
         return [
             'label' => 'Ask Evo',
             'summary' => $summary,
-            'question' => $latest?->question,
-            'answer' => $latest?->answer,
-            'source' => $latest?->source ?? 'fields',
+            'question' => $insight?->question,
+            'answer' => $insight?->answer,
+            'source' => $insight instanceof AiInsight ? $insight->source : 'fields',
             'live' => $this->llm->available(),
         ];
     }
@@ -173,17 +179,22 @@ class RecordInsight
      */
     protected function contactFacts(Contact $contact): array
     {
-        $deals = $contact->deals
-            ->map(function (Deal $deal): string {
-                $stage = $deal->stage?->name;
-                $amount = (int) $deal->amount_cents > 0
-                    ? number_format(((int) $deal->amount_cents) / 100, 0, ',', ' ').' DZD'
-                    : null;
+        $dealLines = [];
 
-                return trim($deal->title.($stage ? ' ('.$stage.')' : '').($amount ? ' '.$amount : ''));
-            })
-            ->filter()
-            ->values();
+        foreach ($contact->deals as $deal) {
+            if (! $deal instanceof Deal) {
+                continue;
+            }
+
+            $stage = $this->stageOf($deal);
+            $amount = (int) $deal->amount_cents > 0
+                ? number_format(((int) $deal->amount_cents) / 100, 0, ',', ' ').' DZD'
+                : null;
+
+            $dealLines[] = trim($deal->title.($stage instanceof Stage ? ' ('.$stage->name.')' : '').($amount ? ' '.$amount : ''));
+        }
+
+        $dealLines = array_values(array_filter($dealLines));
 
         return array_filter([
             'Name' => $contact->displayName(),
@@ -191,9 +202,9 @@ class RecordInsight
             'Phone' => $contact->phone_e164 ?? $contact->phone,
             'City' => $contact->city,
             'Wilaya' => $contact->wilaya,
-            'Company' => $contact->company?->name,
-            'Owner' => $contact->owner?->name,
-            'Deals' => $deals->isEmpty() ? null : $deals->count().' deal'.($deals->count() === 1 ? '' : 's').' ('.$deals->implode(', ').')',
+            'Company' => $this->companyName($contact->company),
+            'Owner' => $this->userName($contact->owner),
+            'Deals' => $dealLines === [] ? null : count($dealLines).' deal'.(count($dealLines) === 1 ? '' : 's').' ('.implode(', ', $dealLines).')',
         ], fn ($value) => filled($value));
     }
 
@@ -205,20 +216,22 @@ class RecordInsight
         $amount = (int) $deal->amount_cents > 0
             ? number_format(((int) $deal->amount_cents) / 100, 0, ',', ' ').' DZD'
             : null;
-        $probability = $deal->stage
-            ? DealBoardForecast::probabilityFor($deal->stage).'%'
+        $stage = $this->stageOf($deal);
+        $probability = $stage
+            ? DealBoardForecast::probabilityFor($stage).'%'
             : null;
+        $contact = $deal->contact instanceof Contact ? $deal->contact : null;
 
         return array_filter([
             'Title' => $deal->title,
-            'Stage' => $deal->stage?->name,
+            'Stage' => $stage?->name,
             'Probability' => $probability,
             'Amount' => $amount,
-            'Contact' => $deal->contact?->displayName(),
-            'Company' => $deal->company?->name ?? $deal->contact?->company?->name,
-            'Owner' => $deal->owner?->name,
+            'Contact' => $contact?->displayName(),
+            'Company' => $this->companyName($deal->company) ?? $this->companyName($contact?->company),
+            'Owner' => $this->userName($deal->owner),
             'Next step' => $deal->next_step,
-            'Close date' => $deal->close_date?->toDateString(),
+            'Close date' => $this->dateString($deal->close_date),
         ], fn ($value) => filled($value));
     }
 
@@ -278,7 +291,7 @@ class RecordInsight
             ]));
 
             foreach ($needles as $needle) {
-                if ($needle !== '' && str_contains($haystack, $needle)) {
+                if (str_contains($haystack, $needle)) {
                     $hits[] = $label.': '.$value;
                     break;
                 }
@@ -372,5 +385,31 @@ class RecordInsight
         }
 
         return (int) $stamp->diffInDays(now());
+    }
+
+    protected function stageOf(Deal $deal): ?Stage
+    {
+        $stage = $deal->stage;
+
+        return $stage instanceof Stage ? $stage : null;
+    }
+
+    protected function companyName(mixed $company): ?string
+    {
+        return $company instanceof Company ? $company->name : null;
+    }
+
+    protected function userName(mixed $user): ?string
+    {
+        return $user instanceof User ? $user->name : null;
+    }
+
+    protected function dateString(mixed $value): ?string
+    {
+        if ($value instanceof CarbonInterface) {
+            return $value->toDateString();
+        }
+
+        return is_string($value) && $value !== '' ? $value : null;
     }
 }
