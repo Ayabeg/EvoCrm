@@ -1,5 +1,25 @@
 # Changelog
 
+## EvoCell 5 — Analytics depth (2026-08-25)
+
+### Added
+- Calculated custom properties (`type=calculated`, `formula.expression` e.g. `{deal.amount} * 0.19`)
+- Saved reports: `saved_reports` table, `/crm/report-builder` UI, `ReportBuilder` service
+- Scheduled reports: `scheduled_reports` table + `reports:deliver` daily command
+
+### HubSpot comparison
+HubSpot custom reports support SQL and cross-object joins. This ships formula-based calculated fields, saved filter reports with grouping, and email scheduled delivery — monitoring depth without ad hoc SQL.
+
+## EvoCell 4 — AI layer (2026-08-25)
+
+### Added
+- RAG-lite Ask Evo: keyword-ranked activity retrieval (30 activities scanned, top matches in prompt)
+- AI pipeline forecast band: low/high DZD range, band label, optional LLM narrative on deals hub + kanban
+- `RecordInsight::pipelineForecastBand()` exposed as `forecastBand` in deal list/board views
+
+### HubSpot comparison
+HubSpot Breeze uses full RAG over CRM + email history. This ships keyword-ranked activity retrieval and a math+LLM forecast band on pipeline views — enough AI assist for a small team without vector infrastructure.
+
 ## EvoCell 3 — Sequences depth (2026-08-25)
 
 ### Added

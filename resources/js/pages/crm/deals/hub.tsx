@@ -80,7 +80,7 @@ export default function DealHub({
                             </div>
                             {forecast ? (
                                 <div className="mt-2">
-                                    <DealForecastBar forecast={forecast} />
+                                    <DealForecastBar forecast={forecast} forecastBand={forecastBand} />
                                 </div>
                             ) : (
                                 <p className="money mt-1 text-[11px] text-ink">{formatDzd(openPipelineCents)}</p>

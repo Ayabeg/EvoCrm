@@ -66,6 +66,12 @@ class CustomAttributes
 
         $out = [];
         foreach ($definitions as $definition) {
+            if ($definition->type === 'calculated') {
+                $out[$definition->key] = $this->evaluateFormula($workspace, $entity, $entityId, $definition);
+
+                continue;
+            }
+
             $out[$definition->key] = $values[$definition->id]->value ?? null;
         }
 
@@ -211,5 +217,35 @@ class CustomAttributes
         }
 
         return null;
+    }
+
+    protected function evaluateFormula(Workspace $workspace, string $entity, int $entityId, CustomAttributeDefinition $definition): ?string
+    {
+        $formula = $definition->formula;
+        if (! is_array($formula) || ! filled($formula['expression'] ?? null)) {
+            return null;
+        }
+
+        $expression = (string) $formula['expression'];
+        $amount = 0;
+
+        if ($entity === 'deal') {
+            $deal = Deal::query()->forWorkspace($workspace)->find($entityId);
+            $amount = $deal ? ((int) $deal->amount_cents) / 100 : 0;
+        }
+
+        $expression = str_replace('{deal.amount}', (string) $amount, $expression);
+
+        if (! preg_match('/^[0-9+\-*\/().\s]+$/', $expression)) {
+            return null;
+        }
+
+        try {
+            $result = eval('return '.$expression.';');
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return is_numeric($result) ? (string) round((float) $result, 2) : null;
     }
 }

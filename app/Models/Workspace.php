@@ -139,6 +139,11 @@ class Workspace extends Model
         return $this->hasMany(Dashboard::class);
     }
 
+    public function savedReports(): HasMany
+    {
+        return $this->hasMany(SavedReport::class);
+    }
+
     public function customAttributeDefinitions(): HasMany
     {
         return $this->hasMany(CustomAttributeDefinition::class);

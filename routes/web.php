@@ -15,6 +15,7 @@ use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\ReportController;
+use App\Http\Controllers\Crm\SavedReportController;
 use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Crm\SegmentController;
 use App\Http\Controllers\Crm\WorkflowController;
@@ -86,6 +87,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/crm/reports', [ReportController::class, 'index'])->name('crm.reports');
+    Route::get('/crm/report-builder', [SavedReportController::class, 'index'])->name('crm.report-builder');
+    Route::post('/crm/report-builder', [SavedReportController::class, 'store'])->name('crm.report-builder.store');
+    Route::get('/crm/report-builder/{savedReport}/run', [SavedReportController::class, 'run'])->name('crm.report-builder.run');
     Route::post('/reports/dashboards', [DashboardController::class, 'store'])->name('reports.dashboards.store');
     Route::put('/reports/dashboards/{dashboard}', [DashboardController::class, 'update'])->name('reports.dashboards.update');
     Route::delete('/reports/dashboards/{dashboard}', [DashboardController::class, 'destroy'])->name('reports.dashboards.destroy');

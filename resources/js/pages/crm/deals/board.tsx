@@ -169,7 +169,7 @@ export default function DealBoard({
                     </div>
                 </PageHeader>
 
-                <DealForecastBar forecast={forecast} />
+                <DealForecastBar forecast={forecast} forecastBand={forecastBand} />
 
                 <div className="flex items-start gap-3 overflow-x-auto pb-6">
                     {stages.map((stage) => {
