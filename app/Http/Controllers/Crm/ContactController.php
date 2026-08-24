@@ -11,7 +11,6 @@ use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -35,7 +34,7 @@ class ContactController extends Controller
             ->withCount(['threads', 'deals', 'enrollments']);
 
         $filter->applyToContacts($query, $filters);
-        $this->sortContacts($query, $filters['sort'] ?? null);
+        $filter->applySort('contact', $query, $filters);
 
         return Inertia::render('crm/contacts/index', [
             'contacts' => $query->limit(120)->get(),
@@ -193,15 +192,4 @@ class ContactController extends Controller
         ]);
     }
 
-    /**
-     * @param  Builder<Contact>  $query
-     */
-    protected function sortContacts($query, ?string $sort): void
-    {
-        match ($sort) {
-            'created_at' => $query->orderByDesc('created_at'),
-            'email' => $query->orderBy('email'),
-            default => $query->orderByDesc('last_activity_at')->orderBy('first_name'),
-        };
-    }
 }

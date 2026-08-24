@@ -9,6 +9,7 @@ use App\Models\CustomAttributeValue;
 use App\Models\Deal;
 use App\Models\SavedFilter;
 use App\Models\Workspace;
+use App\Support\ListViewConfig;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;

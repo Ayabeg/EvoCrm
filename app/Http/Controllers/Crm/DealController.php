@@ -10,7 +10,6 @@ use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -34,7 +33,7 @@ class DealController extends Controller
             ->with(['contact.company', 'company', 'stage', 'owner']);
 
         $filter->applyToDeals($query, $filters);
-        $this->sortDeals($query, $filters['sort'] ?? null);
+        $filter->applySort('deal', $query, $filters);
 
         $deals = $query->limit(120)->get();
 
@@ -224,16 +223,4 @@ class DealController extends Controller
         return $fallback;
     }
 
-    /**
-     * @param  Builder<Deal>  $query
-     */
-    protected function sortDeals($query, ?string $sort): void
-    {
-        match ($sort) {
-            'created_at' => $query->orderByDesc('created_at'),
-            'close_date' => $query->orderByRaw('close_date is null')->orderBy('close_date'),
-            'amount' => $query->orderByDesc('amount_cents'),
-            default => $query->orderByDesc('last_activity_at')->orderByDesc('id'),
-        };
-    }
 }
