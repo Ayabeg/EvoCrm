@@ -6,3 +6,5 @@ export {
 } from '@/evoviz/contract';
 export type { EvoVizId, EvoVizPayload, EvoVizSeries } from '@/evoviz/contract';
 export { EvoVizChart } from '@/evoviz/evo-viz-chart';
+export { WidgetPicker } from '@/evoviz/widget-picker';
+export type { ReportWidgetCatalogItem } from '@/evoviz/widget-picker';
