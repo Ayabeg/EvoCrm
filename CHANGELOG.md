@@ -1,6 +1,5 @@
 # Changelog
 
-<<<<<<< HEAD
 ## Gap #1 — Saved views + advanced filters + column chooser (2026-08-24)
 
 ### Added
@@ -14,7 +13,7 @@
 
 ### HubSpot comparison
 HubSpot list views support nested filter groups, column layouts, and view sharing across teams. This ships the 80% version: workspace-scoped saved views owned by the creator, flat field operators (equals / is true / is false), and column customization without cross-user default views or calculated columns. Enough for a single-digit sales team to save “Unanswered Alger” or “My open deals” layouts without HubSpot’s enterprise view permissions.
-=======
+
 ## Gap #2 — Deal kanban + pipelines + forecasting (2026-08-24)
 
 ### Added
@@ -32,4 +31,3 @@ HubSpot list views support nested filter groups, column layouts, and view sharin
 
 ### HubSpot comparison
 HubSpot Sales Hub supports unlimited custom pipelines, drag-and-drop stage editing, deal splits, and AI forecasting. This ships multi-pipeline **list + board views**, stage-probability weighted totals, and admin-created pipelines cloned from the Evotechly default stage template — enough for a small team running separate motions (e.g. Sales vs Enterprise) without HubSpot's visual pipeline designer or revenue intelligence tier.
->>>>>>> origin/cursor/pipelines-kanban-forecast-91cb

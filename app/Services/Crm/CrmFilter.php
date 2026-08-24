@@ -458,6 +458,85 @@ class CrmFilter
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * @param  array<string, mixed>  $filters
+     */
+    public function count(Workspace $workspace, string $entity, array $filters): int
+    {
+        return match ($entity) {
+            'contact' => $this->applyToContacts(Contact::query()->forWorkspace($workspace), $filters)->count(),
+            'deal' => $this->applyToDeals(Deal::query()->forWorkspace($workspace), $filters)->count(),
+            'company' => $this->applyToCompanies(Company::query()->forWorkspace($workspace), $filters)->count(),
+            default => 0,
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array{count: int, members: array<int, array<string, mixed>>}
+     */
+    public function preview(Workspace $workspace, string $entity, array $filters, int $limit = 5): array
+    {
+        return match ($entity) {
+            'contact' => $this->previewContacts($workspace, $filters, $limit),
+            'deal' => $this->previewDeals($workspace, $filters, $limit),
+            default => ['count' => 0, 'members' => []],
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array{count: int, members: array<int, array<string, mixed>>}
+     */
+    protected function previewContacts(Workspace $workspace, array $filters, int $limit): array
+    {
+        $query = $this->applyToContacts(Contact::query()->forWorkspace($workspace), $filters);
+
+        return [
+            'count' => (clone $query)->count(),
+            'members' => (clone $query)
+                ->with('owner:id,name')
+                ->orderBy('first_name')
+                ->limit($limit)
+                ->get(['id', 'first_name', 'last_name', 'email', 'city', 'owner_id'])
+                ->map(fn (Contact $contact) => [
+                    'id' => $contact->id,
+                    'label' => trim("{$contact->first_name} {$contact->last_name}"),
+                    'detail' => $contact->email ?? $contact->city ?? '—',
+                    'owner' => $contact->owner?->name,
+                ])
+                ->all(),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array{count: int, members: array<int, array<string, mixed>>}
+     */
+    protected function previewDeals(Workspace $workspace, array $filters, int $limit): array
+    {
+        $query = $this->applyToDeals(Deal::query()->forWorkspace($workspace), $filters);
+
+        return [
+            'count' => (clone $query)->count(),
+            'members' => (clone $query)
+                ->with(['owner:id,name', 'stage:id,name'])
+                ->orderBy('title')
+                ->limit($limit)
+                ->get(['id', 'title', 'amount_cents', 'owner_id', 'stage_id'])
+                ->map(fn (Deal $deal) => [
+                    'id' => $deal->id,
+                    'label' => $deal->title,
+                    'detail' => $deal->stage?->name ?? '—',
+                    'owner' => $deal->owner?->name,
+                ])
+                ->all(),
+        ];
+    }
+
+    /**
+>>>>>>> origin/cursor/integrate-gap-modules-91cb
      * @param  Builder<Model>  $query
      */
     protected function applyLastActivity(Builder $query, mixed $window): void

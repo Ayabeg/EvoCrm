@@ -42,6 +42,38 @@ it('lists the segments manage page with named filter counts', function () {
         );
 });
 
+it('previews segment size and sample members from draft filters', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+
+    Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'owner_id' => $user->id,
+        'city' => 'Alger',
+    ]);
+    Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'owner_id' => null,
+        'city' => 'Oran',
+    ]);
+
+    $this->actingAs($user)
+        ->postJson('/crm/segments/preview', [
+            'entity' => 'contact',
+            'filters' => ['city' => 'Alger'],
+        ])
+        ->assertOk()
+        ->assertJson([
+            'count' => 1,
+        ])
+        ->assertJsonStructure([
+            'count',
+            'members' => [
+                ['id', 'label', 'detail'],
+            ],
+        ]);
+});
+
 it('adds Segments as a new CRM nav item without reordering the rest', function () {
     $sidebar = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 

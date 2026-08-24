@@ -8,6 +8,8 @@ import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import DealLineItems from '@/components/crm/deal-line-items';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
+import { RecordLayoutColumn, RecordLayoutProvider } from '@/components/crm/record-layout-context';
+import { RecordLayoutCustomizeButton, RecordLayoutEditor } from '@/components/crm/record-layout-editor';
 import RecordProperties from '@/components/crm/record-properties';
 import ListToolbar from '@/components/crm/list-toolbar';
 import RecordActionRow from '@/components/crm/record-action-row';
@@ -42,9 +44,11 @@ export default function DealHub({
 }: any) {
 
     return (
-        <>
-            <Head title={selected ? selected.title : 'Deals'} />
-            <HubShell
+        <RecordLayoutProvider objectType="deal">
+            <>
+                <Head title={selected ? selected.title : 'Deals'} />
+                <RecordLayoutEditor />
+                <HubShell
                 list={
                     <>
                         <ListToolbar
@@ -171,79 +175,101 @@ export default function DealHub({
                                         <span className="money">{formatDzd(selected.amount_cents)}</span> · {selected.stage?.name} · {selected.next_step ?? 'No next step'}
                                     </p>
                                 </div>
-                                <Link href="/inbox" className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
-                                    Open in Inbox
-                                </Link>
+                                <div className="flex items-center gap-2">
+                                    <RecordLayoutCustomizeButton />
+                                    <Link href="/inbox" className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
+                                        Open in Inbox
+                                    </Link>
+                                </div>
                             </header>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-                                <RecordFacts>
-                                    <RecordFact label="Amount">
-                                        <span className="money">{formatDzd(selected.amount_cents)}</span>
-                                    </RecordFact>
-                                    <RecordFact label="Stage">{selected.stage?.name ?? '—'}</RecordFact>
-                                    <RecordFact label="Owner">{selected.owner?.name ?? 'Unassigned'}</RecordFact>
-                                    <RecordFact label="Next step">{selected.next_step ?? '—'}</RecordFact>
-                                    <RecordFact label="Source">{selected.source ?? '—'}</RecordFact>
-                                    <RecordFact label="Close date">
-                                        {selected.close_date ? String(selected.close_date).slice(0, 10) : '—'}
-                                    </RecordFact>
-                                </RecordFacts>
-                                <RecordActionRow
-                                    dealId={selected.id}
-                                    contactId={selected.contact_id}
-                                    companyId={selected.company_id}
-                                    ownerId={selected.owner_id}
-                                />
-                                <DealHealthPill health={dealHealth} />
-                                <AskEvoPanel action={`/crm/deals/${selected.id}/ask`} insight={askEvo} />
-                                <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
-                                <AssociationsCard associations={associations} />
-                                <div className="grid grid-cols-6 gap-1">
-                                    {stages.map((stage: any) => {
-                                        const column = deals.filter((deal: any) => deal.stage_id === stage.id);
-                                        const sum = column.reduce((acc: number, deal: any) => acc + (deal.amount_cents ?? 0), 0);
+                                <RecordLayoutColumn
+                                    column="main"
+                                    cards={{
+                                        'key-info': (
+                                            <RecordFacts>
+                                                <RecordFact label="Amount">
+                                                    <span className="money">{formatDzd(selected.amount_cents)}</span>
+                                                </RecordFact>
+                                                <RecordFact label="Stage">{selected.stage?.name ?? '—'}</RecordFact>
+                                                <RecordFact label="Owner">{selected.owner?.name ?? 'Unassigned'}</RecordFact>
+                                                <RecordFact label="Next step">{selected.next_step ?? '—'}</RecordFact>
+                                                <RecordFact label="Source">{selected.source ?? '—'}</RecordFact>
+                                                <RecordFact label="Close date">
+                                                    {selected.close_date ? String(selected.close_date).slice(0, 10) : '—'}
+                                                </RecordFact>
+                                            </RecordFacts>
+                                        ),
+                                        actions: (
+                                            <RecordActionRow
+                                                dealId={selected.id}
+                                                contactId={selected.contact_id}
+                                                companyId={selected.company_id}
+                                                ownerId={selected.owner_id}
+                                            />
+                                        ),
+                                        'deal-health': <DealHealthPill health={dealHealth} />,
+                                        'ask-evo': <AskEvoPanel action={`/crm/deals/${selected.id}/ask`} insight={askEvo} />,
+                                        catchup: <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />,
+                                        'associations-main': <AssociationsCard associations={associations} />,
+                                        'stage-board': (
+                                            <div className="grid grid-cols-6 gap-1">
+                                                {stages.map((stage: any) => {
+                                                    const column = deals.filter((deal: any) => deal.stage_id === stage.id);
+                                                    const sum = column.reduce((acc: number, deal: any) => acc + (deal.amount_cents ?? 0), 0);
 
-                                        return (
-                                            <div key={stage.id} className="rounded border border-hairline bg-canvas-soft p-1">
-                                                <p className="text-[10px] font-semibold">{stage.name}</p>
-                                                <p className="money text-[10px] text-ink">{formatDzd(sum)}</p>
-                                                <p className="text-[10px] text-muted-foreground">{column.length}</p>
+                                                    return (
+                                                        <div key={stage.id} className="rounded border border-hairline bg-canvas-soft p-1">
+                                                            <p className="text-[10px] font-semibold">{stage.name}</p>
+                                                            <p className="money text-[10px] text-ink">{formatDzd(sum)}</p>
+                                                            <p className="text-[10px] text-muted-foreground">{column.length}</p>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                                <Form action={`/crm/deals/${selected.id}`} method="put" className="grid grid-cols-2 gap-2 border-b pb-3">
-                                    <Input name="title" defaultValue={selected.title} required className="h-8" />
-                                    <Input name="amount_dzd" type="number" min={0} step="0.01" defaultValue={(selected.amount_cents ?? 0) / 100} className="h-8" />
-                                    <Input name="close_date" type="date" defaultValue={selected.close_date ? String(selected.close_date).slice(0, 10) : ''} className="h-8" />
-                                    <Input name="next_step" defaultValue={selected.next_step ?? ''} placeholder="Next step" className="h-8" />
-                                    <select name="owner_id" defaultValue={selected.owner_id ?? ''} className="h-8 rounded border bg-background px-2">
-                                        <option value="">Unassigned</option>
-                                        {members.map((user: any) => (
-                                            <option key={user.id} value={user.id}>{user.name}</option>
-                                        ))}
-                                    </select>
-                                    <Input name="source" defaultValue={selected.source ?? ''} placeholder="Source" className="h-8" />
-                                    <Input name="lost_reason" defaultValue={selected.lost_reason ?? ''} placeholder="Lost reason" className="col-span-2 h-8" />
-                                    <Button className="col-span-2 h-8">Save deal</Button>
-                                </Form>
-                                <DealLineItems
-                                    dealId={selected.id}
-                                    items={selected.line_items ?? associations?.line_items ?? []}
-                                    products={products}
+                                        ),
+                                        'edit-form': (
+                                            <Form action={`/crm/deals/${selected.id}`} method="put" className="grid grid-cols-2 gap-2 border-b pb-3">
+                                                <Input name="title" defaultValue={selected.title} required className="h-8" />
+                                                <Input name="amount_dzd" type="number" min={0} step="0.01" defaultValue={(selected.amount_cents ?? 0) / 100} className="h-8" />
+                                                <Input name="close_date" type="date" defaultValue={selected.close_date ? String(selected.close_date).slice(0, 10) : ''} className="h-8" />
+                                                <Input name="next_step" defaultValue={selected.next_step ?? ''} placeholder="Next step" className="h-8" />
+                                                <select name="owner_id" defaultValue={selected.owner_id ?? ''} className="h-8 rounded border bg-background px-2">
+                                                    <option value="">Unassigned</option>
+                                                    {members.map((user: any) => (
+                                                        <option key={user.id} value={user.id}>{user.name}</option>
+                                                    ))}
+                                                </select>
+                                                <Input name="source" defaultValue={selected.source ?? ''} placeholder="Source" className="h-8" />
+                                                <Input name="lost_reason" defaultValue={selected.lost_reason ?? ''} placeholder="Lost reason" className="col-span-2 h-8" />
+                                                <Button className="col-span-2 h-8">Save deal</Button>
+                                            </Form>
+                                        ),
+                                        'line-items': (
+                                            <DealLineItems
+                                                dealId={selected.id}
+                                                items={selected.line_items ?? associations?.line_items ?? []}
+                                                products={products}
+                                            />
+                                        ),
+                                        attributes: (
+                                            <RecordProperties
+                                                action={`/crm/deals/${selected.id}/attributes`}
+                                                attributes={attributes}
+                                            />
+                                        ),
+                                        'stage-move': (
+                                            <Form action={`/crm/deals/${selected.id}/move`} method="post" className="flex flex-wrap gap-1">
+                                                {stages.map((stage: any) => (
+                                                    <Button key={stage.id} name="stage_id" value={stage.id} variant={stage.id === selected.stage_id ? 'default' : 'secondary'} className="h-7 text-[11px]">
+                                                        {stage.name}
+                                                    </Button>
+                                                ))}
+                                            </Form>
+                                        ),
+                                        timeline: <RecordTimeline timeline={timeline} />,
+                                    }}
                                 />
-                                <RecordProperties
-                                    action={`/crm/deals/${selected.id}/attributes`}
-                                    attributes={attributes}
-                                />
-                                <Form action={`/crm/deals/${selected.id}/move`} method="post" className="flex flex-wrap gap-1">
-                                    {stages.map((stage: any) => (
-                                        <Button key={stage.id} name="stage_id" value={stage.id} variant={stage.id === selected.stage_id ? 'default' : 'secondary'} className="h-7 text-[11px]">
-                                            {stage.name}
-                                        </Button>
-                                    ))}
-                                </Form>
-                                <RecordTimeline timeline={timeline} />
                             </div>
                         </>
                     ) : (
@@ -253,93 +279,107 @@ export default function DealHub({
                 side={
                     selected ? (
                         <div className="space-y-4 p-3">
-                            <section>
-                                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Log activity</h3>
-                                <Form action="/crm/activities" method="post" className="space-y-1" resetOnSuccess>
-                                    <input type="hidden" name="deal_id" value={selected.id} />
-                                    <input type="hidden" name="contact_id" value={selected.contact_id ?? ''} />
-                                    <input type="hidden" name="company_id" value={selected.company_id ?? ''} />
-                                    <select name="type" className="h-7 w-full rounded border bg-background px-1">
-                                        <option value="note">Note</option>
-                                        <option value="task">Task</option>
-                                        <option value="call">Call</option>
-                                        <option value="meeting">Meeting</option>
-                                    </select>
-                                    <Input name="subject" placeholder="Subject" className="h-7" />
-                                    <Input name="body" placeholder="Details" className="h-7" />
-                                    <Input name="due_at" type="datetime-local" className="h-7" />
-                                    <select name="owner_id" defaultValue={selected.owner_id ?? ''} className="h-7 w-full rounded border bg-background px-1">
-                                        {members.map((user: any) => (
-                                            <option key={user.id} value={user.id}>{user.name}</option>
-                                        ))}
-                                    </select>
-                                    <Button className="h-7 w-full">Add to timeline</Button>
-                                </Form>
-                            </section>
-                            <section>
-                                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Associations</h3>
-                                {associations?.contact ? (
-                                    <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-brand">
-                                        {associations.contact.first_name} {associations.contact.last_name}
-                                    </Link>
-                                ) : null}
-                                {associations?.company ? (
-                                    <Link href={`/crm/companies/${associations.company.id}`} className="block text-brand">
-                                        {associations.company.name}
-                                    </Link>
-                                ) : null}
-                                <p className="mt-2 text-[11px] text-muted-foreground">Desk history</p>
-                                {(associations?.threads ?? []).map((thread: any) => (
-                                    <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-brand">
-                                        {thread.subject ?? 'Thread'}
-                                    </Link>
-                                ))}
-                                <p className="mt-2 text-[11px] text-muted-foreground">Enrollments</p>
-                                {(associations?.enrollments ?? []).map((enrollment: any) => (
-                                    <p key={enrollment.id}>{enrollment.sequence?.name}</p>
-                                ))}
-                            </section>
-                            <section>
-                                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Quote</h3>
-                                {(associations?.quotes ?? []).map((quote: any) => (
-                                    <p key={quote.id}>
-                                        {quote.status} · <span className="money">{formatDzd(quote.total_cents)}</span>
-                                    </p>
-                                ))}
-                                <Form action={`/crm/deals/${selected.id}/quotes`} method="post" className="mt-2 space-y-1">
-                                    <select name="items[0][product_id]" className="h-7 w-full rounded border bg-background px-1 text-[11px]">
-                                        <option value="">Catalog product…</option>
-                                        {(products ?? []).map((product: any) => (
-                                            <option key={product.id} value={product.id}>
-                                                {product.name} · {product.sku}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <Input name="items[0][name]" placeholder="Line item (or pick a product)" className="h-7" />
-                                    <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-7" />
-                                    <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="Unit DZD" className="h-7" />
-                                    <select name="status" className="h-7 w-full rounded border bg-background px-1">
-                                        <option value="draft">draft</option>
-                                        <option value="sent">sent</option>
-                                        <option value="accepted">accepted</option>
-                                    </select>
-                                    <Button className="h-7 w-full">Add quote</Button>
-                                </Form>
-                            </section>
-                            <Form action="/crm/filters" method="post" className="space-y-1 border-t pt-2">
-                                <input type="hidden" name="entity" value="deal" />
-                                <input type="hidden" name="stage" value={activeFilters.stage ?? ''} />
-                                <input type="hidden" name="owner" value={activeFilters.owner ?? ''} />
-                                <input type="hidden" name="city" value={activeFilters.city ?? ''} />
-                                <input type="hidden" name="wilaya" value={activeFilters.wilaya ?? ''} />
-                                <Input name="name" placeholder="Save this list" className="h-7" required />
-                                <Button variant="secondary" className="h-7 w-full">Save filter</Button>
-                            </Form>
+                            <RecordLayoutColumn
+                                column="side"
+                                cards={{
+                                    'log-activity': (
+                                        <section>
+                                            <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Log activity</h3>
+                                            <Form action="/crm/activities" method="post" className="space-y-1" resetOnSuccess>
+                                                <input type="hidden" name="deal_id" value={selected.id} />
+                                                <input type="hidden" name="contact_id" value={selected.contact_id ?? ''} />
+                                                <input type="hidden" name="company_id" value={selected.company_id ?? ''} />
+                                                <select name="type" className="h-7 w-full rounded border bg-background px-1">
+                                                    <option value="note">Note</option>
+                                                    <option value="task">Task</option>
+                                                    <option value="call">Call</option>
+                                                    <option value="meeting">Meeting</option>
+                                                </select>
+                                                <Input name="subject" placeholder="Subject" className="h-7" />
+                                                <Input name="body" placeholder="Details" className="h-7" />
+                                                <Input name="due_at" type="datetime-local" className="h-7" />
+                                                <select name="owner_id" defaultValue={selected.owner_id ?? ''} className="h-7 w-full rounded border bg-background px-1">
+                                                    {members.map((user: any) => (
+                                                        <option key={user.id} value={user.id}>{user.name}</option>
+                                                    ))}
+                                                </select>
+                                                <Button className="h-7 w-full">Add to timeline</Button>
+                                            </Form>
+                                        </section>
+                                    ),
+                                    'associations-side': (
+                                        <section>
+                                            <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Associations</h3>
+                                            {associations?.contact ? (
+                                                <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-brand">
+                                                    {associations.contact.first_name} {associations.contact.last_name}
+                                                </Link>
+                                            ) : null}
+                                            {associations?.company ? (
+                                                <Link href={`/crm/companies/${associations.company.id}`} className="block text-brand">
+                                                    {associations.company.name}
+                                                </Link>
+                                            ) : null}
+                                            <p className="mt-2 text-[11px] text-muted-foreground">Desk history</p>
+                                            {(associations?.threads ?? []).map((thread: any) => (
+                                                <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-brand">
+                                                    {thread.subject ?? 'Thread'}
+                                                </Link>
+                                            ))}
+                                            <p className="mt-2 text-[11px] text-muted-foreground">Enrollments</p>
+                                            {(associations?.enrollments ?? []).map((enrollment: any) => (
+                                                <p key={enrollment.id}>{enrollment.sequence?.name}</p>
+                                            ))}
+                                        </section>
+                                    ),
+                                    quotes: (
+                                        <section>
+                                            <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Quote</h3>
+                                            {(associations?.quotes ?? []).map((quote: any) => (
+                                                <p key={quote.id}>
+                                                    {quote.status} · <span className="money">{formatDzd(quote.total_cents)}</span>
+                                                </p>
+                                            ))}
+                                            <Form action={`/crm/deals/${selected.id}/quotes`} method="post" className="mt-2 space-y-1">
+                                                <select name="items[0][product_id]" className="h-7 w-full rounded border bg-background px-1 text-[11px]">
+                                                    <option value="">Catalog product…</option>
+                                                    {(products ?? []).map((product: any) => (
+                                                        <option key={product.id} value={product.id}>
+                                                            {product.name} · {product.sku}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <Input name="items[0][name]" placeholder="Line item (or pick a product)" className="h-7" />
+                                                <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-7" />
+                                                <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="Unit DZD" className="h-7" />
+                                                <select name="status" className="h-7 w-full rounded border bg-background px-1">
+                                                    <option value="draft">draft</option>
+                                                    <option value="sent">sent</option>
+                                                    <option value="accepted">accepted</option>
+                                                </select>
+                                                <Button className="h-7 w-full">Add quote</Button>
+                                            </Form>
+                                        </section>
+                                    ),
+                                    'save-filter': (
+                                        <Form action="/crm/filters" method="post" className="space-y-1 border-t pt-2">
+                                            <input type="hidden" name="entity" value="deal" />
+                                            <input type="hidden" name="stage" value={activeFilters.stage ?? ''} />
+                                            <input type="hidden" name="owner" value={activeFilters.owner ?? ''} />
+                                            <input type="hidden" name="city" value={activeFilters.city ?? ''} />
+                                            <input type="hidden" name="wilaya" value={activeFilters.wilaya ?? ''} />
+                                            <Input name="name" placeholder="Save this list" className="h-7" required />
+                                            <Button variant="secondary" className="h-7 w-full">Save filter</Button>
+                                        </Form>
+                                    ),
+                                }}
+                            />
                         </div>
                     ) : null
                 }
             />
-        </>
+            </>
+        </RecordLayoutProvider>
     );
 }
 

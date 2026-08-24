@@ -13,13 +13,13 @@ Production CRM stack: **Laravel + Inertia + React (Vite) + SQLite/Postgres**, de
 |-----|----------------------------|------------------------------|-------------------|
 | #1 Saved views | `src/hooks/useListView.ts`, `ListViewToolbar.tsx` | `resources/js/components/crm/saved-view-tabs.tsx`, `list-toolbar.tsx`, `SavedFilter` model | **Exists** — extend AND/OR groups if missing |
 | #2 Pipelines + forecast | `src/lib/pipelines.ts`, `ForecastWorkspace.tsx` | `app/Models/Pipeline.php`, `DealBoardForecast.php`, deals board | **Exists** — polish UI parity |
-| #3 Record layout | `src/hooks/useRecordLayout.ts`, `RecordLayoutEditor.tsx` | `resources/js/components/crm/record-workspace.tsx` | **Partial** — add card customize panel |
+| #3 Record layout | `src/hooks/useRecordLayout.ts`, `RecordLayoutEditor.tsx` | `record-workspace.tsx` + contact/company/deal hubs | **Integrated** — customize layout panel |
 | #4 Workflows | `src/lib/workflow-engine.ts`, `WorkflowEditor.tsx` | `WorkflowRunner.php`, `WorkflowController.php` | **Exists** — wire triggers if gaps remain |
 | #5 Custom properties | `PropertiesWorkspace.tsx`, `CustomPropertyFields.tsx` | `CustomAttributeController.php`, `CustomAttributes.php` | **Exists** as CustomAttribute |
 | #6 Sequences + cron | `sequences-repository.ts`, `SequenceEditor.tsx` | `Sequence.php`, `RunOutboundSequences.php`, `Enrollment.php` | **Exists** in Outbound |
 | #7 Dashboards | `useDashboards.ts`, `DashboardWorkspace.tsx` | `Dashboard.php`, `DashboardController.php`, reports routes | **Exists** — EvoViz widgets |
 | #8 Inbox | `InboxWorkspace.tsx` | `InboxController.php`, `desk/inbox.tsx`, `Thread` model | **Exists** as Desk/Inbox |
-| #9 Segments filters | `segment-filters.ts`, `SegmentsWorkspace.tsx` | `SegmentController.php`, `resources/js/pages/crm/segments` | **Partial** — port live count preview |
+| #9 Segments filters | `segment-filters.ts`, `SegmentsWorkspace.tsx` | `SegmentController.php`, `segments/index.tsx` | **Integrated** — live preview API + filter builder |
 | #10 AI layer | `ai-summary.ts`, `ai-client.ts` | `RecordInsight.php`, `AiInsight.php`, Ask Evo panel | **Exists** — align templates |
 
 ## Archive branch contents worth reading

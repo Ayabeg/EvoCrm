@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\SavedFilter;
+use App\Models\Stage;
 use App\Services\Crm\CrmFilter;
+use App\Support\CrmHub;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,9 +15,14 @@ use Inertia\Response;
 
 class SegmentController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
     {
         $workspace = $request->user()->workspace;
+        $pipeline = $workspace->defaultPipeline();
+        $stages = Stage::query()
+            ->where('pipeline_id', $pipeline->id)
+            ->orderBy('position')
+            ->get(['id', 'name', 'slug']);
 
         $segments = SavedFilter::query()
             ->forWorkspace($workspace)
@@ -32,7 +40,24 @@ class SegmentController extends Controller
         return Inertia::render('crm/segments/index', [
             'segments' => $segments,
             'tab' => 'manage',
+            'members' => $hub->members($workspace),
+            'cities' => config('evosales.cities'),
+            'wilayas' => config('evosales.wilayas'),
+            'stages' => $stages,
         ]);
+    }
+
+    public function preview(Request $request, CrmFilter $filter): JsonResponse
+    {
+        $data = $request->validate([
+            'entity' => ['required', 'in:contact,deal'],
+            'filters' => ['nullable', 'array'],
+        ]);
+
+        $workspace = $request->user()->workspace;
+        $filters = is_array($data['filters'] ?? null) ? $data['filters'] : [];
+
+        return response()->json($filter->preview($workspace, $data['entity'], $filters));
     }
 
     public function store(Request $request): RedirectResponse
