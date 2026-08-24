@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PipelineResource;
 use App\Models\Pipeline;
-use App\Models\Pipeline;
 use App\Services\Crm\PipelineManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
