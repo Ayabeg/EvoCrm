@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Crm;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\PipelineResource;
 use App\Models\Contact;
 use App\Models\Deal;
