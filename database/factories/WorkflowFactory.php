@@ -24,6 +24,11 @@ class WorkflowFactory extends Factory
                 'body' => 'A new contact landed in EvoSales. Book a first conversation.',
                 'due_in_days' => 1,
             ],
+            'condition_field' => null,
+            'condition_operator' => null,
+            'condition_value' => null,
+            'else_action' => null,
+            'else_action_config' => null,
             'active' => true,
             'template_key' => null,
         ];
