@@ -1,6 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { formatDzd } from '@/lib/money';
+import { cn } from '@/lib/utils';
 import PageHeader from '@/components/page-header';
 import {
     Dialog,
@@ -344,6 +345,26 @@ export default function Reports({
             <Head title={title} />
             <div className="flex-1 bg-canvas-soft text-[13px] text-ink">
                 <div className="mx-auto w-full max-w-6xl px-5 py-8">
+                    <nav className="mb-4 flex gap-4 border-b border-hairline">
+                        {[
+                            { label: 'Reports', href: '/reports' },
+                            { label: 'Funnels', href: '/reports/funnels' },
+                            { label: 'Report builder', href: '/crm/report-builder' },
+                        ].map((tab) => (
+                            <Link
+                                key={tab.href}
+                                href={tab.href}
+                                className={cn(
+                                    'border-b-2 pb-2 text-[13px]',
+                                    tab.href === '/reports'
+                                        ? 'border-brand font-medium text-ink'
+                                        : 'border-transparent text-muted-foreground hover:text-ink',
+                                )}
+                            >
+                                {tab.label}
+                            </Link>
+                        ))}
+                    </nav>
                     <PageHeader
                         title={title}
                         description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only — empty categories stay hidden.`}
