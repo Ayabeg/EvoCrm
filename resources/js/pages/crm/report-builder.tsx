@@ -14,7 +14,7 @@ export default function ReportBuilder({
     reports?: ReportRow[];
     result?: { metric: string; value: number; groups?: Array<{ label: string; value: number }> };
     activeReport?: ReportRow | null;
-    crossObject?: Array<{ wilaya: string; sent: number; replies: number; reply_rate: number }>;
+    crossObject?: { metric: string; groups: Array<{ label: string; value: number; count: number }> };
 }) {
     return (
         <>
@@ -66,12 +66,12 @@ export default function ReportBuilder({
                         ))}
                     </div>
                 ) : null}
-                {crossObject?.length ? (
+                {crossObject?.groups?.length ? (
                     <div className="rounded-lg border border-hairline bg-canvas-soft p-4 text-sm">
                         <p className="font-semibold">Reply rate by wilaya</p>
-                        {crossObject.map((row) => (
-                            <p key={row.wilaya} className="text-muted-foreground">
-                                {row.wilaya}: {row.replies}/{row.sent} ({Math.round(row.reply_rate * 100)}%)
+                        {crossObject.groups.map((row) => (
+                            <p key={row.label} className="text-muted-foreground">
+                                {row.label}: {row.value}% reply rate ({row.count} sent)
                             </p>
                         ))}
                     </div>

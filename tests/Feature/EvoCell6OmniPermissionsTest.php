@@ -112,7 +112,10 @@ it('fires segment entered workflow when contact matches segment', function () {
 });
 
 it('scopes deals for team_only permission', function () {
-    $owner = User::factory()->create(['permissions' => ['deals.team_only']]);
+    $owner = User::factory()->create([
+        'role' => \App\Enums\WorkspaceRole::Member,
+        'permissions' => ['deals.team_only', 'deals.view'],
+    ]);
     $other = User::factory()->create(['workspace_id' => $owner->workspace_id]);
 
     Deal::factory()->create([

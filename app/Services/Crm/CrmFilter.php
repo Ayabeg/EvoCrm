@@ -271,14 +271,21 @@ class CrmFilter
             $this->applyIsSet($entity, $query, $field, false);
         }
 
-        if ($operator === 'in' && is_array($value) && $value !== []) {
-            $flat = [$field => $value];
-            match ($entity) {
-                'contact' => $this->applyContactIn($query, $field, $value),
-                'deal' => $this->applyDealIn($query, $field, $value),
-                'company' => $this->applyCompanyIn($query, $field, $value),
-                default => null,
-            };
+        if ($operator === 'in') {
+            if (is_string($value) && filled($value)) {
+                $value = array_values(array_filter(array_map('trim', explode(',', $value)), fn ($item) => $item !== ''));
+            }
+
+            if (is_array($value) && $value !== []) {
+                match ($entity) {
+                    'contact' => $this->applyContactIn($query, $field, $value),
+                    'deal' => $this->applyDealIn($query, $field, $value),
+                    'company' => $this->applyCompanyIn($query, $field, $value),
+                    default => null,
+                };
+            }
+
+            return;
         }
 
         if (in_array($operator, ['before', 'after'], true) && filled($value)) {
