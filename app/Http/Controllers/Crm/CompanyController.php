@@ -48,13 +48,15 @@ class CompanyController extends Controller
     {
         abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        return Inertia::render('crm/companies/hub', [
-            'companies' => Company::query()->forWorkspace($request->user()->workspace)->with('owner')->withCount(['contacts', 'deals'])->orderBy('name')->limit(120)->get(),
-            'selected' => $company,
+        $workspace = $request->user()->workspace;
+        $company->load(['owner', 'contacts', 'deals.stage']);
+
+        return Inertia::render('crm/companies/show', [
+            'company' => $company,
             'associations' => $hub->companyAssociations($company),
             'timeline' => $hub->timeline(company: $company),
-            'attributes' => $hub->attributeBag($request->user()->workspace, 'company', $company->id),
-            'members' => $hub->members($request->user()->workspace),
+            'attributes' => $hub->attributeBag($workspace, 'company', $company->id),
+            'members' => $hub->members($workspace),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
         ]);
