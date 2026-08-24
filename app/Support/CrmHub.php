@@ -200,7 +200,9 @@ class CrmHub
     public function attributeBag(Workspace $workspace, string $entity, int $entityId): array
     {
         return [
-            'definitions' => $this->attributes->definitions($workspace, $entity)->values(),
+            'definitions' => $this->attributes->definitions($workspace, $entity)
+                ->map(fn ($definition) => $this->attributes->presentDefinition($definition))
+                ->values(),
             'values' => $this->attributes->valuesFor($workspace, $entity, $entityId),
         ];
     }

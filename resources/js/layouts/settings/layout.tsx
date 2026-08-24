@@ -71,7 +71,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         : sidebarNavItems;
 
     // The People table needs more room than the settings forms.
-    const wide = page.component === 'settings/people';
+    const wide = page.component === 'settings/people' || page.component === 'settings/attributes';
 
     return (
         <div className="px-4 py-6">

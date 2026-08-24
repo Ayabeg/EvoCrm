@@ -2,10 +2,14 @@
 
 namespace App\Services\Crm;
 
+use App\Models\Company;
+use App\Models\Contact;
 use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
+use App\Models\Deal;
 use App\Models\Workspace;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class CustomAttributes
 {
@@ -17,8 +21,34 @@ class CustomAttributes
         return CustomAttributeDefinition::query()
             ->forWorkspace($workspace)
             ->where('entity', $entity)
+            ->orderByRaw("case when group_name is null or group_name = '' then 1 else 0 end")
+            ->orderBy('group_name')
             ->orderBy('label')
             ->get();
+    }
+
+    /**
+     * @param  array{filled: int, total: int, percent: int}|null  $fillRate
+     * @return array<string, mixed>
+     */
+    public function presentDefinition(CustomAttributeDefinition $definition, ?array $fillRate = null): array
+    {
+        $payload = [
+            'id' => $definition->id,
+            'entity' => $definition->entity,
+            'key' => $definition->key,
+            'label' => $definition->label,
+            'type' => $definition->normalizedType(),
+            'options' => $definition->options,
+            'group' => $definition->group_name,
+            'required' => (bool) $definition->required,
+        ];
+
+        if ($fillRate !== null) {
+            $payload['fill_rate'] = $fillRate;
+        }
+
+        return $payload;
     }
 
     /**
@@ -43,17 +73,59 @@ class CustomAttributes
     }
 
     /**
+     * @return array<int, array{filled: int, total: int, percent: int}>
+     */
+    public function fillRates(Workspace $workspace): array
+    {
+        $totals = [
+            'contact' => Contact::query()->forWorkspace($workspace)->count(),
+            'company' => Company::query()->forWorkspace($workspace)->count(),
+            'deal' => Deal::query()->forWorkspace($workspace)->count(),
+        ];
+
+        $filled = CustomAttributeValue::query()
+            ->forWorkspace($workspace)
+            ->whereNotNull('value')
+            ->where('value', '!=', '')
+            ->selectRaw('definition_id, COUNT(*) as filled_count')
+            ->groupBy('definition_id')
+            ->pluck('filled_count', 'definition_id');
+
+        $rates = [];
+        foreach (CustomAttributeDefinition::query()->forWorkspace($workspace)->get() as $definition) {
+            $total = $totals[$definition->entity] ?? 0;
+            $have = (int) ($filled[$definition->id] ?? 0);
+
+            $rates[$definition->id] = [
+                'filled' => $have,
+                'total' => $total,
+                'percent' => $total > 0 ? (int) round(($have / $total) * 100) : 0,
+            ];
+        }
+
+        return $rates;
+    }
+
+    /**
      * @param  array<string, mixed>  $payload
      */
-    public function saveValues(Workspace $workspace, string $entity, int $entityId, array $payload): void
+    public function saveValues(Workspace $workspace, string $entity, int $entityId, array $payload, bool $enforceRequired = false): void
     {
         foreach ($this->definitions($workspace, $entity) as $definition) {
-            if (! array_key_exists($definition->key, $payload) && ! array_key_exists((string) $definition->id, $payload)) {
+            $raw = $this->rawFromPayload($payload, $definition);
+            $present = $raw !== null || $this->payloadHasKey($payload, $definition);
+
+            if (! $present && ! $enforceRequired) {
                 continue;
             }
 
-            $raw = $payload[$definition->key] ?? $payload[(string) $definition->id] ?? null;
             $value = $raw === null || $raw === '' ? null : (string) $raw;
+
+            $this->assertValid($definition, $value, true);
+
+            if (! $present) {
+                continue;
+            }
 
             CustomAttributeValue::query()->updateOrCreate(
                 [
@@ -67,5 +139,77 @@ class CustomAttributes
                 ]
             );
         }
+    }
+
+    private function assertValid(CustomAttributeDefinition $definition, ?string $value, bool $checkRequired): void
+    {
+        $key = 'attributes.'.$definition->key;
+
+        if ($checkRequired && $definition->required && $value === null) {
+            throw ValidationException::withMessages([
+                $key => $definition->label.' is required.',
+            ]);
+        }
+
+        if ($value === null) {
+            return;
+        }
+
+        $type = $definition->normalizedType();
+
+        if ($type === 'number' && ! is_numeric($value)) {
+            throw ValidationException::withMessages([
+                $key => $definition->label.' must be a number.',
+            ]);
+        }
+
+        if ($type === 'date' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) !== 1) {
+            throw ValidationException::withMessages([
+                $key => $definition->label.' must be a date.',
+            ]);
+        }
+
+        $options = $definition->optionList();
+        if ($type === 'list' && $options !== [] && ! in_array($value, $options, true)) {
+            throw ValidationException::withMessages([
+                $key => $definition->label.' is not a valid option.',
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function payloadHasKey(array $payload, CustomAttributeDefinition $definition): bool
+    {
+        if (array_key_exists($definition->key, $payload)) {
+            return true;
+        }
+
+        foreach (array_keys($payload) as $key) {
+            if ((string) $key === (string) $definition->id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function rawFromPayload(array $payload, CustomAttributeDefinition $definition): mixed
+    {
+        if (array_key_exists($definition->key, $payload)) {
+            return $payload[$definition->key];
+        }
+
+        foreach ($payload as $key => $value) {
+            if ((string) $key === (string) $definition->id) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }

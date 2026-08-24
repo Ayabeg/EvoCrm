@@ -72,6 +72,25 @@ class CompanyController extends Controller
         return back();
     }
 
+    public function updateAttributes(Request $request, Company $company, CustomAttributes $attributes): RedirectResponse
+    {
+        abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'attributes' => ['required', 'array'],
+        ]);
+
+        $attributes->saveValues(
+            $request->user()->workspace,
+            'company',
+            $company->id,
+            $data['attributes'],
+            enforceRequired: true,
+        );
+
+        return back();
+    }
+
     protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, ?Company $selected): Response
     {
         $workspace = $request->user()->workspace;

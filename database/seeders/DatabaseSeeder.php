@@ -773,6 +773,7 @@ class DatabaseSeeder extends Seeder
             'key' => 'sector',
             'label' => 'Sector',
             'type' => 'list',
+            'group_name' => 'About',
             'options' => ['santé', 'éducation', 'logistique', 'retail', 'agri'],
         ]);
         $beds = CustomAttributeDefinition::query()->create([
@@ -781,6 +782,7 @@ class DatabaseSeeder extends Seeder
             'key' => 'beds',
             'label' => 'Beds / size',
             'type' => 'number',
+            'group_name' => 'About',
         ]);
         $competitor = CustomAttributeDefinition::query()->create([
             'workspace_id' => $workspace->id,
@@ -788,6 +790,7 @@ class DatabaseSeeder extends Seeder
             'key' => 'competitor',
             'label' => 'Competitor',
             'type' => 'text',
+            'group_name' => 'Deal details',
         ]);
 
         CustomAttributeValue::query()->create([
