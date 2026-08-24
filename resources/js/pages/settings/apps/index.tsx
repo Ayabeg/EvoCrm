@@ -137,7 +137,9 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         {app.key === 'meta' && app.configured && !app.connected && (
                             <Button size="sm" asChild>
-                                <a href={app.connect_url ?? '#'}>Connect</a>
+                                <Link href={app.connect_url ?? '#'}>
+                                    Set up
+                                </Link>
                             </Button>
                         )}
                         {app.key === 'meta' && !app.configured && !app.connected && (

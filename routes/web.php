@@ -225,6 +225,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/settings/apps', [AppsController::class, 'index'])->name('settings.apps');
     Route::get('/settings/setup/{provider}', [OAuthSetupController::class, 'show'])->name('settings.setup.show');
+    Route::post('/settings/setup/meta/page', [OAuthSetupController::class, 'updateMetaPage'])->name('settings.setup.meta.page');
     Route::get('/settings/apps/meta', [AppsController::class, 'meta'])->name('settings.apps.meta');
     Route::delete('/settings/apps/meta', [AppsController::class, 'destroyMeta'])->name('settings.apps.meta.destroy');
 

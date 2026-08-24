@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\Integration;
+use App\Support\MetaAuth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -37,9 +40,56 @@ class OAuthSetupController extends Controller
             'currentStep' => $stepKey,
             'stepIndex' => $stepIndex === false ? 0 : $stepIndex,
             'troubleshooting' => $config['troubleshooting'] ?? [],
-            'connectUrl' => $provider === 'meta' ? route('auth.meta', ['return' => 'setup']) : null,
+            'connectUrl' => $provider === 'meta' && MetaAuth::enabled()
+                ? route('auth.meta', ['return' => 'setup'])
+                : null,
             'appsUrl' => route('settings.apps'),
+            'metaState' => $provider === 'meta' ? $this->metaState($request) : null,
         ]);
+    }
+
+    public function updateMetaPage(Request $request): RedirectResponse
+    {
+        $integration = $request->user()->workspace->integration(Integration::PROVIDER_META);
+        abort_unless($integration?->isConnected(), 404);
+
+        $data = $request->validate([
+            'page_id' => ['required', 'string', 'max:64'],
+        ]);
+
+        $pages = collect($integration->meta['pages'] ?? []);
+        abort_unless($pages->contains(fn ($page) => ($page['id'] ?? '') === $data['page_id']), 422);
+
+        $meta = $integration->meta ?? [];
+        $meta['selected_page_id'] = $data['page_id'];
+        $meta['selected_page_name'] = (string) $pages->firstWhere('id', $data['page_id'])['name'] ?? '';
+
+        $integration->forceFill(['meta' => $meta])->save();
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Default Facebook Page saved for this workspace.',
+        ]);
+
+        return redirect()->route('settings.setup.show', ['provider' => 'meta', 'step' => 'finish']);
+    }
+
+    /** @return array<string, mixed> */
+    private function metaState(Request $request): array
+    {
+        $integration = $request->user()->workspace->integration(Integration::PROVIDER_META);
+
+        return [
+            'configured' => MetaAuth::enabled(),
+            'connected' => $integration?->isConnected() ?? false,
+            'connected_at' => $integration?->connected_at?->toIso8601String(),
+            'account_name' => $integration?->meta['name'] ?? null,
+            'pages' => $integration?->meta['pages'] ?? [],
+            'selected_page_id' => $integration?->meta['selected_page_id'] ?? null,
+            'selected_page_name' => $integration?->meta['selected_page_name'] ?? null,
+            'unlocks' => MetaAuth::unlocks($integration),
+            'callback_url' => (string) config('services.meta.redirect'),
+        ];
     }
 
     /** @return array<string, mixed> */
