@@ -87,7 +87,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/crm/reports', [ReportController::class, 'index'])->name('crm.reports');
-    Route::get('/crm/report-builder', [SavedReportController::class, 'index'])->name('crm.report-builder');
+    Route::get('/crm/report-builder', [SavedReportController::class, 'index'])->name('crm.report-builder.index');
+    Route::get('/crm/report-builder/cross-object', [SavedReportController::class, 'crossObject'])->name('crm.report-builder.cross-object');
     Route::post('/crm/report-builder', [SavedReportController::class, 'store'])->name('crm.report-builder.store');
     Route::get('/crm/report-builder/{savedReport}/run', [SavedReportController::class, 'run'])->name('crm.report-builder.run');
     Route::post('/reports/dashboards', [DashboardController::class, 'store'])->name('reports.dashboards.store');
@@ -102,11 +103,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/crm/filters/{savedFilter}', [SavedFilterController::class, 'destroy'])->name('crm.filters.destroy');
     Route::get('/crm/record-layouts/{entity}', [\App\Http\Controllers\Crm\RecordLayoutController::class, 'show'])->name('crm.record-layouts.show');
     Route::put('/crm/record-layouts/{entity}', [\App\Http\Controllers\Crm\RecordLayoutController::class, 'update'])->name('crm.record-layouts.update');
+    Route::put('/crm/record-layouts/{entity}/workspace-default', [\App\Http\Controllers\Crm\RecordLayoutController::class, 'updateWorkspaceDefault'])->name('crm.record-layouts.workspace-default');
     Route::get('/crm/segments', [SegmentController::class, 'index'])->name('crm.segments.index');
     Route::post('/crm/segments/preview', [SegmentController::class, 'preview'])->name('crm.segments.preview');
     Route::post('/crm/segments', [SegmentController::class, 'store'])->name('crm.segments.store');
     Route::put('/crm/segments/{segment}', [SegmentController::class, 'update'])->name('crm.segments.update');
     Route::delete('/crm/segments/{segment}', [SegmentController::class, 'destroy'])->name('crm.segments.destroy');
+    Route::post('/crm/segments/{segment}/sync-meta', [SegmentController::class, 'syncMeta'])->name('crm.segments.sync-meta');
+    Route::put('/crm/deals/{deal}/splits', [\App\Http\Controllers\Crm\DealSplitController::class, 'update'])->name('crm.deals.splits.update');
 
     Route::get('/automation', [WorkflowController::class, 'index'])->name('automation');
     Route::get('/crm/workflows', [WorkflowController::class, 'index'])->name('crm.workflows.index');
@@ -131,6 +135,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/crm/contacts/{contact}', [ContactController::class, 'update'])->name('crm.contacts.update');
     Route::put('/crm/contacts/{contact}/attributes', [ContactController::class, 'updateAttributes'])->name('crm.contacts.attributes');
     Route::post('/crm/contacts/{contact}/ask', [AskEvoController::class, 'contact'])->name('crm.contacts.ask');
+    Route::post('/crm/contacts/{contact}/draft-email', [AskEvoController::class, 'draftContact'])->name('crm.contacts.draft-email');
 
     Route::get('/crm/leads', [LeadController::class, 'index'])->name('crm.leads.index');
     Route::post('/crm/leads', [LeadController::class, 'store'])->name('crm.leads.store');
@@ -138,6 +143,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/crm/leads/{lead}', [LeadController::class, 'update'])->name('crm.leads.update');
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
 
+    Route::get('/crm/deals/export', [DealController::class, 'export'])->name('crm.deals.export');
     Route::get('/crm/deals', [DealController::class, 'index'])->name('crm.deals.index');
     Route::get('/crm/deals/board', [DealController::class, 'board'])->name('crm.deals.board');
     Route::post('/crm/deals', [DealController::class, 'store'])->name('crm.deals.store');
@@ -148,6 +154,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/deals/{deal}/line-items', [DealLineItemController::class, 'store'])->name('crm.deals.line-items.store');
     Route::delete('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'destroy'])->name('crm.deals.line-items.destroy');
     Route::post('/crm/deals/{deal}/ask', [AskEvoController::class, 'deal'])->name('crm.deals.ask');
+    Route::post('/crm/deals/{deal}/draft-email', [AskEvoController::class, 'draftDeal'])->name('crm.deals.draft-email');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
     Route::get('/ads/campaigns/{campaign}', [AdsCenterController::class, 'show'])->name('ads.campaigns.show');

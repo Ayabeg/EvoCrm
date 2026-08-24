@@ -25,12 +25,14 @@ class DashboardController extends Controller
             'from' => ['nullable', 'date_format:Y-m-d'],
             'to' => ['nullable', 'date_format:Y-m-d'],
             'owner' => ['nullable', 'integer'],
+            'visibility' => ['nullable', 'in:private,team,workspace'],
         ]);
 
         $dashboard = Dashboard::query()->create([
             'workspace_id' => $request->user()->workspace_id,
             'owner_id' => $request->user()->id,
             'name' => $data['name'],
+            'visibility' => $data['visibility'] ?? 'private',
             'widgets' => $data['widgets'] ?? [],
         ]);
 
@@ -117,5 +119,13 @@ class DashboardController extends Controller
     private function authorizeWorkspace(Request $request, Dashboard $dashboard): void
     {
         abort_unless((int) $dashboard->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $user = $request->user();
+
+        if ($dashboard->visibility === 'workspace' || $dashboard->visibility === 'team') {
+            return;
+        }
+
+        abort_unless((int) $dashboard->owner_id === (int) $user->id || $user->role->canManageSettings(), 403);
     }
 }

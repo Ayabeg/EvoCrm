@@ -150,6 +150,7 @@ export default function SequenceShow({
     templates,
     mailboxes,
     filters,
+    stepAnalytics = [],
 }: {
     sequence: {
         id: number;
@@ -164,6 +165,7 @@ export default function SequenceShow({
     templates: TemplateRow[];
     mailboxes: MailboxRow[];
     filters: FilterRow[];
+    stepAnalytics?: Array<{ position: number; name: string; enrolled: number; sent: number; step_type: string }>;
 }) {
     const [selected, setSelected] = useState<number[]>([]);
     const [templateId, setTemplateId] = useState<string>('');
@@ -246,6 +248,24 @@ export default function SequenceShow({
                                 </>
                             )}
                         </Form>
+                    </Card>
+                ) : null}
+
+                {stepAnalytics.length > 0 ? (
+                    <Card className="p-4">
+                        <h2 className="mb-3 font-medium">Step funnel</h2>
+                        <div className="space-y-1 text-sm">
+                            {stepAnalytics.map((row) => (
+                                <div key={row.position} className="flex items-center justify-between rounded border border-hairline px-3 py-2">
+                                    <span>
+                                        Step {row.position}: {row.name} ({row.step_type})
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {row.enrolled} enrolled · {row.sent} sent
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     </Card>
                 ) : null}
 

@@ -175,6 +175,8 @@ class ContactController extends Controller
             'timeline' => $selected ? $hub->timeline(contact: $selected) : [],
             'catchUp' => $selected ? $hub->catchUp($selected) : ['inbound' => [], 'outbound' => []],
             'askEvo' => $selected ? $insight->forContact($selected) : null,
+            'contactEngagement' => $selected ? $insight->contactEngagement($selected) : null,
+            'proactiveSummary' => $selected ? $insight->proactiveSummary($selected) : null,
             'attributes' => $selected ? $hub->attributeBag($workspace, 'contact', $selected->id) : ['definitions' => [], 'values' => []],
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name', 'city', 'wilaya']),
             'members' => $hub->members($workspace),

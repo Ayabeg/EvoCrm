@@ -9,16 +9,21 @@ export default function ReportBuilder({
     reports = [],
     result,
     activeReport,
+    crossObject,
 }: {
     reports?: ReportRow[];
     result?: { metric: string; value: number; groups?: Array<{ label: string; value: number }> };
     activeReport?: ReportRow | null;
+    crossObject?: Array<{ wilaya: string; sent: number; replies: number; reply_rate: number }>;
 }) {
     return (
         <>
             <Head title="Report builder" />
             <div className="mx-auto max-w-4xl space-y-4 p-4">
                 <PageHeader title="Report builder" description="Save ad hoc CRM reports with filters and grouping." />
+                <Link href="/crm/report-builder/cross-object" className="text-sm text-brand underline">
+                    Cross-object: reply rate by wilaya
+                </Link>
                 <Form action="/crm/report-builder" method="post" className="grid gap-2 rounded-lg border border-hairline bg-canvas p-4">
                     <Input name="name" placeholder="Report name" required />
                     <select name="entity" className="h-9 rounded-md border border-hairline bg-background px-2 text-sm" defaultValue="deal">
@@ -57,6 +62,16 @@ export default function ReportBuilder({
                         {result.groups?.map((group) => (
                             <p key={group.label} className="text-muted-foreground">
                                 {group.label}: {group.value}
+                            </p>
+                        ))}
+                    </div>
+                ) : null}
+                {crossObject?.length ? (
+                    <div className="rounded-lg border border-hairline bg-canvas-soft p-4 text-sm">
+                        <p className="font-semibold">Reply rate by wilaya</p>
+                        {crossObject.map((row) => (
+                            <p key={row.wilaya} className="text-muted-foreground">
+                                {row.wilaya}: {row.replies}/{row.sent} ({Math.round(row.reply_rate * 100)}%)
                             </p>
                         ))}
                     </div>

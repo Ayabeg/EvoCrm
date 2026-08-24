@@ -101,7 +101,7 @@ class SavedFilterController extends Controller
             'sort' => ['nullable'],
             'is_default' => ['sometimes', 'boolean'],
             'is_workspace_default' => ['sometimes', 'boolean'],
-            'visibility' => ['sometimes', 'in:private,workspace'],
+            'visibility' => ['sometimes', 'in:private,team,workspace'],
             'stage' => ['nullable', 'string', 'max:40'],
             'owner' => ['nullable', 'string', 'max:40'],
             'city' => ['nullable', 'string', 'max:80'],

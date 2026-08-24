@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Enrollment;
-use App\Models\Enrollment;
 use App\Models\Mailbox;
+use App\Models\SequenceStep;
 use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\WorkflowRunner;
 use App\Services\Outbound\CampaignService;
@@ -144,14 +144,20 @@ class RunOutboundSequences extends Command
                 }
             }
 
+            $subject = $this->resolveAbSubject($step);
+
             $message = $dispatcher->sendSequenceStep($workspace, $sequence, $contact, [
                 'channel' => $step->channel,
                 'mailbox_id' => $mailbox?->id,
-                'subject' => $step->subject,
-                'body' => $step->body,
+                'subject' => $subject,
+                'body' => $this->mergeMeetingUrl($step->body, $step->meeting_url),
                 'wa_template_name' => $step->wa_template_name,
                 'wa_template_language' => $step->wa_template_language,
             ]);
+
+            if ($message->status === 'sent' && $step->position === 1 && filled($step->subject_b)) {
+                $this->trackAbSend($step, $subject);
+            }
 
             if ($message->status === 'sent') {
                 $next = $stepsForVariant->firstWhere('position', $enrollment->next_step + 1);
@@ -195,5 +201,49 @@ class RunOutboundSequences extends Command
         ));
 
         return self::SUCCESS;
+    }
+
+    protected function resolveAbSubject(SequenceStep $step): ?string
+    {
+        if ($step->position !== 1 || ! filled($step->subject_b)) {
+            return $step->subject;
+        }
+
+        $minSamples = 20;
+        $total = (int) $step->ab_sent_a + (int) $step->ab_sent_b;
+
+        if ($total >= $minSamples) {
+            $rateA = $step->ab_sent_a > 0 ? $step->ab_open_a / $step->ab_sent_a : 0;
+            $rateB = $step->ab_sent_b > 0 ? $step->ab_open_b / $step->ab_sent_b : 0;
+
+            return $rateB > $rateA ? $step->subject_b : $step->subject;
+        }
+
+        return ((int) $step->ab_sent_a <= (int) $step->ab_sent_b) ? $step->subject : $step->subject_b;
+    }
+
+    protected function trackAbSend(SequenceStep $step, ?string $subject): void
+    {
+        if ($subject === $step->subject_b) {
+            $step->increment('ab_sent_b');
+        } else {
+            $step->increment('ab_sent_a');
+        }
+    }
+
+    protected function mergeMeetingUrl(?string $body, ?string $meetingUrl): ?string
+    {
+        if (! filled($meetingUrl)) {
+            return $body;
+        }
+
+        $token = '{{meeting_url}}';
+        $link = $meetingUrl;
+
+        if ($body && str_contains($body, $token)) {
+            return str_replace($token, $link, $body);
+        }
+
+        return trim(($body ?? '')."\n\n".$link);
     }
 }

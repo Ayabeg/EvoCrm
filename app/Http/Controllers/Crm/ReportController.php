@@ -113,11 +113,16 @@ class ReportController extends Controller
             'dashboards' => Dashboard::query()
                 ->forWorkspace($workspace)
                 ->with('owner')
+                ->where(function ($query) use ($request) {
+                    $query->where('owner_id', $request->user()->id)
+                        ->orWhereIn('visibility', ['workspace', 'team']);
+                })
                 ->orderBy('name')
                 ->get()
                 ->map(fn (Dashboard $dashboard) => [
                     'id' => $dashboard->id,
                     'name' => $dashboard->name,
+                    'visibility' => $dashboard->visibility ?? 'private',
                     'owner' => [
                         'id' => $dashboard->owner_id,
                         'name' => $dashboard->owner?->name,

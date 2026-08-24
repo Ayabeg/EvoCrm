@@ -30,6 +30,8 @@ export default function SegmentsIndex({
     cities = [],
     wilayas = [],
     stages = [],
+    contactFilterFields = [],
+    dealFilterFields = [],
 }: {
     segments: Segment[];
     tab?: string;
@@ -37,6 +39,8 @@ export default function SegmentsIndex({
     cities?: string[];
     wilayas?: string[];
     stages?: Array<{ id: number; name: string; slug: string }>;
+    contactFilterFields?: Array<{ id: string; label: string; type: string; options?: string[] }>;
+    dealFilterFields?: Array<{ id: string; label: string; type: string; options?: string[] }>;
 }) {
     const [selectedId, setSelectedId] = useState<number | 'new' | null>(segments[0]?.id ?? null);
     const selected = useMemo(
@@ -214,7 +218,11 @@ export default function SegmentsIndex({
                                             cities={cities}
                                             wilayas={wilayas}
                                             stages={stages}
+                                            filterFields={draftEntity === 'deal' ? dealFilterFields : contactFilterFields}
                                         />
+                                        {draftFilters.filter_groups ? (
+                                            <input type="hidden" name="filter_groups" value={JSON.stringify(draftFilters.filter_groups)} />
+                                        ) : null}
                                         {Object.entries(draftFilters).map(([key, value]) =>
                                             value === undefined || value === false || value === '' ? null : (
                                                 <input

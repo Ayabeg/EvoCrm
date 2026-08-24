@@ -29,7 +29,7 @@ export default function SavedViewTabs({
 }) {
     const { auth } = usePage().props;
     const [naming, setNaming] = useState(false);
-    const [visibility, setVisibility] = useState<'private' | 'workspace'>('private');
+    const [visibility, setVisibility] = useState<'private' | 'team' | 'workspace'>('private');
     const view = String(activeFilters.view ?? 'all');
     const filterId = Number(activeFilters.filter_id ?? 0) || null;
     const fields = filterFields(activeFilters);
@@ -66,9 +66,9 @@ export default function SavedViewTabs({
                     key={filter.id}
                     href={crmListHref(basePath, { filter_id: filter.id })}
                     className={`rounded px-2 py-1 text-[11px] ${filterId === filter.id ? 'bg-ink text-canvas' : 'text-ink hover:bg-canvas-soft'}`}
-                    title={filter.visibility === 'workspace' ? 'Shared with workspace' : 'Private view'}
+                    title={filter.visibility === 'workspace' ? 'Shared with workspace' : filter.visibility === 'team' ? 'Shared with team' : 'Private view'}
                 >
-                    {filter.visibility === 'workspace' ? '◆ ' : ''}
+                    {filter.visibility === 'workspace' ? '◆ ' : filter.visibility === 'team' ? '◇ ' : ''}
                     {filter.name}
                     {filter.is_workspace_default ? ' ★' : ''}
                     {badge(filter.record_count)}
@@ -95,11 +95,12 @@ export default function SavedViewTabs({
                         <select
                             name="visibility"
                             value={visibility}
-                            onChange={(event) => setVisibility(event.target.value as 'private' | 'workspace')}
+                            onChange={(event) => setVisibility(event.target.value as 'private' | 'team' | 'workspace')}
                             className="h-7 rounded border bg-background px-1 text-[11px]"
                         >
                             <option value="private">Private</option>
-                            <option value="workspace">Team</option>
+                            <option value="team">Team</option>
+                            <option value="workspace">Workspace</option>
                         </select>
                     ) : null}
                     <label className="flex items-center gap-1 text-[10px] text-mute">

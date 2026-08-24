@@ -23,7 +23,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read User|null $owner
  */
-#[Fillable(['workspace_id', 'owner_id', 'name', 'widgets'])]
+#[Fillable(['workspace_id', 'owner_id', 'name', 'visibility', 'widgets'])]
 class Dashboard extends Model
 {
     use BelongsToWorkspace;

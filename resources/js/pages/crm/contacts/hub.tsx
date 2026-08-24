@@ -1,4 +1,4 @@
-import { Form, Head, Link, router } from '@inertiajs/react';
+import { Form, Head, Link, router, usePage } from '@inertiajs/react';
 import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
@@ -28,7 +28,11 @@ export default function ContactHub({
     wilayas,
     catchUp,
     askEvo,
+    contactEngagement,
+    proactiveSummary,
 }: any) {
+    const { flash } = usePage().props as { flash?: { emailDraft?: { subject: string; body: string } } };
+    const emailDraft = flash?.emailDraft;
 
     return (
         <RecordLayoutProvider objectType="contact">
@@ -133,14 +137,33 @@ export default function ContactHub({
                                     <p className="text-[11px] text-muted-foreground">
                                         {selected.phone_e164 ?? 'No phone'} · {selected.email ?? 'No email'} · {selected.city ?? selected.company?.city ?? '—'}
                                     </p>
+                                    {contactEngagement ? (
+                                        <p className="mt-1 text-[11px]">
+                                            Engagement: {contactEngagement.label} ({contactEngagement.score}/100)
+                                        </p>
+                                    ) : null}
+                                    {proactiveSummary ? (
+                                        <p className="mt-1 rounded bg-canvas-soft px-2 py-1 text-[11px] text-muted-foreground">{proactiveSummary}</p>
+                                    ) : null}
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <RecordLayoutCustomizeButton />
+                                    <Form action={`/crm/contacts/${selected.id}/draft-email`} method="post">
+                                        <Button type="submit" variant="secondary" className="h-7 px-2 text-[11px]">
+                                            Draft email
+                                        </Button>
+                                    </Form>
                                     <Link href="/inbox" className="rounded bg-brand px-3 py-1 text-[12px] text-canvas">
                                         Open in Inbox
                                     </Link>
                                 </div>
                             </header>
+                            {emailDraft ? (
+                                <div className="border-b bg-canvas-soft px-4 py-2 text-[11px]">
+                                    <p className="font-medium">Draft: {emailDraft.subject}</p>
+                                    <p className="mt-1 whitespace-pre-wrap text-muted-foreground">{emailDraft.body}</p>
+                                </div>
+                            ) : null}
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
                                 <RecordLayoutColumn
                                     column="main"

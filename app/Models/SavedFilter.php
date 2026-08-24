@@ -26,7 +26,7 @@ class SavedFilter extends Model
 
     public function isShared(): bool
     {
-        return $this->visibility === 'workspace';
+        return in_array($this->visibility, ['workspace', 'team'], true);
     }
 
     public function user(): BelongsTo

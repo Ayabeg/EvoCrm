@@ -42,7 +42,7 @@ class CrmHub
             ->forWorkspace($workspace)
             ->where('entity', $entity)
             ->where(function ($query) use ($viewerId) {
-                $query->where('visibility', 'workspace');
+                $query->whereIn('visibility', ['workspace', 'team']);
                 if ($viewerId) {
                     $query->orWhere('user_id', $viewerId);
                 }

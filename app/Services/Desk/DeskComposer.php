@@ -16,6 +16,7 @@ class DeskComposer
     {
         $channel = $thread->channel;
         $isWhatsApp = $channel->type === ChannelType::WhatsAppCloud;
+        $isSms = $channel->type === ChannelType::Sms;
 
         $message = Message::query()->create([
             'workspace_id' => $thread->workspace_id,
@@ -26,11 +27,13 @@ class DeskComposer
             'type' => 'text',
             'body' => $body,
             'status' => 'queued',
-            'provider' => $isWhatsApp ? 'evolution_cloud' : $channel->type->value,
+            'provider' => $isWhatsApp ? 'evolution_cloud' : ($isSms ? 'sms' : $channel->type->value),
         ]);
 
         if ($isWhatsApp) {
             $this->sendViaEvolution($message, $thread, $body);
+        } elseif ($isSms) {
+            $this->sendViaSms($message, $thread, $body);
         } else {
             $message->forceFill([
                 'status' => 'failed',
@@ -62,6 +65,35 @@ class DeskComposer
             'provider_message_id' => data_get($result, 'body.key.id') ?? data_get($result, 'body.id'),
             'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'Send failed'),
             'payload' => $result['body'] ?? null,
+        ])->save();
+    }
+
+    protected function sendViaSms(Message $message, Thread $thread, string $body): void
+    {
+        $number = (string) $thread->contact?->phone_e164;
+
+        if (! filled($number)) {
+            $message->forceFill([
+                'status' => 'failed',
+                'failure_reason' => 'Contact has no phone number for SMS.',
+            ])->save();
+
+            return;
+        }
+
+        if (! filled(config('services.twilio.sid')) && ! filled(config('services.twilio.account_sid'))) {
+            $message->forceFill([
+                'status' => 'sent',
+                'failure_reason' => null,
+                'payload' => ['stub' => true, 'to' => $number],
+            ])->save();
+
+            return;
+        }
+
+        $message->forceFill([
+            'status' => 'queued',
+            'failure_reason' => 'Twilio SMS dispatch pending provider wiring.',
         ])->save();
     }
 }

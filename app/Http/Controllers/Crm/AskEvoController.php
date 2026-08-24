@@ -36,4 +36,30 @@ class AskEvoController extends Controller
 
         return back();
     }
+
+    public function draftContact(Request $request, Contact $contact, RecordInsight $insight): RedirectResponse
+    {
+        abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'intent' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        session()->flash('emailDraft', $insight->draftEmail($contact, $data['intent'] ?? 'follow_up'));
+
+        return back();
+    }
+
+    public function draftDeal(Request $request, Deal $deal, RecordInsight $insight): RedirectResponse
+    {
+        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'intent' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        session()->flash('emailDraft', $insight->draftEmail($deal, $data['intent'] ?? 'follow_up'));
+
+        return back();
+    }
 }

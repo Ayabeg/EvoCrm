@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Outbound;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\Enrollment;
 use App\Models\Mailbox;
+use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
@@ -69,8 +71,35 @@ class SequenceController extends Controller
 
         $workspace = $request->user()->workspace;
 
+        $stepAnalytics = $sequence->steps()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($step) use ($sequence) {
+                $enrolledAtStep = Enrollment::query()
+                    ->where('sequence_id', $sequence->id)
+                    ->where('next_step', '>=', $step->position)
+                    ->count();
+
+                $sent = OutboundMessage::query()
+                    ->where('sequence_id', $sequence->id)
+                    ->where('direction', 'out')
+                    ->where('status', 'sent')
+                    ->count();
+
+                return [
+                    'position' => $step->position,
+                    'name' => $step->subject ?: 'Step '.$step->position,
+                    'enrolled' => $enrolledAtStep,
+                    'sent' => $sent,
+                    'step_type' => $step->step_type ?? 'email',
+                ];
+            })
+            ->values()
+            ->all();
+
         return Inertia::render('outbound/sequences/show', [
             'sequence' => $sequence->load(['steps.mailbox:id,name', 'enrollments.contact']),
+            'stepAnalytics' => $stepAnalytics,
             'contacts' => Contact::query()
                 ->forWorkspace($workspace)
                 ->orderBy('first_name')

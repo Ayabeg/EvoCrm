@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['workspace_id', 'user_id', 'entity', 'layout'])]
+#[Fillable(['workspace_id', 'user_id', 'entity', 'layout', 'is_workspace_default'])]
 class RecordLayout extends Model
 {
     use BelongsToWorkspace;
@@ -16,6 +16,7 @@ class RecordLayout extends Model
     {
         return [
             'layout' => 'array',
+            'is_workspace_default' => 'boolean',
         ];
     }
 

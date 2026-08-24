@@ -19,7 +19,10 @@ export type FilterRule = {
         | 'is_true'
         | 'is_false'
         | 'is_set'
-        | 'is_not_set';
+        | 'is_not_set'
+        | 'in'
+        | 'before'
+        | 'after';
     value?: string | number | boolean | null;
 };
 
@@ -55,7 +58,7 @@ export type SavedView = {
     sort: { field: string; direction: 'asc' | 'desc' };
     is_default: boolean;
     is_workspace_default?: boolean;
-    visibility?: 'private' | 'workspace';
+    visibility?: 'private' | 'team' | 'workspace';
     record_count?: number;
 };
 

@@ -45,6 +45,88 @@ class RecordInsight
     /**
      * @return array{score: int, band: string, label: string, reason: string}
      */
+    public function contactEngagement(Contact $contact): array
+    {
+        $contact->loadMissing(['deals.stage']);
+
+        $days = $this->daysSince($contact->last_activity_at);
+        $openDeals = $contact->deals->filter(fn (Deal $deal) => $deal->stage && ! $deal->stage->is_won && ! $deal->stage->is_lost)->count();
+        $hasEmail = filled($contact->email);
+
+        $score = (int) round(
+            ($this->recencyScore($days) * 0.5)
+            + (min($openDeals, 3) / 3 * 100 * 0.3)
+            + (($hasEmail ? 100 : 0) * 0.2)
+        );
+        $score = max(0, min(100, $score));
+
+        $band = $score >= 70 ? 'engaged' : ($score >= 40 ? 'warming' : 'cold');
+        $label = $score >= 70 ? 'Engaged' : ($score >= 40 ? 'Warming' : 'Cold');
+
+        return [
+            'score' => $score,
+            'band' => $band,
+            'label' => $label,
+            'reason' => ($days === null ? 'no activity' : 'last activity '.$days.'d ago')
+                .' · '.$openDeals.' open deal'.($openDeals === 1 ? '' : 's')
+                .($contact->wilaya ? ' · '.$contact->wilaya : '').'.',
+        ];
+    }
+
+    public function proactiveSummary(Contact|Deal $record): string
+    {
+        $cached = AiInsight::query()
+            ->where('subject_type', $record instanceof Deal ? 'deal' : 'contact')
+            ->where('subject_id', $record->id)
+            ->whereNull('question')
+            ->latest('id')
+            ->first();
+
+        if ($cached && $cached->created_at && $cached->created_at->greaterThan(now()->subHours(6))) {
+            return (string) $cached->answer;
+        }
+
+        $summary = $record instanceof Deal
+            ? $this->summarizeDeal($record->loadMissing(['stage', 'contact', 'company', 'owner']))
+            : $this->summarizeContact($record->loadMissing(['company', 'owner', 'deals.stage']));
+
+        AiInsight::query()->create([
+            'workspace_id' => $record->workspace_id,
+            'subject_type' => $record instanceof Deal ? 'deal' : 'contact',
+            'subject_id' => $record->id,
+            'question' => null,
+            'answer' => $summary,
+            'source' => 'proactive',
+        ]);
+
+        return $summary;
+    }
+
+    /**
+     * @return array{subject: string, body: string}
+     */
+    public function draftEmail(Contact|Deal $record, string $intent = 'follow_up'): array
+    {
+        $name = $record instanceof Deal
+            ? ($record->contact?->displayName() ?? 'there')
+            : $record->displayName();
+
+        $live = $this->llm->complete(
+            $this->systemPrompt(),
+            "Draft a short {$intent} email to {$name}. Algerian B2B tone, French or Arabic ok. Two sentences max.",
+        );
+
+        $body = $live['text'] ?? "Bonjour {$name}, je reviens vers vous concernant notre échange EvoSales.";
+
+        return [
+            'subject' => $intent === 'follow_up' ? 'Suite à notre échange' : 'EvoSales',
+            'body' => $body,
+        ];
+    }
+
+    /**
+     * @return array{score: int, band: string, label: string, reason: string}
+     */
     public function dealHealth(Deal $deal): array
     {
         $deal->loadMissing('stage');

@@ -7,6 +7,7 @@ use App\Models\Enrollment;
 use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Models\Workspace;
+use App\Services\Crm\WorkflowRunner;
 use RuntimeException;
 
 /**
@@ -18,6 +19,7 @@ use RuntimeException;
  */
 class ImapReplyPoller
 {
+    public function __construct(private WorkflowRunner $workflows) {}
     /**
      * @return array{mailbox: string, replies: int, error: string|null}
      */
@@ -131,7 +133,28 @@ class ImapReplyPoller
         if ($lastOutbound && ! $lastOutbound->replied_at) {
             $lastOutbound->forceFill(['replied_at' => now()])->save();
             $this->branchEnrollmentOnReply($contact, $lastOutbound);
+            $this->pauseEnrollmentOnReply($contact, $lastOutbound);
         }
+    }
+
+    protected function pauseEnrollmentOnReply(Contact $contact, OutboundMessage $outbound): void
+    {
+        if (! $outbound->sequence_id) {
+            return;
+        }
+
+        $enrollment = Enrollment::query()
+            ->where('contact_id', $contact->id)
+            ->where('sequence_id', $outbound->sequence_id)
+            ->where('status', 'active')
+            ->first();
+
+        if (! $enrollment) {
+            return;
+        }
+
+        $enrollment->forceFill(['status' => 'paused', 'next_run_at' => null])->save();
+        $this->workflows->handleEnrollmentReplied($contact, $enrollment);
     }
 
     protected function branchEnrollmentOnReply(Contact $contact, OutboundMessage $outbound): void

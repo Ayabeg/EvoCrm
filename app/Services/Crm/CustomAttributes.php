@@ -231,10 +231,25 @@ class CustomAttributes
 
         if ($entity === 'deal') {
             $deal = Deal::query()->forWorkspace($workspace)->find($entityId);
-            $amount = $deal ? ((int) $deal->amount_cents) / 100 : 0;
-        }
+            if (! $deal) {
+                return null;
+            }
 
-        $expression = str_replace('{deal.amount}', (string) $amount, $expression);
+            $amount = ((int) $deal->amount_cents) / 100;
+            $expression = str_replace('{deal.amount}', (string) $amount, $expression);
+
+            if (str_contains($expression, '{deal.age_days}')) {
+                $ageDays = $deal->created_at ? (int) $deal->created_at->diffInDays(now()) : 0;
+                $expression = str_replace('{deal.age_days}', (string) $ageDays, $expression);
+            }
+
+            if (str_contains($expression, '{deal.days_in_stage}')) {
+                $days = $deal->last_activity_at
+                    ? (int) $deal->last_activity_at->diffInDays(now())
+                    : ($deal->created_at ? (int) $deal->created_at->diffInDays(now()) : 0);
+                $expression = str_replace('{deal.days_in_stage}', (string) $days, $expression);
+            }
+        }
 
         if (! preg_match('/^[0-9+\-*\/().\s]+$/', $expression)) {
             return null;

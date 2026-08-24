@@ -62,4 +62,37 @@ class ReportBuilder
 
         return ['metric' => $metric, 'value' => $query->count()];
     }
+
+    /**
+     * Cross-object: reply rate by wilaya (contacts with outbound + reply flag).
+     *
+     * @return array{metric: string, groups: array<int, array{label: string, value: float, count: int}>}
+     */
+    public function replyRateByWilaya(Workspace $workspace): array
+    {
+        $rows = Contact::query()
+            ->forWorkspace($workspace)
+            ->whereNotNull('wilaya')
+            ->withCount([
+                'outboundMessages as sent_count' => fn ($q) => $q->where('direction', 'out')->where('status', 'sent'),
+                'outboundMessages as replied_count' => fn ($q) => $q->where('direction', 'out')->whereNotNull('replied_at'),
+            ])
+            ->get()
+            ->groupBy('wilaya')
+            ->map(function ($group, $wilaya) {
+                $sent = (int) $group->sum('sent_count');
+                $replied = (int) $group->sum('replied_count');
+
+                return [
+                    'label' => (string) $wilaya,
+                    'value' => $sent > 0 ? round(($replied / $sent) * 100, 1) : 0.0,
+                    'count' => $sent,
+                ];
+            })
+            ->sortByDesc('value')
+            ->values()
+            ->all();
+
+        return ['metric' => 'reply_rate_by_wilaya', 'groups' => $rows];
+    }
 }

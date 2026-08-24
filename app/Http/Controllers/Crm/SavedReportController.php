@@ -59,4 +59,12 @@ class SavedReportController extends Controller
             'activeReport' => $savedReport->only(['id', 'name', 'entity', 'metric', 'group_by']),
         ]);
     }
+
+    public function crossObject(Request $request, ReportBuilder $builder): Response
+    {
+        return Inertia::render('crm/report-builder', [
+            'reports' => SavedReport::query()->forWorkspace($request->user()->workspace)->latest()->get(),
+            'crossObject' => $builder->replyRateByWilaya($request->user()->workspace),
+        ]);
+    }
 }

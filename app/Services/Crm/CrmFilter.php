@@ -270,6 +270,34 @@ class CrmFilter
         if ($operator === 'is_not_set') {
             $this->applyIsSet($entity, $query, $field, false);
         }
+
+        if ($operator === 'in' && is_array($value) && $value !== []) {
+            $flat = [$field => $value];
+            match ($entity) {
+                'contact' => $this->applyContactIn($query, $field, $value),
+                'deal' => $this->applyDealIn($query, $field, $value),
+                'company' => $this->applyCompanyIn($query, $field, $value),
+                default => null,
+            };
+        }
+
+        if (in_array($operator, ['before', 'after'], true) && filled($value)) {
+            $sqlOp = $operator === 'before' ? '<' : '>';
+            $column = match ($field) {
+                'created', 'created_at' => 'created_at',
+                'last_activity', 'last_activity_at' => 'last_activity_at',
+                'close_date' => $entity === 'deal' ? 'close_date' : null,
+                default => null,
+            };
+
+            if ($column && in_array($entity, ['contact', 'deal', 'company'], true)) {
+                if ($column === 'close_date') {
+                    $query->whereDate('close_date', $sqlOp, (string) $value);
+                } else {
+                    $query->where($column, $sqlOp, (string) $value);
+                }
+            }
+        }
     }
 
     /**
@@ -331,6 +359,10 @@ class CrmFilter
 
         if ($operator === 'eq' && filled($value)) {
             return [$field => $value];
+        }
+
+        if ($operator === 'in' && is_array($value) && $value !== []) {
+            return [$field.'__in' => $value];
         }
 
         if ($operator === 'eq' && ($field === 'unanswered' || $field === 'unassigned')) {
@@ -467,6 +499,20 @@ class CrmFilter
             $query->where(function (Builder $inner) use ($filters) {
                 $inner->where('wilaya', $filters['wilaya'])
                     ->orWhereHas('company', fn (Builder $company) => $company->where('wilaya', $filters['wilaya']));
+            });
+        }
+
+        if (filled($filters['wilaya__in'] ?? null) && is_array($filters['wilaya__in'])) {
+            $query->where(function (Builder $inner) use ($filters) {
+                $inner->whereIn('wilaya', $filters['wilaya__in'])
+                    ->orWhereHas('company', fn (Builder $company) => $company->whereIn('wilaya', $filters['wilaya__in']));
+            });
+        }
+
+        if (filled($filters['city__in'] ?? null) && is_array($filters['city__in'])) {
+            $query->where(function (Builder $inner) use ($filters) {
+                $inner->whereIn('city', $filters['city__in'])
+                    ->orWhereHas('company', fn (Builder $company) => $company->whereIn('city', $filters['city__in']));
             });
         }
 
@@ -895,6 +941,53 @@ class CrmFilter
 
         if (in_array($column, ['created_at', 'last_activity_at'], true)) {
             $query->where($column, $sqlOp, (string) $value);
+        }
+    }
+
+    /**
+     * @param  Builder<Contact>  $query
+     * @param  array<int, mixed>  $values
+     */
+    protected function applyContactIn(Builder $query, string $field, array $values): void
+    {
+        if ($field === 'wilaya') {
+            $query->where(function (Builder $inner) use ($values) {
+                $inner->whereIn('wilaya', $values)
+                    ->orWhereHas('company', fn (Builder $company) => $company->whereIn('wilaya', $values));
+            });
+
+            return;
+        }
+
+        if (in_array($field, ['city', 'owner'], true)) {
+            $column = $field === 'owner' ? 'owner_id' : $field;
+            $query->whereIn($column, $values);
+        }
+    }
+
+    /**
+     * @param  Builder<Deal>  $query
+     * @param  array<int, mixed>  $values
+     */
+    protected function applyDealIn(Builder $query, string $field, array $values): void
+    {
+        if ($field === 'stage') {
+            $query->whereHas('stage', fn (Builder $stage) => $stage->whereIn('slug', $values));
+        }
+
+        if ($field === 'owner') {
+            $query->whereIn('owner_id', $values);
+        }
+    }
+
+    /**
+     * @param  Builder<Company>  $query
+     * @param  array<int, mixed>  $values
+     */
+    protected function applyCompanyIn(Builder $query, string $field, array $values): void
+    {
+        if (in_array($field, ['city', 'wilaya'], true)) {
+            $query->whereIn($field, $values);
         }
     }
 

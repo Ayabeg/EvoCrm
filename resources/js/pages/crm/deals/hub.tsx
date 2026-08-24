@@ -65,6 +65,7 @@ export default function DealHub({
                             contacts={contacts}
                             stages={stages}
                             stagePills={stagePills}
+                            exportHref="/crm/deals/export"
                         />
                         <div className="border-b px-3 py-2">
                             <div className="flex items-center justify-between gap-2">

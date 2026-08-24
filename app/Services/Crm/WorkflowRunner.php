@@ -5,13 +5,17 @@ namespace App\Services\Crm;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Enrollment;
+use App\Models\Mailbox;
+use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\Stage;
 use App\Models\Workflow;
 use App\Models\WorkflowExecution;
 use App\Models\Workspace;
+use App\Services\Outbound\QuietHoursGuard;
 use App\Services\Outbound\SequenceEnrollment;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class WorkflowRunner
@@ -20,6 +24,7 @@ class WorkflowRunner
         private ActivityRecorder $activities,
         private SequenceEnrollment $enrollment,
         private CustomAttributes $attributes,
+        private QuietHoursGuard $quietHours,
     ) {}
 
     public function handleContactCreated(Contact $contact): void
@@ -79,6 +84,47 @@ class WorkflowRunner
         $this->run($workspace, Workflow::TRIGGER_ENROLLMENT_FINISHED, $enrollment->contact, null);
     }
 
+    public function handleSegmentEntered(Contact $contact, SavedFilter $segment): void
+    {
+        $workspace = $contact->workspace ?? Workspace::query()->find($contact->workspace_id);
+
+        if (! $workspace instanceof Workspace) {
+            return;
+        }
+
+        $workflows = Workflow::query()
+            ->forWorkspace($workspace)
+            ->where('active', true)
+            ->where('trigger', Workflow::TRIGGER_SEGMENT_ENTERED)
+            ->where(function ($query) use ($segment) {
+                $query->whereNull('trigger_saved_filter_id')
+                    ->orWhere('trigger_saved_filter_id', $segment->id);
+            })
+            ->get();
+
+        foreach ($workflows as $workflow) {
+            try {
+                if ((int) ($workflow->delay_minutes ?? 0) > 0) {
+                    $this->schedule($workspace, $workflow, $contact, null);
+                } else {
+                    $this->execute($workspace, $workflow, $contact, null);
+                }
+            } catch (Throwable) {
+            }
+        }
+    }
+
+    public function handleEnrollmentReplied(Contact $contact, Enrollment $enrollment): void
+    {
+        $workspace = $contact->workspace ?? Workspace::query()->find($contact->workspace_id);
+
+        if (! $workspace instanceof Workspace) {
+            return;
+        }
+
+        $this->run($workspace, Workflow::TRIGGER_ENROLLMENT_REPLIED, $contact, null);
+    }
+
     /**
      * Execute a scheduled workflow action (called by workflow:run).
      */
@@ -124,12 +170,22 @@ class WorkflowRunner
 
     private function schedule(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): void
     {
+        $runAt = now()->addMinutes((int) $workflow->delay_minutes);
+
+        if ($this->quietHours->blocks($workspace)) {
+            $hours = $workspace->activeQuietHours();
+            $allowed = $hours?->nextAllowedAt() ?? $runAt;
+            if ($allowed->greaterThan($runAt)) {
+                $runAt = $allowed;
+            }
+        }
+
         WorkflowExecution::query()->create([
             'workspace_id' => $workspace->id,
             'workflow_id' => $workflow->id,
             'contact_id' => $contact?->id,
             'deal_id' => $deal?->id,
-            'run_at' => now()->addMinutes((int) $workflow->delay_minutes),
+            'run_at' => $runAt,
             'status' => WorkflowExecution::STATUS_PENDING,
         ]);
     }
@@ -150,6 +206,9 @@ class WorkflowRunner
             Workflow::ACTION_SEND_WEBHOOK => $this->sendWebhook($workflow, $config, $contact, $deal),
             Workflow::ACTION_SET_PROPERTY => $this->setProperty($workspace, $config, $contact, $deal),
             Workflow::ACTION_ASSIGN_OWNER => $this->assignOwner($config, $contact, $deal),
+            Workflow::ACTION_CREATE_DEAL => $this->createDeal($workspace, $config, $contact),
+            Workflow::ACTION_SEND_EMAIL => $this->sendEmail($workspace, $config, $contact),
+            Workflow::ACTION_NOTIFY_USER => $this->notifyUser($workspace, $config, $contact, $deal),
             default => null,
         };
     }
@@ -403,5 +462,81 @@ class WorkflowRunner
         if ($contact) {
             $contact->forceFill(['owner_id' => $ownerId])->save();
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function createDeal(Workspace $workspace, array $config, ?Contact $contact): void
+    {
+        if (! $contact) {
+            return;
+        }
+
+        $pipeline = $workspace->defaultPipeline();
+        $stage = $pipeline->stageBySlug((string) ($config['stage_slug'] ?? 'new')) ?? $pipeline->stages->first();
+
+        Deal::query()->create([
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contact->id,
+            'company_id' => $contact->company_id,
+            'pipeline_id' => $pipeline->id,
+            'stage_id' => $stage?->id,
+            'owner_id' => $contact->owner_id,
+            'title' => (string) ($config['title'] ?? 'New deal · '.$contact->displayName()),
+            'amount_cents' => (int) ($config['amount_cents'] ?? 0),
+            'currency' => 'DZD',
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function sendEmail(Workspace $workspace, array $config, ?Contact $contact): void
+    {
+        if (! $contact?->email) {
+            return;
+        }
+
+        $mailbox = Mailbox::query()
+            ->forWorkspace($workspace)
+            ->where('enabled', true)
+            ->orderByDesc('is_default')
+            ->first();
+
+        if (! $mailbox) {
+            return;
+        }
+
+        Mail::raw(
+            (string) ($config['body'] ?? 'Follow up from EvoSales'),
+            fn ($message) => $message
+                ->to($contact->email)
+                ->subject((string) ($config['subject'] ?? 'EvoSales follow-up'))
+                ->from($mailbox->from_address, $mailbox->from_name ?? 'EvoSales'),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function notifyUser(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal): void
+    {
+        $userId = isset($config['user_id']) ? (int) $config['user_id'] : ($deal?->owner_id ?? $contact?->owner_id);
+
+        if (! $userId) {
+            return;
+        }
+
+        $this->activities->record($workspace, [
+            'type' => 'notification',
+            'subject' => (string) ($config['subject'] ?? 'Workflow notification'),
+            'body' => (string) ($config['body'] ?? ''),
+            'owner_id' => $userId,
+            'contact_id' => $contact?->id,
+            'deal_id' => $deal?->id,
+            'company_id' => $deal?->company_id ?? $contact?->company_id,
+            'meta' => ['source' => 'workflow'],
+        ]);
     }
 }

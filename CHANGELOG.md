@@ -1,5 +1,21 @@
 # Changelog
 
+## EvoCell 6 — Omni & permissions (2026-08-25)
+
+### Added
+- Deal splits: `deal_splits` table, `PUT /crm/deals/{deal}/splits` (percent must sum to 100)
+- Granular member permissions via `users.permissions` json + `User::canPermission()`
+- SMS channel reply path in `DeskComposer` (stub when Twilio unset; ready for provider wiring)
+- Meta Custom Audience sync: `MetaAudienceSyncService` + `POST /crm/segments/{segment}/sync-meta`
+- Dashboard sharing: `visibility` on dashboards (private / team / workspace)
+- Team-scoped deal visibility via `deals.team_id` + `deals.team_only` permission
+- Segment membership tracking + `segment.entered` workflow trigger via `SegmentMatcher`
+- Plan gap migration: A/B subject stats, workspace record layouts, cross-object reports
+- Living scorecard: `docs/evocells-roadmap.md`
+
+### HubSpot comparison
+HubSpot adds SMS inbox, deal splits, and Custom Audience sync in enterprise tiers. This ships split attribution, permission grants, Meta audience push from segments, and SMS channel groundwork — closing admin/omni gaps while preserving EvoSales outbound moat.
+
 ## EvoCell 5 — Analytics depth (2026-08-25)
 
 ### Added

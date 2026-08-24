@@ -24,6 +24,7 @@ use InvalidArgumentException;
     'closed_at',
     'next_activity_at',
     'owner_id',
+    'team_id',
     'source',
     'lost_reason',
     'close_date',

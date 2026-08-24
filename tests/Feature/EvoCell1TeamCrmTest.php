@@ -112,6 +112,71 @@ it('applies contains and neq filter group operators', function () {
         ->and($filter->count($workspace, 'contact', $neqFilters))->toBe(1);
 });
 
+it('shows team visibility saved views to teammates', function () {
+    $admin = User::factory()->create(['role' => WorkspaceRole::Admin]);
+    $member = User::factory()->create([
+        'workspace_id' => $admin->workspace_id,
+        'role' => WorkspaceRole::Member,
+    ]);
+
+    SavedFilter::query()->create([
+        'workspace_id' => $admin->workspace_id,
+        'user_id' => $admin->id,
+        'name' => 'Team Oran',
+        'entity' => 'contact',
+        'visibility' => 'team',
+        'filters' => ['wilaya' => 'Oran'],
+    ]);
+
+    $this->actingAs($member)
+        ->get('/crm/contacts')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('savedFilters', 1)
+            ->where('savedFilters.0.name', 'Team Oran')
+            ->where('savedFilters.0.visibility', 'team')
+        );
+});
+
+it('applies in before and after filter operators', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+    $filter = app(CrmFilter::class);
+
+    Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'wilaya' => 'Alger',
+        'created_at' => now()->subDays(10),
+    ]);
+    Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'wilaya' => 'Oran',
+        'created_at' => now()->subDays(2),
+    ]);
+
+    $inFilters = [
+        'filter_groups' => [
+            'logic' => 'and',
+            'groups' => [[
+                'logic' => 'and',
+                'rules' => [['field' => 'wilaya', 'operator' => 'in', 'value' => 'Alger,Oran']],
+            ]],
+        ],
+    ];
+
+    expect($filter->count($workspace, 'contact', $inFilters))->toBe(2);
+});
+
+it('exports deals as csv', function () {
+    $user = User::factory()->create();
+    Deal::factory()->create(['workspace_id' => $user->workspace_id, 'title' => 'Export me']);
+
+    $response = $this->actingAs($user)->get('/crm/deals/export');
+
+    $response->assertOk();
+    expect($response->headers->get('content-type'))->toContain('text/csv');
+});
+
 it('lets admins create reorder and delete pipeline stages', function () {
     $user = User::factory()->create();
     $workspace = $user->workspace;

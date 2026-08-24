@@ -45,6 +45,8 @@ class SegmentController extends Controller
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
             'stages' => $stages,
+            'contactFilterFields' => $hub->listViewMeta('contact')['filterFields'],
+            'dealFilterFields' => $hub->listViewMeta('deal')['filterFields'],
         ]);
     }
 

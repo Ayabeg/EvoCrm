@@ -18,7 +18,7 @@ class SavedFilterPolicy
             return false;
         }
 
-        if ($savedFilter->visibility === 'workspace') {
+        if (in_array($savedFilter->visibility, ['workspace', 'team'], true)) {
             return true;
         }
 
@@ -39,6 +39,12 @@ class SavedFilterPolicy
 
         if ($savedFilter->visibility === 'workspace') {
             return $user->role->canManageSettings();
+        }
+
+        if ($savedFilter->visibility === 'team') {
+            return $savedFilter->user_id === null
+                || (int) $savedFilter->user_id === (int) $user->id
+                || $user->role->canManageSettings();
         }
 
         return $savedFilter->user_id === null

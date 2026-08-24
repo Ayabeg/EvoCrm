@@ -1,4 +1,7 @@
 import { Label } from '@/components/ui/label';
+import FilterBuilder from '@/components/crm/filter-builder';
+import type { ListFieldDef, ListViewFilters } from '@/lib/list-view-config';
+import { defaultFilterGroups } from '@/lib/list-view-config';
 
 export type SegmentFilters = {
     stage?: string;
@@ -10,6 +13,10 @@ export type SegmentFilters = {
     status?: string;
     unanswered?: boolean;
     unassigned?: boolean;
+    enrolled_in_sequence?: string;
+    email_replied?: boolean;
+    email_opened?: boolean;
+    filter_groups?: unknown;
 };
 
 type Member = { id: number; name: string };
@@ -23,6 +30,7 @@ export default function SegmentFilterForm({
     cities,
     wilayas,
     stages,
+    filterFields = [],
 }: {
     entity: 'contact' | 'deal';
     filters: SegmentFilters;
@@ -31,6 +39,7 @@ export default function SegmentFilterForm({
     cities: string[];
     wilayas: string[];
     stages: Stage[];
+    filterFields?: ListFieldDef[];
 }) {
     const setField = (key: keyof SegmentFilters, value: string | boolean | undefined) => {
         onChange({ ...filters, [key]: value === '' ? undefined : value });
@@ -158,7 +167,42 @@ export default function SegmentFilterForm({
                     />
                     Unassigned only
                 </label>
+                {entity === 'contact' ? (
+                    <>
+                        <label className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                checked={!!filters.email_replied}
+                                onChange={(event) => setField('email_replied', event.target.checked)}
+                            />
+                            Replied to email
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                checked={!!filters.email_opened}
+                                onChange={(event) => setField('email_opened', event.target.checked)}
+                            />
+                            Opened email
+                        </label>
+                    </>
+                ) : null}
             </div>
+            {filterFields.length > 0 ? (
+                <div className="md:col-span-2">
+                    <Label>Advanced filter groups</Label>
+                    <FilterBuilder
+                        entity={entity}
+                        fields={filterFields}
+                        value={(filters.filter_groups as ListViewFilters | undefined) ?? defaultFilterGroups()}
+                        members={members}
+                        cities={cities}
+                        wilayas={wilayas}
+                        stages={stages}
+                        onChange={(groups) => onChange({ ...filters, filter_groups: groups })}
+                    />
+                </div>
+            ) : null}
         </div>
     );
 }
