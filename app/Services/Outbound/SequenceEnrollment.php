@@ -36,6 +36,8 @@ class SequenceEnrollment
             ]);
         }
 
+        $variantKey = $this->assignVariant($sequence);
+
         $enrollment = Enrollment::query()->updateOrCreate(
             [
                 'workspace_id' => $workspace->id,
@@ -44,8 +46,9 @@ class SequenceEnrollment
             ],
             [
                 'status' => 'active',
-                'next_step' => 1,
+                'next_step' => $this->firstStepPosition($sequence, $variantKey),
                 'next_run_at' => now(),
+                'variant_key' => $variantKey,
             ]
         );
 
@@ -59,5 +62,37 @@ class SequenceEnrollment
         ]);
 
         return $enrollment;
+    }
+
+    protected function assignVariant(Sequence $sequence): ?string
+    {
+        $variants = $sequence->steps()
+            ->whereNotNull('variant_key')
+            ->distinct()
+            ->pluck('variant_key')
+            ->filter()
+            ->values()
+            ->all();
+
+        if ($variants === []) {
+            return null;
+        }
+
+        return $variants[array_rand($variants)];
+    }
+
+    protected function firstStepPosition(Sequence $sequence, ?string $variantKey): int
+    {
+        $query = $sequence->steps()->orderBy('position');
+
+        if ($variantKey) {
+            $match = (clone $query)->where('variant_key', $variantKey)->value('position');
+
+            if ($match) {
+                return (int) $match;
+            }
+        }
+
+        return (int) ($query->value('position') ?? 1);
     }
 }

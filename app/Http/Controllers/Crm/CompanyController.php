@@ -124,7 +124,7 @@ class CompanyController extends Controller
             'timeline' => $selected ? $hub->timeline(company: $selected) : [],
             'attributes' => $selected ? $hub->attributeBag($workspace, 'company', $selected->id) : ['definitions' => [], 'values' => []],
             'members' => $hub->members($workspace),
-            'savedFilters' => $hub->filters($workspace, 'company'),
+            'savedFilters' => $hub->filters($workspace, 'company', $request->user()),
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('company', $filters['columns'] ?? null, $filters['sort'] ?? null),
             'recordCount' => $filter->count($workspace, 'company', $filters),

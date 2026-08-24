@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
     'name',
     'trigger',
     'trigger_stage_id',
+    'trigger_saved_filter_id',
     'action',
     'action_config',
     'condition_field',
@@ -43,6 +44,7 @@ use Illuminate\Support\Carbon;
     'else_action_config',
     'active',
     'template_key',
+    'delay_minutes',
 ])]
 class Workflow extends Model
 {
@@ -55,11 +57,27 @@ class Workflow extends Model
 
     public const TRIGGER_DEAL_CREATED = 'deal.created';
 
+    public const TRIGGER_ENROLLMENT_FINISHED = 'enrollment.finished';
+
+    public const TRIGGER_SEGMENT_ENTERED = 'segment.entered';
+
+    public const TRIGGER_ENROLLMENT_REPLIED = 'enrollment.replied';
+
     public const ACTION_CREATE_TASK = 'create_task';
 
     public const ACTION_ENROLL_SEQUENCE = 'enroll_sequence';
 
     public const ACTION_SEND_WEBHOOK = 'send_webhook';
+
+    public const ACTION_SET_PROPERTY = 'set_property';
+
+    public const ACTION_ASSIGN_OWNER = 'assign_owner';
+
+    public const ACTION_CREATE_DEAL = 'create_deal';
+
+    public const ACTION_SEND_EMAIL = 'send_email';
+
+    public const ACTION_NOTIFY_USER = 'notify_user';
 
     public const CONDITION_DEAL_AMOUNT = 'deal.amount';
 
@@ -92,6 +110,9 @@ class Workflow extends Model
             self::TRIGGER_CONTACT_CREATED,
             self::TRIGGER_DEAL_STAGE_CHANGED,
             self::TRIGGER_DEAL_CREATED,
+            self::TRIGGER_ENROLLMENT_FINISHED,
+            self::TRIGGER_SEGMENT_ENTERED,
+            self::TRIGGER_ENROLLMENT_REPLIED,
         ];
     }
 
@@ -104,6 +125,11 @@ class Workflow extends Model
             self::ACTION_CREATE_TASK,
             self::ACTION_ENROLL_SEQUENCE,
             self::ACTION_SEND_WEBHOOK,
+            self::ACTION_SET_PROPERTY,
+            self::ACTION_ASSIGN_OWNER,
+            self::ACTION_CREATE_DEAL,
+            self::ACTION_SEND_EMAIL,
+            self::ACTION_NOTIFY_USER,
         ];
     }
 

@@ -41,6 +41,7 @@ export default function DealHub({
     pipeline,
     pipelines = [],
     forecast,
+    forecastBand,
 }: any) {
 
     return (
@@ -64,6 +65,7 @@ export default function DealHub({
                             contacts={contacts}
                             stages={stages}
                             stagePills={stagePills}
+                            exportHref="/crm/deals/export"
                         />
                         <div className="border-b px-3 py-2">
                             <div className="flex items-center justify-between gap-2">
@@ -79,7 +81,7 @@ export default function DealHub({
                             </div>
                             {forecast ? (
                                 <div className="mt-2">
-                                    <DealForecastBar forecast={forecast} />
+                                    <DealForecastBar forecast={forecast} forecastBand={forecastBand} />
                                 </div>
                             ) : (
                                 <p className="money mt-1 text-[11px] text-ink">{formatDzd(openPipelineCents)}</p>

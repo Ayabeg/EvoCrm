@@ -18,18 +18,29 @@ class SavedFilterController extends Controller
         $data = $this->validated($request);
         $workspace = $request->user()->workspace;
 
+        $visibility = $data['visibility'] ?? 'private';
+        if ($visibility === 'workspace' && ! $request->user()->role->canManageSettings()) {
+            $visibility = 'private';
+        }
+
         if (! empty($data['is_default'])) {
             $this->clearDefault($workspace->id, $data['entity'], $request->user()->id);
+        }
+
+        if (! empty($data['is_workspace_default'])) {
+            $this->clearWorkspaceDefault($workspace->id, $data['entity']);
         }
 
         $saved = $workspace->savedFilters()->create([
             'user_id' => $request->user()->id,
             'name' => $data['name'],
             'entity' => $data['entity'],
+            'visibility' => $visibility,
             'filters' => $data['filters'],
             'columns' => $data['columns'] ?? null,
             'sort' => $data['sort'] ?? null,
             'is_default' => (bool) ($data['is_default'] ?? false),
+            'is_workspace_default' => (bool) ($data['is_workspace_default'] ?? false),
         ]);
 
         return back()->with('saved_filter_id', $saved->id);
@@ -41,16 +52,27 @@ class SavedFilterController extends Controller
 
         $data = $this->validated($request, updating: true);
 
+        $visibility = $data['visibility'] ?? $savedFilter->visibility;
+        if ($visibility === 'workspace' && ! $request->user()->role->canManageSettings()) {
+            $visibility = $savedFilter->visibility;
+        }
+
         if (! empty($data['is_default'])) {
             $this->clearDefault($savedFilter->workspace_id, $savedFilter->entity, $request->user()->id, $savedFilter->id);
         }
 
+        if (! empty($data['is_workspace_default'])) {
+            $this->clearWorkspaceDefault($savedFilter->workspace_id, $savedFilter->entity, $savedFilter->id);
+        }
+
         $savedFilter->update([
             'name' => $data['name'] ?? $savedFilter->name,
+            'visibility' => $visibility,
             'filters' => $data['filters'] ?? $savedFilter->filters,
             'columns' => $data['columns'] ?? $savedFilter->columns,
             'sort' => $data['sort'] ?? $savedFilter->sort,
             'is_default' => $data['is_default'] ?? $savedFilter->is_default,
+            'is_workspace_default' => $data['is_workspace_default'] ?? $savedFilter->is_workspace_default,
         ]);
 
         return back();
@@ -78,6 +100,8 @@ class SavedFilterController extends Controller
             'columns' => ['nullable'],
             'sort' => ['nullable'],
             'is_default' => ['sometimes', 'boolean'],
+            'is_workspace_default' => ['sometimes', 'boolean'],
+            'visibility' => ['sometimes', 'in:private,team,workspace'],
             'stage' => ['nullable', 'string', 'max:40'],
             'owner' => ['nullable', 'string', 'max:40'],
             'city' => ['nullable', 'string', 'max:80'],
@@ -91,6 +115,11 @@ class SavedFilterController extends Controller
         ];
 
         $data = $request->validate($rules);
+
+        $visibility = $data['visibility'] ?? 'private';
+        if ($visibility === 'workspace' && ! $request->user()->role->canManageSettings()) {
+            $visibility = 'private';
+        }
 
         foreach (['columns', 'sort', 'filter_groups'] as $jsonField) {
             if (isset($data[$jsonField]) && is_string($data[$jsonField])) {
@@ -134,5 +163,14 @@ class SavedFilterController extends Controller
             ->where('user_id', $userId)
             ->when($exceptId, fn ($query) => $query->where('id', '!=', $exceptId))
             ->update(['is_default' => false]);
+    }
+
+    protected function clearWorkspaceDefault(int $workspaceId, string $entity, ?int $exceptId = null): void
+    {
+        SavedFilter::query()
+            ->where('workspace_id', $workspaceId)
+            ->where('entity', $entity)
+            ->when($exceptId, fn ($query) => $query->where('id', '!=', $exceptId))
+            ->update(['is_workspace_default' => false]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Contact;
+use App\Services\Crm\SegmentMatcher;
 use App\Services\Crm\WorkflowRunner;
 
 class ContactObserver
@@ -12,5 +13,14 @@ class ContactObserver
     public function created(Contact $contact): void
     {
         $this->workflows->handleContactCreated($contact);
+    }
+
+    public function saved(Contact $contact): void
+    {
+        if ($contact->wasRecentlyCreated) {
+            return;
+        }
+
+        app(SegmentMatcher::class)->syncContact($contact);
     }
 }

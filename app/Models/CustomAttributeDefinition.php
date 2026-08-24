@@ -10,17 +10,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property list<string>|null $options
  */
-#[Fillable(['workspace_id', 'entity', 'key', 'label', 'type', 'options', 'group_name', 'required'])]
+#[Fillable(['workspace_id', 'entity', 'key', 'label', 'type', 'options', 'formula', 'group_name', 'required'])]
 class CustomAttributeDefinition extends Model
 {
     use BelongsToWorkspace;
 
-    public const TYPES = ['text', 'number', 'date', 'list'];
+    public const TYPES = ['text', 'number', 'date', 'list', 'calculated'];
 
     protected function casts(): array
     {
         return [
             'options' => 'array',
+            'formula' => 'array',
             'required' => 'boolean',
         ];
     }

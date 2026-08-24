@@ -52,12 +52,15 @@ const triggerLabel: Record<string, string> = {
     'contact.created': 'Contact created',
     'deal.stage_changed': 'Deal stage changed',
     'deal.created': 'Deal created',
+    'enrollment.finished': 'Sequence finished',
 };
 
 const actionLabel: Record<string, string> = {
     create_task: 'Create task',
     enroll_sequence: 'Enroll in sequence',
     send_webhook: 'Send webhook',
+    set_property: 'Set property',
+    assign_owner: 'Assign owner',
 };
 
 const operatorLabel: Record<string, string> = {

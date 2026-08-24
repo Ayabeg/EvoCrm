@@ -22,19 +22,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DealController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, PipelineManager $pipelines): Response
     {
-        return $this->hub($request, $filter, $hub, $insight, null);
+        return $this->hub($request, $filter, $hub, $insight, $pipelines, null);
     }
 
-    public function show(Request $request, Deal $deal, CrmFilter $filter, CrmHub $hub, RecordInsight $insight): Response
+    public function show(Request $request, Deal $deal, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, PipelineManager $pipelines): Response
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        return $this->hub($request, $filter, $hub, $insight, $deal);
+        return $this->hub($request, $filter, $hub, $insight, $pipelines, $deal);
     }
 
     public function store(Request $request, ContactIdentity $identity): RedirectResponse
@@ -168,7 +169,48 @@ class DealController extends Controller
         return back();
     }
 
-    public function board(Request $request, PipelineManager $pipelines): Response
+    public function export(Request $request, CrmFilter $filter, PipelineManager $pipelines): StreamedResponse
+    {
+        $workspace = $request->user()->workspace;
+        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
+        $filters = $filter->resolve($request, $workspace, 'deal');
+
+        $query = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->with(['contact', 'company', 'stage', 'owner']);
+
+        $filter->apply('deal', $query, $filters);
+
+        $deals = $query->orderByDesc('last_activity_at')->limit(5000)->get();
+        $filename = 'deals-'.now()->toDateString().'.csv';
+
+        return response()->streamDownload(function () use ($deals): void {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['id', 'title', 'amount_dzd', 'stage', 'owner', 'contact', 'company', 'wilaya', 'close_date', 'created_at']);
+
+            foreach ($deals as $deal) {
+                fputcsv($out, [
+                    $deal->id,
+                    $deal->title,
+                    number_format($deal->amount_cents / 100, 2, '.', ''),
+                    $deal->stage?->name,
+                    $deal->owner?->name,
+                    trim(($deal->contact?->first_name ?? '').' '.($deal->contact?->last_name ?? '')),
+                    $deal->company?->name,
+                    $deal->contact?->wilaya ?? $deal->company?->wilaya,
+                    $deal->close_date?->toDateString(),
+                    $deal->created_at?->toDateTimeString(),
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function board(Request $request, PipelineManager $pipelines, RecordInsight $insight): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
@@ -183,6 +225,7 @@ class DealController extends Controller
             'stages' => $board['stages'],
             'deals' => $board['deals'],
             'forecast' => $board['forecast'],
+            'forecastBand' => $insight->pipelineForecastBand($workspace, $pipeline),
         ]);
     }
 
@@ -212,6 +255,13 @@ class DealController extends Controller
             ->forWorkspace($workspace)
             ->where('pipeline_id', $pipeline->id)
             ->with(['contact.company', 'company', 'stage', 'owner']);
+
+        if ($request->user()->canPermission('deals.team_only')) {
+            $query->where(function ($scoped) use ($request) {
+                $scoped->where('owner_id', $request->user()->id)
+                    ->orWhere('team_id', $request->user()->id);
+            });
+        }
 
         $filter->apply('deal', $query, $filters);
         $filter->applySort('deal', $query, $filters);
@@ -257,6 +307,7 @@ class DealController extends Controller
             'catchUp' => $selected ? $hub->catchUp(deal: $selected) : ['inbound' => [], 'outbound' => []],
             'askEvo' => $selected ? $insight->forDeal($selected) : null,
             'dealHealth' => $selected ? $insight->dealHealth($selected) : null,
+            'proactiveSummary' => $selected ? $insight->proactiveSummary($selected) : null,
             'attributes' => $selected ? $hub->attributeBag($workspace, 'deal', $selected->id) : ['definitions' => [], 'values' => []],
             'pipeline' => [
                 'id' => $pipeline->id,
@@ -264,11 +315,12 @@ class DealController extends Controller
             ],
             'pipelines' => PipelineResource::collection($pipelines->options($workspace))->resolve(),
             'forecast' => $forecast,
+            'forecastBand' => $insight->pipelineForecastBand($workspace, $pipeline),
             'stages' => $pipeline->stages,
             'stagePills' => $stagePills,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
             'members' => $hub->members($workspace),
-            'savedFilters' => $hub->filters($workspace, 'deal'),
+            'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null),
             'recordCount' => $filter->count($workspace, 'deal', $filters),

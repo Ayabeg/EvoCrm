@@ -4,6 +4,8 @@ namespace App\Services\Crm;
 
 use App\Models\Company;
 use App\Models\Contact;
+use App\Models\CustomAttributeDefinition;
+use App\Models\CustomAttributeValue;
 use App\Models\Deal;
 use App\Models\SavedFilter;
 use App\Models\Workspace;
@@ -75,6 +77,9 @@ class CrmFilter
             'status' => $request->input('status', $fromSaved['status'] ?? null),
             'unanswered' => $request->boolean('unanswered') || (($fromSaved['unanswered'] ?? null) === true || ($fromSaved['unanswered'] ?? null) === '1'),
             'unassigned' => $request->boolean('unassigned') || (($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1'),
+            'enrolled_in_sequence' => $request->input('enrolled_in_sequence', $fromSaved['enrolled_in_sequence'] ?? null),
+            'email_replied' => $request->boolean('email_replied') || (($fromSaved['email_replied'] ?? null) === true || ($fromSaved['email_replied'] ?? null) === '1'),
+            'email_opened' => $request->boolean('email_opened') || (($fromSaved['email_opened'] ?? null) === true || ($fromSaved['email_opened'] ?? null) === '1'),
             'view' => $view,
             'filter_id' => $saved?->id,
             'filter_groups' => $filterGroups,
@@ -198,18 +203,151 @@ class CrmFilter
 
         $method = $index === 0 ? 'where' : (($groupLogic === 'or') ? 'orWhere' : 'where');
 
-        $flat = $this->ruleToFlatFilter($field, $operator, $value);
-        if ($flat === null) {
+        $query->{$method}(function (Builder $inner) use ($entity, $field, $operator, $value): void {
+            if (str_starts_with($field, 'custom:')) {
+                $this->applyCustomAttributeRule($entity, $inner, substr($field, 7), $operator, $value);
+
+                return;
+            }
+
+            $flat = $this->ruleToFlatFilter($field, $operator, $value);
+            if ($flat !== null) {
+                match ($entity) {
+                    'contact' => $this->applyToContacts($inner, $flat),
+                    'deal' => $this->applyToDeals($inner, $flat),
+                    'company' => $this->applyToCompanies($inner, $flat),
+                    default => null,
+                };
+
+                return;
+            }
+
+            $this->applyDirectRule($entity, $inner, $field, $operator, $value);
+        });
+    }
+
+    /**
+     * @param  Builder<Contact|Deal|Company>  $query
+     */
+    protected function applyDirectRule(string $entity, Builder $query, string $field, string $operator, mixed $value): void
+    {
+        if ($operator === 'contains' && filled($value)) {
+            $like = '%'.addcslashes((string) $value, '%_').'%';
+            match ($entity) {
+                'contact' => $this->applyContactTextContains($query, $field, $like),
+                'deal' => $this->applyDealTextContains($query, $field, $like),
+                'company' => $this->applyCompanyTextContains($query, $field, $like),
+                default => null,
+            };
+
             return;
         }
 
-        $query->{$method}(function (Builder $inner) use ($entity, $flat): void {
+        if ($operator === 'neq' && filled($value)) {
+            $flat = [$field => $value];
             match ($entity) {
-                'contact' => $this->applyToContacts($inner, $flat),
-                'deal' => $this->applyToDeals($inner, $flat),
-                'company' => $this->applyToCompanies($inner, $flat),
+                'contact' => $this->applyContactNegation($query, $flat),
+                'deal' => $this->applyDealNegation($query, $flat),
+                'company' => $this->applyCompanyNegation($query, $flat),
                 default => null,
             };
+
+            return;
+        }
+
+        if (in_array($operator, ['gt', 'gte', 'lt', 'lte'], true) && filled($value)) {
+            $this->applyNumericOrDateComparison($entity, $query, $field, $operator, $value);
+
+            return;
+        }
+
+        if ($operator === 'is_set') {
+            $this->applyIsSet($entity, $query, $field, true);
+
+            return;
+        }
+
+        if ($operator === 'is_not_set') {
+            $this->applyIsSet($entity, $query, $field, false);
+        }
+
+        if ($operator === 'in') {
+            if (is_string($value) && filled($value)) {
+                $value = array_values(array_filter(array_map('trim', explode(',', $value)), fn ($item) => $item !== ''));
+            }
+
+            if (is_array($value) && $value !== []) {
+                match ($entity) {
+                    'contact' => $this->applyContactIn($query, $field, $value),
+                    'deal' => $this->applyDealIn($query, $field, $value),
+                    'company' => $this->applyCompanyIn($query, $field, $value),
+                    default => null,
+                };
+            }
+
+            return;
+        }
+
+        if (in_array($operator, ['before', 'after'], true) && filled($value)) {
+            $sqlOp = $operator === 'before' ? '<' : '>';
+            $column = match ($field) {
+                'created', 'created_at' => 'created_at',
+                'last_activity', 'last_activity_at' => 'last_activity_at',
+                'close_date' => $entity === 'deal' ? 'close_date' : null,
+                default => null,
+            };
+
+            if ($column && in_array($entity, ['contact', 'deal', 'company'], true)) {
+                if ($column === 'close_date') {
+                    $query->whereDate('close_date', $sqlOp, (string) $value);
+                } else {
+                    $query->where($column, $sqlOp, (string) $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param  Builder<Contact|Deal|Company>  $query
+     */
+    protected function applyCustomAttributeRule(string $entity, Builder $query, string $key, string $operator, mixed $value): void
+    {
+        $definitionId = CustomAttributeDefinition::query()
+            ->where('entity', $entity)
+            ->where('key', $key)
+            ->value('id');
+
+        if (! $definitionId) {
+            $query->whereRaw('1 = 0');
+
+            return;
+        }
+
+        $query->where(function (Builder $outer) use ($entity, $definitionId, $operator, $value): void {
+            $sub = CustomAttributeValue::query()
+                ->where('entity_type', $entity)
+                ->where('definition_id', $definitionId);
+
+            match ($operator) {
+                'eq' => filled($value) ? $sub->where('value', (string) $value) : null,
+                'neq' => filled($value) ? $sub->where('value', '!=', (string) $value) : null,
+                'contains' => filled($value)
+                    ? $sub->where('value', 'like', '%'.addcslashes((string) $value, '%_').'%')
+                    : null,
+                'is_set' => $sub->whereNotNull('value')->where('value', '!=', ''),
+                'is_not_set' => null,
+                default => null,
+            };
+
+            if ($operator === 'is_not_set') {
+                $outer->whereNotIn($outer->getModel()->getTable().'.id', $sub->select('entity_id'));
+
+                return;
+            }
+
+            if ($operator === 'is_set' || ($operator !== 'is_not_set' && filled($value))) {
+                $outer->whereIn($outer->getModel()->getTable().'.id', $sub->select('entity_id'));
+            }
         });
     }
 
@@ -228,6 +366,10 @@ class CrmFilter
 
         if ($operator === 'eq' && filled($value)) {
             return [$field => $value];
+        }
+
+        if ($operator === 'in' && is_array($value) && $value !== []) {
+            return [$field.'__in' => $value];
         }
 
         if ($operator === 'eq' && ($field === 'unanswered' || $field === 'unassigned')) {
@@ -367,6 +509,20 @@ class CrmFilter
             });
         }
 
+        if (filled($filters['wilaya__in'] ?? null) && is_array($filters['wilaya__in'])) {
+            $query->where(function (Builder $inner) use ($filters) {
+                $inner->whereIn('wilaya', $filters['wilaya__in'])
+                    ->orWhereHas('company', fn (Builder $company) => $company->whereIn('wilaya', $filters['wilaya__in']));
+            });
+        }
+
+        if (filled($filters['city__in'] ?? null) && is_array($filters['city__in'])) {
+            $query->where(function (Builder $inner) use ($filters) {
+                $inner->whereIn('city', $filters['city__in'])
+                    ->orWhereHas('company', fn (Builder $company) => $company->whereIn('city', $filters['city__in']));
+            });
+        }
+
         if (! empty($filters['unanswered'])) {
             $query->where('unanswered', true);
         }
@@ -374,6 +530,8 @@ class CrmFilter
         if (isset($filters['unanswered']) && $filters['unanswered'] === false) {
             $query->where('unanswered', false);
         }
+
+        $this->applyBehaviorFilters($query, $filters);
 
         $this->applyLastActivity($query, $filters['last_activity'] ?? null);
         $this->applyCreated($query, $filters['created'] ?? null);
@@ -521,6 +679,28 @@ class CrmFilter
     }
 
     /**
+     * @param  Builder<Contact>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyBehaviorFilters(Builder $query, array $filters): void
+    {
+        if (filled($filters['enrolled_in_sequence'] ?? null)) {
+            $sequenceId = (int) $filters['enrolled_in_sequence'];
+            $query->whereHas('enrollments', fn (Builder $enrollment) => $enrollment
+                ->where('sequence_id', $sequenceId)
+                ->whereIn('status', ['active', 'paused', 'finished']));
+        }
+
+        if (! empty($filters['email_replied'])) {
+            $query->whereHas('outboundMessages', fn (Builder $message) => $message->whereNotNull('replied_at'));
+        }
+
+        if (! empty($filters['email_opened'])) {
+            $query->whereHas('outboundMessages', fn (Builder $message) => $message->whereNotNull('opened_at'));
+        }
+    }
+
+    /**
      * @param  Builder<Model>  $query
      */
     protected function applyLastActivity(Builder $query, mixed $window): void
@@ -634,5 +814,214 @@ class CrmFilter
             'lost' => $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('is_lost', true)),
             default => $query->whereHas('contacts.leads', fn (Builder $lead) => $lead->where('status', $status)),
         };
+    }
+
+    /**
+     * @param  Builder<Contact>  $query
+     */
+    protected function applyContactTextContains(Builder $query, string $field, string $like): void
+    {
+        match ($field) {
+            'email' => $query->where('email', 'like', $like),
+            'city' => $query->where('city', 'like', $like),
+            'wilaya' => $query->where('wilaya', 'like', $like),
+            default => $query->where(function (Builder $inner) use ($like) {
+                $inner->where('first_name', 'like', $like)
+                    ->orWhere('last_name', 'like', $like)
+                    ->orWhere('email', 'like', $like);
+            }),
+        };
+    }
+
+    /**
+     * @param  Builder<Deal>  $query
+     */
+    protected function applyDealTextContains(Builder $query, string $field, string $like): void
+    {
+        if ($field === 'title') {
+            $query->where('title', 'like', $like);
+        }
+    }
+
+    /**
+     * @param  Builder<Company>  $query
+     */
+    protected function applyCompanyTextContains(Builder $query, string $field, string $like): void
+    {
+        match ($field) {
+            'name' => $query->where('name', 'like', $like),
+            'city' => $query->where('city', 'like', $like),
+            'wilaya' => $query->where('wilaya', 'like', $like),
+            default => null,
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @param  Builder<Contact>  $query
+     */
+    protected function applyContactNegation(Builder $query, array $filters): void
+    {
+        if (filled($filters['owner'] ?? null) && ($filters['owner'] ?? '') !== 'unassigned') {
+            $query->where('owner_id', '!=', $filters['owner']);
+        }
+
+        if (filled($filters['city'] ?? null)) {
+            $query->where('city', '!=', $filters['city']);
+        }
+
+        if (filled($filters['wilaya'] ?? null)) {
+            $query->where('wilaya', '!=', $filters['wilaya']);
+        }
+
+        if (filled($filters['status'] ?? null)) {
+            $query->whereDoesntHave('leads', fn (Builder $lead) => $lead->where('status', $filters['status']));
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @param  Builder<Deal>  $query
+     */
+    protected function applyDealNegation(Builder $query, array $filters): void
+    {
+        if (filled($filters['stage'] ?? null)) {
+            $query->whereDoesntHave('stage', fn (Builder $stage) => $stage->where('slug', $filters['stage']));
+        }
+
+        if (filled($filters['owner'] ?? null) && ($filters['owner'] ?? '') !== 'unassigned') {
+            $query->where('owner_id', '!=', $filters['owner']);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @param  Builder<Company>  $query
+     */
+    protected function applyCompanyNegation(Builder $query, array $filters): void
+    {
+        if (filled($filters['city'] ?? null)) {
+            $query->where('city', '!=', $filters['city']);
+        }
+
+        if (filled($filters['wilaya'] ?? null)) {
+            $query->where('wilaya', '!=', $filters['wilaya']);
+        }
+    }
+
+    /**
+     * @param  Builder<Contact|Deal|Company>  $query
+     */
+    protected function applyNumericOrDateComparison(string $entity, Builder $query, string $field, string $operator, mixed $value): void
+    {
+        $sqlOp = match ($operator) {
+            'gt' => '>',
+            'gte' => '>=',
+            'lt' => '<',
+            'lte' => '<=',
+            default => '=',
+        };
+
+        if ($entity === 'deal' && $field === 'amount') {
+            $cents = is_numeric($value) ? (int) round(((float) $value) * 100) : 0;
+            $query->where('amount_cents', $sqlOp, $cents);
+
+            return;
+        }
+
+        $column = match ($field) {
+            'created' => 'created_at',
+            'last_activity' => 'last_activity_at',
+            'close_date' => 'close_date',
+            default => null,
+        };
+
+        if (! $column || ! in_array($entity, ['contact', 'deal', 'company'], true)) {
+            return;
+        }
+
+        if ($entity === 'deal' && $column === 'close_date') {
+            $query->whereDate('close_date', $sqlOp, (string) $value);
+
+            return;
+        }
+
+        if (in_array($column, ['created_at', 'last_activity_at'], true)) {
+            $query->where($column, $sqlOp, (string) $value);
+        }
+    }
+
+    /**
+     * @param  Builder<Contact>  $query
+     * @param  array<int, mixed>  $values
+     */
+    protected function applyContactIn(Builder $query, string $field, array $values): void
+    {
+        if ($field === 'wilaya') {
+            $query->where(function (Builder $inner) use ($values) {
+                $inner->whereIn('wilaya', $values)
+                    ->orWhereHas('company', fn (Builder $company) => $company->whereIn('wilaya', $values));
+            });
+
+            return;
+        }
+
+        if (in_array($field, ['city', 'owner'], true)) {
+            $column = $field === 'owner' ? 'owner_id' : $field;
+            $query->whereIn($column, $values);
+        }
+    }
+
+    /**
+     * @param  Builder<Deal>  $query
+     * @param  array<int, mixed>  $values
+     */
+    protected function applyDealIn(Builder $query, string $field, array $values): void
+    {
+        if ($field === 'stage') {
+            $query->whereHas('stage', fn (Builder $stage) => $stage->whereIn('slug', $values));
+        }
+
+        if ($field === 'owner') {
+            $query->whereIn('owner_id', $values);
+        }
+    }
+
+    /**
+     * @param  Builder<Company>  $query
+     * @param  array<int, mixed>  $values
+     */
+    protected function applyCompanyIn(Builder $query, string $field, array $values): void
+    {
+        if (in_array($field, ['city', 'wilaya'], true)) {
+            $query->whereIn($field, $values);
+        }
+    }
+
+    /**
+     * @param  Builder<Contact|Deal|Company>  $query
+     */
+    protected function applyIsSet(string $entity, Builder $query, string $field, bool $set): void
+    {
+        $column = match ($field) {
+            'owner' => 'owner_id',
+            'email' => 'email',
+            'city' => 'city',
+            'wilaya' => 'wilaya',
+            'close_date' => $entity === 'deal' ? 'close_date' : null,
+            default => null,
+        };
+
+        if (! $column) {
+            return;
+        }
+
+        if ($set) {
+            $query->whereNotNull($column)->where($column, '!=', '');
+        } else {
+            $query->where(function (Builder $inner) use ($column) {
+                $inner->whereNull($column)->orWhere($column, '');
+            });
+        }
     }
 }

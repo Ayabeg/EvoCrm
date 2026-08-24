@@ -109,12 +109,19 @@ export default function DealBoard({
     stages,
     deals,
     forecast,
+    forecastBand,
 }: {
     pipeline: { id: number; name: string };
     pipelines: PipelineOption[];
     stages: BoardStage[];
     deals: BoardDeal[];
     forecast: Forecast;
+    forecastBand?: {
+        low_cents: number;
+        high_cents: number;
+        band_label: string;
+        narrative?: string | null;
+    } | null;
 }) {
     const [draggingId, setDraggingId] = useState<number | null>(null);
     const [overStage, setOverStage] = useState<number | null>(null);
@@ -162,7 +169,7 @@ export default function DealBoard({
                     </div>
                 </PageHeader>
 
-                <DealForecastBar forecast={forecast} />
+                <DealForecastBar forecast={forecast} forecastBand={forecastBand} />
 
                 <div className="flex items-start gap-3 overflow-x-auto pb-6">
                     {stages.map((stage) => {

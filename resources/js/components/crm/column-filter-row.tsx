@@ -14,6 +14,7 @@ export default function ColumnFilterRow({
     wilayas = [],
     exportHref,
     columns = [],
+    filterGroups,
     filterBuilder,
 }: {
     action: string;
@@ -24,6 +25,7 @@ export default function ColumnFilterRow({
     wilayas?: string[];
     exportHref?: string;
     columns?: { id: string; visible: boolean; order: number }[];
+    filterGroups?: import('@/lib/list-view-config').ListViewFilters;
     filterBuilder?: React.ReactNode;
 }) {
     const [advanced, setAdvanced] = useState(false);
@@ -48,6 +50,9 @@ export default function ColumnFilterRow({
                 <input type="hidden" name="view" value={String(fields.view ?? 'all')} />
                 {fields.filter_id ? <input type="hidden" name="filter_id" value={String(fields.filter_id)} /> : null}
                 {fields.stage ? <input type="hidden" name="stage" value={String(fields.stage)} /> : null}
+                {filterGroups ? (
+                    <input type="hidden" name="filter_groups" value={JSON.stringify(filterGroups)} />
+                ) : null}
                 <label className="grid gap-0.5 text-[10px] text-mute">
                     Owner
                     <select

@@ -9,6 +9,8 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('outbound:run')->everyMinute()->withoutOverlapping();
+Schedule::command('workflow:run')->everyMinute()->withoutOverlapping();
+Schedule::command('reports:deliver')->dailyAt('08:00')->timezone('Africa/Algiers')->withoutOverlapping();
 Schedule::command('outbound:poll-replies')->everyFiveMinutes()->withoutOverlapping();
 // Warmup advances once per Africa/Algiers day, just after the default quiet
 // hours end, so peer pings (when opted in) are allowed to send immediately.

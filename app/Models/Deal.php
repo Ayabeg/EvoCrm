@@ -24,6 +24,7 @@ use InvalidArgumentException;
     'closed_at',
     'next_activity_at',
     'owner_id',
+    'team_id',
     'source',
     'lost_reason',
     'close_date',
@@ -94,6 +95,12 @@ class Deal extends Model
     public function lineItems(): HasMany
     {
         return $this->hasMany(DealLineItem::class)->orderBy('id');
+    }
+
+    /** @return HasMany<DealSplit, $this> */
+    public function splits(): HasMany
+    {
+        return $this->hasMany(DealSplit::class);
     }
 
     public function moveTo(Stage $stage, ?User $actor = null): void

@@ -8,7 +8,21 @@ export type ListViewColumn = {
 
 export type FilterRule = {
     field: string;
-    operator: 'eq' | 'is_true' | 'is_false';
+    operator:
+        | 'eq'
+        | 'neq'
+        | 'contains'
+        | 'gt'
+        | 'gte'
+        | 'lt'
+        | 'lte'
+        | 'is_true'
+        | 'is_false'
+        | 'is_set'
+        | 'is_not_set'
+        | 'in'
+        | 'before'
+        | 'after';
     value?: string | number | boolean | null;
 };
 
@@ -43,6 +57,8 @@ export type SavedView = {
     columns: ListViewColumn[];
     sort: { field: string; direction: 'asc' | 'desc' };
     is_default: boolean;
+    is_workspace_default?: boolean;
+    visibility?: 'private' | 'team' | 'workspace';
     record_count?: number;
 };
 

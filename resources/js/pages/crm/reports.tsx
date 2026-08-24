@@ -50,6 +50,7 @@ type DashboardOwner = {
 type DashboardSummary = {
     id: number;
     name: string;
+    visibility?: string;
     owner: DashboardOwner;
     widget_count: number;
 };
@@ -250,6 +251,7 @@ export default function Reports({
     const [newOpen, setNewOpen] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [newName, setNewName] = useState('');
+    const [newVisibility, setNewVisibility] = useState<'private' | 'team' | 'workspace'>('private');
 
     const apply = (event: React.FormEvent) => {
         event.preventDefault();
@@ -287,6 +289,7 @@ export default function Reports({
             '/reports/dashboards',
             {
                 name: newName,
+                visibility: newVisibility,
                 from,
                 to,
                 ...(owner ? { owner } : {}),
@@ -295,6 +298,7 @@ export default function Reports({
                 onSuccess: () => {
                     setNewOpen(false);
                     setNewName('');
+                    setNewVisibility('private');
                 },
             },
         );
@@ -440,6 +444,7 @@ export default function Reports({
                                         : 'border border-hairline bg-canvas text-muted-foreground hover:text-ink'
                                 }`}
                             >
+                                {board.visibility === 'workspace' ? '◆ ' : board.visibility === 'team' ? '◇ ' : ''}
                                 {board.name}
                             </button>
                         ))}
@@ -569,6 +574,20 @@ export default function Reports({
                                 }
                                 className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
                             />
+                        </label>
+                        <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
+                            Sharing
+                            <select
+                                value={newVisibility}
+                                onChange={(event) =>
+                                    setNewVisibility(event.target.value as 'private' | 'team' | 'workspace')
+                                }
+                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
+                            >
+                                <option value="private">Private</option>
+                                <option value="team">Team</option>
+                                <option value="workspace">Workspace</option>
+                            </select>
                         </label>
                         <button
                             type="submit"

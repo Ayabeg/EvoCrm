@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'status',
     'next_step',
     'next_run_at',
+    'variant_key',
 ])]
 class Enrollment extends Model
 {

@@ -34,11 +34,20 @@ class CrmHub
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function filters(Workspace $workspace, string $entity): array
+    public function filters(Workspace $workspace, string $entity, ?User $viewer = null): array
     {
+        $viewerId = $viewer?->id;
+
         return SavedFilter::query()
             ->forWorkspace($workspace)
             ->where('entity', $entity)
+            ->where(function ($query) use ($viewerId) {
+                $query->whereIn('visibility', ['workspace', 'team']);
+                if ($viewerId) {
+                    $query->orWhere('user_id', $viewerId);
+                }
+            })
+            ->orderByDesc('is_workspace_default')
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->get()

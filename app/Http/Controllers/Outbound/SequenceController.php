@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Outbound;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\Enrollment;
 use App\Models\Mailbox;
+use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
@@ -69,8 +71,35 @@ class SequenceController extends Controller
 
         $workspace = $request->user()->workspace;
 
+        $stepAnalytics = $sequence->steps()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($step) use ($sequence) {
+                $enrolledAtStep = Enrollment::query()
+                    ->where('sequence_id', $sequence->id)
+                    ->where('next_step', '>=', $step->position)
+                    ->count();
+
+                $sent = OutboundMessage::query()
+                    ->where('sequence_id', $sequence->id)
+                    ->where('direction', 'out')
+                    ->where('status', 'sent')
+                    ->count();
+
+                return [
+                    'position' => $step->position,
+                    'name' => $step->subject ?: 'Step '.$step->position,
+                    'enrolled' => $enrolledAtStep,
+                    'sent' => $sent,
+                    'step_type' => $step->step_type ?? 'email',
+                ];
+            })
+            ->values()
+            ->all();
+
         return Inertia::render('outbound/sequences/show', [
             'sequence' => $sequence->load(['steps.mailbox:id,name', 'enrollments.contact']),
+            'stepAnalytics' => $stepAnalytics,
             'contacts' => Contact::query()
                 ->forWorkspace($workspace)
                 ->orderBy('first_name')
@@ -121,10 +150,15 @@ class SequenceController extends Controller
 
         $data = $request->validate([
             'delay_hours' => ['required', 'integer', 'min:0'],
+            'step_type' => ['nullable', 'in:email,call,meeting,whatsapp_cloud'],
             'channel' => ['required', 'in:email,whatsapp_cloud'],
             'mailbox_id' => ['nullable', 'integer'],
             'subject' => ['nullable', 'string', 'max:180'],
             'body' => ['nullable', 'string'],
+            'meeting_url' => ['nullable', 'url', 'max:500'],
+            'on_reply_step' => ['nullable', 'integer', 'min:1'],
+            'on_no_reply_step' => ['nullable', 'integer', 'min:1'],
+            'variant_key' => ['nullable', 'string', 'max:10'],
             'template_id' => ['nullable', 'integer'],
             'wa_template_name' => ['nullable', 'string', 'max:120'],
             'wa_template_language' => ['nullable', 'string', 'max:12'],
@@ -149,6 +183,7 @@ class SequenceController extends Controller
 
         $sequence->steps()->create([
             ...$data,
+            'step_type' => $data['step_type'] ?? ($data['channel'] === 'whatsapp_cloud' ? 'whatsapp_cloud' : 'email'),
             'template_id' => $template?->id,
             'position' => ($sequence->steps()->max('position') ?? 0) + 1,
         ]);

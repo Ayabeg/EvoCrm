@@ -176,21 +176,65 @@ export default function FilterBuilder({
                                             className="h-7 rounded border bg-background px-1 text-[11px]"
                                         >
                                             <option value="eq">equals</option>
+                                            <option value="neq">not equals</option>
+                                            <option value="contains">contains</option>
+                                            <option value="in">in list</option>
+                                            <option value="gt">&gt;</option>
+                                            <option value="gte">&gt;=</option>
+                                            <option value="lt">&lt;</option>
+                                            <option value="lte">&lt;=</option>
+                                            <option value="before">before</option>
+                                            <option value="after">after</option>
+                                            <option value="is_set">is set</option>
+                                            <option value="is_not_set">is not set</option>
                                         </select>
-                                        <select
-                                            value={String(rule.value ?? '')}
-                                            onChange={(event) =>
-                                                updateRule(groupIndex, ruleIndex, { value: event.target.value })
-                                            }
-                                            className="h-7 min-w-[6rem] flex-1 rounded border bg-background px-1 text-[11px]"
-                                        >
-                                            <option value="">Select…</option>
-                                            {optionsForField(rule.field).map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        {!['is_set', 'is_not_set'].includes(rule.operator) ? (
+                                            rule.operator === 'in' ? (
+                                                <input
+                                                    type="text"
+                                                    value={String(rule.value ?? '')}
+                                                    onChange={(event) =>
+                                                        updateRule(groupIndex, ruleIndex, { value: event.target.value })
+                                                    }
+                                                    className="h-7 min-w-[6rem] flex-1 rounded border bg-background px-2 text-[11px]"
+                                                    placeholder="a, b, c"
+                                                />
+                                            ) : ['before', 'after'].includes(rule.operator) || field?.type === 'date' ? (
+                                                <input
+                                                    type="date"
+                                                    value={String(rule.value ?? '')}
+                                                    onChange={(event) =>
+                                                        updateRule(groupIndex, ruleIndex, { value: event.target.value })
+                                                    }
+                                                    className="h-7 min-w-[6rem] flex-1 rounded border bg-background px-2 text-[11px]"
+                                                />
+                                            ) : optionsForField(rule.field).length > 0 ? (
+                                                <select
+                                                    value={String(rule.value ?? '')}
+                                                    onChange={(event) =>
+                                                        updateRule(groupIndex, ruleIndex, { value: event.target.value })
+                                                    }
+                                                    className="h-7 min-w-[6rem] flex-1 rounded border bg-background px-1 text-[11px]"
+                                                >
+                                                    <option value="">Select…</option>
+                                                    {optionsForField(rule.field).map((option) => (
+                                                        <option key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    value={String(rule.value ?? '')}
+                                                    onChange={(event) =>
+                                                        updateRule(groupIndex, ruleIndex, { value: event.target.value })
+                                                    }
+                                                    className="h-7 min-w-[6rem] flex-1 rounded border bg-background px-2 text-[11px]"
+                                                    placeholder="Value"
+                                                />
+                                            )
+                                        ) : null}
                                     </>
                                 ) : (
                                     <select
