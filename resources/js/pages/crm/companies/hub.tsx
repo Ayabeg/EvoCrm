@@ -1,6 +1,8 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
+import AssociationsCard from '@/components/crm/associations-card';
 import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import ListToolbar from '@/components/crm/list-toolbar';
+import { RecordFact, RecordFacts } from '@/components/crm/record-workspace';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -65,6 +67,15 @@ export default function CompanyHub({
                     selected ? (
                         <div className="space-y-3 overflow-y-auto p-4">
                             <h2 className="text-base font-semibold">{selected.name}</h2>
+                            <RecordFacts>
+                                <RecordFact label="Domain">{selected.domain ?? '—'}</RecordFact>
+                                <RecordFact label="Phone">{selected.phone ?? '—'}</RecordFact>
+                                <RecordFact label="Owner">{selected.owner?.name ?? 'Unassigned'}</RecordFact>
+                                <RecordFact label="City">{selected.city ?? '—'}</RecordFact>
+                                <RecordFact label="Wilaya">{selected.wilaya ?? '—'}</RecordFact>
+                                <RecordFact label="Contacts">{selected.contacts_count ?? 0}</RecordFact>
+                            </RecordFacts>
+                            <AssociationsCard associations={associations} />
                             <Form action={`/crm/companies/${selected.id}`} method="put" className="grid grid-cols-2 gap-2">
                                 <Input name="name" defaultValue={selected.name} required className="h-8" />
                                 <Input name="domain" defaultValue={selected.domain ?? ''} className="h-8" />

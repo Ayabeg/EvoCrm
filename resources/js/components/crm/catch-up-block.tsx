@@ -56,9 +56,9 @@ export default function CatchUpBlock({
     outbound?: CatchUpItem[];
 }) {
     return (
-        <section className="rounded-lg border border-hairline bg-canvas p-6 text-sm">
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-mute">Catch-up</h3>
-            <div className="grid gap-6 md:grid-cols-2">
+        <section className="rounded border border-hairline bg-canvas p-3 text-sm">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-mute">Catch-up</h3>
+            <div className="grid gap-3 md:grid-cols-2">
                 <div>
                     <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">Inbound</p>
                     {inbound.length === 0 ? (
