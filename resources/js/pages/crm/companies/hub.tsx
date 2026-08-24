@@ -24,48 +24,6 @@ export default function CompanyHub({
     recordCount,
 }: any) {
     return (
-<<<<<<< HEAD
-        <>
-            <Head title={selected ? selected.name : 'Companies'} />
-            <HubShell
-                list={
-                    <>
-                        <ListToolbar
-                            entity="company"
-                            basePath="/crm/companies"
-                            activeFilters={activeFilters}
-                            savedFilters={savedFilters}
-                            listView={listView}
-                            recordCount={recordCount}
-                            members={members}
-                            cities={cities}
-                            wilayas={wilayas}
-                        />
-                        <div className="border-b px-3 py-2">
-                            <h1 className="text-sm font-semibold">Companies</h1>
-                            <p className="text-[11px] text-muted-foreground">{companies.length} accounts</p>
-                        </div>
-                        <div className="min-h-0 flex-1 overflow-y-auto">
-                            {companies.map((company: any) => (
-                                <HubListRow
-                                    key={company.id}
-                                    active={selected?.id === company.id}
-                                    onClick={() => router.get(`/crm/companies/${company.id}`, {}, { preserveState: true })}
-                                >
-                                    <p className="font-medium">{company.name}</p>
-                                    <p className="text-[11px] text-muted-foreground">
-                                        {company.city ?? '—'} · {company.contacts_count ?? 0} contacts
-                                    </p>
-                                </HubListRow>
-                            ))}
-                        </div>
-                        <Form action="/crm/companies" method="post" className="space-y-1 border-t p-2" resetOnSuccess>
-                            <Input name="name" placeholder="Company" required className="h-7" />
-                            <select name="city" className="h-7 w-full rounded border bg-background px-1">
-                                <option value="">City</option>
-                                {cities.map((city: string) => (
-                                    <option key={city} value={city}>{city}</option>
-=======
         <RecordLayoutProvider objectType="company">
             <>
                 <Head title={selected ? selected.name : 'Companies'} />
@@ -78,6 +36,8 @@ export default function CompanyHub({
                                 basePath="/crm/companies"
                                 activeFilters={activeFilters}
                                 savedFilters={savedFilters}
+                                listView={listView}
+                                recordCount={recordCount}
                                 members={members}
                                 cities={cities}
                                 wilayas={wilayas}
@@ -98,7 +58,6 @@ export default function CompanyHub({
                                             {company.city ?? '—'} · {company.contacts_count ?? 0} contacts
                                         </p>
                                     </HubListRow>
->>>>>>> origin/cursor/integrate-gap-modules-91cb
                                 ))}
                             </div>
                             <Form action="/crm/companies" method="post" className="space-y-1 border-t p-2" resetOnSuccess>

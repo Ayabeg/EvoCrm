@@ -9,6 +9,7 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Stage;
 use App\Models\User;
+use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\DealBoardForecast;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -16,7 +17,7 @@ use Illuminate\Support\Str;
 
 class RecordInsight
 {
-    public function __construct(private LlmClient $llm) {}
+    public function __construct(private LlmClient $llm, private CustomAttributes $attributes) {}
 
     /**
      * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
@@ -205,6 +206,7 @@ class RecordInsight
             'Company' => $this->companyName($contact->company),
             'Owner' => $this->userName($contact->owner),
             'Deals' => $dealLines === [] ? null : count($dealLines).' deal'.(count($dealLines) === 1 ? '' : 's').' ('.implode(', ', $dealLines).')',
+            ...$this->attributeFacts($contact->workspace_id, 'contact', $contact->id),
         ], fn ($value) => filled($value));
     }
 
@@ -232,7 +234,34 @@ class RecordInsight
             'Owner' => $this->userName($deal->owner),
             'Next step' => $deal->next_step,
             'Close date' => $this->dateString($deal->close_date),
+            ...$this->attributeFacts($deal->workspace_id, 'deal', $deal->id),
         ], fn ($value) => filled($value));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function attributeFacts(int $workspaceId, string $entity, int $entityId): array
+    {
+        $workspace = \App\Models\Workspace::query()->find($workspaceId);
+
+        if (! $workspace) {
+            return [];
+        }
+
+        $definitions = $this->attributes->definitions($workspace, $entity);
+        $values = $this->attributes->valuesFor($workspace, $entity, $entityId);
+        $facts = [];
+
+        foreach ($definitions as $definition) {
+            $value = $values[$definition->key] ?? null;
+
+            if (filled($value)) {
+                $facts[$definition->label] = is_array($value) ? implode(', ', $value) : (string) $value;
+            }
+        }
+
+        return $facts;
     }
 
     /**

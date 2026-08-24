@@ -458,21 +458,6 @@ class CrmFilter
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * @param  array<string, mixed>  $filters
-     */
-    public function count(Workspace $workspace, string $entity, array $filters): int
-    {
-        return match ($entity) {
-            'contact' => $this->applyToContacts(Contact::query()->forWorkspace($workspace), $filters)->count(),
-            'deal' => $this->applyToDeals(Deal::query()->forWorkspace($workspace), $filters)->count(),
-            'company' => $this->applyToCompanies(Company::query()->forWorkspace($workspace), $filters)->count(),
-            default => 0,
-        };
-    }
-
-    /**
      * @param  array<string, mixed>  $filters
      * @return array{count: int, members: array<int, array<string, mixed>>}
      */
@@ -491,7 +476,7 @@ class CrmFilter
      */
     protected function previewContacts(Workspace $workspace, array $filters, int $limit): array
     {
-        $query = $this->applyToContacts(Contact::query()->forWorkspace($workspace), $filters);
+        $query = $this->apply('contact', Contact::query()->forWorkspace($workspace), $filters);
 
         return [
             'count' => (clone $query)->count(),
@@ -516,7 +501,7 @@ class CrmFilter
      */
     protected function previewDeals(Workspace $workspace, array $filters, int $limit): array
     {
-        $query = $this->applyToDeals(Deal::query()->forWorkspace($workspace), $filters);
+        $query = $this->apply('deal', Deal::query()->forWorkspace($workspace), $filters);
 
         return [
             'count' => (clone $query)->count(),
@@ -536,7 +521,6 @@ class CrmFilter
     }
 
     /**
->>>>>>> origin/cursor/integrate-gap-modules-91cb
      * @param  Builder<Model>  $query
      */
     protected function applyLastActivity(Builder $query, mixed $window): void

@@ -97,6 +97,41 @@ class WorkflowController extends Controller
         return redirect()->route('crm.workflows.index');
     }
 
+    public function update(Request $request, Workflow $workflow): RedirectResponse
+    {
+        abort_unless((int) $workflow->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $workspace = $request->user()->workspace;
+        $data = $this->validated($request, $workspace);
+
+        $stageId = $data['trigger'] === Workflow::TRIGGER_DEAL_STAGE_CHANGED
+            ? $data['trigger_stage_id']
+            : null;
+
+        if ($stageId) {
+            Stage::query()
+                ->where('pipeline_id', $workspace->defaultPipeline()->id)
+                ->findOrFail($stageId);
+        }
+
+        $workflow->update([
+            'name' => $data['name'],
+            'trigger' => $data['trigger'],
+            'trigger_stage_id' => $stageId,
+            'action' => $data['action'],
+            'action_config' => $this->actionConfig($data['action'], $data['then']),
+            'condition_field' => $data['condition_field'],
+            'condition_operator' => $data['condition_field'] ? $data['condition_operator'] : null,
+            'condition_value' => $data['condition_field'] ? $data['condition_value'] : null,
+            'else_action' => $data['condition_field'] ? $data['else_action'] : null,
+            'else_action_config' => $data['condition_field'] && $data['else_action']
+                ? $this->actionConfig($data['else_action'], $data['else'])
+                : null,
+        ]);
+
+        return redirect()->route('crm.workflows.index');
+    }
+
     public function storeTemplate(Request $request, EvoWorkflowTemplates $templates): RedirectResponse
     {
         $data = $request->validate([

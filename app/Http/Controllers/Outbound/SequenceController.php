@@ -215,7 +215,7 @@ class SequenceController extends Controller
 
             if ($filter) {
                 $query = Contact::query()->forWorkspace($workspace);
-                $crmFilter->applyToContacts($query, $filter->filters ?? []);
+                $crmFilter->apply('contact', $query, $crmFilter->fromSaved($filter));
                 $ids = $ids->merge($query->pluck('id'));
             }
         }

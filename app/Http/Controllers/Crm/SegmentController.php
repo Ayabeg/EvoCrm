@@ -34,7 +34,7 @@ class SegmentController extends Controller
                 'name' => $saved->name,
                 'entity' => $saved->entity,
                 'filters' => $saved->filters ?? [],
-                'count' => $filter->count($workspace, $saved->entity, $saved->filters ?? []),
+                'count' => $filter->count($workspace, $saved->entity, $filter->fromSaved($saved)),
             ]);
 
         return Inertia::render('crm/segments/index', [

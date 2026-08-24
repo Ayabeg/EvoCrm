@@ -105,6 +105,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/automation', [WorkflowController::class, 'index'])->name('automation');
     Route::get('/crm/workflows', [WorkflowController::class, 'index'])->name('crm.workflows.index');
     Route::post('/crm/workflows', [WorkflowController::class, 'store'])->name('crm.workflows.store');
+    Route::put('/crm/workflows/{workflow}', [WorkflowController::class, 'update'])->name('crm.workflows.update');
     Route::post('/crm/workflows/templates', [WorkflowController::class, 'storeTemplate'])->name('crm.workflows.templates.store');
     Route::post('/crm/workflows/{workflow}/toggle', [WorkflowController::class, 'toggle'])->name('crm.workflows.toggle');
     Route::delete('/crm/workflows/{workflow}', [WorkflowController::class, 'destroy'])->name('crm.workflows.destroy');
