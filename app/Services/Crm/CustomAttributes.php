@@ -28,6 +28,7 @@ class CustomAttributes
     }
 
     /**
+     * @param  array{filled: int, total: int, percent: int}|null  $fillRate
      * @return array<string, mixed>
      */
     public function presentDefinition(CustomAttributeDefinition $definition, ?array $fillRate = null): array
@@ -111,19 +112,16 @@ class CustomAttributes
     public function saveValues(Workspace $workspace, string $entity, int $entityId, array $payload, bool $enforceRequired = false): void
     {
         foreach ($this->definitions($workspace, $entity) as $definition) {
-            $present = array_key_exists($definition->key, $payload)
-                || array_key_exists((string) $definition->id, $payload);
+            $raw = $this->rawFromPayload($payload, $definition);
+            $present = $raw !== null || $this->payloadHasKey($payload, $definition);
 
             if (! $present && ! $enforceRequired) {
                 continue;
             }
 
-            $raw = $present
-                ? ($payload[$definition->key] ?? $payload[(string) $definition->id] ?? null)
-                : null;
             $value = $raw === null || $raw === '' ? null : (string) $raw;
 
-            $this->assertValid($definition, $value, $enforceRequired || $present);
+            $this->assertValid($definition, $value, true);
 
             if (! $present) {
                 continue;
@@ -171,11 +169,47 @@ class CustomAttributes
             ]);
         }
 
-        $options = $definition->options;
-        if ($type === 'select' && is_array($options) && $options !== [] && ! in_array($value, $options, true)) {
+        $options = $definition->optionList();
+        if ($type === 'select' && $options !== [] && ! in_array($value, $options, true)) {
             throw ValidationException::withMessages([
                 $key => $definition->label.' is not a valid option.',
             ]);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function payloadHasKey(array $payload, CustomAttributeDefinition $definition): bool
+    {
+        if (array_key_exists($definition->key, $payload)) {
+            return true;
+        }
+
+        foreach (array_keys($payload) as $key) {
+            if ((string) $key === (string) $definition->id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function rawFromPayload(array $payload, CustomAttributeDefinition $definition): mixed
+    {
+        if (array_key_exists($definition->key, $payload)) {
+            return $payload[$definition->key];
+        }
+
+        foreach ($payload as $key => $value) {
+            if ((string) $key === (string) $definition->id) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }

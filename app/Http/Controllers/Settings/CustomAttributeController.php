@@ -7,6 +7,7 @@ use App\Models\CustomAttributeDefinition;
 use App\Services\Crm\CustomAttributes;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,7 +42,7 @@ class CustomAttributeController extends Controller
             'entity' => ['required', 'in:contact,company,deal'],
             'key' => ['required', 'string', 'max:60', 'alpha_dash'],
             'label' => ['required', 'string', 'max:80'],
-            'type' => ['required', 'in:text,number,date,select,list'],
+            'type' => ['required', Rule::in([...CustomAttributeDefinition::TYPES, 'list'])],
             'group' => ['nullable', 'string', 'max:80'],
             'required' => ['sometimes', 'boolean'],
             'options' => ['nullable', 'string'],
