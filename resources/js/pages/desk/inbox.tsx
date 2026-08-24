@@ -137,7 +137,6 @@ function ConnectChannels({ channels }: { channels: ChannelCard[] }) {
                         );
                     })}
                 </div>
-            </div>
         </EmptyRoom>
     );
 }
