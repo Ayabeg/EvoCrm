@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Desk;
 
 use App\Http\Controllers\Controller;
 use App\Models\Thread;
+use App\Services\Connectors\ConnectorRegistrar;
 use App\Services\Desk\DeskComposer;
 use App\Services\Desk\DeskEmbedProbe;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +29,7 @@ class InboxController extends Controller
      * configured, the page falls back to the native CRM conversation desk
      * (same threads as /conversations) instead of ejecting to another host.
      */
-    public function inbox(Request $request, DeskEmbedProbe $probe): Response
+    public function inbox(Request $request, DeskEmbedProbe $probe, ConnectorRegistrar $connectors): Response
     {
         $workspace = $request->user()->workspace;
 
@@ -68,6 +69,7 @@ class InboxController extends Controller
             'configuredUrl' => $embedUrl,
             'threads' => $threads,
             'selected' => $selected,
+            'officialConnectors' => $connectors->deskCatalog($workspace),
         ]);
     }
 

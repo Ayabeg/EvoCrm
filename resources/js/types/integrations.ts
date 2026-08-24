@@ -19,6 +19,34 @@ export type AppUnlock = {
     granted: boolean;
 };
 
+export type ConnectorStatus =
+    | 'not_connected'
+    | 'needs_token'
+    | 'needs_reconnect'
+    | 'connected';
+
+export type OfficialDeskConnector = {
+    provider: 'whatsapp_cloud' | 'instagram' | 'facebook_messenger';
+    name: string;
+    tagline: string;
+    intent: string;
+    status: ConnectorStatus;
+    connected_at: string | null;
+    reason: string | null;
+};
+
+export type GoogleWorkspaceConnector = {
+    provider: 'gmail' | 'google_calendar';
+    name: string;
+    tagline: string;
+    intent: string;
+    status: ConnectorStatus;
+    connected_at: string | null;
+    reason: string | null;
+    scopes_on_client: boolean;
+    reconnect_url: string | null;
+};
+
 export type MarketplaceApp = {
     key: string;
     name: string;

@@ -1,9 +1,11 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import { MessageCircle } from 'lucide-react';
+import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import type { OfficialDeskConnector } from '@/types';
 
 type Contact = {
     id: number;
@@ -42,6 +44,7 @@ type Props = {
     configuredUrl: string | null;
     threads: Thread[];
     selected: Thread | null;
+    officialConnectors: OfficialDeskConnector[];
 };
 
 function nameOf(contact?: Contact | null) {
@@ -58,7 +61,15 @@ function nameOf(contact?: Contact | null) {
  * refuses framing), the native CRM conversation desk below keeps the
  * operator on this hostname instead of ejecting to desk.evotechly.com.
  */
-export default function DeskInbox({ embedUrl, embedState, embedReason, configuredUrl, threads, selected }: Props) {
+export default function DeskInbox({
+    embedUrl,
+    embedState,
+    embedReason,
+    configuredUrl,
+    threads,
+    selected,
+    officialConnectors = [],
+}: Props) {
     return (
         <>
             <Head title="My Inbox" />
@@ -79,12 +90,15 @@ export default function DeskInbox({ embedUrl, embedState, embedReason, configure
                 </div>
 
                 {embedUrl ? (
-                    <iframe
-                        title="EvoDesk — EvoSales inbox"
-                        src={embedUrl}
-                        className="min-h-0 w-full flex-1 border-0 bg-canvas"
-                        allow="clipboard-write; microphone; camera"
-                    />
+                    <>
+                        <OfficialConnectPanel connectors={officialConnectors} compact />
+                        <iframe
+                            title="EvoDesk — EvoSales inbox"
+                            src={embedUrl}
+                            className="min-h-0 w-full flex-1 border-0 bg-canvas"
+                            allow="clipboard-write; microphone; camera"
+                        />
+                    </>
                 ) : (
                     <NativeDesk
                         threads={threads}
@@ -92,6 +106,7 @@ export default function DeskInbox({ embedUrl, embedState, embedReason, configure
                         embedState={embedState}
                         embedReason={embedReason}
                         configuredUrl={configuredUrl}
+                        officialConnectors={officialConnectors}
                     />
                 )}
             </div>
@@ -109,12 +124,14 @@ function NativeDesk({
     embedState,
     embedReason,
     configuredUrl,
+    officialConnectors,
 }: {
     threads: Thread[];
     selected: Thread | null;
     embedState: Props['embedState'];
     embedReason: string | null;
     configuredUrl: string | null;
+    officialConnectors: OfficialDeskConnector[];
 }) {
     return (
         <div className="grid min-h-0 flex-1 gap-0 overflow-hidden lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
@@ -135,11 +152,17 @@ function NativeDesk({
                         </p>
                     )}
                 </Card>
+                <OfficialConnectPanel
+                    connectors={officialConnectors}
+                    compact={threads.length > 0}
+                />
                 <table className="w-full text-sm">
                     <tbody>
                         {threads.length === 0 ? (
                             <tr>
-                                <td className="px-4 py-6 text-muted-foreground">No conversations yet.</td>
+                                <td className="px-4 py-6 text-muted-foreground">
+                                    No conversations yet. Connect an official channel above to start.
+                                </td>
                             </tr>
                         ) : (
                             threads.map((thread) => (

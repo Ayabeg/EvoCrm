@@ -33,6 +33,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Connectors',
+        href: '/settings/connectors',
+        icon: null,
+    },
+    {
         title: 'Evolution / WhatsApp Cloud',
         href: '/settings/evolution',
         icon: null,
@@ -71,13 +76,16 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         : sidebarNavItems;
 
     // The People table needs more room than the settings forms.
-    const wide = page.component === 'settings/people' || page.component === 'settings/attributes';
+    const wide =
+        page.component === 'settings/people' ||
+        page.component === 'settings/attributes' ||
+        page.component === 'settings/connectors';
 
     return (
         <div className="px-4 py-6">
             <Heading
                 title="Settings"
-                description="Workspace profile, the apps marketplace, Evolution Cloud, Meta, and channels"
+                description="Workspace profile, the apps marketplace, official connectors, Evolution Cloud, Meta, and channels"
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

@@ -119,6 +119,11 @@ class Workspace extends Model
         return $this->integrations()->where('provider', $provider)->first();
     }
 
+    public function connectors(): HasMany
+    {
+        return $this->hasMany(Connector::class);
+    }
+
     public function savedFilters(): HasMany
     {
         return $this->hasMany(SavedFilter::class);
