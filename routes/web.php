@@ -11,6 +11,7 @@ use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
 use App\Http\Controllers\Crm\DealLineItemController;
+use App\Http\Controllers\Crm\FunnelController;
 use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\QuoteController;
@@ -87,6 +88,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/conversations', [ConversationHistoryController::class, 'index'])->name('crm.conversations');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/reports/funnels', [FunnelController::class, 'index'])->name('reports.funnels');
+    Route::get('/api/funnels/{funnel}', [FunnelController::class, 'show'])->name('api.funnels.show');
     Route::get('/crm/reports', [ReportController::class, 'index'])->name('crm.reports');
     Route::get('/crm/report-builder', [SavedReportController::class, 'index'])->name('crm.report-builder.index');
     Route::get('/crm/report-builder/cross-object', [SavedReportController::class, 'crossObject'])->name('crm.report-builder.cross-object');
