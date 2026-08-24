@@ -25,9 +25,13 @@ class MetaController extends Controller
      * Send the signed-in user to Meta's OAuth consent screen asking for the
      * full first-wave scope set (pages, Instagram, WhatsApp Cloud, Ads).
      */
-    public function redirect(): SymfonyRedirectResponse
+    public function redirect(Request $request): SymfonyRedirectResponse
     {
         abort_unless(MetaAuth::enabled(), 404);
+
+        if ($request->query('return') === 'setup') {
+            $request->session()->put('auth.meta.return', 'setup');
+        }
 
         return Socialite::driver('meta')
             ->scopes(MetaAuth::scopes())
@@ -57,6 +61,10 @@ class MetaController extends Controller
                 'type' => 'error',
                 'message' => 'Meta did not complete the connection. No token was stored.',
             ]);
+
+            if ($request->session()->pull('auth.meta.return') === 'setup') {
+                return redirect()->route('settings.setup.show', ['provider' => 'meta', 'step' => 'connect']);
+            }
 
             return redirect()->route('settings.apps');
         }
@@ -111,6 +119,10 @@ class MetaController extends Controller
             'type' => 'success',
             'message' => 'Meta connected. Facebook Page, Instagram, WhatsApp Cloud, and Ads unlock as their scopes are granted.',
         ]);
+
+        if ($request->session()->pull('auth.meta.return') === 'setup') {
+            return redirect()->route('settings.setup.show', ['provider' => 'meta', 'step' => 'finish']);
+        }
 
         return redirect()->route('settings.apps.meta');
     }
