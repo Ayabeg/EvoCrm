@@ -32,3 +32,4 @@ yarn-error.log
 
 # Local verification artifacts
 screenshots/
+/.next

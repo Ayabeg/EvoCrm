@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/activities/{activity}/complete', [ActivityController::class, 'complete'])->name('crm.activities.complete');
     Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');
     Route::get('/crm/segments', [SegmentController::class, 'index'])->name('crm.segments.index');
+    Route::post('/crm/segments/preview', [SegmentController::class, 'preview'])->name('crm.segments.preview');
     Route::post('/crm/segments', [SegmentController::class, 'store'])->name('crm.segments.store');
     Route::put('/crm/segments/{segment}', [SegmentController::class, 'update'])->name('crm.segments.update');
     Route::delete('/crm/segments/{segment}', [SegmentController::class, 'destroy'])->name('crm.segments.destroy');
