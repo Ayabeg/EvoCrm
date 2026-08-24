@@ -43,6 +43,7 @@ use Illuminate\Support\Carbon;
     'else_action_config',
     'active',
     'template_key',
+    'delay_minutes',
 ])]
 class Workflow extends Model
 {
@@ -55,11 +56,17 @@ class Workflow extends Model
 
     public const TRIGGER_DEAL_CREATED = 'deal.created';
 
+    public const TRIGGER_ENROLLMENT_FINISHED = 'enrollment.finished';
+
     public const ACTION_CREATE_TASK = 'create_task';
 
     public const ACTION_ENROLL_SEQUENCE = 'enroll_sequence';
 
     public const ACTION_SEND_WEBHOOK = 'send_webhook';
+
+    public const ACTION_SET_PROPERTY = 'set_property';
+
+    public const ACTION_ASSIGN_OWNER = 'assign_owner';
 
     public const CONDITION_DEAL_AMOUNT = 'deal.amount';
 
@@ -92,6 +99,7 @@ class Workflow extends Model
             self::TRIGGER_CONTACT_CREATED,
             self::TRIGGER_DEAL_STAGE_CHANGED,
             self::TRIGGER_DEAL_CREATED,
+            self::TRIGGER_ENROLLMENT_FINISHED,
         ];
     }
 
@@ -104,6 +112,8 @@ class Workflow extends Model
             self::ACTION_CREATE_TASK,
             self::ACTION_ENROLL_SEQUENCE,
             self::ACTION_SEND_WEBHOOK,
+            self::ACTION_SET_PROPERTY,
+            self::ACTION_ASSIGN_OWNER,
         ];
     }
 

@@ -41,6 +41,7 @@ class WorkflowController extends Controller
                 'else_action_config' => $workflow->elseConfig(),
                 'active' => $workflow->active,
                 'template_key' => $workflow->template_key,
+                'delay_minutes' => (int) ($workflow->delay_minutes ?? 0),
                 'created_at' => $workflow->created_at?->toIso8601String(),
             ]);
 
@@ -92,6 +93,7 @@ class WorkflowController extends Controller
                 ? $this->actionConfig($data['else_action'], $data['else'])
                 : null,
             'active' => true,
+            'delay_minutes' => (int) ($data['delay_minutes'] ?? 0),
         ]);
 
         return redirect()->route('crm.workflows.index');
@@ -127,6 +129,7 @@ class WorkflowController extends Controller
             'else_action_config' => $data['condition_field'] && $data['else_action']
                 ? $this->actionConfig($data['else_action'], $data['else'])
                 : null,
+            'delay_minutes' => (int) ($data['delay_minutes'] ?? $workflow->delay_minutes ?? 0),
         ]);
 
         return redirect()->route('crm.workflows.index');
@@ -172,7 +175,8 @@ class WorkflowController extends Controller
      *     condition_operator: string|null,
      *     condition_value: string|null,
      *     else_action: string|null,
-     *     else: array{subject: string|null, body: string|null, due_in_days: int, sequence_id: int|null, webhook_url: string|null}
+     *     else: array{subject: string|null, body: string|null, due_in_days: int, sequence_id: int|null, webhook_url: string|null},
+     *     delay_minutes: int
      * }
      */
     protected function validated(Request $request, Workspace $workspace): array
@@ -225,6 +229,12 @@ class WorkflowController extends Controller
                 'url:http,https',
                 'max:500',
             ],
+            'delay_minutes' => ['nullable', 'integer', 'min:0', 'max:43200'],
+            'property_entity' => ['nullable', 'in:contact,deal'],
+            'property_field' => ['nullable', 'string', 'max:80'],
+            'property_value' => ['nullable', 'string', 'max:500'],
+            'assign_owner_id' => ['nullable', 'integer'],
+            'assign_entity' => ['nullable', 'in:contact,deal'],
         ]);
 
         return [
@@ -232,13 +242,6 @@ class WorkflowController extends Controller
             'trigger' => $data['trigger'],
             'trigger_stage_id' => isset($data['trigger_stage_id']) ? (int) $data['trigger_stage_id'] : null,
             'action' => $data['action'],
-            'then' => [
-                'subject' => $data['subject'] ?? null,
-                'body' => $data['body'] ?? null,
-                'due_in_days' => (int) ($data['due_in_days'] ?? 1),
-                'sequence_id' => isset($data['sequence_id']) ? (int) $data['sequence_id'] : null,
-                'webhook_url' => $data['webhook_url'] ?? null,
-            ],
             'condition_field' => filled($data['condition_field'] ?? null) ? (string) $data['condition_field'] : null,
             'condition_operator' => filled($data['condition_operator'] ?? null) ? (string) $data['condition_operator'] : null,
             'condition_value' => array_key_exists('condition_value', $data) ? $data['condition_value'] : null,
@@ -249,12 +252,30 @@ class WorkflowController extends Controller
                 'due_in_days' => (int) ($data['else_due_in_days'] ?? 1),
                 'sequence_id' => isset($data['else_sequence_id']) ? (int) $data['else_sequence_id'] : null,
                 'webhook_url' => $data['else_webhook_url'] ?? null,
+                'property_entity' => $data['property_entity'] ?? null,
+                'property_field' => $data['property_field'] ?? null,
+                'property_value' => $data['property_value'] ?? null,
+                'assign_owner_id' => isset($data['assign_owner_id']) ? (int) $data['assign_owner_id'] : null,
+                'assign_entity' => $data['assign_entity'] ?? null,
+            ],
+            'delay_minutes' => (int) ($data['delay_minutes'] ?? 0),
+            'then' => [
+                'subject' => $data['subject'] ?? null,
+                'body' => $data['body'] ?? null,
+                'due_in_days' => (int) ($data['due_in_days'] ?? 1),
+                'sequence_id' => isset($data['sequence_id']) ? (int) $data['sequence_id'] : null,
+                'webhook_url' => $data['webhook_url'] ?? null,
+                'property_entity' => $data['property_entity'] ?? null,
+                'property_field' => $data['property_field'] ?? null,
+                'property_value' => $data['property_value'] ?? null,
+                'assign_owner_id' => isset($data['assign_owner_id']) ? (int) $data['assign_owner_id'] : null,
+                'assign_entity' => $data['assign_entity'] ?? null,
             ],
         ];
     }
 
     /**
-     * @param  array{subject: string|null, body: string|null, due_in_days: int, sequence_id: int|null, webhook_url: string|null}  $data
+     * @param  array{subject: string|null, body: string|null, due_in_days: int, sequence_id: int|null, webhook_url: string|null, property_entity?: string|null, property_field?: string|null, property_value?: string|null, assign_owner_id?: int|null, assign_entity?: string|null}  $data
      * @return array<string, mixed>
      */
     protected function actionConfig(string $action, array $data): array
@@ -268,6 +289,21 @@ class WorkflowController extends Controller
         if ($action === Workflow::ACTION_SEND_WEBHOOK) {
             return [
                 'url' => $data['webhook_url'],
+            ];
+        }
+
+        if ($action === Workflow::ACTION_SET_PROPERTY) {
+            return [
+                'entity' => $data['property_entity'] ?? 'contact',
+                'field' => $data['property_field'] ?? '',
+                'value' => $data['property_value'] ?? null,
+            ];
+        }
+
+        if ($action === Workflow::ACTION_ASSIGN_OWNER) {
+            return [
+                'entity' => $data['assign_entity'] ?? 'contact',
+                'owner_id' => $data['assign_owner_id'] ?? null,
             ];
         }
 

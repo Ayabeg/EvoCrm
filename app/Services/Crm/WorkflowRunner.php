@@ -4,9 +4,11 @@ namespace App\Services\Crm;
 
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Enrollment;
 use App\Models\Sequence;
 use App\Models\Stage;
 use App\Models\Workflow;
+use App\Models\WorkflowExecution;
 use App\Models\Workspace;
 use App\Services\Outbound\SequenceEnrollment;
 use Illuminate\Support\Facades\Http;
@@ -65,6 +67,32 @@ class WorkflowRunner
         $this->run($workspace, Workflow::TRIGGER_DEAL_STAGE_CHANGED, $contact, $deal);
     }
 
+    public function handleEnrollmentFinished(Enrollment $enrollment): void
+    {
+        $enrollment->loadMissing(['workspace', 'contact']);
+        $workspace = $enrollment->workspace;
+
+        if (! $workspace instanceof Workspace || ! $enrollment->contact) {
+            return;
+        }
+
+        $this->run($workspace, Workflow::TRIGGER_ENROLLMENT_FINISHED, $enrollment->contact, null);
+    }
+
+    /**
+     * Execute a scheduled workflow action (called by workflow:run).
+     */
+    public function executeScheduled(Workflow $workflow, ?Contact $contact, ?Deal $deal): void
+    {
+        $workspace = $workflow->workspace ?? Workspace::query()->find($workflow->workspace_id);
+
+        if (! $workspace instanceof Workspace) {
+            return;
+        }
+
+        $this->execute($workspace, $workflow, $contact, $deal);
+    }
+
     private function run(Workspace $workspace, string $trigger, ?Contact $contact, ?Deal $deal): void
     {
         $workflows = Workflow::query()
@@ -81,11 +109,29 @@ class WorkflowRunner
             }
 
             try {
+                if ((int) ($workflow->delay_minutes ?? 0) > 0) {
+                    $this->schedule($workspace, $workflow, $contact, $deal);
+
+                    continue;
+                }
+
                 $this->execute($workspace, $workflow, $contact, $deal);
             } catch (Throwable) {
                 // Record writes must not fail because a workflow action could not run.
             }
         }
+    }
+
+    private function schedule(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): void
+    {
+        WorkflowExecution::query()->create([
+            'workspace_id' => $workspace->id,
+            'workflow_id' => $workflow->id,
+            'contact_id' => $contact?->id,
+            'deal_id' => $deal?->id,
+            'run_at' => now()->addMinutes((int) $workflow->delay_minutes),
+            'status' => WorkflowExecution::STATUS_PENDING,
+        ]);
     }
 
     private function execute(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): void
@@ -102,6 +148,8 @@ class WorkflowRunner
             Workflow::ACTION_CREATE_TASK => $this->createTask($workspace, $workflow, $contact, $deal, $config),
             Workflow::ACTION_ENROLL_SEQUENCE => $this->enrollSequence($workspace, $config, $contact),
             Workflow::ACTION_SEND_WEBHOOK => $this->sendWebhook($workflow, $config, $contact, $deal),
+            Workflow::ACTION_SET_PROPERTY => $this->setProperty($workspace, $config, $contact, $deal),
+            Workflow::ACTION_ASSIGN_OWNER => $this->assignOwner($config, $contact, $deal),
             default => null,
         };
     }
@@ -292,5 +340,68 @@ class WorkflowRunner
             '{{contact}}' => $contact?->displayName() ?: 'contact',
             '{{deal}}' => $deal?->title ?: 'deal',
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function setProperty(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal): void
+    {
+        $entity = (string) ($config['entity'] ?? 'contact');
+        $field = (string) ($config['field'] ?? '');
+        $value = $config['value'] ?? null;
+
+        if ($field === '' || $value === null) {
+            return;
+        }
+
+        if (str_starts_with($field, 'attr.')) {
+            $key = substr($field, 5);
+            $record = match ($entity) {
+                'deal' => $deal,
+                'contact' => $contact,
+                default => null,
+            };
+
+            if (! $record) {
+                return;
+            }
+
+            $this->attributes->saveValues($workspace, $entity, $record->id, [$key => $value]);
+
+            return;
+        }
+
+        if ($entity === 'contact' && $contact && in_array($field, ['city', 'wilaya', 'source'], true)) {
+            $contact->forceFill([$field => $value])->save();
+        }
+
+        if ($entity === 'deal' && $deal && $field === 'title') {
+            $deal->forceFill(['title' => $value])->save();
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function assignOwner(array $config, ?Contact $contact, ?Deal $deal): void
+    {
+        $ownerId = isset($config['owner_id']) ? (int) $config['owner_id'] : null;
+
+        if (! $ownerId) {
+            return;
+        }
+
+        $entity = (string) ($config['entity'] ?? 'contact');
+
+        if ($entity === 'deal' && $deal) {
+            $deal->forceFill(['owner_id' => $ownerId])->save();
+
+            return;
+        }
+
+        if ($contact) {
+            $contact->forceFill(['owner_id' => $ownerId])->save();
+        }
     }
 }

@@ -58,6 +58,9 @@ class ListViewConfig
                 ['id' => 'status', 'label' => 'Lead status', 'type' => 'select', 'options' => ['new', 'working', 'qualified', 'disqualified']],
                 ['id' => 'unanswered', 'label' => 'Unanswered', 'type' => 'boolean'],
                 ['id' => 'unassigned', 'label' => 'Unassigned', 'type' => 'boolean'],
+                ['id' => 'enrolled_in_sequence', 'label' => 'Enrolled in sequence', 'type' => 'select'],
+                ['id' => 'email_replied', 'label' => 'Replied to email', 'type' => 'boolean'],
+                ['id' => 'email_opened', 'label' => 'Opened email', 'type' => 'boolean'],
             ],
             'deal' => [
                 ['id' => 'stage', 'label' => 'Stage', 'type' => 'select'],

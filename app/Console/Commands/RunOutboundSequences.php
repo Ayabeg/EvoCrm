@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Enrollment;
+use App\Models\Enrollment;
 use App\Models\Mailbox;
+use App\Services\Crm\WorkflowRunner;
 use App\Services\Outbound\CampaignService;
 use App\Services\Outbound\OutboundDispatcher;
 use App\Services\Outbound\QuietHoursGuard;
@@ -27,6 +29,7 @@ class RunOutboundSequences extends Command
         QuietHoursGuard $quietHours,
         SuppressionService $suppressions,
         CampaignService $campaigns,
+        WorkflowRunner $workflows,
     ): int {
         $due = Enrollment::query()
             ->where('status', 'active')
@@ -110,6 +113,8 @@ class RunOutboundSequences extends Command
             if ($message->status === 'sent') {
                 $next = $sequence->steps->firstWhere('position', $enrollment->next_step + 1);
 
+                $wasFinished = $enrollment->status === 'finished';
+
                 $enrollment->forceFill($next
                     ? [
                         'next_step' => $next->position,
@@ -119,6 +124,11 @@ class RunOutboundSequences extends Command
                         'status' => 'finished',
                         'next_run_at' => null,
                     ])->save();
+
+                if (! $wasFinished && $enrollment->status === 'finished') {
+                    $workflows->handleEnrollmentFinished($enrollment);
+                }
+
                 $sent++;
             } else {
                 // Honest retry: the failure stays visible in the outbox.

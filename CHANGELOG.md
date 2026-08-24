@@ -1,5 +1,18 @@
 # Changelog
 
+## EvoCell 2 — Automation spine (2026-08-25)
+
+### Added
+- Workflow delays via `delay_minutes` on workflows and `workflow_executions` queue
+- `workflow:run` artisan command scheduled every minute
+- New workflow trigger: `enrollment.finished` (fires when sequence completes)
+- New workflow actions: `set_property`, `assign_owner`
+- Segment behavior filters: `enrolled_in_sequence`, `email_replied`, `email_opened` on contacts
+- `Contact::outboundMessages()` relationship for behavior filter joins
+
+### HubSpot comparison
+HubSpot Operations Hub adds visual canvas and 100+ actions with delay branches. This ships a scheduled execution queue, two new property/owner actions, enrollment-finished trigger, and outbound-behavior segment filters — the automation spine without a drag-drop builder.
+
 ## EvoCell 1 — Team CRM (2026-08-25)
 
 ### Added

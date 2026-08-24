@@ -77,6 +77,9 @@ class CrmFilter
             'status' => $request->input('status', $fromSaved['status'] ?? null),
             'unanswered' => $request->boolean('unanswered') || (($fromSaved['unanswered'] ?? null) === true || ($fromSaved['unanswered'] ?? null) === '1'),
             'unassigned' => $request->boolean('unassigned') || (($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1'),
+            'enrolled_in_sequence' => $request->input('enrolled_in_sequence', $fromSaved['enrolled_in_sequence'] ?? null),
+            'email_replied' => $request->boolean('email_replied') || (($fromSaved['email_replied'] ?? null) === true || ($fromSaved['email_replied'] ?? null) === '1'),
+            'email_opened' => $request->boolean('email_opened') || (($fromSaved['email_opened'] ?? null) === true || ($fromSaved['email_opened'] ?? null) === '1'),
             'view' => $view,
             'filter_id' => $saved?->id,
             'filter_groups' => $filterGroups,
@@ -475,6 +478,8 @@ class CrmFilter
             $query->where('unanswered', false);
         }
 
+        $this->applyBehaviorFilters($query, $filters);
+
         $this->applyLastActivity($query, $filters['last_activity'] ?? null);
         $this->applyCreated($query, $filters['created'] ?? null);
 
@@ -618,6 +623,28 @@ class CrmFilter
                 ])
                 ->all(),
         ];
+    }
+
+    /**
+     * @param  Builder<Contact>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyBehaviorFilters(Builder $query, array $filters): void
+    {
+        if (filled($filters['enrolled_in_sequence'] ?? null)) {
+            $sequenceId = (int) $filters['enrolled_in_sequence'];
+            $query->whereHas('enrollments', fn (Builder $enrollment) => $enrollment
+                ->where('sequence_id', $sequenceId)
+                ->whereIn('status', ['active', 'paused', 'finished']));
+        }
+
+        if (! empty($filters['email_replied'])) {
+            $query->whereHas('outboundMessages', fn (Builder $message) => $message->whereNotNull('replied_at'));
+        }
+
+        if (! empty($filters['email_opened'])) {
+            $query->whereHas('outboundMessages', fn (Builder $message) => $message->whereNotNull('opened_at'));
+        }
     }
 
     /**
