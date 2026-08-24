@@ -1,5 +1,9 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
+import AssociationsCard from '@/components/crm/associations-card';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
+import ListToolbar from '@/components/crm/list-toolbar';
+import RecordActionRow from '@/components/crm/record-action-row';
+import TimelineFilter from '@/components/crm/timeline-filter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -17,6 +21,7 @@ export default function DealHub({
     cities,
     wilayas,
     openPipelineCents,
+    stagePills,
 }: any) {
 
     return (
@@ -25,6 +30,18 @@ export default function DealHub({
             <HubShell
                 list={
                     <>
+                        <ListToolbar
+                            entity="deal"
+                            basePath="/crm/deals"
+                            activeFilters={activeFilters}
+                            savedFilters={savedFilters}
+                            members={members}
+                            cities={cities}
+                            wilayas={wilayas}
+                            contacts={contacts}
+                            stages={stages}
+                            stagePills={stagePills}
+                        />
                         <div className="border-b px-3 py-2">
                             <div className="flex items-center justify-between">
                                 <h1 className="text-sm font-semibold">Deals</h1>
@@ -124,6 +141,13 @@ export default function DealHub({
                                 </Link>
                             </header>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+                                <RecordActionRow
+                                    dealId={selected.id}
+                                    contactId={selected.contact_id}
+                                    companyId={selected.company_id}
+                                    ownerId={selected.owner_id}
+                                />
+                                <AssociationsCard associations={associations} />
                                 <div className="grid grid-cols-6 gap-1">
                                     {stages.map((stage: any) => {
                                         const column = deals.filter((deal: any) => deal.stage_id === stage.id);
@@ -171,8 +195,10 @@ export default function DealHub({
                                 </Form>
                                 <div>
                                     <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
+                                    <TimelineFilter timeline={timeline}>
+                                        {(items) => (
                                     <div className="space-y-2">
-                                        {timeline.map((item: any) => (
+                                        {items.map((item: any) => (
                                             <div key={item.id} className="border-l-2 border-brand pl-3">
                                                 <p className="text-[11px] uppercase text-muted-foreground">{item.type}</p>
                                                 <p className="font-medium">{item.subject ?? item.body}</p>
@@ -185,6 +211,8 @@ export default function DealHub({
                                             </div>
                                         ))}
                                     </div>
+                                        )}
+                                    </TimelineFilter>
                                 </div>
                             </div>
                         </>

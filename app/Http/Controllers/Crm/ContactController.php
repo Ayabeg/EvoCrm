@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContactController extends Controller
 {
@@ -26,6 +27,46 @@ class ContactController extends Controller
         abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
 
         return $this->hub($request, $filter, $hub, $contact);
+    }
+
+    public function export(Request $request, CrmFilter $filter): StreamedResponse
+    {
+        $workspace = $request->user()->workspace;
+        $filters = $filter->resolve($request, $workspace, 'contact');
+
+        $query = Contact::query()
+            ->forWorkspace($workspace)
+            ->with(['company', 'owner']);
+
+        $filter->applyToContacts($query, $filters);
+
+        $contacts = $query->orderBy('first_name')->limit(5000)->get();
+        $filename = 'contacts-'.now()->toDateString().'.csv';
+
+        return response()->streamDownload(function () use ($contacts): void {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['id', 'first_name', 'last_name', 'email', 'phone', 'company', 'owner', 'city', 'wilaya', 'created_at', 'last_activity_at']);
+
+            foreach ($contacts as $contact) {
+                fputcsv($out, [
+                    $contact->id,
+                    $contact->first_name,
+                    $contact->last_name,
+                    $contact->email,
+                    $contact->phone_e164 ?? $contact->phone,
+                    $contact->company?->name,
+                    $contact->owner?->name,
+                    $contact->city,
+                    $contact->wilaya,
+                    $contact->created_at?->toDateTimeString(),
+                    $contact->last_activity_at?->toDateTimeString(),
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function store(Request $request, ContactIdentity $identity): RedirectResponse
@@ -111,6 +152,7 @@ class ContactController extends Controller
             'selected' => $selected,
             'associations' => $selected ? $hub->contactAssociations($selected) : null,
             'timeline' => $selected ? $hub->timeline(contact: $selected) : [],
+            'catchUp' => $selected ? $hub->catchUp($selected) : ['inbound' => [], 'outbound' => []],
             'attributes' => $selected ? $hub->attributeBag($workspace, 'contact', $selected->id) : ['definitions' => [], 'values' => []],
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name', 'city', 'wilaya']),
             'members' => $hub->members($workspace),

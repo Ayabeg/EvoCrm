@@ -1,16 +1,40 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import ListToolbar from '@/components/crm/list-toolbar';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function CompaniesIndex({ companies }: { companies: any[] }) {
+export default function CompaniesIndex({
+    companies,
+    members = [],
+    savedFilters = [],
+    activeFilters = {},
+    cities = [],
+    wilayas = [],
+}: {
+    companies: any[];
+    members?: { id: number; name: string }[];
+    savedFilters?: { id: number; name: string }[];
+    activeFilters?: Record<string, unknown>;
+    cities?: string[];
+    wilayas?: string[];
+}) {
     return (
         <>
             <Head title="Companies" />
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title="Companies" description="Algeria-first accounts in the Evotechly workspace." />
+                <ListToolbar
+                    entity="company"
+                    basePath="/crm/companies"
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    members={members}
+                    cities={cities}
+                    wilayas={wilayas}
+                />
                 <Card className="p-4">
                     <Form action="/crm/companies" method="post" className="grid gap-3 md:grid-cols-4" resetOnSuccess>
                         {({ processing }) => (

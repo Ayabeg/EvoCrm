@@ -18,7 +18,7 @@ class ActivityController extends Controller
         $workspace = $request->user()->workspace;
 
         $data = $request->validate([
-            'type' => ['required', 'in:note,task,call,meeting'],
+            'type' => ['required', 'in:note,task,call,meeting,email'],
             'subject' => ['nullable', 'string', 'max:180'],
             'body' => ['nullable', 'string'],
             'due_at' => ['nullable', 'date'],

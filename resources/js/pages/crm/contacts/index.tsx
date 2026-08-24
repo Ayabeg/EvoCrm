@@ -1,4 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import ListToolbar from '@/components/crm/list-toolbar';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,9 +18,19 @@ type Contact = {
 export default function ContactsIndex({
     contacts,
     companies,
+    members = [],
+    savedFilters = [],
+    activeFilters = {},
+    cities = [],
+    wilayas = [],
 }: {
     contacts: Contact[];
     companies: { id: number; name: string }[];
+    members?: { id: number; name: string }[];
+    savedFilters?: { id: number; name: string }[];
+    activeFilters?: Record<string, unknown>;
+    cities?: string[];
+    wilayas?: string[];
 }) {
     return (
         <>
@@ -28,6 +39,17 @@ export default function ContactsIndex({
                 <PageHeader
                     title="Contacts"
                     description="One person, one Contact. Conversation history and Deals both point here."
+                />
+                <ListToolbar
+                    entity="contact"
+                    basePath="/crm/contacts"
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    members={members}
+                    cities={cities}
+                    wilayas={wilayas}
+                    companies={companies}
+                    exportHref="/crm/contacts/export"
                 />
                 <Card className="p-4">
                     <Form

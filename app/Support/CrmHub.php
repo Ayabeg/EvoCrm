@@ -6,6 +6,7 @@ use App\Models\Activity;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Message;
 use App\Models\SavedFilter;
 use App\Models\User;
 use App\Models\Workspace;
@@ -136,6 +137,61 @@ class CrmHub
         }
 
         return $query->limit(80)->get()->all();
+    }
+
+    /**
+     * Recent inbound desk messages vs outbound activity for a contact.
+     *
+     * @return array{inbound: array<int, array<string, mixed>>, outbound: array<int, array<string, mixed>>}
+     */
+    public function catchUp(Contact $contact): array
+    {
+        $messages = Message::query()
+            ->where('contact_id', $contact->id)
+            ->latest()
+            ->limit(24)
+            ->get();
+
+        $inbound = $messages
+            ->where('direction', 'inbound')
+            ->take(6)
+            ->values()
+            ->map(fn (Message $message) => [
+                'id' => 'msg-'.$message->id,
+                'label' => $message->body ?: 'Inbound message',
+                'at' => $message->created_at?->toIso8601String(),
+                'source' => 'inbound',
+            ])
+            ->all();
+
+        $outboundMessages = $messages
+            ->where('direction', 'outbound')
+            ->take(6)
+            ->values()
+            ->map(fn (Message $message) => [
+                'id' => 'msg-'.$message->id,
+                'label' => $message->body ?: 'Outbound message',
+                'at' => $message->created_at?->toIso8601String(),
+                'source' => 'outbound',
+            ]);
+
+        $outboundActivities = Activity::query()
+            ->where('contact_id', $contact->id)
+            ->whereIn('type', ['email', 'sequence', 'call', 'note'])
+            ->latest()
+            ->limit(6)
+            ->get()
+            ->map(fn (Activity $activity) => [
+                'id' => 'act-'.$activity->id,
+                'label' => $activity->subject ?? $activity->body ?? $activity->type,
+                'at' => $activity->created_at?->toIso8601String(),
+                'source' => $activity->type,
+            ]);
+
+        return [
+            'inbound' => $inbound,
+            'outbound' => $outboundMessages->concat($outboundActivities)->take(8)->values()->all(),
+        ];
     }
 
     /**

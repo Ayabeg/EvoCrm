@@ -1,5 +1,10 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
+import AssociationsCard from '@/components/crm/associations-card';
+import CatchUpBlock from '@/components/crm/catch-up-block';
 import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
+import ListToolbar from '@/components/crm/list-toolbar';
+import RecordActionRow from '@/components/crm/record-action-row';
+import TimelineFilter from '@/components/crm/timeline-filter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -15,6 +20,7 @@ export default function ContactHub({
     activeFilters,
     cities,
     wilayas,
+    catchUp,
 }: any) {
 
     return (
@@ -23,6 +29,17 @@ export default function ContactHub({
             <HubShell
                 list={
                     <>
+                        <ListToolbar
+                            entity="contact"
+                            basePath="/crm/contacts"
+                            activeFilters={activeFilters}
+                            savedFilters={savedFilters}
+                            members={members}
+                            cities={cities}
+                            wilayas={wilayas}
+                            companies={companies}
+                            exportHref="/crm/contacts/export"
+                        />
                         <div className="border-b px-3 py-2">
                             <div className="flex items-center justify-between">
                                 <h1 className="text-sm font-semibold">Contacts</h1>
@@ -111,6 +128,13 @@ export default function ContactHub({
                                 </Link>
                             </header>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+                                <RecordActionRow
+                                    contactId={selected.id}
+                                    companyId={selected.company_id}
+                                    ownerId={selected.owner_id}
+                                />
+                                <AssociationsCard associations={associations} />
+                                <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                                 <Form action={`/crm/contacts/${selected.id}`} method="put" className="grid grid-cols-2 gap-2 border-b pb-3">
                                     <Input name="first_name" defaultValue={selected.first_name} required className="h-8" />
                                     <Input name="last_name" defaultValue={selected.last_name ?? ''} className="h-8" />
@@ -153,8 +177,10 @@ export default function ContactHub({
                                 </Form>
                                 <div>
                                     <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
+                                    <TimelineFilter timeline={timeline}>
+                                        {(items) => (
                                     <div className="space-y-2">
-                                        {timeline.map((item: any) => (
+                                        {items.map((item: any) => (
                                             <div key={item.id} className="border-l-2 border-brand pl-3">
                                                 <p className="text-[11px] uppercase text-muted-foreground">{item.type}</p>
                                                 <p className="font-medium">{item.subject ?? item.body}</p>
@@ -167,6 +193,8 @@ export default function ContactHub({
                                             </div>
                                         ))}
                                     </div>
+                                        )}
+                                    </TimelineFilter>
                                 </div>
                             </div>
                         </>

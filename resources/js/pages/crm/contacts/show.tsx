@@ -1,4 +1,7 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import AssociationsCard from '@/components/crm/associations-card';
+import CatchUpBlock from '@/components/crm/catch-up-block';
+import RecordActionRow from '@/components/crm/record-action-row';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -8,9 +11,13 @@ import { Label } from '@/components/ui/label';
 export default function ContactShow({
     contact,
     companies,
+    associations,
+    catchUp,
 }: {
     contact: any;
     companies: { id: number; name: string }[];
+    associations?: any;
+    catchUp?: { inbound?: any[]; outbound?: any[] };
 }) {
     return (
         <>
@@ -24,6 +31,13 @@ export default function ContactShow({
                         <Link href="/inbox">Open inbox</Link>
                     </Button>
                 </PageHeader>
+                <RecordActionRow
+                    contactId={contact.id}
+                    companyId={contact.company_id}
+                    ownerId={contact.owner_id}
+                />
+                <AssociationsCard associations={associations ?? { company: contact.company, deals: contact.deals, leads: contact.leads }} />
+                <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                 <Card className="p-4">
                     <Form action={`/crm/contacts/${contact.id}`} method="put" className="grid gap-3 md:grid-cols-3">
                         {({ processing }) => (

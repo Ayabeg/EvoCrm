@@ -1,5 +1,6 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
+import ListToolbar from '@/components/crm/list-toolbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -12,6 +13,8 @@ export default function CompanyHub({
     members,
     cities,
     wilayas,
+    savedFilters = [],
+    activeFilters = {},
 }: any) {
     return (
         <>
@@ -19,6 +22,15 @@ export default function CompanyHub({
             <HubShell
                 list={
                     <>
+                        <ListToolbar
+                            entity="company"
+                            basePath="/crm/companies"
+                            activeFilters={activeFilters}
+                            savedFilters={savedFilters}
+                            members={members}
+                            cities={cities}
+                            wilayas={wilayas}
+                        />
                         <div className="border-b px-3 py-2">
                             <h1 className="text-sm font-semibold">Companies</h1>
                             <p className="text-[11px] text-muted-foreground">{companies.length} accounts</p>

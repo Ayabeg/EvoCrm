@@ -1,16 +1,25 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import AssociationsCard from '@/components/crm/associations-card';
+import RecordActionRow from '@/components/crm/record-action-row';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function DealShow({ deal }: { deal: any }) {
+export default function DealShow({ deal, associations }: { deal: any; associations?: any }) {
     return (
         <>
             <Head title={deal.title} />
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title={deal.title} description={`Stage: ${deal.stage?.name}`} />
+                <RecordActionRow
+                    dealId={deal.id}
+                    contactId={deal.contact_id}
+                    companyId={deal.company_id}
+                    ownerId={deal.owner_id}
+                />
+                <AssociationsCard associations={associations ?? { contact: deal.contact, company: deal.company }} />
                 <Card className="space-y-3 p-4 text-sm">
                     <p>
                         Contact:{' '}

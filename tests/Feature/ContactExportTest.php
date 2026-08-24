@@ -1,0 +1,35 @@
+<?php
+
+use App\Models\Company;
+use App\Models\Contact;
+use App\Models\User;
+
+it('exports contacts as csv on GET and honors the My view', function () {
+    $user = User::factory()->create();
+    $other = User::factory()->create(['workspace_id' => $user->workspace_id]);
+    $company = Company::factory()->create(['workspace_id' => $user->workspace_id, 'name' => 'Export Co']);
+
+    Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'company_id' => $company->id,
+        'owner_id' => $user->id,
+        'first_name' => 'ExportMine',
+        'last_name' => 'Row',
+        'email' => 'export.mine@evotechly.dz',
+    ]);
+    Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'owner_id' => $other->id,
+        'first_name' => 'ExportTheirs',
+        'email' => 'export.theirs@evotechly.dz',
+    ]);
+
+    $this->actingAs($user)
+        ->get('/crm/contacts/export?view=my')
+        ->assertOk()
+        ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+        ->assertSee('first_name')
+        ->assertSee('ExportMine')
+        ->assertSee('Export Co')
+        ->assertDontSee('ExportTheirs');
+});

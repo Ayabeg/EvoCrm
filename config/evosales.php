@@ -47,7 +47,7 @@ return [
         'Blida', 'Béjaïa', 'Batna', 'Tizi Ouzou', 'Ouargla', 'Mostaganem',
     ],
 
-    'activity_types' => ['note', 'task', 'call', 'meeting', 'stage_change', 'sequence'],
+    'activity_types' => ['note', 'task', 'call', 'meeting', 'email', 'stage_change', 'sequence'],
 
     'quote_statuses' => ['draft', 'sent', 'accepted'],
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
@@ -13,16 +14,16 @@ use Inertia\Response;
 
 class CompanyController extends Controller
 {
-    public function index(Request $request, CrmHub $hub): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
     {
-        return $this->hub($request, $hub, null);
+        return $this->hub($request, $filter, $hub, null);
     }
 
-    public function show(Request $request, Company $company, CrmHub $hub): Response
+    public function show(Request $request, Company $company, CrmFilter $filter, CrmHub $hub): Response
     {
         abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        return $this->hub($request, $hub, $company);
+        return $this->hub($request, $filter, $hub, $company);
     }
 
     public function store(Request $request): RedirectResponse
@@ -71,14 +72,19 @@ class CompanyController extends Controller
         return back();
     }
 
-    protected function hub(Request $request, CrmHub $hub, ?Company $selected): Response
+    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, ?Company $selected): Response
     {
         $workspace = $request->user()->workspace;
+        $filters = $filter->resolve($request, $workspace, 'company');
 
-        $companies = Company::query()
+        $query = Company::query()
             ->forWorkspace($workspace)
             ->with('owner')
-            ->withCount(['contacts', 'deals'])
+            ->withCount(['contacts', 'deals']);
+
+        $filter->applyToCompanies($query, $filters);
+
+        $companies = $query
             ->orderBy('name')
             ->limit(120)
             ->get();
@@ -96,6 +102,8 @@ class CompanyController extends Controller
             'timeline' => $selected ? $hub->timeline(company: $selected) : [],
             'attributes' => $selected ? $hub->attributeBag($workspace, 'company', $selected->id) : ['definitions' => [], 'values' => []],
             'members' => $hub->members($workspace),
+            'savedFilters' => $hub->filters($workspace, 'company'),
+            'activeFilters' => $filters,
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
         ]);

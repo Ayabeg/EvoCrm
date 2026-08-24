@@ -174,6 +174,21 @@ class DealController extends Controller
             ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false))
             ->sum('amount_cents');
 
+        $stagePills = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filter, $filters) {
+            $countQuery = Deal::query()->forWorkspace($workspace)->where('stage_id', $stage->id);
+            $withoutStage = $filters;
+            $withoutStage['stage'] = null;
+            $filter->applyToDeals($countQuery, $withoutStage);
+
+            return [
+                'id' => $stage->id,
+                'name' => $stage->name,
+                'slug' => $stage->slug,
+                'count' => $countQuery->count(),
+                'tone' => $stage->is_won ? 'won' : ($stage->is_lost ? 'lost' : 'open'),
+            ];
+        })->values();
+
         return Inertia::render('crm/deals/hub', [
             'deals' => $deals,
             'selected' => $selected?->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items']),
@@ -181,6 +196,7 @@ class DealController extends Controller
             'timeline' => $selected ? $hub->timeline(deal: $selected) : [],
             'attributes' => $selected ? $hub->attributeBag($workspace, 'deal', $selected->id) : ['definitions' => [], 'values' => []],
             'stages' => $pipeline->stages,
+            'stagePills' => $stagePills,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'deal'),

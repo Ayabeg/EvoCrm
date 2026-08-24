@@ -1,4 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import ListToolbar from '@/components/crm/list-toolbar';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -21,10 +22,22 @@ export default function DealsIndex({
     deals,
     stages,
     contacts,
+    members = [],
+    savedFilters = [],
+    activeFilters = {},
+    cities = [],
+    wilayas = [],
+    stagePills = [],
 }: {
     deals: Deal[];
     stages: { id: number; name: string; slug: string; position: number }[];
     contacts: { id: number; first_name: string; last_name?: string | null }[];
+    members?: { id: number; name: string }[];
+    savedFilters?: { id: number; name: string }[];
+    activeFilters?: Record<string, unknown>;
+    cities?: string[];
+    wilayas?: string[];
+    stagePills?: { id: number; name: string; slug: string; count: number; tone: string }[];
 }) {
     return (
         <>
@@ -33,6 +46,18 @@ export default function DealsIndex({
                 <PageHeader
                     title="Deals"
                     description="Default pipeline: New → Qualified → Demo → Proposal → Won / Lost."
+                />
+                <ListToolbar
+                    entity="deal"
+                    basePath="/crm/deals"
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    members={members}
+                    cities={cities}
+                    wilayas={wilayas}
+                    contacts={contacts}
+                    stages={stages}
+                    stagePills={stagePills}
                 />
                 <Card className="p-4">
                     <Form action="/crm/deals" method="post" className="grid gap-3 md:grid-cols-4" resetOnSuccess>
