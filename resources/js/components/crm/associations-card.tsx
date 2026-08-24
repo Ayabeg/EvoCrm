@@ -71,13 +71,15 @@ export default function AssociationsCard({
                     </Link>
                 </AssociationGroup>
             ) : null}
-            <AssociationGroup label="Company" empty={!bag.company}>
-                {bag.company ? (
-                    <Link href={`/crm/companies/${bag.company.id}`} className="block text-brand">
-                        {nameOf(bag.company)}
-                    </Link>
-                ) : null}
-            </AssociationGroup>
+            {'company' in bag ? (
+                <AssociationGroup label="Company" empty={!bag.company}>
+                    {bag.company ? (
+                        <Link href={`/crm/companies/${bag.company.id}`} className="block text-brand">
+                            {nameOf(bag.company)}
+                        </Link>
+                    ) : null}
+                </AssociationGroup>
+            ) : null}
             {bag.lead ? (
                 <AssociationGroup label="Lead" empty={false}>
                     <Link href={`/crm/leads/${bag.lead.id}`} className="block text-brand">

@@ -135,3 +135,23 @@ it('loads the deal show workspace with associations and catch-up', function () {
             ->has('timeline')
         );
 });
+
+it('loads the company show workspace with associations', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+    $company = Company::factory()->create(['workspace_id' => $workspace->id]);
+    Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'company_id' => $company->id,
+    ]);
+
+    $this->actingAs($user)
+        ->get("/crm/companies/{$company->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/hub')
+            ->has('associations.contacts', 1)
+            ->has('associations.deals')
+            ->where('selected.contacts_count', 1)
+        );
+});

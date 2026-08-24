@@ -94,6 +94,8 @@ class CompanyController extends Controller
         }
 
         $selected ??= $companies->first();
+        $selected?->loadMissing('owner');
+        $selected?->loadCount(['contacts', 'deals']);
 
         return Inertia::render('crm/companies/hub', [
             'companies' => $companies,
