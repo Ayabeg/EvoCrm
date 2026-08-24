@@ -4,6 +4,7 @@ use App\Http\Controllers\Ads\AdsCenterController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\MetaController;
 use App\Http\Controllers\Crm\ActivityController;
+use App\Http\Controllers\Crm\AskEvoController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
@@ -105,6 +106,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/crm/contacts/{contact}', [ContactController::class, 'show'])->name('crm.contacts.show');
     Route::put('/crm/contacts/{contact}', [ContactController::class, 'update'])->name('crm.contacts.update');
     Route::put('/crm/contacts/{contact}/attributes', [ContactController::class, 'updateAttributes'])->name('crm.contacts.attributes');
+    Route::post('/crm/contacts/{contact}/ask', [AskEvoController::class, 'contact'])->name('crm.contacts.ask');
 
     Route::get('/crm/leads', [LeadController::class, 'index'])->name('crm.leads.index');
     Route::post('/crm/leads', [LeadController::class, 'store'])->name('crm.leads.store');
@@ -119,6 +121,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/crm/deals/{deal}', [DealController::class, 'update'])->name('crm.deals.update');
     Route::put('/crm/deals/{deal}/attributes', [DealController::class, 'updateAttributes'])->name('crm.deals.attributes');
     Route::post('/crm/deals/{deal}/move', [DealController::class, 'move'])->name('crm.deals.move');
+    Route::post('/crm/deals/{deal}/ask', [AskEvoController::class, 'deal'])->name('crm.deals.ask');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
     Route::get('/ads/campaigns/{campaign}', [AdsCenterController::class, 'show'])->name('ads.campaigns.show');
