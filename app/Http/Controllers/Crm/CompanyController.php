@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
@@ -13,42 +14,32 @@ use Inertia\Response;
 
 class CompanyController extends Controller
 {
-    public function index(Request $request, CrmHub $hub): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
     {
         $workspace = $request->user()->workspace;
-        $view = $request->string('view')->toString() ?: 'all';
-        $q = $request->string('q')->toString();
+        $filters = $filter->resolve($request, $workspace, 'company');
+
+        if (($filters['view'] ?? 'all') === 'mine') {
+            $filters['owner'] = (string) $request->user()->id;
+        }
 
         $query = Company::query()
             ->forWorkspace($workspace)
             ->with('owner')
             ->withCount(['contacts', 'deals']);
 
-        if ($view === 'mine') {
-            $query->where('owner_id', $request->user()->id);
-        }
-
-        if ($q !== '') {
-            $query->where(function ($inner) use ($q) {
-                $inner->where('name', 'like', "%{$q}%")
-                    ->orWhere('domain', 'like', "%{$q}%")
-                    ->orWhere('city', 'like', "%{$q}%");
-            });
-        }
-
-        if ($request->filled('owner') && $request->string('owner') !== 'unassigned') {
-            $query->where('owner_id', $request->integer('owner'));
-        }
+        $filter->apply('company', $query, $filters);
+        $filter->applySort('company', $query, $filters);
 
         return Inertia::render('crm/companies/index', [
             'companies' => $query->orderBy('name')->limit(120)->get(),
             'members' => $hub->members($workspace),
+            'savedFilters' => $hub->filters($workspace, 'company', $request->user()),
+            'activeFilters' => $filters,
+            'listView' => $hub->listViewMeta('company', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'recordCount' => $filter->count($workspace, 'company', $filters),
             'cities' => config('evosales.cities'),
-            'activeFilters' => [
-                'view' => $view,
-                'q' => $q,
-                'owner' => $request->input('owner'),
-            ],
+            'wilayas' => config('evosales.wilayas'),
             'createOpen' => $request->boolean('create'),
         ]);
     }
