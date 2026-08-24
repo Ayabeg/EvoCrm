@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 
-type CatchUpItem = {
+export type CatchUpItem = {
     id: string;
     label: string;
     at?: string | null;
