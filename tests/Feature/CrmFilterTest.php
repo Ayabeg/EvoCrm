@@ -34,7 +34,7 @@ it('filters contacts by wilaya, unanswered, and unassigned', function () {
         ->get('/crm/contacts?wilaya=Alger&unanswered=1&unassigned=1')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/contacts/hub')
+            ->component('crm/contacts/index')
             ->has('contacts', 1)
             ->where('contacts.0.id', $kept->id)
             ->has('listView.columnDefs')

@@ -137,25 +137,25 @@
     --chart-4: var(--evosales-hairline);
     --chart-5: var(--evosales-canvas-soft);
     --radius: 0.5rem;
-    /* Chatwoot dark rail (explicit override of the light chrome, rail only). */
-    --sidebar: #151718;
-    --sidebar-foreground: #b0b4ba;
-    --sidebar-primary: #edeff0;
-    --sidebar-primary-foreground: #151718;
-    --sidebar-accent: rgba(147, 153, 176, 0.12);
-    --sidebar-accent-foreground: #edeff0;
-    --sidebar-border: #1f1f25;
-    --sidebar-ring: #43484e;
-    --sidebar-ink: #edeff0;
-    --sidebar-mute: #b0b4ba;
-    --sidebar-faint: #777b84;
-    --sidebar-well: #2a2b33;
-    --sidebar-well-hover: #1d1e24;
-    --sidebar-line: #272a2d;
-    --sidebar-strong: #2e2d32;
-    --sidebar-hover: #212225;
-    --sidebar-overlay: rgba(35, 36, 42, 0.8);
-    --sidebar-online: #0eb39e;
+    /* HubSpot-style rail: true black, orange active tint. Never navy. */
+    --sidebar: #000000;
+    --sidebar-foreground: #d4d4d4;
+    --sidebar-primary: #f5f5f5;
+    --sidebar-primary-foreground: #000000;
+    --sidebar-accent: rgba(236, 96, 37, 0.22);
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: #1f1f1f;
+    --sidebar-ring: #ec6025;
+    --sidebar-ink: #f5f5f5;
+    --sidebar-mute: #a3a3a3;
+    --sidebar-faint: #737373;
+    --sidebar-well: #171717;
+    --sidebar-well-hover: #262626;
+    --sidebar-line: #1f1f1f;
+    --sidebar-strong: #262626;
+    --sidebar-hover: #141414;
+    --sidebar-overlay: rgba(0, 0, 0, 0.8);
+    --sidebar-online: #22c55e;
 }
 
 /*

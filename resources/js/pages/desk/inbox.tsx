@@ -1,11 +1,8 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
-import { MessageCircle } from 'lucide-react';
-import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
+import { Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import type { OfficialDeskConnector } from '@/types';
 
 type Contact = {
     id: number;
@@ -14,6 +11,7 @@ type Contact = {
     email?: string | null;
     phone_e164?: string | null;
     company?: { id: number; name: string } | null;
+    owner?: { id: number; name: string } | null;
 };
 
 type Thread = {
@@ -27,24 +25,30 @@ type Thread = {
     messages?: {
         id: number;
         direction: string;
+        type?: string;
         body: string;
         status: string;
         failure_reason?: string | null;
         created_at: string;
+        user?: { name: string } | null;
     }[];
 };
 
+type ChannelCard = {
+    key: string;
+    label: string;
+    href: string;
+    connected: boolean;
+};
+
 type Props = {
-    /** EvoDesk (Chatwoot) embed source — same-window iframe, never a new tab. */
     embedUrl: string | null;
-    /** ok = frame it; blocked/unreachable/no-url = native CRM desk instead. */
     embedState: 'ok' | 'blocked' | 'unreachable' | 'no-url';
     embedReason: string | null;
-    /** The configured desk URL even when framing is refused (for the banner). */
     configuredUrl: string | null;
     threads: Thread[];
     selected: Thread | null;
-    officialConnectors: OfficialDeskConnector[];
+    channels?: ChannelCard[];
 };
 
 function nameOf(contact?: Contact | null) {
@@ -55,160 +59,212 @@ function nameOf(contact?: Contact | null) {
     return `${contact.first_name} ${contact.last_name ?? ''}`.trim();
 }
 
-/**
- * My Inbox — the sold EvoDesk (Chatwoot Community) lives inside the CRM
- * chrome here. When the desk URL is not configured (or the desk deployment
- * refuses framing), the native CRM conversation desk below keeps the
- * operator on this hostname instead of ejecting to desk.evotechly.com.
- */
+const CHANNEL_ICONS: Record<string, typeof MessageCircle> = {
+    whatsapp_cloud: MessageCircle,
+    instagram: Instagram,
+    facebook: Facebook,
+};
+
 export default function DeskInbox({
     embedUrl,
     embedState,
-    embedReason,
-    configuredUrl,
     threads,
     selected,
-    officialConnectors = [],
+    channels = [],
 }: Props) {
+    const empty = threads.length === 0;
+
     return (
         <>
-            <Head title="My Inbox" />
-            <div className="flex h-[calc(100dvh-52px)] flex-col">
-                <div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-hairline bg-canvas px-4 py-2">
-                    <h1 className="text-sm font-semibold">My Inbox</h1>
-                    <Badge variant={embedUrl ? 'default' : 'secondary'}>
-                        {embedUrl ? 'EvoDesk · embedded' : 'Native CRM desk'}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground">
-                        The desk never leaves EvoSales.
-                    </p>
-                    <div className="ms-auto flex items-center gap-2">
-                        <Button asChild variant="outline" size="sm">
-                            <Link href="/conversations">Conversation history</Link>
-                        </Button>
-                    </div>
+            <Head title="Desk" />
+            <div className="flex h-[calc(100dvh-52px)] flex-col bg-canvas text-[13px] text-ink">
+                <div className="flex shrink-0 items-center gap-3 border-b border-hairline px-4 py-2">
+                    <h1 className="text-sm font-semibold">Desk</h1>
+                    <Badge variant="secondary">Chat inbox</Badge>
+                    <Link href="/outbound/replies" className="text-[12px] text-brand">
+                        Email
+                    </Link>
+                    <span className="sr-only">
+                        {embedUrl ?? embedState}
+                    </span>
                 </div>
-
-                {embedUrl ? (
-                    <>
-                        <OfficialConnectPanel connectors={officialConnectors} compact />
-                        <iframe
-                            title="EvoDesk — EvoSales inbox"
-                            src={embedUrl}
-                            className="min-h-0 w-full flex-1 border-0 bg-canvas"
-                            allow="clipboard-write; microphone; camera"
-                        />
-                    </>
+                {empty ? (
+                    <ConnectChannels channels={channels} />
                 ) : (
-                    <NativeDesk
-                        threads={threads}
-                        selected={selected}
-                        embedState={embedState}
-                        embedReason={embedReason}
-                        configuredUrl={configuredUrl}
-                        officialConnectors={officialConnectors}
-                    />
+                    <FrontDesk threads={threads} selected={selected} />
                 )}
             </div>
         </>
     );
 }
 
-DeskInbox.layout = {
-    breadcrumbs: [{ title: 'My Inbox', href: '/inbox' }],
-};
+function ConnectChannels({ channels }: { channels: ChannelCard[] }) {
+    const cards =
+        channels.length > 0
+            ? channels
+            : [
+                  { key: 'whatsapp_cloud', label: 'WhatsApp Cloud', href: '/settings/apps', connected: false },
+                  { key: 'instagram', label: 'Instagram', href: '/settings/apps', connected: false },
+                  { key: 'facebook', label: 'Facebook', href: '/settings/apps', connected: false },
+              ];
 
-function NativeDesk({
+    return (
+        <div className="grid flex-1 place-items-center px-6">
+            <div className="w-full max-w-lg text-center">
+                <h2 className="text-[22px] font-semibold">Connect your channels</h2>
+                <p className="mt-2 text-muted-foreground">
+                    Official WhatsApp Cloud, Instagram, and Facebook. No unofficial WhatsApp.
+                </p>
+                <div className="mt-6 grid gap-3">
+                    {cards.map((channel) => {
+                        const Icon = CHANNEL_ICONS[channel.key] ?? MessageCircle;
+
+                        return (
+                            <Link
+                                key={channel.key}
+                                href={channel.href}
+                                className="flex items-center justify-between rounded-md border border-hairline px-4 py-3 text-left hover:border-brand"
+                            >
+                                <span className="inline-flex items-center gap-2 font-medium">
+                                    <Icon className="size-4 text-brand" />
+                                    {channel.label}
+                                </span>
+                                <span className="text-[12px] text-brand">
+                                    {channel.connected ? 'Connected' : 'Connect'}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function FrontDesk({
     threads,
     selected,
-    embedState,
-    embedReason,
-    configuredUrl,
-    officialConnectors,
 }: {
     threads: Thread[];
     selected: Thread | null;
-    embedState: Props['embedState'];
-    embedReason: string | null;
-    configuredUrl: string | null;
-    officialConnectors: OfficialDeskConnector[];
 }) {
+    const [folder, setFolder] = useState('all');
+    const [mode, setMode] = useState<'reply' | 'note'>('reply');
+
+    const filtered = useMemo(() => {
+        if (folder === 'unassigned') {
+            return threads.filter((thread) => !thread.contact.owner);
+        }
+
+        if (folder === 'whatsapp') {
+            return threads.filter((thread) => thread.channel?.type === 'whatsapp_cloud');
+        }
+
+        return threads;
+    }, [folder, threads]);
+
+    const folders = [
+        { key: 'all', label: `All conversations (${threads.length})` },
+        {
+            key: 'unassigned',
+            label: `Unassigned (${threads.filter((thread) => !thread.contact.owner).length})`,
+        },
+        { key: 'whatsapp', label: 'WhatsApp Cloud' },
+    ];
+
     return (
-        <div className="grid min-h-0 flex-1 gap-0 overflow-hidden lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-            <div className="min-h-0 overflow-y-auto border-r border-hairline">
-                <Card className="m-3 border-hairline bg-canvas-soft p-3 text-xs text-muted-foreground">
-                    {embedState === 'no-url' ? (
-                        <p>
-                            <span className="font-medium text-foreground">Native CRM desk.</span> Set{' '}
-                            <code>EVOSALES_INBOX_URL</code> (and optionally <code>EVOSALES_INBOX_EMBED_PATH</code>)
-                            to embed the live EvoDesk UI here instead.
+        <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[220px_minmax(0,280px)_minmax(0,1fr)]">
+            <aside className="min-h-0 overflow-y-auto border-r border-hairline p-3">
+                <p className="mb-2 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                    Shared inbox
+                </p>
+                {folders.map((item) => (
+                    <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => setFolder(item.key)}
+                        className={`mb-1 block w-full rounded-md px-2 py-1.5 text-left ${
+                            folder === item.key
+                                ? 'bg-[rgba(236,96,37,0.12)] font-medium text-ink'
+                                : 'text-muted-foreground'
+                        }`}
+                    >
+                        {item.label}
+                    </button>
+                ))}
+                <p className="mt-4 mb-2 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                    Channels
+                </p>
+                <p className="px-2 text-[12px]">WhatsApp Cloud</p>
+                <Link href="/outbound/replies" className="mt-2 block px-2 text-[12px] text-brand">
+                    Email
+                </Link>
+            </aside>
+
+            <aside className="min-h-0 overflow-y-auto border-r border-hairline">
+                {filtered.map((thread) => (
+                    <button
+                        key={thread.id}
+                        type="button"
+                        onClick={() =>
+                            router.get('/inbox', { thread: thread.id }, { preserveState: true })
+                        }
+                        className={`block w-full border-b border-hairline px-3 py-3 text-left ${
+                            selected?.id === thread.id
+                                ? 'bg-[rgba(236,96,37,0.08)]'
+                                : 'hover:bg-canvas-soft'
+                        }`}
+                    >
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium">{nameOf(thread.contact)}</span>
+                            {(thread.unread_count ?? 0) > 0 ? (
+                                <Badge variant="secondary">{thread.unread_count}</Badge>
+                            ) : null}
+                        </div>
+                        <p className="truncate text-[12px] text-muted-foreground">
+                            {thread.messages?.[0]?.body ?? thread.subject ?? '—'}
                         </p>
-                    ) : (
-                        <p>
-                            <span className="font-medium text-foreground">
-                                EvoDesk at {configuredUrl} is not framed here.
-                            </span>{' '}
-                            {embedReason} You keep working — this is the full CRM desk, not a link out.
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                            {thread.contact.owner?.name ?? 'Unassigned'}
                         </p>
-                    )}
-                </Card>
-                <OfficialConnectPanel
-                    connectors={officialConnectors}
-                    compact={threads.length > 0}
-                />
-                <table className="w-full text-sm">
-                    <tbody>
-                        {threads.length === 0 ? (
-                            <tr>
-                                <td className="px-4 py-6 text-muted-foreground">
-                                    No conversations yet. Connect an official channel above to start.
-                                </td>
-                            </tr>
-                        ) : (
-                            threads.map((thread) => (
-                                <tr
-                                    key={thread.id}
-                                    className={`cursor-pointer border-t border-hairline hover:bg-muted/40 ${
-                                        selected?.id === thread.id ? 'bg-muted/60' : ''
-                                    }`}
-                                    onClick={() =>
-                                        router.get('/inbox', { thread: thread.id }, { preserveState: true })
-                                    }
-                                >
-                                    <td className="px-4 py-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-medium">{nameOf(thread.contact)}</span>
-                                            {(thread.unread_count ?? 0) > 0 ? (
-                                                <Badge variant="secondary">{thread.unread_count}</Badge>
-                                            ) : null}
-                                        </div>
-                                        <p className="text-xs text-muted-foreground">
-                                            {thread.messages?.[0]?.body ?? thread.subject ?? '—'}
-                                        </p>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-            <div className="min-h-0 space-y-4 overflow-y-auto p-4">
+                    </button>
+                ))}
+            </aside>
+
+            <section className="flex min-h-0 flex-col">
                 {selected ? (
                     <>
-                        <div>
-                            <h2 className="font-medium">{nameOf(selected.contact)}</h2>
-                            <p className="text-sm text-muted-foreground">
-                                {selected.contact.company?.name ?? 'No company'} ·{' '}
-                                {selected.contact.phone_e164 ?? 'No phone'}
-                            </p>
-                        </div>
-                        <div className="space-y-2 text-sm">
+                        <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
+                            <div>
+                                <h2 className="font-semibold">{nameOf(selected.contact)}</h2>
+                                <p className="text-[12px] text-muted-foreground">
+                                    {selected.contact.owner?.name ?? 'Unassigned'} · Official WhatsApp
+                                </p>
+                            </div>
+                            <Link
+                                href={`/crm/contacts/${selected.contact.id}`}
+                                className="text-[12px] text-brand"
+                            >
+                                Open contact
+                            </Link>
+                        </header>
+                        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-4">
                             {(selected.messages ?? []).map((message) => (
-                                <div key={message.id} className="rounded-md border border-hairline px-3 py-2">
-                                    <p className="text-xs text-muted-foreground">
-                                        {message.direction} · {message.status}
-                                        {message.failure_reason ? ` · ${message.failure_reason}` : ''}
-                                    </p>
+                                <div
+                                    key={message.id}
+                                    className={`max-w-[80%] rounded-md px-3 py-2 ${
+                                        message.type === 'note'
+                                            ? 'bg-[#FFF4E8] text-ink'
+                                            : message.direction === 'outbound'
+                                              ? 'ml-auto bg-canvas-soft'
+                                              : 'bg-[#EAF7EA]'
+                                    }`}
+                                >
+                                    {message.type === 'note' ? (
+                                        <p className="mb-1 text-[11px] font-medium text-brand">
+                                            Private note — only visible to agents
+                                        </p>
+                                    ) : null}
                                     <p>{message.body}</p>
                                 </div>
                             ))}
@@ -216,31 +272,67 @@ function NativeDesk({
                         <Form
                             action={`/desk/threads/${selected.id}/reply`}
                             method="post"
-                            className="flex gap-2"
+                            className="border-t border-hairline p-3"
                             resetOnSuccess={['body']}
                         >
                             {({ processing }) => (
                                 <>
-                                    <Input
+                                    <div className="mb-2 flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode('reply')}
+                                            className={mode === 'reply' ? 'border-b-2 border-brand pb-1 font-medium' : 'text-muted-foreground'}
+                                        >
+                                            Reply
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode('note')}
+                                            className={mode === 'note' ? 'border-b-2 border-brand pb-1 font-medium' : 'text-muted-foreground'}
+                                        >
+                                            Note
+                                        </button>
+                                    </div>
+                                    {mode === 'note' ? (
+                                        <input type="hidden" name="as_note" value="1" />
+                                    ) : null}
+                                    <textarea
                                         name="body"
-                                        placeholder="Log a session reply (Evolution Cloud if connected)"
                                         required
+                                        placeholder={
+                                            mode === 'note'
+                                                ? 'Private note…'
+                                                : 'Type your message…'
+                                        }
+                                        className="min-h-20 w-full rounded-md border border-hairline p-2 text-[13px]"
                                     />
-                                    <Button disabled={processing}>Send</Button>
+                                    <div className="mt-2 flex justify-end gap-2">
+                                        {mode === 'reply' ? (
+                                            <Button
+                                                name="resolve"
+                                                value="1"
+                                                disabled={processing}
+                                            >
+                                                Send as resolved
+                                            </Button>
+                                        ) : (
+                                            <Button disabled={processing}>Add note</Button>
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </Form>
-                        <Link href={`/crm/contacts/${selected.contact.id}`} className="inline-block text-sm text-brand">
-                            Open CRM record
-                        </Link>
                     </>
                 ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
-                        <MessageCircle className="size-6" />
-                        <p>Select a conversation.</p>
+                    <div className="grid flex-1 place-items-center text-muted-foreground">
+                        Select a conversation.
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 }
+
+DeskInbox.layout = {
+    breadcrumbs: [{ title: 'Desk', href: '/inbox' }],
+};

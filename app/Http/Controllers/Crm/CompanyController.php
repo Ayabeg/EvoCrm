@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
@@ -14,16 +13,60 @@ use Inertia\Response;
 
 class CompanyController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
+    public function index(Request $request, CrmHub $hub): Response
     {
-        return $this->hub($request, $filter, $hub, null);
+        $workspace = $request->user()->workspace;
+        $view = $request->string('view')->toString() ?: 'all';
+        $q = $request->string('q')->toString();
+
+        $query = Company::query()
+            ->forWorkspace($workspace)
+            ->with('owner')
+            ->withCount(['contacts', 'deals']);
+
+        if ($view === 'mine') {
+            $query->where('owner_id', $request->user()->id);
+        }
+
+        if ($q !== '') {
+            $query->where(function ($inner) use ($q) {
+                $inner->where('name', 'like', "%{$q}%")
+                    ->orWhere('domain', 'like', "%{$q}%")
+                    ->orWhere('city', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('owner') && $request->string('owner') !== 'unassigned') {
+            $query->where('owner_id', $request->integer('owner'));
+        }
+
+        return Inertia::render('crm/companies/index', [
+            'companies' => $query->orderBy('name')->limit(120)->get(),
+            'members' => $hub->members($workspace),
+            'cities' => config('evosales.cities'),
+            'activeFilters' => [
+                'view' => $view,
+                'q' => $q,
+                'owner' => $request->input('owner'),
+            ],
+            'createOpen' => $request->boolean('create'),
+        ]);
     }
 
-    public function show(Request $request, Company $company, CrmFilter $filter, CrmHub $hub): Response
+    public function show(Request $request, Company $company, CrmHub $hub): Response
     {
         abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        return $this->hub($request, $filter, $hub, $company);
+        return Inertia::render('crm/companies/hub', [
+            'companies' => Company::query()->forWorkspace($request->user()->workspace)->with('owner')->withCount(['contacts', 'deals'])->orderBy('name')->limit(120)->get(),
+            'selected' => $company,
+            'associations' => $hub->companyAssociations($company),
+            'timeline' => $hub->timeline(company: $company),
+            'attributes' => $hub->attributeBag($request->user()->workspace, 'company', $company->id),
+            'members' => $hub->members($request->user()->workspace),
+            'cities' => config('evosales.cities'),
+            'wilayas' => config('evosales.wilayas'),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -31,19 +74,23 @@ class CompanyController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:180'],
             'domain' => ['nullable', 'string', 'max:180'],
+            'industry' => ['nullable', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:40'],
             'city' => ['nullable', 'string', 'max:120'],
             'wilaya' => ['nullable', 'string', 'max:80'],
             'owner_id' => ['nullable', 'integer'],
+            'add_another' => ['sometimes', 'boolean'],
         ]);
 
         Company::query()->create([
-            ...$data,
+            ...collect($data)->except('add_another')->all(),
             'workspace_id' => $request->user()->workspace_id,
             'country' => 'DZ',
         ]);
 
-        return back();
+        return $request->boolean('add_another')
+            ? redirect()->route('crm.companies.index', ['create' => 1])
+            : redirect()->route('crm.companies.index');
     }
 
     public function update(Request $request, Company $company, CustomAttributes $attributes): RedirectResponse
@@ -53,6 +100,7 @@ class CompanyController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:180'],
             'domain' => ['nullable', 'string', 'max:180'],
+            'industry' => ['nullable', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:40'],
             'city' => ['nullable', 'string', 'max:120'],
             'wilaya' => ['nullable', 'string', 'max:80'],
@@ -70,66 +118,5 @@ class CompanyController extends Controller
         }
 
         return back();
-    }
-
-    public function updateAttributes(Request $request, Company $company, CustomAttributes $attributes): RedirectResponse
-    {
-        abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
-
-        $data = $request->validate([
-            'attributes' => ['required', 'array'],
-        ]);
-
-        $attributes->saveValues(
-            $request->user()->workspace,
-            'company',
-            $company->id,
-            $data['attributes'],
-            enforceRequired: true,
-        );
-
-        return back();
-    }
-
-    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, ?Company $selected): Response
-    {
-        $workspace = $request->user()->workspace;
-        $filters = $filter->resolve($request, $workspace, 'company');
-
-        $query = Company::query()
-            ->forWorkspace($workspace)
-            ->with('owner')
-            ->withCount(['contacts', 'deals']);
-
-        $filter->apply('company', $query, $filters);
-        $filter->applySort('company', $query, $filters);
-
-        $companies = $query
-            ->orderBy('name')
-            ->limit(120)
-            ->get();
-
-        if (! $selected && $request->integer('company')) {
-            $selected = Company::query()->forWorkspace($workspace)->find($request->integer('company'));
-        }
-
-        $selected ??= $companies->first();
-        $selected?->loadMissing('owner');
-        $selected?->loadCount(['contacts', 'deals']);
-
-        return Inertia::render('crm/companies/hub', [
-            'companies' => $companies,
-            'selected' => $selected,
-            'associations' => $selected ? $hub->companyAssociations($selected) : null,
-            'timeline' => $selected ? $hub->timeline(company: $selected) : [],
-            'attributes' => $selected ? $hub->attributeBag($workspace, 'company', $selected->id) : ['definitions' => [], 'values' => []],
-            'members' => $hub->members($workspace),
-            'savedFilters' => $hub->filters($workspace, 'company', $request->user()),
-            'activeFilters' => $filters,
-            'listView' => $hub->listViewMeta('company', $filters['columns'] ?? null, $filters['sort'] ?? null),
-            'recordCount' => $filter->count($workspace, 'company', $filters),
-            'cities' => config('evosales.cities'),
-            'wilayas' => config('evosales.wilayas'),
-        ]);
     }
 }

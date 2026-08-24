@@ -94,6 +94,7 @@ class HomeController extends Controller
                 ['key' => 'integrations', 'name' => 'Integrations', 'href' => '/settings/apps', 'value' => $connectedApps, 'value_label' => 'of '.count($integrations).' connected'],
             ],
             'charts' => $this->evoVizCharts($workspace),
+            'owners' => $workspace->users()->orderBy('name')->get(['id', 'name']),
         ]);
     }
 

@@ -47,7 +47,7 @@ it('loads contact associations for company, deal, thread, and enrollment', funct
         ->get("/crm/contacts/{$contact->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/contacts/hub')
+            ->component('crm/contacts/show')
             ->has('associations.company')
             ->has('associations.deals', 1)
             ->has('associations.threads', 1)

@@ -25,8 +25,8 @@ import { cn } from "@/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// Chatwoot next-sidebar metrics: 200px default rail, 56px icon rail.
-const SIDEBAR_WIDTH = "200px"
+// HubSpot sales chrome: ~220px label rail, 56px icon rail.
+const SIDEBAR_WIDTH = "220px"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"

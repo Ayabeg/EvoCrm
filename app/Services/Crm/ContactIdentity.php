@@ -54,6 +54,7 @@ class ContactIdentity
             'city' => $attributes['city'] ?? null,
             'wilaya' => $attributes['wilaya'] ?? null,
             'source' => $attributes['source'] ?? null,
+            'lead_status' => $attributes['lead_status'] ?? null,
             'meta' => $attributes['meta'] ?? null,
         ]);
     }

@@ -295,7 +295,7 @@ it('puts Home first on the rail, pointing at the command center', function () {
         ->toContain("href: '/dashboard'")
         ->toContain("activePaths: ['/']");
 
-    // Home leads the rail — ahead of My Inbox.
+    // Home leads the rail — ahead of Contacts.
     expect(strpos($sidebar, "label: 'Home'"))
-        ->toBeLessThan(strpos($sidebar, "label: 'My Inbox'"));
+        ->toBeLessThan(strpos($sidebar, "label: 'Contacts'"));
 });

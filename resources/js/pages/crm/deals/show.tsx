@@ -1,103 +1,259 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import AskEvoPanel from '@/components/crm/ask-evo-panel';
-import AssociationsCard from '@/components/crm/associations-card';
-import CatchUpBlock from '@/components/crm/catch-up-block';
-import DealHealthPill from '@/components/crm/deal-health-pill';
-import DealLineItems from '@/components/crm/deal-line-items';
+import { useMemo, useState } from 'react';
 import { formatDzd } from '@/components/crm/hub-chrome';
-import RecordActionRow from '@/components/crm/record-action-row';
-import { RecordFact, RecordFacts } from '@/components/crm/record-workspace';
-import PageHeader from '@/components/page-header';
+import {
+    ActivityTabs,
+    AssociationCard,
+    RecordActions,
+    RecordBack,
+    RecordShell,
+} from '@/components/crm/record-chrome';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
+type Deal = {
+    id: number;
+    title: string;
+    amount_cents: number;
+    close_date?: string | null;
+    type?: string | null;
+    priority?: string | null;
+    last_activity_at?: string | null;
+    owner?: { id: number; name: string } | null;
+    owner_id?: number | null;
+    contact_id?: number | null;
+    company_id?: number | null;
+    stage?: { id: number; name: string; slug: string } | null;
+    pipeline?: { name: string; stages?: { id: number; name: string }[] } | null;
+};
+
+type Activity = {
+    id: number;
+    type: string;
+    subject?: string | null;
+    body?: string | null;
+    done?: boolean;
+    created_at?: string;
+};
 
 export default function DealShow({
     deal,
     associations,
-    catchUp,
-    products,
-    askEvo,
-    dealHealth,
+    timeline,
+    stages,
 }: {
-    deal: any;
-    associations?: any;
-    catchUp?: { inbound?: any[]; outbound?: any[] };
-    products?: any[];
-    askEvo?: any;
-    dealHealth?: any;
+    deal: Deal;
+    associations: {
+        contact?: { id: number; first_name: string; last_name?: string | null } | null;
+        company?: { id: number; name: string } | null;
+    } | null;
+    timeline: Activity[];
+    stages: { id: number; name: string }[];
 }) {
+    const [tab, setTab] = useState('all');
+    const initials = deal.title
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0] ?? '')
+        .join('')
+        .toUpperCase();
+
+    const items = useMemo(() => {
+        if (tab === 'all') {
+            return timeline;
+        }
+
+        const map: Record<string, string> = {
+            notes: 'note',
+            emails: 'email',
+            calls: 'call',
+            tasks: 'task',
+            meetings: 'meeting',
+        };
+
+        return timeline.filter((item) => item.type === map[tab]);
+    }, [tab, timeline]);
+
     return (
         <>
             <Head title={deal.title} />
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader title={deal.title} description={`Stage: ${deal.stage?.name}`} />
-                <RecordFacts>
-                    <RecordFact label="Amount">
-                        <span className="money">{formatDzd(deal.amount_cents)}</span>
-                    </RecordFact>
-                    <RecordFact label="Stage">{deal.stage?.name ?? '—'}</RecordFact>
-                    <RecordFact label="Contact">
-                        <Link href={`/crm/contacts/${deal.contact_id}`} className="text-brand">
-                            {deal.contact?.first_name} {deal.contact?.last_name}
-                        </Link>
-                    </RecordFact>
-                    <RecordFact label="Company">{deal.company?.name ?? '—'}</RecordFact>
-                </RecordFacts>
-                <RecordActionRow
-                    dealId={deal.id}
-                    contactId={deal.contact_id}
-                    companyId={deal.company_id}
-                    ownerId={deal.owner_id}
+            <div className="flex h-[calc(100vh-52px)] flex-col bg-canvas text-[13px] text-ink">
+                <div className="border-b border-hairline px-6 py-3">
+                    <RecordBack href="/crm/deals" label="Back to Deals" />
+                    <div className="mt-3 flex items-start gap-3">
+                        <div className="grid size-10 place-items-center rounded-full bg-ink text-[12px] font-medium text-canvas">
+                            {initials}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <h1 className="text-[20px] font-semibold">{deal.title}</h1>
+                            <div className="mt-2 flex flex-wrap gap-6 text-[13px]">
+                                <Stat label="Amount" value={formatDzd(deal.amount_cents)} />
+                                <Stat
+                                    label="Close date"
+                                    value={
+                                        deal.close_date
+                                            ? String(deal.close_date).slice(0, 10)
+                                            : '—'
+                                    }
+                                />
+                                <Stat
+                                    label="Pipeline"
+                                    value={deal.pipeline?.name ?? 'Sales pipeline'}
+                                />
+                                <div>
+                                    <p className="text-[11px] text-muted-foreground">Stage</p>
+                                    <span className="mt-0.5 inline-flex rounded-full bg-[#EC6025] px-2 py-0.5 text-[11px] text-canvas">
+                                        {deal.stage?.name}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-3">
+                                <RecordActions
+                                    entityId={deal.id}
+                                    dealId={deal.id}
+                                    contactId={deal.contact_id}
+                                    companyId={deal.company_id}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <RecordShell
+                    left={
+                        <div className="space-y-4">
+                            <h2 className="text-[13px] font-semibold">About this deal</h2>
+                            <Field label="Deal owner" value={deal.owner?.name ?? 'Unassigned'} />
+                            <Field
+                                label="Last contacted"
+                                value={
+                                    deal.last_activity_at
+                                        ? String(deal.last_activity_at).slice(0, 10)
+                                        : '—'
+                                }
+                            />
+                            <Field label="Deal type" value={deal.type ?? '—'} />
+                            <Field label="Priority" value={deal.priority ?? '—'} />
+                            <Form
+                                action={`/crm/deals/${deal.id}/move`}
+                                method="post"
+                                className="space-y-1"
+                            >
+                                <p className="text-[11px] text-muted-foreground">Move stage</p>
+                                <div className="flex flex-wrap gap-1">
+                                    {stages.map((stage) => (
+                                        <Button
+                                            key={stage.id}
+                                            name="stage_id"
+                                            value={stage.id}
+                                            variant="outline"
+                                            className="h-7 text-[11px]"
+                                        >
+                                            {stage.name}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </Form>
+                        </div>
+                    }
+                    center={
+                        <div>
+                            <ActivityTabs
+                                tabs={[
+                                    { key: 'all', label: 'All' },
+                                    { key: 'notes', label: 'Notes' },
+                                    { key: 'emails', label: 'Emails' },
+                                    { key: 'calls', label: 'Calls' },
+                                    { key: 'tasks', label: 'Tasks' },
+                                    { key: 'meetings', label: 'Meetings' },
+                                ]}
+                                active={tab}
+                                onChange={setTab}
+                            />
+                            <div className="mt-4 space-y-3">
+                                {items.length === 0 ? (
+                                    <p className="text-muted-foreground">No activity yet.</p>
+                                ) : (
+                                    items.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="border-l-2 border-brand pl-3"
+                                        >
+                                            <p className="text-[11px] uppercase text-muted-foreground">
+                                                {item.type}
+                                            </p>
+                                            <p className="font-medium">
+                                                {item.subject ?? item.body}
+                                            </p>
+                                            {item.type === 'task' && !item.done ? (
+                                                <Form
+                                                    action={`/crm/activities/${item.id}/complete`}
+                                                    method="post"
+                                                >
+                                                    <Button
+                                                        variant="secondary"
+                                                        className="mt-1 h-6 text-[11px]"
+                                                    >
+                                                        Done
+                                                    </Button>
+                                                </Form>
+                                            ) : null}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    }
+                    right={
+                        <div className="space-y-3">
+                            <AssociationCard title="Contacts">
+                                {associations?.contact ? (
+                                    <Link
+                                        href={`/crm/contacts/${associations.contact.id}`}
+                                        className="text-brand"
+                                    >
+                                        {associations.contact.first_name}{' '}
+                                        {associations.contact.last_name}
+                                    </Link>
+                                ) : (
+                                    <p className="text-muted-foreground">No contact</p>
+                                )}
+                            </AssociationCard>
+                            <AssociationCard title="Companies">
+                                {associations?.company ? (
+                                    <Link
+                                        href={`/crm/companies/${associations.company.id}`}
+                                        className="text-brand"
+                                    >
+                                        {associations.company.name}
+                                    </Link>
+                                ) : (
+                                    <p className="text-muted-foreground">No company</p>
+                                )}
+                            </AssociationCard>
+                            <AssociationCard title="Tickets" empty="No tickets" />
+                        </div>
+                    }
                 />
-                <DealHealthPill health={dealHealth} />
-                <AskEvoPanel action={`/crm/deals/${deal.id}/ask`} insight={askEvo} />
-                <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
-                <AssociationsCard associations={associations ?? { contact: deal.contact, company: deal.company }} />
-                <DealLineItems
-                    dealId={deal.id}
-                    items={deal.line_items ?? associations?.line_items ?? []}
-                    products={products}
-                />
-                <Card className="space-y-3 p-4 text-sm">
-                    <Form action={`/crm/deals/${deal.id}/move`} method="post" className="flex flex-wrap gap-2">
-                        {(deal.pipeline?.stages ?? []).map((stage: any) => (
-                            <Button key={stage.id} name="stage_id" value={stage.id} variant={stage.id === deal.stage_id ? 'default' : 'secondary'}>
-                                {stage.name}
-                            </Button>
-                        ))}
-                    </Form>
-                </Card>
-                <Card className="p-4">
-                    <Form action={`/crm/deals/${deal.id}`} method="put" className="grid gap-3 md:grid-cols-3">
-                        {({ processing }) => (
-                            <>
-                                <div>
-                                    <Label>Title</Label>
-                                    <Input name="title" defaultValue={deal.title} required />
-                                </div>
-                                <div>
-                                    <Label>Amount (cents DZD)</Label>
-                                    <Input name="amount_cents" type="number" min={0} defaultValue={deal.amount_cents} />
-                                </div>
-                                <div>
-                                    <Label>Next activity</Label>
-                                    <Input
-                                        name="next_activity_at"
-                                        type="datetime-local"
-                                        defaultValue={deal.next_activity_at ? String(deal.next_activity_at).slice(0, 16) : ''}
-                                    />
-                                </div>
-                                <div>
-                                    <Button disabled={processing}>Save deal</Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </Card>
             </div>
         </>
+    );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+    return (
+        <div>
+            <p className="text-[11px] text-muted-foreground">{label}</p>
+            <p className="font-medium">{value}</p>
+        </div>
+    );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+    return (
+        <div>
+            <p className="text-[11px] text-muted-foreground">{label}</p>
+            <p>{value}</p>
+        </div>
     );
 }
 

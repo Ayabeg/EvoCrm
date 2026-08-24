@@ -3,46 +3,98 @@
 namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PipelineResource;
 use App\Models\Contact;
 use App\Models\Deal;
-use App\Models\Pipeline;
-use App\Models\Product;
 use App\Models\Stage;
-use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
-use App\Services\Crm\DealBoardForecast;
-use App\Services\Crm\PipelineManager;
-use App\Services\Crm\DealLineTotals;
 use App\Support\CrmHub;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DealController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, PipelineManager $pipelines): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
     {
-        return $this->hub($request, $filter, $hub, $insight, $pipelines, null);
+        $workspace = $request->user()->workspace;
+        $pipeline = $workspace->defaultPipeline()->load('stages');
+        $filters = $filter->resolve($request, $workspace, 'deal');
+
+        if (($filters['view'] ?? 'all') === 'mine') {
+            $filters['owner'] = (string) $request->user()->id;
+        }
+
+        $query = Deal::query()
+            ->forWorkspace($workspace)
+            ->with(['contact.company', 'company', 'stage', 'owner']);
+
+        $filter->applyToDeals($query, $filters);
+        $this->sortDeals($query, $filters['sort'] ?? null);
+
+        $deals = $query->limit(120)->get();
+
+        $stageCounts = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filters, $filter) {
+            $countQuery = Deal::query()->forWorkspace($workspace);
+            $countFilters = $filters;
+            unset($countFilters['stage']);
+            $filter->applyToDeals($countQuery, $countFilters);
+
+            return [
+                'id' => $stage->id,
+                'name' => $stage->name,
+                'slug' => $stage->slug,
+                'count' => (clone $countQuery)->where('stage_id', $stage->id)->count(),
+            ];
+        })->values();
+
+        $openCents = Deal::query()
+            ->forWorkspace($workspace)
+            ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false))
+            ->sum('amount_cents');
+
+        return Inertia::render('crm/deals/index', [
+            'deals' => $deals,
+            'stages' => $pipeline->stages,
+            'stageCounts' => $stageCounts,
+            'pipeline' => $pipeline->only(['id', 'name']),
+            'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
+            'members' => $hub->members($workspace),
+            'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
+            'activeFilters' => $filters,
+            'cities' => config('evosales.cities'),
+            'wilayas' => config('evosales.wilayas'),
+            'openPipelineCents' => $openCents,
+            'createOpen' => $request->boolean('create'),
+        ]);
     }
 
-    public function show(Request $request, Deal $deal, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, PipelineManager $pipelines): Response
+    public function show(Request $request, Deal $deal, CrmHub $hub): Response
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        return $this->hub($request, $filter, $hub, $insight, $pipelines, $deal);
+        $workspace = $request->user()->workspace;
+        $deal->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items']);
+
+        return Inertia::render('crm/deals/show', [
+            'deal' => $deal,
+            'associations' => $hub->dealAssociations($deal),
+            'timeline' => $hub->timeline(deal: $deal),
+            'attributes' => $hub->attributeBag($workspace, 'deal', $deal->id),
+            'stages' => $deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages,
+            'members' => $hub->members($workspace),
+        ]);
     }
 
     public function store(Request $request, ContactIdentity $identity): RedirectResponse
     {
         $data = $request->validate([
-            'contact_id' => ['required_without:contact_name', 'nullable', 'integer'],
-            'contact_name' => ['required_without:contact_id', 'nullable', 'string', 'max:180'],
+            'contact_id' => ['nullable', 'integer'],
+            'contact_name' => ['nullable', 'string', 'max:180'],
             'title' => ['required', 'string', 'max:180'],
             'amount_cents' => ['nullable', 'integer', 'min:0'],
             'amount_dzd' => ['nullable', 'numeric', 'min:0'],
@@ -50,25 +102,29 @@ class DealController extends Controller
             'pipeline_id' => ['nullable', 'integer'],
             'owner_id' => ['nullable', 'integer'],
             'source' => ['nullable', 'string', 'max:80'],
+            'type' => ['nullable', 'string', 'max:40'],
+            'priority' => ['nullable', 'string', 'max:40'],
             'close_date' => ['nullable', 'date'],
             'next_step' => ['nullable', 'string', 'max:180'],
+            'add_another' => ['sometimes', 'boolean'],
         ]);
 
         $workspace = $request->user()->workspace;
-        $pipeline = filled($data['pipeline_id'] ?? null)
-            ? Pipeline::query()->forWorkspace($workspace)->findOrFail($data['pipeline_id'])
-            : $workspace->defaultPipeline();
+        $pipeline = $workspace->defaultPipeline();
         $stage = filled($data['stage_id'] ?? null)
             ? Stage::query()->where('pipeline_id', $pipeline->id)->findOrFail($data['stage_id'])
             : $pipeline->stageBySlug('new');
 
-        // Kommo-style quick-add: a bare contact name creates the person inline.
         $contact = filled($data['contact_id'] ?? null)
             ? Contact::query()->forWorkspace($workspace)->findOrFail($data['contact_id'])
             : $identity->findOrCreate($workspace, [
-                'first_name' => Str::before($data['contact_name'], ' '),
-                'last_name' => filled(Str::after($data['contact_name'], ' ')) ? Str::after($data['contact_name'], ' ') : null,
-                'source' => 'quick_add',
+                'first_name' => filled($data['contact_name'] ?? null)
+                    ? Str::before($data['contact_name'], ' ')
+                    : $data['title'],
+                'last_name' => filled($data['contact_name'] ?? null) && filled(Str::after($data['contact_name'], ' '))
+                    ? Str::after($data['contact_name'], ' ')
+                    : null,
+                'source' => 'deal',
             ]);
 
         Deal::query()->create([
@@ -82,14 +138,18 @@ class DealController extends Controller
             'amount_cents' => $this->toCents($data),
             'currency' => 'DZD',
             'source' => $data['source'] ?? 'manual',
+            'type' => $data['type'] ?? null,
+            'priority' => $data['priority'] ?? null,
             'close_date' => $data['close_date'] ?? null,
             'next_step' => $data['next_step'] ?? null,
         ]);
 
-        return back();
+        return $request->boolean('add_another')
+            ? redirect()->route('crm.deals.index', ['create' => 1])
+            : redirect()->route('crm.deals.index');
     }
 
-    public function update(Request $request, Deal $deal, CustomAttributes $attributes, DealLineTotals $lineTotals): RedirectResponse
+    public function update(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -100,51 +160,30 @@ class DealController extends Controller
             'next_activity_at' => ['nullable', 'date'],
             'owner_id' => ['nullable', 'integer'],
             'source' => ['nullable', 'string', 'max:80'],
+            'type' => ['nullable', 'string', 'max:40'],
+            'priority' => ['nullable', 'string', 'max:40'],
             'lost_reason' => ['nullable', 'string', 'max:180'],
             'close_date' => ['nullable', 'date'],
             'next_step' => ['nullable', 'string', 'max:180'],
             'attributes' => ['nullable', 'array'],
         ]);
 
-        $amount = $deal->lineItems()->exists()
-            ? (int) $deal->amount_cents
-            : $this->toCents($data, (int) $deal->amount_cents);
-
         $deal->update([
             'title' => $data['title'],
-            'amount_cents' => $amount,
+            'amount_cents' => $this->toCents($data, (int) $deal->amount_cents),
             'next_activity_at' => $data['next_activity_at'] ?? $deal->next_activity_at,
             'owner_id' => array_key_exists('owner_id', $data) ? $data['owner_id'] : $deal->owner_id,
             'source' => $data['source'] ?? $deal->source,
+            'type' => array_key_exists('type', $data) ? $data['type'] : $deal->type,
+            'priority' => array_key_exists('priority', $data) ? $data['priority'] : $deal->priority,
             'lost_reason' => $data['lost_reason'] ?? $deal->lost_reason,
             'close_date' => $data['close_date'] ?? $deal->close_date,
             'next_step' => $data['next_step'] ?? $deal->next_step,
         ]);
 
-        $lineTotals->rollup($deal);
-
         if (isset($data['attributes'])) {
             $attributes->saveValues($request->user()->workspace, 'deal', $deal->id, $data['attributes']);
         }
-
-        return back();
-    }
-
-    public function updateAttributes(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
-    {
-        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
-
-        $data = $request->validate([
-            'attributes' => ['required', 'array'],
-        ]);
-
-        $attributes->saveValues(
-            $request->user()->workspace,
-            'deal',
-            $deal->id,
-            $data['attributes'],
-            enforceRequired: true,
-        );
 
         return back();
     }
@@ -169,66 +208,6 @@ class DealController extends Controller
         return back();
     }
 
-    public function export(Request $request, CrmFilter $filter, PipelineManager $pipelines): StreamedResponse
-    {
-        $workspace = $request->user()->workspace;
-        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
-        $filters = $filter->resolve($request, $workspace, 'deal');
-
-        $query = Deal::query()
-            ->forWorkspace($workspace)
-            ->where('pipeline_id', $pipeline->id)
-            ->with(['contact', 'company', 'stage', 'owner']);
-
-        $filter->apply('deal', $query, $filters);
-
-        $deals = $query->orderByDesc('last_activity_at')->limit(5000)->get();
-        $filename = 'deals-'.now()->toDateString().'.csv';
-
-        return response()->streamDownload(function () use ($deals): void {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, ['id', 'title', 'amount_dzd', 'stage', 'owner', 'contact', 'company', 'wilaya', 'close_date', 'created_at']);
-
-            foreach ($deals as $deal) {
-                fputcsv($out, [
-                    $deal->id,
-                    $deal->title,
-                    number_format($deal->amount_cents / 100, 2, '.', ''),
-                    $deal->stage?->name,
-                    $deal->owner?->name,
-                    trim(($deal->contact?->first_name ?? '').' '.($deal->contact?->last_name ?? '')),
-                    $deal->company?->name,
-                    $deal->contact?->wilaya ?? $deal->company?->wilaya,
-                    $deal->close_date?->toDateString(),
-                    $deal->created_at?->toDateTimeString(),
-                ]);
-            }
-
-            fclose($out);
-        }, $filename, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-        ]);
-    }
-
-    public function board(Request $request, PipelineManager $pipelines, RecordInsight $insight): Response
-    {
-        $workspace = $request->user()->workspace;
-        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
-        $board = $pipelines->boardData($workspace, $pipeline);
-
-        return Inertia::render('crm/deals/board', [
-            'pipeline' => [
-                'id' => $pipeline->id,
-                'name' => $pipeline->name,
-            ],
-            'pipelines' => PipelineResource::collection($pipelines->options($workspace))->resolve(),
-            'stages' => $board['stages'],
-            'deals' => $board['deals'],
-            'forecast' => $board['forecast'],
-            'forecastBand' => $insight->pipelineForecastBand($workspace, $pipeline),
-        ]);
-    }
-
     /**
      * @param  array<string, mixed>  $data
      */
@@ -245,88 +224,16 @@ class DealController extends Controller
         return $fallback;
     }
 
-    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, PipelineManager $pipelines, ?Deal $selected): Response
+    /**
+     * @param  Builder<Deal>  $query
+     */
+    protected function sortDeals($query, ?string $sort): void
     {
-        $workspace = $request->user()->workspace;
-        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
-        $filters = $filter->resolve($request, $workspace, 'deal');
-
-        $query = Deal::query()
-            ->forWorkspace($workspace)
-            ->where('pipeline_id', $pipeline->id)
-            ->with(['contact.company', 'company', 'stage', 'owner']);
-
-        if ($request->user()->canPermission('deals.team_only')) {
-            $query->where(function ($scoped) use ($request) {
-                $scoped->where('owner_id', $request->user()->id)
-                    ->orWhere('team_id', $request->user()->id);
-            });
-        }
-
-        $filter->apply('deal', $query, $filters);
-        $filter->applySort('deal', $query, $filters);
-
-        $deals = $query->orderByDesc('last_activity_at')->orderByDesc('id')->limit(120)->get();
-
-        if (! $selected && $request->integer('deal')) {
-            $selected = Deal::query()->forWorkspace($workspace)->find($request->integer('deal'));
-        }
-
-        $selected ??= $deals->first();
-
-        $forecast = $pipelines->forecast($workspace, $pipeline);
-
-        $stagePills = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filter, $filters, $pipeline) {
-            $countQuery = Deal::query()
-                ->forWorkspace($workspace)
-                ->where('pipeline_id', $pipeline->id)
-                ->where('stage_id', $stage->id);
-            $withoutStage = $filters;
-            $withoutStage['stage'] = null;
-            $filter->apply('deal', $countQuery, $withoutStage);
-
-            return [
-                'id' => $stage->id,
-                'name' => $stage->name,
-                'slug' => $stage->slug,
-                'count' => $countQuery->count(),
-                'tone' => $stage->is_won ? 'won' : ($stage->is_lost ? 'lost' : 'open'),
-            ];
-        })->values();
-
-        return Inertia::render('crm/deals/hub', [
-            'deals' => $deals,
-            'selected' => $selected?->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items', 'lineItems.product']),
-            'associations' => $selected ? $hub->dealAssociations($selected) : null,
-            'products' => Product::query()
-                ->forWorkspace($workspace)
-                ->active()
-                ->orderBy('name')
-                ->get(['id', 'sku', 'name', 'unit_cents', 'currency', 'active']),
-            'timeline' => $selected ? $hub->timeline(deal: $selected) : [],
-            'catchUp' => $selected ? $hub->catchUp(deal: $selected) : ['inbound' => [], 'outbound' => []],
-            'askEvo' => $selected ? $insight->forDeal($selected) : null,
-            'dealHealth' => $selected ? $insight->dealHealth($selected) : null,
-            'proactiveSummary' => $selected ? $insight->proactiveSummary($selected) : null,
-            'attributes' => $selected ? $hub->attributeBag($workspace, 'deal', $selected->id) : ['definitions' => [], 'values' => []],
-            'pipeline' => [
-                'id' => $pipeline->id,
-                'name' => $pipeline->name,
-            ],
-            'pipelines' => PipelineResource::collection($pipelines->options($workspace))->resolve(),
-            'forecast' => $forecast,
-            'forecastBand' => $insight->pipelineForecastBand($workspace, $pipeline),
-            'stages' => $pipeline->stages,
-            'stagePills' => $stagePills,
-            'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
-            'members' => $hub->members($workspace),
-            'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
-            'activeFilters' => $filters,
-            'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null),
-            'recordCount' => $filter->count($workspace, 'deal', $filters),
-            'cities' => config('evosales.cities'),
-            'wilayas' => config('evosales.wilayas'),
-            'openPipelineCents' => $forecast['open_cents'],
-        ]);
+        match ($sort) {
+            'created_at' => $query->orderByDesc('created_at'),
+            'close_date' => $query->orderByRaw('close_date is null')->orderBy('close_date'),
+            'amount' => $query->orderByDesc('amount_cents'),
+            default => $query->orderByDesc('last_activity_at')->orderByDesc('id'),
+        };
     }
 }

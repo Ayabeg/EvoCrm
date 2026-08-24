@@ -26,6 +26,8 @@ use InvalidArgumentException;
     'owner_id',
     'team_id',
     'source',
+    'type',
+    'priority',
     'lost_reason',
     'close_date',
     'next_step',
