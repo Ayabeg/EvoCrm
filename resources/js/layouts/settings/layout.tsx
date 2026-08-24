@@ -57,6 +57,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/attributes',
         icon: null,
     },
+    {
+        title: 'Pipelines',
+        href: '/settings/pipelines',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
@@ -79,6 +84,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const wide =
         page.component === 'settings/people' ||
         page.component === 'settings/attributes' ||
+        page.component === 'settings/pipelines' ||
         page.component === 'settings/connectors';
 
     return (

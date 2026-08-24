@@ -221,6 +221,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/settings/attributes', [CustomAttributeController::class, 'store'])->name('settings.attributes.store');
     Route::put('/settings/attributes/{definition}', [CustomAttributeController::class, 'update'])->name('settings.attributes.update');
     Route::delete('/settings/attributes/{definition}', [CustomAttributeController::class, 'destroy'])->name('settings.attributes.destroy');
+    Route::get('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'index'])->name('settings.pipelines');
+    Route::middleware('can-manage-settings')->group(function () {
+        Route::post('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'store'])->name('settings.pipelines.store');
+        Route::patch('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'update'])->name('settings.pipelines.update');
+        Route::delete('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'destroy'])->name('settings.pipelines.destroy');
+    });
 });
 
 require __DIR__.'/settings.php';

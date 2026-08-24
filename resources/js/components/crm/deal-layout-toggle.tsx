@@ -7,10 +7,9 @@ export default function DealLayoutToggle({
     current: 'list' | 'board';
     pipelineId?: number;
 }) {
-    const boardHref =
-        pipelineId && pipelineId > 0
-            ? `/crm/deals/board?pipeline=${pipelineId}`
-            : '/crm/deals/board';
+    const query = pipelineId && pipelineId > 0 ? `?pipeline=${pipelineId}` : '';
+    const listHref = `/crm/deals${query}`;
+    const boardHref = `/crm/deals/board${query}`;
 
     return (
         <div
@@ -18,7 +17,7 @@ export default function DealLayoutToggle({
             data-testid="deal-layout-toggle"
         >
             <Link
-                href="/crm/deals"
+                href={listHref}
                 className={`px-2.5 py-1 ${
                     current === 'list'
                         ? 'bg-ink text-canvas'

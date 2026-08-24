@@ -1,7 +1,9 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import type { DragEvent } from 'react';
+import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
+import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import { formatDzd } from '@/components/crm/hub-chrome';
 import PageHeader from '@/components/page-header';
 import { cn } from '@/lib/utils';
@@ -151,59 +153,16 @@ export default function DealBoard({
                     description={`${pipeline.name} — drag a card to move its stage. Weighted forecast uses stage probability.`}
                 >
                     <div className="flex flex-wrap items-center gap-2">
-                        {pipelines.length > 1 ? (
-                            <select
-                                aria-label="Pipeline"
-                                value={pipeline.id}
-                                onChange={(event) =>
-                                    router.get(
-                                        '/crm/deals/board',
-                                        { pipeline: event.target.value },
-                                        { preserveState: true, preserveScroll: true },
-                                    )
-                                }
-                                className="h-8 rounded border border-hairline bg-canvas px-2 text-[12px]"
-                                data-testid="pipeline-picker"
-                            >
-                                {pipelines.map((option) => (
-                                    <option key={option.id} value={option.id}>
-                                        {option.name}
-                                        {option.is_default ? ' (default)' : ''}
-                                    </option>
-                                ))}
-                            </select>
-                        ) : null}
+                        <PipelineSwitcher
+                            pipelineId={pipeline.id}
+                            pipelines={pipelines}
+                            basePath="/crm/deals/board"
+                        />
                         <DealLayoutToggle current="board" pipelineId={pipeline.id} />
                     </div>
                 </PageHeader>
 
-                <div
-                    className="flex flex-wrap items-center gap-4 rounded-lg border border-hairline bg-canvas-soft px-4 py-3 text-sm"
-                    data-testid="forecast-totals"
-                >
-                    <div>
-                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                            Deals
-                        </p>
-                        <p className="font-semibold tabular-nums">{forecast.count}</p>
-                    </div>
-                    <div>
-                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                            Total
-                        </p>
-                        <p className="money font-semibold text-ink">
-                            {formatDzd(forecast.amount_cents)}
-                        </p>
-                    </div>
-                    <div>
-                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                            Weighted forecast
-                        </p>
-                        <p className="money font-semibold text-brand">
-                            {formatDzd(forecast.weighted_cents)}
-                        </p>
-                    </div>
-                </div>
+                <DealForecastBar forecast={forecast} />
 
                 <div className="flex items-start gap-3 overflow-x-auto pb-6">
                     {stages.map((stage) => {

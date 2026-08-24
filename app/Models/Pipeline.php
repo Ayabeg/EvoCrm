@@ -24,6 +24,11 @@ class Pipeline extends Model
         return $this->hasMany(Stage::class)->orderBy('position');
     }
 
+    public function deals(): HasMany
+    {
+        return $this->hasMany(Deal::class);
+    }
+
     public function stageBySlug(string $slug): ?Stage
     {
         return $this->stages()->where('slug', $slug)->first();
