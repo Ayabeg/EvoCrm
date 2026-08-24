@@ -8,6 +8,7 @@ use App\Models\Deal;
 use App\Models\Pipeline;
 use App\Models\Product;
 use App\Models\Stage;
+use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
@@ -22,16 +23,16 @@ use Inertia\Response;
 
 class DealController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight): Response
     {
-        return $this->hub($request, $filter, $hub, null);
+        return $this->hub($request, $filter, $hub, $insight, null);
     }
 
-    public function show(Request $request, Deal $deal, CrmFilter $filter, CrmHub $hub): Response
+    public function show(Request $request, Deal $deal, CrmFilter $filter, CrmHub $hub, RecordInsight $insight): Response
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        return $this->hub($request, $filter, $hub, $deal);
+        return $this->hub($request, $filter, $hub, $insight, $deal);
     }
 
     public function store(Request $request, ContactIdentity $identity): RedirectResponse
@@ -254,7 +255,7 @@ class DealController extends Controller
         return $fallback;
     }
 
-    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, ?Deal $selected): Response
+    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, ?Deal $selected): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $workspace->defaultPipeline()->load('stages');
@@ -305,6 +306,8 @@ class DealController extends Controller
                 ->get(['id', 'sku', 'name', 'unit_cents', 'currency', 'active']),
             'timeline' => $selected ? $hub->timeline(deal: $selected) : [],
             'catchUp' => $selected ? $hub->catchUp(deal: $selected) : ['inbound' => [], 'outbound' => []],
+            'askEvo' => $selected ? $insight->forDeal($selected) : null,
+            'dealHealth' => $selected ? $insight->dealHealth($selected) : null,
             'attributes' => $selected ? $hub->attributeBag($workspace, 'deal', $selected->id) : ['definitions' => [], 'values' => []],
             'stages' => $pipeline->stages,
             'stagePills' => $stagePills,
