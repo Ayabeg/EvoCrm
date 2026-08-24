@@ -2,6 +2,7 @@ import { Form, Head, Link, router } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
+import RecordProperties from '@/components/crm/record-properties';
 import ListToolbar from '@/components/crm/list-toolbar';
 import RecordActionRow from '@/components/crm/record-action-row';
 import TimelineFilter from '@/components/crm/timeline-filter';
@@ -164,17 +165,12 @@ export default function ContactHub({
                                             <option key={wilaya} value={wilaya}>{wilaya}</option>
                                         ))}
                                     </select>
-                                    {(attributes.definitions ?? []).map((definition: any) => (
-                                        <Input
-                                            key={definition.id}
-                                            name={`attributes[${definition.key}]`}
-                                            defaultValue={attributes.values?.[definition.key] ?? ''}
-                                            placeholder={definition.label}
-                                            className="h-8"
-                                        />
-                                    ))}
                                     <Button className="col-span-2 h-8">Save contact</Button>
                                 </Form>
+                                <RecordProperties
+                                    action={`/crm/contacts/${selected.id}/attributes`}
+                                    attributes={attributes}
+                                />
                                 <div>
                                     <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
                                     <TimelineFilter timeline={timeline}>

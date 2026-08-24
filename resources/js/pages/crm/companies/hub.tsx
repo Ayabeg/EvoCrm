@@ -1,6 +1,7 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import ListToolbar from '@/components/crm/list-toolbar';
+import RecordProperties from '@/components/crm/record-properties';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -87,17 +88,12 @@ export default function CompanyHub({
                                         <option key={user.id} value={user.id}>{user.name}</option>
                                     ))}
                                 </select>
-                                {(attributes.definitions ?? []).map((definition: any) => (
-                                    <Input
-                                        key={definition.id}
-                                        name={`attributes[${definition.key}]`}
-                                        defaultValue={attributes.values?.[definition.key] ?? ''}
-                                        placeholder={definition.label}
-                                        className="h-8"
-                                    />
-                                ))}
                                 <Button className="col-span-2 h-8">Save company</Button>
                             </Form>
+                            <RecordProperties
+                                action={`/crm/companies/${selected.id}/attributes`}
+                                attributes={attributes}
+                            />
                             <div>
                                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
                                 {timeline.map((item: any) => (

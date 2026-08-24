@@ -89,12 +89,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/companies', [CompanyController::class, 'store'])->name('crm.companies.store');
     Route::get('/crm/companies/{company}', [CompanyController::class, 'show'])->name('crm.companies.show');
     Route::put('/crm/companies/{company}', [CompanyController::class, 'update'])->name('crm.companies.update');
+    Route::put('/crm/companies/{company}/attributes', [CompanyController::class, 'updateAttributes'])->name('crm.companies.attributes');
 
     Route::get('/crm/contacts', [ContactController::class, 'index'])->name('crm.contacts.index');
     Route::get('/crm/contacts/export', [ContactController::class, 'export'])->name('crm.contacts.export');
     Route::post('/crm/contacts', [ContactController::class, 'store'])->name('crm.contacts.store');
     Route::get('/crm/contacts/{contact}', [ContactController::class, 'show'])->name('crm.contacts.show');
     Route::put('/crm/contacts/{contact}', [ContactController::class, 'update'])->name('crm.contacts.update');
+    Route::put('/crm/contacts/{contact}/attributes', [ContactController::class, 'updateAttributes'])->name('crm.contacts.attributes');
 
     Route::get('/crm/leads', [LeadController::class, 'index'])->name('crm.leads.index');
     Route::post('/crm/leads', [LeadController::class, 'store'])->name('crm.leads.store');
@@ -106,6 +108,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/deals', [DealController::class, 'store'])->name('crm.deals.store');
     Route::get('/crm/deals/{deal}', [DealController::class, 'show'])->name('crm.deals.show');
     Route::put('/crm/deals/{deal}', [DealController::class, 'update'])->name('crm.deals.update');
+    Route::put('/crm/deals/{deal}/attributes', [DealController::class, 'updateAttributes'])->name('crm.deals.attributes');
     Route::post('/crm/deals/{deal}/move', [DealController::class, 'move'])->name('crm.deals.move');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');

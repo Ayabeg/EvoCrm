@@ -1,6 +1,7 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
+import RecordProperties from '@/components/crm/record-properties';
 import ListToolbar from '@/components/crm/list-toolbar';
 import RecordActionRow from '@/components/crm/record-action-row';
 import TimelineFilter from '@/components/crm/timeline-filter';
@@ -175,17 +176,12 @@ export default function DealHub({
                                     </select>
                                     <Input name="source" defaultValue={selected.source ?? ''} placeholder="Source" className="h-8" />
                                     <Input name="lost_reason" defaultValue={selected.lost_reason ?? ''} placeholder="Lost reason" className="col-span-2 h-8" />
-                                    {(attributes.definitions ?? []).map((definition: any) => (
-                                        <Input
-                                            key={definition.id}
-                                            name={`attributes[${definition.key}]`}
-                                            defaultValue={attributes.values?.[definition.key] ?? ''}
-                                            placeholder={definition.label}
-                                            className="h-8"
-                                        />
-                                    ))}
                                     <Button className="col-span-2 h-8">Save deal</Button>
                                 </Form>
+                                <RecordProperties
+                                    action={`/crm/deals/${selected.id}/attributes`}
+                                    attributes={attributes}
+                                />
                                 <Form action={`/crm/deals/${selected.id}/move`} method="post" className="flex flex-wrap gap-1">
                                     {stages.map((stage: any) => (
                                         <Button key={stage.id} name="stage_id" value={stage.id} variant={stage.id === selected.stage_id ? 'default' : 'secondary'} className="h-7 text-[11px]">

@@ -113,6 +113,25 @@ class DealController extends Controller
         return back();
     }
 
+    public function updateAttributes(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
+    {
+        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'attributes' => ['required', 'array'],
+        ]);
+
+        $attributes->saveValues(
+            $request->user()->workspace,
+            'deal',
+            $deal->id,
+            $data['attributes'],
+            enforceRequired: true,
+        );
+
+        return back();
+    }
+
     public function move(Request $request, Deal $deal): RedirectResponse
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
