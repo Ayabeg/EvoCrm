@@ -2,6 +2,7 @@ import { Form, Head, Link } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import RecordActionRow from '@/components/crm/record-action-row';
+import { RecordFact, RecordFacts } from '@/components/crm/record-workspace';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -31,13 +32,21 @@ export default function ContactShow({
                         <Link href="/inbox">Open inbox</Link>
                     </Button>
                 </PageHeader>
+                <RecordFacts>
+                    <RecordFact label="Phone">{contact.phone_e164 ?? contact.phone ?? '—'}</RecordFact>
+                    <RecordFact label="Email">{contact.email ?? '—'}</RecordFact>
+                    <RecordFact label="Owner">{contact.owner?.name ?? 'Unassigned'}</RecordFact>
+                    <RecordFact label="City">{contact.city ?? contact.company?.city ?? '—'}</RecordFact>
+                    <RecordFact label="Wilaya">{contact.wilaya ?? contact.company?.wilaya ?? '—'}</RecordFact>
+                    <RecordFact label="Inbox">{contact.unanswered ? 'Unanswered' : 'Caught up'}</RecordFact>
+                </RecordFacts>
                 <RecordActionRow
                     contactId={contact.id}
                     companyId={contact.company_id}
                     ownerId={contact.owner_id}
                 />
-                <AssociationsCard associations={associations ?? { company: contact.company, deals: contact.deals, leads: contact.leads }} />
                 <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
+                <AssociationsCard associations={associations ?? { company: contact.company, deals: contact.deals, leads: contact.leads, threads: contact.threads }} />
                 <Card className="p-4">
                     <Form action={`/crm/contacts/${contact.id}`} method="put" className="grid gap-3 md:grid-cols-3">
                         {({ processing }) => (
@@ -80,49 +89,6 @@ export default function ContactShow({
                         )}
                     </Form>
                 </Card>
-                <div className="grid gap-4 md:grid-cols-3">
-                    <Card className="p-4 text-sm">
-                        <h2 className="mb-2 font-medium">Leads</h2>
-                        {(contact.leads ?? []).map((lead: any) => (
-                            <Link
-                                key={lead.id}
-                                href={`/crm/leads/${lead.id}`}
-                                className="block text-brand"
-                            >
-                                {lead.title} · {lead.status}
-                            </Link>
-                        ))}
-                    </Card>
-                    <Card className="p-4 text-sm">
-                        <h2 className="mb-2 font-medium">Deals</h2>
-                        {(contact.deals ?? []).map((deal: any) => (
-                            <Link
-                                key={deal.id}
-                                href={`/crm/deals/${deal.id}`}
-                                className="block text-brand"
-                            >
-                                {deal.title} · {deal.stage?.name}
-                            </Link>
-                        ))}
-                    </Card>
-                    <Card className="p-4 text-sm">
-                        <h2 className="mb-2 font-medium">Conversation history</h2>
-                        <p className="mb-2 text-xs text-muted-foreground">Synced from EvoDesk — not the Chatwoot clone.</p>
-                        {(contact.threads ?? []).length === 0 ? (
-                            <p className="text-muted-foreground">No synced threads.</p>
-                        ) : (
-                            (contact.threads ?? []).map((thread: any) => (
-                                <Link
-                                    key={thread.id}
-                                    href={`/conversations?thread=${thread.id}`}
-                                    className="block text-brand"
-                                >
-                                    {thread.subject ?? 'Thread'} · {thread.status}
-                                </Link>
-                            ))
-                        )}
-                    </Card>
-                </div>
             </div>
         </>
     );

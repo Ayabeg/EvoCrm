@@ -1,11 +1,12 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
+import CatchUpBlock from '@/components/crm/catch-up-block';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import RecordProperties from '@/components/crm/record-properties';
 import ListToolbar from '@/components/crm/list-toolbar';
 import RecordActionRow from '@/components/crm/record-action-row';
-import TimelineFilter from '@/components/crm/timeline-filter';
+import { RecordFact, RecordFacts, RecordTimeline } from '@/components/crm/record-workspace';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -24,6 +25,7 @@ export default function DealHub({
     wilayas,
     openPipelineCents,
     stagePills,
+    catchUp,
 }: any) {
 
     return (
@@ -146,12 +148,25 @@ export default function DealHub({
                                 </Link>
                             </header>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+                                <RecordFacts>
+                                    <RecordFact label="Amount">
+                                        <span className="money">{formatDzd(selected.amount_cents)}</span>
+                                    </RecordFact>
+                                    <RecordFact label="Stage">{selected.stage?.name ?? '—'}</RecordFact>
+                                    <RecordFact label="Owner">{selected.owner?.name ?? 'Unassigned'}</RecordFact>
+                                    <RecordFact label="Next step">{selected.next_step ?? '—'}</RecordFact>
+                                    <RecordFact label="Source">{selected.source ?? '—'}</RecordFact>
+                                    <RecordFact label="Close date">
+                                        {selected.close_date ? String(selected.close_date).slice(0, 10) : '—'}
+                                    </RecordFact>
+                                </RecordFacts>
                                 <RecordActionRow
                                     dealId={selected.id}
                                     contactId={selected.contact_id}
                                     companyId={selected.company_id}
                                     ownerId={selected.owner_id}
                                 />
+                                <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                                 <AssociationsCard associations={associations} />
                                 <div className="grid grid-cols-6 gap-1">
                                     {stages.map((stage: any) => {
@@ -193,27 +208,7 @@ export default function DealHub({
                                         </Button>
                                     ))}
                                 </Form>
-                                <div>
-                                    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
-                                    <TimelineFilter timeline={timeline}>
-                                        {(items) => (
-                                    <div className="space-y-2">
-                                        {items.map((item: any) => (
-                                            <div key={item.id} className="border-l-2 border-brand pl-3">
-                                                <p className="text-[11px] uppercase text-muted-foreground">{item.type}</p>
-                                                <p className="font-medium">{item.subject ?? item.body}</p>
-                                                {item.body && item.subject ? <p className="text-muted-foreground">{item.body}</p> : null}
-                                                {item.type === 'task' && !item.done ? (
-                                                    <Form action={`/crm/activities/${item.id}/complete`} method="post">
-                                                        <Button variant="secondary" className="mt-1 h-6 text-[11px]">Done</Button>
-                                                    </Form>
-                                                ) : null}
-                                            </div>
-                                        ))}
-                                    </div>
-                                        )}
-                                    </TimelineFilter>
-                                </div>
+                                <RecordTimeline timeline={timeline} />
                             </div>
                         </>
                     ) : (
