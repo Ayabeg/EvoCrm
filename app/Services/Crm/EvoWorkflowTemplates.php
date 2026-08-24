@@ -14,6 +14,10 @@ class EvoWorkflowTemplates
 
     public const NEW_CONTACT_ENROLL = 'evo_new_contact_enroll';
 
+    public const DEAL_CREATED_AMOUNT_BRANCH = 'evo_deal_created_amount_branch';
+
+    public const CONTACT_ALGER_BRANCH = 'evo_contact_alger_branch';
+
     /**
      * Evotechly-worded starters. Not a HubSpot gallery.
      *
@@ -24,7 +28,12 @@ class EvoWorkflowTemplates
      *     trigger: string,
      *     action: string,
      *     stage_slug: string|null,
-     *     action_config: array<string, mixed>
+     *     action_config: array<string, mixed>,
+     *     condition_field: string|null,
+     *     condition_operator: string|null,
+     *     condition_value: string|null,
+     *     else_action: string|null,
+     *     else_action_config: array<string, mixed>|null
      * }>
      */
     public function all(): array
@@ -42,6 +51,11 @@ class EvoWorkflowTemplates
                     'body' => 'A new contact landed in EvoSales. Confirm they are the right buyer and book a first conversation.',
                     'due_in_days' => 1,
                 ],
+                'condition_field' => null,
+                'condition_operator' => null,
+                'condition_value' => null,
+                'else_action' => null,
+                'else_action_config' => null,
             ],
             [
                 'key' => self::DEAL_QUALIFIED_TASK,
@@ -55,6 +69,11 @@ class EvoWorkflowTemplates
                     'body' => 'This deal just reached Qualified. Confirm the buying committee and schedule the demo.',
                     'due_in_days' => 1,
                 ],
+                'condition_field' => null,
+                'condition_operator' => null,
+                'condition_value' => null,
+                'else_action' => null,
+                'else_action_config' => null,
             ],
             [
                 'key' => self::NEW_CONTACT_ENROLL,
@@ -65,6 +84,53 @@ class EvoWorkflowTemplates
                 'stage_slug' => null,
                 'action_config' => [
                     'sequence_id' => null,
+                ],
+                'condition_field' => null,
+                'condition_operator' => null,
+                'condition_value' => null,
+                'else_action' => null,
+                'else_action_config' => null,
+            ],
+            [
+                'key' => self::DEAL_CREATED_AMOUNT_BRANCH,
+                'name' => 'Gros deal DZD → call today, else first wilaya check',
+                'description' => 'When an Evotechly deal is created, branch on amount. 500,000 DZD or more gets a same-day owner call; smaller deals get a lighter first check-in.',
+                'trigger' => Workflow::TRIGGER_DEAL_CREATED,
+                'action' => Workflow::ACTION_CREATE_TASK,
+                'stage_slug' => null,
+                'action_config' => [
+                    'subject' => 'Gros deal Evotechly — call {{contact}} today',
+                    'body' => 'This deal is 500,000 DZD or more. Confirm the buying committee in the wilaya and lock a same-day call.',
+                    'due_in_days' => 0,
+                ],
+                'condition_field' => Workflow::CONDITION_DEAL_AMOUNT,
+                'condition_operator' => Workflow::OP_GTE,
+                'condition_value' => '500000',
+                'else_action' => Workflow::ACTION_CREATE_TASK,
+                'else_action_config' => [
+                    'subject' => 'New Evotechly deal — first wilaya check-in',
+                    'body' => 'A new deal landed under 500,000 DZD. Confirm the wilaya, the buyer, and the next step.',
+                    'due_in_days' => 1,
+                ],
+            ],
+            [
+                'key' => self::CONTACT_ALGER_BRANCH,
+                'name' => 'Contact in Alger → first sequence, else ask the wilaya',
+                'description' => 'When a contact is created, enroll Alger contacts in the first outbound sequence. Everyone else gets a task to confirm their wilaya before a first visit.',
+                'trigger' => Workflow::TRIGGER_CONTACT_CREATED,
+                'action' => Workflow::ACTION_ENROLL_SEQUENCE,
+                'stage_slug' => null,
+                'action_config' => [
+                    'sequence_id' => null,
+                ],
+                'condition_field' => 'contact.wilaya',
+                'condition_operator' => Workflow::OP_EQ,
+                'condition_value' => 'Alger',
+                'else_action' => Workflow::ACTION_CREATE_TASK,
+                'else_action_config' => [
+                    'subject' => 'Confirm wilaya for {{contact}}',
+                    'body' => 'This Evotechly contact is not marked Alger. Ask which wilaya they operate in before the first visit.',
+                    'due_in_days' => 1,
                 ],
             ],
         ];
@@ -78,7 +144,12 @@ class EvoWorkflowTemplates
      *     trigger: string,
      *     action: string,
      *     stage_slug: string|null,
-     *     action_config: array<string, mixed>
+     *     action_config: array<string, mixed>,
+     *     condition_field: string|null,
+     *     condition_operator: string|null,
+     *     condition_value: string|null,
+     *     else_action: string|null,
+     *     else_action_config: array<string, mixed>|null
      * }
      */
     public function find(string $key): array
@@ -110,6 +181,11 @@ class EvoWorkflowTemplates
             'trigger_stage_id' => $stageId,
             'action' => $template['action'],
             'action_config' => $template['action_config'],
+            'condition_field' => $template['condition_field'],
+            'condition_operator' => $template['condition_operator'],
+            'condition_value' => $template['condition_value'],
+            'else_action' => $template['else_action'],
+            'else_action_config' => $template['else_action_config'],
             'active' => true,
             'template_key' => $template['key'],
         ]);
