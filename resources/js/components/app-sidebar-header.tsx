@@ -1,5 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, Plus, Search } from 'lucide-react';
+import { Bell, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { CommandPalette, useCommandPaletteShortcut } from '@/components/crm/command-palette';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -19,72 +21,72 @@ export function AppSidebarHeader({
     const { auth } = usePage().props;
     const initials = useInitials();
     const user = auth.user;
+    const [paletteOpen, setPaletteOpen] = useState(false);
+
+    useCommandPaletteShortcut(() => setPaletteOpen(true));
 
     return (
-        <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-hairline bg-canvas px-4">
-            <SidebarTrigger className="-ml-1 md:hidden" />
-            <form
-                action="/crm/contacts"
-                method="get"
-                className="relative mx-auto flex h-9 w-full max-w-2xl items-center"
-            >
-                <Search className="pointer-events-none absolute left-3 size-4 text-muted-foreground" />
-                <input
-                    name="q"
-                    placeholder="Find or Ask"
-                    className="h-9 w-full rounded-full border border-hairline bg-canvas-soft pr-16 pl-9 text-[13px] outline-none focus:border-brand"
-                />
-                <span className="pointer-events-none absolute right-3 text-[11px] text-muted-foreground">
-                    ⌘K
-                </span>
-            </form>
-            <div className="flex items-center gap-1.5">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <button
-                            type="button"
-                            title="Create"
-                            className="grid size-8 place-content-center rounded-full border border-hairline text-ink hover:bg-canvas-soft"
-                        >
-                            <Plus className="size-4" />
-                        </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuItem asChild>
-                            <Link href="/crm/contacts?create=1">Contact</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/crm/companies?create=1">Company</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/crm/deals?create=1">Deal</Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+        <>
+            <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-hairline bg-canvas px-4">
+                <SidebarTrigger className="-ml-1 md:hidden" />
                 <button
                     type="button"
-                    title="Notifications"
-                    className="grid size-8 place-content-center rounded-full text-ink hover:bg-canvas-soft"
+                    onClick={() => setPaletteOpen(true)}
+                    className="relative mx-auto flex h-9 w-full max-w-2xl items-center rounded-full border border-hairline bg-canvas-soft pr-16 pl-9 text-left text-[13px] text-muted-foreground outline-none hover:border-brand focus:border-brand"
                 >
-                    <Bell className="size-4" />
+                    <span className="pointer-events-none absolute left-3 text-muted-foreground">⌕</span>
+                    Find or Ask
+                    <span className="pointer-events-none absolute right-3 text-[11px]">⌘K</span>
                 </button>
-                {user ? (
+                <div className="flex items-center gap-1.5">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
-                                className="grid size-8 place-content-center rounded-full bg-ink text-[11px] font-medium text-canvas"
-                                title={user.name}
+                                title="Create"
+                                className="grid size-8 place-content-center rounded-full border border-hairline text-ink hover:bg-canvas-soft"
                             >
-                                {initials(user.name)}
+                                <Plus className="size-4" />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-64">
-                            <UserMenuContent user={user} />
+                        <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem asChild>
+                                <Link href="/crm/contacts?create=1">Contact</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/crm/companies?create=1">Company</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/crm/deals?create=1">Deal</Link>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                ) : null}
-            </div>
-        </header>
+                    <button
+                        type="button"
+                        title="Notifications"
+                        className="grid size-8 place-content-center rounded-full text-ink hover:bg-canvas-soft"
+                    >
+                        <Bell className="size-4" />
+                    </button>
+                    {user ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="grid size-8 place-content-center rounded-full bg-ink text-[11px] font-medium text-canvas"
+                                    title={user.name}
+                                >
+                                    {initials(user.name)}
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-64">
+                                <UserMenuContent user={user} />
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : null}
+                </div>
+            </header>
+            <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+        </>
     );
 }
