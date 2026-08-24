@@ -124,6 +124,11 @@ class Workspace extends Model
         return $this->hasMany(SavedFilter::class);
     }
 
+    public function workflows(): HasMany
+    {
+        return $this->hasMany(Workflow::class);
+    }
+
     public function customAttributeDefinitions(): HasMany
     {
         return $this->hasMany(CustomAttributeDefinition::class);

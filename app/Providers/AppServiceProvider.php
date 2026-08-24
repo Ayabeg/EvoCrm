@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Contact;
+use App\Models\Deal;
 use App\Models\User;
+use App\Observers\ContactObserver;
+use App\Observers\DealObserver;
 use App\Services\Identity\WorkspaceProvisioner;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Authenticated;
@@ -25,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Contact::observe(ContactObserver::class);
+        Deal::observe(DealObserver::class);
 
         // Meta workspace OAuth rides Socialite's official Facebook provider
         // under the "meta" driver name, configured from META_* env vars.
