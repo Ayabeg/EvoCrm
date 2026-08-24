@@ -30,10 +30,16 @@ class HomeController extends Controller
     {
         $workspace = $request->user()->workspace;
         $today = now('Africa/Algiers')->toDateString();
+        $ownerId = $request->integer('owner_id') ?: null;
+        $period = $request->string('period')->toString() ?: 'today';
 
         $openDeals = Deal::query()
             ->forWorkspace($workspace)
             ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false));
+
+        if ($ownerId) {
+            $openDeals->where('owner_id', $ownerId);
+        }
 
         $outbound = OutboundMessage::query()
             ->forWorkspace($workspace)
@@ -95,6 +101,10 @@ class HomeController extends Controller
             ],
             'charts' => $this->evoVizCharts($workspace),
             'owners' => $workspace->users()->orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'owner_id' => $ownerId,
+                'period' => $period,
+            ],
         ]);
     }
 
