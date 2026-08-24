@@ -230,12 +230,13 @@ export function CrmEmptyState({
 }) {
     return (
         <div className="grid flex-1 place-items-center bg-canvas px-6 py-16">
-            <div className="text-center">
+            <div className="max-w-sm text-center">
+                <div className="mx-auto mb-4 size-10 rounded-full border border-hairline bg-canvas-soft" />
                 <p className="text-[14px] text-ink">{line}</p>
                 <button
                     type="button"
                     onClick={onAction}
-                    className="mt-3 text-[13px] font-medium text-brand"
+                    className="mt-3 rounded-sm px-3 py-1.5 text-[13px] font-medium text-brand transition-colors hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                     {actionLabel}
                 </button>
