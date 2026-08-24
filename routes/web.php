@@ -65,6 +65,7 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
 Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])->name('outbound.track.click');
+Route::get('/track/{slug}/visit.gif', [\App\Http\Controllers\Public\FunnelTrackingController::class, 'pixel'])->name('funnel.track.visit');
 
 Route::get('/webhooks/evolution', [EvolutionWebhookController::class, 'verify'])->name('webhooks.evolution.verify');
 Route::post('/webhooks/evolution', [EvolutionWebhookController::class, 'handle'])->name('webhooks.evolution');
