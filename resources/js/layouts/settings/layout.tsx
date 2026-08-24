@@ -62,6 +62,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/pipelines',
         icon: null,
     },
+    {
+        title: 'Permissions',
+        href: '/settings/permissions',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
