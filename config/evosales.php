@@ -49,6 +49,10 @@ return [
 
     'activity_types' => ['note', 'task', 'call', 'meeting', 'email', 'stage_change', 'sequence'],
 
+    'workflow_triggers' => ['contact.created', 'deal.stage_changed'],
+
+    'workflow_actions' => ['create_task', 'enroll_sequence'],
+
     'quote_statuses' => ['draft', 'sent', 'accepted'],
 
     'attribute_types' => ['text', 'number', 'list'],

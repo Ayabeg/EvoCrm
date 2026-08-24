@@ -29,6 +29,7 @@ import {
     SquareKanban,
     Target,
     UserRoundCheck,
+    Workflow,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
@@ -201,6 +202,12 @@ export function AppSidebar() {
                     label: 'Segments',
                     href: '/crm/segments',
                     icon: Layers,
+                },
+                {
+                    name: 'automation',
+                    label: 'Automation',
+                    href: '/crm/workflows',
+                    icon: Workflow,
                 },
             ],
         },

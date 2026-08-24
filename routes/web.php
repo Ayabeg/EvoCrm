@@ -14,6 +14,7 @@ use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\ReportController;
 use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Crm\SegmentController;
+use App\Http\Controllers\Crm\WorkflowController;
 use App\Http\Controllers\Desk\InboxController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Outbound\CampaignController;
@@ -82,6 +83,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/segments', [SegmentController::class, 'store'])->name('crm.segments.store');
     Route::put('/crm/segments/{segment}', [SegmentController::class, 'update'])->name('crm.segments.update');
     Route::delete('/crm/segments/{segment}', [SegmentController::class, 'destroy'])->name('crm.segments.destroy');
+
+    Route::get('/automation', [WorkflowController::class, 'index'])->name('automation');
+    Route::get('/crm/workflows', [WorkflowController::class, 'index'])->name('crm.workflows.index');
+    Route::post('/crm/workflows', [WorkflowController::class, 'store'])->name('crm.workflows.store');
+    Route::post('/crm/workflows/templates', [WorkflowController::class, 'storeTemplate'])->name('crm.workflows.templates.store');
+    Route::post('/crm/workflows/{workflow}/toggle', [WorkflowController::class, 'toggle'])->name('crm.workflows.toggle');
+    Route::delete('/crm/workflows/{workflow}', [WorkflowController::class, 'destroy'])->name('crm.workflows.destroy');
     Route::post('/crm/deals/{deal}/quotes', [QuoteController::class, 'store'])->name('crm.quotes.store');
     Route::put('/crm/quotes/{quote}', [QuoteController::class, 'update'])->name('crm.quotes.update');
 
