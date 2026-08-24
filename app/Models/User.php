@@ -31,7 +31,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Workspace|null $workspace
  * @property WorkspaceRole $role
  */
-#[Fillable(['workspace_id', 'name', 'email', 'password', 'role'])]
+#[Fillable(['workspace_id', 'name', 'email', 'password', 'role', 'permissions'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -49,6 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => WorkspaceRole::class,
+            'permissions' => 'array',
             'two_factor_confirmed_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
@@ -67,5 +68,16 @@ class User extends Authenticatable
     public function ownedDeals(): HasMany
     {
         return $this->hasMany(Deal::class, 'owner_id');
+    }
+
+    public function canPermission(string $permission): bool
+    {
+        if ($this->role->canManageSettings()) {
+            return true;
+        }
+
+        $permissions = $this->permissions ?? [];
+
+        return in_array($permission, $permissions, true) || in_array('*', $permissions, true);
     }
 }

@@ -96,6 +96,12 @@ class Deal extends Model
         return $this->hasMany(DealLineItem::class)->orderBy('id');
     }
 
+    /** @return HasMany<DealSplit, $this> */
+    public function splits(): HasMany
+    {
+        return $this->hasMany(DealSplit::class);
+    }
+
     public function moveTo(Stage $stage, ?User $actor = null): void
     {
         if ((int) $stage->pipeline_id !== (int) $this->pipeline_id) {

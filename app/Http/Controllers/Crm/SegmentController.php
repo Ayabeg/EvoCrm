@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Crm;
 use App\Http\Controllers\Controller;
 use App\Models\SavedFilter;
 use App\Models\Stage;
+use App\Services\Ads\MetaAudienceSyncService;
 use App\Services\Crm\CrmFilter;
 use App\Support\CrmHub;
 use Illuminate\Http\JsonResponse;
@@ -98,6 +99,21 @@ class SegmentController extends Controller
         $segment->delete();
 
         return redirect()->route('crm.segments.index');
+    }
+
+    public function syncMeta(Request $request, SavedFilter $segment, MetaAudienceSyncService $sync): RedirectResponse
+    {
+        abort_unless((int) $segment->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($segment->entity === 'contact', 422);
+        abort_unless($request->user()->role->canManageSettings(), 403);
+
+        $data = $request->validate([
+            'audience_id' => ['required', 'string', 'max:80'],
+        ]);
+
+        $result = $sync->syncSegment($request->user()->workspace, $segment, $data['audience_id']);
+
+        return back()->with('meta_sync', $result);
     }
 
     /**
