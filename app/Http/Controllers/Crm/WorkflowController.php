@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomAttributeDefinition;
+use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\Stage;
 use App\Models\Workflow;
@@ -60,6 +61,11 @@ class WorkflowController extends Controller
             'templates' => $templates->all(),
             'stages' => $stages,
             'sequences' => $sequences,
+            'segments' => SavedFilter::query()
+                ->forWorkspace($workspace)
+                ->where('entity', 'contact')
+                ->orderBy('name')
+                ->get(['id', 'name']),
             'condition_fields' => $this->conditionFieldOptions($workspace),
         ]);
     }
@@ -83,6 +89,7 @@ class WorkflowController extends Controller
             'name' => $data['name'],
             'trigger' => $data['trigger'],
             'trigger_stage_id' => $stageId,
+            'trigger_saved_filter_id' => $data['trigger_saved_filter_id'],
             'action' => $data['action'],
             'action_config' => $this->actionConfig($data['action'], $data['then']),
             'condition_field' => $data['condition_field'],
@@ -120,6 +127,7 @@ class WorkflowController extends Controller
             'name' => $data['name'],
             'trigger' => $data['trigger'],
             'trigger_stage_id' => $stageId,
+            'trigger_saved_filter_id' => $data['trigger_saved_filter_id'],
             'action' => $data['action'],
             'action_config' => $this->actionConfig($data['action'], $data['then']),
             'condition_field' => $data['condition_field'],
@@ -192,6 +200,11 @@ class WorkflowController extends Controller
                 'nullable',
                 'integer',
             ],
+            'trigger_saved_filter_id' => [
+                Rule::requiredIf($request->input('trigger') === Workflow::TRIGGER_SEGMENT_ENTERED),
+                'nullable',
+                'integer',
+            ],
             'action' => ['required', Rule::in(Workflow::actions())],
             'subject' => ['nullable', 'string', 'max:180'],
             'body' => ['nullable', 'string'],
@@ -241,6 +254,7 @@ class WorkflowController extends Controller
             'name' => $data['name'],
             'trigger' => $data['trigger'],
             'trigger_stage_id' => isset($data['trigger_stage_id']) ? (int) $data['trigger_stage_id'] : null,
+            'trigger_saved_filter_id' => isset($data['trigger_saved_filter_id']) ? (int) $data['trigger_saved_filter_id'] : null,
             'action' => $data['action'],
             'condition_field' => filled($data['condition_field'] ?? null) ? (string) $data['condition_field'] : null,
             'condition_operator' => filled($data['condition_operator'] ?? null) ? (string) $data['condition_operator'] : null,

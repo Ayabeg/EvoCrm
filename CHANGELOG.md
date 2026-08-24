@@ -1,179 +1,113 @@
 # Changelog
 
-## EvoCell 6 — Omni & permissions (2026-08-25)
+## EvoCells merged to main (2026-08-25)
+
+**Merge commit:** `9a17fd0` — [PR #50](https://github.com/Mohamedbeghanem/EvoSales/pull/50) only.
+
+PRs #45–#49 were stacked branches whose commits are included in #50; GitHub marked them merged when #50 landed — not separate merges on `main`.
+
+**Scorecard (honest audit):** see [`docs/evocells-roadmap.md`](docs/evocells-roadmap.md) — composite **~81** on M1–M11 (Omega ≥95 not yet met).
+
+---
+
+## EvoCell 6 — Omni & permissions
 
 ### Added
-- Deal splits: `deal_splits` table, `PUT /crm/deals/{deal}/splits` (percent must sum to 100)
-- Granular member permissions via `users.permissions` json + `User::canPermission()`
-- SMS channel reply path in `DeskComposer` (stub when Twilio unset; ready for provider wiring)
-- Meta Custom Audience sync: `MetaAudienceSyncService` + `POST /crm/segments/{segment}/sync-meta`
-- Dashboard sharing: `visibility` on dashboards (private / team / workspace)
-- Team-scoped deal visibility via `deals.team_id` + `deals.team_only` permission
-- Segment membership tracking + `segment.entered` workflow trigger via `SegmentMatcher`
-- Plan gap migration: A/B subject stats, workspace record layouts, cross-object reports
-- Living scorecard: `docs/evocells-roadmap.md`
+- Deal splits (`deal_splits`, `PUT /crm/deals/{deal}/splits`)
+- Granular permissions (`users.permissions`, `User::canPermission()`)
+- SMS reply stub in `DeskComposer` (Twilio-ready)
+- Meta Custom Audience sync (`MetaAudienceSyncService`, segment sync route)
+- Dashboard sharing (`visibility`: private / team / workspace)
+- Team-scoped deals (`deals.team_id`, `deals.team_only` permission)
+- `SegmentMatcher` + `segment.entered` workflow trigger
+- Plan-gap migration: A/B stats, segment memberships, dashboard visibility
 
 ### HubSpot comparison
-HubSpot adds SMS inbox, deal splits, and Custom Audience sync in enterprise tiers. This ships split attribution, permission grants, Meta audience push from segments, and SMS channel groundwork — closing admin/omni gaps while preserving EvoSales outbound moat.
+HubSpot enterprise adds SMS inbox, deal splits, and Custom Audience sync. EvoSales ships splits, permission grants, audience push from segments, and SMS groundwork while keeping the outbound moat.
 
-## EvoCell 5 — Analytics depth (2026-08-25)
+---
+
+## EvoCell 5 — Analytics depth
 
 ### Added
-- Calculated custom properties (`type=calculated`, `formula.expression` e.g. `{deal.amount} * 0.19`)
-- Saved reports: `saved_reports` table, `/crm/report-builder` UI, `ReportBuilder` service
-- Scheduled reports: `scheduled_reports` table + `reports:deliver` daily command
+- Calculated custom properties (`type=calculated`, formula expressions)
+- Saved reports + `/crm/report-builder` + `ReportBuilder`
+- Scheduled reports + `reports:deliver`
+- Cross-object reply rate by wilaya; deal CSV export
 
 ### HubSpot comparison
-HubSpot custom reports support SQL and cross-object joins. This ships formula-based calculated fields, saved filter reports with grouping, and email scheduled delivery — monitoring depth without ad hoc SQL.
+HubSpot custom reports support SQL and arbitrary joins. EvoSales ships formula fields, saved filter reports with grouping, one cross-object report, and scheduled email delivery — monitoring depth without ad hoc SQL.
 
-## EvoCell 4 — AI layer (2026-08-25)
+---
+
+## EvoCell 4 — AI layer
 
 ### Added
-- RAG-lite Ask Evo: keyword-ranked activity retrieval (30 activities scanned, top matches in prompt)
-- AI pipeline forecast band: low/high DZD range, band label, optional LLM narrative on deals hub + kanban
-- `RecordInsight::pipelineForecastBand()` exposed as `forecastBand` in deal list/board views
+- RAG-lite Ask Evo (keyword-ranked activities in prompt)
+- Pipeline forecast band on deals hub + kanban
+- Contact engagement score, proactive summary, draft email action
 
 ### HubSpot comparison
-HubSpot Breeze uses full RAG over CRM + email history. This ships keyword-ranked activity retrieval and a math+LLM forecast band on pipeline views — enough AI assist for a small team without vector infrastructure.
+HubSpot Breeze uses vector RAG over CRM + email. EvoSales ships keyword retrieval, heuristics, and forecast bands — practical for small teams without vector infrastructure.
 
-## EvoCell 3 — Sequences depth (2026-08-25)
+---
+
+## EvoCell 3 — Sequences depth
 
 ### Added
-- Sequence step types: `email`, `call`, `meeting` with `meeting_url` field
-- A/B variants via `variant_key` on steps and enrollments (random assign at enroll)
-- Reply branches: `on_reply_step` jumps enrollment when IMAP reply detected
-- Call/meeting steps create CRM activities instead of outbound messages
+- Step types: email, call, meeting + `meeting_url`
+- A/B subjects with winner after 20 sends (`resolveAbSubject`)
+- Reply branches (`on_reply_step`) and auto-pause on IMAP reply
+- Step funnel analytics on sequence show page
 
 ### HubSpot comparison
-HubSpot Sequences include A/B tests, call steps, and meeting links with reply branching. This ships variant assignment, activity-based call/meeting steps, meeting URLs, and reply-driven step jumps — extending the outbound moat without HubSpot's full analytics tier.
+HubSpot Sequences include A/B, call steps, and meeting links. EvoSales extends the owned-email moat (warmup, quiet hours, suppression) with variants, activity steps, and reply branching.
 
-## EvoCell 2 — Automation spine (2026-08-25)
+---
+
+## EvoCell 2 — Automation spine
 
 ### Added
-- Workflow delays via `delay_minutes` on workflows and `workflow_executions` queue
-- `workflow:run` artisan command scheduled every minute
-- New workflow trigger: `enrollment.finished` (fires when sequence completes)
-- New workflow actions: `set_property`, `assign_owner`
-- Segment behavior filters: `enrolled_in_sequence`, `email_replied`, `email_opened` on contacts
-- `Contact::outboundMessages()` relationship for behavior filter joins
+- Workflow delays (`delay_minutes`, `workflow_executions`, `workflow:run`)
+- Triggers: contact/deal lifecycle, `enrollment.finished`, `segment.entered`, `enrollment.replied`
+- Actions: task, sequence, webhook, `set_property`, `assign_owner`, `create_deal`, `send_email`, `notify_user`
+- Segment behavior filters: `enrolled_in_sequence`, `email_replied`, `email_opened`
+- Automation UI exposes all triggers, actions, delays, and segment pickers
 
 ### HubSpot comparison
-HubSpot Operations Hub adds visual canvas and 100+ actions with delay branches. This ships a scheduled execution queue, two new property/owner actions, enrollment-finished trigger, and outbound-behavior segment filters — the automation spine without a drag-drop builder.
+HubSpot Operations Hub adds visual canvas and 100+ actions. EvoSales ships a scheduled queue, eight actions, quiet-hour-aware delays, and form-based rules — the automation spine without drag-drop.
 
-## EvoCell 1 — Team CRM (2026-08-25)
+---
+
+## EvoCell 1 — Team CRM
 
 ### Added
-- Team-shared saved views with `visibility` (`private` | `workspace`) and `is_workspace_default` flag
-- `SavedFilterPolicy` workspace visibility rules; `CrmHub::filters()` scoped to viewer
-- Filter builder wired end-to-end: AND/OR groups persist to URL query and saved views
-- Extended `CrmFilter` operators: `contains`, `neq`, `gt/gte/lt/lte`, `is_set`, `is_not_set`, custom attribute rules
-- Pipeline stage CRUD: create, rename, probability edit, reorder, safe delete with deal migration
-- Server-persisted record layouts via `GET/PUT /crm/record-layouts/{entity}` (`record_layouts` table)
-- Settings pipeline UI: inline stage editor with drag reorder
+- Shared saved views: `visibility` (`private` | `team` | `workspace`), `is_workspace_default`
+- Filter builder wired to URL + saved views; operators through `in`, `before`, `after`, comparisons, custom attrs
+- Pipeline stage CRUD, reorder, probability, safe delete
+- Server-persisted record layouts (`GET/PUT /crm/record-layouts/{entity}`) + workspace default API
 
 ### HubSpot comparison
-HubSpot list views support team sharing, workspace defaults, and granular permissions. This ships workspace-scoped shared views, expanded filter operators, admin pipeline stage editing, and per-user server layouts — closing the highest-impact team CRM gaps without enterprise ACL granularity.
+HubSpot list views support team sharing and calculated columns. EvoSales closes team CRM gaps (shared views, filters, pipeline admin, server layouts) without enterprise ACL granularity.
 
-## Gap #1 — Saved views + advanced filters + column chooser (2026-08-24)
+---
 
-### Added
-- Extended `saved_filters` with `columns`, `sort`, and `is_default` for reusable list views
-- `ListViewConfig` registry for contact/deal/company column and filter field definitions
-- `SavedFilterPolicy` and `SavedFilterResource` for authorization and API shape
-- Filter builder with AND/OR groups persisted inside saved view filters
-- Column chooser sheet (show/hide + reorder) on Contacts, Deals, and Companies lists
-- Per-view record count badges on saved view tabs
-- `CrmFilter::apply()` / `applyFilterGroups()` / `applySort()` for generic list filtering
+## EvoCell 0 — Gaps #1–#10 baseline (`0304154`)
 
-### HubSpot comparison
-HubSpot list views support nested filter groups, column layouts, and view sharing across teams. This ships the 80% version: workspace-scoped saved views owned by the creator, flat field operators (equals / is true / is false), and column customization without cross-user default views or calculated columns. Enough for a single-digit sales team to save “Unanswered Alger” or “My open deals” layouts without HubSpot’s enterprise view permissions.
+Pre-EvoCells production layer documented in earlier gap PRs (#36–#44). Superseded by EvoCells 1–6 where noted.
 
-## Gap #2 — Deal kanban + pipelines + forecasting (2026-08-24)
+| Gap | Shipped (baseline) | Superseded by EvoCell |
+|-----|-------------------|------------------------|
+| #1 Saved views + filters | Column chooser, AND/OR groups, saved filters | Cell 1: sharing + extended operators |
+| #2 Pipelines + forecast | Multi-pipeline list/board, forecast bar | Cell 1: stage CRUD |
+| #3 Record layout | Card customize panel (localStorage) | Cell 1: **server persistence** |
+| #4 Workflows | Observer-dispatched rules, if/else | Cell 2: delays + expanded triggers/actions |
+| #5 Custom properties | Admin CRUD, jsonb values | Cell 5: calculated formulas |
+| #6 Sequences + cron | Steps, enrollments, `outbound:run` | Cell 3: A/B, call/meeting, reply branches |
+| #7 Dashboards | EvoViz rooms + saved boards | Cell 6: dashboard sharing |
+| #8 Inbox | Desk embed + native fallback | Cell 6: SMS stub |
+| #9 Segments | Live preview API | Cell 2/5: FilterBuilder + behavior filters |
+| #10 AI | Deal health heuristic, Ask Evo stub | Cell 4: RAG-lite + forecast band |
 
-### Added
-- `PipelineManager` service centralizing pipeline resolution, board payload, and forecast math
-- `PipelinePolicy` and `PipelineResource` for authorization and API shape
-- Settings page at `/settings/pipelines` to create pipelines and set the workspace default
-- Pipeline switcher on **both** Deals list hub and kanban board (`?pipeline=` query param)
-- Shared `DealForecastBar` showing deal count, total, weighted forecast, and open pipeline value
-- List view scoped to the active pipeline (stage pills and deals filtered per pipeline)
-
-### Already existed (polished)
-- Kanban board with HTML5 drag-drop and `/crm/deals/{deal}/move`
-- Per-column totals + weighted amounts using `DealBoardForecast` stage probabilities
-- List/Board toggle via `DealLayoutToggle`
-
-### HubSpot comparison
-HubSpot Sales Hub supports unlimited custom pipelines, drag-and-drop stage editing, deal splits, and AI forecasting. This ships multi-pipeline **list + board views**, stage-probability weighted totals, and admin-created pipelines cloned from the Evotechly default stage template — enough for a small team running separate motions (e.g. Sales vs Enterprise) without HubSpot's visual pipeline designer or revenue intelligence tier.
-
-## Gap #3 — Configurable 3-column record page (2026-08-24)
-
-### Added
-- `RecordLayoutProvider`, card registry, and customize panel on contact/company/deal hubs
-- Left/main/side column cards with drag-reorder persisted in localStorage
-
-### HubSpot comparison
-HubSpot record pages support team-shared layouts, conditional cards, and association limits. This ships per-user card visibility/reorder on the existing 3-column hub shell without a server-side layout admin.
-
-## Gap #4 — Workflow engine v1 (2026-08-24)
-
-### Exists on main + added
-- Rule-based workflows: triggers (contact/deal created, deal stage changed), actions (task, sequence enroll, webhook), if/else branches
-- `PUT /crm/workflows/{workflow}` for updating existing rules
-
-### HubSpot comparison
-HubSpot Operations Hub adds visual canvas, 100+ actions, and delay branches. This ships structured form workflows dispatched from model observers — enough for internal automation without a drag-drop builder.
-
-## Gap #5 — Custom properties admin (2026-08-24)
-
-### Exists on main
-- `/settings/attributes` CRUD for contact/deal/company fields (text/number/date/list), groups, required flags, fill rates
-- Values on record hubs via `RecordProperties`
-
-### HubSpot comparison
-HubSpot adds conditional logic and calculated properties. EvoSales ships jsonb-backed custom attributes with admin UI — sufficient for a small team without fill-rate analytics or dependency rules.
-
-## Gap #6 — Sequences + enrollments + cron (2026-08-24)
-
-### Exists on main + wired
-- Outbound sequences with steps, enrollments, `outbound:run` every minute
-- Saved-filter bulk enroll now uses `CrmFilter::apply()` (respects filter groups from Gap #1)
-
-### HubSpot comparison
-HubSpot Sequences include A/B tests and meeting links. EvoSales ships templated merge-field cadences with quiet hours and suppression — the 80% outbound motion for a single-digit team.
-
-## Gap #7 — Multi-dashboard reporting (2026-08-24)
-
-### Exists on main
-- Saved dashboards with EvoViz widget catalog, owner/date filters, report rooms
-- `/reports` board + dashboard CRUD
-
-### HubSpot comparison
-HubSpot custom reports support SQL and cross-object joins. EvoSales reuses pre-built EvoViz rooms plus saved widget boards — monitoring without ad hoc report builder.
-
-## Gap #8 — Omni-channel inbox (2026-08-24)
-
-### Exists on main
-- `/inbox` with Chatwoot embed + native desk fallback, thread reply, official connectors
-
-### HubSpot comparison
-HubSpot Conversations unifies chat, SMS, and team inbox routing. EvoSales ships email/desk-first with WhatsApp Cloud connectors — chat channels flagged for a separate integration pass.
-
-## Gap #9 — Dynamic segments (2026-08-24)
-
-### Added
-- Segment manager with live preview API (`POST /crm/segments/preview`)
-- Segment counts use `CrmFilter::fromSaved()` for parity with list views
-
-### HubSpot comparison
-HubSpot lists support OR logic, behavior filters, and ad audiences. EvoSales segments reuse saved filters with debounced live preview — enough for sequence enroll and export audiences internally.
-
-## Gap #10 — AI layer (2026-08-24)
-
-### Exists on main + wired
-- Deal health heuristic (stage probability + activity recency + amount)
-- Ask Evo panel with template summaries; custom attribute values included in AI facts
-
-### HubSpot comparison
-HubSpot Breeze adds LLM scoring and generative email. EvoSales ships heuristic deal health and field-aware Ask Evo stubs — RAG over full activity history deferred until EVOSTACK AI platform is defined.
-
+### HubSpot comparison (baseline)
+Gaps #1–#10 delivered ~68% composite parity — enough for a single-digit Algerian sales team without HubSpot enterprise tiers. EvoCells 1–6 raised that to **~81%** on core dimensions (see scorecard).

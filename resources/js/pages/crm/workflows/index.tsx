@@ -53,6 +53,8 @@ const triggerLabel: Record<string, string> = {
     'deal.stage_changed': 'Deal stage changed',
     'deal.created': 'Deal created',
     'enrollment.finished': 'Sequence finished',
+    'segment.entered': 'Segment entered',
+    'enrollment.replied': 'Sequence reply received',
 };
 
 const actionLabel: Record<string, string> = {
@@ -61,6 +63,9 @@ const actionLabel: Record<string, string> = {
     send_webhook: 'Send webhook',
     set_property: 'Set property',
     assign_owner: 'Assign owner',
+    create_deal: 'Create deal',
+    send_email: 'Send email',
+    notify_user: 'Notify user',
 };
 
 const operatorLabel: Record<string, string> = {
@@ -116,6 +121,76 @@ function ActionFields({
         );
     }
 
+    if (action === 'set_property') {
+        return (
+            <>
+                <div>
+                    <Label>{prefix ? 'Else entity' : 'Entity'}</Label>
+                    <select name={`${prefix}property_entity`} className={selectClass} defaultValue="contact">
+                        <option value="contact">Contact</option>
+                        <option value="deal">Deal</option>
+                    </select>
+                </div>
+                <div>
+                    <Label>{prefix ? 'Else property field' : 'Property field'}</Label>
+                    <Input name={`${prefix}property_field`} placeholder="wilaya" required />
+                </div>
+                <div className="md:col-span-2">
+                    <Label>{prefix ? 'Else property value' : 'Property value'}</Label>
+                    <Input name={`${prefix}property_value`} placeholder="Alger" required />
+                </div>
+            </>
+        );
+    }
+
+    if (action === 'assign_owner') {
+        return (
+            <>
+                <div>
+                    <Label>{prefix ? 'Else record' : 'Record'}</Label>
+                    <select name={`${prefix}assign_entity`} className={selectClass} defaultValue="contact">
+                        <option value="contact">Contact</option>
+                        <option value="deal">Deal</option>
+                    </select>
+                </div>
+                <div>
+                    <Label>{prefix ? 'Else owner user id' : 'Owner user id'}</Label>
+                    <Input name={`${prefix}assign_owner_id`} type="number" min={1} required />
+                </div>
+            </>
+        );
+    }
+
+    if (action === 'create_deal') {
+        return (
+            <>
+                <div>
+                    <Label>{prefix ? 'Else deal title' : 'Deal title'}</Label>
+                    <Input name={`${prefix}subject`} placeholder="New opportunity" required />
+                </div>
+                <div>
+                    <Label>{prefix ? 'Else amount (DZD)' : 'Amount (DZD)'}</Label>
+                    <Input name={`${prefix}property_value`} type="number" min={0} placeholder="500000" />
+                </div>
+            </>
+        );
+    }
+
+    if (action === 'send_email' || action === 'notify_user') {
+        return (
+            <>
+                <div>
+                    <Label>{prefix ? 'Else subject' : 'Subject'}</Label>
+                    <Input name={`${prefix}subject`} placeholder="Follow up from EvoSales" required />
+                </div>
+                <div className="md:col-span-2">
+                    <Label>{prefix ? 'Else body' : 'Body'}</Label>
+                    <Input name={`${prefix}body`} placeholder="Message body" required />
+                </div>
+            </>
+        );
+    }
+
     if (action === 'create_task') {
         return (
             <>
@@ -139,12 +214,14 @@ export default function WorkflowsIndex({
     templates,
     stages,
     sequences,
+    segments = [],
     condition_fields = [],
 }: {
     workflows: WorkflowRow[];
     templates: Template[];
     stages: Stage[];
     sequences: Sequence[];
+    segments?: Array<{ id: number; name: string }>;
     condition_fields?: ConditionField[];
 }) {
     const [trigger, setTrigger] = useState('contact.created');
@@ -162,7 +239,7 @@ export default function WorkflowsIndex({
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Automation"
-                    description="Evotechly workflows that run in EvoSales when a contact is created, a deal is created, or a deal changes stage. Create a task, enroll the contact in an outbound sequence, or post an optional webhook. Add an if/then branch on deal amount, stage, or a contact property."
+                    description="Evotechly workflows: triggers on contacts, deals, sequences, and segments. Actions include tasks, sequences, property updates, email, webhooks, and delayed runs."
                 />
 
                 <Card className="border-hairline p-4">
@@ -208,8 +285,11 @@ export default function WorkflowsIndex({
                                         onChange={(event) => setTrigger(event.target.value)}
                                     >
                                         <option value="contact.created">Contact created</option>
-                                        <option value="deal.stage_changed">Deal stage changed</option>
                                         <option value="deal.created">Deal created</option>
+                                        <option value="deal.stage_changed">Deal stage changed</option>
+                                        <option value="enrollment.finished">Sequence finished</option>
+                                        <option value="segment.entered">Segment entered</option>
+                                        <option value="enrollment.replied">Sequence reply received</option>
                                     </select>
                                 </div>
                                 {trigger === 'deal.stage_changed' ? (
@@ -227,9 +307,25 @@ export default function WorkflowsIndex({
                                             ))}
                                         </select>
                                     </div>
+                                ) : trigger === 'segment.entered' ? (
+                                    <div>
+                                        <Label>Segment</Label>
+                                        <select name="trigger_saved_filter_id" className={selectClass} required>
+                                            <option value="">Pick a contact segment…</option>
+                                            {segments.map((segment) => (
+                                                <option key={segment.id} value={segment.id}>
+                                                    {segment.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 ) : (
                                     <div />
                                 )}
+                                <div>
+                                    <Label>Delay (minutes, optional)</Label>
+                                    <Input name="delay_minutes" type="number" min={0} defaultValue={0} />
+                                </div>
                                 <div>
                                     <Label>Then action</Label>
                                     <select
@@ -240,6 +336,11 @@ export default function WorkflowsIndex({
                                     >
                                         <option value="create_task">Create task on the record</option>
                                         <option value="enroll_sequence">Enroll contact in a sequence</option>
+                                        <option value="set_property">Set property</option>
+                                        <option value="assign_owner">Assign owner</option>
+                                        <option value="create_deal">Create deal</option>
+                                        <option value="send_email">Send email</option>
+                                        <option value="notify_user">Notify user</option>
                                         <option value="send_webhook">Send webhook URL</option>
                                     </select>
                                 </div>
@@ -329,6 +430,11 @@ export default function WorkflowsIndex({
                                                 <option value="">Do nothing</option>
                                                 <option value="create_task">Create task on the record</option>
                                                 <option value="enroll_sequence">Enroll contact in a sequence</option>
+                                                <option value="set_property">Set property</option>
+                                                <option value="assign_owner">Assign owner</option>
+                                                <option value="create_deal">Create deal</option>
+                                                <option value="send_email">Send email</option>
+                                                <option value="notify_user">Notify user</option>
                                                 <option value="send_webhook">Send webhook URL</option>
                                             </select>
                                         </div>
