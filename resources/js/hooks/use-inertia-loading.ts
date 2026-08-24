@@ -1,0 +1,22 @@
+import { router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+
+export function useInertiaLoading() {
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const removeStart = router.on('start', (event) => {
+            if (event.detail.visit.method === 'get') {
+                setLoading(true);
+            }
+        });
+        const removeFinish = router.on('finish', () => setLoading(false));
+
+        return () => {
+            removeStart();
+            removeFinish();
+        };
+    }, []);
+
+    return loading;
+}

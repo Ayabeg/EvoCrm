@@ -63,6 +63,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Record layouts',
+        href: '/settings/record-layouts',
+        icon: null,
+    },
+    {
         title: 'Permissions',
         href: '/settings/permissions',
         icon: null,
@@ -83,13 +88,14 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
               { title: 'People', href: '/settings/people', icon: null },
               ...sidebarNavItems.slice(3),
           ]
-        : sidebarNavItems;
+        : sidebarNavItems.filter((item) => item.href !== '/settings/record-layouts');
 
     // The People table needs more room than the settings forms.
     const wide =
         page.component === 'settings/people' ||
         page.component === 'settings/attributes' ||
         page.component === 'settings/pipelines' ||
+        page.component === 'settings/record-layouts' ||
         page.component === 'settings/connectors';
 
     return (

@@ -1,6 +1,7 @@
 import { Form, Head, router } from '@inertiajs/react';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -56,8 +57,7 @@ function CopyRecord({ value }: { value: string }) {
 
 export default function DomainsIndex({ domains }: { domains: DomainRow[] }) {
     return (
-        <>
-            <Head title="Sending domains" />
+        <OutboundShell title="Sending domains">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Sending domains"
@@ -322,7 +322,7 @@ export default function DomainsIndex({ domains }: { domains: DomainRow[] }) {
                     ))}
                 </div>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

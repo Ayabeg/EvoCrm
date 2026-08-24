@@ -40,11 +40,43 @@ async function saveServerLayout(objectType: RecordObjectType, layout: RecordLayo
     });
 }
 
-export function useRecordLayout(objectType: RecordObjectType) {
-    const [layout, setLayout] = useState<RecordLayoutState>(() => defaultLayout(objectType));
+async function saveWorkspaceDefaultLayout(objectType: RecordObjectType, layout: RecordLayoutState): Promise<void> {
+    await fetch(`/crm/record-layouts/${objectType}/workspace-default`, {
+        method: 'PUT',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken(),
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ layout }),
+    });
+}
+
+export type RecordLayoutMode = 'user' | 'workspace';
+
+export function useRecordLayout(
+    objectType: RecordObjectType,
+    options?: { mode?: RecordLayoutMode; seedLayout?: RecordLayoutState | null },
+) {
+    const mode = options?.mode ?? 'user';
+    const [layout, setLayout] = useState<RecordLayoutState>(() =>
+        options?.seedLayout ? normalizeLayout(objectType, options.seedLayout) : defaultLayout(objectType),
+    );
     const [editorOpen, setEditorOpen] = useState(false);
+    const [savingDefault, setSavingDefault] = useState(false);
 
     useEffect(() => {
+        if (mode === 'workspace') {
+            setLayout(
+                options?.seedLayout
+                    ? normalizeLayout(objectType, options.seedLayout)
+                    : defaultLayout(objectType),
+            );
+
+            return;
+        }
+
         let cancelled = false;
 
         void fetchServerLayout(objectType).then((server) => {
@@ -65,16 +97,19 @@ export function useRecordLayout(objectType: RecordObjectType) {
         return () => {
             cancelled = true;
         };
-    }, [objectType]);
+    }, [objectType, mode, options?.seedLayout]);
 
     const persist = useCallback(
         (next: RecordLayoutState) => {
             const normalized = normalizeLayout(objectType, next);
             setLayout(normalized);
-            writeRecordLayout(objectType, normalized);
-            void saveServerLayout(objectType, normalized);
+
+            if (mode === 'user') {
+                writeRecordLayout(objectType, normalized);
+                void saveServerLayout(objectType, normalized);
+            }
         },
-        [objectType],
+        [objectType, mode],
     );
 
     const setCardVisible = useCallback(
@@ -113,6 +148,15 @@ export function useRecordLayout(objectType: RecordObjectType) {
         persist(defaultLayout(objectType));
     }, [objectType, persist]);
 
+    const saveWorkspaceDefault = useCallback(async () => {
+        setSavingDefault(true);
+        try {
+            await saveWorkspaceDefaultLayout(objectType, layout);
+        } finally {
+            setSavingDefault(false);
+        }
+    }, [objectType, layout]);
+
     return {
         layout,
         editorOpen,
@@ -120,5 +164,8 @@ export function useRecordLayout(objectType: RecordObjectType) {
         setCardVisible,
         moveCard,
         resetLayout,
+        saveWorkspaceDefault,
+        savingDefault,
+        mode,
     };
 }

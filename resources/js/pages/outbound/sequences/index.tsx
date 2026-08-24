@@ -1,4 +1,5 @@
-import { Form, Head, Link, router } from '@inertiajs/react';
+import { Form, Link, router } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,8 +22,7 @@ type SequenceRow = {
 
 export default function SequencesIndex({ sequences }: { sequences: SequenceRow[] }) {
     return (
-        <>
-            <Head title="Sequences" />
+        <OutboundShell title="Sequences">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Sequences"
@@ -110,7 +110,7 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                     </table>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

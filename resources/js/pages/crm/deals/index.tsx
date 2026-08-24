@@ -2,8 +2,10 @@ import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { SkeletonList } from '@/components/crm/empty-room';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import ListViewTable from '@/components/crm/list-view-table';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
@@ -56,6 +58,7 @@ export default function DealsIndex({
     createOpen?: boolean;
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
+    const loading = useInertiaLoading();
 
     return (
         <>
@@ -78,7 +81,9 @@ export default function DealsIndex({
             >
                 {(columns) => (
                     <>
-                        {deals.length === 0 ? (
+                        {loading ? (
+                            <SkeletonList />
+                        ) : deals.length === 0 ? (
                             <CrmEmptyState
                                 line="No deals in this view."
                                 actionLabel="Create deal"

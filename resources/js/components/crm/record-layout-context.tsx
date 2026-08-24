@@ -13,11 +13,15 @@ const RecordLayoutContext = createContext<RecordLayoutContextValue | null>(null)
 export function RecordLayoutProvider({
     objectType,
     children,
+    mode = 'user',
+    seedLayout,
 }: {
     objectType: RecordObjectType;
     children: ReactNode;
+    mode?: 'user' | 'workspace';
+    seedLayout?: RecordLayoutState | null;
 }) {
-    const recordLayout = useRecordLayout(objectType);
+    const recordLayout = useRecordLayout(objectType, { mode, seedLayout });
 
     const value = useMemo(
         () => ({

@@ -8,6 +8,60 @@ use App\Models\User;
 use App\Services\Ai\RecordInsight;
 use Illuminate\Support\Facades\Http;
 
+it('shows Ask Evo on a company record from company fields', function () {
+    $user = User::factory()->create();
+    $company = \App\Models\Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Clinique Atlas',
+        'domain' => 'clinique-atlas.dz',
+        'city' => 'Alger',
+    ]);
+
+    $this->actingAs($user)
+        ->get("/crm/companies/{$company->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/show')
+            ->where('askEvo.label', 'Ask Evo')
+            ->where('askEvo.live', false)
+            ->where('askEvo.source', 'fields')
+            ->where('askEvo.summary', fn ($summary) => is_string($summary)
+                && str_contains($summary, 'Clinique Atlas')
+                && str_contains($summary, 'clinique-atlas.dz')
+                && ! str_contains($summary, 'Breeze'))
+        );
+});
+
+it('answers Ask Evo from a company without a live model key', function () {
+    $user = User::factory()->create();
+    $company = \App\Models\Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Clinique Atlas',
+        'domain' => 'clinique-atlas.dz',
+    ]);
+
+    $this->actingAs($user)
+        ->from("/crm/companies/{$company->id}")
+        ->post("/crm/companies/{$company->id}/ask", [
+            'question' => 'What is the domain on this record?',
+        ])
+        ->assertRedirect("/crm/companies/{$company->id}");
+
+    $row = AiInsight::query()->where('subject_type', 'company')->where('subject_id', $company->id)->first();
+
+    expect($row)->not->toBeNull()
+        ->and($row->source)->toBe('fields')
+        ->and($row->answer)->toContain('clinique-atlas.dz');
+
+    $this->actingAs($user)
+        ->get("/crm/companies/{$company->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('askEvo.answer', $row->answer)
+            ->where('askEvo.question', 'What is the domain on this record?')
+        );
+});
+
 it('shows Ask Evo on a contact record from this contact fields', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create([

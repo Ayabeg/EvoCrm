@@ -1,4 +1,5 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Form, router } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -68,8 +69,7 @@ export default function WarmupIndex({
     summary: Summary;
 }) {
     return (
-        <>
-            <Head title="Warmup" />
+        <OutboundShell title="Warmup">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Mailbox warmup"
@@ -340,7 +340,7 @@ export default function WarmupIndex({
                     </Card>
                 ) : null}
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

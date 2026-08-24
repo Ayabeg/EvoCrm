@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Services\Ai\RecordInsight;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Support\CrmHub;
@@ -44,7 +45,7 @@ class CompanyController extends Controller
         ]);
     }
 
-    public function show(Request $request, Company $company, CrmHub $hub): Response
+    public function show(Request $request, Company $company, CrmHub $hub, RecordInsight $insight): Response
     {
         abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -59,6 +60,7 @@ class CompanyController extends Controller
             'members' => $hub->members($workspace),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
+            'askEvo' => $insight->forCompany($company),
         ]);
     }
 

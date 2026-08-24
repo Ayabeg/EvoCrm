@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,8 +12,7 @@ export default function QuietHoursEdit({
     quietHours: { starts_at: string; ends_at: string; timezone: string; enabled: boolean };
 }) {
     return (
-        <>
-            <Head title="Quiet hours" />
+        <OutboundShell title="Quiet hours">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Quiet hours"
@@ -53,7 +53,7 @@ export default function QuietHoursEdit({
                     </Form>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

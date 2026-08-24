@@ -2,8 +2,10 @@ import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { SkeletonList } from '@/components/crm/empty-room';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import ListViewTable from '@/components/crm/list-view-table';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +42,7 @@ export default function CompaniesIndex({
     createOpen?: boolean;
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
+    const loading = useInertiaLoading();
 
     return (
         <>
@@ -59,7 +62,9 @@ export default function CompaniesIndex({
             >
                 {(columns) => (
                     <>
-                        {companies.length === 0 ? (
+                        {loading ? (
+                            <SkeletonList />
+                        ) : companies.length === 0 ? (
                             <CrmEmptyState
                                 line="No companies in this view."
                                 actionLabel="Add company"

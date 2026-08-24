@@ -1,5 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import { SkeletonRecord } from '@/components/crm/empty-room';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
 import {
     ActivityTabs,
@@ -40,6 +43,7 @@ export default function CompanyShow({
     members,
     cities,
     wilayas,
+    askEvo,
 }: {
     company: Company;
     associations: {
@@ -51,8 +55,10 @@ export default function CompanyShow({
     members: { id: number; name: string }[];
     cities: string[];
     wilayas: string[];
+    askEvo?: AskEvoPayload | null;
 }) {
     const [tab, setTab] = useState('activities');
+    const loading = useInertiaLoading();
     const items = useMemo(() => {
         if (tab === 'activities') {
             return timeline;
@@ -64,6 +70,9 @@ export default function CompanyShow({
     return (
         <>
             <Head title={company.name} />
+            {loading ? (
+                <SkeletonRecord />
+            ) : (
             <div className="flex h-[calc(100vh-52px)] flex-col bg-canvas text-ui text-ink">
                 <div className="border-b border-hairline px-6 py-3">
                     <RecordBack href="/crm/companies" label="Back to Companies" />
@@ -84,6 +93,7 @@ export default function CompanyShow({
                 <RecordShell
                     left={
                         <div className="space-y-4">
+                            <AskEvoPanel action={`/crm/companies/${company.id}/ask`} insight={askEvo} />
                             <h2 className="text-[13px] font-semibold">About this company</h2>
                             <Field label="Domain" value={company.domain ?? '—'} />
                             <Field label="Phone" value={company.phone ?? '—'} />
@@ -185,6 +195,7 @@ export default function CompanyShow({
                     }
                 />
             </div>
+            )}
         </>
     );
 }

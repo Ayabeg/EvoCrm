@@ -1,5 +1,6 @@
 import { Head, router, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import { EvoKpiCard } from '@/components/crm/evo-kpi-card';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 import PageHeader from '@/components/page-header';
@@ -113,21 +114,21 @@ function KpiStrip({ kpis }: { kpis: ReportKpi[] }) {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-3 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
             {kpis.map((kpi) => (
-                <div key={kpi.label} className="bg-canvas px-4 py-3">
-                    <p className="text-[11px] tracking-wide text-muted-foreground uppercase">
-                        {kpi.label}
-                    </p>
-                    <p className="money mt-1 text-xl font-semibold text-ink">
-                        {formatValue(kpi.value, kpi.format)}
-                    </p>
-                    {kpi.hint ? (
-                        <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                            {kpi.hint}
-                        </p>
-                    ) : null}
-                </div>
+                <EvoKpiCard
+                    key={kpi.label}
+                    label={kpi.label}
+                    value={
+                        kpi.format === 'money' && kpi.value !== null
+                            ? kpi.value / 100
+                            : kpi.format === 'percent' && kpi.value !== null
+                              ? `${NUMBER.format(kpi.value)}%`
+                              : kpi.value
+                    }
+                    format={kpi.format === 'money' ? 'money' : 'number'}
+                    hint={kpi.hint}
+                />
             ))}
         </div>
     );

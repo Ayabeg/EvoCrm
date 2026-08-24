@@ -51,10 +51,15 @@ export function RoomShell({
 export const OUTBOUND_TABS: RoomTab[] = [
     { label: 'Hub', href: '/outbound' },
     { label: 'Mailboxes', href: '/outbound/mailboxes' },
+    { label: 'Domains', href: '/outbound/domains' },
+    { label: 'Templates', href: '/outbound/templates' },
     { label: 'Sequences', href: '/outbound/sequences' },
     { label: 'Campaigns', href: '/outbound/campaigns' },
+    { label: 'Outbox', href: '/outbound/outbox' },
+    { label: 'Replies', href: '/outbound/replies' },
     { label: 'Warmup', href: '/outbound/warmup' },
     { label: 'Suppressions', href: '/outbound/suppressions' },
+    { label: 'Quiet hours', href: '/outbound/quiet-hours' },
 ];
 
 export function outboundTabs(pathname: string): RoomTab[] {

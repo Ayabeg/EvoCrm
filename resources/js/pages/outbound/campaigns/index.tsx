@@ -1,5 +1,6 @@
-import { Form, Head, Link, router } from '@inertiajs/react';
+import { Form, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -79,8 +80,7 @@ export default function CampaignsIndex({
     const template = templates.find((t) => String(t.id) === templateId);
 
     return (
-        <>
-            <Head title="Campaigns" />
+        <OutboundShell title="Campaigns">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Broadcast campaigns"
@@ -399,7 +399,7 @@ export default function CampaignsIndex({
                     </table>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

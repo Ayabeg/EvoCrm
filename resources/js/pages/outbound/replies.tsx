@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 
@@ -14,8 +15,7 @@ type Reply = {
 
 export default function Replies({ replies, imapNote }: { replies: Reply[]; imapNote: string }) {
     return (
-        <>
-            <Head title="Replies" />
+        <OutboundShell title="Replies">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title="Replies" description={imapNote} />
 
@@ -73,7 +73,7 @@ export default function Replies({ replies, imapNote }: { replies: Reply[]; imapN
                     </table>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

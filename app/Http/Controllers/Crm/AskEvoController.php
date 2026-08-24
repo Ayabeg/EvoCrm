@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Services\Ai\RecordInsight;
@@ -33,6 +34,19 @@ class AskEvoController extends Controller
         ]);
 
         $insight->ask($deal, $data['question']);
+
+        return back();
+    }
+
+    public function company(Request $request, Company $company, RecordInsight $insight): RedirectResponse
+    {
+        abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'question' => ['required', 'string', 'max:280'],
+        ]);
+
+        $insight->ask($company, $data['question']);
 
         return back();
     }

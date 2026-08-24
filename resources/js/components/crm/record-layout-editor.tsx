@@ -21,7 +21,7 @@ export function RecordLayoutCustomizeButton() {
 }
 
 export function RecordLayoutEditor() {
-    const { objectType, layout, editorOpen, setEditorOpen, setCardVisible, moveCard, resetLayout } =
+    const { objectType, layout, editorOpen, setEditorOpen, setCardVisible, moveCard, resetLayout, mode } =
         useRecordLayoutContext();
     const defs = cardsForObject(objectType);
 
@@ -31,7 +31,10 @@ export function RecordLayoutEditor() {
                 <SheetHeader>
                     <SheetTitle>Customize record layout</SheetTitle>
                     <SheetDescription>
-                        Show, hide, and reorder cards on {objectType} records. Saved in this browser only.
+                        Show, hide, and reorder cards on {objectType} records.
+                        {mode === 'workspace'
+                            ? ' Save as workspace default when you are done.'
+                            : ' Saved to your account.'}
                     </SheetDescription>
                 </SheetHeader>
                 <div className="space-y-5 px-4 pb-6">

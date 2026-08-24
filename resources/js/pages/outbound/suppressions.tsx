@@ -1,4 +1,5 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Form, router } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,8 +18,7 @@ export default function SuppressionsIndex({
     }[];
 }) {
     return (
-        <>
-            <Head title="Suppression" />
+        <OutboundShell title="Suppressions">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Suppressions"
@@ -105,7 +105,7 @@ export default function SuppressionsIndex({
                     </table>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

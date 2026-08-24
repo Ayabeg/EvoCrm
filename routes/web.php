@@ -132,6 +132,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/crm/companies/{company}', [CompanyController::class, 'show'])->name('crm.companies.show');
     Route::put('/crm/companies/{company}', [CompanyController::class, 'update'])->name('crm.companies.update');
     Route::put('/crm/companies/{company}/attributes', [CompanyController::class, 'updateAttributes'])->name('crm.companies.attributes');
+    Route::post('/crm/companies/{company}/ask', [AskEvoController::class, 'company'])->name('crm.companies.ask');
 
     Route::get('/crm/contacts', [ContactController::class, 'index'])->name('crm.contacts.index');
     Route::get('/crm/contacts/export', [ContactController::class, 'export'])->name('crm.contacts.export');
@@ -249,6 +250,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'index'])->name('settings.pipelines');
     Route::get('/settings/permissions', [\App\Http\Controllers\Settings\PermissionsController::class, 'index'])->name('settings.permissions');
     Route::middleware('can-manage-settings')->group(function () {
+        Route::get('/settings/record-layouts', [\App\Http\Controllers\Settings\RecordLayoutSettingsController::class, 'index'])->name('settings.record-layouts');
         Route::post('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'store'])->name('settings.pipelines.store');
         Route::patch('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'update'])->name('settings.pipelines.update');
         Route::delete('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'destroy'])->name('settings.pipelines.destroy');

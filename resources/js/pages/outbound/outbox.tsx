@@ -1,4 +1,5 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -42,8 +43,7 @@ export default function Outbox({
     counts: { queued: number; deferred: number; sent: number; failed: number };
 }) {
     return (
-        <>
-            <Head title="Outbox" />
+        <OutboundShell title="Outbox">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Outbox"
@@ -212,7 +212,7 @@ export default function Outbox({
                     </table>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

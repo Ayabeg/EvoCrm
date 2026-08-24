@@ -43,6 +43,16 @@ class RecordInsight
     }
 
     /**
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     */
+    public function forCompany(Company $company): array
+    {
+        $company->loadMissing(['owner', 'contacts', 'deals.stage']);
+
+        return $this->present('company', $company->id, $this->summarizeCompany($company));
+    }
+
+    /**
      * @return array{score: int, band: string, label: string, reason: string}
      */
     public function contactEngagement(Contact $contact): array
@@ -167,16 +177,24 @@ class RecordInsight
     /**
      * @return array{answer: string, source: string, summary: string}
      */
-    public function ask(Contact|Deal $record, string $question): array
+    public function ask(Contact|Deal|Company $record, string $question): array
     {
         $question = trim($question);
-        $kind = $record instanceof Deal ? 'deal' : 'contact';
-        $summary = $record instanceof Deal
-            ? $this->summarizeDeal($record->loadMissing(['stage', 'contact', 'company', 'owner']))
-            : $this->summarizeContact($record->loadMissing(['company', 'owner', 'deals.stage']));
-        $facts = $record instanceof Deal
-            ? $this->dealFacts($record)
-            : $this->contactFacts($record);
+        $kind = match (true) {
+            $record instanceof Deal => 'deal',
+            $record instanceof Company => 'company',
+            default => 'contact',
+        };
+        $summary = match (true) {
+            $record instanceof Deal => $this->summarizeDeal($record->loadMissing(['stage', 'contact', 'company', 'owner'])),
+            $record instanceof Company => $this->summarizeCompany($record->loadMissing(['owner', 'contacts', 'deals.stage'])),
+            default => $this->summarizeContact($record->loadMissing(['company', 'owner', 'deals.stage'])),
+        };
+        $facts = match (true) {
+            $record instanceof Deal => $this->dealFacts($record),
+            $record instanceof Company => $this->companyFacts($record),
+            default => $this->contactFacts($record),
+        };
         $activities = $this->retrieveRelevantActivities($record, $question);
 
         $stub = $this->stubAnswer($question, $facts, $summary, $activities);
@@ -252,7 +270,7 @@ class RecordInsight
      *
      * @return Collection<int, Activity>
      */
-    protected function retrieveRelevantActivities(Contact|Deal $record, string $question): Collection
+    protected function retrieveRelevantActivities(Contact|Deal|Company $record, string $question): Collection
     {
         $recent = $this->recentActivities($record, 30);
         $terms = collect(preg_split('/\s+/', Str::lower($question)))
@@ -338,6 +356,24 @@ class RecordInsight
         return $activity === '' ? $line : $line.' '.$activity;
     }
 
+    public function summarizeCompany(Company $company): string
+    {
+        $facts = $this->companyFacts($company);
+        $bits = array_filter([
+            $facts['Name'] ?? 'This company',
+            isset($facts['Domain']) ? 'domain '.$facts['Domain'] : 'no domain',
+            isset($facts['City']) ? $facts['City'] : null,
+            isset($facts['Industry']) ? $facts['Industry'] : null,
+            isset($facts['Contacts']) ? $facts['Contacts'] : 'no contacts',
+            isset($facts['Deals']) ? $facts['Deals'] : 'no deals',
+        ]);
+
+        $line = implode(' · ', $bits).'.';
+        $activity = $this->activityLine($this->recentActivities($company));
+
+        return $activity === '' ? $line : $line.' '.$activity;
+    }
+
     /**
      * @return array<string, string>
      */
@@ -370,6 +406,41 @@ class RecordInsight
             'Owner' => $this->userName($contact->owner),
             'Deals' => $dealLines === [] ? null : count($dealLines).' deal'.(count($dealLines) === 1 ? '' : 's').' ('.implode(', ', $dealLines).')',
             ...$this->attributeFacts($contact->workspace_id, 'contact', $contact->id),
+        ], fn ($value) => filled($value));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function companyFacts(Company $company): array
+    {
+        $contactCount = $company->contacts->count();
+        $dealLines = [];
+
+        foreach ($company->deals as $deal) {
+            if (! $deal instanceof Deal) {
+                continue;
+            }
+
+            $stage = $this->stageOf($deal);
+            $dealLines[] = trim($deal->title.($stage instanceof Stage ? ' ('.$stage->name.')' : ''));
+        }
+
+        $dealLines = array_values(array_filter($dealLines));
+
+        return array_filter([
+            'Name' => $company->name,
+            'Domain' => $company->domain,
+            'Industry' => $company->industry,
+            'Phone' => $company->phone,
+            'City' => $company->city,
+            'Wilaya' => $company->wilaya,
+            'Owner' => $this->userName($company->owner),
+            'Contacts' => $contactCount > 0
+                ? $contactCount.' contact'.($contactCount === 1 ? '' : 's')
+                : null,
+            'Deals' => $dealLines === [] ? null : count($dealLines).' deal'.(count($dealLines) === 1 ? '' : 's').' ('.implode(', ', $dealLines).')',
+            ...$this->attributeFacts($company->workspace_id, 'company', $company->id),
         ], fn ($value) => filled($value));
     }
 
@@ -430,11 +501,13 @@ class RecordInsight
     /**
      * @return Collection<int, Activity>
      */
-    protected function recentActivities(Contact|Deal $record, int $limit = 8): Collection
+    protected function recentActivities(Contact|Deal|Company $record, int $limit = 8): Collection
     {
         $query = Activity::query()->latest('id')->limit($limit);
 
-        if ($record instanceof Deal) {
+        if ($record instanceof Company) {
+            $query->where('company_id', $record->id);
+        } elseif ($record instanceof Deal) {
             $query->where(function ($q) use ($record): void {
                 $q->where('deal_id', $record->id);
                 if ($record->contact_id) {
@@ -525,6 +598,9 @@ class RecordInsight
             'Contact' => ['person', 'who'],
             'Next step' => ['next', 'follow'],
             'Close date' => ['close', 'deadline'],
+            'Domain' => ['website', 'url'],
+            'Industry' => ['sector', 'vertical'],
+            'Contacts' => ['people', 'team'],
             default => [],
         };
     }

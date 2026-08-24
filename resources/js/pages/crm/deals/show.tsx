@@ -1,6 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import { SkeletonRecord } from '@/components/crm/empty-room';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
 import { formatDzd } from '@/lib/money';
 import {
@@ -56,6 +58,7 @@ export default function DealShow({
     askEvo?: AskEvoPayload | null;
 }) {
     const [tab, setTab] = useState('all');
+    const loading = useInertiaLoading();
     const initials = deal.title
         .split(/\s+/)
         .slice(0, 2)
@@ -82,6 +85,9 @@ export default function DealShow({
     return (
         <>
             <Head title={deal.title} />
+            {loading ? (
+                <SkeletonRecord />
+            ) : (
             <div className="flex h-[calc(100vh-52px)] flex-col bg-canvas text-[13px] text-ink">
                 <div className="border-b border-hairline px-6 py-3">
                     <RecordBack href="/crm/deals" label="Back to Deals" />
@@ -248,6 +254,7 @@ export default function DealShow({
                     }
                 />
             </div>
+            )}
         </>
     );
 }

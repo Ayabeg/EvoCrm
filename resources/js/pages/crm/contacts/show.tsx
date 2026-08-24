@@ -2,6 +2,8 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import CatchUpBlock from '@/components/crm/catch-up-block';
+import { SkeletonRecord } from '@/components/crm/empty-room';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
 import {
     ActivityTabs,
@@ -56,6 +58,7 @@ export default function ContactShow({
 }) {
     const [tab, setTab] = useState('catchup');
     const [railOpen, setRailOpen] = useState(true);
+    const loading = useInertiaLoading();
     const name = `${contact.first_name} ${contact.last_name ?? ''}`.trim();
 
     const inbound = useMemo(
@@ -73,6 +76,9 @@ export default function ContactShow({
     return (
         <>
             <Head title={name} />
+            {loading ? (
+                <SkeletonRecord />
+            ) : (
             <div className="flex h-[calc(100vh-52px)] flex-col bg-canvas text-[13px] text-ink">
                 <div className="border-b border-hairline px-6 py-3">
                     <RecordBack href="/crm/contacts" label="Back to Contacts" />
@@ -270,6 +276,7 @@ export default function ContactShow({
                     ) : null}
                 </div>
             </div>
+            )}
         </>
     );
 }

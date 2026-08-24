@@ -1,4 +1,5 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,8 +26,7 @@ export default function TemplatesIndex({
     note: string;
 }) {
     return (
-        <>
-            <Head title="Templates" />
+        <OutboundShell title="Templates">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Email templates"
@@ -190,7 +190,7 @@ export default function TemplatesIndex({
                     </Form>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

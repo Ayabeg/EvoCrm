@@ -32,10 +32,11 @@ const CONTACT_CARDS: RecordLayoutCard[] = [
 
 const COMPANY_CARDS: RecordLayoutCard[] = [
     { id: 'key-info', label: 'Key information', column: 'main', defaultVisible: true, order: 0 },
-    { id: 'associations-main', label: 'Associations', column: 'main', defaultVisible: true, order: 1 },
-    { id: 'edit-form', label: 'Edit record', column: 'main', defaultVisible: true, order: 2 },
-    { id: 'attributes', label: 'Custom properties', column: 'main', defaultVisible: true, order: 3 },
-    { id: 'timeline', label: 'Activity timeline', column: 'main', defaultVisible: true, order: 4 },
+    { id: 'ask-evo', label: 'Ask Evo', column: 'main', defaultVisible: true, order: 1 },
+    { id: 'associations-main', label: 'Associations', column: 'main', defaultVisible: true, order: 2 },
+    { id: 'edit-form', label: 'Edit record', column: 'main', defaultVisible: true, order: 3 },
+    { id: 'attributes', label: 'Custom properties', column: 'main', defaultVisible: true, order: 4 },
+    { id: 'timeline', label: 'Activity timeline', column: 'main', defaultVisible: true, order: 5 },
     { id: 'associations-side', label: 'Associations', column: 'side', defaultVisible: true, order: 0 },
     { id: 'log-note', label: 'Add note', column: 'side', defaultVisible: true, order: 1 },
 ];
