@@ -53,13 +53,24 @@ return [
 
     'attribute_types' => ['text', 'number', 'list'],
 
+    /*
+    | Default Sales pipeline. Stage names stay Evotechly (New → Lost), not
+    | HubSpot Appointment Scheduled. Win probability (0–100) is used by the
+    | deals board forecast: weighted_cents = amount_cents * probability / 100.
+    | A stage row may store its own `probability`; if that column is null,
+    | these defaults apply. Unknown open stages fall back to 20.
+    |
+    | Defaults: New 10, Qualified 25, Demo 50, Proposal 75, Won 100, Lost 0.
+    */
     'pipeline' => [
-        ['name' => 'New', 'slug' => 'new', 'position' => 1, 'is_won' => false, 'is_lost' => false],
-        ['name' => 'Qualified', 'slug' => 'qualified', 'position' => 2, 'is_won' => false, 'is_lost' => false],
-        ['name' => 'Demo', 'slug' => 'demo', 'position' => 3, 'is_won' => false, 'is_lost' => false],
-        ['name' => 'Proposal', 'slug' => 'proposal', 'position' => 4, 'is_won' => false, 'is_lost' => false],
-        ['name' => 'Won', 'slug' => 'won', 'position' => 5, 'is_won' => true, 'is_lost' => false],
-        ['name' => 'Lost', 'slug' => 'lost', 'position' => 6, 'is_won' => false, 'is_lost' => true],
+        ['name' => 'New', 'slug' => 'new', 'position' => 1, 'is_won' => false, 'is_lost' => false, 'probability' => 10],
+        ['name' => 'Qualified', 'slug' => 'qualified', 'position' => 2, 'is_won' => false, 'is_lost' => false, 'probability' => 25],
+        ['name' => 'Demo', 'slug' => 'demo', 'position' => 3, 'is_won' => false, 'is_lost' => false, 'probability' => 50],
+        ['name' => 'Proposal', 'slug' => 'proposal', 'position' => 4, 'is_won' => false, 'is_lost' => false, 'probability' => 75],
+        ['name' => 'Won', 'slug' => 'won', 'position' => 5, 'is_won' => true, 'is_lost' => false, 'probability' => 100],
+        ['name' => 'Lost', 'slug' => 'lost', 'position' => 6, 'is_won' => false, 'is_lost' => true, 'probability' => 0],
     ],
+
+    'stage_probability_fallback' => 20,
 
 ];

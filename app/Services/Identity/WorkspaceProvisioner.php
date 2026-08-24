@@ -51,6 +51,7 @@ class WorkspaceProvisioner
                     'position' => $stage['position'],
                     'is_won' => $stage['is_won'],
                     'is_lost' => $stage['is_lost'],
+                    'probability' => $stage['probability'] ?? null,
                 ]
             );
         }

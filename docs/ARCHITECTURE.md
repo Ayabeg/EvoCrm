@@ -81,7 +81,7 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 - Home (open pipeline value + open tasks as next steps)
 - My Inbox → `/inbox` (EvoDesk embedded in the CRM chrome; native CRM desk fallback)
 - Conversations → history only (CRM context)
-- CRM → Companies / Contacts / Leads / Deals (list + detail + associations sidebar) / Reports
+- CRM → Companies / Contacts / Leads / Deals (list hub + board + detail + associations sidebar) / Reports
 - Campaigns → Ads Hub (`/ads` funnel board + campaign detail)
 - Outbound → Overview / Mailboxes / Domains / Templates / Sequences / Campaigns / Outbox / Replies / Suppressions / Quiet hours / Reports — all under `/outbound` on the CRM hostname
 - Settings → Evolution / Meta / Channels / Custom attributes (plus profile / security / appearance)

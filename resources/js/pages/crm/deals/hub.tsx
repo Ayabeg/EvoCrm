@@ -1,5 +1,6 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
+import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import ListToolbar from '@/components/crm/list-toolbar';
 import RecordActionRow from '@/components/crm/record-action-row';
@@ -43,9 +44,12 @@ export default function DealHub({
                             stagePills={stagePills}
                         />
                         <div className="border-b px-3 py-2">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-2">
                                 <h1 className="text-sm font-semibold">Deals</h1>
-                                <span className="money text-[11px] text-ink">{formatDzd(openPipelineCents)}</span>
+                                <div className="flex items-center gap-2">
+                                    <DealLayoutToggle current="list" />
+                                    <span className="money text-[11px] text-ink">{formatDzd(openPipelineCents)}</span>
+                                </div>
                             </div>
                             <Form action="/crm/deals" method="get" className="mt-2 grid grid-cols-2 gap-1">
                                 <select name="stage" defaultValue={activeFilters.stage ?? ''} className="h-7 rounded border bg-background px-1 text-[11px]">
