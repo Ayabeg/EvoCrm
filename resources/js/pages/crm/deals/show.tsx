@@ -1,35 +1,50 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
+import CatchUpBlock from '@/components/crm/catch-up-block';
+import { formatDzd } from '@/components/crm/hub-chrome';
 import RecordActionRow from '@/components/crm/record-action-row';
+import { RecordFact, RecordFacts } from '@/components/crm/record-workspace';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function DealShow({ deal, associations }: { deal: any; associations?: any }) {
+export default function DealShow({
+    deal,
+    associations,
+    catchUp,
+}: {
+    deal: any;
+    associations?: any;
+    catchUp?: { inbound?: any[]; outbound?: any[] };
+}) {
     return (
         <>
             <Head title={deal.title} />
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title={deal.title} description={`Stage: ${deal.stage?.name}`} />
+                <RecordFacts>
+                    <RecordFact label="Amount">
+                        <span className="money">{formatDzd(deal.amount_cents)}</span>
+                    </RecordFact>
+                    <RecordFact label="Stage">{deal.stage?.name ?? '—'}</RecordFact>
+                    <RecordFact label="Contact">
+                        <Link href={`/crm/contacts/${deal.contact_id}`} className="text-brand">
+                            {deal.contact?.first_name} {deal.contact?.last_name}
+                        </Link>
+                    </RecordFact>
+                    <RecordFact label="Company">{deal.company?.name ?? '—'}</RecordFact>
+                </RecordFacts>
                 <RecordActionRow
                     dealId={deal.id}
                     contactId={deal.contact_id}
                     companyId={deal.company_id}
                     ownerId={deal.owner_id}
                 />
+                <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
                 <AssociationsCard associations={associations ?? { contact: deal.contact, company: deal.company }} />
                 <Card className="space-y-3 p-4 text-sm">
-                    <p>
-                        Contact:{' '}
-                        <Link href={`/crm/contacts/${deal.contact_id}`} className="text-brand">
-                            {deal.contact?.first_name} {deal.contact?.last_name}
-                        </Link>
-                    </p>
-                    <p>
-                        Company: {deal.company?.name ?? '—'}
-                    </p>
                     <Form action={`/crm/deals/${deal.id}/move`} method="post" className="flex flex-wrap gap-2">
                         {(deal.pipeline?.stages ?? []).map((stage: any) => (
                             <Button key={stage.id} name="stage_id" value={stage.id} variant={stage.id === deal.stage_id ? 'default' : 'secondary'}>

@@ -1,16 +1,26 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import AssociationsCard from '@/components/crm/associations-card';
+import { RecordFact, RecordFacts } from '@/components/crm/record-workspace';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function CompanyShow({ company }: { company: any }) {
+export default function CompanyShow({ company, associations }: { company: any; associations?: any }) {
     return (
         <>
             <Head title={company.name} />
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title={company.name} description={`${company.city ?? ''} · ${company.country}`} />
+                <RecordFacts>
+                    <RecordFact label="Domain">{company.domain ?? '—'}</RecordFact>
+                    <RecordFact label="Phone">{company.phone ?? '—'}</RecordFact>
+                    <RecordFact label="City">{company.city ?? '—'}</RecordFact>
+                    <RecordFact label="Wilaya">{company.wilaya ?? '—'}</RecordFact>
+                    <RecordFact label="Owner">{company.owner?.name ?? 'Unassigned'}</RecordFact>
+                </RecordFacts>
+                <AssociationsCard associations={associations ?? { contacts: company.contacts, deals: company.deals }} />
                 <Card className="p-4">
                     <Form action={`/crm/companies/${company.id}`} method="put" className="grid gap-3 md:grid-cols-3">
                         {({ processing }) => (

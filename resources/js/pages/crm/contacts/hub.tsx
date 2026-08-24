@@ -5,7 +5,7 @@ import { HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import RecordProperties from '@/components/crm/record-properties';
 import ListToolbar from '@/components/crm/list-toolbar';
 import RecordActionRow from '@/components/crm/record-action-row';
-import TimelineFilter from '@/components/crm/timeline-filter';
+import { RecordFact, RecordFacts, RecordTimeline } from '@/components/crm/record-workspace';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -129,13 +129,21 @@ export default function ContactHub({
                                 </Link>
                             </header>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+                                <RecordFacts>
+                                    <RecordFact label="Phone">{selected.phone_e164 ?? selected.phone ?? '—'}</RecordFact>
+                                    <RecordFact label="Email">{selected.email ?? '—'}</RecordFact>
+                                    <RecordFact label="Owner">{selected.owner?.name ?? 'Unassigned'}</RecordFact>
+                                    <RecordFact label="City">{selected.city ?? selected.company?.city ?? '—'}</RecordFact>
+                                    <RecordFact label="Wilaya">{selected.wilaya ?? selected.company?.wilaya ?? '—'}</RecordFact>
+                                    <RecordFact label="Inbox">{selected.unanswered ? 'Unanswered' : 'Caught up'}</RecordFact>
+                                </RecordFacts>
                                 <RecordActionRow
                                     contactId={selected.id}
                                     companyId={selected.company_id}
                                     ownerId={selected.owner_id}
                                 />
-                                <AssociationsCard associations={associations} />
                                 <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
+                                <AssociationsCard associations={associations} />
                                 <Form action={`/crm/contacts/${selected.id}`} method="put" className="grid grid-cols-2 gap-2 border-b pb-3">
                                     <Input name="first_name" defaultValue={selected.first_name} required className="h-8" />
                                     <Input name="last_name" defaultValue={selected.last_name ?? ''} className="h-8" />
@@ -171,27 +179,7 @@ export default function ContactHub({
                                     action={`/crm/contacts/${selected.id}/attributes`}
                                     attributes={attributes}
                                 />
-                                <div>
-                                    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
-                                    <TimelineFilter timeline={timeline}>
-                                        {(items) => (
-                                    <div className="space-y-2">
-                                        {items.map((item: any) => (
-                                            <div key={item.id} className="border-l-2 border-brand pl-3">
-                                                <p className="text-[11px] uppercase text-muted-foreground">{item.type}</p>
-                                                <p className="font-medium">{item.subject ?? item.body}</p>
-                                                {item.body && item.subject ? <p className="text-muted-foreground">{item.body}</p> : null}
-                                                {item.type === 'task' && !item.done ? (
-                                                    <Form action={`/crm/activities/${item.id}/complete`} method="post">
-                                                        <Button variant="secondary" className="mt-1 h-6 text-[11px]">Done</Button>
-                                                    </Form>
-                                                ) : null}
-                                            </div>
-                                        ))}
-                                    </div>
-                                        )}
-                                    </TimelineFilter>
-                                </div>
+                                <RecordTimeline timeline={timeline} />
                             </div>
                         </>
                     ) : (
