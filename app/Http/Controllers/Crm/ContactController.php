@@ -178,7 +178,7 @@ class ContactController extends Controller
             'attributes' => $selected ? $hub->attributeBag($workspace, 'contact', $selected->id) : ['definitions' => [], 'values' => []],
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name', 'city', 'wilaya']),
             'members' => $hub->members($workspace),
-            'savedFilters' => $hub->filters($workspace, 'contact'),
+            'savedFilters' => $hub->filters($workspace, 'contact', $request->user()),
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('contact', $filters['columns'] ?? null, $filters['sort'] ?? null),
             'recordCount' => $filter->count($workspace, 'contact', $filters),

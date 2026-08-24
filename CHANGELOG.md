@@ -1,5 +1,19 @@
 # Changelog
 
+## EvoCell 1 — Team CRM (2026-08-25)
+
+### Added
+- Team-shared saved views with `visibility` (`private` | `workspace`) and `is_workspace_default` flag
+- `SavedFilterPolicy` workspace visibility rules; `CrmHub::filters()` scoped to viewer
+- Filter builder wired end-to-end: AND/OR groups persist to URL query and saved views
+- Extended `CrmFilter` operators: `contains`, `neq`, `gt/gte/lt/lte`, `is_set`, `is_not_set`, custom attribute rules
+- Pipeline stage CRUD: create, rename, probability edit, reorder, safe delete with deal migration
+- Server-persisted record layouts via `GET/PUT /crm/record-layouts/{entity}` (`record_layouts` table)
+- Settings pipeline UI: inline stage editor with drag reorder
+
+### HubSpot comparison
+HubSpot list views support team sharing, workspace defaults, and granular permissions. This ships workspace-scoped shared views, expanded filter operators, admin pipeline stage editing, and per-user server layouts — closing the highest-impact team CRM gaps without enterprise ACL granularity.
+
 ## Gap #1 — Saved views + advanced filters + column chooser (2026-08-24)
 
 ### Added

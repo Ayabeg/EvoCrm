@@ -7,6 +7,8 @@ use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Models\Workspace;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class PipelineManager
 {
@@ -172,5 +174,121 @@ class PipelineManager
             ])
             ->values()
             ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, slug: string, position: int, probability: int|null, is_won: bool, is_lost: bool, deals_count: int}>
+     */
+    public function stagesAdmin(Pipeline $pipeline): array
+    {
+        return $pipeline->stages()
+            ->withCount('deals')
+            ->orderBy('position')
+            ->get()
+            ->map(fn (Stage $stage) => [
+                'id' => $stage->id,
+                'name' => $stage->name,
+                'slug' => $stage->slug,
+                'position' => $stage->position,
+                'probability' => $stage->probability,
+                'is_won' => (bool) $stage->is_won,
+                'is_lost' => (bool) $stage->is_lost,
+                'deals_count' => (int) $stage->deals_count,
+            ])
+            ->values()
+            ->all();
+    }
+
+    public function createStage(Pipeline $pipeline, string $name, ?int $probability = null): Stage
+    {
+        $slug = Str::slug($name);
+        $base = $slug;
+        $i = 1;
+        while ($pipeline->stages()->where('slug', $slug)->exists()) {
+            $slug = $base.'-'.$i;
+            $i++;
+        }
+
+        $position = (int) $pipeline->stages()->max('position') + 1;
+
+        return $pipeline->stages()->create([
+            'workspace_id' => $pipeline->workspace_id,
+            'name' => $name,
+            'slug' => $slug,
+            'position' => $position,
+            'is_won' => false,
+            'is_lost' => false,
+            'probability' => $probability,
+        ]);
+    }
+
+    public function updateStage(Stage $stage, array $data): Stage
+    {
+        if (isset($data['name'])) {
+            $stage->name = $data['name'];
+        }
+
+        if (array_key_exists('probability', $data)) {
+            $stage->probability = $data['probability'];
+        }
+
+        if (isset($data['is_won'])) {
+            $stage->is_won = (bool) $data['is_won'];
+            if ($stage->is_won) {
+                $stage->is_lost = false;
+            }
+        }
+
+        if (isset($data['is_lost'])) {
+            $stage->is_lost = (bool) $data['is_lost'];
+            if ($stage->is_lost) {
+                $stage->is_won = false;
+            }
+        }
+
+        $stage->save();
+
+        return $stage;
+    }
+
+    public function deleteStage(Stage $stage, ?int $migrateToStageId = null): void
+    {
+        $dealCount = $stage->deals()->count();
+
+        if ($dealCount > 0) {
+            if (! $migrateToStageId) {
+                throw ValidationException::withMessages([
+                    'migrate_to_stage_id' => 'Choose a stage to move existing deals before deleting.',
+                ]);
+            }
+
+            $target = Stage::query()
+                ->where('pipeline_id', $stage->pipeline_id)
+                ->where('id', $migrateToStageId)
+                ->first();
+
+            if (! $target) {
+                throw ValidationException::withMessages([
+                    'migrate_to_stage_id' => 'Target stage not found in this pipeline.',
+                ]);
+            }
+
+            $stage->deals()->update(['stage_id' => $target->id]);
+        }
+
+        $stage->delete();
+    }
+
+    /**
+     * @param  array<int, int>  $orderedStageIds
+     */
+    public function reorderStages(Pipeline $pipeline, array $orderedStageIds): void
+    {
+        foreach ($orderedStageIds as $position => $stageId) {
+            Stage::query()
+                ->where('pipeline_id', $pipeline->id)
+                ->where('id', $stageId)
+                ->update(['position' => $position]);
+        }
     }
 }

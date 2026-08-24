@@ -96,6 +96,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');
     Route::patch('/crm/filters/{savedFilter}', [SavedFilterController::class, 'update'])->name('crm.filters.update');
     Route::delete('/crm/filters/{savedFilter}', [SavedFilterController::class, 'destroy'])->name('crm.filters.destroy');
+    Route::get('/crm/record-layouts/{entity}', [\App\Http\Controllers\Crm\RecordLayoutController::class, 'show'])->name('crm.record-layouts.show');
+    Route::put('/crm/record-layouts/{entity}', [\App\Http\Controllers\Crm\RecordLayoutController::class, 'update'])->name('crm.record-layouts.update');
     Route::get('/crm/segments', [SegmentController::class, 'index'])->name('crm.segments.index');
     Route::post('/crm/segments/preview', [SegmentController::class, 'preview'])->name('crm.segments.preview');
     Route::post('/crm/segments', [SegmentController::class, 'store'])->name('crm.segments.store');
@@ -230,6 +232,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'store'])->name('settings.pipelines.store');
         Route::patch('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'update'])->name('settings.pipelines.update');
         Route::delete('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'destroy'])->name('settings.pipelines.destroy');
+        Route::post('/settings/pipelines/{pipeline}/stages', [\App\Http\Controllers\Settings\PipelineController::class, 'storeStage'])->name('settings.pipelines.stages.store');
+        Route::patch('/settings/pipelines/{pipeline}/stages/{stage}', [\App\Http\Controllers\Settings\PipelineController::class, 'updateStage'])->name('settings.pipelines.stages.update');
+        Route::delete('/settings/pipelines/{pipeline}/stages/{stage}', [\App\Http\Controllers\Settings\PipelineController::class, 'destroyStage'])->name('settings.pipelines.stages.destroy');
+        Route::post('/settings/pipelines/{pipeline}/stages/reorder', [\App\Http\Controllers\Settings\PipelineController::class, 'reorderStages'])->name('settings.pipelines.stages.reorder');
     });
 });
 

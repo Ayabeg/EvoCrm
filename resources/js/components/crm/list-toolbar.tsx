@@ -4,8 +4,10 @@ import CreateDrawer from '@/components/crm/create-drawer';
 import FilterBuilder from '@/components/crm/filter-builder';
 import SavedViewTabs from '@/components/crm/saved-view-tabs';
 import StagePills, { type StagePill } from '@/components/crm/stage-pills';
-import type { ListViewColumn, ListViewMeta, SavedView } from '@/lib/list-view-config';
-import { useState } from 'react';
+import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
+import { filterGroupsFromActive } from '@/lib/list-view-config';
+import { usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -43,7 +45,14 @@ export default function ListToolbar({
     stagePills?: StagePill[];
     exportHref?: string;
 }) {
+    const { auth } = usePage().props as { auth: { user: { role: string } } };
+    const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
+    const [filterGroups, setFilterGroups] = useState<ListViewFilters>(() => filterGroupsFromActive(activeFilters));
+
+    useEffect(() => {
+        setFilterGroups(filterGroupsFromActive(activeFilters));
+    }, [activeFilters]);
 
     return (
         <div className="border-b border-hairline bg-canvas">
@@ -57,6 +66,8 @@ export default function ListToolbar({
                         columns={columns}
                         listView={listView}
                         recordCount={recordCount}
+                        filterGroups={filterGroups}
+                        canManageSettings={canManageSettings}
                     />
                 </div>
                 <div className="flex items-center gap-1">
@@ -81,12 +92,14 @@ export default function ListToolbar({
                 wilayas={wilayas}
                 exportHref={exportHref}
                 columns={columns}
+                filterGroups={filterGroups}
                 filterBuilder={
                     listView ? (
                         <FilterBuilder
                             entity={entity}
                             fields={listView.filterFields}
-                            value={activeFilters.filter_groups as any}
+                            value={filterGroups}
+                            onChange={setFilterGroups}
                             members={members}
                             cities={cities}
                             wilayas={wilayas}

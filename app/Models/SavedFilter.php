@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['workspace_id', 'user_id', 'name', 'entity', 'filters', 'columns', 'sort', 'is_default'])]
+#[Fillable(['workspace_id', 'user_id', 'name', 'entity', 'visibility', 'filters', 'columns', 'sort', 'is_default', 'is_workspace_default'])]
 class SavedFilter extends Model
 {
     use BelongsToWorkspace;
@@ -20,7 +20,13 @@ class SavedFilter extends Model
             'columns' => 'array',
             'sort' => 'array',
             'is_default' => 'boolean',
+            'is_workspace_default' => 'boolean',
         ];
+    }
+
+    public function isShared(): bool
+    {
+        return $this->visibility === 'workspace';
     }
 
     public function user(): BelongsTo

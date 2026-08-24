@@ -23,6 +23,8 @@ class SavedFilterResource extends JsonResource
             'columns' => ListViewConfig::normalizeColumns($this->entity, $this->columns),
             'sort' => $this->sort ?? ListViewConfig::defaultSort($this->entity),
             'is_default' => (bool) $this->is_default,
+            'is_workspace_default' => (bool) $this->is_workspace_default,
+            'visibility' => $this->visibility ?? 'private',
             'record_count' => $this->when(isset($this->record_count), fn () => $this->record_count),
             'user_id' => $this->user_id,
             'created_at' => $this->created_at?->toIso8601String(),

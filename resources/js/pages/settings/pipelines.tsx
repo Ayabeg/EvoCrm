@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,13 +7,113 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+type StageRow = {
+    id: number;
+    name: string;
+    slug: string;
+    position: number;
+    probability: number | null;
+    is_won: boolean;
+    is_lost: boolean;
+    deals_count: number;
+};
+
 type PipelineRow = {
     id: number;
     name: string;
     is_default: boolean;
     stages_count: number;
     deals_count: number;
+    stages?: StageRow[];
 };
+
+function PipelineStages({ pipeline, canManage }: { pipeline: PipelineRow; canManage: boolean }) {
+    const [open, setOpen] = useState(false);
+    const stages = pipeline.stages ?? [];
+
+    return (
+        <div className="border-t px-4 py-2">
+            <button
+                type="button"
+                onClick={() => setOpen((value) => !value)}
+                className="text-xs font-medium text-brand hover:underline"
+            >
+                {open ? 'Hide stages' : `Manage ${stages.length} stages`}
+            </button>
+            {open ? (
+                <div className="mt-3 space-y-3">
+                    {stages.map((stage) => (
+                        <div key={stage.id} className="flex flex-wrap items-end gap-2 rounded border border-hairline p-2">
+                            {canManage ? (
+                                <Form
+                                    action={`/settings/pipelines/${pipeline.id}/stages/${stage.id}`}
+                                    method="post"
+                                    className="flex flex-wrap items-end gap-2"
+                                >
+                                    <input type="hidden" name="_method" value="patch" />
+                                    <div>
+                                        <Label className="text-[10px]">Name</Label>
+                                        <Input name="name" defaultValue={stage.name} className="mt-0.5 h-8 w-36 text-xs" />
+                                    </div>
+                                    <div>
+                                        <Label className="text-[10px]">Win %</Label>
+                                        <Input
+                                            name="probability"
+                                            type="number"
+                                            min={0}
+                                            max={100}
+                                            defaultValue={stage.probability ?? ''}
+                                            className="mt-0.5 h-8 w-20 text-xs"
+                                        />
+                                    </div>
+                                    <Button type="submit" variant="secondary" size="sm">
+                                        Save
+                                    </Button>
+                                </Form>
+                            ) : (
+                                <span className="text-sm">
+                                    {stage.name} ({stage.probability ?? '—'}%)
+                                </span>
+                            )}
+                            <span className="text-[11px] text-mute">{stage.deals_count} deals</span>
+                            {canManage && stage.deals_count === 0 ? (
+                                <Form
+                                    action={`/settings/pipelines/${pipeline.id}/stages/${stage.id}`}
+                                    method="post"
+                                    className="inline"
+                                >
+                                    <input type="hidden" name="_method" value="delete" />
+                                    <Button type="submit" variant="secondary" size="sm">
+                                        Delete
+                                    </Button>
+                                </Form>
+                            ) : null}
+                        </div>
+                    ))}
+                    {canManage ? (
+                        <Form
+                            action={`/settings/pipelines/${pipeline.id}/stages`}
+                            method="post"
+                            className="flex flex-wrap items-end gap-2"
+                        >
+                            <div>
+                                <Label className="text-[10px]">New stage</Label>
+                                <Input name="name" required placeholder="Negotiation" className="mt-0.5 h-8 w-40 text-xs" />
+                            </div>
+                            <div>
+                                <Label className="text-[10px]">Win %</Label>
+                                <Input name="probability" type="number" min={0} max={100} className="mt-0.5 h-8 w-20 text-xs" />
+                            </div>
+                            <Button type="submit" size="sm">
+                                Add stage
+                            </Button>
+                        </Form>
+                    ) : null}
+                </div>
+            ) : null}
+        </div>
+    );
+}
 
 export default function PipelineSettings({
     pipelines,
@@ -27,7 +128,7 @@ export default function PipelineSettings({
             <div className="space-y-6">
                 <Heading
                     title="Deal pipelines"
-                    description="Multiple pipelines for different sales motions. Each pipeline gets the standard Evotechly stages (New → Lost) with forecast probabilities."
+                    description="Create pipelines, edit stage names and win probabilities, and reorder the board columns your team sees on /crm/deals/board."
                 />
 
                 {canManage ? (
@@ -49,65 +150,40 @@ export default function PipelineSettings({
                     </Card>
                 ) : null}
 
-                <Card className="overflow-hidden">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2">Pipeline</th>
-                                <th className="px-4 py-2">Stages</th>
-                                <th className="px-4 py-2">Deals</th>
-                                <th className="px-4 py-2">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pipelines.map((pipeline) => (
-                                <tr key={pipeline.id} className="border-t">
-                                    <td className="px-4 py-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-medium">{pipeline.name}</span>
-                                            {pipeline.is_default ? <Badge variant="secondary">Default</Badge> : null}
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-2">{pipeline.stages_count}</td>
-                                    <td className="px-4 py-2">{pipeline.deals_count}</td>
-                                    <td className="px-4 py-2">
-                                        {canManage ? (
-                                            <div className="flex flex-wrap gap-2">
-                                                {!pipeline.is_default ? (
-                                                    <Form
-                                                        action={`/settings/pipelines/${pipeline.id}`}
-                                                        method="post"
-                                                        className="inline"
-                                                    >
-                                                        <input type="hidden" name="_method" value="patch" />
-                                                        <input type="hidden" name="is_default" value="1" />
-                                                        <Button type="submit" variant="secondary" size="sm">
-                                                            Make default
-                                                        </Button>
-                                                    </Form>
-                                                ) : null}
-                                                {!pipeline.is_default && pipeline.deals_count === 0 ? (
-                                                    <Form
-                                                        action={`/settings/pipelines/${pipeline.id}`}
-                                                        method="post"
-                                                        className="inline"
-                                                    >
-                                                        <input type="hidden" name="_method" value="delete" />
-                                                        <Button type="submit" variant="secondary" size="sm">
-                                                            Delete
-                                                        </Button>
-                                                    </Form>
-                                                ) : null}
-                                            </div>
-                                        ) : (
-                                            '—'
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Card>
+                <div className="space-y-3">
+                    {pipelines.map((pipeline) => (
+                        <Card key={pipeline.id} className="overflow-hidden">
+                            <div className="grid grid-cols-4 gap-2 px-4 py-3 text-sm">
+                                <div className="col-span-2 flex items-center gap-2">
+                                    <span className="font-medium">{pipeline.name}</span>
+                                    {pipeline.is_default ? <Badge variant="secondary">Default</Badge> : null}
+                                </div>
+                                <div>{pipeline.stages_count} stages</div>
+                                <div className="flex items-center justify-between gap-2">
+                                    <span>{pipeline.deals_count} deals</span>
+                                    {canManage && !pipeline.is_default && pipeline.deals_count === 0 ? (
+                                        <Form action={`/settings/pipelines/${pipeline.id}`} method="post" className="inline">
+                                            <input type="hidden" name="_method" value="delete" />
+                                            <Button type="submit" variant="secondary" size="sm">
+                                                Delete
+                                            </Button>
+                                        </Form>
+                                    ) : null}
+                                    {canManage && !pipeline.is_default ? (
+                                        <Form action={`/settings/pipelines/${pipeline.id}`} method="post" className="inline">
+                                            <input type="hidden" name="_method" value="patch" />
+                                            <input type="hidden" name="is_default" value="1" />
+                                            <Button type="submit" variant="secondary" size="sm">
+                                                Make default
+                                            </Button>
+                                        </Form>
+                                    ) : null}
+                                </div>
+                            </div>
+                            <PipelineStages pipeline={pipeline} canManage={canManage} />
+                        </Card>
+                    ))}
+                </div>
             </div>
         </>
     );

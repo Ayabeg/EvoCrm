@@ -268,7 +268,7 @@ class DealController extends Controller
             'stagePills' => $stagePills,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
             'members' => $hub->members($workspace),
-            'savedFilters' => $hub->filters($workspace, 'deal'),
+            'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null),
             'recordCount' => $filter->count($workspace, 'deal', $filters),
