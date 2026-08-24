@@ -36,12 +36,16 @@ class ContactController extends Controller
         $filter->applyToContacts($query, $filters);
         $filter->applySort('contact', $query, $filters);
 
+        $contacts = $query->limit(120)->get();
+
         return Inertia::render('crm/contacts/index', [
-            'contacts' => $query->limit(120)->get(),
+            'contacts' => $contacts,
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name', 'city', 'wilaya']),
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'contact', $request->user()),
             'activeFilters' => $filters,
+            'listView' => $hub->listViewMeta('contact', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'recordCount' => $filter->count($workspace, 'contact', $filters),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
             'hasMailbox' => Mailbox::query()->forWorkspace($workspace)->exists(),

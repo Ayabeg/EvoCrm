@@ -58,14 +58,16 @@ export function CrmListHeader({
                         {view.label}
                     </Link>
                 ))}
-                <button
-                    type="button"
-                    onClick={onAddView}
-                    className="mb-2 inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-ink"
-                >
-                    <Plus className="size-3.5" />
-                    add view
-                </button>
+                {views.length > 0 ? (
+                    <button
+                        type="button"
+                        onClick={onAddView}
+                        className="mb-2 inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-ink"
+                    >
+                        <Plus className="size-3.5" />
+                        add view
+                    </button>
+                ) : null}
             </div>
         </div>
     );

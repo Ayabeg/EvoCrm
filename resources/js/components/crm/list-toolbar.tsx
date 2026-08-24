@@ -1,13 +1,14 @@
 import ColumnFilterRow from '@/components/crm/column-filter-row';
 import ColumnChooser from '@/components/crm/column-chooser';
-import { CreateDrawer } from '@/components/crm/create-drawer';
 import FilterBuilder from '@/components/crm/filter-builder';
 import SavedViewTabs from '@/components/crm/saved-view-tabs';
 import { StagePills, type StagePill } from '@/components/crm/stage-pills';
 import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -74,13 +75,12 @@ export default function ListToolbar({
                     {listView ? (
                         <ColumnChooser columnDefs={listView.columnDefs} columns={columns} onChange={setColumns} />
                     ) : null}
-                    <CreateDrawer
-                        entity={entity}
-                        companies={companies}
-                        contacts={contacts}
-                        members={members}
-                        stages={stages}
-                    />
+                    <Button asChild className="h-7 rounded-sm bg-ink px-2 text-[11px] text-canvas hover:bg-ink/90">
+                        <Link href={`${basePath}?create=1`}>
+                            <Plus className="mr-1 size-3" />
+                            Create
+                        </Link>
+                    </Button>
                 </div>
             </div>
             <ColumnFilterRow
