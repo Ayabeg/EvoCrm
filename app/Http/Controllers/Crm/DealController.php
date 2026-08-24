@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Crm;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\PipelineResource;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Pipeline;
@@ -13,6 +13,7 @@ use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\DealBoardForecast;
+use App\Services\Crm\PipelineManager;
 use App\Services\Crm\DealLineTotals;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
@@ -166,76 +167,21 @@ class DealController extends Controller
         return back();
     }
 
-    public function board(Request $request): Response
+    public function board(Request $request, PipelineManager $pipelines): Response
     {
         $workspace = $request->user()->workspace;
-        $pipelines = $workspace->pipelines()->orderByDesc('is_default')->orderBy('name')->get();
-
-        $requestedId = $request->integer('pipeline');
-        $pipeline = $requestedId > 0
-            ? $pipelines->firstWhere('id', $requestedId)
-            : $pipelines->firstWhere('is_default', true) ?? $pipelines->first();
-
-        abort_unless($pipeline instanceof Pipeline, 404);
-
-        $pipeline->load('stages');
-
-        $deals = Deal::query()
-            ->forWorkspace($workspace)
-            ->where('pipeline_id', $pipeline->id)
-            ->with(['contact.company', 'company', 'stage', 'owner'])
-            ->orderByDesc('last_activity_at')
-            ->orderByDesc('id')
-            ->limit(200)
-            ->get();
-
-        $stages = $pipeline->stages->map(function (Stage $stage) use ($deals) {
-            $column = $deals->where('stage_id', $stage->id);
-            $amountCents = (int) $column->sum('amount_cents');
-            $probability = $stage->winProbability();
-
-            return [
-                'id' => $stage->id,
-                'name' => $stage->name,
-                'slug' => $stage->slug,
-                'position' => $stage->position,
-                'is_won' => $stage->is_won,
-                'is_lost' => $stage->is_lost,
-                'probability' => $probability,
-                'count' => $column->count(),
-                'amount_cents' => $amountCents,
-                'weighted_cents' => DealBoardForecast::weightedCents($amountCents, $probability),
-            ];
-        })->values();
+        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
+        $board = $pipelines->boardData($workspace, $pipeline);
 
         return Inertia::render('crm/deals/board', [
             'pipeline' => [
                 'id' => $pipeline->id,
                 'name' => $pipeline->name,
             ],
-            'pipelines' => $pipelines->map(fn (Pipeline $row) => [
-                'id' => $row->id,
-                'name' => $row->name,
-                'is_default' => $row->is_default,
-            ])->values(),
-            'stages' => $stages,
-            'deals' => $deals->map(fn (Deal $deal) => [
-                'id' => $deal->id,
-                'title' => $deal->title,
-                'amount_cents' => (int) $deal->amount_cents,
-                'currency' => $deal->currency ?? 'DZD',
-                'stage_id' => $deal->stage_id,
-                'contact_name' => $deal->contact?->displayName(),
-                'company_name' => $deal->company?->name ?? $deal->contact?->company?->name,
-                'owner_name' => $deal->owner?->name,
-                'close_date' => $deal->close_date?->toDateString(),
-                'url' => "/crm/deals/{$deal->id}",
-            ])->values(),
-            'forecast' => [
-                'count' => $deals->count(),
-                'amount_cents' => (int) $stages->sum('amount_cents'),
-                'weighted_cents' => (int) $stages->sum('weighted_cents'),
-            ],
+            'pipelines' => PipelineResource::collection($pipelines->options($workspace))->resolve(),
+            'stages' => $board['stages'],
+            'deals' => $board['deals'],
+            'forecast' => $board['forecast'],
         ]);
     }
 
@@ -255,14 +201,15 @@ class DealController extends Controller
         return $fallback;
     }
 
-    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, ?Deal $selected): Response
+    protected function hub(Request $request, CrmFilter $filter, CrmHub $hub, RecordInsight $insight, PipelineManager $pipelines, ?Deal $selected): Response
     {
         $workspace = $request->user()->workspace;
-        $pipeline = $workspace->defaultPipeline()->load('stages');
+        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
         $filters = $filter->resolve($request, $workspace, 'deal');
 
         $query = Deal::query()
             ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
             ->with(['contact.company', 'company', 'stage', 'owner']);
 
         $filter->apply('deal', $query, $filters);
@@ -276,13 +223,13 @@ class DealController extends Controller
 
         $selected ??= $deals->first();
 
-        $openCents = Deal::query()
-            ->forWorkspace($workspace)
-            ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false))
-            ->sum('amount_cents');
+        $forecast = $pipelines->forecast($workspace, $pipeline);
 
-        $stagePills = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filter, $filters) {
-            $countQuery = Deal::query()->forWorkspace($workspace)->where('stage_id', $stage->id);
+        $stagePills = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filter, $filters, $pipeline) {
+            $countQuery = Deal::query()
+                ->forWorkspace($workspace)
+                ->where('pipeline_id', $pipeline->id)
+                ->where('stage_id', $stage->id);
             $withoutStage = $filters;
             $withoutStage['stage'] = null;
             $filter->apply('deal', $countQuery, $withoutStage);
@@ -310,6 +257,12 @@ class DealController extends Controller
             'askEvo' => $selected ? $insight->forDeal($selected) : null,
             'dealHealth' => $selected ? $insight->dealHealth($selected) : null,
             'attributes' => $selected ? $hub->attributeBag($workspace, 'deal', $selected->id) : ['definitions' => [], 'values' => []],
+            'pipeline' => [
+                'id' => $pipeline->id,
+                'name' => $pipeline->name,
+            ],
+            'pipelines' => PipelineResource::collection($pipelines->options($workspace))->resolve(),
+            'forecast' => $forecast,
             'stages' => $pipeline->stages,
             'stagePills' => $stagePills,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
@@ -320,7 +273,7 @@ class DealController extends Controller
             'recordCount' => $filter->count($workspace, 'deal', $filters),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
-            'openPipelineCents' => $openCents,
+            'openPipelineCents' => $forecast['open_cents'],
         ]);
     }
 }

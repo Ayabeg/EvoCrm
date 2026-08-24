@@ -3,7 +3,9 @@ import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import AssociationsCard from '@/components/crm/associations-card';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import DealHealthPill from '@/components/crm/deal-health-pill';
+import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
+import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import DealLineItems from '@/components/crm/deal-line-items';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import RecordProperties from '@/components/crm/record-properties';
@@ -34,6 +36,9 @@ export default function DealHub({
     products,
     askEvo,
     dealHealth,
+    pipeline,
+    pipelines = [],
+    forecast,
 }: any) {
 
     return (
@@ -58,13 +63,25 @@ export default function DealHub({
                         />
                         <div className="border-b px-3 py-2">
                             <div className="flex items-center justify-between gap-2">
-                                <h1 className="text-sm font-semibold">Deals</h1>
+                                <h1 className="text-sm font-semibold">{pipeline?.name ?? 'Deals'}</h1>
                                 <div className="flex items-center gap-2">
-                                    <DealLayoutToggle current="list" />
-                                    <span className="money text-[11px] text-ink">{formatDzd(openPipelineCents)}</span>
+                                    <PipelineSwitcher
+                                        pipelineId={pipeline?.id ?? 0}
+                                        pipelines={pipelines}
+                                        basePath="/crm/deals"
+                                    />
+                                    <DealLayoutToggle current="list" pipelineId={pipeline?.id} />
                                 </div>
                             </div>
+                            {forecast ? (
+                                <div className="mt-2">
+                                    <DealForecastBar forecast={forecast} />
+                                </div>
+                            ) : (
+                                <p className="money mt-1 text-[11px] text-ink">{formatDzd(openPipelineCents)}</p>
+                            )}
                             <Form action="/crm/deals" method="get" className="mt-2 grid grid-cols-2 gap-1">
+                                {pipeline?.id ? <input type="hidden" name="pipeline" value={pipeline.id} /> : null}
                                 <select name="stage" defaultValue={activeFilters.stage ?? ''} className="h-7 rounded border bg-background px-1 text-[11px]">
                                     <option value="">Stage</option>
                                     {stages.map((stage: any) => (
@@ -129,6 +146,7 @@ export default function DealHub({
                             ))}
                         </div>
                         <Form action="/crm/deals" method="post" className="space-y-1 border-t p-2" resetOnSuccess>
+                            {pipeline?.id ? <input type="hidden" name="pipeline_id" value={pipeline.id} /> : null}
                             <Input name="title" placeholder="Deal title" required className="h-7" />
                             <select name="contact_id" className="h-7 w-full rounded border bg-background px-1" required>
                                 <option value="">Contact</option>
