@@ -139,6 +139,8 @@ it('shows catalog products and line items on the deal record page', function () 
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('crm/deals/hub')
+            ->has('catchUp.inbound')
+            ->has('catchUp.outbound')
             ->has('products', 5)
             ->where('products.0.currency', 'DZD')
             ->has('selected.line_items', 1)
