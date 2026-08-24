@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\ConversionFunnel;
+use App\Services\Funnels\ConversionFunnelProvisioner;
 use App\Services\Funnels\ConversionFunnelQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Inertia\Response;
 class FunnelController extends Controller
 {
     private const TZ = 'Africa/Algiers';
+
+    public function __construct(private ConversionFunnelProvisioner $provisioner) {}
 
     public function index(Request $request, ConversionFunnelQuery $query): Response
     {
@@ -74,13 +77,15 @@ class FunnelController extends Controller
             'funnel' => ['nullable', 'integer', Rule::exists('conversion_funnels', 'id')->where('workspace_id', $workspace->id)],
         ]);
 
-        return ConversionFunnel::query()
+        $funnel = ConversionFunnel::query()
             ->forWorkspace($workspace)
             ->when(
                 isset($validated['funnel']),
                 fn ($q) => $q->where('id', $validated['funnel']),
                 fn ($q) => $q->where('is_default', true),
             )
-            ->firstOrFail();
+            ->first();
+
+        return $funnel ?? $this->provisioner->provision($workspace);
     }
 }

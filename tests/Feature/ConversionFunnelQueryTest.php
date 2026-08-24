@@ -99,3 +99,20 @@ it('serves funnel metrics as JSON', function () {
             'sources',
         ]);
 });
+
+it('provisions a default funnel when the dashboard is opened without one', function () {
+    $user = User::factory()->create();
+    $user->workspace->conversionFunnels()->delete();
+
+    expect($user->workspace->conversionFunnels()->count())->toBe(0);
+
+    $this->actingAs($user)
+        ->get('/reports/funnels')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('reports/funnels/index')
+            ->has('report.stages', 4)
+        );
+
+    expect($user->workspace->fresh()->conversionFunnels()->where('is_default', true)->exists())->toBeTrue();
+});

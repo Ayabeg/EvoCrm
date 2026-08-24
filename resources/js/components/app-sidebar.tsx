@@ -33,7 +33,7 @@ import {
     Workflow,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import { DEFAULT_PINNED, readPins, togglePin } from '@/lib/nav-pins';
@@ -152,6 +152,57 @@ export function AppSidebar() {
     const [pins, setPins] = useState<string[]>(() => readPins());
     const [moreOpen, setMoreOpen] = useState(false);
     const [category, setCategory] = useState('CRM');
+    const moreRef = useRef<HTMLLIElement>(null);
+    const [morePos, setMorePos] = useState<{ top: number; left: number } | null>(null);
+
+    useEffect(() => {
+        if (!moreOpen) {
+            return;
+        }
+
+        const updatePosition = () => {
+            const anchor = moreRef.current;
+            if (!anchor) {
+                return;
+            }
+
+            const rect = anchor.getBoundingClientRect();
+            setMorePos({
+                top: rect.top,
+                left: rect.right + 8,
+            });
+        };
+
+        updatePosition();
+        window.addEventListener('resize', updatePosition);
+        window.addEventListener('scroll', updatePosition, true);
+
+        const onPointerDown = (event: MouseEvent) => {
+            if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
+                const panel = document.getElementById('sidebar-more-panel');
+                if (panel && panel.contains(event.target as Node)) {
+                    return;
+                }
+                setMoreOpen(false);
+            }
+        };
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setMoreOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', onPointerDown);
+        document.addEventListener('keydown', onKeyDown);
+
+        return () => {
+            window.removeEventListener('resize', updatePosition);
+            window.removeEventListener('scroll', updatePosition, true);
+            document.removeEventListener('mousedown', onPointerDown);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [moreOpen]);
     const integrations = page.props.integrations;
     const showSetup = !integrations?.meta?.connected && !integrations?.smtp?.connected;
 
@@ -202,10 +253,11 @@ export function AppSidebar() {
                             </li>
                         );
                     })}
-                    <li className="relative">
+                    <li ref={moreRef} className="relative">
                         <button
                             type="button"
                             title="More"
+                            aria-expanded={moreOpen}
                             onClick={() => setMoreOpen((open) => !open)}
                             className={cn(
                                 collapsed
@@ -219,8 +271,12 @@ export function AppSidebar() {
                             <MoreHorizontal className="size-4" />
                             {!collapsed ? <span>More</span> : null}
                         </button>
-                        {moreOpen ? (
-                            <div className="absolute start-full top-0 z-50 ms-2 flex h-[420px] w-[520px] overflow-hidden rounded-md border border-hairline bg-canvas shadow-xl">
+                        {moreOpen && morePos ? (
+                            <div
+                                id="sidebar-more-panel"
+                                className="fixed z-[100] flex h-[420px] w-[520px] max-w-[calc(100vw-1rem)] overflow-hidden rounded-md border border-hairline bg-canvas shadow-xl"
+                                style={{ top: morePos.top, left: morePos.left }}
+                            >
                                 <div className="w-40 border-r border-hairline bg-canvas-soft py-2">
                                     {CATEGORIES.map((name) => (
                                         <button

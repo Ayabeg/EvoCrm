@@ -72,6 +72,7 @@ class DealController extends Controller
             'wilayas' => config('evosales.wilayas'),
             'openPipelineCents' => $openCents,
             'createOpen' => $request->boolean('create'),
+            'prefillContactId' => $request->integer('contact_id') ?: null,
         ]);
     }
 

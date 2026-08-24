@@ -42,6 +42,7 @@ export default function DealsIndex({
     cities,
     wilayas,
     createOpen,
+    prefillContactId,
 }: {
     deals: Deal[];
     stages: Stage[];
@@ -56,6 +57,7 @@ export default function DealsIndex({
     cities: string[];
     wilayas: string[];
     createOpen?: boolean;
+    prefillContactId?: number | null;
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
     const loading = useInertiaLoading();
@@ -129,6 +131,7 @@ export default function DealsIndex({
                                 <Label className="mb-1 block text-[12px]">Contact</Label>
                                 <select
                                     name="contact_id"
+                                    defaultValue={prefillContactId ?? ''}
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
                                 >
                                     <option value="">New from deal name</option>

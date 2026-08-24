@@ -13,6 +13,8 @@ it('renders the contact record with key information and associations', function 
         'company_id' => $company->id,
         'owner_id' => $user->id,
         'lead_status' => 'open',
+        'first_name' => 'Beghanem Beghanem',
+        'last_name' => 'Beghanem',
     ]);
     $pipeline = $user->workspace->defaultPipeline();
     Deal::query()->create([
@@ -31,8 +33,21 @@ it('renders the contact record with key information and associations', function 
         ->assertInertia(fn ($page) => $page
             ->component('crm/contacts/show')
             ->where('contact.lead_status', 'open')
+            ->where('contact.display_name', 'Beghanem Beghanem')
             ->has('associations.company')
             ->has('associations.deals', 1)
             ->has('timeline')
+            ->has('dealsKanban.stages')
+            ->has('dealsKanban.deals', 1)
+            ->has('askEvo.summary')
         );
+});
+
+it('deduplicates repeated contact name parts in displayName', function () {
+    $contact = Contact::factory()->make([
+        'first_name' => 'Beghanem',
+        'last_name' => 'Beghanem',
+    ]);
+
+    expect($contact->displayName())->toBe('Beghanem');
 });

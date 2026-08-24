@@ -59,9 +59,12 @@ class ContactController extends Controller
 
         $workspace = $request->user()->workspace;
         $contact->load(['company', 'owner', 'deals.stage']);
+        $pipeline = $workspace->defaultPipeline()->load('stages');
 
         return Inertia::render('crm/contacts/show', [
-            'contact' => $contact,
+            'contact' => array_merge($contact->toArray(), [
+                'display_name' => $contact->displayName(),
+            ]),
             'associations' => $hub->contactAssociations($contact),
             'timeline' => $hub->timeline(contact: $contact),
             'catchUp' => $hub->catchUp($contact),
@@ -71,6 +74,20 @@ class ContactController extends Controller
             'askEvo' => $insight->forContact($contact),
             'contactEngagement' => $insight->contactEngagement($contact),
             'proactiveSummary' => $insight->proactiveSummary($contact),
+            'dealsKanban' => [
+                'pipeline' => $pipeline->only(['id', 'name']),
+                'stages' => $pipeline->stages->map(fn ($stage) => [
+                    'id' => $stage->id,
+                    'name' => $stage->name,
+                    'slug' => $stage->slug,
+                ])->values(),
+                'deals' => $contact->deals->map(fn ($deal) => [
+                    'id' => $deal->id,
+                    'title' => $deal->title,
+                    'amount_cents' => (int) $deal->amount_cents,
+                    'stage_id' => $deal->stage_id,
+                ])->values(),
+            ],
         ]);
     }
 

@@ -43,6 +43,13 @@ class Contact extends Model
         ];
     }
 
+    protected $appends = ['display_name'];
+
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->displayName();
+    }
+
     protected static function booted(): void
     {
         static::saving(function (Contact $contact): void {
@@ -97,6 +104,17 @@ class Contact extends Model
 
     public function displayName(): string
     {
-        return trim($this->first_name.' '.($this->last_name ?? ''));
+        $first = trim((string) $this->first_name);
+        $last = trim((string) ($this->last_name ?? ''));
+
+        if ($last === '' || strcasecmp($last, $first) === 0) {
+            return $first;
+        }
+
+        if ($first !== '' && str_contains($first, $last)) {
+            return $first;
+        }
+
+        return trim($first.' '.$last);
     }
 }
