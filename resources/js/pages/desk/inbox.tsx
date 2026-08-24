@@ -1,6 +1,8 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import { Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { EmptyRoom } from '@/components/crm/empty-room';
+import { RoomShell } from '@/components/crm/room-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -77,23 +79,22 @@ export default function DeskInbox({
     return (
         <>
             <Head title="Desk" />
-            <div className="flex h-[calc(100dvh-52px)] flex-col bg-canvas text-[13px] text-ink">
-                <div className="flex shrink-0 items-center gap-3 border-b border-hairline px-4 py-2">
-                    <h1 className="text-sm font-semibold">Desk</h1>
-                    <Badge variant="secondary">Chat inbox</Badge>
-                    <Link href="/outbound/replies" className="text-[12px] text-brand">
-                        Email
-                    </Link>
-                    <span className="sr-only">
-                        {embedUrl ?? embedState}
-                    </span>
-                </div>
+            <RoomShell
+                title="Desk"
+                tabs={[
+                    { label: 'Inbox', href: '/inbox', active: true },
+                    { label: 'Email replies', href: '/outbound/replies' },
+                    { label: 'Channels', href: '/settings/channels' },
+                ]}
+            >
+            <div className="flex h-full flex-col bg-canvas text-[13px] text-ink">
                 {empty ? (
                     <ConnectChannels channels={channels} />
                 ) : (
                     <FrontDesk threads={threads} selected={selected} />
                 )}
             </div>
+            </RoomShell>
         </>
     );
 }
@@ -109,13 +110,13 @@ function ConnectChannels({ channels }: { channels: ChannelCard[] }) {
               ];
 
     return (
-        <div className="grid flex-1 place-items-center px-6">
-            <div className="w-full max-w-lg text-center">
-                <h2 className="text-[22px] font-semibold">Connect your channels</h2>
-                <p className="mt-2 text-muted-foreground">
-                    Official WhatsApp Cloud, Instagram, and Facebook. No unofficial WhatsApp.
-                </p>
-                <div className="mt-6 grid gap-3">
+        <EmptyRoom
+            title="Connect your channels"
+            line="Official WhatsApp Cloud, Instagram, and Facebook. No unofficial WhatsApp."
+            actionLabel="Open Apps"
+            actionHref="/settings/apps"
+        >
+            <div className="mt-6 grid gap-3 text-left">
                     {cards.map((channel) => {
                         const Icon = CHANNEL_ICONS[channel.key] ?? MessageCircle;
 
@@ -137,7 +138,7 @@ function ConnectChannels({ channels }: { channels: ChannelCard[] }) {
                     })}
                 </div>
             </div>
-        </div>
+        </EmptyRoom>
     );
 }
 

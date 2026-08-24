@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { RoomShell, outboundTabs } from '@/components/crm/room-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -81,9 +82,14 @@ export default function OutboundIndex({
     recent: Message[];
     mail_stack: MailStack;
 }) {
+    const { url } = usePage();
+    const pathname = url.split('?')[0] ?? '/outbound';
+
     return (
         <>
             <Head title="Outbound" />
+            <RoomShell title="Outbound" tabs={outboundTabs(pathname)}>
+            <div className="h-full overflow-y-auto">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Outbound"
@@ -340,6 +346,8 @@ export default function OutboundIndex({
                     </table>
                 </Card>
             </div>
+            </div>
+            </RoomShell>
         </>
     );
 }
