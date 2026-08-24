@@ -24,12 +24,17 @@ it('exports contacts as csv on GET and honors the My view', function () {
         'email' => 'export.theirs@evotechly.dz',
     ]);
 
-    $this->actingAs($user)
-        ->get('/crm/contacts/export?view=my')
+    $response = $this->actingAs($user)->get('/crm/contacts/export?view=my');
+
+    $response
         ->assertOk()
-        ->assertHeader('content-type', 'text/csv; charset=UTF-8')
-        ->assertSee('first_name')
-        ->assertSee('ExportMine')
-        ->assertSee('Export Co')
-        ->assertDontSee('ExportTheirs');
+        ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+
+    $csv = $response->streamedContent();
+
+    expect($csv)
+        ->toContain('first_name')
+        ->toContain('ExportMine')
+        ->toContain('Export Co')
+        ->not->toContain('ExportTheirs');
 });
