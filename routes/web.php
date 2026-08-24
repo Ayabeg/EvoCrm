@@ -187,6 +187,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/settings/channels', [ChannelSettingsController::class, 'update'])->name('settings.channels.update');
     Route::get('/settings/attributes', [CustomAttributeController::class, 'edit'])->name('settings.attributes');
     Route::post('/settings/attributes', [CustomAttributeController::class, 'store'])->name('settings.attributes.store');
+    Route::put('/settings/attributes/{definition}', [CustomAttributeController::class, 'update'])->name('settings.attributes.update');
+    Route::delete('/settings/attributes/{definition}', [CustomAttributeController::class, 'destroy'])->name('settings.attributes.destroy');
 });
 
 require __DIR__.'/settings.php';

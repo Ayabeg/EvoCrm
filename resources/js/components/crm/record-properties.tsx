@@ -8,7 +8,7 @@ export type AttributeDefinition = {
     entity: string;
     key: string;
     label: string;
-    type: 'text' | 'number' | 'date' | 'select' | string;
+    type: 'text' | 'number' | 'date' | 'list' | string;
     options?: string[] | null;
     group?: string | null;
     required?: boolean;
@@ -35,7 +35,7 @@ function isSelect(type: string): boolean {
     return type === 'select' || type === 'list';
 }
 
-function PropertyField({
+function AttributeField({
     definition,
     value,
 }: {
@@ -118,7 +118,7 @@ export default function RecordProperties({
                                     <p className="text-[11px] font-medium text-ink">{group}</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {fields.map((definition) => (
-                                            <PropertyField
+                                            <AttributeField
                                                 key={definition.id}
                                                 definition={definition}
                                                 value={values[definition.key] ?? ''}

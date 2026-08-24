@@ -35,12 +35,149 @@ const types = [
     { value: 'text', label: 'Text' },
     { value: 'number', label: 'Number' },
     { value: 'date', label: 'Date' },
-    { value: 'select', label: 'Select' },
+    { value: 'list', label: 'List' },
 ] as const;
 
-export default function AttributeSettings({ definitions }: { definitions: Definition[] }) {
-    const [type, setType] = useState('text');
+function TypeFields({
+    idPrefix,
+    defaultType,
+    defaultOptions,
+}: {
+    idPrefix: string;
+    defaultType: string;
+    defaultOptions?: string[] | null;
+}) {
+    const initial = defaultType === 'select' ? 'list' : defaultType;
+    const [type, setType] = useState(initial);
 
+    return (
+        <>
+            <div>
+                <Label htmlFor={`${idPrefix}-type`}>Type</Label>
+                <select
+                    id={`${idPrefix}-type`}
+                    name="type"
+                    value={type}
+                    onChange={(event) => setType(event.target.value)}
+                    className="mt-1 h-9 w-full rounded-md border border-hairline bg-canvas px-2 text-sm text-ink"
+                >
+                    {types.map((item) => (
+                        <option key={item.value} value={item.value}>
+                            {item.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            {type === 'list' ? (
+                <div>
+                    <Label htmlFor={`${idPrefix}-options`}>List options (comma)</Label>
+                    <Input
+                        id={`${idPrefix}-options`}
+                        name="options"
+                        defaultValue={(defaultOptions ?? []).join(', ')}
+                        placeholder="santé, logistique, retail"
+                        className="mt-1"
+                    />
+                </div>
+            ) : null}
+        </>
+    );
+}
+
+function DefinitionCard({ definition }: { definition: Definition }) {
+    return (
+        <Card className="border-hairline bg-canvas p-3">
+            <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <p className="font-medium text-ink">{definition.label}</p>
+                    <p className="text-sm text-mute">
+                        {definition.entity} · {definition.key} · {definition.group || 'General'}
+                    </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                    <Badge variant="outline">{definition.type}</Badge>
+                    {definition.required ? (
+                        <Badge className="border-transparent bg-brand/10 text-brand">required</Badge>
+                    ) : null}
+                </div>
+            </div>
+
+            {definition.fill_rate ? (
+                <div className="mb-3 space-y-1">
+                    <div className="flex items-center justify-between text-[11px] text-mute">
+                        <span>Fill rate</span>
+                        <span>
+                            {definition.fill_rate.filled} / {definition.fill_rate.total} · {definition.fill_rate.percent}%
+                        </span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-canvas-soft">
+                        <div className="h-full bg-brand" style={{ width: `${definition.fill_rate.percent}%` }} />
+                    </div>
+                </div>
+            ) : null}
+
+            <Form
+                action={`/settings/attributes/${definition.id}`}
+                method="put"
+                className="grid gap-3"
+            >
+                {({ processing }) => (
+                    <>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div>
+                                <Label htmlFor={`label-${definition.id}`}>Label</Label>
+                                <Input
+                                    id={`label-${definition.id}`}
+                                    name="label"
+                                    defaultValue={definition.label}
+                                    required
+                                    className="mt-1"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor={`group-${definition.id}`}>Group</Label>
+                                <Input
+                                    id={`group-${definition.id}`}
+                                    name="group"
+                                    defaultValue={definition.group ?? ''}
+                                    placeholder="About"
+                                    className="mt-1"
+                                />
+                            </div>
+                            <TypeFields
+                                idPrefix={`edit-${definition.id}`}
+                                defaultType={definition.type}
+                                defaultOptions={definition.options}
+                            />
+                        </div>
+                        <label className="flex items-center gap-2 text-sm text-ink">
+                            <input
+                                type="checkbox"
+                                name="required"
+                                value="1"
+                                defaultChecked={Boolean(definition.required)}
+                                className="size-4 accent-brand"
+                            />
+                            Required on the record
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                            <Button disabled={processing}>Save changes</Button>
+                        </div>
+                    </>
+                )}
+            </Form>
+            <Form action={`/settings/attributes/${definition.id}`} method="delete" className="mt-2">
+                {({ processing }) => (
+                    <Button type="submit" variant="secondary" className="h-8" disabled={processing}>
+                        Delete
+                    </Button>
+                )}
+            </Form>
+        </Card>
+    );
+}
+
+export default function AttributeSettings({ definitions }: { definitions: Definition[] }) {
     const byEntity = entities
         .map((entity) => ({
             ...entity,
@@ -50,18 +187,18 @@ export default function AttributeSettings({ definitions }: { definitions: Defini
 
     return (
         <>
-            <Head title="Attributes" />
+            <Head title="Custom attributes" />
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Attributes"
-                    description="Workspace-defined fields for contacts and deals. Values live on each record as an extra section — existing fields stay as they are."
+                    title="Custom attributes"
+                    description="Workspace-defined fields on Contact, Company, and Deal. Add a date or list, group them, then edit or delete the definition."
                 />
 
                 <Card className="border-hairline bg-canvas p-4">
                     <h2 className="mb-1 font-medium text-ink">New attribute</h2>
                     <p className="mb-3 text-sm text-mute">
-                        Type, group, and required flag apply to every record of that entity.
+                        Values are stored per record and shown on the contact or deal hub.
                     </p>
                     <Form action="/settings/attributes" method="post" className="grid gap-3" resetOnSuccess>
                         {({ processing }) => (
@@ -81,22 +218,7 @@ export default function AttributeSettings({ definitions }: { definitions: Defini
                                             ))}
                                         </select>
                                     </div>
-                                    <div>
-                                        <Label htmlFor="type">Type</Label>
-                                        <select
-                                            id="type"
-                                            name="type"
-                                            value={type}
-                                            onChange={(event) => setType(event.target.value)}
-                                            className="mt-1 h-9 w-full rounded-md border border-hairline bg-canvas px-2 text-sm text-ink"
-                                        >
-                                            {types.map((item) => (
-                                                <option key={item.value} value={item.value}>
-                                                    {item.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                    <TypeFields idPrefix="create" defaultType="text" />
                                     <div>
                                         <Label htmlFor="key">Key</Label>
                                         <Input id="key" name="key" required placeholder="beds" className="mt-1" />
@@ -109,17 +231,6 @@ export default function AttributeSettings({ definitions }: { definitions: Defini
                                         <Label htmlFor="group">Group</Label>
                                         <Input id="group" name="group" placeholder="About" className="mt-1" />
                                     </div>
-                                    {type === 'select' ? (
-                                        <div>
-                                            <Label htmlFor="options">Select options (comma)</Label>
-                                            <Input
-                                                id="options"
-                                                name="options"
-                                                placeholder="santé, logistique, retail"
-                                                className="mt-1"
-                                            />
-                                        </div>
-                                    ) : null}
                                 </div>
                                 <label className="flex items-center gap-2 text-sm text-ink">
                                     <input
@@ -144,46 +255,7 @@ export default function AttributeSettings({ definitions }: { definitions: Defini
                             <div key={entity.value} className="space-y-2">
                                 <h2 className="text-sm font-semibold text-ink">{entity.label}</h2>
                                 {entity.items.map((definition) => (
-                                    <Card key={definition.id} className="border-hairline bg-canvas p-3">
-                                        <div className="flex flex-wrap items-start justify-between gap-3">
-                                            <div>
-                                                <p className="font-medium text-ink">{definition.label}</p>
-                                                <p className="text-sm text-mute">
-                                                    {definition.key} · {definition.group || 'General'}
-                                                </p>
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-1.5">
-                                                <Badge variant="outline">{definition.type}</Badge>
-                                                {definition.required ? (
-                                                    <Badge className="border-transparent bg-brand/10 text-brand">
-                                                        required
-                                                    </Badge>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                        {definition.fill_rate ? (
-                                            <div className="mt-3 space-y-1">
-                                                <div className="flex items-center justify-between text-[11px] text-mute">
-                                                    <span>Fill rate</span>
-                                                    <span>
-                                                        {definition.fill_rate.filled} / {definition.fill_rate.total} ·{' '}
-                                                        {definition.fill_rate.percent}%
-                                                    </span>
-                                                </div>
-                                                <div className="h-1.5 overflow-hidden rounded-full bg-canvas-soft">
-                                                    <div
-                                                        className="h-full bg-brand"
-                                                        style={{ width: `${definition.fill_rate.percent}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        ) : null}
-                                        {definition.options && definition.options.length > 0 ? (
-                                            <p className="mt-2 text-[11px] text-mute">
-                                                {definition.options.join(' · ')}
-                                            </p>
-                                        ) : null}
-                                    </Card>
+                                    <DefinitionCard key={definition.id} definition={definition} />
                                 ))}
                             </div>
                         ))
@@ -195,5 +267,5 @@ export default function AttributeSettings({ definitions }: { definitions: Defini
 }
 
 AttributeSettings.layout = {
-    breadcrumbs: [{ title: 'Attributes', href: '/settings/attributes' }],
+    breadcrumbs: [{ title: 'Custom attributes', href: '/settings/attributes' }],
 };

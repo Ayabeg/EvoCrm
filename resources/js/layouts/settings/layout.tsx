@@ -48,7 +48,7 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Attributes',
+        title: 'Custom attributes',
         href: '/settings/attributes',
         icon: null,
     },

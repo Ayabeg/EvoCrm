@@ -170,7 +170,7 @@ class CustomAttributes
         }
 
         $options = $definition->optionList();
-        if ($type === 'select' && $options !== [] && ! in_array($value, $options, true)) {
+        if ($type === 'list' && $options !== [] && ! in_array($value, $options, true)) {
             throw ValidationException::withMessages([
                 $key => $definition->label.' is not a valid option.',
             ]);

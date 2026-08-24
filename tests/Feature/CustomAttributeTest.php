@@ -61,7 +61,7 @@ it('creates a typed contact property and shows the saved value on the record', f
             'entity' => 'contact',
             'key' => 'sector',
             'label' => 'Sector',
-            'type' => 'select',
+            'type' => 'list',
             'group' => 'About',
             'options' => 'santé, retail',
         ])
@@ -93,7 +93,7 @@ it('creates a typed contact property and shows the saved value on the record', f
             ->where('attributes.definitions.0.group', 'About')
             ->where('attributes.definitions.0.required', true)
             ->where('attributes.definitions.0.type', 'date')
-            ->where('attributes.definitions.1.type', 'select')
+            ->where('attributes.definitions.1.type', 'list')
             ->where('attributes.definitions.1.options', ['santé', 'retail'])
         );
 });
@@ -173,6 +173,64 @@ it('reports fill rate on the attributes settings page', function () {
             ->where('definitions.0.fill_rate.total', 2)
             ->where('definitions.0.fill_rate.percent', 50)
         );
+});
+
+it('edits and deletes a custom attribute definition', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    $this->actingAs($user)
+        ->post('/settings/attributes', [
+            'entity' => 'contact',
+            'key' => 'beds',
+            'label' => 'Beds',
+            'type' => 'number',
+            'group' => 'About',
+        ])
+        ->assertRedirect();
+
+    $definition = CustomAttributeDefinition::query()->where('key', 'beds')->first();
+    expect($definition)->not->toBeNull();
+
+    $this->actingAs($user)
+        ->put("/crm/contacts/{$contact->id}/attributes", [
+            'attributes' => ['beds' => '80'],
+        ])
+        ->assertRedirect();
+
+    $this->actingAs($user)
+        ->put("/settings/attributes/{$definition->id}", [
+            'label' => 'Bed count',
+            'type' => 'date',
+            'group' => 'Clinic',
+            'required' => '1',
+        ])
+        ->assertRedirect();
+
+    $definition->refresh();
+    expect($definition->label)->toBe('Bed count')
+        ->and($definition->type)->toBe('date')
+        ->and($definition->group_name)->toBe('Clinic')
+        ->and($definition->required)->toBeTrue()
+        ->and($definition->key)->toBe('beds');
+
+    $this->actingAs($user)
+        ->get('/settings/attributes')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('settings/attributes')
+            ->where('definitions.0.label', 'Bed count')
+            ->where('definitions.0.group', 'Clinic')
+            ->where('definitions.0.type', 'date')
+            ->where('definitions.0.required', true)
+        );
+
+    $this->actingAs($user)
+        ->delete("/settings/attributes/{$definition->id}")
+        ->assertRedirect();
+
+    expect(CustomAttributeDefinition::query()->find($definition->id))->toBeNull()
+        ->and(CustomAttributeValue::query()->where('definition_id', $definition->id)->exists())->toBeFalse();
 });
 
 it('rejects an empty required property on the record', function () {

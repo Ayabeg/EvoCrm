@@ -772,7 +772,7 @@ class DatabaseSeeder extends Seeder
             'entity' => 'company',
             'key' => 'sector',
             'label' => 'Sector',
-            'type' => 'select',
+            'type' => 'list',
             'group_name' => 'About',
             'options' => ['santé', 'éducation', 'logistique', 'retail', 'agri'],
         ]);

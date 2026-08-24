@@ -15,7 +15,7 @@ class CustomAttributeDefinition extends Model
 {
     use BelongsToWorkspace;
 
-    public const TYPES = ['text', 'number', 'date', 'select'];
+    public const TYPES = ['text', 'number', 'date', 'list'];
 
     protected function casts(): array
     {
@@ -27,7 +27,7 @@ class CustomAttributeDefinition extends Model
 
     public function normalizedType(): string
     {
-        return $this->type === 'list' ? 'select' : $this->type;
+        return $this->type === 'select' ? 'list' : $this->type;
     }
 
     /**
