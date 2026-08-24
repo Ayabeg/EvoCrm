@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\QuietHours;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Funnels\ConversionFunnelProvisioner;
 use Illuminate\Support\Str;
 
 class WorkspaceProvisioner
@@ -71,6 +72,8 @@ class WorkspaceProvisioner
             ['workspace_id' => $workspace->id, 'type' => ChannelType::Email],
             ['name' => 'Email', 'status' => 'not_connected']
         );
+
+        app(ConversionFunnelProvisioner::class)->provision($workspace);
 
         QuietHours::query()->firstOrCreate(
             ['workspace_id' => $workspace->id],

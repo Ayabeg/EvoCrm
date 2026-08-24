@@ -112,4 +112,42 @@ return [
 
     'stage_probability_fallback' => 20,
 
+    /*
+    | Default deep conversion funnel (Visits → Orders → Confirmed → Delivered).
+    | matcher_type is resolved by ConversionFunnelQuery; FunnelEventRecorder
+    | writes event_type rows for the bottom three stages plus visits.
+    */
+    'conversion_funnel' => [
+        'stages' => [
+            [
+                'key' => 'visits',
+                'label' => 'Visits',
+                'position' => 1,
+                'matcher_type' => 'event',
+                'matcher_config' => ['event_type' => 'visit'],
+            ],
+            [
+                'key' => 'orders_placed',
+                'label' => 'Orders placed',
+                'position' => 2,
+                'matcher_type' => 'event',
+                'matcher_config' => ['event_type' => 'order_placed'],
+            ],
+            [
+                'key' => 'confirmed',
+                'label' => 'Confirmed',
+                'position' => 3,
+                'matcher_type' => 'event',
+                'matcher_config' => ['event_type' => 'confirmed'],
+            ],
+            [
+                'key' => 'delivered',
+                'label' => 'Delivered',
+                'position' => 4,
+                'matcher_type' => 'event',
+                'matcher_config' => ['event_type' => 'delivered'],
+            ],
+        ],
+    ],
+
 ];
