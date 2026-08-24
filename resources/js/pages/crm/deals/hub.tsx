@@ -1,9 +1,10 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
 import AssociationsCard from '@/components/crm/associations-card';
+import CatchUpBlock from '@/components/crm/catch-up-block';
 import { formatDzd, HubListRow, HubShell } from '@/components/crm/hub-chrome';
 import ListToolbar from '@/components/crm/list-toolbar';
 import RecordActionRow from '@/components/crm/record-action-row';
-import TimelineFilter from '@/components/crm/timeline-filter';
+import { RecordFact, RecordTimeline, RecordWorkspace } from '@/components/crm/record-workspace';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -22,6 +23,7 @@ export default function DealHub({
     wilayas,
     openPipelineCents,
     stagePills,
+    catchUp,
 }: any) {
 
     return (
@@ -140,165 +142,96 @@ export default function DealHub({
                                     Open in Inbox
                                 </Link>
                             </header>
-                            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-                                <RecordActionRow
-                                    dealId={selected.id}
-                                    contactId={selected.contact_id}
-                                    companyId={selected.company_id}
-                                    ownerId={selected.owner_id}
-                                />
-                                <AssociationsCard associations={associations} />
-                                <div className="grid grid-cols-6 gap-1">
-                                    {stages.map((stage: any) => {
-                                        const column = deals.filter((deal: any) => deal.stage_id === stage.id);
-                                        const sum = column.reduce((acc: number, deal: any) => acc + (deal.amount_cents ?? 0), 0);
-
-                                        return (
-                                            <div key={stage.id} className="rounded border border-hairline bg-canvas-soft p-1">
-                                                <p className="text-[10px] font-semibold">{stage.name}</p>
-                                                <p className="money text-[10px] text-ink">{formatDzd(sum)}</p>
-                                                <p className="text-[10px] text-muted-foreground">{column.length}</p>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <Form action={`/crm/deals/${selected.id}`} method="put" className="grid grid-cols-2 gap-2 border-b pb-3">
-                                    <Input name="title" defaultValue={selected.title} required className="h-8" />
-                                    <Input name="amount_dzd" type="number" min={0} step="0.01" defaultValue={(selected.amount_cents ?? 0) / 100} className="h-8" />
-                                    <Input name="close_date" type="date" defaultValue={selected.close_date ? String(selected.close_date).slice(0, 10) : ''} className="h-8" />
-                                    <Input name="next_step" defaultValue={selected.next_step ?? ''} placeholder="Next step" className="h-8" />
-                                    <select name="owner_id" defaultValue={selected.owner_id ?? ''} className="h-8 rounded border bg-background px-2">
-                                        <option value="">Unassigned</option>
-                                        {members.map((user: any) => (
-                                            <option key={user.id} value={user.id}>{user.name}</option>
-                                        ))}
-                                    </select>
-                                    <Input name="source" defaultValue={selected.source ?? ''} placeholder="Source" className="h-8" />
-                                    <Input name="lost_reason" defaultValue={selected.lost_reason ?? ''} placeholder="Lost reason" className="col-span-2 h-8" />
-                                    {(attributes.definitions ?? []).map((definition: any) => (
-                                        <Input
-                                            key={definition.id}
-                                            name={`attributes[${definition.key}]`}
-                                            defaultValue={attributes.values?.[definition.key] ?? ''}
-                                            placeholder={definition.label}
-                                            className="h-8"
+                            <RecordWorkspace
+                                facts={
+                                    <>
+                                        <div className="space-y-4">
+                                            <RecordFact label="Amount">
+                                                <span className="money">{formatDzd(selected.amount_cents)}</span>
+                                            </RecordFact>
+                                            <RecordFact label="Stage">{selected.stage?.name ?? '—'}</RecordFact>
+                                            <RecordFact label="Owner">{selected.owner?.name ?? 'Unassigned'}</RecordFact>
+                                            <RecordFact label="Next step">{selected.next_step ?? '—'}</RecordFact>
+                                            <RecordFact label="Source">{selected.source ?? '—'}</RecordFact>
+                                        </div>
+                                        <RecordActionRow
+                                            dealId={selected.id}
+                                            contactId={selected.contact_id}
+                                            companyId={selected.company_id}
+                                            ownerId={selected.owner_id}
                                         />
-                                    ))}
-                                    <Button className="col-span-2 h-8">Save deal</Button>
-                                </Form>
-                                <Form action={`/crm/deals/${selected.id}/move`} method="post" className="flex flex-wrap gap-1">
-                                    {stages.map((stage: any) => (
-                                        <Button key={stage.id} name="stage_id" value={stage.id} variant={stage.id === selected.stage_id ? 'default' : 'secondary'} className="h-7 text-[11px]">
-                                            {stage.name}
-                                        </Button>
-                                    ))}
-                                </Form>
-                                <div>
-                                    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Activity</h3>
-                                    <TimelineFilter timeline={timeline}>
-                                        {(items) => (
-                                    <div className="space-y-2">
-                                        {items.map((item: any) => (
-                                            <div key={item.id} className="border-l-2 border-brand pl-3">
-                                                <p className="text-[11px] uppercase text-muted-foreground">{item.type}</p>
-                                                <p className="font-medium">{item.subject ?? item.body}</p>
-                                                {item.body && item.subject ? <p className="text-muted-foreground">{item.body}</p> : null}
-                                                {item.type === 'task' && !item.done ? (
-                                                    <Form action={`/crm/activities/${item.id}/complete`} method="post">
-                                                        <Button variant="secondary" className="mt-1 h-6 text-[11px]">Done</Button>
-                                                    </Form>
-                                                ) : null}
-                                            </div>
-                                        ))}
-                                    </div>
-                                        )}
-                                    </TimelineFilter>
-                                </div>
-                            </div>
+                                        <Form action={`/crm/deals/${selected.id}/move`} method="post" className="flex flex-wrap gap-2">
+                                            {stages.map((stage: any) => (
+                                                <Button key={stage.id} name="stage_id" value={stage.id} variant={stage.id === selected.stage_id ? 'default' : 'secondary'} className="h-7 text-[11px]">
+                                                    {stage.name}
+                                                </Button>
+                                            ))}
+                                        </Form>
+                                        <Form action={`/crm/deals/${selected.id}`} method="put" className="grid grid-cols-1 gap-3 border-t border-hairline pt-6">
+                                            <Input name="title" defaultValue={selected.title} required className="h-8" />
+                                            <Input name="amount_dzd" type="number" min={0} step="0.01" defaultValue={(selected.amount_cents ?? 0) / 100} className="h-8" />
+                                            <Input name="close_date" type="date" defaultValue={selected.close_date ? String(selected.close_date).slice(0, 10) : ''} className="h-8" />
+                                            <Input name="next_step" defaultValue={selected.next_step ?? ''} placeholder="Next step" className="h-8" />
+                                            <select name="owner_id" defaultValue={selected.owner_id ?? ''} className="h-8 rounded border bg-background px-2">
+                                                <option value="">Unassigned</option>
+                                                {members.map((user: any) => (
+                                                    <option key={user.id} value={user.id}>{user.name}</option>
+                                                ))}
+                                            </select>
+                                            <Input name="source" defaultValue={selected.source ?? ''} placeholder="Source" className="h-8" />
+                                            <Input name="lost_reason" defaultValue={selected.lost_reason ?? ''} placeholder="Lost reason" className="h-8" />
+                                            {(attributes.definitions ?? []).map((definition: any) => (
+                                                <Input
+                                                    key={definition.id}
+                                                    name={`attributes[${definition.key}]`}
+                                                    defaultValue={attributes.values?.[definition.key] ?? ''}
+                                                    placeholder={definition.label}
+                                                    className="h-8"
+                                                />
+                                            ))}
+                                            <Button className="h-8">Save deal</Button>
+                                        </Form>
+                                    </>
+                                }
+                                center={
+                                    <>
+                                        <CatchUpBlock inbound={catchUp?.inbound} outbound={catchUp?.outbound} />
+                                        <RecordTimeline timeline={timeline} />
+                                    </>
+                                }
+                                associations={
+                                    <>
+                                        <AssociationsCard associations={associations} />
+                                        <section className="space-y-3 border-t border-hairline pt-6">
+                                            <h3 className="text-xs font-semibold uppercase tracking-wide text-mute">New quote</h3>
+                                            <Form action={`/crm/deals/${selected.id}/quotes`} method="post" className="space-y-2">
+                                                <Input name="items[0][name]" placeholder="Line item" required className="h-8" />
+                                                <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-8" />
+                                                <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="Unit DZD" className="h-8" />
+                                                <select name="status" className="h-8 w-full rounded border bg-background px-2">
+                                                    <option value="draft">draft</option>
+                                                    <option value="sent">sent</option>
+                                                    <option value="accepted">accepted</option>
+                                                </select>
+                                                <Button className="h-8 w-full">Add quote</Button>
+                                            </Form>
+                                        </section>
+                                        <Form action="/crm/filters" method="post" className="space-y-2 border-t border-hairline pt-6">
+                                            <input type="hidden" name="entity" value="deal" />
+                                            <input type="hidden" name="stage" value={activeFilters.stage ?? ''} />
+                                            <input type="hidden" name="owner" value={activeFilters.owner ?? ''} />
+                                            <input type="hidden" name="city" value={activeFilters.city ?? ''} />
+                                            <input type="hidden" name="wilaya" value={activeFilters.wilaya ?? ''} />
+                                            <Input name="name" placeholder="Save this list" className="h-8" required />
+                                            <Button variant="secondary" className="h-8 w-full">Save filter</Button>
+                                        </Form>
+                                    </>
+                                }
+                            />
                         </>
                     ) : (
                         <div className="grid flex-1 place-items-center text-muted-foreground">Select a deal</div>
                     )
-                }
-                side={
-                    selected ? (
-                        <div className="space-y-4 p-3">
-                            <section>
-                                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Log activity</h3>
-                                <Form action="/crm/activities" method="post" className="space-y-1" resetOnSuccess>
-                                    <input type="hidden" name="deal_id" value={selected.id} />
-                                    <input type="hidden" name="contact_id" value={selected.contact_id ?? ''} />
-                                    <input type="hidden" name="company_id" value={selected.company_id ?? ''} />
-                                    <select name="type" className="h-7 w-full rounded border bg-background px-1">
-                                        <option value="note">Note</option>
-                                        <option value="task">Task</option>
-                                        <option value="call">Call</option>
-                                        <option value="meeting">Meeting</option>
-                                    </select>
-                                    <Input name="subject" placeholder="Subject" className="h-7" />
-                                    <Input name="body" placeholder="Details" className="h-7" />
-                                    <Input name="due_at" type="datetime-local" className="h-7" />
-                                    <select name="owner_id" defaultValue={selected.owner_id ?? ''} className="h-7 w-full rounded border bg-background px-1">
-                                        {members.map((user: any) => (
-                                            <option key={user.id} value={user.id}>{user.name}</option>
-                                        ))}
-                                    </select>
-                                    <Button className="h-7 w-full">Add to timeline</Button>
-                                </Form>
-                            </section>
-                            <section>
-                                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Associations</h3>
-                                {associations?.contact ? (
-                                    <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-brand">
-                                        {associations.contact.first_name} {associations.contact.last_name}
-                                    </Link>
-                                ) : null}
-                                {associations?.company ? (
-                                    <Link href={`/crm/companies/${associations.company.id}`} className="block text-brand">
-                                        {associations.company.name}
-                                    </Link>
-                                ) : null}
-                                <p className="mt-2 text-[11px] text-muted-foreground">Desk history</p>
-                                {(associations?.threads ?? []).map((thread: any) => (
-                                    <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-brand">
-                                        {thread.subject ?? 'Thread'}
-                                    </Link>
-                                ))}
-                                <p className="mt-2 text-[11px] text-muted-foreground">Enrollments</p>
-                                {(associations?.enrollments ?? []).map((enrollment: any) => (
-                                    <p key={enrollment.id}>{enrollment.sequence?.name}</p>
-                                ))}
-                            </section>
-                            <section>
-                                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide">Quote</h3>
-                                {(associations?.quotes ?? []).map((quote: any) => (
-                                    <p key={quote.id}>
-                                        {quote.status} · <span className="money">{formatDzd(quote.total_cents)}</span>
-                                    </p>
-                                ))}
-                                <Form action={`/crm/deals/${selected.id}/quotes`} method="post" className="mt-2 space-y-1">
-                                    <Input name="items[0][name]" placeholder="Line item" required className="h-7" />
-                                    <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-7" />
-                                    <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="Unit DZD" className="h-7" />
-                                    <select name="status" className="h-7 w-full rounded border bg-background px-1">
-                                        <option value="draft">draft</option>
-                                        <option value="sent">sent</option>
-                                        <option value="accepted">accepted</option>
-                                    </select>
-                                    <Button className="h-7 w-full">Add quote</Button>
-                                </Form>
-                            </section>
-                            <Form action="/crm/filters" method="post" className="space-y-1 border-t pt-2">
-                                <input type="hidden" name="entity" value="deal" />
-                                <input type="hidden" name="stage" value={activeFilters.stage ?? ''} />
-                                <input type="hidden" name="owner" value={activeFilters.owner ?? ''} />
-                                <input type="hidden" name="city" value={activeFilters.city ?? ''} />
-                                <input type="hidden" name="wilaya" value={activeFilters.wilaya ?? ''} />
-                                <Input name="name" placeholder="Save this list" className="h-7" required />
-                                <Button variant="secondary" className="h-7 w-full">Save filter</Button>
-                            </Form>
-                        </div>
-                    ) : null
                 }
             />
         </>

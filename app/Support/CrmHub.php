@@ -52,6 +52,7 @@ class CrmHub
             'leads',
             'deals.stage',
             'deals.owner',
+            'deals.quotes',
             'threads.channel',
             'enrollments.sequence',
         ]);
@@ -62,6 +63,7 @@ class CrmHub
             'leads' => $contact->leads,
             'threads' => $contact->threads,
             'enrollments' => $contact->enrollments,
+            'quotes' => $contact->deals->flatMap->quotes,
         ];
     }
 
@@ -140,12 +142,21 @@ class CrmHub
     }
 
     /**
-     * Recent inbound desk messages vs outbound activity for a contact.
+     * Recent inbound desk messages vs outbound activity for a contact or deal.
      *
      * @return array{inbound: array<int, array<string, mixed>>, outbound: array<int, array<string, mixed>>}
      */
-    public function catchUp(Contact $contact): array
+    public function catchUp(?Contact $contact = null, ?Deal $deal = null): array
     {
+        if ($deal && ! $contact) {
+            $deal->loadMissing('contact');
+            $contact = $deal->contact;
+        }
+
+        if (! $contact) {
+            return ['inbound' => [], 'outbound' => []];
+        }
+
         $messages = Message::query()
             ->where('contact_id', $contact->id)
             ->latest()
@@ -156,41 +167,63 @@ class CrmHub
             ->where('direction', 'inbound')
             ->take(6)
             ->values()
-            ->map(fn (Message $message) => [
-                'id' => 'msg-'.$message->id,
-                'label' => $message->body ?: 'Inbound message',
-                'at' => $message->created_at?->toIso8601String(),
-                'source' => 'inbound',
-            ])
+            ->map(fn (Message $message) => $this->catchUpMessage($message, 'inbound'))
             ->all();
 
         $outboundMessages = $messages
             ->where('direction', 'outbound')
             ->take(6)
             ->values()
-            ->map(fn (Message $message) => [
-                'id' => 'msg-'.$message->id,
-                'label' => $message->body ?: 'Outbound message',
-                'at' => $message->created_at?->toIso8601String(),
-                'source' => 'outbound',
-            ]);
+            ->map(fn (Message $message) => $this->catchUpMessage($message, 'outbound'));
 
-        $outboundActivities = Activity::query()
-            ->where('contact_id', $contact->id)
+        $activityQuery = Activity::query()
             ->whereIn('type', ['email', 'sequence', 'call', 'note'])
             ->latest()
-            ->limit(6)
-            ->get()
-            ->map(fn (Activity $activity) => [
-                'id' => 'act-'.$activity->id,
-                'label' => $activity->subject ?? $activity->body ?? $activity->type,
-                'at' => $activity->created_at?->toIso8601String(),
-                'source' => $activity->type,
-            ]);
+            ->limit(6);
+
+        if ($deal) {
+            $activityQuery->where(function ($query) use ($deal): void {
+                $query->where('deal_id', $deal->id);
+                if ($deal->contact_id) {
+                    $query->orWhere(function ($inner) use ($deal): void {
+                        $inner->where('contact_id', $deal->contact_id)->whereNull('deal_id');
+                    });
+                }
+            });
+        } else {
+            $activityQuery->where('contact_id', $contact->id);
+        }
+
+        $outboundActivities = $activityQuery->get()->map(fn (Activity $activity) => [
+            'id' => 'act-'.$activity->id,
+            'label' => $activity->subject ?? $activity->body ?? $activity->type,
+            'at' => $activity->created_at?->toIso8601String(),
+            'source' => $activity->type,
+            'href' => null,
+        ]);
 
         return [
             'inbound' => $inbound,
-            'outbound' => $outboundMessages->concat($outboundActivities)->take(8)->values()->all(),
+            'outbound' => $outboundMessages
+                ->concat($outboundActivities)
+                ->sortByDesc(fn (array $item) => $item['at'] ?? '')
+                ->take(8)
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return array{id: string, label: string, at: string|null, source: string, href: string|null}
+     */
+    protected function catchUpMessage(Message $message, string $source): array
+    {
+        return [
+            'id' => 'msg-'.$message->id,
+            'label' => $message->body ?: ($source === 'inbound' ? 'Inbound message' : 'Outbound message'),
+            'at' => $message->created_at?->toIso8601String(),
+            'source' => $source,
+            'href' => $message->thread_id ? '/conversations?thread='.$message->thread_id : null,
         ];
     }
 

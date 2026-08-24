@@ -54,3 +54,42 @@ it('loads contact associations for company, deal, thread, and enrollment', funct
             ->has('associations.enrollments', 1)
         );
 });
+
+it('loads deal associations for contact, company, and desk history', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+    $company = Company::factory()->create(['workspace_id' => $workspace->id]);
+    $contact = Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'company_id' => $company->id,
+        'owner_id' => $user->id,
+    ]);
+    $pipeline = $workspace->defaultPipeline();
+    $deal = Deal::query()->create([
+        'workspace_id' => $workspace->id,
+        'contact_id' => $contact->id,
+        'company_id' => $company->id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stageBySlug('new')->id,
+        'title' => 'Assoc deal show',
+        'currency' => 'DZD',
+    ]);
+    Thread::query()->create([
+        'workspace_id' => $workspace->id,
+        'contact_id' => $contact->id,
+        'channel_id' => $workspace->channels()->first()->id,
+        'status' => 'open',
+        'subject' => 'Deal desk history',
+        'last_message_at' => now(),
+    ]);
+
+    $this->actingAs($user)
+        ->get("/crm/deals/{$deal->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/deals/hub')
+            ->has('associations.contact')
+            ->has('associations.company')
+            ->has('associations.threads', 1)
+        );
+});

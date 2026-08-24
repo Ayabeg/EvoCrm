@@ -194,6 +194,7 @@ class DealController extends Controller
             'selected' => $selected?->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items']),
             'associations' => $selected ? $hub->dealAssociations($selected) : null,
             'timeline' => $selected ? $hub->timeline(deal: $selected) : [],
+            'catchUp' => $selected ? $hub->catchUp(deal: $selected) : ['inbound' => [], 'outbound' => []],
             'attributes' => $selected ? $hub->attributeBag($workspace, 'deal', $selected->id) : ['definitions' => [], 'values' => []],
             'stages' => $pipeline->stages,
             'stagePills' => $stagePills,

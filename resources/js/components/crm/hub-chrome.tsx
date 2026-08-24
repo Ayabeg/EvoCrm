@@ -7,15 +7,17 @@ export function HubShell({
 }: {
     list: ReactNode;
     main: ReactNode;
-    side: ReactNode;
+    side?: ReactNode;
 }) {
     return (
         <div className="flex h-[calc(100vh-52px)] min-h-0 flex-1 overflow-hidden border-t border-hairline bg-canvas-soft text-[13px] text-ink">
             <aside className="flex w-72 shrink-0 flex-col border-r border-hairline bg-canvas">{list}</aside>
             <section className="flex min-w-0 flex-1 flex-col overflow-hidden bg-canvas">{main}</section>
-            <aside className="flex w-80 shrink-0 flex-col overflow-y-auto border-l border-hairline bg-canvas">
-                {side}
-            </aside>
+            {side ? (
+                <aside className="flex w-80 shrink-0 flex-col overflow-y-auto border-l border-hairline bg-canvas">
+                    {side}
+                </aside>
+            ) : null}
         </div>
     );
 }

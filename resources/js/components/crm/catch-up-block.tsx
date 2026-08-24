@@ -1,9 +1,52 @@
+import { Link } from '@inertiajs/react';
+
 type CatchUpItem = {
     id: string;
     label: string;
     at?: string | null;
     source?: string;
+    href?: string | null;
 };
+
+const ALGIERS = 'Africa/Algiers';
+
+function formatWhen(iso?: string | null): string | null {
+    if (!iso) {
+        return null;
+    }
+
+    try {
+        return new Intl.DateTimeFormat('en-GB', {
+            timeZone: ALGIERS,
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(iso));
+    } catch {
+        return null;
+    }
+}
+
+function CatchUpRow({ item }: { item: CatchUpItem }) {
+    const when = formatWhen(item.at);
+    const body = (
+        <>
+            <span className="block truncate text-[13px] text-ink">{item.label}</span>
+            {when ? <span className="block text-[11px] text-mute">{when}</span> : null}
+        </>
+    );
+
+    if (item.href) {
+        return (
+            <Link href={item.href} className="block rounded-md px-1 py-1.5 hover:bg-canvas-soft">
+                {body}
+            </Link>
+        );
+    }
+
+    return <div className="px-1 py-1.5">{body}</div>;
+}
 
 export default function CatchUpBlock({
     inbound = [],
@@ -13,31 +56,31 @@ export default function CatchUpBlock({
     outbound?: CatchUpItem[];
 }) {
     return (
-        <section className="rounded border border-hairline bg-canvas p-3 text-sm">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-mute">Catch-up</h3>
-            <div className="grid gap-3 md:grid-cols-2">
+        <section className="rounded-lg border border-hairline bg-canvas p-6 text-sm">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-mute">Catch-up</h3>
+            <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                    <p className="mb-1 text-[11px] font-medium text-ink">Inbound</p>
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">Inbound</p>
                     {inbound.length === 0 ? (
-                        <p className="text-[11px] text-mute">No recent inbound activity.</p>
+                        <p className="text-[13px] text-mute">Nothing inbound to catch up on.</p>
                     ) : (
-                        inbound.map((item) => (
-                            <p key={item.id} className="truncate text-[12px]">
-                                {item.label}
-                            </p>
-                        ))
+                        <div className="divide-y divide-hairline">
+                            {inbound.map((item) => (
+                                <CatchUpRow key={item.id} item={item} />
+                            ))}
+                        </div>
                     )}
                 </div>
                 <div>
-                    <p className="mb-1 text-[11px] font-medium text-ink">Outbound</p>
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">Outbound</p>
                     {outbound.length === 0 ? (
-                        <p className="text-[11px] text-mute">No recent outbound activity.</p>
+                        <p className="text-[13px] text-mute">No recent outbound from this record.</p>
                     ) : (
-                        outbound.map((item) => (
-                            <p key={item.id} className="truncate text-[12px]">
-                                {item.label}
-                            </p>
-                        ))
+                        <div className="divide-y divide-hairline">
+                            {outbound.map((item) => (
+                                <CatchUpRow key={item.id} item={item} />
+                            ))}
+                        </div>
                     )}
                 </div>
             </div>
