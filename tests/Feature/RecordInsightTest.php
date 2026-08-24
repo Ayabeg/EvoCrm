@@ -22,7 +22,7 @@ it('shows Ask Evo on a contact record from this contact fields', function () {
         ->get("/crm/contacts/{$contact->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/contacts/hub')
+            ->component('crm/contacts/show')
             ->where('askEvo.label', 'Ask Evo')
             ->where('askEvo.live', false)
             ->where('askEvo.source', 'fields')
@@ -115,7 +115,7 @@ it('scores deal health from stage probability, recency, and amount', function ()
         ->get("/crm/deals/{$healthy->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/deals/hub')
+            ->component('crm/deals/show')
             ->where('dealHealth.score', 86)
             ->where('dealHealth.label', 'Healthy')
             ->where('askEvo.label', 'Ask Evo')

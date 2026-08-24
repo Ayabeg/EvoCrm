@@ -87,7 +87,7 @@ it('loads deal associations for contact, company, and desk history', function ()
         ->get("/crm/deals/{$deal->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('crm/deals/hub')
+            ->component('crm/deals/show')
             ->has('associations.contact')
             ->has('associations.company')
             ->has('associations.threads', 1)

@@ -4,7 +4,7 @@ import type { DragEvent } from 'react';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 import PageHeader from '@/components/page-header';
 import { cn } from '@/lib/utils';
 

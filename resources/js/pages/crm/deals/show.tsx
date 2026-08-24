@@ -2,7 +2,7 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 import {
     ActivityTabs,
     AssociationCard,

@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { formatDzd } from '@/lib/money';
 
 type ContactRow = {
     id: number;
