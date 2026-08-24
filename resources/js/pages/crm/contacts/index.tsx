@@ -1,6 +1,8 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import ListToolbar from '@/components/crm/list-toolbar';
+import ListViewTable from '@/components/crm/list-view-table';
 import PageHeader from '@/components/page-header';
+import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,6 +15,11 @@ type Contact = {
     email?: string | null;
     phone_e164?: string | null;
     company?: { name: string } | null;
+    owner?: { name: string } | null;
+    city?: string | null;
+    wilaya?: string | null;
+    created_at?: string | null;
+    last_activity_at?: string | null;
 };
 
 export default function ContactsIndex({
@@ -21,14 +28,18 @@ export default function ContactsIndex({
     members = [],
     savedFilters = [],
     activeFilters = {},
+    listView,
+    recordCount,
     cities = [],
     wilayas = [],
 }: {
     contacts: Contact[];
     companies: { id: number; name: string }[];
     members?: { id: number; name: string }[];
-    savedFilters?: { id: number; name: string }[];
+    savedFilters?: SavedView[];
     activeFilters?: Record<string, unknown>;
+    listView?: ListViewMeta;
+    recordCount?: number;
     cities?: string[];
     wilayas?: string[];
 }) {
@@ -45,6 +56,8 @@ export default function ContactsIndex({
                     basePath="/crm/contacts"
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
+                    listView={listView}
+                    recordCount={recordCount}
                     members={members}
                     cities={cities}
                     wilayas={wilayas}
@@ -95,40 +108,15 @@ export default function ContactsIndex({
                     </Form>
                 </Card>
                 <Card className="overflow-hidden">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2">Name</th>
-                                <th className="px-4 py-2">Phone</th>
-                                <th className="px-4 py-2">Email</th>
-                                <th className="px-4 py-2">Company</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {contacts.map((contact) => (
-                                <tr key={contact.id} className="border-t">
-                                    <td className="px-4 py-2">
-                                        <Link
-                                            href={`/crm/contacts/${contact.id}`}
-                                            className="font-medium text-brand"
-                                        >
-                                            {contact.first_name}{' '}
-                                            {contact.last_name}
-                                        </Link>
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        {contact.phone_e164 ?? '—'}
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        {contact.email ?? '—'}
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        {contact.company?.name ?? '—'}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    {listView ? (
+                        <ListViewTable
+                            entity="contact"
+                            rows={contacts}
+                            columnDefs={listView.columnDefs}
+                            columns={listView.columns}
+                            basePath="/crm/contacts"
+                        />
+                    ) : null}
                 </Card>
             </div>
         </>

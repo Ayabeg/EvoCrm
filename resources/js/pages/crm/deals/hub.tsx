@@ -24,6 +24,8 @@ export default function DealHub({
     members,
     savedFilters,
     activeFilters,
+    listView,
+    recordCount,
     cities,
     wilayas,
     openPipelineCents,
@@ -45,6 +47,8 @@ export default function DealHub({
                             basePath="/crm/deals"
                             activeFilters={activeFilters}
                             savedFilters={savedFilters}
+                            listView={listView}
+                            recordCount={recordCount}
                             members={members}
                             cities={cities}
                             wilayas={wilayas}

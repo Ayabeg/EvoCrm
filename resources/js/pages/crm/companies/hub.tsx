@@ -18,6 +18,8 @@ export default function CompanyHub({
     wilayas,
     savedFilters = [],
     activeFilters = {},
+    listView,
+    recordCount,
 }: any) {
     return (
         <>
@@ -30,6 +32,8 @@ export default function CompanyHub({
                             basePath="/crm/companies"
                             activeFilters={activeFilters}
                             savedFilters={savedFilters}
+                            listView={listView}
+                            recordCount={recordCount}
                             members={members}
                             cities={cities}
                             wilayas={wilayas}

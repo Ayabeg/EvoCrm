@@ -265,7 +265,8 @@ class DealController extends Controller
             ->forWorkspace($workspace)
             ->with(['contact.company', 'company', 'stage', 'owner']);
 
-        $filter->applyToDeals($query, $filters);
+        $filter->apply('deal', $query, $filters);
+        $filter->applySort('deal', $query, $filters);
 
         $deals = $query->orderByDesc('last_activity_at')->orderByDesc('id')->limit(120)->get();
 
@@ -284,7 +285,7 @@ class DealController extends Controller
             $countQuery = Deal::query()->forWorkspace($workspace)->where('stage_id', $stage->id);
             $withoutStage = $filters;
             $withoutStage['stage'] = null;
-            $filter->applyToDeals($countQuery, $withoutStage);
+            $filter->apply('deal', $countQuery, $withoutStage);
 
             return [
                 'id' => $stage->id,
@@ -315,6 +316,8 @@ class DealController extends Controller
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'deal'),
             'activeFilters' => $filters,
+            'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'recordCount' => $filter->count($workspace, 'deal', $filters),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
             'openPipelineCents' => $openCents,

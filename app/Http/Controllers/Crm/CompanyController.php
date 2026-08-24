@@ -101,7 +101,8 @@ class CompanyController extends Controller
             ->with('owner')
             ->withCount(['contacts', 'deals']);
 
-        $filter->applyToCompanies($query, $filters);
+        $filter->apply('company', $query, $filters);
+        $filter->applySort('company', $query, $filters);
 
         $companies = $query
             ->orderBy('name')
@@ -125,6 +126,8 @@ class CompanyController extends Controller
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'company'),
             'activeFilters' => $filters,
+            'listView' => $hub->listViewMeta('company', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'recordCount' => $filter->count($workspace, 'company', $filters),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
         ]);

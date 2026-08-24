@@ -1,30 +1,34 @@
 import { Form, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { crmListHref, filterFields } from '@/components/crm/list-query';
+import type { ListViewColumn, ListViewMeta, SavedView } from '@/lib/list-view-config';
+import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
-type SavedFilter = {
-    id: number;
-    name: string;
-};
 
 export default function SavedViewTabs({
     basePath,
     entity,
     activeFilters,
     savedFilters = [],
+    columns = [],
+    listView,
+    recordCount,
 }: {
     basePath: string;
     entity: 'contact' | 'company' | 'deal';
     activeFilters: Record<string, unknown>;
-    savedFilters?: SavedFilter[];
+    savedFilters?: SavedView[];
+    columns?: ListViewColumn[];
+    listView?: ListViewMeta;
+    recordCount?: number;
 }) {
     const { auth } = usePage().props;
     const [naming, setNaming] = useState(false);
     const view = String(activeFilters.view ?? 'all');
     const filterId = Number(activeFilters.filter_id ?? 0) || null;
     const fields = filterFields(activeFilters);
+    const filterGroups = filterGroupsFromActive(activeFilters);
 
     const allHref = crmListHref(basePath, fields, { view: 'all', owner: null, filter_id: null });
     const myHref = crmListHref(basePath, fields, {
@@ -33,13 +37,18 @@ export default function SavedViewTabs({
         filter_id: null,
     });
 
+    const badge = (count?: number) =>
+        typeof count === 'number' ? (
+            <span className="ml-1 rounded bg-canvas-soft px-1 py-0.5 text-[9px] text-mute">{count}</span>
+        ) : null;
+
     return (
         <div className="flex flex-wrap items-center gap-1 border-b border-hairline bg-canvas px-3 py-1.5">
             <Link
                 href={allHref}
                 className={`rounded px-2 py-1 text-[11px] ${view === 'all' && !filterId ? 'bg-ink text-canvas' : 'text-ink hover:bg-canvas-soft'}`}
             >
-                All
+                All{badge(recordCount)}
             </Link>
             <Link
                 href={myHref}
@@ -54,6 +63,7 @@ export default function SavedViewTabs({
                     className={`rounded px-2 py-1 text-[11px] ${filterId === filter.id ? 'bg-ink text-canvas' : 'text-ink hover:bg-canvas-soft'}`}
                 >
                     {filter.name}
+                    {badge(filter.record_count)}
                 </Link>
             ))}
             {naming ? (
@@ -69,6 +79,9 @@ export default function SavedViewTabs({
                     <input type="hidden" name="wilaya" value={String(fields.wilaya ?? '')} />
                     {fields.unanswered ? <input type="hidden" name="unanswered" value="1" /> : null}
                     {fields.unassigned ? <input type="hidden" name="unassigned" value="1" /> : null}
+                    <input type="hidden" name="filter_groups" value={JSON.stringify(filterGroups)} />
+                    <input type="hidden" name="columns" value={JSON.stringify(columns.length ? columns : listView?.columns ?? [])} />
+                    <input type="hidden" name="sort" value={JSON.stringify(listView?.sort ?? { field: 'created_at', direction: 'desc' })} />
                     <Input name="name" placeholder="View name" required className="h-7 w-32 text-[11px]" />
                     <Button className="h-7 px-2 text-[11px]">Save</Button>
                     <Button type="button" variant="secondary" className="h-7 px-2 text-[11px]" onClick={() => setNaming(false)}>

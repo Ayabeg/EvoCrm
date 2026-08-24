@@ -1,5 +1,5 @@
 import { Form, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { crmListHref, filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 
@@ -13,6 +13,8 @@ export default function ColumnFilterRow({
     cities = [],
     wilayas = [],
     exportHref,
+    columns = [],
+    filterBuilder,
 }: {
     action: string;
     entity: 'contact' | 'company' | 'deal';
@@ -21,6 +23,8 @@ export default function ColumnFilterRow({
     cities?: string[];
     wilayas?: string[];
     exportHref?: string;
+    columns?: { id: string; visible: boolean; order: number }[];
+    filterBuilder?: React.ReactNode;
 }) {
     const [advanced, setAdvanced] = useState(false);
     const fields = filterFields(activeFilters);
@@ -118,6 +122,9 @@ export default function ColumnFilterRow({
                         Export CSV
                     </a>
                 ) : null}
+                {advanced && filterBuilder ? (
+                    <div className="w-full border-t border-hairline pt-2">{filterBuilder}</div>
+                ) : null}
                 {advanced ? (
                     <div className="flex w-full flex-wrap items-end gap-2 border-t border-hairline pt-2">
                         {cities.length > 0 ? (
@@ -171,6 +178,7 @@ export default function ColumnFilterRow({
                         {fields.wilaya ? <input type="hidden" name="wilaya" value={String(fields.wilaya)} /> : null}
                         {fields.unanswered ? <input type="hidden" name="unanswered" value="1" /> : null}
                         {fields.unassigned ? <input type="hidden" name="unassigned" value="1" /> : null}
+                        {columns.length ? <input type="hidden" name="columns" value={JSON.stringify(columns)} /> : null}
                     </>
                 )}
             </Form>

@@ -7,14 +7,17 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Message;
+use App\Http\Resources\SavedFilterResource;
 use App\Models\SavedFilter;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
+use App\Support\ListViewConfig;
 
 class CrmHub
 {
-    public function __construct(private CustomAttributes $attributes) {}
+    public function __construct(private CustomAttributes $attributes, private CrmFilter $filter) {}
 
     /**
      * @return array<string, mixed>
@@ -29,16 +32,36 @@ class CrmHub
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     public function filters(Workspace $workspace, string $entity): array
     {
         return SavedFilter::query()
             ->forWorkspace($workspace)
             ->where('entity', $entity)
+            ->orderByDesc('is_default')
             ->orderBy('name')
             ->get()
+            ->map(function (SavedFilter $savedFilter) use ($workspace, $entity) {
+                $resolved = $this->filter->fromSaved($savedFilter);
+                $savedFilter->setAttribute('record_count', $this->filter->count($workspace, $entity, $resolved));
+
+                return (new SavedFilterResource($savedFilter))->resolve();
+            })
             ->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function listViewMeta(string $entity, ?array $columns = null, ?array $sort = null): array
+    {
+        return [
+            'columnDefs' => ListViewConfig::columns($entity),
+            'filterFields' => ListViewConfig::filterFields($entity),
+            'columns' => ListViewConfig::normalizeColumns($entity, $columns),
+            'sort' => $sort ?? ListViewConfig::defaultSort($entity),
+        ];
     }
 
     /**

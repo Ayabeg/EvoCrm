@@ -9,7 +9,7 @@ use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
-use App\Support\CrmHub;
+use App\Support\ListViewConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,7 +39,7 @@ class ContactController extends Controller
             ->forWorkspace($workspace)
             ->with(['company', 'owner']);
 
-        $filter->applyToContacts($query, $filters);
+        $filter->apply('contact', $query, $filters);
 
         $contacts = $query->orderBy('first_name')->limit(5000)->get();
         $filename = 'contacts-'.now()->toDateString().'.csv';
@@ -157,7 +157,8 @@ class ContactController extends Controller
             ->with(['company', 'owner', 'deals.stage'])
             ->withCount(['threads', 'deals', 'enrollments']);
 
-        $filter->applyToContacts($query, $filters);
+        $filter->apply('contact', $query, $filters);
+        $filter->applySort('contact', $query, $filters);
 
         $contacts = $query->orderByDesc('last_activity_at')->orderBy('first_name')->limit(120)->get();
 
@@ -179,6 +180,8 @@ class ContactController extends Controller
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'contact'),
             'activeFilters' => $filters,
+            'listView' => $hub->listViewMeta('contact', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'recordCount' => $filter->count($workspace, 'contact', $filters),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
         ]);

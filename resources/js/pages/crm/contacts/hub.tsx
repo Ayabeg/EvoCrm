@@ -20,6 +20,8 @@ export default function ContactHub({
     members,
     savedFilters,
     activeFilters,
+    listView,
+    recordCount,
     cities,
     wilayas,
     catchUp,
@@ -37,6 +39,8 @@ export default function ContactHub({
                             basePath="/crm/contacts"
                             activeFilters={activeFilters}
                             savedFilters={savedFilters}
+                            listView={listView}
+                            recordCount={recordCount}
                             members={members}
                             cities={cities}
                             wilayas={wilayas}

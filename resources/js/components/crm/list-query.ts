@@ -13,6 +13,11 @@ export function crmListHref(
             continue;
         }
 
+        if (key === 'filter_groups' && typeof value === 'object') {
+            params.set(key, JSON.stringify(value));
+            continue;
+        }
+
         if (value === true) {
             params.set(key, '1');
         } else {
@@ -38,5 +43,6 @@ export function filterFields(filters: ListFilters): ListFilters {
         unanswered: filters.unanswered,
         unassigned: filters.unassigned,
         filter_id: filters.filter_id,
+        filter_groups: filters.filter_groups,
     };
 }

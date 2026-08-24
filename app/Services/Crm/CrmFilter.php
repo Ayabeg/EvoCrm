@@ -16,6 +16,31 @@ class CrmFilter
     /**
      * @return array<string, mixed>
      */
+    public function fromSaved(SavedFilter $saved): array
+    {
+        $fromSaved = $saved->filters ?? [];
+
+        return [
+            'stage' => $fromSaved['stage'] ?? null,
+            'owner' => $fromSaved['owner'] ?? null,
+            'city' => $fromSaved['city'] ?? null,
+            'wilaya' => $fromSaved['wilaya'] ?? null,
+            'last_activity' => $fromSaved['last_activity'] ?? null,
+            'created' => $fromSaved['created'] ?? null,
+            'status' => $fromSaved['status'] ?? null,
+            'unanswered' => ($fromSaved['unanswered'] ?? null) === true || ($fromSaved['unanswered'] ?? null) === '1',
+            'unassigned' => ($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1',
+            'view' => $fromSaved['view'] ?? 'all',
+            'filter_id' => $saved->id,
+            'filter_groups' => $this->parseFilterGroups(null, $fromSaved['filter_groups'] ?? null),
+            'columns' => $saved->resolvedColumns(),
+            'sort' => $saved->resolvedSort(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function resolve(Request $request, Workspace $workspace, string $entity): array
     {
         $saved = null;
@@ -38,6 +63,8 @@ class CrmFilter
             $owner = (string) $request->user()->id;
         }
 
+        $filterGroups = $this->parseFilterGroups($request->input('filter_groups'), $fromSaved['filter_groups'] ?? null);
+
         return [
             'stage' => $request->input('stage', $fromSaved['stage'] ?? null),
             'owner' => $owner,
@@ -50,7 +77,266 @@ class CrmFilter
             'unassigned' => $request->boolean('unassigned') || (($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1'),
             'view' => $view,
             'filter_id' => $saved?->id,
+            'filter_groups' => $filterGroups,
+            'columns' => $saved?->resolvedColumns() ?? ListViewConfig::normalizeColumns($entity, null),
+            'sort' => $saved?->resolvedSort() ?? ListViewConfig::defaultSort($entity),
         ];
+    }
+
+    /**
+     * @param  Builder<Contact|Deal|Company>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function apply(string $entity, Builder $query, array $filters): Builder
+    {
+        if ($this->hasFilterGroups($filters)) {
+            return $this->applyFilterGroups($entity, $query, $filters['filter_groups']);
+        }
+
+        return match ($entity) {
+            'contact' => $this->applyToContacts($query, $filters),
+            'deal' => $this->applyToDeals($query, $filters),
+            'company' => $this->applyToCompanies($query, $filters),
+            default => $query,
+        };
+    }
+
+    /**
+     * @param  Builder<Contact|Deal|Company>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function applySort(string $entity, Builder $query, array $filters): Builder
+    {
+        $sort = $filters['sort'] ?? null;
+        if (! is_array($sort) || ! filled($sort['field'] ?? null)) {
+            return $query;
+        }
+
+        $field = (string) $sort['field'];
+        $direction = ($sort['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+
+        return match ($entity) {
+            'contact' => $this->applyContactSort($query, $field, $direction),
+            'deal' => $this->applyDealSort($query, $field, $direction),
+            'company' => $this->applyCompanySort($query, $field, $direction),
+            default => $query,
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    public function count(Workspace $workspace, string $entity, array $filters): int
+    {
+        $query = match ($entity) {
+            'contact' => Contact::query()->forWorkspace($workspace),
+            'deal' => Deal::query()->forWorkspace($workspace),
+            'company' => Company::query()->forWorkspace($workspace),
+            default => null,
+        };
+
+        if (! $query) {
+            return 0;
+        }
+
+        return $this->apply($entity, $query, $filters)->count();
+    }
+
+    /**
+     * @param  array<string, mixed>  $filterGroups
+     * @param  Builder<Contact|Deal|Company>  $query
+     */
+    public function applyFilterGroups(string $entity, Builder $query, array $filterGroups): Builder
+    {
+        $groups = $filterGroups['groups'] ?? [];
+        if ($groups === []) {
+            return $query;
+        }
+
+        $topLogic = ($filterGroups['logic'] ?? 'and') === 'or' ? 'orWhere' : 'where';
+
+        $query->{$topLogic}(function (Builder $outer) use ($entity, $groups, $topLogic): void {
+            foreach ($groups as $index => $group) {
+                $groupLogic = ($group['logic'] ?? 'and') === 'or' ? 'orWhere' : 'where';
+                $method = $index === 0 && $topLogic === 'where' ? 'where' : $groupLogic;
+
+                $outer->{$method}(function (Builder $inner) use ($entity, $group): void {
+                    $rules = $group['rules'] ?? [];
+                    foreach ($rules as $ruleIndex => $rule) {
+                        $this->applyRule($entity, $inner, $rule, $ruleIndex, $group['logic'] ?? 'and');
+                    }
+                });
+            }
+        });
+
+        return $query;
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function hasFilterGroups(array $filters): bool
+    {
+        $groups = $filters['filter_groups']['groups'] ?? [];
+
+        return is_array($groups) && collect($groups)->contains(fn (array $group) => ! empty($group['rules']));
+    }
+
+    /**
+     * @param  Builder<Contact|Deal|Company>  $query
+     * @param  array<string, mixed>  $rule
+     */
+    protected function applyRule(string $entity, Builder $query, array $rule, int $index, string $groupLogic): void
+    {
+        $field = (string) ($rule['field'] ?? '');
+        $operator = (string) ($rule['operator'] ?? 'eq');
+        $value = $rule['value'] ?? null;
+
+        if ($field === '') {
+            return;
+        }
+
+        $method = $index === 0 ? 'where' : (($groupLogic === 'or') ? 'orWhere' : 'where');
+
+        $flat = $this->ruleToFlatFilter($field, $operator, $value);
+        if ($flat === null) {
+            return;
+        }
+
+        $query->{$method}(function (Builder $inner) use ($entity, $flat): void {
+            match ($entity) {
+                'contact' => $this->applyToContacts($inner, $flat),
+                'deal' => $this->applyToDeals($inner, $flat),
+                'company' => $this->applyToCompanies($inner, $flat),
+                default => null,
+            };
+        });
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function ruleToFlatFilter(string $field, string $operator, mixed $value): ?array
+    {
+        if ($operator === 'is_true') {
+            return [$field => true];
+        }
+
+        if ($operator === 'is_false') {
+            return [$field => false];
+        }
+
+        if ($operator === 'eq' && filled($value)) {
+            return [$field => $value];
+        }
+
+        if ($operator === 'eq' && ($field === 'unanswered' || $field === 'unassigned')) {
+            return [$field => true];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  mixed  $incoming
+     * @param  mixed  $fallback
+     * @return array<string, mixed>|null
+     */
+    protected function parseFilterGroups(mixed $incoming, mixed $fallback): ?array
+    {
+        $raw = $incoming ?? $fallback;
+        if (is_string($raw) && $raw !== '') {
+            $decoded = json_decode($raw, true);
+            $raw = is_array($decoded) ? $decoded : null;
+        }
+
+        if (! is_array($raw)) {
+            return null;
+        }
+
+        $groups = collect($raw['groups'] ?? [])
+            ->filter(fn ($group) => is_array($group))
+            ->map(function (array $group) {
+                $rules = collect($group['rules'] ?? [])
+                    ->filter(fn ($rule) => is_array($rule) && filled($rule['field'] ?? null))
+                    ->values()
+                    ->all();
+
+                return [
+                    'logic' => in_array($group['logic'] ?? '', ['or', 'and'], true) ? $group['logic'] : 'and',
+                    'rules' => $rules,
+                ];
+            })
+            ->filter(fn (array $group) => $group['rules'] !== [])
+            ->values()
+            ->all();
+
+        if ($groups === []) {
+            return null;
+        }
+
+        return [
+            'logic' => in_array($raw['logic'] ?? '', ['or', 'and'], true) ? $raw['logic'] : 'and',
+            'groups' => $groups,
+        ];
+    }
+
+    /**
+     * @param  Builder<Contact>  $query
+     */
+    protected function applyContactSort(Builder $query, string $field, string $direction): Builder
+    {
+        if ($field === 'name') {
+            return $query->orderBy('first_name', $direction)->orderBy('last_name', $direction);
+        }
+
+        if ($field === 'company') {
+            return $query->leftJoin('companies', 'contacts.company_id', '=', 'companies.id')
+                ->orderBy('companies.name', $direction)
+                ->select('contacts.*');
+        }
+
+        if (in_array($field, ['email', 'city', 'wilaya', 'created_at', 'last_activity_at'], true)) {
+            return $query->orderBy($field, $direction);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  Builder<Deal>  $query
+     */
+    protected function applyDealSort(Builder $query, string $field, string $direction): Builder
+    {
+        if ($field === 'title') {
+            return $query->orderBy('title', $direction);
+        }
+
+        if ($field === 'amount') {
+            return $query->orderBy('amount_cents', $direction);
+        }
+
+        if ($field === 'close_date') {
+            return $query->orderBy('close_date', $direction);
+        }
+
+        if (in_array($field, ['created_at', 'last_activity_at'], true)) {
+            return $query->orderBy($field, $direction);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  Builder<Company>  $query
+     */
+    protected function applyCompanySort(Builder $query, string $field, string $direction): Builder
+    {
+        if (in_array($field, ['name', 'city', 'wilaya', 'created_at'], true)) {
+            return $query->orderBy($field, $direction);
+        }
+
+        return $query;
     }
 
     /**
@@ -83,6 +369,10 @@ class CrmFilter
 
         if (! empty($filters['unanswered'])) {
             $query->where('unanswered', true);
+        }
+
+        if (isset($filters['unanswered']) && $filters['unanswered'] === false) {
+            $query->where('unanswered', false);
         }
 
         $this->applyLastActivity($query, $filters['last_activity'] ?? null);
@@ -165,19 +455,6 @@ class CrmFilter
         $this->applyCompanyDealStatus($query, $filters['status'] ?? null);
 
         return $query;
-    }
-
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    public function count(Workspace $workspace, string $entity, array $filters): int
-    {
-        return match ($entity) {
-            'contact' => $this->applyToContacts(Contact::query()->forWorkspace($workspace), $filters)->count(),
-            'deal' => $this->applyToDeals(Deal::query()->forWorkspace($workspace), $filters)->count(),
-            'company' => $this->applyToCompanies(Company::query()->forWorkspace($workspace), $filters)->count(),
-            default => 0,
-        };
     }
 
     /**
