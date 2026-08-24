@@ -22,16 +22,19 @@ Installed to `.agents/skills/` (13 skills). Primary guides for this plan:
 
 **Preservation rules (§11):** Keep routes, nav labels, form field names, analytics hooks, and Evotechly orange mark. No silent URL or IA renames.
 
-### Brandbook (Mohamedbeghanem/Brandbook)
+### Brandbook
 
-**Status:** Repository returned 404 (private or not yet published). Brand tokens below are extracted from **in-repo canonical sources** that Brandbook should mirror when available:
+**Status:** ✅ **Resolved** — `Mohamedbeghanem/Brandbook` does not exist on GitHub (404: repo never created; confirmed 2026-08-24). Brand tokens are vendored into **[`docs/brandbook/`](./brandbook/README.md)** from live implementation sources.
 
-- `README.md` § Brand
-- `resources/css/app.css`
-- `public/brand/evotechly/mark.svg`
-- `tests/Feature/BrandingTest.php`
+| Source | Role |
+|--------|------|
+| [`docs/brandbook/design-tokens.md`](./brandbook/design-tokens.md) | Complete token table (canonical for redesign) |
+| [`resources/css/app.css`](../resources/css/app.css) | Live CSS — source of truth for hex values |
+| [`public/brand/evotechly/mark.svg`](../public/brand/evotechly/mark.svg) | Mark artwork `#EC6025` |
+| [`README.md`](../README.md) § Brand | Product brand rules |
+| [`tests/Feature/BrandingTest.php`](../tests/Feature/BrandingTest.php) | Automated assertions |
 
-When Brandbook is accessible, reconcile this table against its `design-model.yaml` / brand book HTML and update tokens only where Brandbook explicitly overrides README.
+Marketing PDFs in Google Drive (*Design system v3.0*, *Web Design System v1.0*) use `#FF6A00` for campaigns — **product UI stays `#EC6025`**. If a standalone Brandbook repo is created later, mirror `docs/brandbook/` and reconcile against `app.css`.
 
 ---
 
@@ -63,7 +66,7 @@ One architecture, one component system, Brandbook-aligned tokens, taste-skill po
 
 ## 2. Brand token mapping
 
-| Brandbook / brand intent | Current CSS / Tailwind | Target token | Usage |
+| Brandbook token ([design-tokens.md](./brandbook/design-tokens.md)) | Current CSS / Tailwind | Target token | Usage |
 |--------------------------|------------------------|--------------|-------|
 | Canvas (primary surface) | `--evosales-canvas` `#FFFFFF` | `bg-canvas` | Cards, main panels |
 | Canvas soft (page wash) | `--evosales-canvas-soft` `#F7F7F6` | `bg-background`, `bg-canvas-soft` | App background only |
@@ -462,7 +465,7 @@ Use production or seeded workspace. Capture **Light + Dark Cabinet** for each.
 
 | Risk | Mitigation |
 |------|------------|
-| Brandbook repo inaccessible | Use README/css/mark as source of truth; reconcile when repo published |
+| ~~Brandbook repo inaccessible~~ | **Resolved:** vendored to `docs/brandbook/`; tokens from `app.css` + mark.svg |
 | Hub deletion breaks hidden workflows | Parity checklist + Pest before delete |
 | Command palette scope creep | v1: search + nav only; Ask Evo in v2 |
 | Funnels/OAuth stacks not merged | Redesign PRs 8/10 are integration-only; don't block core unification |
@@ -473,11 +476,10 @@ Use production or seeded workspace. Capture **Light + Dark Cabinet** for each.
 
 ### Open questions for product owner
 
-1. **Brandbook:** When will `Mohamedbeghanem/Brandbook` be public? Any tokens beyond orange/black/white?
-2. **Hub vs split view:** Retire hub entirely, or offer optional split-pane list+record (HubSpot preview pane)?
-3. **⌘K scope:** Global Ask Evo copilot or record-only first?
-4. **Leads duplication:** Keep `/leads` board only and remove `/crm/leads` from More?
-5. **Merge priority:** Complete dual-UI fix before funnels/oauth, or parallel?
+1. **Hub vs split view:** Retire hub entirely, or offer optional split-pane list+record (HubSpot preview pane)?
+2. **⌘K scope:** Global Ask Evo copilot or record-only first?
+3. **Leads duplication:** Keep `/leads` board only and remove `/crm/leads` from More?
+4. **Merge priority:** Complete dual-UI fix before funnels/oauth, or parallel?
 
 ---
 
