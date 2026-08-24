@@ -5,6 +5,7 @@ namespace App\Services\Crm;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Sequence;
+use App\Models\Stage;
 use App\Models\Workflow;
 use App\Models\Workspace;
 use App\Services\Outbound\SequenceEnrollment;
@@ -150,13 +151,13 @@ class WorkflowRunner
             return null;
         }
 
-        $deal->loadMissing('stage');
+        $stage = Stage::query()->find($deal->stage_id);
 
         $candidates = array_values(array_filter([
-            $deal->stage?->slug,
-            $deal->stage?->name,
-            $deal->stage_id !== null ? (string) $deal->stage_id : null,
-        ], fn (mixed $value): bool => is_string($value) && $value !== ''));
+            $stage?->slug,
+            $stage?->name,
+            (string) $deal->stage_id,
+        ], fn (?string $value): bool => is_string($value) && $value !== ''));
 
         foreach ($candidates as $candidate) {
             if (strcasecmp($candidate, $expected) === 0) {
@@ -164,7 +165,7 @@ class WorkflowRunner
             }
         }
 
-        return $deal->stage?->slug;
+        return $stage?->slug;
     }
 
     /**

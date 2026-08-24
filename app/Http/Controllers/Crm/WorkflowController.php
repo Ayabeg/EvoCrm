@@ -287,9 +287,9 @@ class WorkflowController extends Controller
      */
     protected function contactAttributeKeys(Workspace $workspace): array
     {
-        return $this->contactAttributeDefinitions($workspace)
-            ->map(fn (CustomAttributeDefinition $definition) => $definition->key)
-            ->all();
+        return array_values($this->contactAttributeDefinitions($workspace)
+            ->map(fn (CustomAttributeDefinition $definition): string => $definition->key)
+            ->all());
     }
 
     /**
