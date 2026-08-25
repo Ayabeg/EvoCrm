@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'wilaya',
     'source',
     'lead_status',
+    'external_id',
     'meta',
     'last_activity_at',
     'unanswered',

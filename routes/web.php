@@ -7,6 +7,7 @@ use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\AskEvoController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
+use App\Http\Controllers\Crm\ContactImportController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
@@ -153,6 +154,11 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
 
     Route::get('/crm/contacts', [ContactController::class, 'index'])->name('crm.contacts.index');
     Route::get('/crm/contacts/export', [ContactController::class, 'export'])->name('crm.contacts.export');
+    Route::get('/crm/contacts/import', [ContactImportController::class, 'create'])->name('crm.contacts.import');
+    Route::post('/crm/contacts/import', [ContactImportController::class, 'store'])->name('crm.contacts.import.store');
+    Route::get('/crm/contacts/import/{batch}', [ContactImportController::class, 'show'])->name('crm.contacts.import.show');
+    Route::put('/crm/contacts/import/{batch}', [ContactImportController::class, 'update'])->name('crm.contacts.import.update');
+    Route::post('/crm/contacts/import/{batch}/commit', [ContactImportController::class, 'commit'])->name('crm.contacts.import.commit');
     Route::post('/crm/contacts', [ContactController::class, 'store'])->name('crm.contacts.store');
     Route::get('/crm/contacts/{contact}', [ContactController::class, 'show'])->name('crm.contacts.show');
     Route::put('/crm/contacts/{contact}', [ContactController::class, 'update'])->name('crm.contacts.update');

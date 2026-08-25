@@ -161,12 +161,12 @@
 **Description:** Add a preview-first contact importer with column mapping, normalization, idempotent matching, row errors, and durable batch progress.
 
 **Acceptance criteria:**
-- [ ] Admins can upload CSV, map supported fields/custom attributes, and preview create/update/skip/error counts.
-- [ ] Confirmed imports process in chunks and match contacts using the approved identity order.
-- [ ] Re-importing the same source produces no unintended duplicate contacts.
+- [x] Admins can upload CSV, map supported fields/custom attributes, and preview create/update/skip/error counts.
+- [x] Confirmed imports process in chunks and match contacts using the approved identity order.
+- [x] Re-importing the same source produces no unintended duplicate contacts.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=ContactImportTest`
+- [x] Tests pass: `php artisan test --filter=ContactImportTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: import a representative HubSpot contacts export twice.
 

@@ -31,10 +31,6 @@ class EnforceProductPermissions
             return 'settings.integrations';
         }
 
-        if ($request->isMethodSafe()) {
-            return null;
-        }
-
         if (str_contains($name, '.import')) {
             return 'crm.import';
         }
@@ -45,6 +41,10 @@ class EnforceProductPermissions
 
         if (str_contains($name, '.bulk')) {
             return 'crm.bulk';
+        }
+
+        if ($request->isMethodSafe()) {
+            return null;
         }
 
         if (str_starts_with($name, 'crm.workflows') || $name === 'automation') {

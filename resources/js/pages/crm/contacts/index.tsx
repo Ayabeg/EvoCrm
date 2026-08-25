@@ -1,5 +1,6 @@
-import { Form, Link } from '@inertiajs/react';
+import { Form, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import type { Auth } from '@/types';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmShell } from '@/components/crm/crm-shell';
@@ -54,6 +55,8 @@ export default function ContactsIndex({
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
     const loading = useInertiaLoading();
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const canImport = auth.capabilities.includes('crm.import');
 
     return (
         <>
@@ -72,6 +75,13 @@ export default function ContactsIndex({
                 wilayas={wilayas}
                 companies={companies}
                 exportHref="/crm/contacts/export"
+                headerActions={
+                    canImport ? (
+                        <Link href="/crm/contacts/import" className="text-ui font-medium text-brand">
+                            Import
+                        </Link>
+                    ) : null
+                }
                 banner={
                     !hasMailbox ? (
                         <div className="border-b border-hairline bg-canvas-soft px-6 py-2">
