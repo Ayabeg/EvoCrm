@@ -73,8 +73,8 @@ export default function CompanyShow({
             {loading ? (
                 <SkeletonRecord />
             ) : (
-            <div className="flex h-[calc(100vh-52px)] flex-col bg-canvas text-ui text-ink">
-                <div className="border-b border-hairline px-6 py-3">
+            <div className="flex h-app-workspace flex-col bg-canvas text-ui text-ink">
+                <div className="shrink-0 border-b border-hairline px-4 py-3 sm:px-6">
                     <RecordBack href="/crm/companies" label="Back to Companies" />
                     <div className="mt-3 flex items-start justify-between gap-3">
                         <div>

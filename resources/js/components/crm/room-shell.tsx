@@ -53,8 +53,8 @@ export function RoomShell({
     actions?: ReactNode;
 }) {
     return (
-        <div className="flex h-[calc(100vh-52px)] flex-col bg-canvas text-[13px] text-ink">
-            <div className="border-b border-hairline bg-canvas px-6 pt-4">
+        <div className="flex h-app-workspace flex-col bg-canvas text-[13px] text-ink">
+            <div className="border-b border-hairline bg-canvas px-4 pt-4 sm:px-6">
                 <div className="flex items-center justify-between gap-3">
                     <h1 className="text-[22px] font-semibold tracking-tight">{title}</h1>
                     {actions}

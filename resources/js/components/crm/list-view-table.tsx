@@ -130,7 +130,8 @@ export default function ListViewTable({
     const visible = visibleColumns({ columnDefs, filterFields: [], columns, sort: { field: 'created_at', direction: 'desc' } });
 
     return (
-        <table className="w-full text-sm">
+        <div className="min-h-0 flex-1 overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-muted/50 text-left">
                 <tr>
                     {visible.map((column) => (
@@ -167,5 +168,6 @@ export default function ListViewTable({
                 ))}
             </tbody>
         </table>
+        </div>
     );
 }

@@ -29,7 +29,7 @@ export function CrmListHeader({
     headerActions?: ReactNode;
 }) {
     return (
-        <div className="border-b border-hairline bg-canvas px-6 pt-5">
+        <div className="border-b border-hairline bg-canvas px-4 pt-5 sm:px-6">
             <div className="flex items-start justify-between gap-4">
                 <button
                     type="button"
@@ -93,7 +93,7 @@ export function CrmListToolbar({
     children?: ReactNode;
 }) {
     return (
-        <div className="space-y-2 border-b border-hairline bg-canvas px-6 py-3">
+        <div className="space-y-2 border-b border-hairline bg-canvas px-4 py-3 sm:px-6">
             <FormBar action={action}>
                 <input type="hidden" name="sort" value={sort ?? ''} />
                 <div className="flex flex-wrap items-center gap-2">
