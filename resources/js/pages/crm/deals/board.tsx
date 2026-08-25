@@ -67,7 +67,7 @@ function DealCard({
             onDragStart={(event) => onDragStart(event, deal.id)}
             onDragEnd={onDragEnd}
             className={cn(
-                'cursor-grab rounded-lg border border-hairline bg-canvas p-3 text-sm shadow-xs',
+                'cursor-grab rounded-lg border border-hairline bg-canvas p-4 text-sm shadow-xs',
                 dragging && 'opacity-40',
             )}
             data-testid={`deal-card-${deal.id}`}
@@ -164,7 +164,7 @@ export default function DealBoard({
     return (
         <CrmShell title="Deals board">
             <div className="h-full overflow-y-auto">
-            <div className="flex-1 space-y-4 bg-canvas-soft p-6 text-ink">
+            <div className="flex-1 space-y-5 bg-canvas-soft px-4 py-5 text-ink sm:px-6 sm:py-6">
                 <PageHeader
                     title="Deals board"
                     description={`${pipeline.name} — drag a card to move its stage. Column totals update live.`}
@@ -182,7 +182,7 @@ export default function DealBoard({
                 <CrmKpiStrip kpis={pipelineKpis} columns={3} />
                 <DealForecastBar forecast={forecast} forecastBand={forecastBand} />
 
-                <div className="flex items-start gap-3 overflow-x-auto pb-6">
+                <div className="flex items-start gap-4 overflow-x-auto pb-2 sm:gap-5">
                     {stages.map((stage) => {
                         const cards = deals.filter((deal) => deal.stage_id === stage.id);
 
@@ -201,12 +201,12 @@ export default function DealBoard({
                                 }
                                 onDrop={(event) => onDrop(event, stage)}
                                 className={cn(
-                                    'w-64 shrink-0 rounded-xl border border-hairline bg-canvas-soft/60 p-2',
+                                    'w-72 shrink-0 rounded-xl border border-hairline bg-canvas p-3 shadow-xs',
                                     overStage === stage.id && 'ring-2 ring-brand/50',
                                 )}
                                 data-testid={`stage-column-${stage.slug}`}
                             >
-                                <header className="px-1.5 pt-1 pb-2">
+                                <header className="px-1 pb-3">
                                     <div className="flex items-center justify-between gap-2">
                                         <h2 className="truncate text-sm font-semibold">
                                             {stage.name}
@@ -228,7 +228,7 @@ export default function DealBoard({
                                     />
                                 </header>
 
-                                <div className="grid min-h-16 gap-2">
+                                <div className="grid min-h-16 gap-3">
                                     {cards.map((deal) => (
                                         <DealCard
                                             key={deal.id}

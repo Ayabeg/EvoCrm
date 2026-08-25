@@ -115,9 +115,9 @@ export function AdaptiveWorkspaceShell({
     const centerScroll = scrollPanels.center ?? true;
     const rightScroll = scrollPanels.right ?? true;
 
-    const leftRegion = cn('border-hairline p-4 md:border-r', leftClassName);
-    const centerRegion = cn('p-4 sm:p-5', centerClassName);
-    const rightRegion = cn('border-hairline p-4 md:border-l', rightClassName);
+    const leftRegion = cn('border-hairline bg-canvas px-5 py-5 md:border-r', leftClassName);
+    const centerRegion = cn('bg-canvas px-5 py-5 sm:px-6 sm:py-6', centerClassName);
+    const rightRegion = cn('border-hairline bg-canvas px-5 py-5 md:border-l', rightClassName);
 
     return (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -154,7 +154,7 @@ export function AdaptiveWorkspaceShell({
                         {left}
                     </ScrollPanel>
                 ) : (
-                    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_min(280px,35vw)] overflow-hidden">
+                    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] gap-px overflow-hidden bg-hairline">
                         <ScrollPanel className={centerRegion} scrollable={centerScroll}>
                             {center}
                         </ScrollPanel>
@@ -166,7 +166,7 @@ export function AdaptiveWorkspaceShell({
             </div>
 
             {/* Desktop: intrinsic fluid rails + independent scroll regions */}
-            <div className="hidden min-h-0 flex-1 overflow-hidden lg:grid lg:grid-cols-[min(260px,22vw)_minmax(0,1fr)_min(280px,24vw)]">
+            <div className="hidden min-h-0 flex-1 gap-px overflow-hidden bg-hairline lg:grid lg:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)_minmax(18rem,22rem)]">
                 <ScrollPanel className={leftRegion} scrollable={leftScroll}>
                     {left}
                 </ScrollPanel>

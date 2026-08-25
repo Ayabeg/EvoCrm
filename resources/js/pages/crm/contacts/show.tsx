@@ -102,8 +102,8 @@ export default function ContactShow({
             {loading ? (
                 <SkeletonRecord />
             ) : (
-                <div className="flex h-app-workspace flex-col bg-canvas text-ui text-ink">
-                    <div className="shrink-0 border-b border-hairline px-4 py-3 sm:px-6">
+                <div className="flex h-app-workspace flex-col bg-canvas-soft text-ui text-ink">
+                    <div className="shrink-0 border-b border-hairline bg-canvas px-5 py-4 sm:px-6 sm:py-5">
                         <RecordBack href="/crm/contacts" label="Back to Contacts" />
                         <div className="mt-3 flex items-start gap-3">
                             <div
@@ -139,7 +139,7 @@ export default function ContactShow({
 
                     <RecordShell
                         left={
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 <AskEvoPanel
                                     action={`/crm/contacts/${contact.id}/ask`}
                                     insight={askEvo}
@@ -170,7 +170,7 @@ export default function ContactShow({
                             </div>
                         }
                         center={
-                            <div>
+                            <div className="space-y-5">
                                 <ActivityTabs
                                     tabs={[
                                         { key: 'catchup', label: 'Catch-up' },
@@ -186,19 +186,17 @@ export default function ContactShow({
                                 />
                                 {tab === 'catchup' ? (
                                     catchUp ? (
-                                        <div className="mt-4">
-                                            <CatchUpBlock
+                                        <CatchUpBlock
                                                 inbound={catchUp.inbound}
                                                 outbound={catchUp.outbound}
                                             />
-                                        </div>
                                     ) : (
-                                        <p className="mt-4 text-muted-foreground">
+                                        <p className="text-muted-foreground">
                                             No catch-up items yet.
                                         </p>
                                     )
                                 ) : (
-                                    <div className="mt-4 space-y-3">
+                                    <div className="space-y-4">
                                         {activityItems.length === 0 ? (
                                             <p className="text-muted-foreground">
                                                 No activity yet.
@@ -237,7 +235,7 @@ export default function ContactShow({
                             </div>
                         }
                         right={
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {dealsKanban ? (
                                     <ContactDealsKanban
                                         pipelineName={dealsKanban.pipeline.name}
