@@ -9,6 +9,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
@@ -28,24 +29,44 @@ export function AppSidebarHeader({
 
     return (
         <>
-            <header className="flex h-[52px] shrink-0 items-center gap-2 border-b border-hairline bg-canvas px-3 sm:gap-3 sm:px-4">
-                <SidebarTrigger className="-ml-1 shrink-0 md:hidden" />
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setPaletteOpen(true)}
-                    className="relative mx-auto h-9 min-w-0 flex-1 justify-start gap-2 rounded-full border-hairline bg-canvas-soft pr-3 pl-9 text-left text-[13px] font-normal text-muted-foreground sm:max-w-2xl sm:pr-16"
-                >
-                    <Search
-                        className="pointer-events-none absolute left-3 size-4 text-muted-foreground"
-                        aria-hidden
+            <header
+                className="flex h-[52px] shrink-0 items-center gap-2 border-b px-3 sm:gap-3 sm:px-4"
+                style={{
+                    borderColor: 'var(--aurora-border-default)',
+                    background:
+                        'linear-gradient(180deg, var(--aurora-panel-strong-top), var(--aurora-panel-strong))',
+                    boxShadow: 'var(--aurora-highlight-medium)',
+                }}
+            >
+                <SidebarTrigger
+                    className="-ml-1 shrink-0 md:hidden"
+                    style={{ color: 'var(--aurora-text-primary)' }}
+                />
+                <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl">
+                    <Input
+                        readOnly
+                        size="sm"
+                        value=""
+                        placeholder="Find or Ask"
+                        aria-label="Open command palette"
+                        onClick={() => setPaletteOpen(true)}
+                        onFocus={() => setPaletteOpen(true)}
+                        startAdornment={
+                            <Search className="size-4" aria-hidden />
+                        }
+                        className="cursor-pointer rounded-full pr-12 sm:pr-16"
                     />
-                    <span className="truncate sm:hidden">Search</span>
-                    <span className="hidden truncate sm:inline">Find or Ask</span>
-                    <span className="pointer-events-none absolute right-3 hidden text-[11px] sm:inline">
+                    <span
+                        className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 sm:inline"
+                        style={{
+                            color: 'var(--aurora-text-muted)',
+                            fontFamily: 'var(--aurora-font-sans)',
+                            fontSize: 'var(--aurora-type-caption)',
+                        }}
+                    >
                         ⌘K
                     </span>
-                </Button>
+                </div>
                 <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -87,7 +108,11 @@ export function AppSidebarHeader({
                                     type="button"
                                     variant="secondary"
                                     size="icon"
-                                    className="rounded-full bg-ink text-[11px] font-medium text-canvas hover:bg-ink/90"
+                                    className="rounded-full text-[11px] font-medium"
+                                    style={{
+                                        background: 'var(--aurora-text-primary)',
+                                        color: 'var(--aurora-panel-strong)',
+                                    }}
                                     title={user.name}
                                 >
                                     {initials(user.name)}

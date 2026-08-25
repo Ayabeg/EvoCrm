@@ -33,17 +33,32 @@ export function DashboardHeader({
     };
 
     return (
-        <header className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-                <h1 className="aurora-text-display-2">Home</h1>
-                <p
-                    className="aurora-text-body-sm mt-1"
-                    style={{ color: 'var(--aurora-text-muted)' }}
-                >
-                    {subtitle}
-                </p>
+        <header className="mb-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <h1 className="aurora-text-display-1">Home</h1>
+                    <p
+                        className="aurora-text-lead mt-1"
+                        style={{ color: 'var(--aurora-text-muted)' }}
+                    >
+                        {subtitle}
+                    </p>
+                </div>
+                <Button asChild size="sm" className="shrink-0 self-start lg:self-auto">
+                    <Link href="/crm/deals">New deal</Link>
+                </Button>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+
+            <div
+                className="flex flex-wrap items-center gap-2 rounded-[var(--aurora-radius-2)] border p-3"
+                style={{
+                    borderColor: 'var(--aurora-border-default)',
+                    background:
+                        'linear-gradient(180deg, var(--aurora-panel-medium-top), var(--aurora-panel-medium))',
+                    boxShadow:
+                        'var(--aurora-shadow-medium), var(--aurora-highlight-medium)',
+                }}
+            >
                 <Input
                     type="date"
                     size="sm"
@@ -76,7 +91,7 @@ export function DashboardHeader({
                         })
                     }
                     aria-label="Filter by owner"
-                    className="w-[10.5rem]"
+                    className="w-[11rem]"
                 >
                     <option value="">All owners</option>
                     {owners.map((owner) => (
@@ -85,9 +100,6 @@ export function DashboardHeader({
                         </option>
                     ))}
                 </NativeSelect>
-                <Button asChild size="sm">
-                    <Link href="/crm/deals">New deal</Link>
-                </Button>
             </div>
         </header>
     );

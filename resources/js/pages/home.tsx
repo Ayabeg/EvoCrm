@@ -72,7 +72,7 @@ export default function Home({
     return (
         <>
             <Head title="Home" />
-            <div className="aurora-page-shell flex-1">
+            <div className="flex-1">
                 <div className="mx-auto w-full max-w-7xl px-4 py-5 md:px-6">
                     <DashboardHeader
                         subtitle={subtitle}

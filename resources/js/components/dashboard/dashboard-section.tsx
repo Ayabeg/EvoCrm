@@ -23,7 +23,7 @@ export function DashboardSection({
     className?: string;
 }) {
     return (
-        <Card elevated={false} className={cn('@container/dashboard-section', className)}>
+        <Card className={cn('@container/dashboard-section', className)}>
             <CardHeader className="flex flex-row flex-wrap items-end justify-between gap-2">
                 <div>
                     <CardTitle as="h2">{title}</CardTitle>

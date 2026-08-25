@@ -74,10 +74,26 @@
         0 0 0 1px color-mix(in srgb, var(--evosales-mark) 28%, transparent),
         0 2px 8px color-mix(in srgb, var(--evosales-mark) 18%, transparent);
 
-    /* Page shell — flat EvoSales wash (no Aurora cyan radial) */
-    --aurora-shell-bg: var(--evosales-canvas-soft);
+    /* Page shell — warm EvoTechly wash (visible Aurora tier-0, not flat gray) */
+    --aurora-shell-bg: radial-gradient(
+            circle at 14% -10%,
+            color-mix(in srgb, var(--evosales-mark) 7%, transparent),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 88% 0%,
+            color-mix(in srgb, var(--evosales-mark) 4%, transparent),
+            transparent 28%
+        ),
+        var(--evosales-canvas-soft);
 
-    /* Shadows — neutral EvoSales elevation (no navy-tinted Aurora defaults) */
+    /* Radii — Aurora optical scale (visible card roundness) */
+    --aurora-radius-1: 12px;
+    --aurora-radius-2: 16px;
+    --aurora-radius-3: 20px;
+    --radius-1: var(--aurora-radius-1);
+    --radius-2: var(--aurora-radius-2);
+    --radius-3: var(--aurora-radius-3);
     --aurora-shadow-medium: 0 1px 2px rgba(17, 17, 17, 0.06), 0 4px 12px rgba(17, 17, 17, 0.05);
     --aurora-shadow-strong: 0 2px 8px rgba(17, 17, 17, 0.08), 0 12px 24px rgba(17, 17, 17, 0.06);
     --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.72);
@@ -87,14 +103,6 @@
     --aurora-font-display: var(--font-sans);
     --aurora-font-sans: var(--font-sans);
     --aurora-font-mono: ui-monospace, Menlo, monospace;
-
-    /* Radii — EvoSales default for shadcn; Aurora components use bridge values */
-    --aurora-radius-1: 8px;
-    --aurora-radius-2: 10px;
-    --aurora-radius-3: 12px;
-    --radius-1: var(--aurora-radius-1);
-    --radius-2: var(--aurora-radius-2);
-    --radius-3: var(--aurora-radius-3);
 
     /* shadcn bridge — EvoSales remains canonical for legacy components */
     --background: var(--evosales-canvas-soft);
@@ -166,7 +174,9 @@
 
     --aurora-shell-bg: var(--evosales-canvas-soft);
 
-    /* Shadows — true-black dark cabinet */
+    --aurora-radius-1: 12px;
+    --aurora-radius-2: 16px;
+    --aurora-radius-3: 20px;
     --aurora-shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.28), 0 8px 20px rgba(0, 0, 0, 0.18);
     --aurora-shadow-strong: 0 4px 16px rgba(0, 0, 0, 0.36), 0 16px 32px rgba(0, 0, 0, 0.24);
     --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.04);

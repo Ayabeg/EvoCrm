@@ -1,3 +1,11 @@
+import {
+    Activity,
+    CircleDollarSign,
+    Handshake,
+    Percent,
+    TrendingUp,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { EvoKpiCard } from '@/components/crm/evo-kpi-card';
 import { StatGrid } from '@/components/ui/aurora/stat-card';
 
@@ -10,6 +18,14 @@ export type KpiTile = {
     href?: string;
     change?: number | null;
     changeLabel?: string;
+};
+
+const KPI_ICONS: Record<string, LucideIcon> = {
+    revenue: CircleDollarSign,
+    pipeline: TrendingUp,
+    win_rate: Percent,
+    open_deals: Handshake,
+    activities_done: Activity,
 };
 
 export function CrmKpiStrip({
@@ -31,7 +47,7 @@ export function CrmKpiStrip({
             style={{
                 gridTemplateColumns:
                     columns >= 5
-                        ? 'repeat(auto-fill, minmax(160px, 1fr))'
+                        ? 'repeat(auto-fill, minmax(180px, 1fr))'
                         : undefined,
             }}
         >
@@ -41,6 +57,8 @@ export function CrmKpiStrip({
                         ? kpi.value / 100
                         : kpi.value;
 
+                const Icon = KPI_ICONS[kpi.key];
+
                 const card = (
                     <EvoKpiCard
                         label={kpi.label}
@@ -49,10 +67,11 @@ export function CrmKpiStrip({
                         hint={kpi.hint}
                         change={kpi.change}
                         changeLabel={kpi.changeLabel}
+                        icon={Icon ? <Icon className="size-4" /> : undefined}
                         className={
                             kpi.href
-                                ? 'h-full cursor-pointer hover:border-brand/60'
-                                : undefined
+                                ? 'h-full cursor-pointer transition-transform duration-150 hover:-translate-y-0.5'
+                                : 'h-full'
                         }
                     />
                 );

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { StatCard } from '@/components/ui/aurora/stat-card';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +9,7 @@ export function EvoKpiCard({
     change,
     changeLabel,
     format = 'number',
+    icon,
     className,
 }: {
     label: string;
@@ -16,6 +18,7 @@ export function EvoKpiCard({
     change?: number | null;
     changeLabel?: string;
     format?: 'number' | 'money' | 'percent';
+    icon?: ReactNode;
     className?: string;
 }) {
     const display =
@@ -56,7 +59,7 @@ export function EvoKpiCard({
             delta={changeDisplay}
             trend={trend}
             description={description}
-            compact
+            icon={icon}
             className={cn('h-full @container/kpi', className)}
         />
     );

@@ -188,10 +188,14 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+          className="text-sidebar-foreground w-(--sidebar-width) border-sidebar-border p-0 [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              background: "var(--sidebar)",
+              borderColor: "var(--sidebar-border)",
+              color: "var(--sidebar-foreground)",
+              boxShadow: "0 24px 48px rgba(0,0,0,0.32)",
             } as React.CSSProperties
           }
           side={side}
