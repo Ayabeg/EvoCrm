@@ -4,13 +4,17 @@ export function EvoKpiCard({
     label,
     value,
     hint,
+    change,
+    changeLabel,
     format = 'number',
     className,
 }: {
     label: string;
     value: number | string | null;
     hint?: string;
-    format?: 'number' | 'money';
+    change?: number | null;
+    changeLabel?: string;
+    format?: 'number' | 'money' | 'percent';
     className?: string;
 }) {
     const display =
@@ -22,9 +26,16 @@ export function EvoKpiCard({
                     currency: 'DZD',
                     maximumFractionDigits: 0,
                 }).format(value)
-              : typeof value === 'number'
-                ? new Intl.NumberFormat('en-US').format(value)
-                : value;
+              : format === 'percent' && typeof value === 'number'
+                ? `${value}%`
+                : typeof value === 'number'
+                  ? new Intl.NumberFormat('en-US').format(value)
+                  : value;
+
+    const changeDisplay =
+        change === null || change === undefined
+            ? null
+            : `${change > 0 ? '+' : ''}${change}%`;
 
     return (
         <section
@@ -47,6 +58,32 @@ export function EvoKpiCard({
             <p className="money text-kpi mt-2 font-semibold tracking-tight text-ink">
                 {display}
             </p>
+            {changeDisplay ? (
+                <p className="mt-1 flex items-center gap-1.5 text-ui text-muted-foreground">
+                    <span
+                        className={
+                            change !== undefined && change > 0
+                                ? 'text-brand'
+                                : change !== undefined && change < 0
+                                  ? 'text-ink'
+                                  : undefined
+                        }
+                        aria-hidden
+                    >
+                        {change !== undefined && change > 0
+                            ? '↑'
+                            : change !== undefined && change < 0
+                              ? '↓'
+                              : '→'}
+                    </span>
+                    <span>{changeDisplay}</span>
+                    {changeLabel ? (
+                        <span className="text-muted-foreground">
+                            {changeLabel}
+                        </span>
+                    ) : null}
+                </p>
+            ) : null}
             {hint ? (
                 <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
                     {hint}
