@@ -42,7 +42,8 @@ export function CrmListHeader({
                     {headerActions}
                     <Button
                         onClick={onPrimary}
-                        className="h-8 rounded-sm bg-ink px-3 text-[13px] text-canvas hover:bg-ink/90"
+                        size="sm"
+                        className="h-8 rounded-sm text-ui"
                     >
                         {primaryLabel}
                     </Button>
@@ -54,7 +55,7 @@ export function CrmListHeader({
                         key={view.key}
                         href={view.href}
                         className={cn(
-                            'border-b-2 pb-2 text-[13px]',
+                            'border-b-2 pb-2 text-ui',
                             activeView === view.key
                                 ? 'border-brand font-medium text-ink'
                                 : 'border-transparent text-muted-foreground hover:text-ink',
@@ -67,7 +68,7 @@ export function CrmListHeader({
                     <button
                         type="button"
                         onClick={onAddView}
-                        className="mb-2 inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-ink"
+                        className="mb-2 inline-flex items-center gap-1 text-ui text-muted-foreground hover:text-ink"
                     >
                         <Plus className="size-3.5" />
                         add view
@@ -102,17 +103,17 @@ export function CrmListToolbar({
                             name="q"
                             defaultValue={query ?? ''}
                             placeholder="Search"
-                            className="h-8 rounded-sm bg-canvas pl-7 text-[13px]"
+                            className="h-8 rounded-sm bg-canvas pl-7 text-ui"
                         />
                     </div>
                     <Button
                         type="submit"
                         variant="outline"
-                        className="h-8 rounded-sm text-[13px]"
+                        className="h-8 rounded-sm text-ui"
                     >
                         Filter
                     </Button>
-                    <label className="inline-flex h-8 items-center gap-1 rounded-sm border border-hairline px-2 text-[13px] text-muted-foreground">
+                    <label className="inline-flex h-8 items-center gap-1 rounded-sm border border-hairline px-2 text-ui text-muted-foreground">
                         Sort by
                         <select
                             name="sort"
@@ -243,7 +244,7 @@ export function CrmEmptyState({
                 <button
                     type="button"
                     onClick={onAction}
-                    className="mt-3 rounded-sm px-3 py-1.5 text-[13px] font-medium text-brand transition-colors hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    className="mt-3 rounded-sm px-3 py-1.5 text-ui font-medium text-brand transition-colors hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                     {actionLabel}
                 </button>

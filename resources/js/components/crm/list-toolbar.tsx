@@ -88,7 +88,7 @@ export default function ListToolbar({
                     {listView ? (
                         <ColumnChooser columnDefs={listView.columnDefs} columns={columns} onChange={setColumns} />
                     ) : null}
-                    <Button asChild className="h-7 rounded-sm bg-ink px-2 text-[11px] text-canvas hover:bg-ink/90">
+                    <Button asChild size="sm" className="h-7 rounded-sm text-[11px]">
                         <Link href={`${basePath}?create=1`}>
                             <Plus className="mr-1 size-3" />
                             Create
