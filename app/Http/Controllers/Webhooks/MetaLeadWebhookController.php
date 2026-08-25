@@ -3,28 +3,24 @@
 namespace App\Http\Controllers\Webhooks;
 
 use App\Http\Controllers\Controller;
-use App\Models\Workspace;
 use App\Services\Ads\LeadFormIngestor;
+use App\Services\Webhooks\WebhookEndpointManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MetaLeadWebhookController extends Controller
 {
-    public function handle(Request $request, LeadFormIngestor $ingestor): JsonResponse
-    {
-        $expected = (string) config('meta.lead_ingest_token');
-
-        if ($expected !== '' && $request->header('X-EvoSales-Token') !== $expected) {
-            return response()->json(['ok' => false, 'error' => 'Unauthorized'], 401);
-        }
-
-        $workspace = Workspace::query()->first();
-
-        if (! $workspace) {
-            return response()->json(['ok' => false, 'error' => 'No workspace'], 404);
-        }
+    public function handle(
+        Request $request,
+        string $webhookKey,
+        LeadFormIngestor $ingestor,
+        WebhookEndpointManager $endpoints,
+    ): JsonResponse {
+        $endpoint = $endpoints->resolve(WebhookEndpointManager::PROVIDER_META_LEADS, $webhookKey);
+        $workspace = $endpoint->workspace;
 
         $lead = $ingestor->ingest($workspace, $request->all());
+        $endpoints->markReceived($endpoint, 'leadgen');
 
         return response()->json([
             'ok' => true,

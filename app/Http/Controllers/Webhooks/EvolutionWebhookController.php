@@ -3,16 +3,21 @@
 namespace App\Http\Controllers\Webhooks;
 
 use App\Http\Controllers\Controller;
-use App\Models\Workspace;
 use App\Services\Evolution\EvolutionWebhookProcessor;
+use App\Services\Webhooks\WebhookEndpointManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class EvolutionWebhookController extends Controller
 {
-    public function verify(Request $request): Response|JsonResponse
-    {
+    public function verify(
+        Request $request,
+        string $webhookKey,
+        WebhookEndpointManager $endpoints,
+    ): Response|JsonResponse {
+        $endpoints->resolve(WebhookEndpointManager::PROVIDER_EVOLUTION, $webhookKey);
+
         $token = (string) config('evolution.meta.webhook_verify_token');
 
         if ($token !== '' && $request->query('hub_verify_token') === $token) {
@@ -26,15 +31,17 @@ class EvolutionWebhookController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    public function handle(Request $request, EvolutionWebhookProcessor $processor): JsonResponse
-    {
-        $workspace = Workspace::query()->first();
-
-        if (! $workspace) {
-            return response()->json(['ok' => false, 'error' => 'No workspace'], 404);
-        }
+    public function handle(
+        Request $request,
+        string $webhookKey,
+        EvolutionWebhookProcessor $processor,
+        WebhookEndpointManager $endpoints,
+    ): JsonResponse {
+        $endpoint = $endpoints->resolve(WebhookEndpointManager::PROVIDER_EVOLUTION, $webhookKey);
+        $workspace = $endpoint->workspace;
 
         $message = $processor->handle($workspace, $request->all());
+        $endpoints->markReceived($endpoint, $request->string('event')->toString());
 
         return response()->json([
             'ok' => true,

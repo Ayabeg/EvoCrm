@@ -114,6 +114,11 @@ class Workspace extends Model
         return $this->hasMany(Integration::class);
     }
 
+    public function webhookEndpoints(): HasMany
+    {
+        return $this->hasMany(WebhookEndpoint::class);
+    }
+
     public function integration(string $provider): ?Integration
     {
         return $this->integrations()->where('provider', $provider)->first();

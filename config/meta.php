@@ -31,8 +31,6 @@ return [
 
     'graph_version' => env('META_GRAPH_VERSION', 'v21.0'),
 
-    'lead_ingest_token' => env('META_LEAD_INGEST_TOKEN'),
-
     'scopes' => [
         'public_profile',
         'email',

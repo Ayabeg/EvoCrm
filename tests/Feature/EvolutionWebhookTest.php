@@ -5,6 +5,7 @@ use App\Models\Message;
 use App\Models\Thread;
 use App\Models\Workspace;
 use App\Services\Evolution\EvolutionWebhookProcessor;
+use App\Services\Webhooks\WebhookEndpointManager;
 
 it('maps an Evolution Cloud webhook to contact, thread, and message', function () {
     $workspace = Workspace::factory()->create();
@@ -33,9 +34,10 @@ it('maps an Evolution Cloud webhook to contact, thread, and message', function (
 });
 
 it('accepts the public webhook endpoint', function () {
-    Workspace::factory()->create();
+    $workspace = Workspace::factory()->create();
+    $endpoint = app(WebhookEndpointManager::class)->forWorkspace($workspace, 'evolution');
 
-    $this->postJson('/webhooks/evolution', [
+    $this->postJson("/webhooks/evolution/{$endpoint->key}", [
         'event' => 'MESSAGES_UPSERT',
         'data' => [
             'phone' => '0555111222',

@@ -70,9 +70,17 @@ Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name
 Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])->name('outbound.track.click');
 Route::get('/track/{slug}/visit.gif', [\App\Http\Controllers\Public\FunnelTrackingController::class, 'pixel'])->name('funnel.track.visit');
 
-Route::get('/webhooks/evolution', [EvolutionWebhookController::class, 'verify'])->name('webhooks.evolution.verify');
-Route::post('/webhooks/evolution', [EvolutionWebhookController::class, 'handle'])->name('webhooks.evolution');
-Route::post('/webhooks/meta/leads', [MetaLeadWebhookController::class, 'handle'])->name('webhooks.meta.leads');
+Route::get('/webhooks/evolution/{webhookKey}', [EvolutionWebhookController::class, 'verify'])
+    ->whereAlphaNumeric('webhookKey')
+    ->name('webhooks.evolution.verify');
+Route::post('/webhooks/evolution/{webhookKey}', [EvolutionWebhookController::class, 'handle'])
+    ->whereAlphaNumeric('webhookKey')
+    ->middleware('throttle:120,1')
+    ->name('webhooks.evolution');
+Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::class, 'handle'])
+    ->whereAlphaNumeric('webhookKey')
+    ->middleware('throttle:60,1')
+    ->name('webhooks.meta.leads');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');

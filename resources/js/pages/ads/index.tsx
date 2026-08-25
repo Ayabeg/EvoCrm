@@ -90,7 +90,8 @@ export default function AdsHub({ accounts, campaigns, totals, leads, meta }: Pro
                         <p className="text-brand">{meta.reason}</p>
                         <p className="mt-1 text-muted-foreground">
                             Until then this hub runs on local demo data. Lead forms POST to{' '}
-                            <code>/webhooks/meta/leads</code> and create Contact + Lead.
+                            <code>/webhooks/meta/leads/{'{webhookKey}'}</code> and create Contact +
+                            Lead in the resolved workspace.
                         </p>
                     </Card>
                 ) : null}

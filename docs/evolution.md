@@ -23,7 +23,7 @@ See `.env.example`:
 - `EVOLUTION_BASE_URL`
 - `EVOLUTION_API_KEY`
 - `EVOLUTION_INSTANCE`
-- `EVOLUTION_WEBHOOK_URL` — EvoSales public URL, typically `https://<host>/webhooks/evolution`
+- `EVOLUTION_WEBHOOK_URL` — legacy fallback only; Settings provisions a random workspace-scoped endpoint
 - `WA_BUSINESS_TOKEN` — Meta Cloud permanent token
 - `WA_BUSINESS_PHONE_NUMBER_ID`
 - `WA_BUSINESS_WABA_ID`
@@ -41,7 +41,7 @@ Implemented in `App\Services\Evolution\EvolutionCloudService`:
 | --- | --- | --- |
 | Create | `POST /instance/create` | Always `WHATSAPP-BUSINESS`, `qrcode: false`, Cloud token + phone number id + WABA id |
 | Fetch | `GET /instance/fetchInstances` | Health check |
-| Set webhook | `POST /webhook/set/{instance}` | Points at EvoSales `/webhooks/evolution` |
+| Set webhook | `POST /webhook/set/{instance}` | Points at the workspace's `/webhooks/evolution/{webhookKey}` endpoint |
 | Session text | `POST /message/sendText/{instance}` | Desk composer, 24h customer window |
 | Template | `POST /message/sendTemplate/{instance}` | Outbound Center only |
 
@@ -54,7 +54,7 @@ This repo is the control plane. Optional `EVODESK_URL` documents a sibling Chatw
 Typical production topology:
 
 1. Meta Cloud webhook → Evolution `/webhook/meta` (verify token = `WA_BUSINESS_TOKEN_WEBHOOK`).
-2. Evolution emits `MESSAGES_UPSERT` to EvoSales `/webhooks/evolution`.
+2. Evolution emits `MESSAGES_UPSERT` to the workspace-scoped EvoSales endpoint.
 3. EvoSales maps the event onto Contact + Thread + Message.
 4. If you also run EvoDesk, configure Evolution’s Chatwoot plugin toward that URL — EvoSales does not vendor Chatwoot.
 
