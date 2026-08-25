@@ -7,6 +7,7 @@ import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import { formatDzd } from '@/lib/money';
+import { stageUnderlineColor } from '@/lib/stage-colors';
 import PageHeader from '@/components/page-header';
 import { cn } from '@/lib/utils';
 
@@ -48,22 +49,6 @@ type Forecast = {
     weighted_cents: number;
 };
 
-/**
- * Stage underlines stay inside Evotechly white / black / #EC6025.
- * Same existing pipeline names as the list hub: New → Lost.
- */
-const STAGE_COLORS: Record<string, string> = {
-    new: '#EC6025',
-    qualified: '#F08A5C',
-    demo: '#A3A3A3',
-    proposal: '#8A8A8A',
-    won: 'var(--evosales-ink)',
-    lost: '#D4D4D4',
-};
-
-function stageColor(slug: string): string {
-    return STAGE_COLORS[slug] ?? '#8A8A8A';
-}
 
 function DealCard({
     deal,
@@ -239,7 +224,7 @@ export default function DealBoard({
                                     </p>
                                     <div
                                         className="mt-2 h-1 rounded-full"
-                                        style={{ backgroundColor: stageColor(stage.slug) }}
+                                        style={{ backgroundColor: stageUnderlineColor(stage.slug) }}
                                     />
                                 </header>
 

@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { formatDzd } from '@/lib/money';
+import { stageUnderlineColor } from '@/lib/stage-colors';
 import { cn } from '@/lib/utils';
 
 type KanbanStage = {
@@ -14,19 +15,6 @@ type KanbanDeal = {
     amount_cents: number;
     stage_id: number;
 };
-
-const STAGE_COLORS: Record<string, string> = {
-    new: '#EC6025',
-    qualified: '#F08A5C',
-    demo: '#A3A3A3',
-    proposal: '#8A8A8A',
-    won: 'var(--evosales-ink)',
-    lost: '#D4D4D4',
-};
-
-function stageColor(slug: string): string {
-    return STAGE_COLORS[slug] ?? '#8A8A8A';
-}
 
 export default function ContactDealsKanban({
     pipelineName,
@@ -69,7 +57,7 @@ export default function ContactDealsKanban({
                             >
                                 <div
                                     className="border-b-2 px-2 py-1.5"
-                                    style={{ borderColor: stageColor(stage.slug) }}
+                                    style={{ borderColor: stageUnderlineColor(stage.slug) }}
                                 >
                                     <p className="truncate text-[11px] font-semibold text-ink">
                                         {stage.name}

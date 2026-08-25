@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { stageUnderlineColor } from '@/lib/stage-colors';
 
 type Stage = {
     id: number;
@@ -65,22 +66,6 @@ const STRIP: { key: string; label: string }[] = [
     { key: 'new_today', label: 'New today' },
 ];
 
-/**
- * Stage underlines stay inside the brand: the Evotechly orange and its
- * tint, neutral grays, and the adaptive ink token for Won. No Kommo blue.
- */
-const STAGE_COLORS: Record<string, string> = {
-    new: '#EC6025',
-    qualified: '#F08A5C',
-    demo: '#A3A3A3',
-    proposal: '#8A8A8A',
-    won: 'var(--evosales-ink)',
-    lost: '#D4D4D4',
-};
-
-function stageColor(slug: string): string {
-    return STAGE_COLORS[slug] ?? '#8A8A8A';
-}
 
 function formatAmount(cents: number, currency: string): string {
     if (currency === 'DZD') {
@@ -393,7 +378,7 @@ export default function LeadsBoard({
                                     <div
                                         className="mt-2 h-1 rounded-full"
                                         style={{
-                                            backgroundColor: stageColor(
+                                            backgroundColor: stageUnderlineColor(
                                                 stage.slug,
                                             ),
                                         }}
