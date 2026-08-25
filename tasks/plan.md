@@ -78,7 +78,13 @@ Lead conversion
 
 ## Task List
 
-### Phase 0: Production Trust
+### Phase 0: Baseline
+
+- [x] Task 0: Audit repository and production architecture
+
+The audit is recorded in [`docs/evolsales-baseline.md`](../docs/evolsales-baseline.md). It establishes the evidenced Docker Compose VPS topology, current process gaps, integration and authorization architecture, baseline quality failures, and external verification blockers.
+
+### Phase 1: Production Trust
 
 - [ ] Task 1: Deploy the scheduler as a durable worker
 - [ ] Task 2: Add scheduler and integration health signals

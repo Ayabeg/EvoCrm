@@ -1,5 +1,28 @@
 # EvoSales HubSpot Gap Closure Tasks
 
+## Task 0: Audit repository and production architecture
+
+**Description:** Establish the actual repository, deployment, data, integration, authorization, event, and quality baseline before changing production-critical behavior.
+
+**Acceptance criteria:**
+- [x] Production process, database/queue/cache, integrations, webhooks, permissions, CRM gaps, and event architecture are inventoried.
+- [x] Baseline tests, lint, static analysis, type checks, and build are run and recorded.
+- [x] Unknown production/staging facts are explicitly identified instead of inferred.
+
+**Verification:**
+- [x] Baseline document created: `docs/evolsales-baseline.md`
+- [x] Repository evidence includes exact files and target tasks.
+- [x] No application behavior or unrelated refactor was included.
+
+**Dependencies:** None
+
+**Files touched:**
+- `docs/evolsales-baseline.md`
+- `tasks/plan.md`
+- `tasks/todo.md`
+
+**Estimated scope:** Medium
+
 ## Task 1: Deploy the scheduler as a durable worker
 
 **Description:** Add a production-safe process definition that runs Laravel scheduling independently of the HTTP service and documents the required database/locking assumptions.
