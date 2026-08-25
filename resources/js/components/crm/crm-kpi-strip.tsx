@@ -25,7 +25,7 @@ const KPI_ICONS: Record<string, LucideIcon> = {
     pipeline: TrendingUp,
     win_rate: Percent,
     open_deals: Handshake,
-    activities_done: Activity,
+    activities: Activity,
 };
 
 export function CrmKpiStrip({
