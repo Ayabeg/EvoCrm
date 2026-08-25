@@ -2,7 +2,7 @@
 
 ## HubSpot comparison redo (2026-08-25)
 
-Re-audited EvoSales against HubSpot Sales/Service Hub 2026 on `d139f6e`. Composite **~81 → ~85**. See [`docs/hubspot-parity-comparison.md`](docs/hubspot-parity-comparison.md). Omega (≥95) is still not met.
+Re-audited EvoSales against HubSpot Sales/Service Hub 2026 on `d139f6e`. Composite **~81 → ~85**. See [`docs/hubspot-parity-comparison.md`](docs/hubspot-parity-comparison.md) and the capability matrix [`docs/hubspot-side-by-side.md`](docs/hubspot-side-by-side.md). Omega (≥95) is still not met.
 
 ---
 
