@@ -107,9 +107,6 @@ class AdsCenterController extends Controller
         return back();
     }
 
-    /**
-     * @return array{connected: bool, app_id_set: bool, ad_account_id_set: bool, reason: string|null}
-     */
     protected function metaStatus(): array
     {
         return [

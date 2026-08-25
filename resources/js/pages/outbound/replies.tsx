@@ -1,45 +1,51 @@
-import { Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
+type Lead = { id: number; title: string; status: string };
 type Reply = {
     id: number;
     subject?: string | null;
     body?: string | null;
     created_at: string;
-    contact?: { id: number; first_name: string; last_name?: string | null; email?: string | null } | null;
+    contact?: {
+        id: number;
+        first_name: string;
+        last_name?: string | null;
+        email?: string | null;
+        leads?: Lead[];
+    } | null;
     mailbox?: { id: number; name: string } | null;
-    parent?: { id: number; subject?: string | null; sent_at?: string | null } | null;
+    parent?: { id: number; subject?: string | null } | null;
 };
+
+function primaryLead(contact: NonNullable<Reply['contact']>): Lead | null {
+    if (!contact.leads?.length) return null;
+    return contact.leads.find((l) => l.status !== 'qualified') ?? contact.leads[0] ?? null;
+}
 
 export default function Replies({ replies, imapNote }: { replies: Reply[]; imapNote: string }) {
     return (
         <OutboundShell title="Replies">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader title="Replies" description={imapNote} />
-
                 <Card className="overflow-hidden">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-left">
                             <tr>
                                 <th className="px-4 py-2">From</th>
                                 <th className="px-4 py-2">Subject</th>
-                                <th className="px-4 py-2">In reply to</th>
-                                <th className="px-4 py-2">Mailbox</th>
+                                <th className="px-4 py-2">Lead</th>
                                 <th className="px-4 py-2">Received</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {replies.length === 0 ? (
-                                <tr>
-                                    <td className="px-4 py-6 text-muted-foreground" colSpan={5}>
-                                        No replies yet. Once a mailbox has IMAP settings, the poller records inbound
-                                        mail from known contacts here.
-                                    </td>
-                                </tr>
-                            ) : (
-                                replies.map((reply) => (
+                            {replies.map((reply) => {
+                                const lead = reply.contact ? primaryLead(reply.contact) : null;
+                                return (
                                     <tr key={reply.id} className="border-t border-hairline align-top">
                                         <td className="px-4 py-2">
                                             {reply.contact ? (
@@ -49,26 +55,38 @@ export default function Replies({ replies, imapNote }: { replies: Reply[]; imapN
                                             ) : (
                                                 '—'
                                             )}
-                                            <span className="block text-xs text-muted-foreground">
-                                                {reply.contact?.email ?? ''}
-                                            </span>
                                         </td>
+                                        <td className="px-4 py-2">{reply.subject ?? '—'}</td>
                                         <td className="px-4 py-2">
-                                            {reply.subject ?? '—'}
-                                            {reply.body ? (
-                                                <span className="block max-w-md truncate text-xs text-muted-foreground" title={reply.body}>
-                                                    {reply.body}
-                                                </span>
-                                            ) : null}
+                                            {lead ? (
+                                                <div className="flex items-center gap-2">
+                                                    <Link href={`/crm/leads/${lead.id}`} className="text-brand">
+                                                        {lead.title}
+                                                    </Link>
+                                                    {lead.status !== 'qualified' ? (
+                                                        <Form
+                                                            action={`/crm/leads/${lead.id}/qualify`}
+                                                            method="post"
+                                                            options={{ preserveScroll: true }}
+                                                        >
+                                                            <Button type="submit" variant="outline" className="h-6 px-2 text-[11px]">
+                                                                Qualify
+                                                            </Button>
+                                                        </Form>
+                                                    ) : (
+                                                        <Badge variant="secondary" className="text-[10px]">
+                                                            Qualified
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                '—'
+                                            )}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-muted-foreground">
-                                            {reply.parent?.subject ?? '—'}
-                                        </td>
-                                        <td className="px-4 py-2">{reply.mailbox?.name ?? '—'}</td>
                                         <td className="px-4 py-2 text-xs text-muted-foreground">{reply.created_at}</td>
                                     </tr>
-                                ))
-                            )}
+                                );
+                            })}
                         </tbody>
                     </table>
                 </Card>
@@ -77,6 +95,4 @@ export default function Replies({ replies, imapNote }: { replies: Reply[]; imapN
     );
 }
 
-Replies.layout = {
-    breadcrumbs: [{ title: 'Replies', href: '/outbound/replies' }],
-};
+Replies.layout = { breadcrumbs: [{ title: 'Replies', href: '/outbound/replies' }] };

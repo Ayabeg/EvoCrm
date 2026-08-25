@@ -34,7 +34,12 @@ type Props = {
         id: number;
         created_at: string;
         contact?: { id: number; first_name: string; last_name?: string | null } | null;
-        lead?: { id: number; title: string; status: string } | null;
+        lead?: {
+            id: number;
+            title: string;
+            status: string;
+            deal?: { id: number; title: string } | null;
+        } | null;
     }[];
     threads: {
         id: number;
@@ -143,13 +148,14 @@ export default function CampaignShow({ campaign, funnel, daily, leads, threads, 
                                 <tr>
                                     <th className="px-4 py-2">Contact</th>
                                     <th className="px-4 py-2">CRM lead</th>
+                                    <th className="px-4 py-2">Deal</th>
                                     <th className="px-4 py-2">Received</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {leads.length === 0 ? (
                                     <tr>
-                                        <td className="px-4 py-6 text-muted-foreground" colSpan={3}>
+                                        <td className="px-4 py-6 text-muted-foreground" colSpan={4}>
                                             No leads attributed yet.
                                         </td>
                                     </tr>
@@ -172,6 +178,15 @@ export default function CampaignShow({ campaign, funnel, daily, leads, threads, 
                                                 {row.lead ? (
                                                     <Link href={`/crm/leads/${row.lead.id}`} className="text-brand">
                                                         {row.lead.title}
+                                                    </Link>
+                                                ) : (
+                                                    '—'
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                {row.lead?.deal ? (
+                                                    <Link href={`/crm/deals/${row.lead.deal.id}`} className="text-brand">
+                                                        {row.lead.deal.title}
                                                     </Link>
                                                 ) : (
                                                     '—'
