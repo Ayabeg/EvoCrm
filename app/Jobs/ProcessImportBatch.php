@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\ImportBatch;
 use App\Services\Crm\ContactCsvImporter;
+use App\Services\Crm\DealCsvImporter;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -17,7 +18,7 @@ class ProcessImportBatch implements ShouldQueue
 
     public function __construct(public int $batchId) {}
 
-    public function handle(ContactCsvImporter $contacts): void
+    public function handle(ContactCsvImporter $contacts, DealCsvImporter $deals): void
     {
         $batch = ImportBatch::query()->find($this->batchId);
 
@@ -27,6 +28,12 @@ class ProcessImportBatch implements ShouldQueue
 
         if ($batch->type === ImportBatch::TYPE_CONTACTS) {
             $contacts->process($batch);
+
+            return;
+        }
+
+        if ($batch->type === ImportBatch::TYPE_DEALS) {
+            $deals->process($batch);
 
             return;
         }

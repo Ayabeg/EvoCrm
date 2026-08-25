@@ -1,5 +1,6 @@
-import { Form } from '@inertiajs/react';
+import { Form, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import type { Auth } from '@/types';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmShell } from '@/components/crm/crm-shell';
@@ -63,6 +64,8 @@ export default function DealsIndex({
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
     const loading = useInertiaLoading();
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const canImport = auth.capabilities.includes('crm.import');
 
     return (
         <>
@@ -87,7 +90,16 @@ export default function DealsIndex({
                     { key: 'board', label: 'Board', href: '/crm/deals/board' },
                 ]}
                 activeView="list"
-                headerActions={<DealLayoutToggle current="list" />}
+                headerActions={
+                    <>
+                        {canImport ? (
+                            <Link href="/crm/deals/import" className="text-ui font-medium text-brand">
+                                Import
+                            </Link>
+                        ) : null}
+                        <DealLayoutToggle current="list" />
+                    </>
+                }
             >
                 {(columns) => (
                     <>

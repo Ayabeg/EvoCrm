@@ -11,6 +11,7 @@ use App\Http\Controllers\Crm\ContactImportController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
+use App\Http\Controllers\Crm\DealImportController;
 use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\DealSplitController;
 use App\Http\Controllers\Crm\FunnelController;
@@ -173,6 +174,11 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
 
     Route::get('/crm/deals/export', [DealController::class, 'export'])->name('crm.deals.export');
+    Route::get('/crm/deals/import', [DealImportController::class, 'create'])->name('crm.deals.import');
+    Route::post('/crm/deals/import', [DealImportController::class, 'store'])->name('crm.deals.import.store');
+    Route::get('/crm/deals/import/{batch}', [DealImportController::class, 'show'])->name('crm.deals.import.show');
+    Route::put('/crm/deals/import/{batch}', [DealImportController::class, 'update'])->name('crm.deals.import.update');
+    Route::post('/crm/deals/import/{batch}/commit', [DealImportController::class, 'commit'])->name('crm.deals.import.commit');
     Route::get('/crm/deals', [DealController::class, 'index'])->name('crm.deals.index');
     Route::get('/crm/deals/board', [DealController::class, 'board'])->name('crm.deals.board');
     Route::post('/crm/deals', [DealController::class, 'store'])->name('crm.deals.store');
