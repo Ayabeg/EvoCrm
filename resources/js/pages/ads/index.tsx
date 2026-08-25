@@ -1,6 +1,5 @@
 import { Form, Link } from '@inertiajs/react';
 import { AdsShell } from '@/components/crm/ads-shell';
-import { EMPTY_FUNNEL, FunnelBoard } from '@/components/ads/funnel';
 import type { FunnelCounts } from '@/components/ads/funnel';
 import { formatDzd } from '@/lib/money';
 import PageHeader from '@/components/page-header';
@@ -50,25 +49,22 @@ function kindOf(campaign: Campaign): string {
     if (campaign.click_to_whatsapp && campaign.lead_form) {
         return 'CTWA + Lead form';
     }
-
     if (campaign.click_to_whatsapp) {
         return 'Click-to-WhatsApp';
     }
-
     if (campaign.lead_form) {
         return 'Lead form';
     }
-
     return 'Traffic';
 }
 
-export default function AdsHub({ accounts, campaigns, funnels, totals, leads, meta }: Props) {
+export default function AdsHub({ accounts, campaigns, totals, leads, meta }: Props) {
     return (
         <AdsShell title="Ads">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Ads Hub"
-                    description="Meta ad accounts, campaigns, and the full funnel from impressions to won deals. Official Marketing API only."
+                    description="Meta ad accounts, campaigns, and lead intake — table-first summary."
                 >
                     <div className="flex items-center gap-2">
                         <Badge variant={meta.connected ? 'default' : 'secondary'}>
@@ -89,67 +85,71 @@ export default function AdsHub({ accounts, campaigns, funnels, totals, leads, me
                         <p className="text-brand">{meta.reason}</p>
                         <p className="mt-1 text-muted-foreground">
                             Until then this hub runs on local demo data. Lead forms POST to{' '}
-                            <code>/webhooks/meta/leads</code> and create Contact + Lead; click-to-WhatsApp
-                            conversations land in My Inbox via Evolution Cloud.
+                            <code>/webhooks/meta/leads</code> and create Contact + Lead.
                         </p>
                     </Card>
                 ) : null}
 
-                <div className="grid gap-3 md:grid-cols-6">
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-lg border border-hairline bg-canvas px-4 py-2.5 text-[13px]">
                     {[
                         ['Spend', formatDzd(totals.spend_cents)],
                         ['Impressions', totals.impressions.toLocaleString()],
                         ['Clicks', totals.clicks.toLocaleString()],
-                        ['Conversations / Leads', String(totals.conversations + totals.form_leads)],
+                        ['Conv. / Leads', String(totals.conversations + totals.form_leads)],
                         ['Deals', String(totals.deals)],
                         ['Won', String(totals.won)],
                     ].map(([label, value]) => (
-                        <Card key={label} className="p-3">
-                            <p className="text-[11px] uppercase text-muted-foreground">{label}</p>
-                            <p className="mt-1 text-lg font-semibold">{value}</p>
-                        </Card>
+                        <div key={label} className="flex items-baseline gap-2">
+                            <span className="text-[11px] uppercase text-muted-foreground">{label}</span>
+                            <span className="font-semibold tabular-nums">{value}</span>
+                        </div>
                     ))}
                 </div>
 
-                <section className="space-y-3">
-                    <h2 className="text-sm font-semibold">Funnel board</h2>
-                    {campaigns.length === 0 ? (
-                        <Card className="p-6 text-sm text-muted-foreground">
-                            No campaigns yet. Run <code>php artisan db:seed</code> for demo data, or connect Meta
-                            and sync.
-                        </Card>
-                    ) : (
-                        <div className="grid gap-3 xl:grid-cols-2">
-                            {campaigns.map((campaign) => (
-                                <Card key={campaign.id} className="space-y-3 p-4">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <Link
-                                            href={`/ads/campaigns/${campaign.id}`}
-                                            className="font-medium text-brand"
-                                        >
-                                            {campaign.name}
-                                        </Link>
-                                        <Badge variant="secondary">{kindOf(campaign)}</Badge>
-                                        <Badge variant={campaign.status === 'active' ? 'default' : 'outline'}>
-                                            {campaign.status}
-                                        </Badge>
-                                        <span className="ms-auto text-xs text-muted-foreground">
-                                            {campaign.account?.name ?? '—'}
-                                        </span>
-                                    </div>
-                                    <FunnelBoard funnel={funnels[campaign.id] ?? EMPTY_FUNNEL} compact />
-                                    <p className="text-xs text-muted-foreground">
-                                        Spend {formatDzd((funnels[campaign.id] ?? EMPTY_FUNNEL).spend_cents)} ·{' '}
-                                        {campaign.ad_sets_count} ad sets
-                                        {campaign.daily_budget_cents > 0
-                                            ? ` · budget ${formatDzd(campaign.daily_budget_cents)}/day`
-                                            : ''}
-                                    </p>
-                                </Card>
-                            ))}
-                        </div>
-                    )}
-                </section>
+                <Card className="overflow-hidden">
+                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">Campaigns</h2>
+                    <table className="w-full text-sm">
+                        <thead className="bg-muted/50 text-left">
+                            <tr>
+                                <th className="px-4 py-2">Campaign</th>
+                                <th className="px-4 py-2">Account</th>
+                                <th className="px-4 py-2">Kind</th>
+                                <th className="px-4 py-2">Status</th>
+                                <th className="px-4 py-2">Budget/day</th>
+                                <th className="px-4 py-2">Ad sets</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {campaigns.length === 0 ? (
+                                <tr>
+                                    <td className="px-4 py-6 text-muted-foreground" colSpan={6}>
+                                        No campaigns yet — sync from Meta or use demo data.
+                                    </td>
+                                </tr>
+                            ) : (
+                                campaigns.map((campaign) => (
+                                    <tr key={campaign.id} className="border-t border-hairline">
+                                        <td className="px-4 py-2">
+                                            <Link
+                                                href={`/ads/campaigns/${campaign.id}`}
+                                                className="font-medium text-brand hover:underline"
+                                            >
+                                                {campaign.name}
+                                            </Link>
+                                        </td>
+                                        <td className="px-4 py-2">{campaign.account?.name ?? '—'}</td>
+                                        <td className="px-4 py-2">{kindOf(campaign)}</td>
+                                        <td className="px-4 py-2">{campaign.status}</td>
+                                        <td className="px-4 py-2 money tabular-nums">
+                                            {formatDzd(campaign.daily_budget_cents)}
+                                        </td>
+                                        <td className="px-4 py-2 tabular-nums">{campaign.ad_sets_count}</td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </Card>
 
                 <div className="grid gap-4 lg:grid-cols-2">
                     <Card className="overflow-hidden">

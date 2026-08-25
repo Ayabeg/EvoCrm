@@ -10,9 +10,55 @@ use App\Models\Deal;
 use App\Services\Crm\ActivityRecorder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ActivityController extends Controller
 {
+    public function index(Request $request): Response
+    {
+        $workspace = $request->user()->workspace;
+        $type = $request->string('type')->toString();
+        $ownerId = $request->integer('owner_id') ?: null;
+        $date = $request->string('date')->toString();
+
+        $query = Activity::query()
+            ->forWorkspace($workspace)
+            ->with(['contact', 'deal', 'company', 'owner'])
+            ->orderByRaw('due_at is null')
+            ->orderBy('due_at')
+            ->orderByDesc('created_at');
+
+        if ($type !== '' && in_array($type, ['note', 'task', 'call', 'meeting', 'email'], true)) {
+            $query->where('type', $type);
+        }
+
+        if ($ownerId) {
+            $query->where('owner_id', $ownerId);
+        }
+
+        if ($date === 'today') {
+            $query->whereNotNull('due_at')
+                ->where('due_at', '<=', now('Africa/Algiers')->endOfDay());
+        } elseif ($date === 'overdue') {
+            $query->whereNotNull('due_at')
+                ->where('due_at', '<', now('Africa/Algiers')->startOfDay())
+                ->where('done', false);
+        } elseif ($date !== '') {
+            $query->whereDate('due_at', $date);
+        }
+
+        return Inertia::render('crm/activities/index', [
+            'activities' => $query->limit(200)->get(),
+            'members' => $workspace->users()->orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'type' => $type !== '' ? $type : null,
+                'owner_id' => $ownerId,
+                'date' => $date !== '' ? $date : null,
+            ],
+        ]);
+    }
+
     public function store(Request $request, ActivityRecorder $recorder): RedirectResponse
     {
         $workspace = $request->user()->workspace;
