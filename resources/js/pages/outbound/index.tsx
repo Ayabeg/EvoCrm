@@ -1,6 +1,6 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { RoomShell, outboundSubTabs, outboundTabs } from '@/components/crm/room-shell';
-import PageHeader from '@/components/page-header';
+import { Link } from '@inertiajs/react';
+import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
@@ -71,6 +71,34 @@ function healthVariant(status: string): 'default' | 'secondary' | 'outline' {
     return 'outline';
 }
 
+function outboundKpis(stats: Stats): KpiTile[] {
+    return [
+        { key: 'sent', label: 'Sent · 30d', value: stats.sent_30d, href: '/outbound/outbox' },
+        { key: 'deferred', label: 'Deferred', value: stats.deferred, href: '/outbound/outbox?status=deferred' },
+        { key: 'replies', label: 'Replies · 30d', value: stats.replies_30d, href: '/outbound/replies' },
+        { key: 'suppressed', label: 'Suppressed', value: stats.suppressed, href: '/outbound/suppressions' },
+        { key: 'failed', label: 'Failed · 30d', value: stats.failed_30d, href: '/outbound/outbox?status=failed' },
+        {
+            key: 'campaigns',
+            label: 'Campaigns',
+            value: `${stats.campaigns_sending} live · ${stats.campaigns_sent} sent`,
+            href: '/outbound/campaigns',
+        },
+        {
+            key: 'sequences',
+            label: 'Sequences',
+            value: `${stats.sequences_active} active · ${stats.enrolled_active} enrolled`,
+            href: '/outbound/sequences',
+        },
+        {
+            key: 'domains',
+            label: 'Domains',
+            value: `${stats.domains_verified}/${stats.domains} verified`,
+            href: '/outbound/domains',
+        },
+    ];
+}
+
 export default function OutboundIndex({
     stats,
     mailboxHealth,
@@ -82,25 +110,15 @@ export default function OutboundIndex({
     recent: Message[];
     mail_stack: MailStack;
 }) {
-    const { url } = usePage();
-    const pathname = url.split('?')[0] ?? '/outbound';
-
     return (
-        <>
-            <Head title="Outbound" />
-            <RoomShell
-                title="Outbound"
-                tabs={outboundTabs(pathname)}
-                subTabs={outboundSubTabs(pathname)}
-            >
-            <div className="h-full overflow-y-auto">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Outbound"
-                    description="The email department lives here on the CRM host: mailboxes, sending domains, templates, sequences, broadcast campaigns, suppression, and quiet hours. WhatsApp stays official Cloud templates only."
-                />
+        <OutboundShell title="Outbound">
+            <div className="space-y-4 p-4 text-ui md:p-6">
+                <p className="text-muted-foreground">
+                    Mailboxes, sending domains, templates, sequences, broadcast campaigns,
+                    suppression, and quiet hours. WhatsApp stays official Cloud templates only.
+                </p>
 
-                <Card className="flex flex-wrap items-center gap-3 p-4 text-sm">
+                <Card className="flex flex-wrap items-center gap-3 p-4">
                     <div>
                         <h2 className="font-medium">Live mail stack</h2>
                         <p className="text-muted-foreground">
@@ -123,71 +141,16 @@ export default function OutboundIndex({
                     </a>
                 </Card>
 
-                <div className="grid gap-3 md:grid-cols-4">
-                    {[
-                        [
-                            'Sent · 30d',
-                            String(stats.sent_30d),
-                            '/outbound/outbox',
-                        ],
-                        [
-                            'Deferred',
-                            String(stats.deferred),
-                            '/outbound/outbox?status=deferred',
-                        ],
-                        [
-                            'Replies · 30d',
-                            String(stats.replies_30d),
-                            '/outbound/replies',
-                        ],
-                        [
-                            'Suppressed',
-                            String(stats.suppressed),
-                            '/outbound/suppressions',
-                        ],
-                        [
-                            'Failed · 30d',
-                            String(stats.failed_30d),
-                            '/outbound/outbox?status=failed',
-                        ],
-                        [
-                            'Campaigns',
-                            `${stats.campaigns_sending} live · ${stats.campaigns_sent} sent`,
-                            '/outbound/campaigns',
-                        ],
-                        [
-                            'Sequences',
-                            `${stats.sequences_active} active · ${stats.enrolled_active} enrolled`,
-                            '/outbound/sequences',
-                        ],
-                        [
-                            'Domains',
-                            `${stats.domains_verified}/${stats.domains} verified`,
-                            '/outbound/domains',
-                        ],
-                    ].map(([label, value, href]) => (
-                        <Link key={label} href={href}>
-                            <Card className="p-3">
-                                <p className="text-[11px] text-muted-foreground uppercase">
-                                    {label}
-                                </p>
-                                <p className="mt-1 text-lg font-semibold">
-                                    {value}
-                                </p>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
+                <CrmKpiStrip kpis={outboundKpis(stats)} columns={4} />
 
                 <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">
+                    <h2 className="border-b border-hairline px-4 py-2 font-medium">
                         Mailbox health{' '}
                         <span className="font-normal text-muted-foreground">
-                            — {stats.mailboxes_enabled}/{stats.mailboxes}{' '}
-                            enabled
+                            — {stats.mailboxes_enabled}/{stats.mailboxes} enabled
                         </span>
                     </h2>
-                    <table className="w-full text-sm">
+                    <table className="w-full">
                         <thead className="bg-muted/50 text-left">
                             <tr>
                                 <th className="px-4 py-2">Mailbox</th>
@@ -204,8 +167,8 @@ export default function OutboundIndex({
                                         className="px-4 py-6 text-muted-foreground"
                                         colSpan={5}
                                     >
-                                        No mailbox yet — add one under
-                                        Mailboxes, enable it, and send a test.
+                                        No mailbox yet — add one under Mailboxes, enable it, and
+                                        send a test.
                                     </td>
                                 </tr>
                             ) : (
@@ -221,7 +184,7 @@ export default function OutboundIndex({
                                             >
                                                 {box.name}
                                             </Link>
-                                            <span className="block text-xs text-muted-foreground">
+                                            <span className="block text-ui text-muted-foreground">
                                                 {box.from_address}
                                             </span>
                                         </td>
@@ -234,13 +197,13 @@ export default function OutboundIndex({
                                                 {box.effective_status}
                                             </Badge>
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-muted-foreground">
+                                        <td className="px-4 py-2 text-muted-foreground">
                                             {box.imap_configured ? 'on' : 'off'}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-muted-foreground">
+                                        <td className="px-4 py-2 text-muted-foreground">
                                             {box.sent_today}/{box.daily_limit}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-muted-foreground">
+                                        <td className="px-4 py-2 text-muted-foreground">
                                             {box.last_tested_at ?? 'never'}
                                         </td>
                                     </tr>
@@ -251,10 +214,10 @@ export default function OutboundIndex({
                 </Card>
 
                 <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">
+                    <h2 className="border-b border-hairline px-4 py-2 font-medium">
                         Recent activity
                     </h2>
-                    <table className="w-full text-sm">
+                    <table className="w-full">
                         <thead className="bg-muted/50 text-left">
                             <tr>
                                 <th className="px-4 py-2">Direction</th>
@@ -271,9 +234,8 @@ export default function OutboundIndex({
                                         className="px-4 py-6 text-muted-foreground"
                                         colSpan={5}
                                     >
-                                        Nothing sent yet. Create a mailbox, then
-                                        enroll contacts in a sequence or send a
-                                        campaign.
+                                        Nothing sent yet. Create a mailbox, then enroll contacts
+                                        in a sequence or send a campaign.
                                     </td>
                                 </tr>
                             ) : (
@@ -302,8 +264,7 @@ export default function OutboundIndex({
                                                     className="text-brand"
                                                 >
                                                     {message.contact.first_name}{' '}
-                                                    {message.contact
-                                                        .last_name ?? ''}
+                                                    {message.contact.last_name ?? ''}
                                                 </Link>
                                             ) : (
                                                 message.to_address
@@ -334,7 +295,7 @@ export default function OutboundIndex({
                                         <td className="px-4 py-2">
                                             {message.status}
                                             {message.defer_reason ? (
-                                                <span className="block text-xs text-muted-foreground">
+                                                <span className="block text-ui text-muted-foreground">
                                                     deferred ·{' '}
                                                     {message.defer_reason.replace(
                                                         '_',
@@ -350,9 +311,7 @@ export default function OutboundIndex({
                     </table>
                 </Card>
             </div>
-            </div>
-            </RoomShell>
-        </>
+        </OutboundShell>
     );
 }
 
