@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
+use App\Models\OutboundCampaign;
 use App\Models\SavedFilter;
 use App\Models\Stage;
 use App\Services\Ads\MetaAudienceSyncService;
@@ -25,6 +26,8 @@ class SegmentController extends Controller
             ->orderBy('position')
             ->get(['id', 'name', 'slug']);
 
+        $campaignsByFilter = OutboundCampaign::query()->forWorkspace($workspace)->whereNotNull('saved_filter_id')->get(['id', 'name', 'status', 'saved_filter_id'])->groupBy('saved_filter_id');
+
         $segments = SavedFilter::query()
             ->forWorkspace($workspace)
             ->whereIn('entity', ['contact', 'deal'])
@@ -36,6 +39,7 @@ class SegmentController extends Controller
                 'entity' => $saved->entity,
                 'filters' => $saved->filters ?? [],
                 'count' => $filter->count($workspace, $saved->entity, $filter->fromSaved($saved)),
+                'campaigns' => ($campaignsByFilter[$saved->id] ?? collect())->map(fn (OutboundCampaign $c) => ['id' => $c->id, 'name' => $c->name, 'status' => $c->status])->values()->all(),
             ]);
 
         return Inertia::render('crm/segments/index', [
@@ -47,6 +51,7 @@ class SegmentController extends Controller
             'stages' => $stages,
             'contactFilterFields' => $hub->listViewMeta('contact')['filterFields'],
             'dealFilterFields' => $hub->listViewMeta('deal')['filterFields'],
+            'canSyncMeta' => $request->user()->role->canManageSettings(),
         ]);
     }
 

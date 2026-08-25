@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Ads;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ad;
 use App\Models\AdAccount;
 use App\Models\AdCampaign;
 use App\Models\AdLead;
+use App\Models\AdSet;
 use App\Services\Ads\AdsFunnel;
 use App\Services\Ads\MetaAdsService;
 use Illuminate\Http\RedirectResponse;
@@ -45,6 +47,26 @@ class AdsCenterController extends Controller
                 ->get(),
             'meta' => $this->metaStatus(),
         ]);
+    }
+
+
+    public function campaigns(Request $request, AdsFunnel $funnel): Response
+    {
+        $workspace = $request->user()->workspace;
+        $campaigns = AdCampaign::query()->forWorkspace($workspace)->with('account')->withCount(['adSets'])->latest()->get();
+        return Inertia::render('ads/campaigns/index', ['campaigns' => $campaigns, 'funnels' => $funnel->forWorkspace($workspace), 'meta' => $this->metaStatus()]);
+    }
+
+    public function adSets(Request $request): Response
+    {
+        $workspace = $request->user()->workspace;
+        return Inertia::render('ads/ad-sets/index', ['adSets' => AdSet::query()->forWorkspace($workspace)->with('campaign:id,name,status')->withCount('ads')->latest()->get(), 'meta' => $this->metaStatus()]);
+    }
+
+    public function adsIndex(Request $request): Response
+    {
+        $workspace = $request->user()->workspace;
+        return Inertia::render('ads/ads/index', ['ads' => Ad::query()->forWorkspace($workspace)->with('adSet:id,name,ad_campaign_id', 'adSet.campaign:id,name')->latest()->get(), 'meta' => $this->metaStatus()]);
     }
 
     public function show(Request $request, AdCampaign $campaign, AdsFunnel $funnel): Response

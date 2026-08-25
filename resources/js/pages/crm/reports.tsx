@@ -1,6 +1,7 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
-import { ReportsShell } from '@/components/crm/reports-shell';
+import { ReportsShell, reportsBasePath } from '@/components/crm/reports-shell';
+import { OutboundReportsDetail, type OutboundDetailProps } from '@/components/outbound/reports-detail';
 import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import { formatDzd } from '@/lib/money';
 import {
@@ -71,6 +72,8 @@ type OpenDashboard = {
 };
 
 type Props = {
+    activeCategory?: string;
+    outboundDetail?: OutboundDetailProps | null;
     window: {
         from: string;
         to: string;
@@ -223,6 +226,8 @@ function filterQuery(
 }
 
 export default function Reports({
+    activeCategory = 'overview',
+    outboundDetail = null,
     window,
     categories,
     owners,
@@ -230,6 +235,7 @@ export default function Reports({
     dashboard,
     widgetCatalog,
 }: Props) {
+    const reportsPath = reportsBasePath(activeCategory);
     const [from, setFrom] = useState(window.from);
     const [to, setTo] = useState(window.to);
     const [owner, setOwner] = useState(
@@ -242,7 +248,7 @@ export default function Reports({
 
     const apply = (event: React.FormEvent) => {
         event.preventDefault();
-        router.get('/reports', filterQuery(from, to, owner, dashboard?.id), {
+        router.get(reportsPath, filterQuery(from, to, owner, dashboard?.id), {
             preserveState: true,
         });
     };
@@ -259,13 +265,13 @@ export default function Reports({
     };
 
     const openRooms = () => {
-        router.get('/reports', filterQuery(from, to, owner), {
+        router.get(reportsPath, filterQuery(from, to, owner), {
             preserveState: true,
         });
     };
 
     const openDashboard = (id: number) => {
-        router.get('/reports', filterQuery(from, to, owner, id), {
+        router.get(reportsPath, filterQuery(from, to, owner, id), {
             preserveState: true,
         });
     };

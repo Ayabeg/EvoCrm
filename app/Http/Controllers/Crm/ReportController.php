@@ -11,7 +11,9 @@ use App\Models\Dashboard;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\Message;
+use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
+use App\Models\Sequence;
 use App\Models\Thread;
 use App\Models\User;
 use App\Models\Workspace;
@@ -49,6 +51,7 @@ class ReportController extends Controller
     public function index(Request $request): Response
     {
         $workspace = $request->user()->workspace;
+        $category = $request->route('category');
 
         $validated = $request->validate([
             'from' => ['nullable', 'date_format:Y-m-d'],
@@ -81,7 +84,13 @@ class ReportController extends Controller
             $this->adsCategory($workspace, $from, $to),
             $this->deskCategory($workspace, $from, $to),
             $this->activityCategory($workspace, $from, $to),
-        ])->filter()->values()->all();
+        ])->filter()->values();
+
+        $keyMap = ['sales' => 'leads', 'pipeline' => 'pipeline', 'outbound' => 'outbound', 'ads' => 'ads'];
+        if ($category !== null && isset($keyMap[$category])) {
+            $categories = $categories->filter(fn (array $room) => $room['key'] === $keyMap[$category])->values();
+        }
+        $categories = $categories->all();
 
         $open = null;
 
@@ -94,6 +103,8 @@ class ReportController extends Controller
         }
 
         return Inertia::render('crm/reports', [
+            'activeCategory' => $category ?? 'overview',
+            'outboundDetail' => $category === 'outbound' ? $this->outboundDetail($workspace) : null,
             'window' => [
                 'from' => $from->toDateString(),
                 'to' => $to->toDateString(),
@@ -669,9 +680,21 @@ class ReportController extends Controller
         ];
     }
 
+
+    private function outboundDetail(Workspace $workspace): array
+    {
+        $out = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out');
+        $totals = ['queued' => (clone $out)->where('status', 'queued')->count(), 'sent' => (clone $out)->where('status', 'sent')->count(), 'failed' => (clone $out)->where('status', 'failed')->count(), 'opened' => (clone $out)->whereNotNull('opened_at')->count(), 'clicked' => (clone $out)->whereNotNull('clicked_at')->count(), 'replied' => (clone $out)->whereNotNull('replied_at')->count(), 'bounced' => (clone $out)->where('failure_reason', 'like', '%bounce%')->count()];
+        $perSequence = Sequence::query()->forWorkspace($workspace)->withCount('enrollments')->get()->map(fn (Sequence $s) => ['id' => $s->id, 'name' => $s->name, 'enrollments' => $s->enrollments_count, 'sent' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->where('status', 'sent')->count(), 'opened' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('opened_at')->count(), 'replied' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('replied_at')->count()]);
+        $perCampaign = OutboundCampaign::query()->forWorkspace($workspace)->latest()->limit(20)->get()->map(fn (OutboundCampaign $c) => array_merge(['id' => $c->id, 'name' => $c->name, 'status' => $c->status, 'audience_count' => $c->audience_count], $c->messageCounts()));
+        $daily = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'sent')->where('sent_at', '>=', now()->subDays(30))->selectRaw('DATE(sent_at) as day, COUNT(*) as sent')->groupBy('day')->orderBy('day')->get();
+        return ['totals' => $totals, 'perSequence' => $perSequence, 'perCampaign' => $perCampaign, 'daily' => $daily, 'tracking' => ['sent' => '', 'opened' => '', 'clicked' => '', 'replied' => '', 'bounced' => '']];
+    }
+
     /* ------------------------------------------------------------------ */
     /* Shared helpers */
     /* ------------------------------------------------------------------ */
+
 
     /**
      * A chart whose series carries no signal stays out of the payload —

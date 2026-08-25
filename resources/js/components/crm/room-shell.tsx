@@ -104,10 +104,11 @@ const OUTBOUND_PRIMARY: TabDef[] = [
     { label: 'Campaigns', href: '/outbound/campaigns' },
     { label: 'Sequences', href: '/outbound/sequences' },
     { label: 'Templates', href: '/outbound/templates' },
+    { label: 'Lists', href: '/outbound/lists' },
     {
         label: 'Activity',
         href: '/outbound/outbox',
-        activePaths: ['/outbound/outbox', '/outbound/replies', '/outbound/reports'],
+        activePaths: ['/outbound/outbox', '/outbound/replies'],
     },
     {
         label: 'Settings',
@@ -125,7 +126,6 @@ const OUTBOUND_PRIMARY: TabDef[] = [
 const OUTBOUND_ACTIVITY_SUB: TabDef[] = [
     { label: 'Outbox', href: '/outbound/outbox' },
     { label: 'Replies', href: '/outbound/replies' },
-    { label: 'Reports', href: '/outbound/reports' },
 ];
 
 const OUTBOUND_SETTINGS_SUB: TabDef[] = [
@@ -136,7 +136,7 @@ const OUTBOUND_SETTINGS_SUB: TabDef[] = [
     { label: 'Quiet hours', href: '/outbound/quiet-hours' },
 ];
 
-const ACTIVITY_PATHS = ['/outbound/outbox', '/outbound/replies', '/outbound/reports'];
+const ACTIVITY_PATHS = ['/outbound/outbox', '/outbound/replies'];
 const SETTINGS_PATHS = [
     '/outbound/mailboxes',
     '/outbound/domains',

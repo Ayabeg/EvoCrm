@@ -12,7 +12,6 @@ use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
 use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\FunnelController;
-use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\ReportController;
@@ -26,6 +25,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Outbound\CampaignController;
 use App\Http\Controllers\Outbound\DomainController;
 use App\Http\Controllers\Outbound\EnrollmentController;
+use App\Http\Controllers\Outbound\ListsController;
 use App\Http\Controllers\Outbound\MailboxController;
 use App\Http\Controllers\Outbound\OutboundController;
 use App\Http\Controllers\Outbound\OutboundReportController;
@@ -80,7 +80,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/auth/meta', [MetaController::class, 'redirect'])->name('auth.meta');
     Route::get('/auth/meta/callback', [MetaController::class, 'callback'])->name('auth.meta.callback');
 
-    Route::get('/leads', [LeadBoardController::class, 'index'])->name('leads.index');
+    Route::redirect('/leads', '/crm/deals/board')->name('leads.index');
+
+    Route::get('/crm/activities', [ActivityController::class, 'index'])->name('crm.activities.index');
 
     Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
@@ -90,6 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/reports/funnels', [FunnelController::class, 'index'])->name('reports.funnels');
+    Route::get('/reports/{category}', [ReportController::class, 'index'])->whereIn('category', ['sales', 'pipeline', 'outbound', 'ads'])->name('reports.category');
     Route::get('/api/funnels/{funnel}', [FunnelController::class, 'show'])->name('api.funnels.show');
     Route::get('/crm/reports', [ReportController::class, 'index'])->name('crm.reports');
     Route::get('/crm/report-builder', [SavedReportController::class, 'index'])->name('crm.report-builder.index');
@@ -163,10 +166,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/deals/{deal}/draft-email', [AskEvoController::class, 'draftDeal'])->name('crm.deals.draft-email');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
+    Route::get('/ads/campaigns', [AdsCenterController::class, 'campaigns'])->name('ads.campaigns.index');
+    Route::get('/ads/ad-sets', [AdsCenterController::class, 'adSets'])->name('ads.ad-sets.index');
+    Route::get('/ads/ads', [AdsCenterController::class, 'adsIndex'])->name('ads.ads.index');
     Route::get('/ads/campaigns/{campaign}', [AdsCenterController::class, 'show'])->name('ads.campaigns.show');
     Route::post('/ads/sync', [AdsCenterController::class, 'sync'])->name('ads.sync');
 
     Route::get('/outbound', [OutboundController::class, 'index'])->name('outbound.index');
+    Route::get('/outbound/lists', [ListsController::class, 'index'])->name('outbound.lists.index');
 
     Route::get('/outbound/mailboxes', [MailboxController::class, 'index'])->name('outbound.mailboxes.index');
     Route::post('/outbound/mailboxes', [MailboxController::class, 'store'])->name('outbound.mailboxes.store');
@@ -212,7 +219,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/outbound/outbox', [OutboxController::class, 'index'])->name('outbound.outbox.index');
     Route::get('/outbound/replies', [ReplyController::class, 'index'])->name('outbound.replies.index');
-    Route::get('/outbound/reports', [OutboundReportController::class, 'index'])->name('outbound.reports.index');
+    Route::redirect('/outbound/reports', '/reports/outbound');
 
     Route::get('/outbound/suppressions', [SuppressionController::class, 'index'])->name('outbound.suppressions.index');
     Route::post('/outbound/suppressions', [SuppressionController::class, 'store'])->name('outbound.suppressions.store');
