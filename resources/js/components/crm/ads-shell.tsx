@@ -12,6 +12,8 @@ function tabActive(pathname: string, tab: TabDef): boolean {
 }
 const ADS_TABS: TabDef[] = [
     { label: 'Overview', href: '/ads', exact: true },
+    { label: 'Attribution', href: '/ads/attribution', exact: true },
+    { label: 'Audiences', href: '/ads/audiences', exact: true },
     { label: 'Campaigns', href: '/ads/campaigns', activePaths: ['/ads/campaigns'] },
     { label: 'Ad sets', href: '/ads/ad-sets' },
     { label: 'Ads', href: '/ads/ads' },
