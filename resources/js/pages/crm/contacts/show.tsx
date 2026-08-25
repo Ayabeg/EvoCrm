@@ -6,6 +6,7 @@ import CatchUpBlock from '@/components/crm/catch-up-block';
 import type {CatchUpItem} from '@/components/crm/catch-up-block';
 import ContactDealsKanban from '@/components/crm/contact-deals-kanban';
 import { SkeletonRecord } from '@/components/crm/empty-room';
+import PlaybookCard from '@/components/crm/playbook-card';
 import {
     ActivityTabs,
     AssociationCard,
@@ -13,7 +14,6 @@ import {
     RecordBack,
     RecordShell,
 } from '@/components/crm/record-chrome';
-import PlaybookCard from '@/components/crm/playbook-card';
 import RecordProperties from '@/components/crm/record-properties';
 import type {AttributeBag} from '@/components/crm/record-properties';
 import { Avatar, AvatarFallback } from '@/components/ui/aurora/avatar';

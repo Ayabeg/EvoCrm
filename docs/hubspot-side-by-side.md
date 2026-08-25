@@ -44,6 +44,7 @@ HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of
 | Column chooser | Persisted per view | Chooser saved with the view | Match |
 | Bulk actions | Assign, enroll, edit, delete | Assign, enroll, move, delete | Match |
 | Calculated columns | List formulas | Custom/calculated attributes as list columns | Match |
+| Association filters | Cross-object filters | Contact `deal_stage` / `has_open_deal` | Partial |
 | Export | CSV | Contacts + deals; deals honor pipeline | Match |
 | Multi-pipeline on list | Yes | `PipelineSwitcher` + `?pipeline=` | Match |
 

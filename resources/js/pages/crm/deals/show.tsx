@@ -7,6 +7,7 @@ import type {CatalogProduct, DealLineItemRow} from '@/components/crm/deal-line-i
 import DealQuotes from '@/components/crm/deal-quotes';
 import DealSplits from '@/components/crm/deal-splits';
 import { SkeletonRecord } from '@/components/crm/empty-room';
+import PlaybookCard from '@/components/crm/playbook-card';
 import {
     ActivityTabs,
     AssociationCard,
@@ -14,7 +15,6 @@ import {
     RecordBack,
     RecordShell,
 } from '@/components/crm/record-chrome';
-import PlaybookCard from '@/components/crm/playbook-card';
 import RecordProperties from '@/components/crm/record-properties';
 import type {AttributeBag} from '@/components/crm/record-properties';
 import { Button } from '@/components/ui/button';
