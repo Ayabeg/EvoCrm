@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Crm;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Lead;
+use App\Services\Crm\LeadConverter;
+use App\Services\Crm\PipelineManager;
+use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -44,10 +47,11 @@ class LeadController extends Controller
         return back();
     }
 
-    public function show(Request $request, Lead $lead): Response
+    public function show(Request $request, Lead $lead, CrmHub $hub, PipelineManager $pipelines): Response
     {
         abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
 
+        $workspace = $request->user()->workspace;
         $lead->load(['contact.company', 'contact.threads', 'contact.enrollments.sequence', 'contact.deals.stage', 'company', 'deal.stage']);
 
         return Inertia::render('crm/leads/show', [
@@ -61,9 +65,21 @@ class LeadController extends Controller
                 'deals' => $lead->contact?->deals ?? [],
             ],
             'contacts' => Contact::query()
-                ->forWorkspace($request->user()->workspace)
+                ->forWorkspace($workspace)
                 ->orderBy('first_name')
                 ->get(['id', 'first_name', 'last_name']),
+            'pipelines' => $pipelines->options($workspace)->load('stages')->map(fn ($row) => [
+                'id' => $row->id,
+                'name' => $row->name,
+                'is_default' => (bool) $row->is_default,
+                'stages' => $row->stages()->orderBy('position')->get(['id', 'name', 'slug', 'pipeline_id']),
+            ])->values(),
+            'members' => $hub->members($workspace),
+            'contactDeals' => $lead->contact?->deals?->map(fn ($deal) => [
+                'id' => $deal->id,
+                'title' => $deal->title,
+                'stage' => $deal->stage?->name,
+            ])->values() ?? [],
         ]);
     }
 
@@ -82,10 +98,21 @@ class LeadController extends Controller
         return back();
     }
 
-    public function qualify(Request $request, Lead $lead): RedirectResponse
+    public function qualify(Request $request, Lead $lead, LeadConverter $converter): RedirectResponse
     {
         abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
-        $lead->qualify();
+
+        $data = $request->validate([
+            'mode' => ['nullable', 'in:create,link'],
+            'pipeline_id' => ['nullable', 'integer'],
+            'stage_id' => ['nullable', 'integer'],
+            'owner_id' => ['nullable', 'integer'],
+            'amount_cents' => ['nullable', 'integer', 'min:0'],
+            'amount_dzd' => ['nullable', 'numeric', 'min:0'],
+            'deal_id' => ['nullable', 'integer'],
+        ]);
+
+        $converter->convert($lead, $request->user(), $data);
 
         return back();
     }

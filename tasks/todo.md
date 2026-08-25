@@ -269,12 +269,12 @@
 **Description:** Replace status-only qualification with an explicit conversion flow that creates or links a pipeline deal and records the transition.
 
 **Acceptance criteria:**
-- [ ] Qualification asks for pipeline, stage, owner, amount, and whether to create or link a deal.
-- [ ] Conversion is transactional and cannot create multiple deals from repeated submission.
-- [ ] Lead, contact, deal, source attribution, and timeline remain linked.
+- [x] Qualification asks for pipeline, stage, owner, amount, and whether to create or link a deal.
+- [x] Conversion is transactional and cannot create multiple deals from repeated submission.
+- [x] Lead, contact, deal, source attribution, and timeline remain linked.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=LeadConversionTest`
+- [x] Tests pass: `php artisan test --filter=LeadConversionTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: qualify one lead into a new deal and another into an existing deal.
 

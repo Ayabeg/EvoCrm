@@ -1,9 +1,27 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import LeadConversionDialog from '@/components/crm/lead-conversion-dialog';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-export default function LeadShow({ lead, associations }: { lead: any; associations?: any }) {
+export default function LeadShow({
+    lead,
+    associations,
+    pipelines = [],
+    members = [],
+    contactDeals = [],
+}: {
+    lead: any;
+    associations?: any;
+    pipelines?: {
+        id: number;
+        name: string;
+        is_default?: boolean;
+        stages: { id: number; name: string; slug: string; pipeline_id: number }[];
+    }[];
+    members?: { id: number; name: string }[];
+    contactDeals?: { id: number; title: string; stage?: string | null }[];
+}) {
     return (
         <>
             <Head title={lead.title} />
@@ -13,11 +31,12 @@ export default function LeadShow({ lead, associations }: { lead: any; associatio
                         Open in Inbox
                     </Link>
                     {lead.status !== 'qualified' ? (
-                        <Form action={`/crm/leads/${lead.id}/qualify`} method="post">
-                            {({ processing }) => (
-                                <Button disabled={processing}>Qualify</Button>
-                            )}
-                        </Form>
+                        <LeadConversionDialog
+                            leadId={lead.id}
+                            pipelines={pipelines}
+                            members={members}
+                            contactDeals={contactDeals}
+                        />
                     ) : null}
                 </PageHeader>
                 <Card className="space-y-2 p-4 text-sm">
