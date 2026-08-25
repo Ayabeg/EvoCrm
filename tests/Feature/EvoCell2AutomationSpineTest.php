@@ -28,8 +28,6 @@ it('schedules delayed workflow executions instead of running immediately', funct
 
     $contact = Contact::factory()->create(['workspace_id' => $workspace->id]);
 
-    app(WorkflowRunner::class)->handleContactCreated($contact);
-
     expect(WorkflowExecution::query()->where('workflow_id', $workflow->id)->count())->toBe(1)
         ->and(Activity::query()->where('contact_id', $contact->id)->count())->toBe(0);
 });

@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
 import type { KpiTile } from '@/components/crm/crm-kpi-strip';
 import { ReportsShell, reportsBasePath } from '@/components/crm/reports-shell';
+import { OutboundReportsDetail } from '@/components/outbound/reports-detail';
+import type { OutboundDetailProps } from '@/components/outbound/reports-detail';
 import {
     Dialog,
     DialogContent,
@@ -73,6 +75,7 @@ type OpenDashboard = {
 
 type Props = {
     activeCategory?: string;
+    outboundDetail?: OutboundDetailProps | null;
     window: {
         from: string;
         to: string;
@@ -226,6 +229,7 @@ function filterQuery(
 
 export default function Reports({
     activeCategory = 'overview',
+    outboundDetail = null,
     window,
     categories,
     owners,
@@ -533,12 +537,17 @@ export default function Reports({
                             </p>
                         </div>
                     ) : (
-                        categories.map((category) => (
-                            <CategorySection
-                                key={category.key}
-                                category={category}
-                            />
-                        ))
+                        <>
+                            {categories.map((category) => (
+                                <CategorySection
+                                    key={category.key}
+                                    category={category}
+                                />
+                            ))}
+                            {outboundDetail ? (
+                                <OutboundReportsDetail {...outboundDetail} />
+                            ) : null}
+                        </>
                     )}
             </ReportsShell>
 

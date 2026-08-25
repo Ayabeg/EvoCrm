@@ -56,6 +56,10 @@ it('renders the outbound overview, outbox, replies, and reports pages', function
             ->component('crm/reports')
             ->where('activeCategory', 'outbound')
             ->where('categories.0.key', 'outbound')
+            ->where('outboundDetail.totals.sent', 1)
+            ->where('outboundDetail.totals.opened', 1)
+            ->has('outboundDetail.tracking.opened')
+            ->has('outboundDetail.tracking.bounced')
         );
 });
 
