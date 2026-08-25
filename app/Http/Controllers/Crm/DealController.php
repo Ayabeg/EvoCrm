@@ -109,7 +109,7 @@ class DealController extends Controller
             'deal' => $deal,
             'associations' => $hub->dealAssociations($deal),
             'timeline' => $hub->timeline(deal: $deal),
-            'catchUp' => $hub->catchUp($deal),
+            'catchUp' => $hub->catchUp(deal: $deal),
             'attributes' => $hub->attributeBag($workspace, 'deal', $deal->id),
             'stages' => $deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages,
             'members' => $hub->members($workspace),
@@ -211,6 +211,25 @@ class DealController extends Controller
         if (isset($data['attributes'])) {
             $attributes->saveValues($request->user()->workspace, 'deal', $deal->id, $data['attributes']);
         }
+
+        return back();
+    }
+
+    public function updateAttributes(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
+    {
+        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'attributes' => ['required', 'array'],
+        ]);
+
+        $attributes->saveValues(
+            $request->user()->workspace,
+            'deal',
+            $deal->id,
+            $data['attributes'],
+            enforceRequired: true,
+        );
 
         return back();
     }

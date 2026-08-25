@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { PillGroup, PillTrigger, TabsContent } from '@/components/ui/tabs';
 
 export type WorkspacePanelKey = 'left' | 'center' | 'right';
 
@@ -43,32 +44,33 @@ export function WorkspacePanelSwitcher({
     className?: string;
 }) {
     return (
-        <div
-            role="tablist"
-            aria-label="Workspace panels"
-            className={cn(
-                'grid shrink-0 grid-cols-3 gap-1 border-b border-hairline bg-canvas p-2 lg:hidden',
-                className,
-            )}
+        <PillGroup
+            value={active}
+            onValueChange={(value) => onChange(value as WorkspacePanelKey)}
+            className={cn('w-full shrink-0 border-b border-hairline bg-canvas p-2 lg:hidden', className)}
+            panels={
+                <>
+                    {panels.map((panel) => (
+                        <TabsContent
+                            key={panel.key}
+                            value={panel.key}
+                            className="sr-only"
+                            aria-hidden
+                        />
+                    ))}
+                </>
+            }
         >
             {panels.map((panel) => (
-                <button
+                <PillTrigger
                     key={panel.key}
-                    type="button"
-                    role="tab"
-                    aria-selected={active === panel.key}
-                    onClick={() => onChange(panel.key)}
-                    className={cn(
-                        'min-h-11 rounded-md px-2 py-2.5 text-center text-[12px] font-medium transition-colors',
-                        active === panel.key
-                            ? 'bg-brand/12 text-ink'
-                            : 'text-muted-foreground hover:bg-canvas-soft hover:text-ink',
-                    )}
+                    value={panel.key}
+                    className="min-h-11 flex-1 justify-center px-2 py-2.5 text-center text-[12px] font-medium"
                 >
                     {panel.label}
-                </button>
+                </PillTrigger>
             ))}
-        </div>
+        </PillGroup>
     );
 }
 

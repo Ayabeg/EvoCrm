@@ -1,11 +1,11 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
-import { Facebook, Instagram, MessageCircle } from 'lucide-react';
-import { useMemo, useState } from 'react';
 import { DeskShell } from '@/components/crm/desk-shell';
-import { EmptyRoom } from '@/components/crm/empty-room';
+import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { OfficialDeskConnector } from '@/types';
+import { useMemo, useState } from 'react';
 
 type Contact = {
     id: number;
@@ -37,13 +37,6 @@ type Thread = {
     }[];
 };
 
-type ChannelCard = {
-    key: string;
-    label: string;
-    href: string;
-    connected: boolean;
-};
-
 type Props = {
     embedUrl: string | null;
     embedState: 'ok' | 'blocked' | 'unreachable' | 'no-url';
@@ -51,7 +44,7 @@ type Props = {
     configuredUrl: string | null;
     threads: Thread[];
     selected: Thread | null;
-    channels?: ChannelCard[];
+    officialConnectors: OfficialDeskConnector[];
 };
 
 function nameOf(contact?: Contact | null) {
@@ -62,73 +55,53 @@ function nameOf(contact?: Contact | null) {
     return `${contact.first_name} ${contact.last_name ?? ''}`.trim();
 }
 
-const CHANNEL_ICONS: Record<string, typeof MessageCircle> = {
-    whatsapp_cloud: MessageCircle,
-    instagram: Instagram,
-    facebook: Facebook,
-};
-
 export default function DeskInbox({
     embedUrl,
     embedState,
+    embedReason,
+    configuredUrl,
     threads,
     selected,
-    channels = [],
+    officialConnectors = [],
 }: Props) {
+    if (embedUrl) {
+        return (
+            <DeskShell title="Desk">
+                <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
+                    <OfficialConnectPanel connectors={officialConnectors} compact />
+                    <iframe
+                        title="EvoDesk — EvoSales inbox"
+                        src={embedUrl}
+                        className="min-h-0 w-full flex-1 border-0 bg-canvas"
+                        allow="clipboard-write; microphone; camera"
+                    />
+                </div>
+            </DeskShell>
+        );
+    }
+
     const empty = threads.length === 0;
 
     return (
         <DeskShell title="Desk">
-            <div className="flex h-full flex-col bg-canvas text-ui text-ink">
+            <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
                 {empty ? (
-                    <ConnectChannels channels={channels} />
+                    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                        {embedState !== 'no-url' ? (
+                            <p className="border-b border-hairline px-4 py-3 text-xs text-muted-foreground">
+                                <span className="font-medium text-ink">
+                                    EvoDesk at {configuredUrl} is not framed here.
+                                </span>{' '}
+                                {embedReason}
+                            </p>
+                        ) : null}
+                        <OfficialConnectPanel connectors={officialConnectors} />
+                    </div>
                 ) : (
                     <FrontDesk threads={threads} selected={selected} />
                 )}
             </div>
         </DeskShell>
-    );
-}
-
-function ConnectChannels({ channels }: { channels: ChannelCard[] }) {
-    const cards =
-        channels.length > 0
-            ? channels
-            : [
-                  { key: 'whatsapp_cloud', label: 'WhatsApp Cloud', href: '/settings/apps', connected: false },
-                  { key: 'instagram', label: 'Instagram', href: '/settings/apps', connected: false },
-                  { key: 'facebook', label: 'Facebook', href: '/settings/apps', connected: false },
-              ];
-
-    return (
-        <EmptyRoom
-            title="Connect your channels"
-            line="Official WhatsApp Cloud, Instagram, and Facebook. No unofficial WhatsApp."
-            actionLabel="Open Apps"
-            actionHref="/settings/apps"
-        >
-            <div className="mt-6 grid gap-3 text-left">
-                    {cards.map((channel) => {
-                        const Icon = CHANNEL_ICONS[channel.key] ?? MessageCircle;
-
-                        return (
-                            <Link
-                                key={channel.key}
-                                href={channel.href}
-                                className="flex items-center justify-between rounded-md border border-hairline px-4 py-3 text-left hover:border-brand"
-                            >
-                                <span className="inline-flex items-center gap-2 font-medium">
-                                    <Icon className="size-4 text-brand" />
-                                    {channel.label}
-                                </span>
-                                <span className="text-ui text-brand">
-                                    {channel.connected ? 'Connected' : 'Connect'}
-                                </span>
-                            </Link>
-                        );
-                    })}
-                </div>
-        </EmptyRoom>
     );
 }
 
@@ -278,14 +251,22 @@ function FrontDesk({
                                         <button
                                             type="button"
                                             onClick={() => setMode('reply')}
-                                            className={mode === 'reply' ? 'border-b-2 border-brand pb-1 font-medium' : 'text-muted-foreground'}
+                                            className={
+                                                mode === 'reply'
+                                                    ? 'border-b-2 border-brand pb-1 font-medium'
+                                                    : 'text-muted-foreground'
+                                            }
                                         >
                                             Reply
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setMode('note')}
-                                            className={mode === 'note' ? 'border-b-2 border-brand pb-1 font-medium' : 'text-muted-foreground'}
+                                            className={
+                                                mode === 'note'
+                                                    ? 'border-b-2 border-brand pb-1 font-medium'
+                                                    : 'text-muted-foreground'
+                                            }
                                         >
                                             Note
                                         </button>

@@ -123,7 +123,7 @@ Phase 1 installs tokens + component CSS only. UI primitives migrate incrementall
 | `list-view-table.tsx` | `@aurora/aurora-data-table` | Phase 6 | Responsive row/card |
 | `evo-kpi-card.tsx` | `@aurora/aurora-stat-card` | Phase 5 | EvoViz chart colors |
 | `ask-evo-panel.tsx` | `@aurora/aurora-prompt-input` block | Phase 4 | `--axon-orange` |
-| `adaptive-workspace-shell.tsx` | Aurora tabs + sheet | Phase 4 | Responsive Craft matrix |
+| `adaptive-workspace-shell.tsx` | Aurora PillGroup tabs + sheet | Phase 4 | Responsive Craft matrix |
 
 **Rule:** One canonical component per primitive. No `EvoButton` / `AuroraButton` / `LegacyButton` coexistence after migration.
 
@@ -145,7 +145,7 @@ Phase 1 installs tokens + component CSS only. UI primitives migrate incrementall
 | **1** | Registry, tokens, bridge, docs | **Done** (PR #86) |
 | **2** | Core primitives — canonical `@/components/ui/*` → Aurora adapters | **Done** |
 | **3** | Application shell — command bar Aurora Button/CommandPalette | **Done** |
-| **4** | Contact Detail — Aurora tabs, cards, avatar, Ask Evo card | **Done** |
+| **4** | Contact Detail — Aurora tabs, cards, avatar, Ask Evo card + mobile Sheet | **Done** |
 | **5** | Home dashboard — StatCard KPIs, Aurora dashboard sections | **Done** |
 | **6** | Tables/forms/drawers — list card rows @480px, Sheet via Aurora | **Done** |
 | **7** | Remaining modules inherit via ui adapters; sidebar keeps EvoDesk rail | **Done** |

@@ -2,6 +2,7 @@
 
 use App\Enums\WorkspaceRole;
 use App\Models\Contact;
+use App\Models\Deal;
 use App\Models\Pipeline;
 use App\Models\RecordLayout;
 use App\Models\SavedFilter;
