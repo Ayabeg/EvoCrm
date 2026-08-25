@@ -1,5 +1,6 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { useState } from 'react';
+import { CrmShell } from '@/components/crm/crm-shell';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -234,8 +235,8 @@ export default function WorkflowsIndex({
     const needsConditionValue = conditionOperator !== 'is_set' && conditionOperator !== 'is_empty';
 
     return (
-        <>
-            <Head title="Automation" />
+        <CrmShell title="Automation">
+            <div className="h-full overflow-y-auto">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Automation"
@@ -512,7 +513,8 @@ export default function WorkflowsIndex({
                     </table>
                 </Card>
             </div>
-        </>
+            </div>
+        </CrmShell>
     );
 }
 

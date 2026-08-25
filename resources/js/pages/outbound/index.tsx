@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { RoomShell, outboundTabs } from '@/components/crm/room-shell';
+import { RoomShell, outboundSubTabs, outboundTabs } from '@/components/crm/room-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -88,7 +88,11 @@ export default function OutboundIndex({
     return (
         <>
             <Head title="Outbound" />
-            <RoomShell title="Outbound" tabs={outboundTabs(pathname)}>
+            <RoomShell
+                title="Outbound"
+                tabs={outboundTabs(pathname)}
+                subTabs={outboundSubTabs(pathname)}
+            >
             <div className="h-full overflow-y-auto">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader

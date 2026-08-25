@@ -1,4 +1,5 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
+import { ReportsShell } from '@/components/crm/reports-shell';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,10 +18,12 @@ export default function ReportBuilder({
     crossObject?: { metric: string; groups: Array<{ label: string; value: number; count: number }> };
 }) {
     return (
-        <>
-            <Head title="Report builder" />
-            <div className="mx-auto max-w-4xl space-y-4 p-4">
-                <PageHeader title="Report builder" description="Save ad hoc CRM reports with filters and grouping." />
+        <ReportsShell
+            title="Report builder"
+            pageTitle="Report builder"
+            description="Save ad hoc CRM reports with filters and grouping."
+        >
+            <div className="mx-auto max-w-4xl space-y-4">
                 <Link href="/crm/report-builder/cross-object" className="text-sm text-brand underline">
                     Cross-object: reply rate by wilaya
                 </Link>
@@ -77,6 +80,6 @@ export default function ReportBuilder({
                     </div>
                 ) : null}
             </div>
-        </>
+        </ReportsShell>
     );
 }

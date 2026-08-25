@@ -1,6 +1,6 @@
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useState } from 'react';
-import { CrmAnalyticsShell } from '@/components/crm/crm-analytics-shell';
+import { ReportsShell } from '@/components/crm/reports-shell';
 import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import { formatDzd } from '@/lib/money';
 import {
@@ -328,10 +328,9 @@ export default function Reports({
 
     return (
         <>
-            <Head title={title} />
-            <CrmAnalyticsShell
-                active="/reports"
+            <ReportsShell
                 title={title}
+                pageTitle={title}
                 description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only — empty categories stay hidden.`}
                 filters={
                     <form
@@ -537,7 +536,7 @@ export default function Reports({
                             />
                         ))
                     )}
-            </CrmAnalyticsShell>
+            </ReportsShell>
 
             <Dialog open={newOpen} onOpenChange={setNewOpen}>
                 <DialogContent>

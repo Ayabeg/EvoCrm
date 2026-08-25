@@ -1,6 +1,7 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import type { DragEvent } from 'react';
+import { CrmShell } from '@/components/crm/crm-shell';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
@@ -176,8 +177,8 @@ export default function DealBoard({
     ];
 
     return (
-        <>
-            <Head title="Deals board" />
+        <CrmShell title="Deals board">
+            <div className="h-full overflow-y-auto">
             <div className="flex-1 space-y-4 bg-canvas-soft p-6 text-ink">
                 <PageHeader
                     title="Deals board"
@@ -267,7 +268,8 @@ export default function DealBoard({
                     })}
                 </div>
             </div>
-        </>
+            </div>
+        </CrmShell>
     );
 }
 

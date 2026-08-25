@@ -1,5 +1,6 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import { SkeletonList } from '@/components/crm/empty-room';
@@ -56,8 +57,8 @@ export default function ContactsIndex({
 
     return (
         <>
-            <Head title="Contacts" />
-            <CrmListShell
+            <CrmShell title="Contacts">
+                <CrmListShell
                 title="Contacts"
                 entity="contact"
                 basePath="/crm/contacts"
@@ -107,6 +108,7 @@ export default function ContactsIndex({
                     </>
                 )}
             </CrmListShell>
+            </CrmShell>
 
             <CreateDrawer
                 open={drawer}
