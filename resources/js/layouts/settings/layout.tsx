@@ -72,6 +72,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/permissions',
         icon: null,
     },
+    {
+        title: 'System health',
+        href: '/settings/system-health',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
@@ -96,7 +101,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         page.component === 'settings/attributes' ||
         page.component === 'settings/pipelines' ||
         page.component === 'settings/record-layouts' ||
-        page.component === 'settings/connectors';
+        page.component === 'settings/connectors' ||
+        page.component === 'settings/system-health';
 
     return (
         <div className="px-4 py-6">

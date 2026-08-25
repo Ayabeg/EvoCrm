@@ -10,9 +10,13 @@ use App\Observers\ContactObserver;
 use App\Observers\DealObserver;
 use App\Observers\LeadObserver;
 use App\Services\Identity\WorkspaceProvisioner;
+use App\Services\Operations\ScheduledTaskMonitor;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Console\Events\ScheduledTaskFailed;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -25,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(ScheduledTaskMonitor::class);
     }
 
     public function boot(): void
@@ -57,6 +61,19 @@ class AppServiceProvider extends ServiceProvider
                 $user->forceFill(['last_login_at' => now()])->save();
             }
         });
+
+        Event::listen(
+            ScheduledTaskStarting::class,
+            fn (ScheduledTaskStarting $event) => app(ScheduledTaskMonitor::class)->starting($event),
+        );
+        Event::listen(
+            ScheduledTaskFinished::class,
+            fn (ScheduledTaskFinished $event) => app(ScheduledTaskMonitor::class)->finished($event),
+        );
+        Event::listen(
+            ScheduledTaskFailed::class,
+            fn (ScheduledTaskFailed $event) => app(ScheduledTaskMonitor::class)->failed($event),
+        );
     }
 
     protected function configureDefaults(): void
