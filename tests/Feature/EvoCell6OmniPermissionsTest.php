@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\WorkspaceRole;
 use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Dashboard;
@@ -34,7 +35,7 @@ it('stores deal splits that sum to 100 percent', function () {
 
 it('checks granular permissions on members', function () {
     $member = User::factory()->create([
-        'role' => \App\Enums\WorkspaceRole::Member,
+        'role' => WorkspaceRole::Member,
         'permissions' => ['deals.view'],
     ]);
 
@@ -111,18 +112,24 @@ it('fires segment entered workflow when contact matches segment', function () {
 
 it('scopes deals for team_only permission', function () {
     $owner = User::factory()->create([
-        'role' => \App\Enums\WorkspaceRole::Member,
+        'role' => WorkspaceRole::Member,
         'permissions' => ['deals.team_only', 'deals.view'],
     ]);
     $other = User::factory()->create(['workspace_id' => $owner->workspace_id]);
+    $pipeline = $owner->workspace->defaultPipeline();
+    $stage = $pipeline->stageBySlug('new');
 
     Deal::factory()->create([
         'workspace_id' => $owner->workspace_id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $stage->id,
         'owner_id' => $owner->id,
         'title' => 'Mine',
     ]);
     Deal::factory()->create([
         'workspace_id' => $owner->workspace_id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $stage->id,
         'owner_id' => $other->id,
         'title' => 'Theirs',
     ]);
