@@ -59,7 +59,7 @@ class FunnelController extends Controller
 
         $to = isset($validated['to'])
             ? Carbon::parse($validated['to'], self::TZ)->endOfDay()
-            : now(self::TZ)->endOfDay();
+            : Carbon::now(self::TZ)->endOfDay();
         $from = isset($validated['from'])
             ? Carbon::parse($validated['from'], self::TZ)->startOfDay()
             : $to->copy()->subDays(29)->startOfDay();

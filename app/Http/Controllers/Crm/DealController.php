@@ -7,8 +7,10 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Stage;
 use App\Services\Ai\RecordInsight;
+use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
+use App\Services\Crm\PipelineManager;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -73,6 +75,26 @@ class DealController extends Controller
             'openPipelineCents' => $openCents,
             'createOpen' => $request->boolean('create'),
             'prefillContactId' => $request->integer('contact_id') ?: null,
+        ]);
+    }
+
+    public function board(Request $request, PipelineManager $pipelines): Response
+    {
+        $workspace = $request->user()->workspace;
+        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
+        $board = $pipelines->boardData($workspace, $pipeline);
+
+        return Inertia::render('crm/deals/board', [
+            'pipeline' => $pipeline->only(['id', 'name']),
+            'pipelines' => $pipelines->options($workspace)->map(fn ($row) => [
+                'id' => $row->id,
+                'name' => $row->name,
+                'is_default' => (bool) $row->is_default,
+            ])->values(),
+            'stages' => $board['stages'],
+            'deals' => $board['deals'],
+            'forecast' => $board['forecast'],
+            'forecastBand' => null,
         ]);
     }
 

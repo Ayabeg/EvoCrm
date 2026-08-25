@@ -6,6 +6,7 @@ use App\Models\AdCampaignStat;
 use App\Models\ConversionFunnel;
 use App\Models\FunnelEvent;
 use App\Models\Workspace;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -31,13 +32,13 @@ class ConversionFunnelQuery
     public function forFunnel(
         Workspace $workspace,
         ?ConversionFunnel $funnel,
-        ?Carbon $from = null,
-        ?Carbon $to = null,
+        ?CarbonInterface $from = null,
+        ?CarbonInterface $to = null,
     ): array {
         $funnel ??= $this->defaultFunnel($workspace);
 
-        $to ??= now(self::TZ)->endOfDay();
-        $from ??= $to->copy()->subDays(29)->startOfDay();
+        $to = $to ? Carbon::parse($to) : Carbon::now(self::TZ)->endOfDay();
+        $from = $from ? Carbon::parse($from) : $to->copy()->subDays(29)->startOfDay();
 
         if ($from->gt($to)) {
             [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
