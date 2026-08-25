@@ -86,19 +86,19 @@ The audit is recorded in [`docs/evolsales-baseline.md`](../docs/evolsales-baseli
 
 ### Phase 1: Production Trust
 
-- [ ] Task 1: Deploy the scheduler as a durable worker
-- [ ] Task 2: Add scheduler and integration health signals
-- [ ] Task 3: Make inbound webhooks tenant-safe
-- [ ] Task 4: Unify Meta OAuth credentials with runtime services
-- [ ] Task 5: Enforce CRM permissions and expose editable overrides
+- [x] Task 1: Deploy the scheduler as a durable worker
+- [x] Task 2: Add scheduler and integration health signals
+- [x] Task 3: Make inbound webhooks tenant-safe
+- [x] Task 4: Unify Meta OAuth credentials with runtime services
+- [x] Task 5: Enforce CRM permissions and expose editable overrides
 
 ### Checkpoint: Production Trust
 
-- [ ] Scheduled commands execute independently from the HTTP process.
-- [ ] A workspace cannot receive or mutate another workspace's webhook data.
-- [ ] Runtime Meta sync uses the connection shown in Settings.
-- [ ] Permission tests prove forbidden member actions return 403.
-- [ ] Full test suite and production build pass.
+- [x] Scheduled commands execute independently from the HTTP process.
+- [x] A workspace cannot receive or mutate another workspace's webhook data.
+- [x] Runtime Meta sync uses the connection shown in Settings.
+- [x] Permission tests prove forbidden member actions return 403.
+- [x] Full test suite and production build pass.
 
 ### Phase 1: Migration and Data Operations
 

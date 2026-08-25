@@ -28,13 +28,13 @@
 **Description:** Add a production-safe process definition that runs Laravel scheduling independently of the HTTP service and documents the required database/locking assumptions.
 
 **Acceptance criteria:**
-- [ ] Web and scheduler processes have separate startup definitions.
-- [ ] Scheduler restarts automatically without changing the web server command.
-- [ ] Deployment documentation names every scheduled command and required environment value.
+- [x] Web and scheduler processes have separate startup definitions.
+- [x] Scheduler restarts automatically without changing the web server command.
+- [x] Deployment documentation names every scheduled command and required environment value.
 
 **Verification:**
-- [ ] Tests pass: `composer test -- --filter=Schedule`
-- [ ] Build succeeds: `npm run build`
+- [x] Tests pass: `composer test -- --filter=Schedule`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: observe two consecutive `schedule:list`/worker cycles in staging.
 
 **Dependencies:** None
@@ -52,13 +52,13 @@
 **Description:** Persist command freshness and expose an admin health view so operators can distinguish healthy automation from a configured-but-idle deployment.
 
 **Acceptance criteria:**
-- [ ] Each critical scheduled command records last start, success, failure, and error summary.
-- [ ] Settings displays freshness for sequences, workflows, replies, mailbox sync, warmup, and reports.
-- [ ] Stale or failed jobs produce a clear warning without exposing secrets.
+- [x] Each critical scheduled command records last start, success, failure, and error summary.
+- [x] Settings displays freshness for sequences, workflows, replies, mailbox sync, warmup, and reports.
+- [x] Stale or failed jobs produce a clear warning without exposing secrets.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=SchedulerHealthTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Tests pass: `php artisan test --filter=SchedulerHealthTest`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: force one command failure and confirm the warning appears.
 
 **Dependencies:** Task 1
@@ -77,13 +77,13 @@
 **Description:** Replace first-workspace selection with signed, provider-specific workspace resolution for Evolution and Meta lead ingestion.
 
 **Acceptance criteria:**
-- [ ] Every inbound webhook resolves exactly one workspace from a stored provider mapping or signed token.
-- [ ] Unknown, ambiguous, or invalid webhook identities are rejected without writing domain rows.
-- [ ] Cross-workspace replay tests prove contacts, threads, leads, and events remain isolated.
+- [x] Every inbound webhook resolves exactly one workspace from a stored provider mapping or signed token.
+- [x] Unknown, ambiguous, or invalid webhook identities are rejected without writing domain rows.
+- [x] Cross-workspace replay tests prove contacts, threads, leads, and events remain isolated.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=WebhookTenancyTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Tests pass: `php artisan test --filter=WebhookTenancyTest`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: send staging webhooks for two workspaces and inspect isolated results.
 
 **Dependencies:** None
@@ -102,13 +102,13 @@
 **Description:** Make ads and audience synchronization consume the encrypted workspace Meta integration selected in Settings instead of unrelated global access-token configuration.
 
 **Acceptance criteria:**
-- [ ] Ads and audience services resolve credentials for the current workspace.
-- [ ] Expired, missing, or insufficient-scope tokens return an actionable connection state.
-- [ ] Disconnecting Meta immediately prevents subsequent synchronization.
+- [x] Ads and audience services resolve credentials for the current workspace.
+- [x] Expired, missing, or insufficient-scope tokens return an actionable connection state.
+- [x] Disconnecting Meta immediately prevents subsequent synchronization.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=MetaWorkspaceCredentialsTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Tests pass: `php artisan test --filter=MetaWorkspaceCredentialsTest`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: connect, sync, disconnect, and verify sync is blocked.
 
 **Dependencies:** Task 3
@@ -127,13 +127,13 @@
 **Description:** Turn the read-only permission matrix into server-enforced authorization with owner-controlled per-member overrides.
 
 **Acceptance criteria:**
-- [ ] Mutating, export, import, merge, bulk, and settings operations use policies or permission middleware.
-- [ ] Owners can edit supported member overrides; admins cannot grant privileges they do not hold.
-- [ ] Default owner/admin/member behavior remains backward compatible and denial paths return 403.
+- [x] Mutating, export, import, merge, bulk, and settings operations use policies or permission middleware.
+- [x] Owners can edit supported member overrides; admins cannot grant privileges they do not hold.
+- [x] Default owner/admin/member behavior remains backward compatible and denial paths return 403.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=CrmPermissionsTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Tests pass: `php artisan test --filter=CrmPermissionsTest`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: change a member override and confirm navigation and endpoint behavior agree.
 
 **Dependencies:** None
@@ -149,10 +149,10 @@
 
 ## Checkpoint: Production Trust
 
-- [ ] Tasks 1–5 acceptance criteria pass.
-- [ ] `composer test` passes.
+- [x] Tasks 1–5 acceptance criteria pass.
+- [x] `composer test` passes.
 - [ ] `composer lint:check && composer types:check` pass.
-- [ ] `npm run lint:check && npm run types:check && npm run build` pass.
+- [x] `npm run lint:check && npm run types:check && npm run build` pass.
 - [ ] Staging proves scheduler freshness, webhook isolation, Meta sync, and permission denial.
 - [ ] Human review completed before migration work.
 
