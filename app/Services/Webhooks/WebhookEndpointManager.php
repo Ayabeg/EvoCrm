@@ -59,6 +59,7 @@ class WebhookEndpointManager
         $route = match ($provider) {
             self::PROVIDER_EVOLUTION => 'webhooks.evolution',
             self::PROVIDER_META_LEADS => 'webhooks.meta.leads',
+            default => abort(404),
         };
 
         return route($route, ['webhookKey' => $endpoint->key]);

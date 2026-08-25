@@ -50,11 +50,16 @@ class ScheduledCommandRun extends Model
         ];
     }
 
+    /** @return BelongsTo<Workspace, $this> */
     public function workspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class);
     }
 
+    /**
+     * @param  Builder<ScheduledCommandRun>  $query
+     * @return Builder<ScheduledCommandRun>
+     */
     public function scopeForWorkspace(Builder $query, Workspace|int $workspace): Builder
     {
         $workspaceId = $workspace instanceof Workspace ? $workspace->id : $workspace;

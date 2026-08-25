@@ -34,7 +34,7 @@ class ScheduledCommandHealth
 
     public function fail(ScheduledCommandRun $run, Throwable $exception): void
     {
-        $duration = $run->started_at?->diffInMilliseconds(now()) ?? 0;
+        $duration = $run->started_at->diffInMilliseconds(now());
 
         $run->forceFill([
             'status' => ScheduledCommandRun::STATUS_FAILED,
@@ -61,8 +61,17 @@ class ScheduledCommandHealth
     public function summary(Workspace|int|null $workspace = null): array
     {
         $definitions = config('operations.scheduled_commands', []);
+        $summary = [];
 
-        return collect($definitions)->map(function (array $definition, string $command) use ($workspace): array {
+        if (! is_array($definitions)) {
+            return $summary;
+        }
+
+        foreach ($definitions as $command => $definition) {
+            if (! is_string($command) || ! is_array($definition)) {
+                continue;
+            }
+
             $query = ScheduledCommandRun::query()->where('command', $command);
 
             if ($workspace !== null) {
@@ -81,18 +90,20 @@ class ScheduledCommandHealth
                 ->latest('finished_at')
                 ->first();
 
-            return [
+            $summary[] = [
                 'command' => $command,
-                'label' => (string) $definition['label'],
-                'cadence' => (string) $definition['cadence'],
-                'state' => $this->state($latest, (int) $definition['stale_after_seconds']),
+                'label' => (string) ($definition['label'] ?? $command),
+                'cadence' => (string) ($definition['cadence'] ?? 'Not configured'),
+                'state' => $this->state($latest, (int) ($definition['stale_after_seconds'] ?? 300)),
                 'last_started_at' => $latest?->started_at?->toIso8601String(),
                 'last_success_at' => $lastSuccess?->finished_at?->toIso8601String(),
                 'last_failure_at' => $lastFailure?->finished_at?->toIso8601String(),
                 'duration_ms' => $latest?->duration_ms,
                 'error_type' => $lastFailure?->error_type,
             ];
-        })->values()->all();
+        }
+
+        return $summary;
     }
 
     private function state(?ScheduledCommandRun $latest, int $staleAfterSeconds): string

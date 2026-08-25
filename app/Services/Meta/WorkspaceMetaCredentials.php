@@ -89,14 +89,25 @@ class WorkspaceMetaCredentials
      */
     public function accounts(?Integration $integration): array
     {
-        return collect($integration?->meta['ad_accounts'] ?? [])
-            ->filter(fn (mixed $account): bool => is_array($account) && filled($account['id'] ?? null))
-            ->map(fn (array $account): array => [
+        $configured = $integration?->meta['ad_accounts'] ?? [];
+        $accounts = [];
+
+        if (! is_array($configured)) {
+            return $accounts;
+        }
+
+        foreach ($configured as $account) {
+            if (! is_array($account) || ! filled($account['id'] ?? null)) {
+                continue;
+            }
+
+            $accounts[] = [
                 'id' => (string) $account['id'],
                 'name' => (string) ($account['name'] ?? $account['id']),
-            ])
-            ->values()
-            ->all();
+            ];
+        }
+
+        return $accounts;
     }
 
     /**

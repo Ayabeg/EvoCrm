@@ -18,16 +18,28 @@ class PermissionsController extends Controller
      */
     private function matrix(): array
     {
-        return collect(config('permissions.capabilities', []))
-            ->map(fn (array $capability, string $key): array => [
+        $configured = config('permissions.capabilities', []);
+        $matrix = [];
+
+        if (! is_array($configured)) {
+            return $matrix;
+        }
+
+        foreach ($configured as $key => $capability) {
+            if (! is_string($key) || ! is_array($capability) || ! is_array($capability['defaults'] ?? null)) {
+                continue;
+            }
+
+            $matrix[] = [
                 'key' => $key,
-                'label' => (string) $capability['label'],
-                'owner' => (bool) $capability['defaults']['owner'],
-                'admin' => (bool) $capability['defaults']['admin'],
-                'member' => (bool) $capability['defaults']['member'],
-            ])
-            ->values()
-            ->all();
+                'label' => (string) ($capability['label'] ?? $key),
+                'owner' => (bool) ($capability['defaults']['owner'] ?? false),
+                'admin' => (bool) ($capability['defaults']['admin'] ?? false),
+                'member' => (bool) ($capability['defaults']['member'] ?? false),
+            ];
+        }
+
+        return $matrix;
     }
 
     public function index(Request $request): Response

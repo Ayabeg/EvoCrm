@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToWorkspace;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * A workspace-level connection to an external app (Meta, …). OAuth tokens
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $access_token
  * @property array<int, string>|null $scopes
  * @property array<string, mixed>|null $meta
+ * @property Carbon|null $expires_at
+ * @property Carbon|null $connected_at
  */
 #[Fillable([
     'workspace_id',
@@ -46,6 +49,7 @@ class Integration extends Model
         ];
     }
 
+    /** @return BelongsTo<Workspace, $this> */
     public function workspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class);
