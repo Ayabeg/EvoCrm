@@ -180,13 +180,14 @@ class WorkflowRunner
             }
         }
 
-        WorkflowExecution::query()->create([
+        WorkflowExecution::query()->firstOrCreate([
             'workspace_id' => $workspace->id,
             'workflow_id' => $workflow->id,
             'contact_id' => $contact?->id,
             'deal_id' => $deal?->id,
-            'run_at' => $runAt,
             'status' => WorkflowExecution::STATUS_PENDING,
+        ], [
+            'run_at' => $runAt,
         ]);
     }
 

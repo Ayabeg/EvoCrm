@@ -6,6 +6,7 @@ use App\Enums\WorkspaceRole;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Product;
 use App\Models\Stage;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
@@ -18,13 +19,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DealController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub, PipelineManager $pipelines): Response
     {
         $workspace = $request->user()->workspace;
-        $pipeline = $workspace->defaultPipeline()->load('stages');
+        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
         $filters = $filter->resolve($request, $workspace, 'deal');
 
         $teamOnly = $request->user()->role === WorkspaceRole::Member
@@ -36,6 +38,7 @@ class DealController extends Controller
 
         $query = Deal::query()
             ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
             ->with(['contact.company', 'company', 'stage', 'owner']);
 
         $filter->applyToDeals($query, $filters);
@@ -59,12 +62,14 @@ class DealController extends Controller
 
         $openQuery = Deal::query()
             ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
             ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false));
 
         if ($teamOnly) {
             $openQuery->where('owner_id', $request->user()->id);
         }
 
+        $forecast = $pipelines->forecast($workspace, $pipeline);
         $openCents = $openQuery->sum('amount_cents');
 
         return Inertia::render('crm/deals/index', [
@@ -72,6 +77,11 @@ class DealController extends Controller
             'stages' => $pipeline->stages,
             'stageCounts' => $stageCounts,
             'pipeline' => $pipeline->only(['id', 'name']),
+            'pipelines' => $pipelines->options($workspace)->map(fn ($row) => [
+                'id' => $row->id,
+                'name' => $row->name,
+                'is_default' => (bool) $row->is_default,
+            ])->values(),
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'company_id']),
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
@@ -82,6 +92,7 @@ class DealController extends Controller
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
             'openPipelineCents' => $openCents,
+            'forecast' => $forecast,
             'createOpen' => $request->boolean('create'),
             'prefillContactId' => $request->integer('contact_id') ?: null,
         ]);
@@ -112,16 +123,19 @@ class DealController extends Controller
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
-        $deal->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items']);
+        $deal->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items', 'lineItems.product']);
 
         return Inertia::render('crm/deals/show', [
             'deal' => $deal,
+            'selected' => $deal,
             'associations' => $hub->dealAssociations($deal),
             'timeline' => $hub->timeline(deal: $deal),
             'catchUp' => $hub->catchUp(deal: $deal),
             'attributes' => $hub->attributeBag($workspace, 'deal', $deal->id),
             'stages' => $deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages,
             'members' => $hub->members($workspace),
+            'products' => Product::query()->forWorkspace($workspace)->orderBy('name')->get(),
+            'dealHealth' => $insight->dealHealth($deal),
             'askEvo' => $insight->forDeal($deal),
         ]);
     }
@@ -206,7 +220,9 @@ class DealController extends Controller
 
         $deal->update([
             'title' => $data['title'],
-            'amount_cents' => $this->toCents($data, (int) $deal->amount_cents),
+            'amount_cents' => $deal->lineItems()->exists()
+                ? (int) $deal->amount_cents
+                : $this->toCents($data, (int) $deal->amount_cents),
             'next_activity_at' => $data['next_activity_at'] ?? $deal->next_activity_at,
             'owner_id' => array_key_exists('owner_id', $data) ? $data['owner_id'] : $deal->owner_id,
             'source' => $data['source'] ?? $deal->source,
@@ -222,6 +238,45 @@ class DealController extends Controller
         }
 
         return back();
+    }
+
+    public function export(Request $request, CrmFilter $filter, PipelineManager $pipelines): StreamedResponse
+    {
+        $workspace = $request->user()->workspace;
+        $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
+        $filters = $filter->resolve($request, $workspace, 'deal');
+
+        $query = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->with(['contact', 'company', 'owner', 'stage']);
+
+        $filter->applyToDeals($query, $filters);
+
+        return response()->streamDownload(function () use ($query): void {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['id', 'title', 'amount_cents', 'currency', 'stage', 'contact', 'company', 'owner', 'source', 'close_date', 'created_at']);
+
+            $query->orderBy('title')->each(function (Deal $deal) use ($out): void {
+                fputcsv($out, [
+                    $deal->id,
+                    $deal->title,
+                    $deal->amount_cents,
+                    $deal->currency,
+                    $deal->stage?->name,
+                    $deal->contact?->displayName(),
+                    $deal->company?->name,
+                    $deal->owner?->name,
+                    $deal->source,
+                    $deal->close_date?->toDateString(),
+                    $deal->created_at?->toDateTimeString(),
+                ]);
+            });
+
+            fclose($out);
+        }, 'deals-'.now()->toDateString().'.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function updateAttributes(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
@@ -278,5 +333,4 @@ class DealController extends Controller
 
         return $fallback;
     }
-
 }

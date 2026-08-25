@@ -51,9 +51,11 @@ class CompanyController extends Controller
 
         $workspace = $request->user()->workspace;
         $company->load(['owner', 'contacts', 'deals.stage']);
+        $company->loadCount('contacts');
 
         return Inertia::render('crm/companies/show', [
             'company' => $company,
+            'selected' => $company,
             'associations' => $hub->companyAssociations($company),
             'timeline' => $hub->timeline(company: $company),
             'attributes' => $hub->attributeBag($workspace, 'company', $company->id),

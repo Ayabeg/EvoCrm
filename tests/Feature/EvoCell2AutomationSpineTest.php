@@ -113,6 +113,7 @@ it('filters contacts by sequence enrollment and email reply behavior', function 
         'contact_id' => $replied->id,
         'channel' => 'email',
         'direction' => 'out',
+        'to_address' => $replied->email,
         'status' => 'sent',
         'replied_at' => now(),
     ]);

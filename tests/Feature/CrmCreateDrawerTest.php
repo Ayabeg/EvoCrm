@@ -25,7 +25,7 @@ it('creates a contact from the create drawer and can add another', function () {
             'email' => 'drawer.two@evotechly.dz',
             'add_another' => '1',
         ])
-        ->assertRedirect('/crm/contacts');
+        ->assertRedirect('/crm/contacts?create=1');
 
     expect(Contact::query()->forWorkspace($user->workspace)->where('first_name', 'Drawer')->count())->toBe(2);
 

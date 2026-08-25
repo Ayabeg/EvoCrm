@@ -26,9 +26,9 @@ class DealObserver
             return;
         }
 
+        $deal->unsetRelation('stage')->load('stage');
         $this->workflows->handleDealStageChanged($deal);
 
-        $deal->loadMissing('stage');
         $slug = $deal->stage?->slug;
 
         if ($slug === 'proposal') {

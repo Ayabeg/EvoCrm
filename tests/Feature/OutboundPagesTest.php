@@ -48,13 +48,14 @@ it('renders the outbound overview, outbox, replies, and reports pages', function
     $this->actingAs($user)->get('/outbound/replies')->assertOk()
         ->assertInertia(fn ($page) => $page->component('outbound/replies')->has('replies', 1));
 
-    $this->actingAs($user)->get('/outbound/reports')->assertOk()
+    $this->actingAs($user)->get('/outbound/reports')
+        ->assertRedirect('/reports/outbound');
+
+    $this->actingAs($user)->get('/reports/outbound')->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('outbound/reports')
-            ->where('totals.sent', 1)
-            ->where('totals.opened', 1)
-            ->has('tracking.opened')
-            ->has('tracking.bounced')
+            ->component('crm/reports')
+            ->where('activeCategory', 'outbound')
+            ->where('categories.0.key', 'outbound')
         );
 });
 
