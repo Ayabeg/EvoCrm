@@ -1,7 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2, Star } from 'lucide-react';
 import { useState } from 'react';
-import { CrmAnalyticsShell } from '@/components/crm/crm-analytics-shell';
 import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import { QuickLaunchGrid } from '@/components/crm/quick-launch-grid';
 import { EvoVizChart } from '@/evoviz';
@@ -117,13 +116,22 @@ export default function Home({
     return (
         <>
             <Head title="Home" />
-            <CrmAnalyticsShell
-                active="/dashboard"
-                title={`Good ${greeting()}, ${firstName}`}
-                description="Your command center — open deals, inbox, pipeline, and where to go next."
-                filters={filterControls}
-                hero={
-                    <div className="relative mb-6 overflow-hidden rounded-xl border border-hairline bg-canvas p-5">
+            <div className="flex-1 bg-canvas-soft text-[13px] text-ink">
+                <div className="mx-auto w-full max-w-7xl px-5 py-8">
+                {filterControls ? (
+                    <header className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <h1 className="text-page-title font-semibold tracking-tight">
+                                {`Good ${greeting()}, ${firstName}`}
+                            </h1>
+                            <p className="mt-1 text-[13px] text-muted-foreground">
+                                Your command center — open deals, inbox, pipeline, and where to go next.
+                            </p>
+                        </div>
+                        <div className="shrink-0">{filterControls}</div>
+                    </header>
+                ) : null}
+                <div className="relative mb-6 overflow-hidden rounded-xl border border-hairline bg-canvas p-5">
                         <div
                             className="pointer-events-none absolute inset-0 opacity-[0.04]"
                             style={{
@@ -158,13 +166,7 @@ export default function Home({
                             </button>
                         </div>
                     </div>
-                }
-                footer={
-                    dataAsOf
-                        ? `Data as of ${dataAsOf} · Africa/Algiers`
-                        : 'Data as of now · Africa/Algiers'
-                }
-            >
+
                 <section aria-label="Headline KPIs">
                     <CrmKpiStrip kpis={primaryKpis} columns={4} />
                 </section>
@@ -260,7 +262,18 @@ export default function Home({
                         </ul>
                     )}
                 </section>
-            </CrmAnalyticsShell>
+
+                {dataAsOf ? (
+                    <footer className="mt-10 border-t border-hairline pt-4 text-[11px] text-muted-foreground">
+                        {`Data as of ${dataAsOf} · Africa/Algiers`}
+                    </footer>
+                ) : (
+                    <footer className="mt-10 border-t border-hairline pt-4 text-[11px] text-muted-foreground">
+                        Data as of now · Africa/Algiers
+                    </footer>
+                )}
+                </div>
+            </div>
         </>
     );
 }

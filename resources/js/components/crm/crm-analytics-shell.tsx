@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 const REPORTS_TABS = [
-    { label: 'Home', href: '/dashboard' },
     { label: 'Reports', href: '/reports' },
     { label: 'Funnels', href: '/reports/funnels' },
     { label: 'Report builder', href: '/crm/report-builder' },
@@ -21,7 +20,9 @@ export function CrmAnalyticsNav({ active }: { active: string }) {
                     href={tab.href}
                     className={cn(
                         'border-b-2 px-3 pb-2.5 text-[13px] transition-colors',
-                        tab.href === active || (active === '/dashboard' && tab.href === '/dashboard')
+                        tab.href === active ||
+                            (active.startsWith('/crm/reports') && tab.href === '/reports') ||
+                            (active.startsWith(`${tab.href}/`) && tab.href !== '/reports')
                             ? 'border-brand font-medium text-ink'
                             : 'border-transparent text-muted-foreground hover:text-ink',
                     )}

@@ -52,24 +52,39 @@ type MoreItem = NavLeaf & { category: string };
 
 const PRIMARY: NavLeaf[] = [
     { id: 'home', label: 'Home', href: '/dashboard', icon: House, activePaths: ['/'] },
-    { id: 'contacts', label: 'Contacts', href: '/crm/contacts', icon: Contact },
-    { id: 'companies', label: 'Companies', href: '/crm/companies', icon: Building2 },
-    { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake },
-    { id: 'desk', label: 'Desk', href: '/inbox', icon: Inbox, activePaths: ['/desk'] },
-    { id: 'outbound', label: 'Outbound', href: '/outbound', icon: Send, exact: true },
-    { id: 'ads', label: 'Ads', href: '/ads', icon: Megaphone },
-    { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users },
-    { id: 'reports', label: 'Reports', href: '/reports', icon: ChartSpline, activePaths: ['/crm/reports', '/reports/funnels'] },
+    {
+        id: 'crm',
+        label: 'CRM',
+        href: '/crm/contacts',
+        icon: Contact,
+        activePaths: ['/crm'],
+    },
+    {
+        id: 'desk',
+        label: 'Desk',
+        href: '/inbox',
+        icon: Inbox,
+        activePaths: ['/desk', '/conversations'],
+    },
+    { id: 'outbound', label: 'Outbound', href: '/outbound', icon: Send, activePaths: ['/outbound'] },
+    { id: 'ads', label: 'Ads', href: '/ads', icon: Megaphone, activePaths: ['/ads'] },
+    {
+        id: 'reports',
+        label: 'Reports',
+        href: '/reports',
+        icon: ChartSpline,
+        activePaths: ['/crm/reports', '/reports/funnels', '/crm/report-builder'],
+    },
 ];
 
 const MORE_ITEMS: MoreItem[] = [
     { id: 'contacts', label: 'Contacts', href: '/crm/contacts', icon: Contact, category: 'CRM' },
     { id: 'companies', label: 'Companies', href: '/crm/companies', icon: Building2, category: 'CRM' },
     { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake, category: 'CRM' },
-    { id: 'leads', label: 'Leads', href: '/leads', icon: SquareKanban, category: 'CRM' },
-    { id: 'crm-leads', label: 'CRM Leads', href: '/crm/leads', icon: SquareKanban, category: 'CRM' },
+    { id: 'leads', label: 'Leads', href: '/crm/leads', icon: SquareKanban, category: 'CRM' },
+    { id: 'pipelines', label: 'Pipelines', href: '/crm/deals/board', icon: SquareKanban, category: 'CRM' },
     { id: 'workflows', label: 'Automation', href: '/crm/workflows', icon: Workflow, category: 'CRM' },
-    { id: 'home', label: 'Home', href: '/dashboard', icon: House, category: 'Sales' },
+    { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users, category: 'CRM' },
     { id: 'desk', label: 'Desk', href: '/inbox', icon: Inbox, category: 'Desk' },
     { id: 'conversations', label: 'Conversations', href: '/conversations', icon: MessageCircle, category: 'Desk' },
     { id: 'outbound', label: 'Outbound', href: '/outbound', icon: Send, category: 'Outbound' },
@@ -88,13 +103,12 @@ const MORE_ITEMS: MoreItem[] = [
     { id: 'conversion-funnels', label: 'Conversion funnels', href: '/reports/funnels', icon: ChartSpline, category: 'Reports' },
     { id: 'report-builder', label: 'Report builder', href: '/crm/report-builder', icon: PenLine, category: 'Reports' },
     { id: 'outbound-reports', label: 'Outbound reports', href: '/outbound/reports', icon: LibraryBig, category: 'Reports' },
-    { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users, category: 'Reports' },
     { id: 'settings', label: 'Settings', href: '/settings', icon: Settings, category: 'Settings' },
     { id: 'settings-channels', label: 'Channels', href: '/settings/channels', icon: LayoutGrid, category: 'Settings' },
     { id: 'settings-apps', label: 'Apps', href: '/settings/apps', icon: LayoutGrid, category: 'Settings' },
 ];
 
-const CATEGORIES = ['CRM', 'Sales', 'Desk', 'Outbound', 'Ads', 'Reports', 'Settings'];
+const CATEGORIES = ['CRM', 'Desk', 'Outbound', 'Ads', 'Reports', 'Settings'];
 
 function pathMatches(current: string, href: string, exact?: boolean, extra: string[] = []): boolean {
     if (exact) {

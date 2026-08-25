@@ -1,4 +1,5 @@
-import { Form, Head, Link, router } from '@inertiajs/react';
+import { Form, Link, router } from '@inertiajs/react';
+import { DeskShell } from '@/components/crm/desk-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,8 +49,8 @@ function nameOf(contact?: Contact | null) {
 
 export default function ConversationHistory({ threads, selected }: Props) {
     return (
-        <>
-            <Head title="Conversation history" />
+        <DeskShell title="Conversations">
+            <div className="h-full overflow-y-auto">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Conversation history"
@@ -197,7 +198,8 @@ export default function ConversationHistory({ threads, selected }: Props) {
                     </Card>
                 </div>
             </div>
-        </>
+            </div>
+        </DeskShell>
     );
 }
 

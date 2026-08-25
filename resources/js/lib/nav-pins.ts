@@ -2,13 +2,10 @@ const STORAGE_KEY = 'evosales.nav.pins';
 
 export const DEFAULT_PINNED = [
     'home',
-    'contacts',
-    'companies',
-    'deals',
+    'crm',
     'desk',
     'outbound',
     'ads',
-    'segments',
     'reports',
 ] as const;
 

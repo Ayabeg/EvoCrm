@@ -1,4 +1,5 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
+import { AdsShell } from '@/components/crm/ads-shell';
 import { EMPTY_FUNNEL, FunnelBoard } from '@/components/ads/funnel';
 import type { FunnelCounts } from '@/components/ads/funnel';
 import { formatDzd } from '@/lib/money';
@@ -63,8 +64,7 @@ function kindOf(campaign: Campaign): string {
 
 export default function AdsHub({ accounts, campaigns, funnels, totals, leads, meta }: Props) {
     return (
-        <>
-            <Head title="Ads Hub" />
+        <AdsShell title="Ads">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Ads Hub"
@@ -235,7 +235,7 @@ export default function AdsHub({ accounts, campaigns, funnels, totals, leads, me
                     </Card>
                 </div>
             </div>
-        </>
+        </AdsShell>
     );
 }
 

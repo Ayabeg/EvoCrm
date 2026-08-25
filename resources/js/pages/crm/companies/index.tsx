@@ -1,5 +1,6 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { useState } from 'react';
+import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import { SkeletonList } from '@/components/crm/empty-room';
@@ -46,8 +47,8 @@ export default function CompaniesIndex({
 
     return (
         <>
-            <Head title="Companies" />
-            <CrmListShell
+            <CrmShell title="Companies">
+                <CrmListShell
                 title="Companies"
                 entity="company"
                 basePath="/crm/companies"
@@ -85,6 +86,7 @@ export default function CompaniesIndex({
                     </>
                 )}
             </CrmListShell>
+            </CrmShell>
 
             <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create company">
                 <Form

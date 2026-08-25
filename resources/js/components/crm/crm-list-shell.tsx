@@ -55,7 +55,7 @@ export function CrmListShell({
     }, [listView?.columns]);
 
     return (
-        <div className="flex h-[calc(100vh-52px)] flex-col bg-canvas text-ui text-ink">
+        <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
             <CrmListHeader
                 title={title}
                 views={[]}

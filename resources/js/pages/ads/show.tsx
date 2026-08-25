@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { AdsShell } from '@/components/crm/ads-shell';
 import { FunnelBoard } from '@/components/ads/funnel';
 import type { FunnelCounts } from '@/components/ads/funnel';
 import { formatDzd } from '@/lib/money';
@@ -48,8 +49,7 @@ export default function CampaignShow({ campaign, funnel, daily, leads, threads, 
     const maxImpressions = Math.max(...daily.map((d) => d.impressions), 1);
 
     return (
-        <>
-            <Head title={campaign.name} />
+        <AdsShell title={campaign.name}>
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title={campaign.name}
@@ -228,7 +228,7 @@ export default function CampaignShow({ campaign, funnel, daily, leads, threads, 
                     </table>
                 </Card>
             </div>
-        </>
+        </AdsShell>
     );
 }
 

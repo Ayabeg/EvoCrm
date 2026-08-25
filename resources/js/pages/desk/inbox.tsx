@@ -1,8 +1,8 @@
-import { Form, Head, Link, router } from '@inertiajs/react';
+import { Form, Link, router } from '@inertiajs/react';
 import { Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { DeskShell } from '@/components/crm/desk-shell';
 import { EmptyRoom } from '@/components/crm/empty-room';
-import { RoomShell } from '@/components/crm/room-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -77,16 +77,7 @@ export default function DeskInbox({
     const empty = threads.length === 0;
 
     return (
-        <>
-            <Head title="Desk" />
-            <RoomShell
-                title="Desk"
-                tabs={[
-                    { label: 'Inbox', href: '/inbox', active: true },
-                    { label: 'Email replies', href: '/outbound/replies' },
-                    { label: 'Channels', href: '/settings/channels' },
-                ]}
-            >
+        <DeskShell title="Desk">
             <div className="flex h-full flex-col bg-canvas text-[13px] text-ink">
                 {empty ? (
                     <ConnectChannels channels={channels} />
@@ -94,8 +85,7 @@ export default function DeskInbox({
                     <FrontDesk threads={threads} selected={selected} />
                 )}
             </div>
-            </RoomShell>
-        </>
+        </DeskShell>
     );
 }
 

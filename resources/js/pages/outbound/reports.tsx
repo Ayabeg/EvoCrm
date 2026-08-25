@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -68,8 +69,7 @@ export default function OutboundReports({
     const maxSent = Math.max(...daily.map((d) => d.sent), 1);
 
     return (
-        <>
-            <Head title="Outbound reports" />
+        <OutboundShell title="Outbound reports">
             <div className="flex-1 space-y-6 p-6">
                 <PageHeader
                     title="Outbound reports"
@@ -312,7 +312,7 @@ export default function OutboundReports({
                     </table>
                 </Card>
             </div>
-        </>
+        </OutboundShell>
     );
 }
 

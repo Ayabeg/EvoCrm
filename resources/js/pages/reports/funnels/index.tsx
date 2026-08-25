@@ -1,6 +1,6 @@
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useState } from 'react';
-import { CrmAnalyticsShell } from '@/components/crm/crm-analytics-shell';
+import { ReportsShell } from '@/components/crm/reports-shell';
 import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import {
     FunnelStageBoard,
@@ -164,10 +164,9 @@ export default function ConversionFunnels({
 
     return (
         <>
-            <Head title="Conversion funnels" />
-            <CrmAnalyticsShell
-                active="/reports/funnels"
+            <ReportsShell
                 title="Conversion funnels"
+                pageTitle="Conversion funnels"
                 description={`${report.window.from} → ${report.window.to} · ${report.window.days} days · ${report.window.timezone}. Stage drop-off with source spend and CPL.`}
                 filters={filterForm}
                 footer={`Funnel: ${report.funnel.name} · Data window ${report.window.from} → ${report.window.to}`}
@@ -189,7 +188,7 @@ export default function ConversionFunnels({
                     </h2>
                     <SourceBreakdownTable rows={report.sources} />
                 </section>
-            </CrmAnalyticsShell>
+            </ReportsShell>
         </>
     );
 }
