@@ -77,6 +77,12 @@
     /* Page shell — flat EvoSales wash (no Aurora cyan radial) */
     --aurora-shell-bg: var(--evosales-canvas-soft);
 
+    /* Shadows — neutral EvoSales elevation (no navy-tinted Aurora defaults) */
+    --aurora-shadow-medium: 0 1px 2px rgba(17, 17, 17, 0.06), 0 4px 12px rgba(17, 17, 17, 0.05);
+    --aurora-shadow-strong: 0 2px 8px rgba(17, 17, 17, 0.08), 0 12px 24px rgba(17, 17, 17, 0.06);
+    --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    --aurora-highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+
     /* Typography — Geist per Brandbook; Aurora scale preserved */
     --aurora-font-display: var(--font-sans);
     --aurora-font-sans: var(--font-sans);
@@ -159,6 +165,12 @@
         0 2px 8px color-mix(in srgb, var(--evosales-mark) 18%, transparent);
 
     --aurora-shell-bg: var(--evosales-canvas-soft);
+
+    /* Shadows — true-black dark cabinet */
+    --aurora-shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.28), 0 8px 20px rgba(0, 0, 0, 0.18);
+    --aurora-shadow-strong: 0 4px 16px rgba(0, 0, 0, 0.36), 0 16px 32px rgba(0, 0, 0, 0.24);
+    --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    --aurora-highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
     --background: var(--evosales-canvas-soft);
     --foreground: var(--evosales-ink);

@@ -1,5 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { NativeSelect } from '@/components/ui/native-select';
 
 type Owner = { id: number; name: string };
 
@@ -31,30 +33,40 @@ export function DashboardHeader({
     };
 
     return (
-        <header className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <header className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <h1 className="text-page-title">Home</h1>
-                <p className="mt-0.5 text-ui text-muted-foreground">
+                <h1 className="aurora-text-display-2">Home</h1>
+                <p
+                    className="aurora-text-body-sm mt-1"
+                    style={{ color: 'var(--aurora-text-muted)' }}
+                >
                     {subtitle}
                 </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-                <input
+                <Input
                     type="date"
+                    size="sm"
                     value={filters.from ?? ''}
                     onChange={(e) => apply({ from: e.target.value })}
-                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
                     aria-label="From date"
+                    className="w-[9.5rem]"
                 />
-                <span className="text-ui text-muted-foreground">–</span>
-                <input
+                <span
+                    className="aurora-text-caption"
+                    style={{ color: 'var(--aurora-text-muted)' }}
+                >
+                    –
+                </span>
+                <Input
                     type="date"
+                    size="sm"
                     value={filters.to ?? ''}
                     onChange={(e) => apply({ to: e.target.value })}
-                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
                     aria-label="To date"
+                    className="w-[9.5rem]"
                 />
-                <select
+                <NativeSelect
                     value={filters.owner_id ?? ''}
                     onChange={(e) =>
                         apply({
@@ -63,8 +75,8 @@ export function DashboardHeader({
                                 : null,
                         })
                     }
-                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
                     aria-label="Filter by owner"
+                    className="w-[10.5rem]"
                 >
                     <option value="">All owners</option>
                     {owners.map((owner) => (
@@ -72,7 +84,7 @@ export function DashboardHeader({
                             {owner.name}
                         </option>
                     ))}
-                </select>
+                </NativeSelect>
                 <Button asChild size="sm">
                     <Link href="/crm/deals">New deal</Link>
                 </Button>

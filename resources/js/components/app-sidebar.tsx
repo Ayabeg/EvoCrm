@@ -36,6 +36,7 @@ import type { LucideIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
+import { PillGroup, PillTrigger, TabsContent } from '@/components/ui/tabs';
 import { DEFAULT_PINNED, readPins, togglePin } from '@/lib/nav-pins';
 import { cn } from '@/lib/utils';
 
@@ -132,21 +133,21 @@ function MorePanelItems({
                 return (
                     <div
                         key={`${item.category}-${item.id}`}
-                        className="flex items-center justify-between rounded-md px-2 py-2 hover:bg-canvas-soft"
+                        className="flex items-center justify-between rounded-md px-2 py-2 hover:bg-sidebar-hover"
                     >
                         <Link
                             href={item.href}
-                            className="flex min-w-0 flex-1 items-center gap-2.5 py-0.5 text-[13px] text-ink"
+                            className="flex min-w-0 flex-1 items-center gap-2.5 py-0.5 text-[13px] text-sidebar-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                             onClick={onNavigate}
                         >
-                            <Icon className="size-4 shrink-0 text-muted-foreground" />
+                            <Icon className="size-4 shrink-0 text-sidebar-mute" />
                             <span className="truncate">{item.label}</span>
                         </Link>
                         <button
                             type="button"
                             title={pinned ? 'Unpin' : 'Pin'}
                             onClick={() => onPinsChange(togglePin(item.id, pins))}
-                            className="ms-2 shrink-0 p-1 text-muted-foreground hover:text-brand"
+                            className="ms-2 shrink-0 rounded p-1 text-sidebar-mute hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                         >
                             {pinned ? <Pin className="size-4" /> : <PinOff className="size-4" />}
                         </button>
@@ -172,16 +173,32 @@ function MorePanelDesktop({
 }) {
     return (
         <>
-            <div className="w-40 border-r border-hairline bg-canvas-soft py-2">
+            <div
+                className="w-40 border-r py-2"
+                style={{
+                    borderColor: 'var(--aurora-border-default)',
+                    background: 'var(--aurora-control-surface)',
+                }}
+            >
                 {CATEGORIES.map((name) => (
                     <button
                         key={name}
                         type="button"
                         onClick={() => onCategoryChange(name)}
                         className={cn(
-                            'block w-full px-3 py-1.5 text-left text-[13px]',
-                            category === name ? 'bg-canvas font-medium text-ink' : 'text-muted-foreground',
+                            'block w-full px-3 py-1.5 text-left text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aurora-focus-ring-strong)]',
+                            category === name
+                                ? 'font-medium'
+                                : 'text-[var(--aurora-text-muted)]',
                         )}
+                        style={
+                            category === name
+                                ? {
+                                      background: 'var(--aurora-panel-strong)',
+                                      color: 'var(--aurora-text-primary)',
+                                  }
+                                : undefined
+                        }
                     >
                         {name}
                     </button>
@@ -214,23 +231,33 @@ function MorePanelMobile({
 }) {
     return (
         <div className="mx-1 mt-2 rounded-lg border border-sidebar-border bg-sidebar-well">
-            <div className="flex gap-1 overflow-x-auto border-b border-sidebar-border p-2 no-scrollbar">
+            <PillGroup
+                value={category}
+                onValueChange={onCategoryChange}
+                className="mx-2 mt-2 w-[calc(100%-1rem)] border-0 bg-transparent p-0"
+                panels={
+                    <>
+                        {CATEGORIES.map((name) => (
+                            <TabsContent
+                                key={name}
+                                value={name}
+                                className="sr-only"
+                                aria-hidden
+                            />
+                        ))}
+                    </>
+                }
+            >
                 {CATEGORIES.map((name) => (
-                    <button
+                    <PillTrigger
                         key={name}
-                        type="button"
-                        onClick={() => onCategoryChange(name)}
-                        className={cn(
-                            'shrink-0 rounded-md px-3 py-1.5 text-[12px] font-medium',
-                            category === name
-                                ? 'bg-sidebar-accent text-sidebar-ink'
-                                : 'text-sidebar-mute',
-                        )}
+                        value={name}
+                        className="min-h-9 shrink-0 px-3 py-1.5 text-[12px]"
                     >
                         {name}
-                    </button>
+                    </PillTrigger>
                 ))}
-            </div>
+            </PillGroup>
             <div className="max-h-56 overflow-y-auto p-2">
                 <MorePanelItems
                     category={category}
@@ -419,6 +446,7 @@ export function AppSidebar() {
                                 moreOpen
                                     ? 'bg-sidebar-accent text-sidebar-ink'
                                     : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
+                                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                             )}
                         >
                             <MoreHorizontal className="size-4" />
@@ -441,8 +469,14 @@ export function AppSidebar() {
                         {!isMobile && moreOpen && morePos ? (
                             <div
                                 id="sidebar-more-panel"
-                                className="fixed z-[100] flex h-[420px] w-[520px] max-w-[calc(100vw-1rem)] overflow-hidden rounded-md border border-hairline bg-canvas shadow-xl"
-                                style={{ top: morePos.top, left: morePos.left }}
+                                className="fixed z-[100] flex h-[420px] w-[520px] max-w-[calc(100vw-1rem)] overflow-hidden rounded-[var(--aurora-radius-2)] border shadow-xl"
+                                style={{
+                                    top: morePos.top,
+                                    left: morePos.left,
+                                    borderColor: 'var(--aurora-border-default)',
+                                    background: 'var(--aurora-panel-strong)',
+                                    boxShadow: 'var(--aurora-shadow-strong)',
+                                }}
                             >
                                 <MorePanelDesktop
                                     category={category}

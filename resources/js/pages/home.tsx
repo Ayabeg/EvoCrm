@@ -72,8 +72,8 @@ export default function Home({
     return (
         <>
             <Head title="Home" />
-            <div className="flex-1 bg-canvas-soft text-ui text-ink">
-                <div className="mx-auto w-full max-w-7xl px-4 py-4 md:px-5">
+            <div className="aurora-page-shell flex-1">
+                <div className="mx-auto w-full max-w-7xl px-4 py-5 md:px-6">
                     <DashboardHeader
                         subtitle={subtitle}
                         owners={owners}
@@ -81,7 +81,7 @@ export default function Home({
                     />
 
                     {kpis.length > 0 ? (
-                        <section aria-label="Command KPIs" className="mb-5">
+                        <section aria-label="Command KPIs" className="mb-6">
                             <CrmKpiStrip kpis={kpis} columns={5} />
                         </section>
                     ) : null}
@@ -104,7 +104,8 @@ export default function Home({
                                     action={
                                         <Link
                                             href="/crm/deals/board"
-                                            className="text-ui text-brand hover:underline"
+                                            className="aurora-text-body-sm transition-colors hover:underline"
+                                            style={{ color: 'var(--aurora-accent-primary)' }}
                                         >
                                             Open board
                                         </Link>
@@ -115,15 +116,33 @@ export default function Home({
                                             payload={pipelineHealth.chart}
                                         />
                                     ) : (
-                                        <ul className="space-y-2 rounded-lg border border-hairline bg-canvas p-4">
+                                        <ul
+                                            className="space-y-2 rounded-[var(--aurora-radius-1)] border p-4"
+                                            style={{
+                                                borderColor: 'var(--aurora-border-default)',
+                                                background: 'var(--aurora-panel-medium)',
+                                            }}
+                                        >
                                             {pipelineHealth.stages.map(
                                                 (stage) => (
                                                     <li
                                                         key={stage.name}
-                                                        className="flex items-center justify-between gap-3 text-ui"
+                                                        className="flex items-center justify-between gap-3"
                                                     >
-                                                        <span>{stage.name}</span>
-                                                        <span className="text-muted-foreground">
+                                                        <span
+                                                            className="aurora-text-body-sm"
+                                                            style={{
+                                                                color: 'var(--aurora-text-primary)',
+                                                            }}
+                                                        >
+                                                            {stage.name}
+                                                        </span>
+                                                        <span
+                                                            className="aurora-text-caption money"
+                                                            style={{
+                                                                color: 'var(--aurora-text-muted)',
+                                                            }}
+                                                        >
                                                             {stage.count} ·{' '}
                                                             {formatDzd(
                                                                 stage.amount_cents,
@@ -143,17 +162,44 @@ export default function Home({
                                     title="Sales performance"
                                     description="Won deals in period by owner"
                                 >
-                                    <div className="overflow-x-auto rounded-lg border border-hairline bg-canvas">
-                                        <table className="w-full min-w-[320px] text-ui">
+                                    <div
+                                        className="overflow-x-auto rounded-[var(--aurora-radius-1)] border"
+                                        style={{
+                                            borderColor: 'var(--aurora-border-default)',
+                                            background: 'var(--aurora-panel-medium)',
+                                        }}
+                                    >
+                                        <table className="w-full min-w-[320px]">
                                             <thead>
-                                                <tr className="border-b border-hairline text-left text-section-label uppercase tracking-wide text-muted-foreground">
-                                                    <th className="px-4 py-2 font-medium">
+                                                <tr
+                                                    className="border-b text-left"
+                                                    style={{
+                                                        borderColor:
+                                                            'var(--aurora-border-default)',
+                                                    }}
+                                                >
+                                                    <th
+                                                        className="aurora-text-eyebrow px-4 py-2 font-medium"
+                                                        style={{
+                                                            color: 'var(--aurora-text-muted)',
+                                                        }}
+                                                    >
                                                         Owner
                                                     </th>
-                                                    <th className="px-4 py-2 text-right font-medium">
+                                                    <th
+                                                        className="aurora-text-eyebrow px-4 py-2 text-right font-medium"
+                                                        style={{
+                                                            color: 'var(--aurora-text-muted)',
+                                                        }}
+                                                    >
                                                         Won
                                                     </th>
-                                                    <th className="px-4 py-2 text-right font-medium">
+                                                    <th
+                                                        className="aurora-text-eyebrow px-4 py-2 text-right font-medium"
+                                                        style={{
+                                                            color: 'var(--aurora-text-muted)',
+                                                        }}
+                                                    >
                                                         Revenue
                                                     </th>
                                                 </tr>
@@ -162,15 +208,34 @@ export default function Home({
                                                 {salesPerformance.map((row) => (
                                                     <tr
                                                         key={row.owner}
-                                                        className="border-b border-hairline last:border-0"
+                                                        className="border-b last:border-0"
+                                                        style={{
+                                                            borderColor:
+                                                                'var(--aurora-border-default)',
+                                                        }}
                                                     >
-                                                        <td className="px-4 py-2">
+                                                        <td
+                                                            className="aurora-text-body-sm px-4 py-2"
+                                                            style={{
+                                                                color: 'var(--aurora-text-primary)',
+                                                            }}
+                                                        >
                                                             {row.owner}
                                                         </td>
-                                                        <td className="money px-4 py-2 text-right">
+                                                        <td
+                                                            className="money aurora-text-body-sm px-4 py-2 text-right"
+                                                            style={{
+                                                                color: 'var(--aurora-text-primary)',
+                                                            }}
+                                                        >
                                                             {row.won}
                                                         </td>
-                                                        <td className="money px-4 py-2 text-right">
+                                                        <td
+                                                            className="money aurora-text-body-sm px-4 py-2 text-right"
+                                                            style={{
+                                                                color: 'var(--aurora-text-primary)',
+                                                            }}
+                                                        >
                                                             {formatDzd(
                                                                 row.revenue_cents,
                                                             )}
@@ -194,7 +259,8 @@ export default function Home({
                                 action={
                                     <Link
                                         href="/crm/activities"
-                                        className="text-ui text-brand hover:underline"
+                                        className="aurora-text-body-sm transition-colors hover:underline"
+                                        style={{ color: 'var(--aurora-accent-primary)' }}
                                     >
                                         View all
                                     </Link>
@@ -209,7 +275,13 @@ export default function Home({
                         </div>
                     </div>
 
-                    <footer className="mt-6 border-t border-hairline pt-3 text-section-label font-normal text-muted-foreground normal-case tracking-normal">
+                    <footer
+                        className="aurora-text-caption mt-8 border-t pt-3"
+                        style={{
+                            borderColor: 'var(--aurora-border-default)',
+                            color: 'var(--aurora-text-muted)',
+                        }}
+                    >
                         {dataAsOf
                             ? `Data as of ${dataAsOf} · ${window.timezone}`
                             : `Data as of now · ${window.timezone}`}
