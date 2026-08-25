@@ -63,24 +63,65 @@ class HomeController extends Controller
         $metaConnected = (filled(config('meta.access_token')) && filled(config('meta.app_id')))
             || ($workspace->integration(Integration::PROVIDER_META)?->isConnected() ?? false);
 
+        $openDealsCount = (clone $openDeals)->count();
+        $tasksDue = Activity::query()
+            ->forWorkspace($workspace)
+            ->where('type', 'task')
+            ->where('done', false)
+            ->whereNotNull('due_at')
+            ->where('due_at', '<=', now('Africa/Algiers')->endOfDay())
+            ->count();
+        $deferredCount = (clone $outbound)
+            ->where('status', 'queued')
+            ->whereNotNull('deferred_until')
+            ->where('deferred_until', '>', now())
+            ->count();
+        $contactTotal = Contact::query()->forWorkspace($workspace)->count();
+
         return Inertia::render('home', [
             'today' => [
-                ['key' => 'open_deals', 'label' => 'Open deals', 'value' => (clone $openDeals)->count()],
-                ['key' => 'tasks_due', 'label' => 'Tasks due', 'value' => Activity::query()
-                    ->forWorkspace($workspace)
-                    ->where('type', 'task')
-                    ->where('done', false)
-                    ->whereNotNull('due_at')
-                    ->where('due_at', '<=', now('Africa/Algiers')->endOfDay())
-                    ->count()],
-                ['key' => 'inbox_unread', 'label' => 'Unread in desk', 'value' => $unread],
-                ['key' => 'outbound_sent', 'label' => 'Sent today', 'value' => $sentToday],
-                ['key' => 'outbound_deferred', 'label' => 'Deferred', 'value' => (clone $outbound)
-                    ->where('status', 'queued')
-                    ->whereNotNull('deferred_until')
-                    ->where('deferred_until', '>', now())
-                    ->count()],
-                ['key' => 'leads_new', 'label' => 'New leads today', 'value' => $leadsNewToday],
+                [
+                    'key' => 'open_deals',
+                    'label' => 'Open deals',
+                    'value' => $openDealsCount,
+                    'hint' => 'Active pipeline — not won or lost',
+                    'href' => '/crm/deals',
+                ],
+                [
+                    'key' => 'tasks_due',
+                    'label' => 'Tasks due today',
+                    'value' => $tasksDue,
+                    'hint' => $tasksDue > 0 ? 'Needs attention today' : 'Nothing due today',
+                    'href' => '/crm/contacts',
+                ],
+                [
+                    'key' => 'inbox_unread',
+                    'label' => 'Unread in desk',
+                    'value' => $unread,
+                    'hint' => $unread > 0 ? 'Conversations waiting' : 'Inbox clear',
+                    'href' => '/inbox',
+                ],
+                [
+                    'key' => 'leads_new',
+                    'label' => 'New leads today',
+                    'value' => $leadsNewToday,
+                    'hint' => 'Captured since midnight Algiers',
+                    'href' => '/leads',
+                ],
+                [
+                    'key' => 'outbound_sent',
+                    'label' => 'Sent today',
+                    'value' => $sentToday,
+                    'hint' => 'Outbound messages delivered',
+                    'href' => '/outbound',
+                ],
+                [
+                    'key' => 'outbound_deferred',
+                    'label' => 'Deferred sends',
+                    'value' => $deferredCount,
+                    'hint' => 'Queued for later delivery',
+                    'href' => '/outbound',
+                ],
             ],
             'nextSteps' => Activity::query()
                 ->forWorkspace($workspace)
@@ -94,7 +135,7 @@ class HomeController extends Controller
             'departments' => [
                 ['key' => 'inbox', 'name' => 'Inbox', 'href' => '/inbox', 'value' => $unread, 'value_label' => 'unread'],
                 ['key' => 'leads', 'name' => 'Leads', 'href' => '/leads', 'value' => $leadsNewToday, 'value_label' => 'new today'],
-                ['key' => 'contacts', 'name' => 'Contacts', 'href' => '/crm/contacts', 'value' => Contact::query()->forWorkspace($workspace)->count(), 'value_label' => 'total'],
+                ['key' => 'contacts', 'name' => 'Contacts', 'href' => '/crm/contacts', 'value' => $contactTotal, 'value_label' => 'total'],
                 ['key' => 'ads', 'name' => 'Ads', 'href' => '/ads', 'connected' => $metaConnected],
                 ['key' => 'outbound', 'name' => 'Outbound', 'href' => '/outbound', 'value' => $sentToday, 'value_label' => 'sent today'],
                 ['key' => 'integrations', 'name' => 'Integrations', 'href' => '/settings/apps', 'value' => $connectedApps, 'value_label' => 'of '.count($integrations).' connected'],
@@ -105,6 +146,7 @@ class HomeController extends Controller
                 'owner_id' => $ownerId,
                 'period' => $period,
             ],
+            'dataAsOf' => now('Africa/Algiers')->format('Y-m-d H:i'),
         ]);
     }
 

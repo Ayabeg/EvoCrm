@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { formatDzd } from '@/components/crm/hub-chrome';
+import { CrmAnalyticsShell } from '@/components/crm/crm-analytics-shell';
+import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import {
     FunnelStageBoard,
     type FunnelStageRow,
@@ -9,7 +10,6 @@ import {
     SourceBreakdownTable,
     type SourceBreakdownRow,
 } from '@/components/funnels/source-breakdown-table';
-import PageHeader from '@/components/page-header';
 
 type FunnelSummary = {
     id: number;
@@ -56,11 +56,7 @@ export default function ConversionFunnels({
         event.preventDefault();
         router.get(
             '/reports/funnels',
-            {
-                from,
-                to,
-                funnel: funnelId,
-            },
+            { from, to, funnel: funnelId },
             { preserveState: true },
         );
     };
@@ -71,136 +67,129 @@ export default function ConversionFunnels({
         });
     };
 
+    const kpis: KpiTile[] = [
+        {
+            key: 'spend',
+            label: 'Ad spend',
+            value: report.kpis.spend_cents,
+            format: 'money',
+            hint: 'Total source spend in window',
+        },
+        {
+            key: 'visits',
+            label: 'Visits',
+            value: report.kpis.visits,
+            hint: 'Top-of-funnel traffic',
+        },
+        {
+            key: 'orders',
+            label: 'Orders',
+            value: report.kpis.orders,
+            hint: 'Bottom-of-funnel conversions',
+        },
+        {
+            key: 'cpl',
+            label: 'Cost per lead',
+            value: report.kpis.cpl_cents,
+            format: 'money',
+            hint: report.kpis.cpl_cents !== null ? 'Spend ÷ visits' : 'No visits in window',
+        },
+        {
+            key: 'cr',
+            label: 'Visit → order',
+            value: report.kpis.conversion_rate,
+            format: 'percent',
+            hint: report.kpis.conversion_rate !== null ? 'Conversion rate' : 'No visits to convert',
+        },
+    ];
+
+    const filterForm = (
+        <form
+            onSubmit={apply}
+            className="flex flex-wrap items-end gap-2"
+            aria-label="Funnel filters"
+        >
+            <label className="grid gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                Funnel
+                <select
+                    value={funnelId}
+                    onChange={(event) => setFunnelId(event.target.value)}
+                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] normal-case text-ink"
+                >
+                    {funnels.map((funnel) => (
+                        <option key={funnel.id} value={funnel.id}>
+                            {funnel.name}
+                            {funnel.is_default ? ' (default)' : ''}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            <label className="grid gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                From
+                <input
+                    type="date"
+                    value={from}
+                    max={to}
+                    onChange={(event) => setFrom(event.target.value)}
+                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] normal-case text-ink"
+                />
+            </label>
+            <label className="grid gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                To
+                <input
+                    type="date"
+                    value={to}
+                    min={from}
+                    onChange={(event) => setTo(event.target.value)}
+                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] normal-case text-ink"
+                />
+            </label>
+            <button
+                type="submit"
+                className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+            >
+                Apply
+            </button>
+            {custom ? (
+                <button
+                    type="button"
+                    onClick={reset}
+                    className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-muted-foreground transition-colors hover:text-ink"
+                >
+                    Last 30 days
+                </button>
+            ) : null}
+        </form>
+    );
+
     return (
         <>
             <Head title="Conversion funnels" />
-            <div className="flex-1 bg-canvas-soft text-[13px] text-ink">
-                <div className="mx-auto w-full max-w-6xl px-5 py-8">
-                    <PageHeader
-                        title="Conversion funnels"
-                        description={`${report.window.from} → ${report.window.to} · ${report.window.days} days · ${report.window.timezone}. Visits through delivery with source spend and CPL.`}
-                    >
-                        <form
-                            onSubmit={apply}
-                            className="flex flex-wrap items-end gap-2"
-                            aria-label="Funnel filters"
-                        >
-                            <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                                Funnel
-                                <select
-                                    value={funnelId}
-                                    onChange={(event) =>
-                                        setFunnelId(event.target.value)
-                                    }
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                                >
-                                    {funnels.map((funnel) => (
-                                        <option
-                                            key={funnel.id}
-                                            value={funnel.id}
-                                        >
-                                            {funnel.name}
-                                            {funnel.is_default
-                                                ? ' (default)'
-                                                : ''}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                                From
-                                <input
-                                    type="date"
-                                    value={from}
-                                    max={to}
-                                    onChange={(event) =>
-                                        setFrom(event.target.value)
-                                    }
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                                />
-                            </label>
-                            <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                                To
-                                <input
-                                    type="date"
-                                    value={to}
-                                    min={from}
-                                    onChange={(event) =>
-                                        setTo(event.target.value)
-                                    }
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                                />
-                            </label>
-                            <button
-                                type="submit"
-                                className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
-                            >
-                                Apply
-                            </button>
-                            {custom ? (
-                                <button
-                                    type="button"
-                                    onClick={reset}
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-muted-foreground transition-colors hover:text-ink"
-                                >
-                                    Last 30 days
-                                </button>
-                            ) : null}
-                        </form>
-                    </PageHeader>
+            <CrmAnalyticsShell
+                active="/reports/funnels"
+                title="Conversion funnels"
+                description={`${report.window.from} → ${report.window.to} · ${report.window.days} days · ${report.window.timezone}. Stage drop-off with source spend and CPL.`}
+                filters={filterForm}
+                footer={`Funnel: ${report.funnel.name} · Data window ${report.window.from} → ${report.window.to}`}
+            >
+                <CrmKpiStrip kpis={kpis} columns={5} />
 
-                    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-3 xl:grid-cols-5">
-                        {[
-                            ['Spend', formatDzd(report.kpis.spend_cents)],
-                            [
-                                'Visits',
-                                report.kpis.visits.toLocaleString(),
-                            ],
-                            [
-                                'Orders',
-                                report.kpis.orders.toLocaleString(),
-                            ],
-                            [
-                                'CPL',
-                                report.kpis.cpl_cents !== null
-                                    ? formatDzd(report.kpis.cpl_cents)
-                                    : '—',
-                            ],
-                            [
-                                'Visit → order',
-                                report.kpis.conversion_rate !== null
-                                    ? `${report.kpis.conversion_rate}%`
-                                    : '—',
-                            ],
-                        ].map(([label, value]) => (
-                            <div key={label} className="bg-canvas px-4 py-3">
-                                <p className="text-[11px] tracking-wide text-muted-foreground uppercase">
-                                    {label}
-                                </p>
-                                <p className="money mt-1 text-xl font-semibold text-ink">
-                                    {value}
-                                </p>
-                            </div>
-                        ))}
+                <section className="mt-8 space-y-3">
+                    <h2 className="text-[13px] font-medium text-ink">
+                        Stage conversion — where drop-off happens
+                    </h2>
+                    <div className="rounded-lg border border-hairline bg-canvas p-4">
+                        <FunnelStageBoard stages={report.stages} />
                     </div>
+                </section>
 
-                    <section className="mt-8 space-y-3">
-                        <h2 className="text-sm font-medium text-ink">
-                            {report.funnel.name}
-                        </h2>
-                        <div className="rounded-lg border border-hairline bg-canvas p-4">
-                            <FunnelStageBoard stages={report.stages} />
-                        </div>
-                    </section>
-
-                    <section className="mt-8 space-y-3">
-                        <h2 className="text-sm font-medium text-ink">
-                            Source breakdown
-                        </h2>
-                        <SourceBreakdownTable rows={report.sources} />
-                    </section>
-                </div>
-            </div>
+                <section className="mt-8 space-y-3">
+                    <h2 className="text-[13px] font-medium text-ink">
+                        Source breakdown — which channels convert
+                    </h2>
+                    <SourceBreakdownTable rows={report.sources} />
+                </section>
+            </CrmAnalyticsShell>
         </>
     );
 }
