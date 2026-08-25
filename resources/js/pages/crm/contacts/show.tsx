@@ -103,30 +103,33 @@ export default function ContactShow({
                 <SkeletonRecord />
             ) : (
                 <div className="flex h-app-workspace flex-col bg-canvas-soft text-ui text-ink">
-                    <div className="shrink-0 border-b border-hairline bg-canvas px-5 py-4 sm:px-6 sm:py-5">
+                    <div className="shrink-0 border-b border-hairline bg-canvas px-4 py-4 sm:px-6 sm:py-5">
                         <RecordBack href="/crm/contacts" label="Back to Contacts" />
-                        <div className="mt-3 flex items-start gap-3">
+                        <div className="mt-4 flex items-start gap-3">
                             <div
-                                className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-medium text-canvas"
+                                className="grid size-11 shrink-0 place-items-center rounded-full bg-ink text-[13px] font-medium text-canvas sm:size-10 sm:text-[12px]"
                                 aria-hidden
                             >
                                 {initials || '?'}
                             </div>
-                            <div className="min-w-0 flex-1">
-                                <h1 className="text-record-title font-semibold">{name}</h1>
-                                <p className="text-muted-foreground">
+                            <div className="min-w-0 flex-1 space-y-1">
+                                <h1 className="text-record-title font-semibold leading-snug">{name}</h1>
+                                <p className="text-[13px] leading-relaxed text-muted-foreground">
                                     {contact.company?.name ?? 'No company'}
-                                    {contact.email ? ` · ${contact.email}` : ''}
                                 </p>
+                                {contact.email ? (
+                                    <p className="truncate text-[13px] text-muted-foreground">{contact.email}</p>
+                                ) : null}
                                 {contactEngagement ? (
-                                    <p className="mt-1 text-[12px] text-muted-foreground">
+                                    <p className="pt-1 text-[12px] leading-relaxed text-muted-foreground">
                                         <span className="font-medium text-ink">
                                             {contactEngagement.label}
                                         </span>{' '}
-                                        ({contactEngagement.score}/100) · {contactEngagement.reason}
+                                        ({contactEngagement.score}/100)
+                                        <span className="hidden sm:inline"> · {contactEngagement.reason}</span>
                                     </p>
                                 ) : null}
-                                <div className="mt-3">
+                                <div className="pt-3">
                                     <RecordActions
                                         entityId={contact.id}
                                         contactId={contact.id}

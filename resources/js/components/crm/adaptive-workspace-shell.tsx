@@ -47,7 +47,7 @@ export function WorkspacePanelSwitcher({
             role="tablist"
             aria-label="Workspace panels"
             className={cn(
-                'flex shrink-0 gap-1 overflow-x-auto border-b border-hairline bg-canvas px-3 py-2 no-scrollbar',
+                'grid shrink-0 grid-cols-3 gap-1 border-b border-hairline bg-canvas p-2 lg:hidden',
                 className,
             )}
         >
@@ -59,7 +59,7 @@ export function WorkspacePanelSwitcher({
                     aria-selected={active === panel.key}
                     onClick={() => onChange(panel.key)}
                     className={cn(
-                        'shrink-0 rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors',
+                        'min-h-11 rounded-md px-2 py-2.5 text-center text-[12px] font-medium transition-colors',
                         active === panel.key
                             ? 'bg-brand/12 text-ink'
                             : 'text-muted-foreground hover:bg-canvas-soft hover:text-ink',
@@ -115,9 +115,18 @@ export function AdaptiveWorkspaceShell({
     const centerScroll = scrollPanels.center ?? true;
     const rightScroll = scrollPanels.right ?? true;
 
-    const leftRegion = cn('border-hairline bg-canvas px-5 py-5 md:border-r', leftClassName);
-    const centerRegion = cn('bg-canvas px-5 py-5 sm:px-6 sm:py-6', centerClassName);
-    const rightRegion = cn('border-hairline bg-canvas px-5 py-5 md:border-l', rightClassName);
+    const leftRegion = cn(
+        'border-hairline bg-canvas px-4 py-4 max-md:px-4 max-md:py-5 md:border-r md:px-5 md:py-5',
+        leftClassName,
+    );
+    const centerRegion = cn(
+        'bg-canvas px-4 py-4 max-md:px-4 max-md:py-5 sm:px-6 sm:py-6',
+        centerClassName,
+    );
+    const rightRegion = cn(
+        'border-hairline bg-canvas px-4 py-4 max-md:px-4 max-md:py-5 md:border-l md:px-5 md:py-5',
+        rightClassName,
+    );
 
     return (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
