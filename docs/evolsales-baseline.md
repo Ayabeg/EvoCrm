@@ -4,6 +4,8 @@
 **Repository baseline:** `cursor/hubspot-gap-plan-fd45` at `41727db`, based on `main` at `7e0e1da`  
 **Scope:** Task 0 audit only. No application behavior was changed.
 
+**Status after remaining waves (2026-08-25):** Tasks 1–21 are implemented on `cursor/hubspot-gap-remaining-waves-fd45`. The Gap column below is the pre-implementation inventory, not current product state. See `CHANGELOG.md` and `docs/production-processes.md` for shipped behavior.
+
 ## Executive Finding
 
 EvoSales is a Laravel 13 monolith with a React 19/Inertia frontend and substantial working CRM, outbound, Meta Ads, WhatsApp, automation, and reporting functionality. The production evidence checked into the repository points to a Docker Compose deployment on a VPS called “Server 1” under `/home/deploy/evosales`. The repository does not contain a Render Blueprint, Kubernetes manifest, systemd unit, Supervisor configuration, or host cron definition.

@@ -74,10 +74,17 @@ The queue worker exits after one hour through `--max-time=3600`; Docker restarts
 | `workflow:run` | Every minute | workflow executions and CRM rows |
 | `outbound:poll-replies` | Every five minutes | outbound messages, enrollments, activities |
 | `outbound:sync-mailboxes` | Every fifteen minutes | mailboxes |
-| `reports:deliver` | Daily at 08:00 Africa/Algiers | scheduled reports |
+| `google:sync-mail` | Every fifteen minutes | Gmail tokens, `google_sync_states`, activities |
+| `google:sync-calendar` | Every fifteen minutes | Calendar tokens, `google_sync_states`, activities |
+| `reports:deliver` | Daily at 08:00 Africa/Algiers | scheduled reports, last window/status |
 | `outbound:warmup` | Daily at 08:05 Africa/Algiers | mailbox warmup state |
 
-Task 2 adds persisted running/success/failed/stale health for these commands. Until then, container status and logs are the only runtime signals.
+Each command records start/success/failure freshness in `scheduled_command_runs`. Settings → System health shows stale or failed commands without exposing secrets.
+
+Inbound webhooks resolve a workspace from a stored provider key, not “first workspace”:
+
+- Evolution and Meta lead ingestion
+- Outbound bounce events at `POST /webhooks/outbound/bounces/{webhookKey}`
 
 ## Environment requirements
 

@@ -5,6 +5,8 @@
 **Previous audit:** `9a17fd0` via [PR #51](https://github.com/Mohamedbeghanem/EvoSales/pull/51) — composite **~81/100**  
 **Methodology:** Evidence from routes, controllers/services, UI components, and Pest feature tests — not aspirational backend-only claims.
 
+**Post-audit implementations (2026-08-25):** Waves 3–5 closed the documented seller-workflow, revenue-loop, and operations gaps: lead→deal conversion, Gmail/Calendar sync, deal health/forecast, line items and splits on the deal page, quote PDF/email/public acceptance, outbound bounce webhooks, `segment.exited` workflows, scheduled report delivery, and deals-list pipeline selection. Composite scores below remain the 2026-08-24 snapshot.
+
 ---
 
 ## Executive summary
@@ -15,12 +17,12 @@
 | **Lists & views** | Saved views, advanced filters, calculated columns, bulk actions | Saved filters (private/team/workspace), sort, export, basic column toggles | **85** | `SavedFilterController`, `CrmFilter`, `ListViewConfig`; **gap:** new chrome `index` pages lack `FilterBuilder` / persisted `ColumnChooser` |
 | **Pipelines & forecast** | Multi-pipeline, drag board, AI forecast, revenue analytics | Stage CRUD/reorder, kanban board, weighted forecast bar, stage pills | **87** | `PipelineManager`, `DealBoardForecast`, `settings/pipelines`, `DealBoardTest` |
 | **Record UX** | Configurable layouts, timeline, playbooks, side panels | 3-column record chrome, activities, associations; server `record_layouts` API | **84** | `record-chrome.tsx`, `RecordLayoutController`; **gap:** new `show` pages omit Ask Evo, custom props, layout editor |
-| **Segments** | Active lists, enter/exit events, ads sync | `SegmentMatcher`, enter trigger, Meta audience sync | **84** | `SegmentMatcher`, `crm/segments`, `EvoCell6OmniPermissionsTest`; no `segment.exited` |
+| **Segments** | Active lists, enter/exit events, ads sync | `SegmentMatcher`, enter/exit triggers, Meta audience sync | **84** | `SegmentMatcher`, `segment.exited` workflows (`SegmentExitWorkflowTest`), Meta audience sync |
 | **Workflows** | Visual canvas, branches, delays, 100+ actions | 6 triggers, 8 actions, delays queue, if/else, form UI | **78** | `WorkflowRunner` (543 LOC), `CrmWorkflowsTest` (21 cases); no canvas |
 | **Sequences (Sales Hub)** | Sequences, tasks, A/B, reporting | Email + WA sequences, A/B subjects, call/meeting steps, reply pause, warmup | **92** ⭐ | `SequenceController`, `SequenceEnrollment`, `OutboundWarmupTest`; moat: owned mail stack |
 | **Desk / Inbox** | Unified inbox, live chat, SMS, SLA, bots | EvoDesk embed, native WA/email threads, channel cards | **76** | `InboxController`, `DeskComposer`; SMS stub (`Twilio SMS dispatch pending`) |
 | **Marketing** | Campaigns, ads, attribution, forms, SEO | Meta Ads center, lead webhooks, outbound campaigns, segment → audience | **88** ⭐ | `AdsCenterController`, `MetaAudienceSyncService`; no HubSpot-style marketing hub |
-| **Reporting** | Custom report builder, dashboards, attribution | Category reports + EvoViz, saved reports, multi-dashboard | **78** | `ReportController` (809 LOC), `ReportBuilder`, `CrmReportDashboardsTest`; schedule stub |
+| **Reporting** | Custom report builder, dashboards, attribution | Category reports + EvoViz, saved reports, scheduled email delivery | **78** | `ReportController`, `ScheduledReportRenderer`, `ScheduledReportDeliveryTest` |
 | **Settings / admin** | Teams, RBAC matrix, SSO, audit log | Owner/admin/member, granular `permissions` JSON, people invites | **70** | `PeopleController`, `can-manage-settings`; no permission matrix UI |
 | **Integrations / OAuth** | 1,000+ app marketplace | Google OAuth, Meta OAuth, Gmail/Calendar connectors, Evolution WA | **93** ⭐ | `ConnectorController`, `AppsController`, `DeskConnectorsTest` |
 | **Visual chrome** | Consistent HubSpot shell across all objects | HubSpot-style sidebar, list/record chrome, home command center, create drawer | **79** | Commits `6b1f65c`–`3c271d8`; **gap:** dual UI (chrome `index/show` vs legacy `hub`) |
@@ -132,7 +134,7 @@ The chrome port introduced a **dual UI architecture** that lowers functional par
 | List UI | ✅ | `/crm/segments` |
 | Matcher | ✅ | `SegmentMatcher::syncContact` — enter + workflow trigger |
 | Meta sync | ✅ | `POST /crm/segments/{id}/sync-meta` |
-| Exit events | ❌ | Membership deleted silently; no `segment.exited` trigger |
+| Exit events | ✅ | `segment.exited` workflow trigger (`SegmentExitWorkflowTest`) |
 | Gaps | | Behavior filters UI on segment index; active list analytics |
 
 ### Workflows / automation (78)

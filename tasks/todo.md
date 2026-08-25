@@ -344,12 +344,12 @@
 **Description:** Wire existing deal-health and forecast services into deal records and boards with transparent explanations instead of unsupported predictive claims.
 
 **Acceptance criteria:**
-- [ ] Deal pages show current health, contributing factors, and suggested next action.
-- [ ] Board forecast receives the computed forecast band rather than `null`.
-- [ ] Empty or insufficient history produces an honest deterministic state.
+- [x] Deal pages show current health, contributing factors, and suggested next action.
+- [x] Board forecast receives the computed forecast band rather than `null`.
+- [x] Empty or insufficient history produces an honest deterministic state.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=DealGuidanceTest`
+- [x] Tests pass: `php artisan test --filter=DealGuidanceTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: compare stale, active, won, and low-data deals.
 
@@ -366,23 +366,23 @@
 
 ## Checkpoint: Seller Workflow
 
-- [ ] Tasks 10–13 acceptance criteria pass.
-- [ ] Lead conversion is idempotent and attribution-safe.
-- [ ] Google sync imports each provider event once.
-- [ ] Sync failures and stale states are visible.
-- [ ] Forecast guidance does not claim unsupported predictive accuracy.
+- [x] Tasks 10–13 acceptance criteria pass.
+- [x] Lead conversion is idempotent and attribution-safe.
+- [x] Google sync imports each provider event once.
+- [x] Sync failures and stale states are visible.
+- [x] Forecast guidance does not claim unsupported predictive accuracy.
 
 ## Task 14: Restore deal line-item editing on the record page
 
 **Description:** Mount the existing line-item capability on the redesigned deal page and add the missing product selection and total-refresh contract.
 
 **Acceptance criteria:**
-- [ ] Reps can add, edit, and remove product or ad hoc line items from a deal.
-- [ ] Deal amount and displayed totals update transactionally from line items.
-- [ ] Controller props, UI, and existing line-item tests agree.
+- [x] Reps can add, edit, and remove product or ad hoc line items from a deal.
+- [x] Deal amount and displayed totals update transactionally from line items.
+- [x] Controller props, UI, and existing line-item tests agree.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=DealLineItemTest`
+- [x] Tests pass: `php artisan test --filter=DealLineItemTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: modify quantities and prices and confirm all totals refresh.
 
@@ -402,12 +402,12 @@
 **Description:** Expose the existing deal-split API through an authorized editor with allocation validation.
 
 **Acceptance criteria:**
-- [ ] Authorized users can add/remove teammates and edit split percentages or amounts.
-- [ ] Invalid users, cross-workspace users, negative values, and incorrect totals are rejected.
-- [ ] Deal records show the current split and update atomically.
+- [x] Authorized users can add/remove teammates and edit split percentages or amounts.
+- [x] Invalid users, cross-workspace users, negative values, and incorrect totals are rejected.
+- [x] Deal records show the current split and update atomically.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=DealSplitTest`
+- [x] Tests pass: `php artisan test --filter=DealSplitTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: create valid and invalid split allocations.
 
@@ -427,12 +427,12 @@
 **Description:** Turn quote records into immutable versioned documents that can be rendered and emailed through the workspace mailbox.
 
 **Acceptance criteria:**
-- [ ] A quote snapshot includes customer, seller, currency, line items, totals, and expiration.
-- [ ] An authorized rep can preview and email the generated PDF.
-- [ ] Sending records a timeline event and does not mutate the sent version when deal data later changes.
+- [x] A quote snapshot includes customer, seller, currency, line items, totals, and expiration.
+- [x] An authorized rep can preview and email the generated PDF.
+- [x] Sending records a timeline event and does not mutate the sent version when deal data later changes.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=QuoteDeliveryTest`
+- [x] Tests pass: `php artisan test --filter=QuoteDeliveryTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: send a quote and compare the email/PDF with its saved snapshot.
 
@@ -452,12 +452,12 @@
 **Description:** Provide a minimal public quote view with revocable signed access and auditable acceptance.
 
 **Acceptance criteria:**
-- [ ] Customers can view only the intended quote through a random, expiring or revocable token.
-- [ ] Acceptance captures timestamp and the approved evidence policy without requiring CRM login.
-- [ ] Accepted quotes become immutable and emit timeline/workflow events.
+- [x] Customers can view only the intended quote through a random, expiring or revocable token.
+- [x] Acceptance captures timestamp and the approved evidence policy without requiring CRM login.
+- [x] Accepted quotes become immutable and emit timeline/workflow events.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=QuoteAcceptanceTest`
+- [x] Tests pass: `php artisan test --filter=QuoteAcceptanceTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: accept once, retry, expire/revoke a link, and attempt cross-quote access.
 
@@ -474,7 +474,7 @@
 
 ## Checkpoint: Revenue Loop
 
-- [ ] Tasks 14–17 acceptance criteria pass.
+- [x] Tasks 14–17 acceptance criteria pass.
 - [ ] Deal and quote totals remain consistent under concurrent updates.
 - [ ] Sent quote versions are immutable.
 - [ ] Public quote access passes authorization and leakage tests.
@@ -485,12 +485,12 @@
 **Description:** Normalize provider bounce events, update outbound-message outcomes, and automatically suppress hard-bounced addresses.
 
 **Acceptance criteria:**
-- [ ] One provider adapter records soft/hard bounce type and timestamp idempotently.
-- [ ] Hard bounces add email suppression before future dispatch.
-- [ ] Outbound reports distinguish sent, delivered where known, bounced, opened, clicked, and replied.
+- [x] One provider adapter records soft/hard bounce type and timestamp idempotently.
+- [x] Hard bounces add email suppression before future dispatch.
+- [x] Outbound reports distinguish sent, delivered where known, bounced, opened, clicked, and replied.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=OutboundBounceTest`
+- [x] Tests pass: `php artisan test --filter=OutboundBounceTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: replay soft and hard bounce fixtures and inspect reporting/suppression.
 
@@ -510,12 +510,12 @@
 **Description:** Make segment membership exits first-class events that can start workflows and remain auditable.
 
 **Acceptance criteria:**
-- [ ] Segment synchronization records enter and exit transitions idempotently.
-- [ ] `segment.exited` is available as a workflow trigger with the source segment.
-- [ ] Re-entry after exit produces a new valid transition without duplicate executions.
+- [x] Segment synchronization records enter and exit transitions idempotently.
+- [x] `segment.exited` is available as a workflow trigger with the source segment.
+- [x] Re-entry after exit produces a new valid transition without duplicate executions.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=SegmentExitWorkflowTest`
+- [x] Tests pass: `php artisan test --filter=SegmentExitWorkflowTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: move a contact into, out of, and back into a segment.
 
@@ -535,12 +535,12 @@
 **Description:** Replace placeholder report emails with configurable schedules and actual report output.
 
 **Acceptance criteria:**
-- [ ] Authorized users can create, edit, pause, and delete report schedules.
-- [ ] Delivery renders the selected report/dashboard for the configured date range and recipients.
-- [ ] Success/failure state is recorded and visible with no duplicate delivery for one schedule window.
+- [x] Authorized users can create, edit, pause, and delete report schedules.
+- [x] Delivery renders the selected report/dashboard for the configured date range and recipients.
+- [x] Success/failure state is recorded and visible with no duplicate delivery for one schedule window.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=ScheduledReportDeliveryTest`
+- [x] Tests pass: `php artisan test --filter=ScheduledReportDeliveryTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: schedule a staging report and inspect content, filters, recipients, and status.
 
@@ -560,12 +560,12 @@
 **Description:** Bring the board's pipeline selection behavior to the primary deals list and preserve pipeline context across views and exports.
 
 **Acceptance criteria:**
-- [ ] Deals list, stage pills, saved views, create drawer, and export respect the selected pipeline.
-- [ ] Pipeline selection cannot expose another workspace's pipeline.
-- [ ] The workspace default remains the fallback when no pipeline is selected.
+- [x] Deals list, stage pills, saved views, create drawer, and export respect the selected pipeline.
+- [x] Pipeline selection cannot expose another workspace's pipeline.
+- [x] The workspace default remains the fallback when no pipeline is selected.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=DealListPipelineTest`
+- [x] Tests pass: `php artisan test --filter=DealListPipelineTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: switch among pipelines and verify counts, records, creation, and export.
 
@@ -582,7 +582,7 @@
 
 ## Checkpoint: Complete
 
-- [ ] Tasks 18–21 acceptance criteria pass.
+- [x] Tasks 18–21 acceptance criteria pass.
 - [ ] Full regression suite passes: `composer test`.
 - [ ] Backend quality passes: `composer lint:check && composer types:check`.
 - [ ] Frontend quality passes: `npm run lint:check && npm run types:check && npm run build`.

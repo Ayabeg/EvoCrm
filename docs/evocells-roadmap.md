@@ -34,11 +34,11 @@ Scores are **HubSpot Sales/Service Hub parity** (0–100). Moat dimensions may e
 | **M2** Lists & views | 88 | **85** | 95 | −3 | Chrome index lacks FilterBuilder / persisted columns; backend + hub components intact |
 | **M3** Pipelines & forecast | 87 | **87** | 95 | 0 | Stage CRUD/reorder, weighted forecast, AI band — no validated revenue intelligence |
 | **M4** Record UX | 82 | **84** | 92 | +2 | Record chrome landed; Ask Evo + custom props not on new show pages |
-| **M5** Segments | 84 | **84** | 90 | 0 | FilterBuilder groups, behavior filters, `SegmentMatcher` — no `segment.exited` |
+| **M5** Segments | 84 | **84** | 90 | 0 | FilterBuilder groups, behavior filters, `SegmentMatcher`, `segment.exited` |
 | **M6** Workflows | 78 | **78** | 85 | 0 | Delays queue, 6 triggers, 8 actions, quiet hours — no visual canvas |
 | **M7** Sequences | 92 | **92** | **105** | 0 | A/B subjects, call/meeting steps, reply pause, warmup moat |
 | **M8** Inbox | 76 | **76** | **102** | 0 | Email/desk/WA strong; SMS stub; no live-chat widget |
-| **M9** Reporting | 78 | **78** | 88 | 0 | Calculated props, report builder, cross-object wilaya report, scheduled email stub |
+| **M9** Reporting | 78 | **78** | 88 | 0 | Calculated props, report builder, cross-object wilaya report, scheduled HTML delivery |
 | **M10** AI | 65 | **60** | 80 | −5 | Service deep; new record pages don't render Ask Evo / engagement UI |
 | **M11** Admin/permissions | 70 | **70** | 90 | 0 | `users.permissions`, dashboard sharing — no full RBAC UI |
 | **M12** Integrations/ads | 93 | **93** | **110** | 0 | Native Meta funnel + segment → Custom Audience sync |
@@ -83,7 +83,7 @@ Moat headline: **M7 92**, **M12 93** — ahead on owned outbound + Meta native f
 | C Team saved view | List views | 1 | **Mostly done** | Workspace views work; chrome index missing save/filter UI |
 | D Pipeline admin | Pipeline settings | 1 | **Done** | Stage CRUD, reorder, safe delete |
 | E Deal automation | Operations Hub | 2 | **Mostly done** | Backend + form UI for delays/triggers/actions |
-| F Weekly reporting | Custom reports | 5 | **Partial** | Saved reports + schedule stub; not arbitrary SQL |
+| F Weekly reporting | Custom reports | 5 | **Mostly done** | Saved reports + cron delivery; not arbitrary SQL |
 | G Inbox → record | Conversations | 6 | **Partial** | WA/email; SMS stub |
 | H Ask AI | Breeze | 4 | **Partial** | Service ready; chrome show pages don't render panel |
 

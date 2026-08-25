@@ -1,5 +1,20 @@
 # Changelog
 
+## HubSpot gap Waves 3–5 (2026-08-25)
+
+### Added
+- Lead → deal conversion with pipeline/stage/owner/amount, create-or-link, and a unique `deals.lead_id`
+- Gmail and Google Calendar timeline sync with incremental cursors, start/pause, and scheduled commands
+- Deal health factors, next action, and a computed board forecast band (including a Low data state)
+- Deal-page line item editing (product or ad hoc) and authorized deal-split editing
+- Quote PDF preview/email, immutable sent snapshots, and public token acceptance at `/q/{token}`
+- Outbound bounce webhook with hard-bounce suppression
+- `segment.exited` workflow trigger
+- Scheduled report CRUD and real HTML delivery (no duplicate window)
+- Pipeline selection on the deals list, create drawer, views, and export
+
+---
+
 ## EvoCells merged to main (2026-08-25)
 
 **Merge commit:** `9a17fd0` — [PR #50](https://github.com/Mohamedbeghanem/EvoSales/pull/50) only.
