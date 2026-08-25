@@ -61,8 +61,8 @@ export function RecordActions({
     const [active, setActive] = useState<ActionType | null>(null);
 
     return (
-        <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-1.5">
+        <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
                 {ACTION_DEFS.map((action) => {
                     const Icon = action.icon;
                     const selected = active === action.type;
@@ -74,14 +74,14 @@ export function RecordActions({
                             title={action.label}
                             onClick={() => setActive(selected ? null : action.type)}
                             className={cn(
-                                'inline-flex h-8 items-center gap-1.5 rounded-full border px-2.5 text-[12px] font-medium transition-colors',
+                                'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[12px] font-medium transition-colors sm:min-h-8 sm:justify-start sm:px-2.5',
                                 selected
                                     ? 'border-brand bg-brand text-canvas'
                                     : 'border-hairline text-ink hover:bg-canvas-soft',
                             )}
                         >
-                            <Icon className="size-3.5" />
-                            {action.label}
+                            <Icon className="size-4 shrink-0 sm:size-3.5" />
+                            <span className="truncate">{action.label}</span>
                         </button>
                     );
                 })}
@@ -90,9 +90,9 @@ export function RecordActions({
                         <button
                             type="button"
                             title="More actions"
-                            className="inline-flex size-8 items-center justify-center rounded-full border border-hairline text-ink hover:bg-canvas-soft"
+                            className="inline-flex min-h-11 items-center justify-center rounded-full border border-hairline text-ink hover:bg-canvas-soft sm:size-8 sm:min-h-8"
                         >
-                            <MoreHorizontal className="size-3.5" />
+                            <MoreHorizontal className="size-4 sm:size-3.5" />
                             <span className="sr-only">More actions for record {entityId}</span>
                         </button>
                     </DropdownMenuTrigger>
@@ -262,14 +262,14 @@ export function ActivityTabs({
     onChange: (key: string) => void;
 }) {
     return (
-        <div className="flex flex-wrap gap-x-5 gap-y-1 border-b border-hairline pb-1">
+        <div className="-mx-1 flex gap-1 overflow-x-auto border-b border-hairline px-1 pb-0 no-scrollbar">
             {tabs.map((tab) => (
                 <button
                     key={tab.key}
                     type="button"
                     onClick={() => onChange(tab.key)}
                     className={cn(
-                        'border-b-2 px-1 pb-3 pt-1 text-[13px]',
+                        'shrink-0 border-b-2 px-3 pb-3 pt-1 text-[13px] min-h-11',
                         active === tab.key
                             ? 'border-brand font-medium text-ink'
                             : 'border-transparent text-muted-foreground',

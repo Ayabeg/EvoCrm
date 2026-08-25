@@ -112,6 +112,137 @@ const MORE_ITEMS: MoreItem[] = [
 
 const CATEGORIES = ['CRM', 'Desk', 'Outbound', 'Ads', 'Reports', 'Settings'];
 
+function MorePanelItems({
+    category,
+    pins,
+    onPinsChange,
+    onNavigate,
+}: {
+    category: string;
+    pins: string[];
+    onPinsChange: (pins: string[]) => void;
+    onNavigate: () => void;
+}) {
+    return (
+        <>
+            {MORE_ITEMS.filter((item) => item.category === category).map((item) => {
+                const pinned = pins.includes(item.id);
+                const Icon = item.icon;
+
+                return (
+                    <div
+                        key={`${item.category}-${item.id}`}
+                        className="flex items-center justify-between rounded-md px-2 py-2 hover:bg-canvas-soft"
+                    >
+                        <Link
+                            href={item.href}
+                            className="flex min-w-0 flex-1 items-center gap-2.5 py-0.5 text-[13px] text-ink"
+                            onClick={onNavigate}
+                        >
+                            <Icon className="size-4 shrink-0 text-muted-foreground" />
+                            <span className="truncate">{item.label}</span>
+                        </Link>
+                        <button
+                            type="button"
+                            title={pinned ? 'Unpin' : 'Pin'}
+                            onClick={() => onPinsChange(togglePin(item.id, pins))}
+                            className="ms-2 shrink-0 p-1 text-muted-foreground hover:text-brand"
+                        >
+                            {pinned ? <Pin className="size-4" /> : <PinOff className="size-4" />}
+                        </button>
+                    </div>
+                );
+            })}
+        </>
+    );
+}
+
+function MorePanelDesktop({
+    category,
+    onCategoryChange,
+    pins,
+    onPinsChange,
+    onNavigate,
+}: {
+    category: string;
+    onCategoryChange: (category: string) => void;
+    pins: string[];
+    onPinsChange: (pins: string[]) => void;
+    onNavigate: () => void;
+}) {
+    return (
+        <>
+            <div className="w-40 border-r border-hairline bg-canvas-soft py-2">
+                {CATEGORIES.map((name) => (
+                    <button
+                        key={name}
+                        type="button"
+                        onClick={() => onCategoryChange(name)}
+                        className={cn(
+                            'block w-full px-3 py-1.5 text-left text-[13px]',
+                            category === name ? 'bg-canvas font-medium text-ink' : 'text-muted-foreground',
+                        )}
+                    >
+                        {name}
+                    </button>
+                ))}
+            </div>
+            <div className="min-w-0 flex-1 overflow-y-auto p-2">
+                <MorePanelItems
+                    category={category}
+                    pins={pins}
+                    onPinsChange={onPinsChange}
+                    onNavigate={onNavigate}
+                />
+            </div>
+        </>
+    );
+}
+
+function MorePanelMobile({
+    category,
+    onCategoryChange,
+    pins,
+    onPinsChange,
+    onNavigate,
+}: {
+    category: string;
+    onCategoryChange: (category: string) => void;
+    pins: string[];
+    onPinsChange: (pins: string[]) => void;
+    onNavigate: () => void;
+}) {
+    return (
+        <div className="mx-1 mt-2 rounded-lg border border-sidebar-border bg-sidebar-well">
+            <div className="flex gap-1 overflow-x-auto border-b border-sidebar-border p-2 no-scrollbar">
+                {CATEGORIES.map((name) => (
+                    <button
+                        key={name}
+                        type="button"
+                        onClick={() => onCategoryChange(name)}
+                        className={cn(
+                            'shrink-0 rounded-md px-3 py-1.5 text-[12px] font-medium',
+                            category === name
+                                ? 'bg-sidebar-accent text-sidebar-ink'
+                                : 'text-sidebar-mute',
+                        )}
+                    >
+                        {name}
+                    </button>
+                ))}
+            </div>
+            <div className="max-h-56 overflow-y-auto p-2">
+                <MorePanelItems
+                    category={category}
+                    pins={pins}
+                    onPinsChange={onPinsChange}
+                    onNavigate={onNavigate}
+                />
+            </div>
+        </div>
+    );
+}
+
 function pathMatches(current: string, href: string, exact?: boolean, extra: string[] = []): boolean {
     if (exact) {
         return current === href || extra.includes(current);
@@ -161,7 +292,7 @@ function ChannelChips({ collapsed }: { collapsed: boolean }) {
 }
 
 export function AppSidebar() {
-    const { state, isMobile, toggleSidebar } = useSidebar();
+    const { state, isMobile, openMobile, toggleSidebar } = useSidebar();
     const collapsed = state === 'collapsed' && !isMobile;
     const page = usePage();
     const currentPath = new URL(page.url, 'http://localhost').pathname;
@@ -172,7 +303,13 @@ export function AppSidebar() {
     const [morePos, setMorePos] = useState<{ top: number; left: number } | null>(null);
 
     useEffect(() => {
-        if (!moreOpen) {
+        if (isMobile && !openMobile) {
+            setMoreOpen(false);
+        }
+    }, [isMobile, openMobile]);
+
+    useEffect(() => {
+        if (!moreOpen || isMobile) {
             return;
         }
 
@@ -218,7 +355,7 @@ export function AppSidebar() {
             document.removeEventListener('mousedown', onPointerDown);
             document.removeEventListener('keydown', onKeyDown);
         };
-    }, [moreOpen]);
+    }, [moreOpen, isMobile]);
     const integrations = page.props.integrations;
     const showSetup = !integrations?.meta?.connected && !integrations?.smtp?.connected;
 
@@ -247,14 +384,14 @@ export function AppSidebar() {
             </section>
 
             <nav className={cn('no-scrollbar min-h-0 flex-grow overflow-y-auto pb-3', collapsed ? 'px-1' : 'px-2')}>
-                <ul className={cn('m-0 flex list-none flex-col gap-0.5', collapsed && 'items-center')}>
+                <ul className={cn('m-0 flex list-none flex-col gap-1', collapsed && 'items-center')}>
                     {railItems.map((item) => {
                         const Icon = item.icon;
                         const active = pathMatches(currentPath, item.href, item.exact, item.activePaths);
                         const rowClass = cn(
                             collapsed
                                 ? 'flex size-10 items-center justify-center rounded-md'
-                                : 'flex h-9 items-center gap-2.5 rounded-md px-2 text-[13px]',
+                                : 'flex min-h-11 items-center gap-2.5 rounded-md px-3 text-[13px]',
                             active
                                 ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                                 : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
@@ -278,7 +415,7 @@ export function AppSidebar() {
                             className={cn(
                                 collapsed
                                     ? 'flex size-10 items-center justify-center rounded-md'
-                                    : 'flex h-9 w-full items-center gap-2.5 rounded-md px-2 text-[13px]',
+                                    : 'flex min-h-11 w-full items-center gap-2.5 rounded-md px-3 text-[13px]',
                                 moreOpen
                                     ? 'bg-sidebar-accent text-sidebar-ink'
                                     : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
@@ -287,57 +424,33 @@ export function AppSidebar() {
                             <MoreHorizontal className="size-4" />
                             {!collapsed ? <span>More</span> : null}
                         </button>
-                        {moreOpen && morePos ? (
+                        {isMobile && moreOpen ? (
+                            <MorePanelMobile
+                                category={category}
+                                onCategoryChange={setCategory}
+                                pins={pins}
+                                onPinsChange={setPins}
+                                onNavigate={() => {
+                                    setMoreOpen(false);
+                                    if (openMobile) {
+                                        toggleSidebar();
+                                    }
+                                }}
+                            />
+                        ) : null}
+                        {!isMobile && moreOpen && morePos ? (
                             <div
                                 id="sidebar-more-panel"
                                 className="fixed z-[100] flex h-[420px] w-[520px] max-w-[calc(100vw-1rem)] overflow-hidden rounded-md border border-hairline bg-canvas shadow-xl"
                                 style={{ top: morePos.top, left: morePos.left }}
                             >
-                                <div className="w-40 border-r border-hairline bg-canvas-soft py-2">
-                                    {CATEGORIES.map((name) => (
-                                        <button
-                                            key={name}
-                                            type="button"
-                                            onClick={() => setCategory(name)}
-                                            className={cn(
-                                                'block w-full px-3 py-1.5 text-left text-[13px]',
-                                                category === name ? 'bg-canvas font-medium text-ink' : 'text-muted-foreground',
-                                            )}
-                                        >
-                                            {name}
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="min-w-0 flex-1 overflow-y-auto p-2">
-                                    {MORE_ITEMS.filter((item) => item.category === category).map((item) => {
-                                        const pinned = pins.includes(item.id);
-                                        const Icon = item.icon;
-
-                                        return (
-                                            <div
-                                                key={`${item.category}-${item.id}`}
-                                                className="flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-canvas-soft"
-                                            >
-                                                <Link
-                                                    href={item.href}
-                                                    className="flex min-w-0 items-center gap-2 text-[13px] text-ink"
-                                                    onClick={() => setMoreOpen(false)}
-                                                >
-                                                    <Icon className="size-3.5 text-muted-foreground" />
-                                                    <span className="truncate">{item.label}</span>
-                                                </Link>
-                                                <button
-                                                    type="button"
-                                                    title={pinned ? 'Unpin' : 'Pin'}
-                                                    onClick={() => setPins(togglePin(item.id, pins))}
-                                                    className="text-muted-foreground hover:text-brand"
-                                                >
-                                                    {pinned ? <Pin className="size-3.5" /> : <PinOff className="size-3.5" />}
-                                                </button>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                <MorePanelDesktop
+                                    category={category}
+                                    onCategoryChange={setCategory}
+                                    pins={pins}
+                                    onPinsChange={setPins}
+                                    onNavigate={() => setMoreOpen(false)}
+                                />
                             </div>
                         ) : null}
                     </li>
@@ -359,12 +472,12 @@ export function AppSidebar() {
                     type="button"
                     onClick={toggleSidebar}
                     className={cn(
-                        'flex items-center gap-2 border-t border-sidebar-border px-3 py-2 text-[12px] text-sidebar-mute hover:text-sidebar-ink',
+                        'flex items-center gap-2 border-t border-sidebar-border px-3 py-3 text-[12px] text-sidebar-mute hover:text-sidebar-ink',
                         collapsed && 'justify-center',
                     )}
                 >
-                    <ChevronLeft className={cn('size-3.5', collapsed && 'rotate-180')} />
-                    {!collapsed ? <span>Collapse</span> : null}
+                    <ChevronLeft className={cn('size-4', collapsed && 'rotate-180')} />
+                    {!collapsed ? <span>{isMobile ? 'Close menu' : 'Collapse'}</span> : null}
                     {!collapsed ? <Bell className="ms-auto size-3.5" /> : null}
                 </button>
             </section>
