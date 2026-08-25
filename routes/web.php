@@ -144,6 +144,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/record-layouts/{entity}/workspace-default', [RecordLayoutController::class, 'updateWorkspaceDefault'])->name('crm.record-layouts.workspace-default');
     Route::get('/crm/segments', [SegmentController::class, 'index'])->name('crm.segments.index');
     Route::post('/crm/segments/preview', [SegmentController::class, 'preview'])->name('crm.segments.preview');
+    Route::get('/crm/segments/{segment}', [SegmentController::class, 'show'])->name('crm.segments.show');
     Route::post('/crm/segments', [SegmentController::class, 'store'])->name('crm.segments.store');
     Route::put('/crm/segments/{segment}', [SegmentController::class, 'update'])->name('crm.segments.update');
     Route::delete('/crm/segments/{segment}', [SegmentController::class, 'destroy'])->name('crm.segments.destroy');

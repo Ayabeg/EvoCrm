@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contact;
 use App\Models\OutboundCampaign;
 use App\Models\SavedFilter;
 use App\Models\Stage;
@@ -12,6 +13,7 @@ use App\Support\CrmHub;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -96,6 +98,41 @@ class SegmentController extends Controller
         ]);
 
         return redirect()->route('crm.segments.index');
+    }
+
+    public function show(Request $request, SavedFilter $segment): Response
+    {
+        abort_unless((int) $segment->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless(in_array($segment->entity, ['contact', 'deal'], true), 404);
+
+        $workspace = $request->user()->workspace;
+        $rows = DB::table('contact_segment_memberships')
+            ->where('workspace_id', $workspace->id)
+            ->where('saved_filter_id', $segment->id)
+            ->orderByDesc('id')
+            ->get();
+
+        $contacts = Contact::query()
+            ->forWorkspace($workspace)
+            ->whereIn('id', $rows->pluck('contact_id')->filter()->all())
+            ->get()
+            ->keyBy('id');
+
+        return Inertia::render('crm/segments/show', [
+            'segment' => [
+                'id' => $segment->id,
+                'name' => $segment->name,
+                'entity' => $segment->entity,
+            ],
+            'history' => $rows->map(fn (object $row) => [
+                'id' => $row->id,
+                'contact_id' => $row->contact_id,
+                'contact_name' => $contacts->get($row->contact_id)?->displayName() ?? 'Unknown contact',
+                'entered_at' => $row->entered_at,
+                'exited_at' => $row->exited_at,
+                'status' => $row->exited_at ? 'exited' : 'current',
+            ])->values()->all(),
+        ]);
     }
 
     public function destroy(Request $request, SavedFilter $segment): RedirectResponse

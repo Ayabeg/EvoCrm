@@ -33,6 +33,7 @@ class SegmentMatcher
             $membership = DB::table('contact_segment_memberships')
                 ->where('contact_id', $contact->id)
                 ->where('saved_filter_id', $segment->id)
+                ->whereNull('exited_at')
                 ->first();
 
             if ($matches && ! $membership) {
@@ -41,6 +42,7 @@ class SegmentMatcher
                     'contact_id' => $contact->id,
                     'saved_filter_id' => $segment->id,
                     'entered_at' => now(),
+                    'exited_at' => null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -50,9 +52,11 @@ class SegmentMatcher
 
             if (! $matches && $membership) {
                 DB::table('contact_segment_memberships')
-                    ->where('contact_id', $contact->id)
-                    ->where('saved_filter_id', $segment->id)
-                    ->delete();
+                    ->where('id', $membership->id)
+                    ->update([
+                        'exited_at' => now(),
+                        'updated_at' => now(),
+                    ]);
 
                 $this->workflows->handleSegmentExited($contact, $segment);
             }

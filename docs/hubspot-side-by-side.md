@@ -79,7 +79,7 @@ HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of
 | Enter trigger | Yes | `segment.entered` | Match |
 | Exit trigger | Yes | `segment.exited` | Match |
 | Ads sync | Ads / audiences | Segment → Meta Custom Audience | Match |
-| Membership history | List membership log | Exit deletes the row; workflow is the audit | Partial |
+| Membership history | List membership log | Enter/exit stints on `/crm/segments/{id}` | Match |
 
 ## Workflows (80)
 

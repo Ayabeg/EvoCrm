@@ -40,7 +40,8 @@ it('records segment exit and fires the matching workflow once', function () {
     app(SegmentMatcher::class)->syncContact($contact);
     app(SegmentMatcher::class)->syncContact($contact);
 
-    expect(DB::table('contact_segment_memberships')->where('contact_id', $contact->id)->count())->toBe(0)
+    expect(DB::table('contact_segment_memberships')->where('contact_id', $contact->id)->count())->toBe(1)
+        ->and(DB::table('contact_segment_memberships')->where('contact_id', $contact->id)->whereNull('exited_at')->count())->toBe(0)
         ->and(Activity::query()->where('contact_id', $contact->id)->where('subject', 'Contact left Alger')->count())->toBe(1);
 });
 
@@ -76,5 +77,6 @@ it('re-enters a segment as a new valid transition', function () {
     app(SegmentMatcher::class)->syncContact($contact);
 
     expect(Activity::query()->where('contact_id', $contact->id)->where('subject', 'Back in Alger')->count())->toBe(2)
-        ->and(DB::table('contact_segment_memberships')->where('contact_id', $contact->id)->count())->toBe(1);
+        ->and(DB::table('contact_segment_memberships')->where('contact_id', $contact->id)->count())->toBe(2)
+        ->and(DB::table('contact_segment_memberships')->where('contact_id', $contact->id)->whereNull('exited_at')->count())->toBe(1);
 });

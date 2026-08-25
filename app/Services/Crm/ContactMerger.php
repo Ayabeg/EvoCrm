@@ -287,15 +287,22 @@ class ContactMerger
             return;
         }
 
-        $survivorFilters = DB::table('contact_segment_memberships')
+        $survivorCurrent = DB::table('contact_segment_memberships')
             ->where('contact_id', $survivor->id)
+            ->whereNull('exited_at')
             ->pluck('saved_filter_id')
             ->all();
 
-        DB::table('contact_segment_memberships')
-            ->where('contact_id', $absorbed->id)
-            ->whereIn('saved_filter_id', $survivorFilters)
-            ->delete();
+        if ($survivorCurrent !== []) {
+            DB::table('contact_segment_memberships')
+                ->where('contact_id', $absorbed->id)
+                ->whereNull('exited_at')
+                ->whereIn('saved_filter_id', $survivorCurrent)
+                ->update([
+                    'exited_at' => now(),
+                    'updated_at' => now(),
+                ]);
+        }
 
         DB::table('contact_segment_memberships')
             ->where('contact_id', $absorbed->id)
