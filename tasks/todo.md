@@ -186,12 +186,12 @@
 **Description:** Extend the import framework to deals, pipelines, owners, contact/company associations, amounts, currencies, and close dates.
 
 **Acceptance criteria:**
-- [ ] Deal import previews mapping and unresolved association errors before writes.
-- [ ] Imported deals resolve valid pipeline stages and associate with existing/imported contacts and companies.
-- [ ] A stable external ID or approved composite key makes re-import idempotent.
+- [x] Deal import previews mapping and unresolved association errors before writes.
+- [x] Imported deals resolve valid pipeline stages and associate with existing/imported contacts and companies.
+- [x] A stable external ID or approved composite key makes re-import idempotent.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=DealImportTest`
+- [x] Tests pass: `php artisan test --filter=DealImportTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: import paired HubSpot contact/deal exports and inspect associations.
 
@@ -211,12 +211,12 @@
 **Description:** Detect likely duplicate contacts and provide a transactional merge that preserves associations and an audit record.
 
 **Acceptance criteria:**
-- [ ] Duplicate review groups candidates by normalized email, phone, or imported external ID.
-- [ ] An authorized user selects the surviving values before merging.
-- [ ] Deals, leads, activities, threads, enrollments, attributes, and messages point to the survivor after merge.
+- [x] Duplicate review groups candidates by normalized email, phone, or imported external ID.
+- [x] An authorized user selects the surviving values before merging.
+- [x] Deals, leads, activities, threads, enrollments, attributes, and messages point to the survivor after merge.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=ContactMergeTest`
+- [x] Tests pass: `php artisan test --filter=ContactMergeTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: merge a contact with activity, deal, thread, and sequence history.
 

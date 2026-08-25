@@ -8,6 +8,7 @@ use App\Http\Controllers\Crm\AskEvoController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ContactImportController;
+use App\Http\Controllers\Crm\ContactMergeController;
 use App\Http\Controllers\Crm\ConversationHistoryController;
 use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
@@ -160,6 +161,9 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/contacts/import/{batch}', [ContactImportController::class, 'show'])->name('crm.contacts.import.show');
     Route::put('/crm/contacts/import/{batch}', [ContactImportController::class, 'update'])->name('crm.contacts.import.update');
     Route::post('/crm/contacts/import/{batch}/commit', [ContactImportController::class, 'commit'])->name('crm.contacts.import.commit');
+    Route::get('/crm/contacts/duplicates', [ContactMergeController::class, 'index'])->name('crm.contacts.merge.index');
+    Route::get('/crm/contacts/merge/{survivor}/{absorbed}', [ContactMergeController::class, 'show'])->name('crm.contacts.merge.show');
+    Route::post('/crm/contacts/merge', [ContactMergeController::class, 'store'])->name('crm.contacts.merge.store');
     Route::post('/crm/contacts', [ContactController::class, 'store'])->name('crm.contacts.store');
     Route::get('/crm/contacts/{contact}', [ContactController::class, 'show'])->name('crm.contacts.show');
     Route::put('/crm/contacts/{contact}', [ContactController::class, 'update'])->name('crm.contacts.update');

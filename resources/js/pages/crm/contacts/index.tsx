@@ -57,6 +57,7 @@ export default function ContactsIndex({
     const loading = useInertiaLoading();
     const { auth } = usePage<{ auth: Auth }>().props;
     const canImport = auth.capabilities.includes('crm.import');
+    const canMerge = auth.capabilities.includes('crm.merge');
 
     return (
         <>
@@ -76,11 +77,18 @@ export default function ContactsIndex({
                 companies={companies}
                 exportHref="/crm/contacts/export"
                 headerActions={
-                    canImport ? (
-                        <Link href="/crm/contacts/import" className="text-ui font-medium text-brand">
-                            Import
-                        </Link>
-                    ) : null
+                    <div className="flex items-center gap-3">
+                        {canMerge ? (
+                            <Link href="/crm/contacts/duplicates" className="text-ui font-medium text-brand">
+                                Duplicates
+                            </Link>
+                        ) : null}
+                        {canImport ? (
+                            <Link href="/crm/contacts/import" className="text-ui font-medium text-brand">
+                                Import
+                            </Link>
+                        ) : null}
+                    </div>
                 }
                 banner={
                     !hasMailbox ? (
