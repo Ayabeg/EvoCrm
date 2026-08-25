@@ -5,6 +5,10 @@ use App\Models\ScheduledCommandRun;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Operations\ScheduledCommandHealth;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Event;
 
 it('records running success and duration without sensitive failure details', function () {
     $health = app(ScheduledCommandHealth::class);
@@ -50,6 +54,21 @@ it('summarizes success failure running and stale states per command', function (
         ->and($summary['workflow:run']['last_failure_at'])->not->toBeNull()
         ->and($summary['outbound:poll-replies']['state'])->toBe('running')
         ->and($summary['outbound:sync-mailboxes']['state'])->toBe('stale');
+});
+
+it('records named Laravel scheduler events through the production listener', function () {
+    $task = collect(app(Schedule::class)->events())
+        ->first(fn ($event) => $event->description === 'outbound:run');
+
+    expect($task)->not->toBeNull();
+
+    Event::dispatch(new ScheduledTaskStarting($task));
+    Event::dispatch(new ScheduledTaskFinished($task, 0.25));
+
+    $run = ScheduledCommandRun::query()->where('command', 'outbound:run')->firstOrFail();
+
+    expect($run->status)->toBe(ScheduledCommandRun::STATUS_SUCCESS)
+        ->and($run->duration_ms)->toBe(250);
 });
 
 it('keeps workspace-specific health isolated while retaining global runs', function () {
