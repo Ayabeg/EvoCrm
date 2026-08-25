@@ -590,3 +590,21 @@
 - [ ] Performance review covers import batches, synchronization, segment matching, and campaign expansion.
 - [x] Documentation reflects implemented behavior and removes superseded stub claims.
 - [ ] Human acceptance walkthrough completed.
+
+## Task 22: Keep segment membership history
+
+**Description:** Record enter and exit as durable membership stints so operators can audit who left a segment without relying only on workflow executions.
+
+**Acceptance criteria:**
+- [x] Exit sets `exited_at` instead of deleting the membership row.
+- [x] Re-entry inserts a new current row and leaves the prior stint visible.
+- [x] Segment history is workspace-scoped and visible on `/crm/segments/{id}`.
+
+**Verification:**
+- [x] Tests pass: `php artisan test --filter=SegmentMembershipHistoryTest`
+- [ ] Build succeeds: `npm run build`
+- [ ] Manual check: move a contact out of and back into a segment and inspect history.
+
+**Dependencies:** Task 19
+
+**Estimated scope:** Small
