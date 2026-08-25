@@ -1,6 +1,6 @@
 # EvoCells HubSpot Depth Scorecard
 
-**Production baseline:** commit `0304154` (pre-EvoCells) → **`3c271d8`** on `main` (EvoCells 1–6 + HubSpot chrome + 500 fixes, 2026-08-24).
+**Production baseline:** commit `0304154` (pre-EvoCells) → **`3c271d8`** on `main` (EvoCells 1–6 + HubSpot chrome, 2026-08-24) → **`d139f6e`** on `cursor/hubspot-gap-remaining-waves-fd45` (Waves 1–5, 2026-08-25).
 
 **Full side-by-side audit:** [hubspot-parity-comparison.md](./hubspot-parity-comparison.md)
 
@@ -24,38 +24,38 @@ Going forward: one EvoCell = one branch off latest `main`, one merge each (see p
 
 ---
 
-## Dimension scorecard (`main` @ `3c271d8`)
+## Dimension scorecard (`d139f6e`, 2026-08-25)
 
 Scores are **HubSpot Sales/Service Hub parity** (0–100). Moat dimensions may exceed 100 when EvoSales is ahead.
 
-| Dim | @ `9a17fd0` | @ `3c271d8` | Omega | Δ | Evidence / remaining gap |
-|-----|-------------|-------------|-------|---|--------------------------|
-| **M1** Core CRM | 94 | **94** | 98 | 0 | Hubs, associations, DZD commerce, deal splits — no enterprise object model |
-| **M2** Lists & views | 88 | **85** | 95 | −3 | Chrome index lacks FilterBuilder / persisted columns; backend + hub components intact |
-| **M3** Pipelines & forecast | 87 | **87** | 95 | 0 | Stage CRUD/reorder, weighted forecast, AI band — no validated revenue intelligence |
-| **M4** Record UX | 82 | **84** | 92 | +2 | Record chrome landed; Ask Evo + custom props not on new show pages |
-| **M5** Segments | 84 | **84** | 90 | 0 | FilterBuilder groups, behavior filters, `SegmentMatcher`, `segment.exited` |
-| **M6** Workflows | 78 | **78** | 85 | 0 | Delays queue, 6 triggers, 8 actions, quiet hours — no visual canvas |
-| **M7** Sequences | 92 | **92** | **105** | 0 | A/B subjects, call/meeting steps, reply pause, warmup moat |
-| **M8** Inbox | 76 | **76** | **102** | 0 | Email/desk/WA strong; SMS stub; no live-chat widget |
-| **M9** Reporting | 78 | **78** | 88 | 0 | Calculated props, report builder, cross-object wilaya report, scheduled HTML delivery |
-| **M10** AI | 65 | **60** | 80 | −5 | Service deep; new record pages don't render Ask Evo / engagement UI |
-| **M11** Admin/permissions | 70 | **70** | 90 | 0 | `users.permissions`, dashboard sharing — no full RBAC UI |
-| **M12** Integrations/ads | 93 | **93** | **110** | 0 | Native Meta funnel + segment → Custom Audience sync |
-| **M13** Regional DZ | 95 | **95** | **120** | 0 | Wilaya, DZD, Algiers TZ, AR/FR prompts |
-| **M14** Visual chrome | ~62 | **79** | 90 | +17 | Sidebar, list/record chrome, home command center — dual UI with legacy hub |
+| Dim | @ `9a17fd0` | @ `3c271d8` | @ `d139f6e` | Omega | Δ vs chrome | Evidence / remaining gap |
+|-----|-------------|-------------|-------------|-------|-------------|--------------------------|
+| **M1** Core CRM | 94 | 94 | **96** | 98 | +2 | Lead convert, quote send/accept, import/merge — no tickets/custom objects |
+| **M2** Lists & views | 88 | 85 | **90** | 95 | +5 | FilterBuilder + columns + bulk + import on chrome; no calculated list columns |
+| **M3** Pipelines & forecast | 87 | 87 | **90** | 95 | +3 | List+board pipeline switcher, wired forecast/health — no 15% backtest |
+| **M4** Record UX | 82 | 84 | **90** | 92 | +6 | Ask Evo + props on contact/deal/company; layouts settings; no playbooks |
+| **M5** Segments | 84 | 84 | **88** | 90 | +4 | `segment.exited`; membership history still deleted on exit |
+| **M6** Workflows | 78 | 78 | **80** | 85 | +2 | 7 triggers, 8 actions — no visual canvas |
+| **M7** Sequences | 92 | 92 | **93** | **105** | +1 | Bounce webhook + suppression; no SMS/LinkedIn steps |
+| **M8** Inbox | 76 | 76 | **76** | **102** | 0 | Email/desk/WA; SMS stub; no Laravel live chat |
+| **M9** Reporting | 78 | 78 | **85** | 88 | +7 | Real scheduled HTML delivery; no SQL explorer |
+| **M10** AI | 65 | 60 | **72** | 80 | +12 | Ask Evo/health/engagement rendered; keyword RAG, not Breeze agents |
+| **M11** Admin/permissions | 70 | 70 | **80** | 90 | +10 | Permission matrix + health; no SAML/audit log |
+| **M12** Integrations/ads | 93 | 93 | **96** | **110** | +3 | Gmail/Calendar sync + tenant webhooks; no marketplace |
+| **M13** Regional DZ | 95 | 95 | **95** | **120** | 0 | Wilaya, DZD, Algiers TZ, AR/FR prompts |
+| **M14** Visual chrome | ~62 | 79 | **84** | 90 | +5 | Hub split-panel retired; leads still a second pattern |
 
 ### Composite
 
-| Metric | @ `9a17fd0` | @ `3c271d8` |
-|--------|-------------|-------------|
-| **M1–M11 average** | **~81** | **~81** |
-| **M14 Visual chrome** | ~62 | **~79** |
-| **Omega gate (≥95)** | **Not met** | **Not met** |
+| Metric | @ `9a17fd0` | @ `3c271d8` | @ `d139f6e` |
+|--------|-------------|-------------|-------------|
+| **M1–M11 average** | **~81** | **~81** | **~85** |
+| **M14 Visual chrome** | ~62 | **~79** | **~84** |
+| **Omega gate (≥95)** | **Not met** | **Not met** | **Not met** |
 
-Chrome improved **look-and-feel (+17 M14)** but functional composite is flat: list/record feature wiring lagged the UI port.
+Waves 1–5 closed the chrome-wiring gap that kept the 2026-08-24 composite flat. Omega is still out of reach because tickets/custom objects, canvas, SMS/live chat, SSO, and Breeze-scale AI remain deferred.
 
-Moat headline: **M7 92**, **M12 93** — ahead on owned outbound + Meta native funnel; **M8 76** — not yet at 105.
+Moat headline: **M7 93**, **M12 96** — owned outbound + Meta funnel + Google timeline sync; **M8 76** — not yet at 105.
 
 ---
 
@@ -64,8 +64,8 @@ Moat headline: **M7 92**, **M12 93** — ahead on owned outbound + Meta native f
 | Surface | Component / route | HubSpot parity | Notes |
 |---------|-------------------|----------------|-------|
 | Sidebar | `app-sidebar.tsx` | ~85% | Primary nav + pinned More drawer |
-| List chrome | `list-chrome.tsx` → contacts/deals/companies `index` | ~82% | Header tabs, toolbar, drawer create, export footer |
-| Record chrome | `record-chrome.tsx` → contacts/deals `show` | ~78% | 3-column layout; missing AI rail |
+| List chrome | `CrmListShell` → contacts/deals/companies `index` | ~88% | FilterBuilder, columns, saved views, bulk, export |
+| Record chrome | `record-chrome.tsx` → contacts/deals/companies `show` | ~86% | 3-column + Ask Evo + properties; deal commerce mounted |
 | Home | `home.tsx` `/dashboard` | ~80% | Command center + EvoViz |
 | Desk | `desk/inbox.tsx` | ~75% | Embed + native fallback in shell |
 | Stage pills | `stage-pills.tsx` on deals list | ~90% | Counts per stage |
@@ -78,14 +78,14 @@ Moat headline: **M7 92**, **M12 93** — ahead on owned outbound + Meta native f
 
 | Workflow | HubSpot reference | Cell | Status | Notes |
 |----------|-------------------|------|--------|-------|
-| A Lead → won deal | Sales pipeline | 4, 5 | **Partial** | Calculated fields + forecast band; no 15% backtest |
-| B List → sequence → track | Sequences | 2, 3 | **Mostly done** | Behavior enroll, A/B, reply pause; basic step funnel |
-| C Team saved view | List views | 1 | **Mostly done** | Workspace views work; chrome index missing save/filter UI |
-| D Pipeline admin | Pipeline settings | 1 | **Done** | Stage CRUD, reorder, safe delete |
-| E Deal automation | Operations Hub | 2 | **Mostly done** | Backend + form UI for delays/triggers/actions |
-| F Weekly reporting | Custom reports | 5 | **Mostly done** | Saved reports + cron delivery; not arbitrary SQL |
+| A Lead → won deal | Sales pipeline | 4, 5 | **Mostly done** | Conversion + quote accept; no 15% forecast backtest |
+| B List → sequence → track | Sequences | 2, 3 | **Mostly done** | Behavior enroll, A/B, reply pause, bounces |
+| C Team saved view | List views | 1 | **Done** | Chrome FilterBuilder + save-view + columns |
+| D Pipeline admin | Pipeline settings | 1 | **Done** | Stage CRUD, reorder, list+board switcher |
+| E Deal automation | Operations Hub | 2 | **Mostly done** | 7 triggers including segment exit; no canvas |
+| F Weekly reporting | Custom reports | 5 | **Mostly done** | Saved reports + real HTML cron delivery |
 | G Inbox → record | Conversations | 6 | **Partial** | WA/email; SMS stub |
-| H Ask AI | Breeze | 4 | **Partial** | Service ready; chrome show pages don't render panel |
+| H Ask AI | Breeze | 4 | **Partial** | Ask Evo on records; keyword RAG, not agents |
 
 ---
 
@@ -94,20 +94,20 @@ Moat headline: **M7 92**, **M12 93** — ahead on owned outbound + Meta native f
 | Cell | Criterion | Met |
 |------|-----------|-----|
 | 1 | Teammate sees admin-published view | ✅ |
-| 1 | Complex filter count correct | ✅ (hub/ListToolbar; not on chrome index) |
+| 1 | Complex filter count correct | ✅ chrome `FilterBuilder` on contacts/deals/companies |
 | 1 | Stage reorder updates kanban | ✅ |
 | 1 | Layout survives new browser | ✅ |
 | 2 | Delayed automation without manual action | ✅ |
 | 3 | Step drop-off visible | ⚠️ Text funnel only |
 | 3 | A/B winner after N sends | ✅ |
 | 3 | Reply auto-pauses enrollment | ✅ |
-| 4 | Ask Evo uses timeline context | ⚠️ Keyword RAG; UI not on chrome show |
+| 4 | Ask Evo uses timeline context | ⚠️ Keyword RAG; now rendered on chrome show |
 | 4 | Forecast within 15% backtest | ❌ |
 | 5 | Cross-object chart without code | ⚠️ One wilaya report |
 | 6 | Segment → Meta audience | ✅ (needs Meta creds) |
 | 6 | Team-scoped deals | ✅ |
 | Chrome | HubSpot shell on Home/CRM/Desk | ✅ |
-| Chrome | Feature parity on chrome vs hub | ❌ |
+| Chrome | Feature parity on chrome vs hub | ✅ FilterBuilder / Ask Evo / properties on primary routes |
 
 ---
 
@@ -123,6 +123,8 @@ Moat headline: **M7 92**, **M12 93** — ahead on owned outbound + Meta native f
 | 6 Omni | `cursor/evocell-6-omni-permissions-91cb` | #50 | **#50 merge** |
 | Scorecard redo | `cursor/fix-evocell-merge-comparison-91cb` | #51 | Direct merge |
 | HubSpot chrome | `cursor/hubspot-chrome-port-91cb` | — | Cherry-pick to main |
+| Gap Waves 1–5 | `cursor/hubspot-gap-remaining-waves-fd45` | #92 | Pending (includes #88/#91 stack) |
+| Scorecard redo 2026-08-25 | same branch | #92 | This audit (`d139f6e`+) |
 
 ---
 
@@ -144,13 +146,12 @@ curl -sf https://crm.evotechly.com/up
 
 ## Next work toward Omega
 
-1. **M2 + M14** — Wire `FilterBuilder` + persisted `ColumnChooser` onto chrome `index` pages; retire or merge hub split-panel
-2. **M4 + M10** — Render Ask Evo, engagement, custom properties on `show` pages
-3. **M6** — Visual workflow list with delay preview; optional read-only canvas v1
-4. **M8** — Twilio/DZ SMS send path; live-chat routing config
-5. **M10** — Activity-index RAG or LLM key rollout; forecast backtest
-6. **M9** — Scheduled reports attach real report output
-7. **M11** — Permission matrix settings UI
-8. **Tests** — Realign `CrmSavedViewTest` to `index` components
+1. **M3 + M10** — Forecast band backtest within 15% on historical deals
+2. **M8** — Twilio/DZ SMS send path (live chat stays EvoDesk)
+3. **M6** — Optional read-only workflow canvas v1
+4. **M2** — Calculated columns and deeper association filters
+5. **M4** — Playbooks on records
+6. **M11** — Login/audit trail; SAML remains deferred
+7. **M5** — Segment membership history (exit is an event today)
 
-See [Top 10 gaps](./hubspot-parity-comparison.md#top-10-gaps-to-close-for-omega-95-composite) for full prioritized list.
+See [Top remaining gaps](./hubspot-parity-comparison.md#top-remaining-gaps-toward-omega-95-composite) for the full list.
