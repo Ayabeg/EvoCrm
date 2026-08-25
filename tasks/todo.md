@@ -621,7 +621,7 @@
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=AuditTrailTest`
 - [x] Build succeeds: `npm run build`
-- [ ] Manual check: log in and open Settings → Audit trail
+- [x] Manual check: local browser — Settings → Audit trail shows owner login (not staging).
 
 **Dependencies:** Task 8, Task 16, Task 17
 
@@ -639,7 +639,7 @@
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=ListColumnsAndAssociationFiltersTest`
 - [x] Build succeeds: `npm run build`
-- [ ] Manual check: enable a calculated column and filter contacts by deal stage
+- [x] Manual check: local browser — column chooser shows Lead score (calc) (not staging).
 
 **Dependencies:** None
 
@@ -657,7 +657,7 @@
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=RecordPlaybookTest`
 - [x] Build succeeds: `npm run build`
-- [ ] Manual check: create a contact playbook and open a contact record
+- [x] Manual check: local browser — First Alger call on Sara Khelifi (not staging).
 
 **Dependencies:** None
 

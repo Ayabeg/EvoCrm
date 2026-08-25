@@ -204,18 +204,18 @@ Provider-dependent tasks also require contract tests with mocked provider respon
 
 Stacked on segment membership history. Do not start canvas, Breeze, tickets, e-sign, SAML, or marketplace.
 
-- [ ] Task 23: Workspace audit / login trail
-- [ ] Task 24: Calculated list columns and association filters
-- [ ] Task 25: Record playbooks
+- [x] Task 23: Workspace audit / login trail
+- [x] Task 24: Calculated list columns and association filters
+- [x] Task 25: Record playbooks
 
 ### Checkpoint: Wave 6
 
-- [ ] Login, import, merge, quote send/accept, and permission changes write durable audit events
-- [ ] Audit page is workspace-scoped and owner/admin only
-- [ ] List column chooser includes custom/calculated attributes and renders their values
-- [ ] Contacts can be filtered by associated deal stage and open-deal presence
-- [ ] Playbooks can be authored in settings and shown on contact and deal records
-- [ ] Full test suite and production build pass
+- [x] Login, import, merge, quote send/accept, and permission changes write durable audit events
+- [x] Audit page is workspace-scoped and owner/admin only
+- [x] List column chooser includes custom/calculated attributes and renders their values
+- [x] Contacts can be filtered by associated deal stage and open-deal presence
+- [x] Playbooks can be authored in settings and shown on contact and deal records
+- [x] Full test suite and production build pass
 
 ## Open Questions
 
