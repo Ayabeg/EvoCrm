@@ -7,6 +7,8 @@ export type KpiTile = {
     format?: 'number' | 'money' | 'percent';
     hint?: string;
     href?: string;
+    change?: number | null;
+    changeLabel?: string;
 };
 
 export function CrmKpiStrip({
@@ -37,18 +39,18 @@ export function CrmKpiStrip({
         <div className={`grid grid-cols-2 gap-3 ${gridClass} ${className ?? ''}`}>
             {kpis.map((kpi) => {
                 const displayValue =
-                    kpi.format === 'percent' && typeof kpi.value === 'number'
-                        ? `${new Intl.NumberFormat('en-US').format(kpi.value)}%`
-                        : kpi.format === 'money' && typeof kpi.value === 'number'
-                          ? kpi.value / 100
-                          : kpi.value;
+                    kpi.format === 'money' && typeof kpi.value === 'number'
+                        ? kpi.value / 100
+                        : kpi.value;
 
                 const card = (
                     <EvoKpiCard
                         label={kpi.label}
                         value={displayValue}
-                        format={kpi.format === 'money' ? 'money' : 'number'}
+                        format={kpi.format ?? 'number'}
                         hint={kpi.hint}
+                        change={kpi.change}
+                        changeLabel={kpi.changeLabel}
                         className={
                             kpi.href
                                 ? 'h-full cursor-pointer hover:border-brand/60'

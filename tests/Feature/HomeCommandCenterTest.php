@@ -26,7 +26,7 @@ function homeDeal(User $user, string $stageSlug = 'new'): Deal
     ]);
 }
 
-it('serves the data-first command center', function () {
+it('serves the command center dashboard', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
@@ -34,31 +34,25 @@ it('serves the data-first command center', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('home')
-            ->has('today', 6)
+            ->has('window')
+            ->has('kpis')
+            ->has('attention')
+            ->has('activityFeed')
+            ->has('quickActions')
             ->has('owners')
             ->has('filters')
-            ->has('dataAsOf')
-            ->missing('nextSteps')
-            ->missing('inboxPreview')
-            ->missing('recentDeals')
-            ->missing('departments')
-            ->missing('charts'));
+            ->has('dataAsOf'));
 });
 
-it('counts real numbers in the today strip', function () {
+it('builds attention items from real workspace data', function () {
     $user = User::factory()->create();
     $workspace = $user->workspace;
     $contact = Contact::factory()->create(['workspace_id' => $workspace->id]);
-    homeDeal($user, 'new');
-    homeDeal($user, 'won');
-    Activity::query()->create([
-        'workspace_id' => $workspace->id,
-        'type' => 'task',
-        'subject' => 'Due',
-        'due_at' => now()->addHours(2),
-        'done' => false,
-        'contact_id' => $contact->id,
-    ]);
+
+    homeDeal($user, 'new')->forceFill([
+        'last_activity_at' => now()->subDays(10),
+    ])->save();
+
     Activity::query()->create([
         'workspace_id' => $workspace->id,
         'type' => 'task',
@@ -67,6 +61,7 @@ it('counts real numbers in the today strip', function () {
         'done' => false,
         'contact_id' => $contact->id,
     ]);
+
     $channel = Channel::query()->firstOrCreate(
         ['workspace_id' => $workspace->id, 'type' => ChannelType::WhatsAppCloud],
         ['name' => 'WA', 'status' => 'connected'],
@@ -76,47 +71,53 @@ it('counts real numbers in the today strip', function () {
         'contact_id' => $contact->id,
         'channel_id' => $channel->id,
         'status' => 'open',
-        'unread_count' => 3,
+        'unread_count' => 2,
     ]);
-    OutboundMessage::query()->create([
-        'workspace_id' => $workspace->id,
-        'contact_id' => $contact->id,
-        'channel' => 'email',
-        'direction' => 'out',
-        'to_address' => 'a@b.dz',
-        'status' => 'sent',
-        'sent_at' => now(),
-    ]);
-    OutboundMessage::query()->create([
-        'workspace_id' => $workspace->id,
-        'contact_id' => $contact->id,
-        'channel' => 'email',
-        'direction' => 'out',
-        'to_address' => 'c@b.dz',
-        'status' => 'queued',
-        'deferred_until' => now()->addHours(3),
-    ]);
-    Lead::factory()->create(['workspace_id' => $workspace->id, 'contact_id' => $contact->id]);
 
     $this->actingAs($user)
         ->get('/dashboard')
         ->assertInertia(fn ($page) => $page
-            ->where('today.0.value', 1)
-            ->where('today.1.value', 2)
-            ->where('today.2.value', 3)
-            ->where('today.3.key', 'leads_new')
-            ->where('today.4.value', 1)
-            ->where('today.5.value', 1));
+            ->has('attention', 3)
+            ->where('attention.0.key', 'stalled_deals')
+            ->where('attention.1.key', 'overdue_activities')
+            ->where('attention.2.key', 'inbox_unread'));
 });
 
-it('filters open deals by owner in the KPI strip', function () {
+it('filters dashboard by owner', function () {
     $user = User::factory()->create();
     $other = User::factory()->create(['workspace_id' => $user->workspace_id]);
 
-    homeDeal($user, 'new')->forceFill(['owner_id' => $user->id])->save();
-    homeDeal($user, 'new')->forceFill(['owner_id' => $other->id])->save();
+    homeDeal($user, 'won')->forceFill([
+        'owner_id' => $user->id,
+        'closed_at' => now(),
+    ])->save();
+    homeDeal($user, 'won')->forceFill([
+        'owner_id' => $other->id,
+        'closed_at' => now(),
+    ])->save();
 
     $this->actingAs($user)
         ->get('/dashboard?owner_id='.$user->id)
-        ->assertInertia(fn ($page) => $page->where('today.0.value', 1));
+        ->assertInertia(fn ($page) => $page
+            ->where('filters.owner_id', $user->id)
+            ->where('kpis.0.key', 'revenue'));
+});
+
+it('includes recent activity feed rows', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    Activity::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'type' => 'note',
+        'subject' => 'Called prospect',
+        'contact_id' => $contact->id,
+        'actor_id' => $user->id,
+    ]);
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertInertia(fn ($page) => $page
+            ->has('activityFeed', 1)
+            ->where('activityFeed.0.subject', 'Called prospect'));
 });
