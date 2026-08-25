@@ -20,6 +20,7 @@ class ReplyController extends Controller
                 ->where('direction', 'in')
                 ->with([
                     'contact:id,first_name,last_name,email',
+                    'contact.leads:id,contact_id,title,status',
                     'mailbox:id,name,from_address',
                     'parent:id,subject,sent_at',
                 ])

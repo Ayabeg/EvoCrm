@@ -1,5 +1,6 @@
 import { Form, Link } from '@inertiajs/react';
 import {
+    Bolt,
     Calendar,
     Handshake,
     Inbox,
@@ -8,7 +9,9 @@ import {
     NotebookPen,
     Phone,
     Send,
+    SendHorizonal,
     SquareCheck,
+    Users,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -98,6 +101,30 @@ export function RecordActions({
                                 <Link href={`/crm/deals?create=1&contact_id=${contactId}`}>
                                     <Handshake className="size-3.5" />
                                     Create deal
+                                </Link>
+                            </DropdownMenuItem>
+                        ) : null}
+                        {contactId ? (
+                            <DropdownMenuItem asChild>
+                                <Link href="/outbound/sequences">
+                                    <Bolt className="size-3.5" />
+                                    Enroll in sequence
+                                </Link>
+                            </DropdownMenuItem>
+                        ) : null}
+                        {contactId ? (
+                            <DropdownMenuItem asChild>
+                                <Link href="/outbound/campaigns">
+                                    <SendHorizonal className="size-3.5" />
+                                    Add to campaign
+                                </Link>
+                            </DropdownMenuItem>
+                        ) : null}
+                        {contactId ? (
+                            <DropdownMenuItem asChild>
+                                <Link href="/crm/segments">
+                                    <Users className="size-3.5" />
+                                    View segments
                                 </Link>
                             </DropdownMenuItem>
                         ) : null}
