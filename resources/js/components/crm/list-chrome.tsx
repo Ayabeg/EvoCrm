@@ -42,7 +42,8 @@ export function CrmListHeader({
                     {headerActions}
                     <Button
                         onClick={onPrimary}
-                        className="h-8 rounded-sm bg-ink px-3 text-[13px] text-canvas hover:bg-ink/90"
+                        size="sm"
+                        className="h-8 rounded-sm text-ui"
                     >
                         {primaryLabel}
                     </Button>

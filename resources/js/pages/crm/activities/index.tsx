@@ -1,7 +1,6 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { CrmShell } from '@/components/crm/crm-shell';
-import { CrmListFooter } from '@/components/crm/list-chrome';
-import PageHeader from '@/components/page-header';
+import { CrmListFooter, CrmListHeader } from '@/components/crm/list-chrome';
 import { Badge } from '@/components/ui/badge';
 
 type Activity = {
@@ -53,17 +52,25 @@ export default function ActivitiesIndex({
 
     return (
         <CrmShell title="Activities">
-            <div className="flex h-full flex-col overflow-hidden">
-                <div className="border-b border-hairline bg-canvas px-6 py-4">
-                    <PageHeader
-                        title="Activities"
-                        description="Tasks, calls, meetings, and notes across contacts, deals, and companies."
-                    />
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
+                <CrmListHeader
+                    title="Activities"
+                    views={[]}
+                    activeView=""
+                    primaryLabel="Log activity"
+                    onPrimary={() => {
+                        window.location.href = '/crm/activities?create=1';
+                    }}
+                />
+                <div className="border-b border-hairline px-6 py-3">
+                    <p className="mb-3 text-muted-foreground">
+                        Tasks, calls, meetings, and notes across contacts, deals, and companies.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
                         <select
                             value={filters.type ?? ''}
                             onChange={(e) => apply({ type: e.target.value })}
-                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[12px]"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
                             aria-label="Activity type"
                         >
                             <option value="">All types</option>
@@ -80,7 +87,7 @@ export default function ActivitiesIndex({
                                     owner_id: e.target.value ? Number(e.target.value) : null,
                                 })
                             }
-                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[12px]"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
                             aria-label="Owner"
                         >
                             <option value="">All owners</option>
@@ -93,7 +100,7 @@ export default function ActivitiesIndex({
                         <select
                             value={filters.date ?? 'all'}
                             onChange={(e) => apply({ date: e.target.value })}
-                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[12px]"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
                             aria-label="Due date"
                         >
                             <option value="all">Any due date</option>
@@ -105,7 +112,7 @@ export default function ActivitiesIndex({
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-auto">
-                    <table className="w-full text-[13px]">
+                    <table className="w-full">
                         <thead className="sticky top-0 bg-muted/50 text-left">
                             <tr>
                                 <th className="px-4 py-2 font-medium">Subject</th>
@@ -182,7 +189,7 @@ export default function ActivitiesIndex({
                                                 >
                                                     <button
                                                         type="submit"
-                                                        className="text-[12px] text-brand hover:underline"
+                                                        className="text-ui text-brand hover:underline"
                                                     >
                                                         Done
                                                     </button>

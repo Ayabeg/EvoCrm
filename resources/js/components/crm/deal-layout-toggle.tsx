@@ -20,7 +20,7 @@ export default function DealLayoutToggle({
                 href={listHref}
                 className={`px-2.5 py-1 ${
                     current === 'list'
-                        ? 'bg-ink text-canvas'
+                        ? 'bg-brand text-primary-foreground'
                         : 'bg-canvas text-ink hover:bg-canvas-soft'
                 }`}
             >
@@ -30,7 +30,7 @@ export default function DealLayoutToggle({
                 href={boardHref}
                 className={`px-2.5 py-1 ${
                     current === 'board'
-                        ? 'bg-brand text-canvas'
+                        ? 'bg-brand text-primary-foreground'
                         : 'bg-canvas text-ink hover:bg-canvas-soft'
                 }`}
             >
