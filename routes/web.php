@@ -12,6 +12,7 @@ use App\Http\Controllers\Crm\DashboardController;
 use App\Http\Controllers\Crm\DealController;
 use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\FunnelController;
+use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\ReportController;
@@ -80,7 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/auth/meta', [MetaController::class, 'redirect'])->name('auth.meta');
     Route::get('/auth/meta/callback', [MetaController::class, 'callback'])->name('auth.meta.callback');
 
-    Route::redirect('/leads', '/crm/deals/board')->name('leads.index');
+    Route::get('/leads', [LeadBoardController::class, 'index'])->name('leads.index');
 
     Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
@@ -165,6 +166,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/crm/deals/{deal}/draft-email', [AskEvoController::class, 'draftDeal'])->name('crm.deals.draft-email');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
+    Route::get('/ads/attribution', [AdsCenterController::class, 'attribution'])->name('ads.attribution');
+    Route::get('/ads/audiences', [AdsCenterController::class, 'audiences'])->name('ads.audiences');
     Route::get('/ads/campaigns', [AdsCenterController::class, 'campaigns'])->name('ads.campaigns.index');
     Route::get('/ads/ad-sets', [AdsCenterController::class, 'adSets'])->name('ads.ad-sets.index');
     Route::get('/ads/ads', [AdsCenterController::class, 'adsIndex'])->name('ads.ads.index');
