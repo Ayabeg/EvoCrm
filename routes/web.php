@@ -267,6 +267,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'index'])->name('settings.pipelines');
     Route::get('/settings/permissions', [\App\Http\Controllers\Settings\PermissionsController::class, 'index'])->name('settings.permissions');
     Route::middleware('can-manage-settings')->group(function () {
+        Route::put('/settings/meta/ad-account', [MetaSettingsController::class, 'updateAdAccount'])->name('settings.meta.ad-account');
         Route::get('/settings/record-layouts', [\App\Http\Controllers\Settings\RecordLayoutSettingsController::class, 'index'])->name('settings.record-layouts');
         Route::post('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'store'])->name('settings.pipelines.store');
         Route::patch('/settings/pipelines/{pipeline}', [\App\Http\Controllers\Settings\PipelineController::class, 'update'])->name('settings.pipelines.update');

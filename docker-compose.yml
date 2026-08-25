@@ -34,8 +34,6 @@ services:
       WA_BUSINESS_GRAPH_VERSION: ${WA_BUSINESS_GRAPH_VERSION:-v21.0}
       WA_BUSINESS_TOKEN_WEBHOOK: ${WA_BUSINESS_TOKEN_WEBHOOK:-}
       META_APP_ID: ${META_APP_ID:-}
-      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
-      META_AD_ACCOUNT_ID: ${META_AD_ACCOUNT_ID:-}
     volumes: &app-volumes
       - .:/var/www/html
     command: >

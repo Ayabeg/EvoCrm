@@ -10,8 +10,10 @@ use App\Models\AdLead;
 use App\Models\AdSet;
 use App\Models\OutboundCampaign;
 use App\Models\SavedFilter;
+use App\Models\Workspace;
 use App\Services\Ads\AdsFunnel;
 use App\Services\Ads\MetaAdsService;
+use App\Services\Meta\WorkspaceMetaCredentials;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,6 +21,8 @@ use Inertia\Response;
 
 class AdsCenterController extends Controller
 {
+    public function __construct(private WorkspaceMetaCredentials $metaCredentials) {}
+
     public function index(Request $request, AdsFunnel $funnel): Response
     {
         $workspace = $request->user()->workspace;
@@ -47,7 +51,7 @@ class AdsCenterController extends Controller
                 ->latest()
                 ->limit(50)
                 ->get(),
-            'meta' => $this->metaStatus(),
+            'meta' => $this->metaStatus($workspace),
         ]);
     }
 
@@ -56,19 +60,19 @@ class AdsCenterController extends Controller
     {
         $workspace = $request->user()->workspace;
         $campaigns = AdCampaign::query()->forWorkspace($workspace)->with('account')->withCount(['adSets'])->latest()->get();
-        return Inertia::render('ads/campaigns/index', ['campaigns' => $campaigns, 'funnels' => $funnel->forWorkspace($workspace), 'meta' => $this->metaStatus()]);
+        return Inertia::render('ads/campaigns/index', ['campaigns' => $campaigns, 'funnels' => $funnel->forWorkspace($workspace), 'meta' => $this->metaStatus($workspace)]);
     }
 
     public function adSets(Request $request): Response
     {
         $workspace = $request->user()->workspace;
-        return Inertia::render('ads/ad-sets/index', ['adSets' => AdSet::query()->forWorkspace($workspace)->with('campaign:id,name,status')->withCount('ads')->latest()->get(), 'meta' => $this->metaStatus()]);
+        return Inertia::render('ads/ad-sets/index', ['adSets' => AdSet::query()->forWorkspace($workspace)->with('campaign:id,name,status')->withCount('ads')->latest()->get(), 'meta' => $this->metaStatus($workspace)]);
     }
 
     public function adsIndex(Request $request): Response
     {
         $workspace = $request->user()->workspace;
-        return Inertia::render('ads/ads/index', ['ads' => Ad::query()->forWorkspace($workspace)->with('adSet:id,name,ad_campaign_id', 'adSet.campaign:id,name')->latest()->get(), 'meta' => $this->metaStatus()]);
+        return Inertia::render('ads/ads/index', ['ads' => Ad::query()->forWorkspace($workspace)->with('adSet:id,name,ad_campaign_id', 'adSet.campaign:id,name')->latest()->get(), 'meta' => $this->metaStatus($workspace)]);
     }
 
     public function attribution(Request $request, AdsFunnel $funnel): Response
@@ -88,7 +92,7 @@ class AdsCenterController extends Controller
             'campaigns' => $campaigns,
             'funnels' => $funnels,
             'totals' => $funnel->totals($funnels),
-            'meta' => $this->metaStatus(),
+            'meta' => $this->metaStatus($workspace),
         ]);
     }
 
@@ -123,7 +127,7 @@ class AdsCenterController extends Controller
 
         return Inertia::render('ads/audiences', [
             'segments' => $segments,
-            'meta' => $this->metaStatus(),
+            'meta' => $this->metaStatus($workspace),
         ]);
     }
 
@@ -146,7 +150,7 @@ class AdsCenterController extends Controller
                 ->orderByDesc('last_message_at')
                 ->limit(20)
                 ->get(),
-            'meta' => $this->metaStatus(),
+            'meta' => $this->metaStatus($request->user()->workspace),
         ]);
     }
 
@@ -165,15 +169,15 @@ class AdsCenterController extends Controller
         return back();
     }
 
-    protected function metaStatus(): array
+    protected function metaStatus(Workspace $workspace): array
     {
+        $status = $this->metaCredentials->status($workspace);
+
         return [
-            'connected' => filled(config('meta.access_token')) && filled(config('meta.app_id')),
+            'connected' => $status['connected'],
             'app_id_set' => filled(config('meta.app_id')),
-            'ad_account_id_set' => filled(config('meta.ad_account_id')),
-            'reason' => filled(config('meta.access_token'))
-                ? null
-                : 'Meta is not connected. Set META_APP_ID, META_ACCESS_TOKEN, and META_AD_ACCOUNT_ID. Do not invent Tech Provider status.',
+            'ad_account_id_set' => $status['ad_account_id_set'],
+            'reason' => $status['reason'],
         ];
     }
 }

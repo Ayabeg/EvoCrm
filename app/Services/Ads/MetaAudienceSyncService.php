@@ -6,12 +6,16 @@ use App\Models\Contact;
 use App\Models\SavedFilter;
 use App\Models\Workspace;
 use App\Services\Crm\CrmFilter;
+use App\Services\Meta\WorkspaceMetaCredentials;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class MetaAudienceSyncService
 {
-    public function __construct(private CrmFilter $filter) {}
+    public function __construct(
+        private CrmFilter $filter,
+        private WorkspaceMetaCredentials $credentials,
+    ) {}
 
     /**
      * @return array{synced: int, audience_id: string|null, error: string|null}
@@ -22,11 +26,10 @@ class MetaAudienceSyncService
             return ['synced' => 0, 'audience_id' => null, 'error' => 'Segment not in workspace.'];
         }
 
-        $token = config('meta.access_token') ?: config('services.meta.access_token');
-        $accountId = config('meta.ad_account_id') ?: config('services.meta.ad_account_id');
+        $credentials = $this->credentials->resolve($workspace);
 
-        if (! filled($token) || ! filled($accountId)) {
-            return ['synced' => 0, 'audience_id' => null, 'error' => 'Meta credentials not configured.'];
+        if (! $credentials['ok']) {
+            return ['synced' => 0, 'audience_id' => null, 'error' => $credentials['reason']];
         }
 
         $filters = app(CrmFilter::class)->fromSaved($segment);
@@ -51,11 +54,15 @@ class MetaAudienceSyncService
             ],
         ];
 
-        $response = Http::withToken($token)
+        $response = Http::withToken((string) $credentials['token'])
             ->post("https://graph.facebook.com/v21.0/{$audienceId}/users", $payload);
 
         if (! $response->successful()) {
-            Log::warning('Meta audience sync failed', ['body' => $response->body()]);
+            Log::warning('Meta audience sync failed', [
+                'event' => 'meta_audience_sync_failed',
+                'workspace_id' => $workspace->id,
+                'status' => $response->status(),
+            ]);
 
             return ['synced' => 0, 'audience_id' => $audienceId, 'error' => 'Meta API error.'];
         }

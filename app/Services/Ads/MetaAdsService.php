@@ -6,19 +6,21 @@ use App\Models\AdAccount;
 use App\Models\AdCampaign;
 use App\Models\AdCampaignStat;
 use App\Models\Workspace;
+use App\Services\Meta\WorkspaceMetaCredentials;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
 /**
- * Official Meta Marketing API sync. Env-driven: when META_ACCESS_TOKEN and
- * META_AD_ACCOUNT_ID are empty the workspace runs on local demo/seed data and
- * sync() is a no-op with a clear reason. Never invent app IDs.
+ * Official Meta Marketing API sync using the encrypted OAuth connection and
+ * selected ad account that belong to the workspace.
  */
 class MetaAdsService
 {
-    public function configured(): bool
+    public function __construct(private WorkspaceMetaCredentials $credentials) {}
+
+    public function configured(Workspace $workspace): bool
     {
-        return filled(config('meta.access_token')) && filled(config('meta.ad_account_id'));
+        return $this->credentials->resolve($workspace)['ok'];
     }
 
     /**
@@ -26,15 +28,18 @@ class MetaAdsService
      */
     public function sync(Workspace $workspace): array
     {
-        if (! $this->configured()) {
+        $credentials = $this->credentials->resolve($workspace);
+
+        if (! $credentials['ok']) {
             return [
                 'ok' => false,
-                'reason' => 'Meta is not connected. Set META_APP_ID, META_ACCESS_TOKEN, and META_AD_ACCOUNT_ID. Demo campaigns stay local.',
+                'reason' => $credentials['reason'],
                 'campaigns' => 0,
             ];
         }
 
-        $accountExternalId = (string) config('meta.ad_account_id');
+        $accountExternalId = (string) $credentials['ad_account_id'];
+        $token = (string) $credentials['token'];
         $account = AdAccount::query()->firstOrCreate(
             ['workspace_id' => $workspace->id, 'external_id' => $accountExternalId],
             ['name' => 'Meta ad account '.$accountExternalId, 'status' => 'connected'],
@@ -44,7 +49,7 @@ class MetaAdsService
             $account->forceFill(['status' => 'connected'])->save();
         }
 
-        $campaigns = $this->fetchCampaigns($accountExternalId);
+        $campaigns = $this->fetchCampaigns($accountExternalId, $token);
         $synced = 0;
 
         foreach ($campaigns as $row) {
@@ -60,7 +65,7 @@ class MetaAdsService
                 ],
             );
 
-            $this->syncInsights($workspace, $campaign);
+            $this->syncInsights($workspace, $campaign, $token);
             $synced++;
         }
 
@@ -70,9 +75,9 @@ class MetaAdsService
     /**
      * @return array<int, array<string, mixed>>
      */
-    protected function fetchCampaigns(string $accountExternalId): array
+    protected function fetchCampaigns(string $accountExternalId, string $token): array
     {
-        $response = $this->client()->get($this->url('/act_'.ltrim($accountExternalId, 'act_').'/campaigns'), [
+        $response = $this->client($token)->get($this->url('/act_'.ltrim($accountExternalId, 'act_').'/campaigns'), [
             'fields' => 'id,name,objective,status,daily_budget',
             'limit' => 100,
         ]);
@@ -82,13 +87,13 @@ class MetaAdsService
         return $response->json('data') ?? [];
     }
 
-    protected function syncInsights(Workspace $workspace, AdCampaign $campaign): void
+    protected function syncInsights(Workspace $workspace, AdCampaign $campaign, string $token): void
     {
         if (! $campaign->external_id) {
             return;
         }
 
-        $response = $this->client()->get($this->url('/'.$campaign->external_id.'/insights'), [
+        $response = $this->client($token)->get($this->url('/'.$campaign->external_id.'/insights'), [
             'fields' => 'impressions,clicks,spend,date_start',
             'date_preset' => 'last_30d',
             'time_increment' => 1,
@@ -128,11 +133,11 @@ class MetaAdsService
         return strtoupper((string) ($row['objective'] ?? '')) === 'LEAD_GENERATION';
     }
 
-    protected function client(): PendingRequest
+    protected function client(string $token): PendingRequest
     {
         return Http::timeout(20)
             ->acceptJson()
-            ->withToken($this->token());
+            ->withToken($token);
     }
 
     protected function url(string $path): string
@@ -142,8 +147,4 @@ class MetaAdsService
         return "https://graph.facebook.com/{$version}".'/'.ltrim($path, '/');
     }
 
-    protected function token(): string
-    {
-        return (string) config('meta.access_token');
-    }
 }

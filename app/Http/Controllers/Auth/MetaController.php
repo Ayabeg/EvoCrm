@@ -93,8 +93,17 @@ class MetaController extends Controller
         }
 
         $scopes = $this->grantedScopes($token) ?? MetaAuth::scopes();
+        $pages = $this->discover($token, '/me/accounts', in_array('pages_show_list', $scopes, true));
+        $adAccounts = $this->discover($token, '/me/adaccounts', in_array('ads_management', $scopes, true));
 
         $workspace = $request->user()->workspace;
+        $existing = $workspace->integration(Integration::PROVIDER_META);
+        $selectedAccount = (string) ($existing?->meta['selected_ad_account_id'] ?? '');
+        $discoveredIds = array_column($adAccounts, 'id');
+
+        if (! in_array($selectedAccount, $discoveredIds, true)) {
+            $selectedAccount = count($adAccounts) === 1 ? $adAccounts[0]['id'] : '';
+        }
 
         $integration = Integration::query()->updateOrCreate(
             ['workspace_id' => $workspace->id, 'provider' => Integration::PROVIDER_META],
@@ -108,8 +117,9 @@ class MetaController extends Controller
                     'name' => $metaUser->getName(),
                     'email' => $metaUser->getEmail(),
                     'long_lived' => $longLived,
-                    'pages' => $this->discover($token, '/me/accounts', in_array('pages_show_list', $scopes, true)),
-                    'ad_accounts' => $this->discover($token, '/me/adaccounts', in_array('ads_management', $scopes, true)),
+                    'pages' => $pages,
+                    'ad_accounts' => $adAccounts,
+                    'selected_ad_account_id' => $selectedAccount !== '' ? $selectedAccount : null,
                 ],
                 'connected_at' => now(),
             ],

@@ -25,10 +25,6 @@ return [
 
     'redirect_uri' => env('META_REDIRECT_URI', 'https://crm.evotechly.com/auth/meta/callback'),
 
-    'access_token' => env('META_ACCESS_TOKEN'),
-
-    'ad_account_id' => env('META_AD_ACCOUNT_ID'),
-
     'graph_version' => env('META_GRAPH_VERSION', 'v21.0'),
 
     'scopes' => [
