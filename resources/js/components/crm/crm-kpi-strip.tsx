@@ -1,4 +1,5 @@
 import { EvoKpiCard } from '@/components/crm/evo-kpi-card';
+import { StatGrid } from '@/components/ui/aurora/stat-card';
 
 export type KpiTile = {
     key: string;
@@ -24,19 +25,16 @@ export function CrmKpiStrip({
         return null;
     }
 
-    const gridClass =
-        columns === 6
-            ? 'sm:grid-cols-3 xl:grid-cols-6'
-            : columns === 5
-              ? 'sm:grid-cols-3 xl:grid-cols-5'
-              : columns === 3
-                ? 'sm:grid-cols-3'
-                : columns === 2
-                  ? 'grid-cols-2'
-                  : 'sm:grid-cols-2 xl:grid-cols-4';
-
     return (
-        <div className={`grid grid-cols-2 gap-3 ${gridClass} ${className ?? ''}`}>
+        <StatGrid
+            className={className}
+            style={{
+                gridTemplateColumns:
+                    columns >= 5
+                        ? 'repeat(auto-fill, minmax(160px, 1fr))'
+                        : undefined,
+            }}
+        >
             {kpis.map((kpi) => {
                 const displayValue =
                     kpi.format === 'money' && typeof kpi.value === 'number'
@@ -73,6 +71,6 @@ export function CrmKpiStrip({
 
                 return <div key={kpi.key}>{card}</div>;
             })}
-        </div>
+        </StatGrid>
     );
 }

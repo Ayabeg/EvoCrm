@@ -142,13 +142,13 @@ Phase 1 installs tokens + component CSS only. UI primitives migrate incrementall
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| **1** | Registry, tokens, bridge, docs | **This PR** |
-| **2** | Core primitives (Button, Input, Badge, Select, …) | Planned |
-| **3** | Application shell, command bar, sidebar | Planned |
-| **4** | Contact Detail (first complex screen) | Planned |
-| **5** | Home dashboard | Planned |
-| **6** | Tables, forms, drawers | Planned |
-| **7** | Remaining modules | Planned |
+| **1** | Registry, tokens, bridge, docs | **Done** (PR #86) |
+| **2** | Core primitives — canonical `@/components/ui/*` → Aurora adapters | **Done** |
+| **3** | Application shell — command bar Aurora Button/CommandPalette | **Done** |
+| **4** | Contact Detail — Aurora tabs, cards, avatar, Ask Evo card | **Done** |
+| **5** | Home dashboard — StatCard KPIs, Aurora dashboard sections | **Done** |
+| **6** | Tables/forms/drawers — list card rows @480px, Sheet via Aurora | **Done** |
+| **7** | Remaining modules inherit via ui adapters; sidebar keeps EvoDesk rail | **Done** |
 
 Each phase: typecheck, lint, build, viewport spot-check (280 / 375 / 768 / 1024 / 1440).
 
@@ -220,8 +220,11 @@ Production should pin a git commit per [Aurora versioning docs](https://github.c
 - [x] Tokens + component CSS vendored
 - [x] EvoTechly bridge — orange primary, no navy body
 - [x] EvoSales desktop tokens unchanged at 1440px
-- [ ] Aurora Button installed (Phase 2)
-- [ ] Contact detail on Aurora primitives (Phase 4)
+- [x] Aurora Button installed + shadcn adapter
+- [x] Contact detail on Aurora primitives (tabs, cards, avatar, Ask Evo)
+- [x] Home KPI strip uses Aurora StatCard
+- [x] List tables: card rows below 480px container width
+- [x] Command palette uses Aurora CommandPalette block
 
 ## Related docs
 

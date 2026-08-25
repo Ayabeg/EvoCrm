@@ -1,6 +1,8 @@
 import { Form } from '@inertiajs/react';
-import { Input } from '@/components/ui/input';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 
 export type AskEvoPayload = {
     label?: string;
@@ -23,40 +25,54 @@ export default function AskEvoPanel({
         'Ask Evo about this record — answers use fields and recent activity on this contact.';
 
     return (
-        <section
+        <Card
             data-testid="ask-evo"
-            className="rounded-lg border border-hairline bg-canvas p-4 text-ui text-ink shadow-xs"
+            accent="cyan"
+            elevated={false}
+            className="py-0"
             style={{
                 backgroundImage:
-                    'radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, #EC6025 16%, transparent) 0%, transparent 64%)',
+                    'radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--evosales-mark) 16%, transparent) 0%, transparent 64%)',
             }}
         >
-            <div className="mb-2 flex items-center justify-between gap-2">
-                <h3 className="text-section-label font-semibold uppercase tracking-wide text-ink">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 py-3">
+                <CardTitle as="h3" className="flex items-center gap-1.5 text-section-label uppercase">
+                    <Sparkles className="size-3.5 text-brand" aria-hidden />
                     Ask Evo
-                </h3>
+                </CardTitle>
                 <span className="text-[10px] text-mute">
                     {insight?.live ? 'Evo + model' : 'This record'}
                 </span>
-            </div>
-            <p className="text-[12px] leading-5 text-ink">{summary}</p>
-            {insight?.answer ? (
-                <p className="mt-2 border-l-2 border-brand pl-2 text-[12px] leading-5">
-                    {insight.question ? (
-                        <span className="text-mute">{insight.question} — </span>
-                    ) : null}
-                    {insight.answer}
-                </p>
-            ) : null}
-            <Form action={action} method="post" className="mt-3 flex flex-col gap-2" resetOnSuccess options={{ preserveScroll: true }}>
-                <Input
-                    name="question"
-                    placeholder="Ask about this record…"
-                    required
-                    className="h-8 border-hairline bg-canvas text-ui"
-                />
-                <Button className="h-8 w-full text-[12px] sm:w-auto">Ask Evo</Button>
-            </Form>
-        </section>
+            </CardHeader>
+            <CardContent className="space-y-3 pb-4 text-ui">
+                <p className="text-[12px] leading-5">{summary}</p>
+                {insight?.answer ? (
+                    <p className="border-l-2 border-brand pl-2 text-[12px] leading-5">
+                        {insight.question ? (
+                            <span className="text-mute">{insight.question} — </span>
+                        ) : null}
+                        {insight.answer}
+                    </p>
+                ) : null}
+                <Form
+                    action={action}
+                    method="post"
+                    className="flex flex-col gap-2"
+                    resetOnSuccess
+                    options={{ preserveScroll: true }}
+                >
+                    <Input
+                        name="question"
+                        placeholder="Ask about this record…"
+                        required
+                        size="sm"
+                        className="text-ui"
+                    />
+                    <Button type="submit" size="sm" className="w-full sm:w-auto">
+                        Ask Evo
+                    </Button>
+                </Form>
+            </CardContent>
+        </Card>
     );
 }

@@ -23,8 +23,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function RecordBack({ href, label }: { href: string; label: string }) {
     return (
@@ -68,33 +69,33 @@ export function RecordActions({
                     const selected = active === action.type;
 
                     return (
-                        <button
+                        <Button
                             key={action.type}
                             type="button"
                             title={action.label}
+                            size="sm"
+                            variant={selected ? 'default' : 'outline'}
+                            shape="pill"
                             onClick={() => setActive(selected ? null : action.type)}
-                            className={cn(
-                                'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[12px] font-medium transition-colors sm:min-h-8 sm:justify-start sm:px-2.5',
-                                selected
-                                    ? 'border-brand bg-brand text-canvas'
-                                    : 'border-hairline text-ink hover:bg-canvas-soft',
-                            )}
+                            className="min-h-11 sm:min-h-8"
                         >
                             <Icon className="size-4 shrink-0 sm:size-3.5" />
                             <span className="truncate">{action.label}</span>
-                        </button>
+                        </Button>
                     );
                 })}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button
+                        <Button
                             type="button"
+                            variant="outline"
+                            size="icon"
                             title="More actions"
-                            className="inline-flex min-h-11 items-center justify-center rounded-full border border-hairline text-ink hover:bg-canvas-soft sm:size-8 sm:min-h-8"
+                            className="min-h-11 min-w-11 sm:min-h-8 sm:min-w-8"
                         >
                             <MoreHorizontal className="size-4 sm:size-3.5" />
                             <span className="sr-only">More actions for record {entityId}</span>
-                        </button>
+                        </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-48">
                         {contactId ? (
@@ -262,23 +263,19 @@ export function ActivityTabs({
     onChange: (key: string) => void;
 }) {
     return (
-        <div className="-mx-1 flex gap-1 overflow-x-auto border-b border-hairline px-1 pb-0 no-scrollbar">
-            {tabs.map((tab) => (
-                <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => onChange(tab.key)}
-                    className={cn(
-                        'shrink-0 border-b-2 px-3 pb-3 pt-1 text-[13px] min-h-11',
-                        active === tab.key
-                            ? 'border-brand font-medium text-ink'
-                            : 'border-transparent text-muted-foreground',
-                    )}
-                >
-                    {tab.label}
-                </button>
-            ))}
-        </div>
+        <Tabs value={active} onValueChange={onChange} className="w-full">
+            <TabsList className="no-scrollbar h-auto w-full min-h-11 justify-start gap-0 border-b-0 bg-transparent p-0">
+                {tabs.map((tab) => (
+                    <TabsTrigger
+                        key={tab.key}
+                        value={tab.key}
+                        className="min-h-11 shrink-0 px-3 py-2 sm:min-h-9"
+                    >
+                        {tab.label}
+                    </TabsTrigger>
+                ))}
+            </TabsList>
+        </Tabs>
     );
 }
 
@@ -296,11 +293,11 @@ export function AssociationCard({
     addLabel?: string;
 }) {
     return (
-        <section className="rounded-lg border border-hairline bg-canvas">
-            <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-                <h3 className="text-[12px] font-semibold tracking-wide text-ink uppercase">
+        <Card elevated={false} className="overflow-hidden py-0">
+            <CardHeader className="flex flex-row items-center justify-between py-3">
+                <CardTitle as="h3" className="text-[12px] uppercase tracking-wide">
                     {title}
-                </h3>
+                </CardTitle>
                 {addHref ? (
                     <Link
                         href={addHref}
@@ -311,12 +308,12 @@ export function AssociationCard({
                 ) : (
                     <span className="text-[12px] font-medium text-muted-foreground">{addLabel}</span>
                 )}
-            </div>
-            <div className="px-4 py-3 text-[13px] leading-relaxed">
+            </CardHeader>
+            <CardContent className="py-3 text-[13px] leading-relaxed">
                 {children ?? (
                     <p className="text-muted-foreground">{empty ?? 'None'}</p>
                 )}
-            </div>
-        </section>
+            </CardContent>
+        </Card>
     );
 }
