@@ -23,6 +23,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { cn } from '@/lib/utils';
 
 export function RecordBack({ href, label }: { href: string; label: string }) {
@@ -227,23 +228,27 @@ export function RecordShell({
     left,
     center,
     right,
+    leftLabel = 'Details',
+    centerLabel = 'Activity',
+    rightLabel = 'Related',
 }: {
     left: ReactNode;
     center: ReactNode;
     right: ReactNode;
+    leftLabel?: string;
+    centerLabel?: string;
+    rightLabel?: string;
 }) {
     return (
-        <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[260px_minmax(0,1fr)_280px]">
-            <aside className="min-h-0 overflow-y-auto border-r border-hairline bg-canvas p-4">
-                {left}
-            </aside>
-            <section className="min-h-0 overflow-y-auto bg-canvas p-5">
-                {center}
-            </section>
-            <aside className="min-h-0 overflow-y-auto border-l border-hairline bg-canvas p-4">
-                {right}
-            </aside>
-        </div>
+        <AdaptiveWorkspaceShell
+            left={left}
+            center={center}
+            right={right}
+            leftLabel={leftLabel}
+            centerLabel={centerLabel}
+            rightLabel={rightLabel}
+            defaultPanel="center"
+        />
     );
 }
 

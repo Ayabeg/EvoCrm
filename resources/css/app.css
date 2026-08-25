@@ -24,6 +24,8 @@
  * Cabinet; its tokens live below and never leak into content.
  */
 :root {
+    /* Top command bar height — keep in sync with AppSidebarHeader h-[52px] */
+    --app-chrome-height: 52px;
     --evosales-canvas: #ffffff;
     --evosales-canvas-soft: #f7f7f6;
     --evosales-ink: #111111;
@@ -269,5 +271,11 @@
         font-weight: 600;
         letter-spacing: -0.02em;
         line-height: 1.15;
+    }
+
+    /* Workspace height below the command bar — prefer dvh on mobile browsers */
+    .h-app-workspace {
+        height: calc(100vh - var(--app-chrome-height));
+        height: calc(100dvh - var(--app-chrome-height));
     }
 }

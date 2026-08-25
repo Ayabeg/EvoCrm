@@ -27,18 +27,18 @@ export function AppSidebarHeader({
 
     return (
         <>
-            <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-hairline bg-canvas px-4">
-                <SidebarTrigger className="-ml-1 md:hidden" />
+            <header className="flex h-[52px] shrink-0 items-center gap-2 border-b border-hairline bg-canvas px-3 sm:gap-3 sm:px-4">
+                <SidebarTrigger className="-ml-1 shrink-0 md:hidden" />
                 <button
                     type="button"
                     onClick={() => setPaletteOpen(true)}
-                    className="relative mx-auto flex h-9 w-full max-w-2xl items-center rounded-full border border-hairline bg-canvas-soft pr-16 pl-9 text-left text-[13px] text-muted-foreground outline-none hover:border-brand focus:border-brand"
+                    className="relative mx-auto flex h-9 min-w-0 flex-1 items-center rounded-full border border-hairline bg-canvas-soft pr-9 pl-9 text-left text-[13px] text-muted-foreground outline-none hover:border-brand focus:border-brand sm:max-w-2xl sm:pr-16"
                 >
                     <span className="pointer-events-none absolute left-3 text-muted-foreground">⌕</span>
-                    Find or Ask
-                    <span className="pointer-events-none absolute right-3 text-[11px]">⌘K</span>
+                    <span className="truncate">Find or Ask</span>
+                    <span className="pointer-events-none absolute right-3 hidden text-[11px] sm:inline">⌘K</span>
                 </button>
-                <div className="flex items-center gap-1.5">
+                <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <button
