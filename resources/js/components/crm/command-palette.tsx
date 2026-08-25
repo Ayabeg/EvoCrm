@@ -10,23 +10,17 @@ import {
     Megaphone,
     MessageCircle,
     PenLine,
-    Search,
     Send,
     SendHorizonal,
     SquareKanban,
     Users,
     Workflow,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+    CommandPalette as AuroraCommandPalette,
+    type CommandItem,
+} from '@/components/aurora/command-palette';
 
 const NAV_ITEMS = [
     { label: 'Home', href: '/dashboard', icon: Home, keywords: 'dashboard command center' },
@@ -54,83 +48,47 @@ const NAV_ITEMS = [
     { label: 'Outbound reports', href: '/outbound/reports', icon: LibraryBig, keywords: 'email performance' },
 ];
 
-export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-    const [query, setQuery] = useState('');
-    const filtered = useMemo(() => {
-        const needle = query.trim().toLowerCase();
-        if (!needle) return NAV_ITEMS;
-        return NAV_ITEMS.filter(
-            (item) =>
-                item.label.toLowerCase().includes(needle) ||
-                item.keywords.includes(needle) ||
-                item.href.includes(needle),
-        );
-    }, [query]);
-
-    const runSearch = useCallback(() => {
-        const term = query.trim();
-        if (!term) return;
-        onOpenChange(false);
-        router.get('/crm/contacts', { q: term }, { preserveState: true });
-    }, [onOpenChange, query]);
-
-    useEffect(() => {
-        if (!open) setQuery('');
-    }, [open]);
+export function CommandPalette({
+    open,
+    onOpenChange,
+}: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}) {
+    const items = useMemo<CommandItem[]>(
+        () =>
+            NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                return {
+                    id: item.href,
+                    label: item.label,
+                    description: item.keywords,
+                    section: 'navigate',
+                    icon: <Icon className="size-3.5" strokeWidth={1.65} aria-hidden />,
+                    onSelect: () => {
+                        onOpenChange(false);
+                        router.visit(item.href);
+                    },
+                };
+            }),
+        [onOpenChange],
+    );
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="gap-0 overflow-hidden border-hairline bg-canvas p-0 sm:max-w-lg">
-                <DialogHeader className="border-b border-hairline px-4 py-3 text-left">
-                    <DialogTitle className="text-[15px] font-semibold">Find or Ask</DialogTitle>
-                    <DialogDescription className="text-[12px]">
-                        Search contacts or jump to any room, list, or report category.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="border-b border-hairline px-3 py-2">
-                    <Input
-                        autoFocus
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                if (filtered.length === 1) {
-                                    onOpenChange(false);
-                                    router.visit(filtered[0].href);
-                                    return;
-                                }
-                                runSearch();
-                            }
-                        }}
-                        placeholder="Search contacts, deals, or navigate…"
-                        className="h-9 border-0 bg-canvas-soft text-[13px] shadow-none focus-visible:ring-0"
-                    />
-                </div>
-                <ul className="max-h-72 overflow-y-auto py-1">
-                    {filtered.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <li key={item.href}>
-                                <button
-                                    type="button"
-                                    className={cn(
-                                        'flex w-full items-center gap-3 px-4 py-2 text-left text-[13px] hover:bg-canvas-soft',
-                                    )}
-                                    onClick={() => {
-                                        onOpenChange(false);
-                                        router.visit(item.href);
-                                    }}
-                                >
-                                    <Icon className="size-4 text-muted-foreground" />
-                                    <span>{item.label}</span>
-                                </button>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </DialogContent>
-        </Dialog>
+        <AuroraCommandPalette
+            open={open}
+            onOpenChange={onOpenChange}
+            items={items}
+            sections={[{ id: 'navigate', label: 'Navigate' }]}
+            placeholder="Search contacts, deals, or navigate…"
+            filter={(query, item) => {
+                const needle = query.trim().toLowerCase();
+                if (!needle) return 1;
+                const hay = `${item.label} ${item.description ?? ''}`.toLowerCase();
+                return hay.includes(needle) ? 1 : 0;
+            }}
+            onSelect={(item) => item.onSelect?.()}
+        />
     );
 }
 

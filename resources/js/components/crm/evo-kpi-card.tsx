@@ -1,3 +1,4 @@
+import { StatCard } from '@/components/ui/aurora/stat-card';
 import { cn } from '@/lib/utils';
 
 export function EvoKpiCard({
@@ -34,61 +35,29 @@ export function EvoKpiCard({
 
     const changeDisplay =
         change === null || change === undefined
-            ? null
+            ? undefined
             : `${change > 0 ? '+' : ''}${change}%`;
 
+    const trend =
+        change === null || change === undefined
+            ? undefined
+            : change > 0
+              ? ('up' as const)
+              : change < 0
+                ? ('down' as const)
+                : ('flat' as const);
+
+    const description = [changeLabel, hint].filter(Boolean).join(' · ') || undefined;
+
     return (
-        <section
-            className={cn(
-                'relative overflow-hidden rounded-lg border border-hairline bg-canvas p-4 transition-colors',
-                className,
-            )}
-        >
-            <div
-                className="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full opacity-[0.06]"
-                style={{
-                    background:
-                        'radial-gradient(circle, var(--evosales-mark) 0%, transparent 70%)',
-                }}
-                aria-hidden
-            />
-            <p className="text-section-label uppercase tracking-wide text-muted-foreground">
-                {label}
-            </p>
-            <p className="money text-kpi mt-2 font-semibold tracking-tight text-ink">
-                {display}
-            </p>
-            {changeDisplay ? (
-                <p className="mt-1 flex items-center gap-1.5 text-ui text-muted-foreground">
-                    <span
-                        className={
-                            change !== undefined && change > 0
-                                ? 'text-brand'
-                                : change !== undefined && change < 0
-                                  ? 'text-ink'
-                                  : undefined
-                        }
-                        aria-hidden
-                    >
-                        {change !== undefined && change > 0
-                            ? '↑'
-                            : change !== undefined && change < 0
-                              ? '↓'
-                              : '→'}
-                    </span>
-                    <span>{changeDisplay}</span>
-                    {changeLabel ? (
-                        <span className="text-muted-foreground">
-                            {changeLabel}
-                        </span>
-                    ) : null}
-                </p>
-            ) : null}
-            {hint ? (
-                <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
-                    {hint}
-                </p>
-            ) : null}
-        </section>
+        <StatCard
+            label={label}
+            value={<span className="money">{display}</span>}
+            delta={changeDisplay}
+            trend={trend}
+            description={description}
+            compact
+            className={cn('h-full @container/kpi', className)}
+        />
     );
 }

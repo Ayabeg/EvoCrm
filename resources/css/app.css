@@ -12,6 +12,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
+ * Aurora layer order — required by aurora-components registry item.
+ * See docs/visual-system/aurora-adoption.md
+ */
+@layer theme, base, components, aurora-components, utilities;
+
+/*
  * EvoSales palette — white + black + orange. Do not invent more.
  * Light Cabinet: canvas #FFFFFF, soft white #F7F7F6 (page wash only),
  * ink #111111, mute #525252, hairline #E5E5E5, Evotechly mark orange #EC6025.
@@ -169,11 +175,17 @@
     --sidebar-online: #22c55e;
 }
 
+/* Aurora Design System — registry primitives + component CSS */
+@import '../js/components/aurora.css';
+@import './aurora-evotechly-bridge.css';
+@import '../js/components/aurora-components.css';
+
 /*
  * Dark Cabinet — TRUE BLACK, never navy/charcoal-blue. Canvas #000000,
  * elevated surfaces #0A0A0A, hairline #1F1F1F, ink #F5F5F5, mute #A3A3A3.
  * Every override below is a neutral gray (zero chroma) or the Evotechly
  * orange; no blue, indigo, navy, or teal tint is allowed in dark tokens.
+ * Aurora remapping for .dark lives in aurora-evotechly-bridge.css.
  */
 .dark {
     --evosales-canvas: #0a0a0a;

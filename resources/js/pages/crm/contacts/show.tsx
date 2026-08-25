@@ -13,6 +13,7 @@ import {
     RecordBack,
     RecordShell,
 } from '@/components/crm/record-chrome';
+import { Avatar, AvatarFallback } from '@/components/ui/aurora/avatar';
 import { Button } from '@/components/ui/button';
 import { formatContactName } from '@/lib/contact-name';
 
@@ -106,12 +107,11 @@ export default function ContactShow({
                     <div className="shrink-0 border-b border-hairline bg-canvas px-4 py-4 sm:px-6 sm:py-5">
                         <RecordBack href="/crm/contacts" label="Back to Contacts" />
                         <div className="mt-4 flex items-start gap-3">
-                            <div
-                                className="grid size-11 shrink-0 place-items-center rounded-full bg-ink text-[13px] font-medium text-canvas sm:size-10 sm:text-[12px]"
-                                aria-hidden
-                            >
-                                {initials || '?'}
-                            </div>
+                            <Avatar size="lg" className="shrink-0">
+                                <AvatarFallback className="bg-ink text-[13px] font-medium text-canvas sm:text-[12px]">
+                                    {initials || '?'}
+                                </AvatarFallback>
+                            </Avatar>
                             <div className="min-w-0 flex-1 space-y-1">
                                 <h1 className="text-record-title font-semibold leading-snug">{name}</h1>
                                 <p className="text-[13px] leading-relaxed text-muted-foreground">

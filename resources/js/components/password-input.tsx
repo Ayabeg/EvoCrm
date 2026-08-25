@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 export default function PasswordInput({
     className,
     ref,
+    size: _nativeSize,
     ...props
 }: Omit<ComponentProps<'input'>, 'type'> & { ref?: Ref<HTMLInputElement> }) {
     const [showPassword, setShowPassword] = useState(false);

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 export function DashboardSection({
@@ -15,19 +16,19 @@ export function DashboardSection({
     className?: string;
 }) {
     return (
-        <section className={cn('space-y-3', className)}>
-            <div className="flex flex-wrap items-end justify-between gap-2">
+        <Card elevated={false} className={cn('@container/dashboard-section py-0', className)}>
+            <CardHeader className="flex flex-row flex-wrap items-end justify-between gap-2 py-4">
                 <div>
-                    <h2 className="text-ui font-semibold text-ink">{title}</h2>
+                    <CardTitle as="h2" className="text-ui font-semibold normal-case tracking-normal">
+                        {title}
+                    </CardTitle>
                     {description ? (
-                        <p className="mt-0.5 text-ui text-muted-foreground">
-                            {description}
-                        </p>
+                        <p className="mt-0.5 text-ui text-muted-foreground">{description}</p>
                     ) : null}
                 </div>
                 {action}
-            </div>
-            {children}
-        </section>
+            </CardHeader>
+            <CardContent className="pb-4">{children}</CardContent>
+        </Card>
     );
 }
