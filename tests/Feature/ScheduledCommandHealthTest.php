@@ -101,7 +101,7 @@ it('shows operational health only to workspace administrators', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('settings/system-health')
-            ->has('commands', 6)
+            ->has('commands', 8)
             ->has('integrations', 5));
 
     expect($response->getContent())->not->toContain('secret-value');

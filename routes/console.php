@@ -11,6 +11,8 @@ Artisan::command('inspire', function () {
 Schedule::command('outbound:run')->name('outbound:run')->everyMinute()->withoutOverlapping();
 Schedule::command('workflow:run')->name('workflow:run')->everyMinute()->withoutOverlapping();
 Schedule::command('reports:deliver')->name('reports:deliver')->dailyAt('08:00')->timezone('Africa/Algiers')->withoutOverlapping();
+Schedule::command('google:sync-mail')->name('google:sync-mail')->everyFifteenMinutes()->withoutOverlapping();
+Schedule::command('google:sync-calendar')->name('google:sync-calendar')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('outbound:poll-replies')->name('outbound:poll-replies')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('outbound:sync-mailboxes')->name('outbound:sync-mailboxes')->everyFifteenMinutes()->withoutOverlapping();
 // Warmup advances once per Africa/Algiers day, just after the default quiet

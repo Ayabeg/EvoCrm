@@ -279,6 +279,8 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/settings/connectors', [ConnectorController::class, 'index'])->name('settings.connectors');
     Route::post('/settings/connectors', [ConnectorController::class, 'store'])->name('settings.connectors.store');
     Route::get('/settings/connectors/google/{provider}', [ConnectorController::class, 'reconnectGoogle'])->name('settings.connectors.google');
+    Route::post('/settings/connectors/{provider}/sync', [ConnectorController::class, 'startSync'])->name('settings.connectors.sync.start');
+    Route::post('/settings/connectors/{provider}/pause', [ConnectorController::class, 'pauseSync'])->name('settings.connectors.sync.pause');
 
     Route::get('/settings/evolution', [EvolutionSettingsController::class, 'edit'])->name('settings.evolution');
     Route::post('/settings/evolution/sync', [EvolutionSettingsController::class, 'sync'])->name('settings.evolution.sync');

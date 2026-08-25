@@ -73,6 +73,27 @@ function GoogleConnectorCard({
                 </p>
             ) : null}
 
+            {connector.sync ? (
+                <div className="rounded-lg border border-hairline bg-canvas-soft p-3 text-xs text-muted-foreground">
+                    <p className="font-medium text-foreground">
+                        Sync {connector.sync.status}
+                    </p>
+                    <p>
+                        {connector.sync.last_synced_at
+                            ? `Last sync ${connector.sync.last_synced_at}`
+                            : 'No sync run yet.'}
+                    </p>
+                    {connector.sync.last_error ? (
+                        <p className="text-destructive">{connector.sync.last_error}</p>
+                    ) : null}
+                    <p>
+                        {connector.sync.has_token
+                            ? 'Workspace token stored.'
+                            : 'No workspace token yet — reconnect Google.'}
+                    </p>
+                </div>
+            ) : null}
+
             <div className="flex flex-wrap items-center gap-2">
                 <Form action="/settings/connectors" method="post">
                     {({ processing }) => (
@@ -90,6 +111,24 @@ function GoogleConnectorCard({
                             Reconnect Google for {connector.name}
                         </a>
                     </Button>
+                ) : null}
+                {connector.status === 'connected' ? (
+                    <>
+                        <Form action={`/settings/connectors/${connector.provider}/sync`} method="post">
+                            {({ processing }) => (
+                                <Button size="sm" variant="outline" disabled={processing}>
+                                    Start sync
+                                </Button>
+                            )}
+                        </Form>
+                        <Form action={`/settings/connectors/${connector.provider}/pause`} method="post">
+                            {({ processing }) => (
+                                <Button size="sm" variant="outline" disabled={processing}>
+                                    Pause sync
+                                </Button>
+                            )}
+                        </Form>
+                    </>
                 ) : null}
             </div>
         </Card>

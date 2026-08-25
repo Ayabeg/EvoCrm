@@ -21,6 +21,8 @@ class ActivityRecorder
         $activity = Activity::query()->create([
             'workspace_id' => $workspace->id,
             'type' => $type,
+            'provider' => $attributes['provider'] ?? null,
+            'provider_event_id' => $attributes['provider_event_id'] ?? null,
             'subject' => $attributes['subject'] ?? null,
             'body' => $attributes['body'] ?? null,
             'due_at' => $attributes['due_at'] ?? null,

@@ -6,6 +6,7 @@ use App\Enums\ConnectorProvider;
 use App\Enums\ConnectorStatus;
 use App\Exceptions\UnofficialWhatsAppRefused;
 use App\Models\Connector;
+use App\Models\GoogleSyncState;
 use App\Models\Integration;
 use App\Models\Workspace;
 use App\Services\Evolution\EvolutionCloudService;
@@ -59,6 +60,8 @@ class ConnectorRegistrar
             throw new \InvalidArgumentException('Google connectors only.');
         }
 
+        $this->persistGoogleTokens($workspace, $provider, $config);
+
         return Connector::query()->updateOrCreate(
             [
                 'workspace_id' => $workspace->id,
@@ -86,8 +89,13 @@ class ConnectorRegistrar
      */
     public function googleCatalog(Workspace $workspace): array
     {
-        return array_map(function (array $row): array {
+        return array_map(function (array $row) use ($workspace): array {
             $provider = ConnectorProvider::from((string) $row['provider']);
+            $sync = GoogleSyncState::query()
+                ->forWorkspace($workspace)
+                ->where('provider', $provider->value)
+                ->first();
+            $integration = $workspace->integration($provider->value);
 
             return [
                 ...$row,
@@ -95,6 +103,13 @@ class ConnectorRegistrar
                 'reconnect_url' => GoogleAuth::enabled() && GoogleAuth::hasConnectorScope($provider)
                     ? '/settings/connectors/google/'.$provider->value
                     : null,
+                'sync' => [
+                    'status' => $sync?->status ?? 'idle',
+                    'cursor' => $sync?->cursor,
+                    'last_synced_at' => $sync?->last_synced_at?->toIso8601String(),
+                    'last_error' => $sync?->last_error,
+                    'has_token' => (bool) $integration?->isConnected(),
+                ],
             ];
         }, $this->catalog($workspace, ConnectorProvider::google()));
     }
@@ -230,5 +245,33 @@ class ConnectorRegistrar
     private function refuseUnofficial(ConnectorProvider $provider): void
     {
         $this->refuseUnofficialWhatsApp($provider->value);
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    public function persistGoogleTokens(Workspace $workspace, ConnectorProvider $provider, array $config = []): Integration
+    {
+        $integrationProvider = $provider === ConnectorProvider::Gmail
+            ? Integration::PROVIDER_GMAIL
+            : Integration::PROVIDER_GOOGLE_CALENDAR;
+
+        return Integration::query()->updateOrCreate(
+            [
+                'workspace_id' => $workspace->id,
+                'provider' => $integrationProvider,
+            ],
+            [
+                'status' => filled($config['access_token'] ?? null) ? 'connected' : 'not_connected',
+                'access_token' => $config['access_token'] ?? null,
+                'refresh_token' => $config['refresh_token'] ?? null,
+                'expires_at' => $config['expires_at'] ?? null,
+                'scopes' => $config['scopes'] ?? GoogleAuth::connectorScopes($provider),
+                'meta' => [
+                    'google_email' => $config['google_email'] ?? null,
+                ],
+                'connected_at' => filled($config['access_token'] ?? null) ? now() : null,
+            ],
+        );
     }
 }

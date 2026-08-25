@@ -141,6 +141,11 @@ class GoogleController extends Controller
         app(ConnectorRegistrar::class)->markGoogleConnected($workspace, $provider, [
             'google_email' => $googleUser->getEmail(),
             'scopes' => GoogleAuth::connectorScopes($provider),
+            'access_token' => $googleUser->token ?? null,
+            'refresh_token' => $googleUser->refreshToken ?? null,
+            'expires_at' => isset($googleUser->expiresIn)
+                ? now()->addSeconds((int) $googleUser->expiresIn)
+                : null,
         ]);
 
         Inertia::flash('toast', [

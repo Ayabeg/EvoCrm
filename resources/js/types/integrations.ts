@@ -45,6 +45,13 @@ export type GoogleWorkspaceConnector = {
     reason: string | null;
     scopes_on_client: boolean;
     reconnect_url: string | null;
+    sync?: {
+        status: 'idle' | 'running' | 'paused' | 'error';
+        cursor?: string | null;
+        last_synced_at?: string | null;
+        last_error?: string | null;
+        has_token?: boolean;
+    };
 };
 
 export type MarketplaceApp = {

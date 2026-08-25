@@ -294,12 +294,12 @@
 **Description:** Use stored Google OAuth grants to import relevant sent and received email metadata into CRM timelines with incremental cursors and deduplication.
 
 **Acceptance criteria:**
-- [ ] Connected users can start, pause, reconnect, and inspect Gmail sync state.
-- [ ] Matching email activity is attached once to contacts and relevant deals.
-- [ ] Sync stores provider IDs/cursors and handles token refresh and revocation safely.
+- [x] Connected users can start, pause, reconnect, and inspect Gmail sync state.
+- [x] Matching email activity is attached once to contacts and relevant deals.
+- [x] Sync stores provider IDs/cursors and handles token refresh and revocation safely.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=GoogleMailSyncTest`
+- [x] Tests pass: `php artisan test --filter=GoogleMailSyncTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: send and receive staging messages, sync twice, and confirm no duplicates.
 
@@ -319,12 +319,12 @@
 **Description:** Synchronize relevant Google Calendar events into meeting activities and expose conflict-safe connector status.
 
 **Acceptance criteria:**
-- [ ] Calendar sync imports, updates, and cancels CRM meeting activities idempotently.
-- [ ] Attendee emails associate meetings with known contacts and relevant deals when unambiguous.
-- [ ] Incremental cursor expiration triggers a safe full resync rather than data loss.
+- [x] Calendar sync imports, updates, and cancels CRM meeting activities idempotently.
+- [x] Attendee emails associate meetings with known contacts and relevant deals when unambiguous.
+- [x] Incremental cursor expiration triggers a safe full resync rather than data loss.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=GoogleCalendarSyncTest`
+- [x] Tests pass: `php artisan test --filter=GoogleCalendarSyncTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: create, move, and cancel a staging meeting and inspect the timeline.
 

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Settings;
 use App\Enums\ConnectorProvider;
 use App\Http\Controllers\Controller;
 use App\Services\Connectors\ConnectorRegistrar;
+use App\Services\Connectors\GoogleCalendarSync;
+use App\Services\Connectors\GoogleMailSync;
 use App\Support\GoogleAuth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -76,5 +78,41 @@ class ConnectorController extends Controller
         $request->session()->put('google_connector_intent', $enum->value);
 
         return GoogleAuth::redirectForConnector($enum);
+    }
+
+    public function startSync(Request $request, string $provider, GoogleMailSync $mail, GoogleCalendarSync $calendar): RedirectResponse
+    {
+        $enum = ConnectorProvider::tryFrom($provider);
+        abort_unless($enum instanceof ConnectorProvider && $enum->isGoogle(), 404);
+
+        $workspace = $request->user()->workspace;
+        $enum === ConnectorProvider::Gmail
+            ? $mail->start($workspace)
+            : $calendar->start($workspace);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => $enum->label().' sync started.',
+        ]);
+
+        return back();
+    }
+
+    public function pauseSync(Request $request, string $provider, GoogleMailSync $mail, GoogleCalendarSync $calendar): RedirectResponse
+    {
+        $enum = ConnectorProvider::tryFrom($provider);
+        abort_unless($enum instanceof ConnectorProvider && $enum->isGoogle(), 404);
+
+        $workspace = $request->user()->workspace;
+        $enum === ConnectorProvider::Gmail
+            ? $mail->pause($workspace)
+            : $calendar->pause($workspace);
+
+        Inertia::flash('toast', [
+            'type' => 'info',
+            'message' => $enum->label().' sync paused.',
+        ]);
+
+        return back();
     }
 }

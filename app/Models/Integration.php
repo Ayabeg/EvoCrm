@@ -37,6 +37,10 @@ class Integration extends Model
 
     public const PROVIDER_META = 'meta';
 
+    public const PROVIDER_GMAIL = 'gmail';
+
+    public const PROVIDER_GOOGLE_CALENDAR = 'google_calendar';
+
     protected function casts(): array
     {
         return [

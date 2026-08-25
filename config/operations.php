@@ -32,5 +32,15 @@ return [
             'cadence' => 'Daily at 08:05 Africa/Algiers',
             'stale_after_seconds' => 97200,
         ],
+        'google:sync-mail' => [
+            'label' => 'Gmail timeline sync',
+            'cadence' => 'Every fifteen minutes',
+            'stale_after_seconds' => 1800,
+        ],
+        'google:sync-calendar' => [
+            'label' => 'Google Calendar sync',
+            'cadence' => 'Every fifteen minutes',
+            'stale_after_seconds' => 1800,
+        ],
     ],
 ];

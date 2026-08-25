@@ -9,6 +9,9 @@ use App\Models\User;
 use App\Observers\ContactObserver;
 use App\Observers\DealObserver;
 use App\Observers\LeadObserver;
+use App\Services\Connectors\FakeGoogleApiClient;
+use App\Services\Connectors\GoogleApiClient;
+use App\Services\Connectors\HttpGoogleApiClient;
 use App\Services\Identity\WorkspaceProvisioner;
 use App\Services\Operations\ScheduledTaskMonitor;
 use Carbon\CarbonImmutable;
@@ -30,6 +33,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ScheduledTaskMonitor::class);
+        $this->app->singleton(GoogleApiClient::class, function ($app) {
+            return $app->environment('testing')
+                ? $app->make(FakeGoogleApiClient::class)
+                : $app->make(HttpGoogleApiClient::class);
+        });
+        $this->app->singleton(FakeGoogleApiClient::class);
     }
 
     public function boot(): void

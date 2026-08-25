@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'workspace_id',
     'type',
+    'provider',
+    'provider_event_id',
     'subject',
     'body',
     'due_at',
