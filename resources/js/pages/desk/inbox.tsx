@@ -78,7 +78,7 @@ export default function DeskInbox({
 
     return (
         <DeskShell title="Desk">
-            <div className="flex h-full flex-col bg-canvas text-[13px] text-ink">
+            <div className="flex h-full flex-col bg-canvas text-ui text-ink">
                 {empty ? (
                     <ConnectChannels channels={channels} />
                 ) : (
@@ -120,7 +120,7 @@ function ConnectChannels({ channels }: { channels: ChannelCard[] }) {
                                     <Icon className="size-4 text-brand" />
                                     {channel.label}
                                 </span>
-                                <span className="text-[12px] text-brand">
+                                <span className="text-ui text-brand">
                                     {channel.connected ? 'Connected' : 'Connect'}
                                 </span>
                             </Link>
@@ -165,7 +165,7 @@ function FrontDesk({
     return (
         <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[220px_minmax(0,280px)_minmax(0,1fr)]">
             <aside className="min-h-0 overflow-y-auto border-r border-hairline p-3">
-                <p className="mb-2 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                <p className="text-section-label mb-2 text-muted-foreground">
                     Shared inbox
                 </p>
                 {folders.map((item) => (
@@ -175,18 +175,18 @@ function FrontDesk({
                         onClick={() => setFolder(item.key)}
                         className={`mb-1 block w-full rounded-md px-2 py-1.5 text-left ${
                             folder === item.key
-                                ? 'bg-[rgba(236,96,37,0.12)] font-medium text-ink'
+                                ? 'bg-brand/12 font-medium text-ink'
                                 : 'text-muted-foreground'
                         }`}
                     >
                         {item.label}
                     </button>
                 ))}
-                <p className="mt-4 mb-2 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                <p className="text-section-label mt-4 mb-2 text-muted-foreground">
                     Channels
                 </p>
-                <p className="px-2 text-[12px]">WhatsApp Cloud</p>
-                <Link href="/outbound/replies" className="mt-2 block px-2 text-[12px] text-brand">
+                <p className="px-2 text-ui text-muted-foreground">WhatsApp Cloud</p>
+                <Link href="/outbound/replies" className="mt-2 block px-2 text-ui text-brand">
                     Email
                 </Link>
             </aside>
@@ -201,7 +201,7 @@ function FrontDesk({
                         }
                         className={`block w-full border-b border-hairline px-3 py-3 text-left ${
                             selected?.id === thread.id
-                                ? 'bg-[rgba(236,96,37,0.08)]'
+                                ? 'bg-brand/8'
                                 : 'hover:bg-canvas-soft'
                         }`}
                     >
@@ -211,10 +211,10 @@ function FrontDesk({
                                 <Badge variant="secondary">{thread.unread_count}</Badge>
                             ) : null}
                         </div>
-                        <p className="truncate text-[12px] text-muted-foreground">
+                        <p className="truncate text-ui text-muted-foreground">
                             {thread.messages?.[0]?.body ?? thread.subject ?? '—'}
                         </p>
-                        <p className="mt-1 text-[11px] text-muted-foreground">
+                        <p className="mt-1 text-section-label text-muted-foreground normal-case tracking-normal">
                             {thread.contact.owner?.name ?? 'Unassigned'}
                         </p>
                     </button>
@@ -227,13 +227,13 @@ function FrontDesk({
                         <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
                             <div>
                                 <h2 className="font-semibold">{nameOf(selected.contact)}</h2>
-                                <p className="text-[12px] text-muted-foreground">
+                                <p className="text-ui text-muted-foreground">
                                     {selected.contact.owner?.name ?? 'Unassigned'} · Official WhatsApp
                                 </p>
                             </div>
                             <Link
                                 href={`/crm/contacts/${selected.contact.id}`}
-                                className="text-[12px] text-brand"
+                                className="text-ui text-brand"
                             >
                                 Open contact
                             </Link>
@@ -242,16 +242,16 @@ function FrontDesk({
                             {(selected.messages ?? []).map((message) => (
                                 <div
                                     key={message.id}
-                                    className={`max-w-[80%] rounded-md px-3 py-2 ${
+                                    className={`max-w-[80%] rounded-md border border-hairline px-3 py-2 ${
                                         message.type === 'note'
-                                            ? 'bg-[#FFF4E8] text-ink'
+                                            ? 'bg-muted text-ink'
                                             : message.direction === 'outbound'
-                                              ? 'ml-auto bg-canvas-soft'
-                                              : 'bg-[#EAF7EA]'
+                                              ? 'ml-auto border-transparent bg-canvas-soft'
+                                              : 'border-transparent bg-muted'
                                     }`}
                                 >
                                     {message.type === 'note' ? (
-                                        <p className="mb-1 text-[11px] font-medium text-brand">
+                                        <p className="text-section-label mb-1 font-medium text-brand normal-case tracking-normal">
                                             Private note — only visible to agents
                                         </p>
                                     ) : null}
@@ -294,7 +294,7 @@ function FrontDesk({
                                                 ? 'Private note…'
                                                 : 'Type your message…'
                                         }
-                                        className="min-h-20 w-full rounded-md border border-hairline p-2 text-[13px]"
+                                        className="min-h-20 w-full rounded-md border border-hairline p-2 text-ui"
                                     />
                                     <div className="mt-2 flex justify-end gap-2">
                                         {mode === 'reply' ? (
