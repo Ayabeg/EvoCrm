@@ -153,8 +153,9 @@ Waves 1–5 on this branch. The 2026-08-24 scorecard stayed flat because chrome 
 |-------|--------|----------|
 | List UI | ✅ | `/crm/segments` + `FilterBuilder` |
 | Enter / exit | ✅ | `segment.entered` and `segment.exited`; re-entry is a new transition |
+| Membership history | ✅ | `/crm/segments/{id}` enter/exit stints; current member = `exited_at` null |
 | Meta sync | ✅ | `POST /crm/segments/{id}/sync-meta` |
-| Gaps | | Membership history table; active-list analytics |
+| Gaps | | Active-list analytics |
 
 ### Workflows / automation (80)
 

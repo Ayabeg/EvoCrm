@@ -603,7 +603,7 @@
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=SegmentMembershipHistoryTest`
 - [x] Build succeeds: `npm run build`
-- [ ] Manual check: move a contact out of and back into a segment and inspect history.
+- [x] Manual check: local browser — Alger history shows Amine Benali entered then exited (not staging).
 
 **Dependencies:** Task 19
 

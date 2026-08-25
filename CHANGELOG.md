@@ -1,5 +1,14 @@
 # Changelog
 
+## Segment membership history (2026-08-25)
+
+### Added
+- Enter/exit stints on `contact_segment_memberships` (`exited_at` instead of delete)
+- Workspace-scoped history on `/crm/segments/{id}` and a History link on the segments index
+- Re-entry inserts a new current row; merge keeps history on the survivor
+
+---
+
 ## HubSpot comparison redo (2026-08-25)
 
 Re-audited EvoSales against HubSpot Sales/Service Hub 2026 on `d139f6e`. Composite **~81 → ~85**. See [`docs/hubspot-parity-comparison.md`](docs/hubspot-parity-comparison.md) and the capability matrix [`docs/hubspot-side-by-side.md`](docs/hubspot-side-by-side.md). Omega (≥95) is still not met.

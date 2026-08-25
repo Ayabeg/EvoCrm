@@ -34,7 +34,7 @@ Scores are **HubSpot Sales/Service Hub parity** (0–100). Moat dimensions may e
 | **M2** Lists & views | 88 | 85 | **90** | 95 | +5 | FilterBuilder + columns + bulk + import on chrome; no calculated list columns |
 | **M3** Pipelines & forecast | 87 | 87 | **90** | 95 | +3 | List+board pipeline switcher, wired forecast/health — no 15% backtest |
 | **M4** Record UX | 82 | 84 | **90** | 92 | +6 | Ask Evo + props on contact/deal/company; layouts settings; no playbooks |
-| **M5** Segments | 84 | 84 | **88** | 90 | +4 | `segment.exited`; membership history still deleted on exit |
+| **M5** Segments | 84 | 84 | **88** | 90 | +4 | `segment.exited` + enter/exit stints on `/crm/segments/{id}` |
 | **M6** Workflows | 78 | 78 | **80** | 85 | +2 | 7 triggers, 8 actions — no visual canvas |
 | **M7** Sequences | 92 | 92 | **93** | **105** | +1 | Bounce webhook + suppression; no SMS/LinkedIn steps |
 | **M8** Inbox | 76 | 76 | **76** | **102** | 0 | Email/desk/WA; SMS stub; no Laravel live chat |
@@ -152,6 +152,6 @@ curl -sf https://crm.evotechly.com/up
 4. **M2** — Calculated columns and deeper association filters
 5. **M4** — Playbooks on records
 6. **M11** — Login/audit trail; SAML remains deferred
-7. **M5** — Segment membership history (exit is an event today)
+7. **M5** — Segment membership history is shipped; next M5 lift is calculated/dynamic list depth, not more history UI
 
 See [Top remaining gaps](./hubspot-parity-comparison.md#top-remaining-gaps-toward-omega-95-composite) for the full list.
