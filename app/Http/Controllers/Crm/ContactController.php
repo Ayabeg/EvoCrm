@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Mailbox;
+use App\Models\Sequence;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
@@ -50,6 +51,13 @@ class ContactController extends Controller
             'wilayas' => config('evosales.wilayas'),
             'hasMailbox' => Mailbox::query()->forWorkspace($workspace)->exists(),
             'createOpen' => $request->boolean('create'),
+            'bulk' => [
+                'enabled' => $request->user()->canPermission('crm.bulk'),
+                'sequences' => Sequence::query()
+                    ->forWorkspace($workspace)
+                    ->orderBy('name')
+                    ->get(['id', 'name']),
+            ],
         ]);
     }
 

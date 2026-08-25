@@ -127,12 +127,20 @@ export default function ListViewTable({
     columnDefs,
     columns,
     basePath,
+    selectable = false,
+    selectedIds = [],
+    onToggle,
+    onTogglePage,
 }: {
     entity: 'contact' | 'deal' | 'company';
     rows: ContactRow[] | DealRow[] | CompanyRow[];
     columnDefs: ListColumnDef[];
     columns: ListViewColumn[];
     basePath: string;
+    selectable?: boolean;
+    selectedIds?: number[];
+    onToggle?: (id: number) => void;
+    onTogglePage?: () => void;
 }) {
     const visible = visibleColumns({
         columnDefs,
@@ -141,6 +149,8 @@ export default function ListViewTable({
         sort: { field: 'created_at', direction: 'desc' },
     });
     const primaryId = primaryColumnId(entity);
+    const pageIds = rows.map((row) => row.id);
+    const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
 
     return (
         <div className="@container/list min-h-0 flex-1">
@@ -149,6 +159,16 @@ export default function ListViewTable({
                 <table className="aurora-text-table w-full min-w-[640px] border-collapse">
                     <thead>
                         <tr className="border-b border-hairline bg-canvas-soft text-left">
+                            {selectable ? (
+                                <th className="w-10 px-3 py-2.5">
+                                    <input
+                                        type="checkbox"
+                                        checked={allSelected}
+                                        onChange={onTogglePage}
+                                        aria-label="Select page"
+                                    />
+                                </th>
+                            ) : null}
                             {visible.map((column) => (
                                 <th
                                     key={column.id}
@@ -165,6 +185,16 @@ export default function ListViewTable({
                                 key={row.id}
                                 className="border-t border-hairline transition-colors hover:bg-canvas-soft/80"
                             >
+                                {selectable ? (
+                                    <td className="px-3 py-2.5">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedIds.includes(row.id)}
+                                            onChange={() => onToggle?.(row.id)}
+                                            aria-label={`Select ${row.id}`}
+                                        />
+                                    </td>
+                                ) : null}
                                 {visible.map((column) => {
                                     const label =
                                         entity === 'contact'
@@ -208,11 +238,20 @@ export default function ListViewTable({
                               : renderCompanyCell(primaryId, row as CompanyRow);
 
                     return (
-                        <li key={row.id}>
+                        <li key={row.id} className="flex items-start gap-2">
+                            {selectable ? (
+                                <input
+                                    type="checkbox"
+                                    className="mt-4"
+                                    checked={selectedIds.includes(row.id)}
+                                    onChange={() => onToggle?.(row.id)}
+                                    aria-label={`Select ${row.id}`}
+                                />
+                            ) : null}
                             <Link
                                 href={`${basePath}/${row.id}`}
                                 className={cn(
-                                    'block rounded-lg border border-hairline bg-canvas p-3 no-underline',
+                                    'block min-w-0 flex-1 rounded-lg border border-hairline bg-canvas p-3 no-underline',
                                     'transition-colors hover:border-brand/40 hover:bg-canvas-soft',
                                 )}
                             >

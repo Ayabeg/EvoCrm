@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\MetaController;
 use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\AskEvoController;
+use App\Http\Controllers\Crm\BulkActionController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ContactImportController;
@@ -164,6 +165,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/contacts/duplicates', [ContactMergeController::class, 'index'])->name('crm.contacts.merge.index');
     Route::get('/crm/contacts/merge/{survivor}/{absorbed}', [ContactMergeController::class, 'show'])->name('crm.contacts.merge.show');
     Route::post('/crm/contacts/merge', [ContactMergeController::class, 'store'])->name('crm.contacts.merge.store');
+    Route::post('/crm/contacts/bulk', [BulkActionController::class, 'contacts'])->name('crm.contacts.bulk');
     Route::post('/crm/contacts', [ContactController::class, 'store'])->name('crm.contacts.store');
     Route::get('/crm/contacts/{contact}', [ContactController::class, 'show'])->name('crm.contacts.show');
     Route::put('/crm/contacts/{contact}', [ContactController::class, 'update'])->name('crm.contacts.update');
@@ -183,6 +185,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/deals/import/{batch}', [DealImportController::class, 'show'])->name('crm.deals.import.show');
     Route::put('/crm/deals/import/{batch}', [DealImportController::class, 'update'])->name('crm.deals.import.update');
     Route::post('/crm/deals/import/{batch}/commit', [DealImportController::class, 'commit'])->name('crm.deals.import.commit');
+    Route::post('/crm/deals/bulk', [BulkActionController::class, 'deals'])->name('crm.deals.bulk');
     Route::get('/crm/deals', [DealController::class, 'index'])->name('crm.deals.index');
     Route::get('/crm/deals/board', [DealController::class, 'board'])->name('crm.deals.board');
     Route::post('/crm/deals', [DealController::class, 'store'])->name('crm.deals.store');

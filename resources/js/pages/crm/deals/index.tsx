@@ -7,6 +7,7 @@ import { CrmShell } from '@/components/crm/crm-shell';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import ListViewTable from '@/components/crm/list-view-table';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
@@ -46,6 +47,7 @@ export default function DealsIndex({
     wilayas,
     createOpen,
     prefillContactId,
+    bulk,
 }: {
     deals: Deal[];
     stages: Stage[];
@@ -61,11 +63,14 @@ export default function DealsIndex({
     wilayas: string[];
     createOpen?: boolean;
     prefillContactId?: number | null;
+    bulk?: { enabled: boolean };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const loading = useInertiaLoading();
     const { auth } = usePage<{ auth: Auth }>().props;
     const canImport = auth.capabilities.includes('crm.import');
+    const canBulk = Boolean(bulk?.enabled);
 
     return (
         <>
@@ -103,6 +108,15 @@ export default function DealsIndex({
             >
                 {(columns) => (
                     <>
+                        {canBulk && selectedIds.length > 0 ? (
+                            <BulkActionBar
+                                entity="deal"
+                                selectedIds={selectedIds}
+                                members={members}
+                                stages={stages}
+                                onClear={() => setSelectedIds([])}
+                            />
+                        ) : null}
                         {loading ? (
                             <SkeletonList />
                         ) : deals.length === 0 ? (
@@ -119,6 +133,25 @@ export default function DealsIndex({
                                     columnDefs={listView.columnDefs}
                                     columns={columns}
                                     basePath="/crm/deals"
+                                    selectable={canBulk}
+                                    selectedIds={selectedIds}
+                                    onToggle={(id) =>
+                                        setSelectedIds((current) =>
+                                            current.includes(id)
+                                                ? current.filter((value) => value !== id)
+                                                : [...current, id],
+                                        )
+                                    }
+                                    onTogglePage={() =>
+                                        setSelectedIds((current) => {
+                                            const pageIds = deals.map((deal) => deal.id);
+                                            const allSelected = pageIds.every((id) => current.includes(id));
+
+                                            return allSelected
+                                                ? current.filter((id) => !pageIds.includes(id))
+                                                : [...new Set([...current, ...pageIds])];
+                                        })
+                                    }
                                 />
                             </div>
                         )}

@@ -236,12 +236,12 @@
 **Description:** Connect list selection to permission-aware batch operations for owner assignment, sequence enrollment, stage movement, and safe deletion.
 
 **Acceptance criteria:**
-- [ ] Contact and deal lists support select-page and explicit selected-record actions.
-- [ ] Every bulk request validates workspace scope, permissions, and action-specific constraints.
-- [ ] Large selections run as batches with progress and row-level failures.
+- [x] Contact and deal lists support select-page and explicit selected-record actions.
+- [x] Every bulk request validates workspace scope, permissions, and action-specific constraints.
+- [x] Large selections run as batches with progress and row-level failures.
 
 **Verification:**
-- [ ] Tests pass: `php artisan test --filter=CrmBulkActionsTest`
+- [x] Tests pass: `php artisan test --filter=CrmBulkActionsTest`
 - [ ] Build succeeds: `npm run build`
 - [ ] Manual check: assign, enroll, move, and delete mixed-validity selections.
 

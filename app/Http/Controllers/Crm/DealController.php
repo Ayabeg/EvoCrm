@@ -95,6 +95,9 @@ class DealController extends Controller
             'forecast' => $forecast,
             'createOpen' => $request->boolean('create'),
             'prefillContactId' => $request->integer('contact_id') ?: null,
+            'bulk' => [
+                'enabled' => $request->user()->canPermission('crm.bulk'),
+            ],
         ]);
     }
 

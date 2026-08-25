@@ -6,6 +6,7 @@ import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import ListViewTable from '@/components/crm/list-view-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +41,7 @@ export default function ContactsIndex({
     wilayas,
     hasMailbox,
     createOpen,
+    bulk,
 }: {
     contacts: Contact[];
     companies: { id: number; name: string }[];
@@ -52,12 +54,15 @@ export default function ContactsIndex({
     wilayas: string[];
     hasMailbox: boolean;
     createOpen?: boolean;
+    bulk?: { enabled: boolean; sequences: { id: number; name: string }[] };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const loading = useInertiaLoading();
     const { auth } = usePage<{ auth: Auth }>().props;
     const canImport = auth.capabilities.includes('crm.import');
     const canMerge = auth.capabilities.includes('crm.merge');
+    const canBulk = Boolean(bulk?.enabled);
 
     return (
         <>
@@ -103,6 +108,15 @@ export default function ContactsIndex({
             >
                 {(columns) => (
                     <>
+                        {canBulk && selectedIds.length > 0 ? (
+                            <BulkActionBar
+                                entity="contact"
+                                selectedIds={selectedIds}
+                                members={members}
+                                sequences={bulk?.sequences ?? []}
+                                onClear={() => setSelectedIds([])}
+                            />
+                        ) : null}
                         {loading ? (
                             <SkeletonList />
                         ) : contacts.length === 0 ? (
@@ -119,6 +133,25 @@ export default function ContactsIndex({
                                     columnDefs={listView.columnDefs}
                                     columns={columns}
                                     basePath="/crm/contacts"
+                                    selectable={canBulk}
+                                    selectedIds={selectedIds}
+                                    onToggle={(id) =>
+                                        setSelectedIds((current) =>
+                                            current.includes(id)
+                                                ? current.filter((value) => value !== id)
+                                                : [...current, id],
+                                        )
+                                    }
+                                    onTogglePage={() =>
+                                        setSelectedIds((current) => {
+                                            const pageIds = contacts.map((contact) => contact.id);
+                                            const allSelected = pageIds.every((id) => current.includes(id));
+
+                                            return allSelected
+                                                ? current.filter((id) => !pageIds.includes(id))
+                                                : [...new Set([...current, ...pageIds])];
+                                        })
+                                    }
                                 />
                             </div>
                         )}
