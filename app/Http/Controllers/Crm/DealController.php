@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Crm;
 
+use App\Enums\WorkspaceRole;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Deal;
@@ -26,7 +27,10 @@ class DealController extends Controller
         $pipeline = $workspace->defaultPipeline()->load('stages');
         $filters = $filter->resolve($request, $workspace, 'deal');
 
-        if ($request->user()->canPermission('deals.team_only') || ($filters['view'] ?? 'all') === 'mine') {
+        $teamOnly = $request->user()->role === WorkspaceRole::Member
+            && $request->user()->canPermission('deals.team_only');
+
+        if ($teamOnly || ($filters['view'] ?? 'all') === 'mine') {
             $filters['owner'] = (string) $request->user()->id;
         }
 
@@ -57,7 +61,7 @@ class DealController extends Controller
             ->forWorkspace($workspace)
             ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false));
 
-        if ($request->user()->canPermission('deals.team_only')) {
+        if ($teamOnly) {
             $openQuery->where('owner_id', $request->user()->id);
         }
 
