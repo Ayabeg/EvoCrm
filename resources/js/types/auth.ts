@@ -15,6 +15,7 @@ export type User = {
 
 export type Auth = {
     user: User;
+    capabilities: string[];
 };
 
 export type TwoFactorSetupData = {

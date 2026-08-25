@@ -2,35 +2,37 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\WorkspaceRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PermissionsController extends Controller
 {
     /**
-     * RBAC matrix v1 — read-only stub for workspace admins.
-     *
      * @return array<int, array{key: string, label: string, owner: bool, admin: bool, member: bool}>
      */
     private function matrix(): array
     {
-        return [
-            ['key' => 'deals.view', 'label' => 'View deals', 'owner' => true, 'admin' => true, 'member' => true],
-            ['key' => 'deals.edit', 'label' => 'Edit deals', 'owner' => true, 'admin' => true, 'member' => false],
-            ['key' => 'contacts.export', 'label' => 'Export contacts', 'owner' => true, 'admin' => true, 'member' => false],
-            ['key' => 'settings.pipelines', 'label' => 'Manage pipelines', 'owner' => true, 'admin' => true, 'member' => false],
-            ['key' => 'settings.attributes', 'label' => 'Manage attributes', 'owner' => true, 'admin' => true, 'member' => false],
-            ['key' => 'settings.permissions', 'label' => 'Manage permissions', 'owner' => true, 'admin' => false, 'member' => false],
-            ['key' => 'reports.dashboards', 'label' => 'Save dashboards', 'owner' => true, 'admin' => true, 'member' => true],
-        ];
+        return collect(config('permissions.capabilities', []))
+            ->map(fn (array $capability, string $key): array => [
+                'key' => $key,
+                'label' => (string) $capability['label'],
+                'owner' => (bool) $capability['defaults']['owner'],
+                'admin' => (bool) $capability['defaults']['admin'],
+                'member' => (bool) $capability['defaults']['member'],
+            ])
+            ->values()
+            ->all();
     }
 
     public function index(Request $request): Response
     {
-        abort_unless(in_array($request->user()->role, ['owner', 'admin'], true), 403);
+        abort_unless($request->user()->role->canManageSettings(), 403);
 
         $workspace = $request->user()->workspace;
 
@@ -40,6 +42,28 @@ class PermissionsController extends Controller
                 ->where('workspace_id', $workspace->id)
                 ->orderBy('name')
                 ->get(['id', 'name', 'email', 'role', 'permissions']),
+            'canManage' => $request->user()->canPermission('settings.permissions'),
         ]);
+    }
+
+    public function update(Request $request, User $user): RedirectResponse
+    {
+        $actor = $request->user();
+
+        abort_unless($actor->canPermission('settings.permissions'), 403);
+        abort_unless((int) $user->workspace_id === (int) $actor->workspace_id, 404);
+        abort_unless($user->role === WorkspaceRole::Member, 422);
+
+        $supported = array_keys(config('permissions.capabilities', []));
+        $data = $request->validate([
+            'permissions' => ['sometimes', 'array', 'max:'.count($supported)],
+            'permissions.*' => ['string', Rule::in($supported)],
+        ]);
+
+        $user->forceFill([
+            'permissions' => array_values(array_intersect($supported, array_unique($data['permissions'] ?? []))),
+        ])->save();
+
+        return back();
     }
 }

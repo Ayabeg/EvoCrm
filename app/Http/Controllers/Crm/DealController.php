@@ -26,7 +26,7 @@ class DealController extends Controller
         $pipeline = $workspace->defaultPipeline()->load('stages');
         $filters = $filter->resolve($request, $workspace, 'deal');
 
-        if (($filters['view'] ?? 'all') === 'mine') {
+        if ($request->user()->canPermission('deals.team_only') || ($filters['view'] ?? 'all') === 'mine') {
             $filters['owner'] = (string) $request->user()->id;
         }
 
@@ -53,10 +53,15 @@ class DealController extends Controller
             ];
         })->values();
 
-        $openCents = Deal::query()
+        $openQuery = Deal::query()
             ->forWorkspace($workspace)
-            ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false))
-            ->sum('amount_cents');
+            ->whereHas('stage', fn ($q) => $q->where('is_won', false)->where('is_lost', false));
+
+        if ($request->user()->canPermission('deals.team_only')) {
+            $openQuery->where('owner_id', $request->user()->id);
+        }
+
+        $openCents = $openQuery->sum('amount_cents');
 
         return Inertia::render('crm/deals/index', [
             'deals' => $deals,

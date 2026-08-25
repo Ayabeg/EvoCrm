@@ -52,11 +52,9 @@ it('syncs contact segment emails to meta audience when configured', function () 
         'filters' => [],
     ]);
 
-    config(['meta.access_token' => null]);
-
     $result = app(MetaAudienceSyncService::class)->syncSegment($admin->workspace, $segment, '12345');
 
-    expect($result['error'])->toBe('Meta credentials not configured.');
+    expect($result['error'])->toBe('Meta is not connected for this workspace.');
 });
 
 it('shares dashboards with workspace visibility', function () {

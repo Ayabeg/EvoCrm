@@ -4,6 +4,7 @@ use App\Http\Controllers\Settings\PeopleController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\Settings\SystemHealthController;
+use App\Http\Middleware\EnforceProductPermissions;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
 
-    Route::middleware('can-manage-settings')->group(function () {
+    Route::middleware(['can-manage-settings', EnforceProductPermissions::class])->group(function () {
         Route::get('settings/system-health', SystemHealthController::class)->name('settings.system-health');
         Route::get('settings/people', [PeopleController::class, 'index'])->name('settings.people');
         Route::post('settings/people', [PeopleController::class, 'store'])->name('settings.people.store');

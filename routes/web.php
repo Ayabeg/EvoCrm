@@ -48,6 +48,7 @@ use App\Http\Controllers\Settings\MetaSettingsController;
 use App\Http\Controllers\Settings\OAuthSetupController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
+use App\Http\Middleware\EnforceProductPermissions;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -82,7 +83,7 @@ Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::cla
     ->middleware('throttle:60,1')
     ->name('webhooks.meta.leads');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
 
     // Meta workspace OAuth (Facebook Login). 404 unless META_* env is set.
@@ -266,6 +267,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/settings/attributes/{definition}', [CustomAttributeController::class, 'destroy'])->name('settings.attributes.destroy');
     Route::get('/settings/pipelines', [\App\Http\Controllers\Settings\PipelineController::class, 'index'])->name('settings.pipelines');
     Route::get('/settings/permissions', [\App\Http\Controllers\Settings\PermissionsController::class, 'index'])->name('settings.permissions');
+    Route::put('/settings/permissions/{user}', [\App\Http\Controllers\Settings\PermissionsController::class, 'update'])->name('settings.permissions.update');
     Route::middleware('can-manage-settings')->group(function () {
         Route::put('/settings/meta/ad-account', [MetaSettingsController::class, 'updateAdAccount'])->name('settings.meta.ad-account');
         Route::get('/settings/record-layouts', [\App\Http\Controllers\Settings\RecordLayoutSettingsController::class, 'index'])->name('settings.record-layouts');

@@ -72,12 +72,25 @@ class User extends Authenticatable
 
     public function canPermission(string $permission): bool
     {
-        if ($this->role->canManageSettings()) {
+        if ($this->role === WorkspaceRole::Owner) {
             return true;
         }
 
-        $permissions = $this->permissions ?? [];
+        if ($this->role === WorkspaceRole::Member) {
+            $permissions = $this->permissions ?? [];
 
-        return in_array($permission, $permissions, true) || in_array('*', $permissions, true);
+            if (in_array($permission, $permissions, true) || in_array('*', $permissions, true)) {
+                return true;
+            }
+        }
+
+        $capabilities = config('permissions.capabilities', []);
+        $capability = $capabilities[$permission] ?? null;
+
+        if (! is_array($capability)) {
+            return false;
+        }
+
+        return (bool) ($capability['defaults'][$this->role->value] ?? false);
     }
 }

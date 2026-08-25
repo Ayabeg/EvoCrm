@@ -79,6 +79,17 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
+const requiredPermissionByHref: Record<string, string> = {
+    '/settings/apps': 'settings.integrations',
+    '/settings/connectors': 'settings.integrations',
+    '/settings/evolution': 'settings.integrations',
+    '/settings/meta': 'settings.integrations',
+    '/settings/channels': 'settings.integrations',
+    '/settings/attributes': 'settings.attributes',
+    '/settings/pipelines': 'settings.pipelines',
+    '/settings/record-layouts': 'settings.attributes',
+};
+
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
     const page = usePage<{ auth: Auth }>();
@@ -87,13 +98,26 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     // People manages workspace members — owner/admin only. The routes 403
     // for members; the nav item simply stays hidden for them.
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
+    const visibleItems = sidebarNavItems.filter((item) => {
+        if (
+            ['/settings/permissions', '/settings/system-health'].includes(
+                toUrl(item.href),
+            )
+        ) {
+            return canManageSettings;
+        }
+
+        const permission = requiredPermissionByHref[toUrl(item.href)];
+
+        return !permission || auth.capabilities.includes(permission);
+    });
     const items = canManageSettings
         ? [
-              ...sidebarNavItems.slice(0, 3),
+              ...visibleItems.slice(0, 3),
               { title: 'People', href: '/settings/people', icon: null },
-              ...sidebarNavItems.slice(3),
+              ...visibleItems.slice(3),
           ]
-        : sidebarNavItems.filter((item) => item.href !== '/settings/record-layouts');
+        : visibleItems;
 
     // The People table needs more room than the settings forms.
     const wide =
