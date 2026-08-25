@@ -91,6 +91,10 @@ class EnforceProductPermissions
             return 'settings.attributes';
         }
 
+        if (str_starts_with($name, 'settings.audit') || str_starts_with($name, 'settings.playbooks')) {
+            return null;
+        }
+
         if (str_starts_with($name, 'settings.')) {
             return 'settings.integrations';
         }

@@ -271,9 +271,9 @@ These replace the 2026-08-24 list. Items 7–8 from that list (`segment.exited`,
 | 1 | **Forecast backtest** — validate the band within 15% on historical deals | M3, M10 | Large | Still the honest AI/forecast ceiling |
 | 2 | **SMS send path** (Twilio or DZ provider) | M8 | Medium | Composer already stubs the failure |
 | 3 | **Visual workflow canvas** (read-only v1 → editable) | M6 | Large | Explicitly deferred; largest remaining automation gap |
-| 4 | **Calculated columns + association filters on lists** | M2 | Medium | FilterBuilder is wired; list math is not |
-| 5 | **Playbooks on records** | M4 | Medium | HubSpot Professional staple; EvoSales has none |
-| 6 | **SSO + audit log** | M11 | Medium | SAML deferred; even a login/audit trail would lift admin |
+| 4 | **Calculated columns + association filters on lists** | M2 | Medium | Shipped: custom/calc columns + deal_stage / has_open_deal |
+| 5 | **Playbooks on records** | M4 | Medium | Shipped: settings CRUD + contact/deal cards |
+| 6 | **SSO + audit log** | M11 | Medium | Audit trail shipped; SAML still deferred |
 | 7 | **Segment membership history** | M5 | Small | Shipped: enter/exit stints on `/crm/segments/{id}` |
 | 8 | **Breeze-comparable RAG** (optional) | M10 | Large | Explicitly deferred; do not fake agent claims |
 | 9 | **Tickets or a Service Hub boundary** | M1, M8 | Large | Empty ticket card on deals is UI only |

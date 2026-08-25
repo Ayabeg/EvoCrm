@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\WorkflowRunner;
+use App\Services\Operations\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,7 +38,7 @@ class QuoteAcceptanceController extends Controller
         ]);
     }
 
-    public function accept(Request $request, string $token, ActivityRecorder $activities, WorkflowRunner $workflows): RedirectResponse
+    public function accept(Request $request, string $token, ActivityRecorder $activities, WorkflowRunner $workflows, AuditLogger $audit): RedirectResponse
     {
         $quote = $this->resolve($token);
 
@@ -59,6 +60,18 @@ class QuoteAcceptanceController extends Controller
             'deal_id' => $quote->deal_id,
             'meta' => ['quote_id' => $quote->id],
         ]);
+
+        if ($quote->workspace) {
+            $audit->record(
+                $quote->workspace,
+                'quote.accepted',
+                'Quote #'.$quote->id.' was accepted from the public link.',
+                null,
+                $quote,
+                ['ip' => $request->ip()],
+                $request->ip(),
+            );
+        }
 
         if ($quote->deal) {
             $workflows->handleDealCreated($quote->deal);

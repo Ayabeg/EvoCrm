@@ -200,6 +200,23 @@ Provider-dependent tasks also require contract tests with mocked provider respon
 | Large imports and campaigns exhaust web requests | High | Persist batches and process chunks through workers; show progress from durable state |
 | Scope expands into HubSpot enterprise cloning | Medium | Enforce the explicit defer list and require evidence of customer demand before adding deferred areas |
 
+## Phase 5: Wave 6 seller trust
+
+Stacked on segment membership history. Do not start canvas, Breeze, tickets, e-sign, SAML, or marketplace.
+
+- [ ] Task 23: Workspace audit / login trail
+- [ ] Task 24: Calculated list columns and association filters
+- [ ] Task 25: Record playbooks
+
+### Checkpoint: Wave 6
+
+- [ ] Login, import, merge, quote send/accept, and permission changes write durable audit events
+- [ ] Audit page is workspace-scoped and owner/admin only
+- [ ] List column chooser includes custom/calculated attributes and renders their values
+- [ ] Contacts can be filtered by associated deal stage and open-deal presence
+- [ ] Playbooks can be authored in settings and shown on contact and deal records
+- [ ] Full test suite and production build pass
+
 ## Open Questions
 
 1. Which production orchestrator currently runs EvoSales, and does it support a dedicated worker service?

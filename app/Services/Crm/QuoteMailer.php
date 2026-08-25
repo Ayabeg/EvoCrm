@@ -6,6 +6,7 @@ use App\Mail\WorkspaceHtmlMail;
 use App\Models\Mailbox;
 use App\Models\Quote;
 use App\Models\User;
+use App\Services\Operations\AuditLogger;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -14,6 +15,7 @@ class QuoteMailer
     public function __construct(
         private QuoteDocument $documents,
         private ActivityRecorder $activities,
+        private AuditLogger $audit,
     ) {}
 
     public function send(Quote $quote, User $actor, string $to): Quote
@@ -61,6 +63,17 @@ class QuoteMailer
             'deal_id' => $quote->deal_id,
             'meta' => ['quote_id' => $quote->id, 'to' => $to],
         ], $actor);
+
+        if ($quote->workspace) {
+            $this->audit->record(
+                $quote->workspace,
+                'quote.sent',
+                'Quote #'.$quote->id.' emailed to '.$to.'.',
+                $actor,
+                $quote,
+                ['to' => $to],
+            );
+        }
 
         return $quote->fresh() ?? $quote;
     }

@@ -31,16 +31,16 @@ Scores are **HubSpot Sales/Service Hub parity** (0–100). Moat dimensions may e
 | Dim | @ `9a17fd0` | @ `3c271d8` | @ `d139f6e` | Omega | Δ vs chrome | Evidence / remaining gap |
 |-----|-------------|-------------|-------------|-------|-------------|--------------------------|
 | **M1** Core CRM | 94 | 94 | **96** | 98 | +2 | Lead convert, quote send/accept, import/merge — no tickets/custom objects |
-| **M2** Lists & views | 88 | 85 | **90** | 95 | +5 | FilterBuilder + columns + bulk + import on chrome; no calculated list columns |
+| **M2** Lists & views | 88 | 85 | **90** | 95 | +5 | FilterBuilder + columns + bulk + import; calculated list columns + deal-stage filters shipped in Wave 6 (score pending redo) |
 | **M3** Pipelines & forecast | 87 | 87 | **90** | 95 | +3 | List+board pipeline switcher, wired forecast/health — no 15% backtest |
-| **M4** Record UX | 82 | 84 | **90** | 92 | +6 | Ask Evo + props on contact/deal/company; layouts settings; no playbooks |
+| **M4** Record UX | 82 | 84 | **90** | 92 | +6 | Ask Evo + props + layouts; playbooks shipped in Wave 6 (score pending redo) |
 | **M5** Segments | 84 | 84 | **88** | 90 | +4 | `segment.exited` + enter/exit stints on `/crm/segments/{id}` |
 | **M6** Workflows | 78 | 78 | **80** | 85 | +2 | 7 triggers, 8 actions — no visual canvas |
 | **M7** Sequences | 92 | 92 | **93** | **105** | +1 | Bounce webhook + suppression; no SMS/LinkedIn steps |
 | **M8** Inbox | 76 | 76 | **76** | **102** | 0 | Email/desk/WA; SMS stub; no Laravel live chat |
 | **M9** Reporting | 78 | 78 | **85** | 88 | +7 | Real scheduled HTML delivery; no SQL explorer |
 | **M10** AI | 65 | 60 | **72** | 80 | +12 | Ask Evo/health/engagement rendered; keyword RAG, not Breeze agents |
-| **M11** Admin/permissions | 70 | 70 | **80** | 90 | +10 | Permission matrix + health; no SAML/audit log |
+| **M11** Admin/permissions | 70 | 70 | **80** | 90 | +10 | Permission matrix + health + audit trail; SAML still deferred |
 | **M12** Integrations/ads | 93 | 93 | **96** | **110** | +3 | Gmail/Calendar sync + tenant webhooks; no marketplace |
 | **M13** Regional DZ | 95 | 95 | **95** | **120** | 0 | Wilaya, DZD, Algiers TZ, AR/FR prompts |
 | **M14** Visual chrome | ~62 | 79 | **84** | 90 | +5 | Hub split-panel retired; leads still a second pattern |
@@ -149,9 +149,9 @@ curl -sf https://crm.evotechly.com/up
 1. **M3 + M10** — Forecast band backtest within 15% on historical deals
 2. **M8** — Twilio/DZ SMS send path (live chat stays EvoDesk)
 3. **M6** — Optional read-only workflow canvas v1
-4. **M2** — Calculated columns and deeper association filters
-5. **M4** — Playbooks on records
-6. **M11** — Login/audit trail; SAML remains deferred
-7. **M5** — Segment membership history is shipped; next M5 lift is calculated/dynamic list depth, not more history UI
+4. **M2** — Calculated list columns and deal-stage filters shipped; remaining list depth is association math beyond open-deal/stage
+5. **M4** — Record playbooks shipped; remaining record gap is richer playbook branching
+6. **M11** — Audit trail shipped; SAML remains deferred
+7. **M5** — Segment membership history is shipped
 
 See [Top remaining gaps](./hubspot-parity-comparison.md#top-remaining-gaps-toward-omega-95-composite) for the full list.

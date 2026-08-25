@@ -4,6 +4,8 @@ import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
+type AttributeMap = Record<string, string | null>;
+
 type ContactRow = {
     id: number;
     first_name: string;
@@ -16,6 +18,7 @@ type ContactRow = {
     last_activity_at?: string | null;
     company?: { name: string } | null;
     owner?: { name: string } | null;
+    attributes?: AttributeMap;
 };
 
 type DealRow = {
@@ -29,6 +32,7 @@ type DealRow = {
     company?: { name: string } | null;
     contact?: { first_name: string; last_name?: string | null } | null;
     owner?: { name: string } | null;
+    attributes?: AttributeMap;
 };
 
 type CompanyRow = {
@@ -38,6 +42,7 @@ type CompanyRow = {
     wilaya?: string | null;
     created_at?: string | null;
     owner?: { name: string } | null;
+    attributes?: AttributeMap;
 };
 
 function formatDate(value?: string | null): string {
@@ -69,8 +74,18 @@ function renderContactCell(columnId: string, row: ContactRow): string {
         case 'last_activity_at':
             return formatDate(row.last_activity_at);
         default:
-            return '—';
+            return customAttributeValue(row.attributes, columnId);
     }
+}
+
+function customAttributeValue(attributes: AttributeMap | undefined, columnId: string): string {
+    if (!columnId.startsWith('custom:')) {
+        return '—';
+    }
+
+    const value = attributes?.[columnId.slice(7)];
+
+    return value == null || value === '' ? '—' : value;
 }
 
 function renderDealCell(columnId: string, row: DealRow): string {
@@ -96,7 +111,7 @@ function renderDealCell(columnId: string, row: DealRow): string {
         case 'last_activity_at':
             return formatDate(row.last_activity_at);
         default:
-            return '—';
+            return customAttributeValue(row.attributes, columnId);
     }
 }
 
@@ -113,7 +128,7 @@ function renderCompanyCell(columnId: string, row: CompanyRow): string {
         case 'created_at':
             return formatDate(row.created_at);
         default:
-            return '—';
+            return customAttributeValue(row.attributes, columnId);
     }
 }
 

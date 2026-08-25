@@ -1,5 +1,15 @@
 # Changelog
 
+## Wave 6 seller trust (2026-08-25)
+
+### Added
+- Workspace audit trail for login, import, merge, quote send/accept, and permission changes (`/settings/audit`)
+- Custom and calculated attributes as contact/deal/company list columns
+- Contact association filters: deal stage and has-open-deal
+- Record playbooks authored in Settings and shown on contact and deal records
+
+---
+
 ## Segment membership history (2026-08-25)
 
 ### Added

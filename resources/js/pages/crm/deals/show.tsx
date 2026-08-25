@@ -14,6 +14,7 @@ import {
     RecordBack,
     RecordShell,
 } from '@/components/crm/record-chrome';
+import PlaybookCard from '@/components/crm/playbook-card';
 import RecordProperties from '@/components/crm/record-properties';
 import type {AttributeBag} from '@/components/crm/record-properties';
 import { Button } from '@/components/ui/button';
@@ -57,6 +58,7 @@ export default function DealShow({
     members,
     splits,
     canManageSplits,
+    playbooks,
 }: {
     deal: Deal & {
         line_items?: DealLineItemRow[];
@@ -92,6 +94,7 @@ export default function DealShow({
     members?: { id: number; name: string }[];
     splits?: { user_id: number; percent: number; user?: { name: string } | null }[];
     canManageSplits?: boolean;
+    playbooks?: Array<{ id: number; name: string; body: string }>;
 }) {
     const [tab, setTab] = useState('all');
     const loading = useInertiaLoading();
@@ -177,6 +180,7 @@ export default function DealShow({
                     left={
                         <div className="space-y-4">
                             <AskEvoPanel action={`/crm/deals/${deal.id}/ask`} insight={askEvo} />
+                            <PlaybookCard playbooks={playbooks} />
                             <h2 className="text-[13px] font-semibold">About this deal</h2>
                             <Field label="Deal owner" value={deal.owner?.name ?? 'Unassigned'} />
                             <Field

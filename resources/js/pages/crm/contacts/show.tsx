@@ -13,6 +13,7 @@ import {
     RecordBack,
     RecordShell,
 } from '@/components/crm/record-chrome';
+import PlaybookCard from '@/components/crm/playbook-card';
 import RecordProperties from '@/components/crm/record-properties';
 import type {AttributeBag} from '@/components/crm/record-properties';
 import { Avatar, AvatarFallback } from '@/components/ui/aurora/avatar';
@@ -57,6 +58,7 @@ export default function ContactShow({
     proactiveSummary,
     catchUp,
     dealsKanban,
+    playbooks,
 }: {
     contact: Contact;
     associations: {
@@ -70,6 +72,7 @@ export default function ContactShow({
     proactiveSummary?: string | null;
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     dealsKanban?: DealKanban | null;
+    playbooks?: Array<{ id: number; name: string; body: string }>;
 }) {
     const [tab, setTab] = useState('catchup');
     const loading = useInertiaLoading();
@@ -150,6 +153,7 @@ export default function ContactShow({
                                     action={`/crm/contacts/${contact.id}/ask`}
                                     insight={askEvo}
                                 />
+                                <PlaybookCard playbooks={playbooks} />
                                 {proactiveSummary ? (
                                     <p className="rounded border border-hairline bg-canvas-soft px-3 py-2 text-[12px] text-muted-foreground">
                                         {proactiveSummary}

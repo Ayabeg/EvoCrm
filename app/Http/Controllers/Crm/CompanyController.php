@@ -33,11 +33,11 @@ class CompanyController extends Controller
         $filter->applySort('company', $query, $filters);
 
         return Inertia::render('crm/companies/index', [
-            'companies' => $query->orderBy('name')->limit(120)->get(),
+            'companies' => $hub->withListAttributes($workspace, 'company', $query->orderBy('name')->limit(120)->get()),
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'company', $request->user()),
             'activeFilters' => $filters,
-            'listView' => $hub->listViewMeta('company', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'listView' => $hub->listViewMeta('company', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
             'recordCount' => $filter->count($workspace, 'company', $filters),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),

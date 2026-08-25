@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Enums\WorkspaceRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Operations\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -72,9 +73,19 @@ class PermissionsController extends Controller
             'permissions.*' => ['string', Rule::in($supported)],
         ]);
 
+        $granted = array_values(array_intersect($supported, array_unique($data['permissions'] ?? [])));
         $user->forceFill([
-            'permissions' => array_values(array_intersect($supported, array_unique($data['permissions'] ?? []))),
+            'permissions' => $granted,
         ])->save();
+
+        app(AuditLogger::class)->record(
+            $actor->workspace,
+            'permissions.updated',
+            'Updated permissions for '.$user->email,
+            $actor,
+            $user,
+            ['permissions' => $granted],
+        );
 
         return back();
     }

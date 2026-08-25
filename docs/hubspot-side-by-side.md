@@ -43,7 +43,7 @@ HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of
 | AND/OR filters | Advanced filters | `FilterBuilder` on contacts, deals, companies | Match |
 | Column chooser | Persisted per view | Chooser saved with the view | Match |
 | Bulk actions | Assign, enroll, edit, delete | Assign, enroll, move, delete | Match |
-| Calculated columns | List formulas | Custom calculated props, not list columns | Partial |
+| Calculated columns | List formulas | Custom/calculated attributes as list columns | Match |
 | Export | CSV | Contacts + deals; deals honor pipeline | Match |
 | Multi-pipeline on list | Yes | `PipelineSwitcher` + `?pipeline=` | Match |
 
@@ -68,7 +68,7 @@ HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of
 | Engagement | Scores / intent | Contact engagement heuristic | Partial |
 | Custom props on record | Yes | `RecordProperties` | Match |
 | Layout editor | Card library | `/settings/record-layouts` | Partial |
-| Playbooks | Professional | None | Gap |
+| Playbooks | Professional | Settings scripts on contact/deal records | Match |
 | Deal commerce on record | Quotes / products | Health, line items, quotes, splits | Match |
 
 ## Segments (88)
@@ -150,7 +150,7 @@ HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of
 | Record layouts | Yes | Workspace default editor | Partial |
 | System health | Status / ops | Eight scheduled-command freshness signals | Ahead |
 | SSO / SAML | Enterprise | Fortify + Google login | Deferred |
-| Audit log | Enterprise | None | Gap |
+| Audit log | Enterprise | `/settings/audit` for login, import, merge, quotes, permissions | Partial |
 
 ## Integrations (96) — moat
 

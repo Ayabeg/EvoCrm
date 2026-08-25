@@ -26,6 +26,8 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **CustomAttributeValue** | Value for one entity + definition. |
 | **SavedFilter** | Named list: stage, owner, city, wilaya, last activity, unanswered, unassigned. |
 | **ContactSegmentMembership** | Enter/exit stint for a contact on a contact SavedFilter. Current member = `exited_at` null. Exit sets `exited_at`; re-entry inserts a new row. |
+| **AuditEvent** | Workspace log for login, import, merge, quote send/accept, and permission changes. Owner/admin read `/settings/audit`. |
+| **Playbook** | Named script for contact or deal records. Shown on the matching record page. |
 | **Dashboard** | Saved Reports board on top of the default rooms. `name`, `owner_id`, `widgets` JSON (keys into existing EvoViz charts). Workspace-scoped. |
 | **Workflow** | Automation with triggers including `contact.created`, `deal.stage_changed`, `segment.entered`, and `segment.exited`. Actions include task, sequence, webhook, property, owner, deal, email, and notify. Delayed actions queue. |
 | **Quote** | Versioned quote on a Deal. Status `draft` / `sent` / `accepted`. Currency DZD. Sending freezes `snapshot`/`snapshot_html` and issues a revocable public token. Sent and accepted quotes are immutable. |

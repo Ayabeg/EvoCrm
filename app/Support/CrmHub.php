@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Message;
+use App\Models\Playbook;
 use App\Models\SavedFilter;
 use App\Models\User;
 use App\Models\Workspace;
@@ -62,14 +63,92 @@ class CrmHub
     /**
      * @return array<string, mixed>
      */
-    public function listViewMeta(string $entity, ?array $columns = null, ?array $sort = null): array
+    public function listViewMeta(string $entity, ?array $columns = null, ?array $sort = null, ?Workspace $workspace = null): array
     {
+        $extraColumns = $workspace ? $this->customColumnDefs($workspace, $entity) : [];
+
         return [
-            'columnDefs' => ListViewConfig::columns($entity),
-            'filterFields' => ListViewConfig::filterFields($entity),
-            'columns' => ListViewConfig::normalizeColumns($entity, $columns),
+            'columnDefs' => array_merge(ListViewConfig::columns($entity), $extraColumns),
+            'filterFields' => array_merge(
+                ListViewConfig::filterFields($entity),
+                $workspace ? $this->associationFilterFields($workspace, $entity) : [],
+            ),
+            'columns' => ListViewConfig::normalizeColumns($entity, $columns, $extraColumns),
             'sort' => $sort ?? ListViewConfig::defaultSort($entity),
         ];
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, Contact|Deal|Company>  $rows
+     * @return list<array<string, mixed>>
+     */
+    public function withListAttributes(Workspace $workspace, string $entity, $rows): array
+    {
+        return $rows->map(fn ($row) => array_merge($row->toArray(), [
+            'attributes' => $this->attributes->valuesFor($workspace, $entity, (int) $row->id),
+        ]))->values()->all();
+    }
+
+    /**
+     * @return list<array{id: int, name: string, body: string}>
+     */
+    public function playbooks(Workspace $workspace, string $entity): array
+    {
+        return Playbook::query()
+            ->forWorkspace($workspace)
+            ->where('entity', $entity)
+            ->orderBy('position')
+            ->orderBy('name')
+            ->get(['id', 'name', 'body'])
+            ->map(fn (Playbook $playbook) => [
+                'id' => $playbook->id,
+                'name' => $playbook->name,
+                'body' => $playbook->body,
+            ])
+            ->all();
+    }
+
+    /**
+     * @return list<array{id: string, label: string, defaultVisible: bool}>
+     */
+    protected function customColumnDefs(Workspace $workspace, string $entity): array
+    {
+        return $this->attributes->definitions($workspace, $entity)
+            ->map(fn ($definition) => [
+                'id' => 'custom:'.$definition->key,
+                'label' => $definition->type === 'calculated' ? $definition->label.' (calc)' : $definition->label,
+                'defaultVisible' => false,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return list<array{id: string, label: string, type: string, options?: list<string>}>
+     */
+    protected function associationFilterFields(Workspace $workspace, string $entity): array
+    {
+        if (! in_array($entity, ['contact', 'company'], true)) {
+            return [];
+        }
+
+        $fields = [
+            ['id' => 'has_open_deal', 'label' => 'Has open deal', 'type' => 'boolean'],
+        ];
+
+        if ($entity === 'contact') {
+            $pipeline = $workspace->defaultPipeline();
+            $pipeline->loadMissing('stages');
+            $stages = $pipeline->stages->pluck('slug')->filter()->values()->all();
+            $fields[] = [
+                'id' => 'deal_stage',
+                'label' => 'Deal stage',
+                'type' => 'select',
+                'options' => $stages,
+            ];
+        }
+
+        return $fields;
     }
 
     /**

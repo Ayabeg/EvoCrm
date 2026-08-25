@@ -101,16 +101,16 @@ class ListViewConfig
      * @param  array<int, array{id: string, visible?: bool, order?: int}>|null  $columns
      * @return array<int, array{id: string, visible: bool, order: int}>
      */
-    public static function normalizeColumns(string $entity, ?array $columns): array
+    public static function normalizeColumns(string $entity, ?array $columns, array $extraDefs = []): array
     {
-        $defs = self::columns($entity);
+        $defs = array_merge(self::columns($entity), $extraDefs);
         $source = $columns ?: [];
 
         $ordered = collect($source)
             ->sortBy(fn (array $column) => $column['order'] ?? 0)
             ->values();
 
-        return collect($defs)->map(function (array $def, int $index) use ($ordered) {
+        $normalized = collect($defs)->map(function (array $def, int $index) use ($ordered) {
             $match = $ordered->firstWhere('id', $def['id']);
 
             return [
@@ -118,6 +118,18 @@ class ListViewConfig
                 'visible' => $match['visible'] ?? $def['defaultVisible'],
                 'order' => $match['order'] ?? $index,
             ];
-        })->sortBy('order')->values()->all();
+        });
+
+        $extras = $ordered
+            ->filter(fn (array $column) => str_starts_with((string) ($column['id'] ?? ''), 'custom:')
+                && ! $normalized->contains(fn (array $row) => $row['id'] === $column['id']))
+            ->values()
+            ->map(fn (array $column, int $index) => [
+                'id' => (string) $column['id'],
+                'visible' => (bool) ($column['visible'] ?? false),
+                'order' => $column['order'] ?? count($defs) + $index,
+            ]);
+
+        return $normalized->concat($extras)->sortBy('order')->values()->all();
     }
 }

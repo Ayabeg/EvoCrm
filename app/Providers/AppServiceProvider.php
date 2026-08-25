@@ -13,6 +13,7 @@ use App\Services\Connectors\FakeGoogleApiClient;
 use App\Services\Connectors\GoogleApiClient;
 use App\Services\Connectors\HttpGoogleApiClient;
 use App\Services\Identity\WorkspaceProvisioner;
+use App\Services\Operations\AuditLogger;
 use App\Services\Operations\ScheduledTaskMonitor;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Authenticated;
@@ -68,6 +69,14 @@ class AppServiceProvider extends ServiceProvider
             $user = $event->user;
             if ($user instanceof User) {
                 $user->forceFill(['last_login_at' => now()])->save();
+                if ($user->workspace) {
+                    app(AuditLogger::class)->record(
+                        $user->workspace,
+                        'login',
+                        $user->email.' signed in',
+                        $user,
+                    );
+                }
             }
         });
 

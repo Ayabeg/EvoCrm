@@ -12,6 +12,7 @@ use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Operations\AuditLogger;
 use App\Support\AlgerianPhone;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
@@ -198,6 +199,21 @@ class DealCsvImporter
                 'finished_at' => now(),
                 'processed_rows' => $batch->total_rows,
             ])->save();
+
+            if ($batch->workspace) {
+                app(AuditLogger::class)->record(
+                    $batch->workspace,
+                    'import.completed',
+                    'Deal import '.$batch->filename.' finished',
+                    $batch->user,
+                    $batch,
+                    [
+                        'created' => $batch->created_count,
+                        'updated' => $batch->updated_count,
+                        'filename' => $batch->filename,
+                    ],
+                );
+            }
         } catch (Throwable $exception) {
             $batch->forceFill([
                 'status' => ImportBatch::STATUS_FAILED,

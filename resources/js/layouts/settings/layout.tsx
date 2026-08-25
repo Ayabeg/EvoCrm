@@ -73,6 +73,16 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Playbooks',
+        href: '/settings/playbooks',
+        icon: null,
+    },
+    {
+        title: 'Audit trail',
+        href: '/settings/audit',
+        icon: null,
+    },
+    {
         title: 'System health',
         href: '/settings/system-health',
         icon: null,
@@ -100,7 +110,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const visibleItems = sidebarNavItems.filter((item) => {
         if (
-            ['/settings/permissions', '/settings/system-health'].includes(
+            ['/settings/permissions', '/settings/system-health', '/settings/audit', '/settings/playbooks'].includes(
                 toUrl(item.href),
             )
         ) {
@@ -126,7 +136,9 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         page.component === 'settings/pipelines' ||
         page.component === 'settings/record-layouts' ||
         page.component === 'settings/connectors' ||
-        page.component === 'settings/system-health';
+        page.component === 'settings/system-health' ||
+        page.component === 'settings/audit' ||
+        page.component === 'settings/playbooks';
 
     return (
         <div className="px-4 py-6">

@@ -33,6 +33,8 @@ class CrmFilter
             'status' => $fromSaved['status'] ?? null,
             'unanswered' => ($fromSaved['unanswered'] ?? null) === true || ($fromSaved['unanswered'] ?? null) === '1',
             'unassigned' => ($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1',
+            'deal_stage' => $fromSaved['deal_stage'] ?? null,
+            'has_open_deal' => ($fromSaved['has_open_deal'] ?? null) === true || ($fromSaved['has_open_deal'] ?? null) === '1',
             'view' => $fromSaved['view'] ?? 'all',
             'filter_id' => $saved->id,
             'filter_groups' => $this->parseFilterGroups(null, $fromSaved['filter_groups'] ?? null),
@@ -81,6 +83,8 @@ class CrmFilter
             'enrolled_in_sequence' => $request->input('enrolled_in_sequence', $fromSaved['enrolled_in_sequence'] ?? null),
             'email_replied' => $request->boolean('email_replied') || (($fromSaved['email_replied'] ?? null) === true || ($fromSaved['email_replied'] ?? null) === '1'),
             'email_opened' => $request->boolean('email_opened') || (($fromSaved['email_opened'] ?? null) === true || ($fromSaved['email_opened'] ?? null) === '1'),
+            'deal_stage' => $request->input('deal_stage', $fromSaved['deal_stage'] ?? null),
+            'has_open_deal' => $request->boolean('has_open_deal') || (($fromSaved['has_open_deal'] ?? null) === true || ($fromSaved['has_open_deal'] ?? null) === '1'),
             'view' => $view,
             'filter_id' => $saved?->id,
             'filter_groups' => $filterGroups,
@@ -522,6 +526,14 @@ class CrmFilter
             });
         }
 
+        if (filled($filters['deal_stage'] ?? null)) {
+            $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('slug', $filters['deal_stage']));
+        }
+
+        if (! empty($filters['has_open_deal'])) {
+            $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('is_won', false)->where('is_lost', false));
+        }
+
         if (! empty($filters['unanswered'])) {
             $query->where('unanswered', true);
         }
@@ -610,6 +622,10 @@ class CrmFilter
         $this->applyCreated($query, $filters['created'] ?? null);
         $this->applyCompanyLastActivity($query, $filters['last_activity'] ?? null);
         $this->applyCompanyDealStatus($query, $filters['status'] ?? null);
+
+        if (! empty($filters['has_open_deal'])) {
+            $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('is_won', false)->where('is_lost', false));
+        }
 
         return $query;
     }

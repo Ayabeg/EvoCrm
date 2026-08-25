@@ -40,12 +40,12 @@ class ContactController extends Controller
         $contacts = $query->limit(120)->get();
 
         return Inertia::render('crm/contacts/index', [
-            'contacts' => $contacts,
+            'contacts' => $hub->withListAttributes($workspace, 'contact', $contacts),
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name', 'city', 'wilaya']),
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'contact', $request->user()),
             'activeFilters' => $filters,
-            'listView' => $hub->listViewMeta('contact', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'listView' => $hub->listViewMeta('contact', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
             'recordCount' => $filter->count($workspace, 'contact', $filters),
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
@@ -77,6 +77,7 @@ class ContactController extends Controller
             'timeline' => $hub->timeline(contact: $contact),
             'catchUp' => $hub->catchUp($contact),
             'attributes' => $hub->attributeBag($workspace, 'contact', $contact->id),
+            'playbooks' => $hub->playbooks($workspace, 'contact'),
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name']),
             'members' => $hub->members($workspace),
             'askEvo' => $insight->forContact($contact),

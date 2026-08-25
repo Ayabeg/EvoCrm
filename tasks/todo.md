@@ -608,3 +608,57 @@
 **Dependencies:** Task 19
 
 **Estimated scope:** Small
+
+## Task 23: Workspace audit / login trail
+
+**Description:** Persist a workspace-scoped audit log for logins, imports, merges, quote send/accept, and permission changes so owners can see who changed what without SAML.
+
+**Acceptance criteria:**
+- [ ] Durable `audit_events` rows for login, import completed, contact merged, quote sent, quote accepted, and permission updates
+- [ ] `/settings/audit` lists events for the current workspace only
+- [ ] Members receive 403; other workspaces cannot read the log
+
+**Verification:**
+- [ ] Tests pass: `php artisan test --filter=AuditTrailTest`
+- [ ] Build succeeds: `npm run build`
+- [ ] Manual check: log in and open Settings → Audit trail
+
+**Dependencies:** Task 8, Task 16, Task 17
+
+**Estimated scope:** Medium
+
+## Task 24: Calculated list columns and association filters
+
+**Description:** Let sellers show custom/calculated attributes as list columns and filter contacts by associated deal stage or open-deal presence.
+
+**Acceptance criteria:**
+- [ ] Custom and calculated attributes appear in the contact/deal/company column chooser
+- [ ] List rows include evaluated attribute values for visible custom columns
+- [ ] Contact lists accept `deal_stage` and `has_open_deal` filters
+
+**Verification:**
+- [ ] Tests pass: `php artisan test --filter=ListColumnsAndAssociationFiltersTest`
+- [ ] Build succeeds: `npm run build`
+- [ ] Manual check: enable a calculated column and filter contacts by deal stage
+
+**Dependencies:** None
+
+**Estimated scope:** Medium
+
+## Task 25: Record playbooks
+
+**Description:** Let owners author short call/email scripts and show the matching playbook on contact and deal records.
+
+**Acceptance criteria:**
+- [ ] Workspace playbooks persist with entity, name, and body
+- [ ] Settings CRUD is owner/admin only
+- [ ] Contact and deal show pages render playbooks for that entity
+
+**Verification:**
+- [ ] Tests pass: `php artisan test --filter=RecordPlaybookTest`
+- [ ] Build succeeds: `npm run build`
+- [ ] Manual check: create a contact playbook and open a contact record
+
+**Dependencies:** None
+
+**Estimated scope:** Medium

@@ -14,13 +14,14 @@ use App\Models\Thread;
 use App\Models\User;
 use App\Models\WorkflowExecution;
 use App\Models\Workspace;
+use App\Services\Operations\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class ContactMerger
 {
-    public function __construct(private ActivityRecorder $activities) {}
+    public function __construct(private ActivityRecorder $activities, private AuditLogger $audit) {}
 
     /**
      * @return list<array{key: string, reasons: list<string>, contacts: list<array<string, mixed>>}>
@@ -154,6 +155,15 @@ class ContactMerger
                     'values' => $values,
                 ],
             ], $actor);
+
+            $this->audit->record(
+                $workspace,
+                'contact.merged',
+                "Merged {$absorbedName} into {$survivor->displayName()}.",
+                $actor,
+                $survivor,
+                ['absorbed_name' => $absorbedName],
+            );
 
             $absorbed->delete();
         });

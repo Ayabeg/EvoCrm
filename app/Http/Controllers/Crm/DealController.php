@@ -44,7 +44,7 @@ class DealController extends Controller
         $filter->applyToDeals($query, $filters);
         $filter->applySort('deal', $query, $filters);
 
-        $deals = $query->limit(120)->get();
+        $deals = $hub->withListAttributes($workspace, 'deal', $query->limit(120)->get());
 
         $stageCounts = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filters, $filter) {
             $countQuery = Deal::query()->forWorkspace($workspace);
@@ -86,7 +86,7 @@ class DealController extends Controller
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
             'activeFilters' => $filters,
-            'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null),
+            'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
             'recordCount' => $filter->count($workspace, 'deal', $filters),
             'stagePills' => $stageCounts,
             'cities' => config('evosales.cities'),
@@ -135,6 +135,7 @@ class DealController extends Controller
             'timeline' => $hub->timeline(deal: $deal),
             'catchUp' => $hub->catchUp(deal: $deal),
             'attributes' => $hub->attributeBag($workspace, 'deal', $deal->id),
+            'playbooks' => $hub->playbooks($workspace, 'deal'),
             'stages' => $deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages,
             'members' => $hub->members($workspace),
             'products' => Product::query()->forWorkspace($workspace)->orderBy('name')->get(),

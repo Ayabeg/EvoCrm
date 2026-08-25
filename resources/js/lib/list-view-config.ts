@@ -97,6 +97,11 @@ export function filterGroupsFromActive(activeFilters: Record<string, unknown>): 
     pushEq('last_activity', activeFilters.last_activity);
     pushEq('status', activeFilters.status);
     pushEq('stage', activeFilters.stage);
+    pushEq('deal_stage', activeFilters.deal_stage);
+
+    if (activeFilters.has_open_deal) {
+        rules.push({ field: 'has_open_deal', operator: 'is_true' });
+    }
 
     if (activeFilters.unanswered) {
         rules.push({ field: 'unanswered', operator: 'is_true' });
