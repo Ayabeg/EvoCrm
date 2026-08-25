@@ -2,6 +2,10 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import type {AskEvoPayload} from '@/components/crm/ask-evo-panel';
+import DealLineItems from '@/components/crm/deal-line-items';
+import type {CatalogProduct, DealLineItemRow} from '@/components/crm/deal-line-items';
+import DealQuotes from '@/components/crm/deal-quotes';
+import DealSplits from '@/components/crm/deal-splits';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import {
     ActivityTabs,
@@ -48,16 +52,46 @@ export default function DealShow({
     stages,
     attributes,
     askEvo,
+    dealHealth,
+    products,
+    members,
+    splits,
+    canManageSplits,
 }: {
-    deal: Deal;
+    deal: Deal & {
+        line_items?: DealLineItemRow[];
+        quotes?: Array<{
+            id: number;
+            status: string;
+            total_cents: number;
+            notes?: string | null;
+            sent_at?: string | null;
+            accepted_at?: string | null;
+            expires_at?: string | null;
+            items?: Array<{ id: number; name: string; quantity: number; unit_cents: number; total_cents: number }>;
+        }>;
+    };
     associations: {
         contact?: { id: number; first_name: string; last_name?: string | null } | null;
         company?: { id: number; name: string } | null;
+        quotes?: unknown[];
+        line_items?: DealLineItemRow[];
     } | null;
     timeline: Activity[];
     stages: { id: number; name: string }[];
     attributes?: AttributeBag;
     askEvo?: AskEvoPayload | null;
+    dealHealth?: {
+        score: number;
+        label: string;
+        reason: string;
+        factors?: { key: string; label: string; detail: string }[];
+        next_action?: string;
+    } | null;
+    products?: CatalogProduct[];
+    members?: { id: number; name: string }[];
+    splits?: { user_id: number; percent: number; user?: { name: string } | null }[];
+    canManageSplits?: boolean;
 }) {
     const [tab, setTab] = useState('all');
     const loading = useInertiaLoading();
@@ -99,6 +133,13 @@ export default function DealShow({
                         </div>
                         <div className="min-w-0 flex-1">
                             <h1 className="text-[20px] font-semibold">{deal.title}</h1>
+                            {dealHealth ? (
+                                <p className="pt-1 text-[12px] leading-relaxed text-muted-foreground">
+                                    <span className="font-medium text-ink">{dealHealth.label}</span>{' '}
+                                    ({dealHealth.score}/100)
+                                    <span className="hidden sm:inline"> · {dealHealth.reason}</span>
+                                </p>
+                            ) : null}
                             <div className="mt-2 flex flex-wrap gap-6 text-[13px]">
                                 <Stat label="Amount" value={formatDzd(deal.amount_cents)} />
                                 <Stat
@@ -148,6 +189,36 @@ export default function DealShow({
                             />
                             <Field label="Deal type" value={deal.type ?? '—'} />
                             <Field label="Priority" value={deal.priority ?? '—'} />
+                            {dealHealth?.factors ? (
+                                <div className="space-y-1 rounded border border-hairline p-3">
+                                    <p className="text-[11px] font-medium uppercase text-muted-foreground">Health factors</p>
+                                    {dealHealth.factors.map((factor) => (
+                                        <p key={factor.key} className="text-[12px]">
+                                            <span className="text-muted-foreground">{factor.label}: </span>
+                                            {factor.detail}
+                                        </p>
+                                    ))}
+                                    {dealHealth.next_action ? (
+                                        <p className="pt-1 text-[12px] text-ink">{dealHealth.next_action}</p>
+                                    ) : null}
+                                </div>
+                            ) : null}
+                            <DealLineItems
+                                dealId={deal.id}
+                                items={deal.line_items ?? associations?.line_items}
+                                products={products}
+                            />
+                            <DealQuotes
+                                dealId={deal.id}
+                                quotes={deal.quotes ?? []}
+                                products={products}
+                            />
+                            <DealSplits
+                                dealId={deal.id}
+                                members={members ?? []}
+                                splits={splits ?? []}
+                                canManage={Boolean(canManageSplits)}
+                            />
                             <Form
                                 action={`/crm/deals/${deal.id}/move`}
                                 method="post"

@@ -28,6 +28,7 @@ export function CrmListShell({
     stages = [],
     stagePills = [],
     exportHref,
+    createHref,
     banner,
     views = [],
     activeView = '',
@@ -50,6 +51,7 @@ export function CrmListShell({
     stages?: Stage[];
     stagePills?: StagePill[];
     exportHref?: string;
+    createHref?: string;
     banner?: ReactNode;
     views?: ListView[];
     activeView?: string;
@@ -72,7 +74,7 @@ export function CrmListShell({
                 activeView={activeView}
                 primaryLabel={primaryLabel}
                 onPrimary={() => {
-                    window.location.href = `${basePath}?create=1`;
+                    window.location.href = createHref ?? `${basePath}?create=1`;
                 }}
                 headerActions={headerActions}
             />

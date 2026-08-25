@@ -25,7 +25,7 @@ class OutboundReportController extends Controller
             'opened' => (clone $out)->whereNotNull('opened_at')->count(),
             'clicked' => (clone $out)->whereNotNull('clicked_at')->count(),
             'replied' => (clone $out)->whereNotNull('replied_at')->count(),
-            'bounced' => (clone $out)->where('failure_reason', 'like', '%bounce%')->count(),
+            'bounced' => (clone $out)->where(fn ($query) => $query->where('status', 'bounced')->orWhereNotNull('bounced_at'))->count(),
         ];
 
         $perSequence = Sequence::query()
@@ -98,7 +98,7 @@ class OutboundReportController extends Controller
                 'opened' => 'Tracked with a 1px image — only counts recipients whose mail client loads remote images.',
                 'clicked' => 'Tracked by rewriting links through a redirect on this host — only counts recipients who follow a link.',
                 'replied' => 'Tracked when the IMAP poller matches an inbound mail to a contact. Requires mailbox IMAP settings + ext-imap.',
-                'bounced' => 'Not tracked yet — needs ESP webhooks or bounce-box parsing. Counts shown are failures mentioning a bounce.',
+                'bounced' => 'Tracked from the outbound bounce webhook. Hard bounces suppress the address; soft bounces stay visible in this bucket.',
             ],
         ]);
     }

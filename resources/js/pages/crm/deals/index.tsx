@@ -5,6 +5,7 @@ import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmShell } from '@/components/crm/crm-shell';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
+import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import ListViewTable from '@/components/crm/list-view-table';
@@ -37,6 +38,7 @@ export default function DealsIndex({
     stages,
     stagePills,
     pipeline,
+    pipelines = [],
     contacts,
     members,
     savedFilters,
@@ -53,6 +55,7 @@ export default function DealsIndex({
     stages: Stage[];
     stagePills: StagePill[];
     pipeline: { id: number; name: string };
+    pipelines?: { id: number; name: string; is_default?: boolean }[];
     contacts: Contact[];
     members: { id: number; name: string }[];
     savedFilters: SavedView[];
@@ -90,9 +93,11 @@ export default function DealsIndex({
                 contacts={contacts}
                 stages={stages}
                 stagePills={stagePills}
+                exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
+                createHref={`/crm/deals?pipeline=${pipeline.id}&create=1`}
                 views={[
-                    { key: 'list', label: 'List', href: '/crm/deals' },
-                    { key: 'board', label: 'Board', href: '/crm/deals/board' },
+                    { key: 'list', label: 'List', href: `/crm/deals?pipeline=${pipeline.id}` },
+                    { key: 'board', label: 'Board', href: `/crm/deals/board?pipeline=${pipeline.id}` },
                 ]}
                 activeView="list"
                 headerActions={
@@ -102,7 +107,12 @@ export default function DealsIndex({
                                 Import
                             </Link>
                         ) : null}
-                        <DealLayoutToggle current="list" />
+                        <PipelineSwitcher
+                            pipelineId={pipeline.id}
+                            pipelines={pipelines}
+                            basePath="/crm/deals"
+                        />
+                        <DealLayoutToggle current="list" pipelineId={pipeline.id} />
                     </>
                 }
             >

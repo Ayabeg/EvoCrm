@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Crm;
 use App\Http\Controllers\Controller;
 use App\Models\Deal;
 use App\Models\Quote;
+use App\Services\Crm\QuoteDocument;
+use App\Services\Crm\QuoteMailer;
 use App\Services\Crm\QuoteTotals;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class QuoteController extends Controller
 {
@@ -18,6 +21,7 @@ class QuoteController extends Controller
         $data = $request->validate([
             'status' => ['nullable', 'in:draft,sent,accepted'],
             'notes' => ['nullable', 'string'],
+            'expires_at' => ['nullable', 'date'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['nullable', 'integer'],
             'items.*.name' => ['required_without:items.*.product_id', 'nullable', 'string', 'max:180'],
@@ -32,6 +36,7 @@ class QuoteController extends Controller
             'status' => $data['status'] ?? 'draft',
             'currency' => 'DZD',
             'notes' => $data['notes'] ?? null,
+            'expires_at' => $data['expires_at'] ?? null,
         ]);
 
         $totals->sync($quote, $data['items']);
@@ -42,10 +47,12 @@ class QuoteController extends Controller
     public function update(Request $request, Quote $quote, QuoteTotals $totals): RedirectResponse
     {
         abort_unless((int) $quote->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_if($quote->isImmutable(), 422, 'Sent quotes cannot be edited.');
 
         $data = $request->validate([
             'status' => ['nullable', 'in:draft,sent,accepted'],
             'notes' => ['nullable', 'string'],
+            'expires_at' => ['nullable', 'date'],
             'items' => ['nullable', 'array', 'min:1'],
             'items.*.product_id' => ['nullable', 'integer'],
             'items.*.name' => ['required_without:items.*.product_id', 'nullable', 'string', 'max:180'],
@@ -57,11 +64,47 @@ class QuoteController extends Controller
         $quote->fill([
             'status' => $data['status'] ?? $quote->status,
             'notes' => $data['notes'] ?? $quote->notes,
+            'expires_at' => $data['expires_at'] ?? $quote->expires_at,
         ])->save();
 
         if (! empty($data['items'])) {
             $totals->sync($quote, $data['items']);
         }
+
+        return back();
+    }
+
+    public function preview(Request $request, Quote $quote, QuoteDocument $documents): Response
+    {
+        abort_unless((int) $quote->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        return response($documents->pdf($quote), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="quote-'.$quote->id.'.pdf"',
+        ]);
+    }
+
+    public function send(Request $request, Quote $quote, QuoteMailer $mailer): RedirectResponse
+    {
+        abort_unless((int) $quote->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'to' => ['nullable', 'email'],
+        ]);
+
+        $to = $data['to'] ?? $quote->deal?->contact?->email;
+        abort_unless(filled($to), 422);
+
+        $mailer->send($quote, $request->user(), (string) $to);
+
+        return back();
+    }
+
+    public function revoke(Request $request, Quote $quote): RedirectResponse
+    {
+        abort_unless((int) $quote->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $quote->forceFill(['revoked_at' => now()])->save();
 
         return back();
     }

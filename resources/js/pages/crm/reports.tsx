@@ -89,6 +89,17 @@ type Props = {
     dashboards: DashboardSummary[];
     dashboard: OpenDashboard | null;
     widgetCatalog: ReportWidgetCatalogItem[];
+    schedules?: {
+        id: number;
+        name?: string | null;
+        cron: string;
+        recipients: string[];
+        active: boolean;
+        last_status?: string | null;
+        last_error?: string | null;
+        last_sent_at?: string | null;
+    }[];
+    savedReports?: { id: number; name: string }[];
 };
 
 const NUMBER = new Intl.NumberFormat('en-US');
@@ -236,6 +247,8 @@ export default function Reports({
     dashboards,
     dashboard,
     widgetCatalog,
+    schedules = [],
+    savedReports = [],
 }: Props) {
     const reportsPath = reportsBasePath(activeCategory);
     const [from, setFrom] = useState(window.from);
@@ -450,6 +463,84 @@ export default function Reports({
                             New dashboard
                         </button>
                     </nav>
+                    <section className="mb-6 rounded-lg border border-hairline bg-canvas p-3 text-sm">
+                        <h2 className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            Scheduled reports
+                        </h2>
+                        {schedules.length === 0 ? (
+                            <p className="mb-2 text-[12px] text-muted-foreground">No schedules yet.</p>
+                        ) : (
+                            <ul className="mb-3 space-y-1 text-[12px]">
+                                {schedules.map((schedule) => (
+                                    <li key={schedule.id} className="flex flex-wrap items-center justify-between gap-2">
+                                        <span>
+                                            {schedule.name ?? 'Untitled'} · {schedule.cron} ·{' '}
+                                            {schedule.active ? 'active' : 'paused'} · {schedule.last_status ?? 'never sent'}
+                                        </span>
+                                        <span className="flex gap-1">
+                                            <form
+                                                onSubmit={(event) => {
+                                                    event.preventDefault();
+                                                    router.put(`/reports/schedules/${schedule.id}`, {
+                                                        recipients: schedule.recipients,
+                                                        active: !schedule.active,
+                                                    });
+                                                }}
+                                            >
+                                                <button type="submit" className="text-brand">
+                                                    {schedule.active ? 'Pause' : 'Resume'}
+                                                </button>
+                                            </form>
+                                            <form
+                                                onSubmit={(event) => {
+                                                    event.preventDefault();
+                                                    router.delete(`/reports/schedules/${schedule.id}`);
+                                                }}
+                                            >
+                                                <button type="submit" className="text-destructive">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        <form
+                            className="grid gap-2 md:grid-cols-4"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                const form = event.currentTarget;
+                                const recipients = String(new FormData(form).get('recipients') ?? '')
+                                    .split(',')
+                                    .map((value) => value.trim())
+                                    .filter(Boolean);
+                                router.post('/reports/schedules', {
+                                    name: String(new FormData(form).get('name') ?? ''),
+                                    saved_report_id: String(new FormData(form).get('saved_report_id') ?? '') || null,
+                                    dashboard_id: dashboard?.id ?? null,
+                                    cron: String(new FormData(form).get('cron') ?? '0 8 * * 1'),
+                                    recipients,
+                                    active: true,
+                                });
+                            }}
+                        >
+                            <input name="name" placeholder="Schedule name" className="h-8 rounded-md border border-hairline px-2 text-[13px]" />
+                            <select name="saved_report_id" className="h-8 rounded-md border border-hairline px-2 text-[13px]">
+                                <option value="">Saved report…</option>
+                                {savedReports.map((report) => (
+                                    <option key={report.id} value={report.id}>
+                                        {report.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <input name="cron" defaultValue="0 8 * * 1" className="h-8 rounded-md border border-hairline px-2 font-mono text-[12px]" />
+                            <input name="recipients" placeholder="a@b.com, c@d.com" className="h-8 rounded-md border border-hairline px-2 text-[13px]" />
+                            <button type="submit" className="h-8 rounded-md bg-brand px-3 text-[13px] text-white md:col-span-4">
+                                Create schedule
+                            </button>
+                        </form>
+                    </section>
 
                     {dashboard ? (
                         <section aria-label={dashboard.name}>

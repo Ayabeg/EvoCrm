@@ -2,9 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\WorkspaceHtmlMail;
 use App\Models\ScheduledReport;
+use App\Services\Crm\ScheduledReportRenderer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class DeliverScheduledReports extends Command
 {
@@ -12,34 +15,57 @@ class DeliverScheduledReports extends Command
 
     protected $description = 'Send due scheduled report emails';
 
-    public function handle(): int
+    public function handle(ScheduledReportRenderer $renderer): int
     {
         $due = ScheduledReport::query()
             ->where('active', true)
-            ->where(function ($query) {
-                $query->whereNull('last_sent_at')
-                    ->orWhere('last_sent_at', '<', now()->subDay());
-            })
+            ->with(['savedReport', 'dashboard', 'workspace'])
             ->get();
 
         $sent = 0;
 
         foreach ($due as $schedule) {
+            $window = $renderer->dueWindow($schedule);
             $recipients = collect($schedule->recipients ?? [])->filter()->all();
 
             if ($recipients === []) {
+                $schedule->forceFill([
+                    'last_status' => 'failed',
+                    'last_error' => 'No recipients configured.',
+                    'last_window' => $window,
+                ])->save();
+
                 continue;
             }
 
-            foreach ($recipients as $email) {
-                Mail::raw(
-                    'Your EvoSales scheduled report is ready. View dashboards at your CRM reports page.',
-                    fn ($message) => $message->to($email)->subject('EvoSales scheduled report')
-                );
+            if ($schedule->last_window === $window && $schedule->last_status === 'sent') {
+                continue;
             }
 
-            $schedule->forceFill(['last_sent_at' => now()])->save();
-            $sent++;
+            try {
+                $document = $renderer->render($schedule);
+
+                foreach ($recipients as $email) {
+                    Mail::to($email)->send(new WorkspaceHtmlMail(
+                        subjectLine: $document['subject'],
+                        htmlBody: $document['html'],
+                    ));
+                }
+
+                $schedule->forceFill([
+                    'last_sent_at' => now(),
+                    'last_status' => 'sent',
+                    'last_error' => null,
+                    'last_window' => $window,
+                ])->save();
+                $sent++;
+            } catch (Throwable $e) {
+                $schedule->forceFill([
+                    'last_status' => 'failed',
+                    'last_error' => $e->getMessage(),
+                    'last_window' => $window,
+                ])->save();
+            }
         }
 
         $this->info("reports:deliver — {$sent} schedules processed.");

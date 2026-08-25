@@ -13,6 +13,8 @@ use App\Models\Lead;
 use App\Models\Message;
 use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
+use App\Models\SavedReport;
+use App\Models\ScheduledReport;
 use App\Models\Sequence;
 use App\Models\Thread;
 use App\Models\User;
@@ -143,6 +145,26 @@ class ReportController extends Controller
                 ->all(),
             'dashboard' => $this->presentDashboard($open, $categories),
             'widgetCatalog' => ReportWidgets::catalog(),
+            'schedules' => ScheduledReport::query()
+                ->forWorkspace($workspace)
+                ->latest()
+                ->get()
+                ->map(fn (ScheduledReport $schedule) => [
+                    'id' => $schedule->id,
+                    'name' => $schedule->name,
+                    'cron' => $schedule->cron,
+                    'recipients' => $schedule->recipients,
+                    'active' => $schedule->active,
+                    'last_status' => $schedule->last_status,
+                    'last_error' => $schedule->last_error,
+                    'last_sent_at' => $schedule->last_sent_at?->toIso8601String(),
+                ])
+                ->all(),
+            'savedReports' => SavedReport::query()
+                ->forWorkspace($workspace)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->all(),
         ]);
     }
 
@@ -683,7 +705,7 @@ class ReportController extends Controller
     private function outboundDetail(Workspace $workspace): array
     {
         $out = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out');
-        $totals = ['queued' => (clone $out)->where('status', 'queued')->count(), 'sent' => (clone $out)->where('status', 'sent')->count(), 'failed' => (clone $out)->where('status', 'failed')->count(), 'opened' => (clone $out)->whereNotNull('opened_at')->count(), 'clicked' => (clone $out)->whereNotNull('clicked_at')->count(), 'replied' => (clone $out)->whereNotNull('replied_at')->count(), 'bounced' => (clone $out)->where('failure_reason', 'like', '%bounce%')->count()];
+        $totals = ['queued' => (clone $out)->where('status', 'queued')->count(), 'sent' => (clone $out)->where('status', 'sent')->count(), 'failed' => (clone $out)->where('status', 'failed')->count(), 'opened' => (clone $out)->whereNotNull('opened_at')->count(), 'clicked' => (clone $out)->whereNotNull('clicked_at')->count(), 'replied' => (clone $out)->whereNotNull('replied_at')->count(), 'bounced' => (clone $out)->where(fn ($query) => $query->where('status', 'bounced')->orWhereNotNull('bounced_at'))->count()];
         $perSequence = Sequence::query()->forWorkspace($workspace)->withCount('enrollments')->get()->map(fn (Sequence $s) => ['id' => $s->id, 'name' => $s->name, 'enrollments' => $s->enrollments_count, 'sent' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->where('status', 'sent')->count(), 'opened' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('opened_at')->count(), 'replied' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('replied_at')->count()]);
         $perCampaign = OutboundCampaign::query()->forWorkspace($workspace)->latest()->limit(20)->get()->map(fn (OutboundCampaign $c) => array_merge(['id' => $c->id, 'name' => $c->name, 'status' => $c->status, 'audience_count' => $c->audience_count], $c->messageCounts()));
         $daily = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'sent')->where('sent_at', '>=', now()->subDays(30))->selectRaw('DATE(sent_at) as day, COUNT(*) as sent')->groupBy('day')->orderBy('day')->get();

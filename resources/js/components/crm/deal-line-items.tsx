@@ -67,11 +67,35 @@ export default function DealLineItems({
                         <tbody>
                             {rows.map((row) => (
                                 <tr key={row.id} className="border-t border-hairline">
-                                    <td className="py-1.5 pr-2">{row.name}</td>
-                                    <td className="py-1.5 pr-2 text-mute">{row.sku ?? '—'}</td>
-                                    <td className="py-1.5 text-right">{row.quantity}</td>
-                                    <td className="money py-1.5 text-right">{formatDzd(row.unit_cents)}</td>
-                                    <td className="money py-1.5 text-right">{formatDzd(row.total_cents)}</td>
+                                    <td className="py-1.5 pr-2" colSpan={5}>
+                                        <Form
+                                            action={`/crm/deals/${dealId}/line-items/${row.id}`}
+                                            method="put"
+                                            className="grid grid-cols-[2fr_1fr_1fr_auto] items-center gap-1"
+                                        >
+                                            <input
+                                                name="name"
+                                                defaultValue={row.name}
+                                                className="h-6 rounded border border-hairline bg-canvas px-1 text-[11px]"
+                                            />
+                                            <Input
+                                                name="quantity"
+                                                type="number"
+                                                min={1}
+                                                defaultValue={row.quantity}
+                                                className="h-6"
+                                            />
+                                            <Input
+                                                name="unit_dzd"
+                                                type="number"
+                                                min={0}
+                                                step="0.01"
+                                                defaultValue={(row.unit_cents / 100).toFixed(2)}
+                                                className="h-6"
+                                            />
+                                            <Button className="h-6 px-2 text-[11px]">Save</Button>
+                                        </Form>
+                                    </td>
                                     <td className="py-1.5 pl-2 text-right">
                                         <Form
                                             action={`/crm/deals/${dealId}/line-items/${row.id}`}
@@ -88,22 +112,20 @@ export default function DealLineItems({
                     </table>
                 </div>
             )}
-            {catalog.length > 0 ? (
-                <Form action={`/crm/deals/${dealId}/line-items`} method="post" className="grid grid-cols-3 gap-1" resetOnSuccess>
-                    <select name="product_id" required className="col-span-2 h-7 rounded border border-hairline bg-canvas px-1 text-[11px] text-ink">
-                        <option value="">Add product</option>
-                        {catalog.map((product) => (
-                            <option key={product.id} value={product.id}>
-                                {product.name} · {product.sku} · {formatDzd(product.unit_cents)}
-                            </option>
-                        ))}
-                    </select>
-                    <Input name="quantity" type="number" min={1} defaultValue={1} className="h-7" />
-                    <Button className="col-span-3 h-7 text-[11px]">Add line item</Button>
-                </Form>
-            ) : (
-                <p className="text-[12px] text-mute">No active products in this workspace yet.</p>
-            )}
+            <Form action={`/crm/deals/${dealId}/line-items`} method="post" className="grid grid-cols-3 gap-1" resetOnSuccess>
+                <select name="product_id" className="col-span-2 h-7 rounded border border-hairline bg-canvas px-1 text-[11px] text-ink">
+                    <option value="">Ad hoc or catalog…</option>
+                    {catalog.map((product) => (
+                        <option key={product.id} value={product.id}>
+                            {product.name} · {product.sku} · {formatDzd(product.unit_cents)}
+                        </option>
+                    ))}
+                </select>
+                <Input name="quantity" type="number" min={1} defaultValue={1} className="h-7" />
+                <Input name="name" placeholder="Ad hoc name" className="col-span-2 h-7" />
+                <Input name="unit_dzd" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
+                <Button className="col-span-3 h-7 text-[11px]">Add line item</Button>
+            </Form>
         </section>
     );
 }

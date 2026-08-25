@@ -86,6 +86,16 @@ class WorkflowRunner
 
     public function handleSegmentEntered(Contact $contact, SavedFilter $segment): void
     {
+        $this->runSegmentTrigger($contact, $segment, Workflow::TRIGGER_SEGMENT_ENTERED);
+    }
+
+    public function handleSegmentExited(Contact $contact, SavedFilter $segment): void
+    {
+        $this->runSegmentTrigger($contact, $segment, Workflow::TRIGGER_SEGMENT_EXITED);
+    }
+
+    private function runSegmentTrigger(Contact $contact, SavedFilter $segment, string $trigger): void
+    {
         $workspace = $contact->workspace ?? Workspace::query()->find($contact->workspace_id);
 
         if (! $workspace instanceof Workspace) {
@@ -95,7 +105,7 @@ class WorkflowRunner
         $workflows = Workflow::query()
             ->forWorkspace($workspace)
             ->where('active', true)
-            ->where('trigger', Workflow::TRIGGER_SEGMENT_ENTERED)
+            ->where('trigger', $trigger)
             ->where(function ($query) use ($segment) {
                 $query->whereNull('trigger_saved_filter_id')
                     ->orWhere('trigger_saved_filter_id', $segment->id);

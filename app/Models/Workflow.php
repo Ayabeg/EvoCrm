@@ -61,6 +61,8 @@ class Workflow extends Model
 
     public const TRIGGER_SEGMENT_ENTERED = 'segment.entered';
 
+    public const TRIGGER_SEGMENT_EXITED = 'segment.exited';
+
     public const TRIGGER_ENROLLMENT_REPLIED = 'enrollment.replied';
 
     public const ACTION_CREATE_TASK = 'create_task';
@@ -112,6 +114,7 @@ class Workflow extends Model
             self::TRIGGER_DEAL_CREATED,
             self::TRIGGER_ENROLLMENT_FINISHED,
             self::TRIGGER_SEGMENT_ENTERED,
+            self::TRIGGER_SEGMENT_EXITED,
             self::TRIGGER_ENROLLMENT_REPLIED,
         ];
     }

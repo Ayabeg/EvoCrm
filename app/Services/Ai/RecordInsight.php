@@ -166,11 +166,25 @@ class RecordInsight
             : ($days === 0 ? 'active today' : 'last activity '.$days.' days ago');
         $amountBit = $hasAmount ? 'amount set' : 'amount missing';
 
+        $nextAction = match (true) {
+            $days === null && ! $hasAmount => 'Add an amount and log a first activity — health is incomplete without either.',
+            $days === null => 'Log a first activity so health is more than stage math.',
+            $days > 7 => 'Book a follow-up — this deal has gone quiet.',
+            ! $hasAmount => 'Set an amount so forecast and health are not incomplete.',
+            default => 'Keep the next step current and move the stage when the buyer advances.',
+        };
+
         return [
             'score' => $score,
             'band' => $band,
-            'label' => $label,
+            'label' => $days === null && ! $hasAmount ? 'Low data' : $label,
             'reason' => $stageBit.' · '.$activityBit.' · '.$amountBit.'.',
+            'factors' => [
+                ['key' => 'stage', 'label' => 'Stage probability', 'detail' => $stageBit],
+                ['key' => 'recency', 'label' => 'Activity', 'detail' => $activityBit],
+                ['key' => 'amount', 'label' => 'Amount', 'detail' => $amountBit],
+            ],
+            'next_action' => $nextAction,
         ];
     }
 

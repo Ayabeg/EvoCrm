@@ -36,6 +36,36 @@ class DealLineTotals
         return $line;
     }
 
+    /**
+     * @param  array<string, mixed>  $item
+     */
+    public function update(DealLineItem $line, array $item, ?Product $product = null): DealLineItem
+    {
+        $quantity = max(1, (int) ($item['quantity'] ?? $line->quantity));
+        $unit = array_key_exists('unit_cents', $item) || array_key_exists('unit_dzd', $item)
+            ? $this->unitCents($item, $product)
+            : (int) $line->unit_cents;
+        $name = filled($item['name'] ?? null)
+            ? (string) $item['name']
+            : ($product instanceof Product ? $product->name : $line->name);
+        $sku = filled($item['sku'] ?? null)
+            ? (string) $item['sku']
+            : ($product instanceof Product ? $product->sku : $line->sku);
+
+        $line->forceFill([
+            'product_id' => $product instanceof Product ? $product->id : ($item['product_id'] ?? $line->product_id),
+            'name' => $name,
+            'sku' => $sku,
+            'quantity' => $quantity,
+            'unit_cents' => $unit,
+            'total_cents' => $quantity * $unit,
+        ])->save();
+
+        $this->rollup($line->deal);
+
+        return $line->fresh() ?? $line;
+    }
+
     public function remove(DealLineItem $item): Deal
     {
         $deal = $item->deal;

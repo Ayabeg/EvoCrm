@@ -55,6 +55,7 @@ const triggerLabel: Record<string, string> = {
     'deal.created': 'Deal created',
     'enrollment.finished': 'Sequence finished',
     'segment.entered': 'Segment entered',
+    'segment.exited': 'Segment exited',
     'enrollment.replied': 'Sequence reply received',
 };
 
@@ -290,6 +291,7 @@ export default function WorkflowsIndex({
                                         <option value="deal.stage_changed">Deal stage changed</option>
                                         <option value="enrollment.finished">Sequence finished</option>
                                         <option value="segment.entered">Segment entered</option>
+                                        <option value="segment.exited">Segment exited</option>
                                         <option value="enrollment.replied">Sequence reply received</option>
                                     </select>
                                 </div>
@@ -308,7 +310,7 @@ export default function WorkflowsIndex({
                                             ))}
                                         </select>
                                     </div>
-                                ) : trigger === 'segment.entered' ? (
+                                ) : trigger === 'segment.entered' || trigger === 'segment.exited' ? (
                                     <div>
                                         <Label>Segment</Label>
                                         <select name="trigger_saved_filter_id" className={selectClass} required>

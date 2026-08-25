@@ -13,8 +13,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'dashboard_id',
     'cron',
     'recipients',
+    'name',
     'active',
     'last_sent_at',
+    'last_status',
+    'last_error',
+    'last_window',
 ])]
 class ScheduledReport extends Model
 {

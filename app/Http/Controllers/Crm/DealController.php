@@ -117,7 +117,7 @@ class DealController extends Controller
             'stages' => $board['stages'],
             'deals' => $board['deals'],
             'forecast' => $board['forecast'],
-            'forecastBand' => null,
+            'forecastBand' => app(RecordInsight::class)->pipelineForecastBand($workspace, $pipeline),
         ]);
     }
 
@@ -126,7 +126,7 @@ class DealController extends Controller
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
-        $deal->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items', 'lineItems.product']);
+        $deal->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items', 'lineItems.product', 'splits.user']);
 
         return Inertia::render('crm/deals/show', [
             'deal' => $deal,
@@ -138,6 +138,8 @@ class DealController extends Controller
             'stages' => $deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages,
             'members' => $hub->members($workspace),
             'products' => Product::query()->forWorkspace($workspace)->orderBy('name')->get(),
+            'splits' => $deal->splits,
+            'canManageSplits' => $request->user()->role->canManageSettings(),
             'dealHealth' => $insight->dealHealth($deal),
             'askEvo' => $insight->forDeal($deal),
         ]);
@@ -163,7 +165,10 @@ class DealController extends Controller
         ]);
 
         $workspace = $request->user()->workspace;
-        $pipeline = $workspace->defaultPipeline();
+        $pipeline = app(PipelineManager::class)->resolve(
+            $workspace,
+            filled($data['pipeline_id'] ?? null) ? (int) $data['pipeline_id'] : null,
+        );
         $stage = filled($data['stage_id'] ?? null)
             ? Stage::query()->where('pipeline_id', $pipeline->id)->findOrFail($data['stage_id'])
             : $pipeline->stageBySlug('new');

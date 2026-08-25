@@ -24,6 +24,7 @@ use App\Http\Controllers\Crm\RecordLayoutController;
 use App\Http\Controllers\Crm\ReportController;
 use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Crm\SavedReportController;
+use App\Http\Controllers\Crm\ScheduledReportController;
 use App\Http\Controllers\Crm\SegmentController;
 use App\Http\Controllers\Crm\WorkflowController;
 use App\Http\Controllers\Desk\DeskConnectorController;
@@ -43,6 +44,7 @@ use App\Http\Controllers\Outbound\SuppressionController;
 use App\Http\Controllers\Outbound\TemplateController;
 use App\Http\Controllers\Outbound\WarmupController;
 use App\Http\Controllers\Public\FunnelTrackingController;
+use App\Http\Controllers\Public\QuoteAcceptanceController;
 use App\Http\Controllers\Public\TrackingController;
 use App\Http\Controllers\Public\UnsubscribeController;
 use App\Http\Controllers\Settings\AppsController;
@@ -57,6 +59,7 @@ use App\Http\Controllers\Settings\PipelineController;
 use App\Http\Controllers\Settings\RecordLayoutSettingsController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
+use App\Http\Controllers\Webhooks\OutboundBounceWebhookController;
 use App\Http\Middleware\EnforceProductPermissions;
 use Illuminate\Support\Facades\Route;
 
@@ -76,6 +79,8 @@ Route::middleware('guest')->group(function () {
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
+Route::get('/q/{token}', [QuoteAcceptanceController::class, 'show'])->name('quotes.public.show');
+Route::post('/q/{token}/accept', [QuoteAcceptanceController::class, 'accept'])->name('quotes.public.accept');
 Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
 Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])->name('outbound.track.click');
 Route::get('/track/{slug}/visit.gif', [FunnelTrackingController::class, 'pixel'])->name('funnel.track.visit');
@@ -87,6 +92,10 @@ Route::post('/webhooks/evolution/{webhookKey}', [EvolutionWebhookController::cla
     ->whereAlphaNumeric('webhookKey')
     ->middleware('throttle:120,1')
     ->name('webhooks.evolution');
+Route::post('/webhooks/outbound/bounces/{webhookKey}', [OutboundBounceWebhookController::class, 'handle'])
+    ->whereAlphaNumeric('webhookKey')
+    ->middleware('throttle:120,1')
+    ->name('webhooks.outbound.bounces');
 Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::class, 'handle'])
     ->whereAlphaNumeric('webhookKey')
     ->middleware('throttle:60,1')
@@ -116,6 +125,9 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/report-builder/cross-object', [SavedReportController::class, 'crossObject'])->name('crm.report-builder.cross-object');
     Route::post('/crm/report-builder', [SavedReportController::class, 'store'])->name('crm.report-builder.store');
     Route::get('/crm/report-builder/{savedReport}/run', [SavedReportController::class, 'run'])->name('crm.report-builder.run');
+    Route::post('/reports/schedules', [ScheduledReportController::class, 'store'])->name('reports.schedules.store');
+    Route::put('/reports/schedules/{scheduledReport}', [ScheduledReportController::class, 'update'])->name('reports.schedules.update');
+    Route::delete('/reports/schedules/{scheduledReport}', [ScheduledReportController::class, 'destroy'])->name('reports.schedules.destroy');
     Route::post('/reports/dashboards', [DashboardController::class, 'store'])->name('reports.dashboards.store');
     Route::put('/reports/dashboards/{dashboard}', [DashboardController::class, 'update'])->name('reports.dashboards.update');
     Route::delete('/reports/dashboards/{dashboard}', [DashboardController::class, 'destroy'])->name('reports.dashboards.destroy');
@@ -147,6 +159,9 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::delete('/crm/workflows/{workflow}', [WorkflowController::class, 'destroy'])->name('crm.workflows.destroy');
     Route::post('/crm/deals/{deal}/quotes', [QuoteController::class, 'store'])->name('crm.quotes.store');
     Route::put('/crm/quotes/{quote}', [QuoteController::class, 'update'])->name('crm.quotes.update');
+    Route::get('/crm/quotes/{quote}/preview', [QuoteController::class, 'preview'])->name('crm.quotes.preview');
+    Route::post('/crm/quotes/{quote}/send', [QuoteController::class, 'send'])->name('crm.quotes.send');
+    Route::post('/crm/quotes/{quote}/revoke', [QuoteController::class, 'revoke'])->name('crm.quotes.revoke');
 
     Route::get('/crm/companies', [CompanyController::class, 'index'])->name('crm.companies.index');
     Route::post('/crm/companies', [CompanyController::class, 'store'])->name('crm.companies.store');
@@ -194,6 +209,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/deals/{deal}/attributes', [DealController::class, 'updateAttributes'])->name('crm.deals.attributes');
     Route::post('/crm/deals/{deal}/move', [DealController::class, 'move'])->name('crm.deals.move');
     Route::post('/crm/deals/{deal}/line-items', [DealLineItemController::class, 'store'])->name('crm.deals.line-items.store');
+    Route::put('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'update'])->name('crm.deals.line-items.update');
     Route::delete('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'destroy'])->name('crm.deals.line-items.destroy');
     Route::post('/crm/deals/{deal}/ask', [AskEvoController::class, 'deal'])->name('crm.deals.ask');
     Route::post('/crm/deals/{deal}/draft-email', [AskEvoController::class, 'draftDeal'])->name('crm.deals.draft-email');

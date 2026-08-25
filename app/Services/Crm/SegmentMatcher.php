@@ -53,6 +53,8 @@ class SegmentMatcher
                     ->where('contact_id', $contact->id)
                     ->where('saved_filter_id', $segment->id)
                     ->delete();
+
+                $this->workflows->handleSegmentExited($contact, $segment);
             }
         }
     }

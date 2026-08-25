@@ -201,7 +201,10 @@ class WorkflowController extends Controller
                 'integer',
             ],
             'trigger_saved_filter_id' => [
-                Rule::requiredIf($request->input('trigger') === Workflow::TRIGGER_SEGMENT_ENTERED),
+                Rule::requiredIf(in_array($request->input('trigger'), [
+                    Workflow::TRIGGER_SEGMENT_ENTERED,
+                    Workflow::TRIGGER_SEGMENT_EXITED,
+                ], true)),
                 'nullable',
                 'integer',
             ],

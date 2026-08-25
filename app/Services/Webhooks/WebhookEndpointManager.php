@@ -12,6 +12,8 @@ class WebhookEndpointManager
 
     public const PROVIDER_META_LEADS = 'meta_leads';
 
+    public const PROVIDER_OUTBOUND_BOUNCE = 'outbound_bounce';
+
     public function forWorkspace(Workspace $workspace, string $provider): WebhookEndpoint
     {
         $this->assertProvider($provider);
@@ -59,6 +61,7 @@ class WebhookEndpointManager
         $route = match ($provider) {
             self::PROVIDER_EVOLUTION => 'webhooks.evolution',
             self::PROVIDER_META_LEADS => 'webhooks.meta.leads',
+            self::PROVIDER_OUTBOUND_BOUNCE => 'webhooks.outbound.bounces',
             default => abort(404),
         };
 
@@ -78,6 +81,7 @@ class WebhookEndpointManager
         abort_unless(in_array($provider, [
             self::PROVIDER_EVOLUTION,
             self::PROVIDER_META_LEADS,
+            self::PROVIDER_OUTBOUND_BOUNCE,
         ], true), 404);
     }
 }

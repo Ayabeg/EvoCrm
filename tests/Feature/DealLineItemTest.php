@@ -150,6 +150,49 @@ it('shows catalog products and line items on the deal record page', function () 
         );
 });
 
+it('edits a line item quantity and rolls the deal total up', function () {
+    $user = User::factory()->create();
+    $deal = commerceDealFor($user, 1_000_000);
+    $product = Product::query()->forWorkspace($user->workspace)->where('sku', 'EVO-DESK-SEAT')->first();
+
+    $this->actingAs($user)
+        ->post("/crm/deals/{$deal->id}/line-items", [
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ])
+        ->assertRedirect();
+
+    $line = $deal->fresh()->lineItems->first();
+
+    $this->actingAs($user)
+        ->put("/crm/deals/{$deal->id}/line-items/{$line->id}", [
+            'quantity' => 3,
+        ])
+        ->assertRedirect();
+
+    expect($deal->fresh()->amount_cents)->toBe(13_500_000)
+        ->and($line->fresh()->quantity)->toBe(3)
+        ->and($line->fresh()->total_cents)->toBe(13_500_000);
+});
+
+it('adds an ad hoc line item without a catalog product', function () {
+    $user = User::factory()->create();
+    $deal = commerceDealFor($user, 1_000_000);
+
+    $this->actingAs($user)
+        ->post("/crm/deals/{$deal->id}/line-items", [
+            'name' => 'Custom install',
+            'quantity' => 2,
+            'unit_dzd' => 15000,
+        ])
+        ->assertRedirect();
+
+    $deal->refresh();
+    expect($deal->lineItems)->toHaveCount(1)
+        ->and($deal->lineItems->first()->name)->toBe('Custom install')
+        ->and($deal->amount_cents)->toBe(3_000_000);
+});
+
 it('rejects a product from another workspace', function () {
     $user = User::factory()->create();
     $other = Workspace::factory()->create();

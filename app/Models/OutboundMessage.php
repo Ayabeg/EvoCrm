@@ -25,6 +25,9 @@ use Illuminate\Support\Str;
     'body_html',
     'status',
     'failure_reason',
+    'bounce_type',
+    'bounced_at',
+    'provider_event_id',
     'deferred_until',
     'defer_reason',
     'sent_at',
@@ -47,6 +50,7 @@ class OutboundMessage extends Model
             'opened_at' => 'datetime',
             'open_count' => 'integer',
             'clicked_at' => 'datetime',
+            'bounced_at' => 'datetime',
             'click_count' => 'integer',
             'deferred_until' => 'datetime',
         ];
