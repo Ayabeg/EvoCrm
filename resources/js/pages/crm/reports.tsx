@@ -1,9 +1,8 @@
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { EvoKpiCard } from '@/components/crm/evo-kpi-card';
+import { CrmAnalyticsShell } from '@/components/crm/crm-analytics-shell';
+import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import { formatDzd } from '@/lib/money';
-import { cn } from '@/lib/utils';
-import PageHeader from '@/components/page-header';
 import {
     Dialog,
     DialogContent,
@@ -109,29 +108,15 @@ function formatValue(
 }
 
 function KpiStrip({ kpis }: { kpis: ReportKpi[] }) {
-    if (kpis.length === 0) {
-        return null;
-    }
+    const tiles: KpiTile[] = kpis.map((kpi, index) => ({
+        key: `${kpi.label}-${index}`,
+        label: kpi.label,
+        value: kpi.value,
+        format: kpi.format,
+        hint: kpi.hint,
+    }));
 
-    return (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-            {kpis.map((kpi) => (
-                <EvoKpiCard
-                    key={kpi.label}
-                    label={kpi.label}
-                    value={
-                        kpi.format === 'money' && kpi.value !== null
-                            ? kpi.value / 100
-                            : kpi.format === 'percent' && kpi.value !== null
-                              ? `${NUMBER.format(kpi.value)}%`
-                              : kpi.value
-                    }
-                    format={kpi.format === 'money' ? 'money' : 'number'}
-                    hint={kpi.hint}
-                />
-            ))}
-        </div>
-    );
+    return <CrmKpiStrip kpis={tiles} columns={6} />;
 }
 
 function BackingTable({ table }: { table: ReportTable }) {
@@ -344,102 +329,82 @@ export default function Reports({
     return (
         <>
             <Head title={title} />
-            <div className="flex-1 bg-canvas-soft text-[13px] text-ink">
-                <div className="mx-auto w-full max-w-6xl px-5 py-8">
-                    <nav className="mb-4 flex gap-4 border-b border-hairline">
-                        {[
-                            { label: 'Reports', href: '/reports' },
-                            { label: 'Funnels', href: '/reports/funnels' },
-                            { label: 'Report builder', href: '/crm/report-builder' },
-                        ].map((tab) => (
-                            <Link
-                                key={tab.href}
-                                href={tab.href}
-                                className={cn(
-                                    'border-b-2 pb-2 text-[13px]',
-                                    tab.href === '/reports'
-                                        ? 'border-brand font-medium text-ink'
-                                        : 'border-transparent text-muted-foreground hover:text-ink',
-                                )}
-                            >
-                                {tab.label}
-                            </Link>
-                        ))}
-                    </nav>
-                    <PageHeader
-                        title={title}
-                        description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only — empty categories stay hidden.`}
+            <CrmAnalyticsShell
+                active="/reports"
+                title={title}
+                description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only — empty categories stay hidden.`}
+                filters={
+                    <form
+                        onSubmit={apply}
+                        className="flex flex-wrap items-end gap-2"
+                        aria-label="Dashboard filters"
                     >
-                        <form
-                            onSubmit={apply}
-                            className="flex flex-wrap items-end gap-2"
-                            aria-label="Dashboard filters"
-                        >
-                            <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                                Owner
-                                <select
-                                    value={owner}
-                                    onChange={(event) =>
-                                        setOwner(event.target.value)
-                                    }
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                                    aria-label="Owner"
-                                >
-                                    <option value="">All owners</option>
-                                    {owners.map((person) => (
-                                        <option
-                                            key={person.id}
-                                            value={person.id}
-                                        >
-                                            {person.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                                From
-                                <input
-                                    type="date"
-                                    name="from"
-                                    value={from}
-                                    max={to}
-                                    onChange={(event) =>
-                                        setFrom(event.target.value)
-                                    }
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                                />
-                            </label>
-                            <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                                To
-                                <input
-                                    type="date"
-                                    name="to"
-                                    value={to}
-                                    min={from}
-                                    onChange={(event) =>
-                                        setTo(event.target.value)
-                                    }
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                                />
-                            </label>
-                            <button
-                                type="submit"
-                                className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                        <label className="grid gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                            Owner
+                            <select
+                                value={owner}
+                                onChange={(event) =>
+                                    setOwner(event.target.value)
+                                }
+                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] normal-case text-ink"
+                                aria-label="Owner"
                             >
-                                Apply
+                                <option value="">All owners</option>
+                                {owners.map((person) => (
+                                    <option
+                                        key={person.id}
+                                        value={person.id}
+                                    >
+                                        {person.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <label className="grid gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                            From
+                            <input
+                                type="date"
+                                name="from"
+                                value={from}
+                                max={to}
+                                onChange={(event) =>
+                                    setFrom(event.target.value)
+                                }
+                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] normal-case text-ink"
+                            />
+                        </label>
+                        <label className="grid gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                            To
+                            <input
+                                type="date"
+                                name="to"
+                                value={to}
+                                min={from}
+                                onChange={(event) =>
+                                    setTo(event.target.value)
+                                }
+                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] normal-case text-ink"
+                            />
+                        </label>
+                        <button
+                            type="submit"
+                            className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                        >
+                            Apply
+                        </button>
+                        {window.custom ? (
+                            <button
+                                type="button"
+                                onClick={reset}
+                                className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-muted-foreground transition-colors hover:text-ink"
+                            >
+                                Last 30 days
                             </button>
-                            {window.custom ? (
-                                <button
-                                    type="button"
-                                    onClick={reset}
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-muted-foreground transition-colors hover:text-ink"
-                                >
-                                    Last 30 days
-                                </button>
-                            ) : null}
-                        </form>
-                    </PageHeader>
-
+                        ) : null}
+                    </form>
+                }
+                footer={`Reports window ${window.from} → ${window.to} · ${window.timezone}`}
+            >
                     <nav
                         aria-label="Dashboards"
                         className="mb-8 flex flex-wrap items-center gap-2"
@@ -572,8 +537,7 @@ export default function Reports({
                             />
                         ))
                     )}
-                </div>
-            </div>
+            </CrmAnalyticsShell>
 
             <Dialog open={newOpen} onOpenChange={setNewOpen}>
                 <DialogContent>

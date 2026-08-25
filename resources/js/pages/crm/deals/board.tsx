@@ -4,6 +4,7 @@ import type { DragEvent } from 'react';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
+import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import { formatDzd } from '@/lib/money';
 import PageHeader from '@/components/page-header';
 import { cn } from '@/lib/utils';
@@ -151,13 +152,36 @@ export default function DealBoard({
         );
     };
 
+    const pipelineKpis: KpiTile[] = [
+        {
+            key: 'deals',
+            label: 'Open deals',
+            value: forecast.count,
+            hint: 'In this pipeline',
+        },
+        {
+            key: 'amount',
+            label: 'Pipeline value',
+            value: forecast.amount_cents,
+            format: 'money',
+            hint: 'Total deal amount',
+        },
+        {
+            key: 'weighted',
+            label: 'Weighted forecast',
+            value: forecast.weighted_cents,
+            format: 'money',
+            hint: 'Stage probability applied',
+        },
+    ];
+
     return (
         <>
             <Head title="Deals board" />
-            <div className="flex-1 space-y-4 bg-canvas p-6 text-ink">
+            <div className="flex-1 space-y-4 bg-canvas-soft p-6 text-ink">
                 <PageHeader
                     title="Deals board"
-                    description={`${pipeline.name} — drag a card to move its stage. Weighted forecast uses stage probability.`}
+                    description={`${pipeline.name} — drag a card to move its stage. Column totals update live.`}
                 >
                     <div className="flex flex-wrap items-center gap-2">
                         <PipelineSwitcher
@@ -169,6 +193,7 @@ export default function DealBoard({
                     </div>
                 </PageHeader>
 
+                <CrmKpiStrip kpis={pipelineKpis} columns={3} />
                 <DealForecastBar forecast={forecast} forecastBand={forecastBand} />
 
                 <div className="flex items-start gap-3 overflow-x-auto pb-6">
