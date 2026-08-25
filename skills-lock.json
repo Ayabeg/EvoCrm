@@ -13,11 +13,23 @@
       "skillPath": "skills/brandkit/SKILL.md",
       "computedHash": "b63012f3c3d21197e0185d3e9cc7ec40c589fb10e0b5a32a561739de31aa3f20"
     },
+    "chart-designer": {
+      "source": "claude-office-skills/skills",
+      "sourceType": "github",
+      "skillPath": "chart-designer/SKILL.md",
+      "computedHash": "8854853b5343416770d0f164969faa4fbfb0a5671b00b2573ddb85202df1401e"
+    },
     "browser-testing-with-devtools": {
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/browser-testing-with-devtools/SKILL.md",
       "computedHash": "639950ea71851d9c4919608cba8b6276cd1ba30cd82acdc4949c701537eed661"
+    },
+    "chart-designer": {
+      "source": "claude-office-skills/skills",
+      "sourceType": "github",
+      "skillPath": "chart-designer/SKILL.md",
+      "computedHash": "6d69766f465bea4e2836a35c93e75b322cc236a5266ae1e50f2ff851c494699c"
     },
     "ci-cd-and-automation": {
       "source": "addyosmani/agent-skills",
@@ -42,6 +54,18 @@
       "sourceType": "github",
       "skillPath": "skills/context-engineering/SKILL.md",
       "computedHash": "bb8864454c5a24636cab86c4b3c4b29e7e7431c80485bfd7c9c0a19a01936510"
+    },
+    "dashboard-designer": {
+      "source": "nickcrew/claude-cortex",
+      "sourceType": "github",
+      "skillPath": "skills/dashboard-designer/SKILL.md",
+      "computedHash": "dbf2af07bc3ed6d3246c95d4042f40a73d464acaf14b20386cb82e7d94cfea2e"
+    },
+    "dashboard-designer": {
+      "source": "nickcrew/claude-cortex",
+      "sourceType": "github",
+      "skillPath": "skills/dashboard-designer/SKILL.md",
+      "computedHash": "d8181587aa7fa6414c90cb2be8e6b3a5c60c3856ac591e94e49827351a7eb7d6"
     },
     "debugging-and-error-recovery": {
       "source": "addyosmani/agent-skills",
@@ -139,11 +163,23 @@
       "skillPath": "skills/incremental-implementation/SKILL.md",
       "computedHash": "bd40e91eac68b83ba0204dd57b4bd35511cb900f937a7127b79f2396b2bb305d"
     },
+    "interactive-dashboard-builder": {
+      "source": "w95/awesome-claude-corporate-skills",
+      "sourceType": "github",
+      "skillPath": "10-data-analytics/interactive-dashboard-builder/SKILL.md",
+      "computedHash": "3756173c5802fd4f60eda76087edc778ceda155dc6404d6a2fa9ca54c0e18d9f"
+    },
     "industrial-brutalist-ui": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
       "skillPath": "skills/brutalist-skill/SKILL.md",
       "computedHash": "8fc355c4aadb7d29c53ca28bc41be3cd6eea765d121e3737c4dc2d0f90a8effa"
+    },
+    "interactive-dashboard-builder": {
+      "source": "w95/awesome-claude-corporate-skills",
+      "sourceType": "github",
+      "skillPath": "10-data-analytics/interactive-dashboard-builder/SKILL.md",
+      "computedHash": "4eb80bd006f3f38a3df7444bfb3435e86d0e791138b762948cef3996fa8da8f4"
     },
     "interview-me": {
       "source": "addyosmani/agent-skills",
