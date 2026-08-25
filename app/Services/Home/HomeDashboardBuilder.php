@@ -6,8 +6,8 @@ use App\Models\Activity;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\OutboundMessage;
+use App\Models\Stage;
 use App\Models\Thread;
-use App\Models\User;
 use App\Models\Workspace;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -131,10 +131,10 @@ class HomeDashboardBuilder
     private function kpi(
         string $key,
         string $label,
-        int|null $value,
+        ?int $value,
         string $format,
-        int|null $currentForChange,
-        int|null $previous,
+        ?int $currentForChange,
+        ?int $previous,
         string $href,
         ?string $hint = null,
     ): ?array {
@@ -212,7 +212,7 @@ class HomeDashboardBuilder
 
     /**
      * @param  Collection<int, Deal>  $open
-     * @param  Collection<int, \App\Models\Stage>  $stages
+     * @param  Collection<int, Stage>  $stages
      * @return array<string, mixed>|null
      */
     private function pipelineHealth(Collection $open, Collection $stages, int $pipelineCents): ?array

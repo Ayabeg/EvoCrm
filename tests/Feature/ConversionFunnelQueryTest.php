@@ -3,6 +3,7 @@
 use App\Models\AdAccount;
 use App\Models\AdCampaign;
 use App\Models\AdCampaignStat;
+use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\FunnelEvent;
 use App\Models\User;
@@ -54,7 +55,7 @@ it('returns funnel metrics with stage counts and source breakdown', function () 
 
     Deal::query()->create([
         'workspace_id' => $workspace->id,
-        'contact_id' => \App\Models\Contact::factory()->create(['workspace_id' => $workspace->id])->id,
+        'contact_id' => Contact::factory()->create(['workspace_id' => $workspace->id])->id,
         'pipeline_id' => $pipeline->id,
         'stage_id' => $pipeline->stageBySlug('new')->id,
         'title' => 'Order',

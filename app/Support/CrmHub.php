@@ -2,18 +2,17 @@
 
 namespace App\Support;
 
+use App\Http\Resources\SavedFilterResource;
 use App\Models\Activity;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Message;
-use App\Http\Resources\SavedFilterResource;
 use App\Models\SavedFilter;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
-use App\Support\ListViewConfig;
 
 class CrmHub
 {

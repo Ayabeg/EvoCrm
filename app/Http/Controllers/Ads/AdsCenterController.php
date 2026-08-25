@@ -21,9 +21,7 @@ use Inertia\Response;
 
 class AdsCenterController extends Controller
 {
-    public function __construct(private WorkspaceMetaCredentials $metaCredentials)
-    {
-    }
+    public function __construct(private WorkspaceMetaCredentials $metaCredentials) {}
 
     public function index(Request $request, AdsFunnel $funnel): Response
     {
@@ -57,23 +55,25 @@ class AdsCenterController extends Controller
         ]);
     }
 
-
     public function campaigns(Request $request, AdsFunnel $funnel): Response
     {
         $workspace = $request->user()->workspace;
         $campaigns = AdCampaign::query()->forWorkspace($workspace)->with('account')->withCount(['adSets'])->latest()->get();
+
         return Inertia::render('ads/campaigns/index', ['campaigns' => $campaigns, 'funnels' => $funnel->forWorkspace($workspace), 'meta' => $this->metaStatus($workspace)]);
     }
 
     public function adSets(Request $request): Response
     {
         $workspace = $request->user()->workspace;
+
         return Inertia::render('ads/ad-sets/index', ['adSets' => AdSet::query()->forWorkspace($workspace)->with('campaign:id,name,status')->withCount('ads')->latest()->get(), 'meta' => $this->metaStatus($workspace)]);
     }
 
     public function adsIndex(Request $request): Response
     {
         $workspace = $request->user()->workspace;
+
         return Inertia::render('ads/ads/index', ['ads' => Ad::query()->forWorkspace($workspace)->with('adSet:id,name,ad_campaign_id', 'adSet.campaign:id,name')->latest()->get(), 'meta' => $this->metaStatus($workspace)]);
     }
 

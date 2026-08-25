@@ -7,6 +7,7 @@ use App\Models\Sequence;
 use App\Models\SequenceStep;
 use App\Models\User;
 use App\Services\Outbound\SequenceEnrollment;
+use Illuminate\Support\Facades\Artisan;
 
 it('assigns A/B variant at enrollment when steps have variant keys', function () {
     $user = User::factory()->create();
@@ -77,7 +78,7 @@ it('creates call activity for call sequence steps', function () {
         'next_run_at' => now()->subMinute(),
     ]);
 
-    \Illuminate\Support\Facades\Artisan::call('outbound:run');
+    Artisan::call('outbound:run');
 
     expect(Activity::query()->where('contact_id', $contact->id)->where('type', 'call')->exists())->toBeTrue();
 });

@@ -10,6 +10,7 @@ use App\Models\Sequence;
 use App\Models\User;
 use App\Models\Workflow;
 use App\Services\Crm\EvoWorkflowTemplates;
+use App\Services\Crm\WorkflowRunner;
 use App\Services\Outbound\SuppressionService;
 use Illuminate\Support\Facades\Http;
 
@@ -561,7 +562,7 @@ it('branches on a contact custom property', function () {
         'else_action_config' => ['subject' => 'Qualify sector'],
     ]);
 
-    app(\App\Services\Crm\WorkflowRunner::class)->handleContactCreated($contact->fresh());
+    app(WorkflowRunner::class)->handleContactCreated($contact->fresh());
 
     expect(Activity::query()->where('contact_id', $contact->id)->where('type', 'task')->pluck('subject')->all())
         ->toBe(['Santé buyer — book Evotechly demo']);

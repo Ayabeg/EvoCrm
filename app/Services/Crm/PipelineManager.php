@@ -79,8 +79,8 @@ class PipelineManager
 
     /**
      * @return array{
-     *     stages: \Illuminate\Support\Collection<int, array<string, mixed>>,
-     *     deals: \Illuminate\Support\Collection<int, array<string, mixed>>,
+     *     stages: Collection<int, array<string, mixed>>,
+     *     deals: Collection<int, array<string, mixed>>,
      *     forecast: array{count: int, amount_cents: int, weighted_cents: int}
      * }
      */

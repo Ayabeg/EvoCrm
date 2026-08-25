@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PipelineResource;
 use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Services\Crm\PipelineManager;
@@ -23,7 +22,7 @@ class PipelineController extends Controller
 
         return Inertia::render('settings/pipelines', [
             'pipelines' => collect($pipelines->adminIndex($workspace))
-                ->map(function (array $row) use ($workspace, $pipelines) {
+                ->map(function (array $row) use ($pipelines) {
                     $pipeline = Pipeline::query()->find($row['id']);
                     if (! $pipeline) {
                         return $row;

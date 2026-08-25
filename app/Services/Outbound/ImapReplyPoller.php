@@ -20,6 +20,7 @@ use RuntimeException;
 class ImapReplyPoller
 {
     public function __construct(private WorkflowRunner $workflows) {}
+
     /**
      * @return array{mailbox: string, replies: int, error: string|null}
      */

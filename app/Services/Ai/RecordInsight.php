@@ -477,7 +477,7 @@ class RecordInsight
      */
     protected function attributeFacts(int $workspaceId, string $entity, int $entityId): array
     {
-        $workspace = \App\Models\Workspace::query()->find($workspaceId);
+        $workspace = Workspace::query()->find($workspaceId);
 
         if (! $workspace) {
             return [];

@@ -212,5 +212,4 @@ class ContactController extends Controller
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
-
 }

@@ -25,6 +25,7 @@ class ListsController extends Controller
                 'campaigns' => ($campaignsByFilter[$saved->id] ?? collect())
                     ->map(fn (OutboundCampaign $c) => ['id' => $c->id, 'name' => $c->name, 'status' => $c->status])->values()->all(),
             ]);
+
         return Inertia::render('outbound/lists/index', ['lists' => $lists]);
     }
 }

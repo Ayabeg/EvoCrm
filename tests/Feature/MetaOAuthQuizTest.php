@@ -2,7 +2,6 @@
 
 use App\Models\Integration;
 use App\Models\User;
-use App\Support\MetaAuth;
 
 it('returns meta connection state on the finish setup step', function () {
     $user = User::factory()->create();

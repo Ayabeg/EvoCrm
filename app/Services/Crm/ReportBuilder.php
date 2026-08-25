@@ -3,7 +3,6 @@
 namespace App\Services\Crm;
 
 use App\Models\Contact;
-use App\Models\CustomAttributeDefinition;
 use App\Models\Deal;
 use App\Models\SavedReport;
 use App\Models\Workspace;

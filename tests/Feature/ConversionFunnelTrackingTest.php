@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\AdAccount;
+use App\Models\AdCampaign;
+use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\FunnelEvent;
 use App\Models\Lead;
@@ -13,7 +16,7 @@ it('records order_placed when a deal is created', function () {
 
     Deal::query()->create([
         'workspace_id' => $workspace->id,
-        'contact_id' => \App\Models\Contact::factory()->create(['workspace_id' => $workspace->id])->id,
+        'contact_id' => Contact::factory()->create(['workspace_id' => $workspace->id])->id,
         'pipeline_id' => $pipeline->id,
         'stage_id' => $pipeline->stageBySlug('new')->id,
         'title' => 'Test order',
@@ -37,7 +40,7 @@ it('records confirmed and delivered on deal stage moves', function () {
 
     $deal = Deal::query()->create([
         'workspace_id' => $workspace->id,
-        'contact_id' => \App\Models\Contact::factory()->create(['workspace_id' => $workspace->id])->id,
+        'contact_id' => Contact::factory()->create(['workspace_id' => $workspace->id])->id,
         'pipeline_id' => $pipeline->id,
         'stage_id' => $pipeline->stageBySlug('demo')->id,
         'title' => 'Stage funnel deal',
@@ -87,9 +90,9 @@ it('records a visit when an ad-attributed lead is created', function () {
     $user = User::factory()->create();
     $workspace = $user->workspace;
 
-    $campaign = \App\Models\AdCampaign::query()->create([
+    $campaign = AdCampaign::query()->create([
         'workspace_id' => $workspace->id,
-        'ad_account_id' => \App\Models\AdAccount::query()->create([
+        'ad_account_id' => AdAccount::query()->create([
             'workspace_id' => $workspace->id,
             'name' => 'Acct',
             'status' => 'demo',
@@ -100,7 +103,7 @@ it('records a visit when an ad-attributed lead is created', function () {
 
     Lead::query()->create([
         'workspace_id' => $workspace->id,
-        'contact_id' => \App\Models\Contact::factory()->create(['workspace_id' => $workspace->id])->id,
+        'contact_id' => Contact::factory()->create(['workspace_id' => $workspace->id])->id,
         'ad_campaign_id' => $campaign->id,
         'title' => 'Meta lead',
         'status' => 'new',
@@ -124,7 +127,7 @@ it('dedupes funnel events for the same deal and event type', function () {
 
     $deal = Deal::query()->create([
         'workspace_id' => $workspace->id,
-        'contact_id' => \App\Models\Contact::factory()->create(['workspace_id' => $workspace->id])->id,
+        'contact_id' => Contact::factory()->create(['workspace_id' => $workspace->id])->id,
         'pipeline_id' => $pipeline->id,
         'stage_id' => $pipeline->stageBySlug('new')->id,
         'title' => 'Dedupe deal',

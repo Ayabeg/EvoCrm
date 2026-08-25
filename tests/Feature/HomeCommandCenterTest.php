@@ -5,8 +5,6 @@ use App\Models\Activity;
 use App\Models\Channel;
 use App\Models\Contact;
 use App\Models\Deal;
-use App\Models\Lead;
-use App\Models\OutboundMessage;
 use App\Models\Thread;
 use App\Models\User;
 

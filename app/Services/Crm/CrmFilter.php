@@ -381,8 +381,6 @@ class CrmFilter
     }
 
     /**
-     * @param  mixed  $incoming
-     * @param  mixed  $fallback
      * @return array<string, mixed>|null
      */
     protected function parseFilterGroups(mixed $incoming, mixed $fallback): ?array

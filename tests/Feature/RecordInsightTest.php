@@ -2,6 +2,7 @@
 
 use App\Models\Activity;
 use App\Models\AiInsight;
+use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\User;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 
 it('shows Ask Evo on a company record from company fields', function () {
     $user = User::factory()->create();
-    $company = \App\Models\Company::factory()->create([
+    $company = Company::factory()->create([
         'workspace_id' => $user->workspace_id,
         'name' => 'Clinique Atlas',
         'domain' => 'clinique-atlas.dz',
@@ -34,7 +35,7 @@ it('shows Ask Evo on a company record from company fields', function () {
 
 it('answers Ask Evo from a company without a live model key', function () {
     $user = User::factory()->create();
-    $company = \App\Models\Company::factory()->create([
+    $company = Company::factory()->create([
         'workspace_id' => $user->workspace_id,
         'name' => 'Clinique Atlas',
         'domain' => 'clinique-atlas.dz',

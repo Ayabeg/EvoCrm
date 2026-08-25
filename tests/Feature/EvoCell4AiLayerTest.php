@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Activity;
+use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\User;
 use App\Services\Ai\RecordInsight;
@@ -25,9 +27,9 @@ it('returns pipeline forecast band with low and high range', function () {
 
 it('uses keyword-ranked activities for ask evo retrieval', function () {
     $user = User::factory()->create();
-    $contact = \App\Models\Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
 
-    \App\Models\Activity::query()->create([
+    Activity::query()->create([
         'workspace_id' => $user->workspace_id,
         'contact_id' => $contact->id,
         'type' => 'note',
