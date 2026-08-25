@@ -1,20 +1,29 @@
 services:
-  app:
+  web:
     build: .
+    restart: unless-stopped
     # Pin the outbound SMTP host to its origin IPv4 — resolving it through
     # Cloudflare gives an IPv6 anycast address where port 587 times out.
-    extra_hosts:
+    extra_hosts: &app-extra-hosts
       - "outbound.evotechly.com:169.58.75.34" # pragma: allowlist secret
     ports:
       - "${PORT:-8000}:8000"
-    environment:
-      APP_NAME: EvoSales
-      APP_ENV: local
-      APP_DEBUG: "true"
-      APP_URL: http://localhost:${PORT:-8000}
-      APP_TIMEZONE: Africa/Algiers
+    environment: &app-environment
+      APP_NAME: ${APP_NAME:-EvoSales}
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Africa/Algiers}
       PORT: 8000
-      DB_CONNECTION: sqlite
+      DB_CONNECTION: ${DB_CONNECTION:-sqlite}
+      DB_HOST: ${DB_HOST:-127.0.0.1}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-database/database.sqlite}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-}
+      SESSION_DRIVER: ${SESSION_DRIVER:-database}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-database}
+      CACHE_STORE: ${CACHE_STORE:-database}
       EVOLUTION_BASE_URL: ${EVOLUTION_BASE_URL:-}
       EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-}
       EVOLUTION_INSTANCE: ${EVOLUTION_INSTANCE:-evosales}
@@ -27,10 +36,28 @@ services:
       META_APP_ID: ${META_APP_ID:-}
       META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
       META_AD_ACCOUNT_ID: ${META_AD_ACCOUNT_ID:-}
-    volumes:
+    volumes: &app-volumes
       - .:/var/www/html
     command: >
       sh -c "php artisan serve --host=0.0.0.0 --port=$${PORT:-8000}"
+
+  queue:
+    build: .
+    restart: unless-stopped
+    extra_hosts: *app-extra-hosts
+    environment: *app-environment
+    volumes: *app-volumes
+    command: >
+      sh -c "php artisan queue:work --sleep=3 --tries=3 --timeout=90 --max-time=3600"
+
+  scheduler:
+    build: .
+    restart: unless-stopped
+    extra_hosts: *app-extra-hosts
+    environment: *app-environment
+    volumes: *app-volumes
+    command: >
+      sh -c "php artisan schedule:work"
 
   # Optional. Cloud / Business API credentials only.
   # Do not create Baileys or QR instances against this service.

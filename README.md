@@ -112,7 +112,13 @@ composer test
 docker compose up --build
 ```
 
-App binds `0.0.0.0:$PORT` (default 8000). Optional Evolution API (Cloud env only, no Baileys instance):
+Compose starts independent `web`, `queue`, and `scheduler` services. The web
+service binds `0.0.0.0:$PORT` (default 8000); queue and scheduler processes
+restart independently. Production requires a shared durable SQL database for
+database queues, cache locks, and sessions. See
+[production processes](docs/production-processes.md).
+
+Optional Evolution API (Cloud env only, no Baileys instance):
 
 ```bash
 docker compose --profile evolution up --build
