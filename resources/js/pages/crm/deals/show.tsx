@@ -1,10 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import AskEvoPanel from '@/components/crm/ask-evo-panel';
+import type {AskEvoPayload} from '@/components/crm/ask-evo-panel';
 import { SkeletonRecord } from '@/components/crm/empty-room';
-import { useInertiaLoading } from '@/hooks/use-inertia-loading';
-import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
-import { formatDzd } from '@/lib/money';
 import {
     ActivityTabs,
     AssociationCard,
@@ -12,7 +10,11 @@ import {
     RecordBack,
     RecordShell,
 } from '@/components/crm/record-chrome';
+import RecordProperties from '@/components/crm/record-properties';
+import type {AttributeBag} from '@/components/crm/record-properties';
 import { Button } from '@/components/ui/button';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { formatDzd } from '@/lib/money';
 
 type Deal = {
     id: number;

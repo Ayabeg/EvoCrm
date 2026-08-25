@@ -1,4 +1,5 @@
-import { type ReactNode, useMemo, useState } from 'react';
+import {  useMemo, useState } from 'react';
+import type {ReactNode} from 'react';
 
 type TimelineItem = {
     id: number;

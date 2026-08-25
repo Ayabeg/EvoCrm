@@ -1,11 +1,11 @@
 import { Form, Link } from '@inertiajs/react';
-import { AdsShell } from '@/components/crm/ads-shell';
 import type { FunnelCounts } from '@/components/ads/funnel';
-import { formatDzd } from '@/lib/money';
+import { AdsShell } from '@/components/crm/ads-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { formatDzd } from '@/lib/money';
 
 type Account = {
     id: number;
@@ -54,12 +54,15 @@ function kindOf(campaign: Campaign): string {
     if (campaign.click_to_whatsapp && campaign.lead_form) {
         return 'CTWA + Lead form';
     }
+
     if (campaign.click_to_whatsapp) {
         return 'Click-to-WhatsApp';
     }
+
     if (campaign.lead_form) {
         return 'Lead form';
     }
+
     return 'Traffic';
 }
 

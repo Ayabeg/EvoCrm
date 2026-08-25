@@ -15,7 +15,9 @@ import {
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,8 +26,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function RecordBack({ href, label }: { href: string; label: string }) {
     return (

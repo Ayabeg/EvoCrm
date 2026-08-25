@@ -1,13 +1,24 @@
 import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { RoomShell, type RoomTab } from '@/components/crm/room-shell';
+import { RoomShell  } from '@/components/crm/room-shell';
+import type {RoomTab} from '@/components/crm/room-shell';
 
 type TabDef = RoomTab & { exact?: boolean; activePaths?: string[] };
 function tabActive(pathname: string, tab: TabDef): boolean {
     const extras = tab.activePaths ?? [];
-    if (tab.exact) return pathname === tab.href || extras.includes(pathname);
-    if (pathname === tab.href) return true;
-    if (extras.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return true;
+
+    if (tab.exact) {
+return pathname === tab.href || extras.includes(pathname);
+}
+
+    if (pathname === tab.href) {
+return true;
+}
+
+    if (extras.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+return true;
+}
+
     return pathname.startsWith(`${tab.href}/`);
 }
 const REPORTS_TABS: TabDef[] = [
@@ -28,5 +39,6 @@ export function ReportsShell({ title, pageTitle, description, filters, footer, h
     title: string; pageTitle?: string; description?: string; filters?: ReactNode; footer?: ReactNode; hero?: ReactNode; children: ReactNode;
 }) {
     const pathname = usePage().url.split('?')[0] ?? '/reports';
+
     return (<><Head title={title} /><RoomShell title="Reports" tabs={reportsTabs(pathname)}><div className="h-full overflow-y-auto"><div className="mx-auto w-full max-w-7xl px-5 py-8">{hero}<header className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><h2 className="text-page-title font-semibold tracking-tight">{pageTitle ?? title}</h2>{description ? <p className="mt-1 text-[13px] text-muted-foreground">{description}</p> : null}</div>{filters ? <div className="shrink-0">{filters}</div> : null}</header>{children}{footer ? <footer className="mt-10 border-t border-hairline pt-4 text-[11px] text-muted-foreground">{footer}</footer> : null}</div></div></RoomShell></>);
 }

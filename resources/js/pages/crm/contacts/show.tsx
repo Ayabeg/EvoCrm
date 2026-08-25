@@ -1,11 +1,11 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import AskEvoPanel, { type AskEvoPayload } from '@/components/crm/ask-evo-panel';
-import CatchUpBlock, { type CatchUpItem } from '@/components/crm/catch-up-block';
+import AskEvoPanel from '@/components/crm/ask-evo-panel';
+import type {AskEvoPayload} from '@/components/crm/ask-evo-panel';
+import CatchUpBlock from '@/components/crm/catch-up-block';
+import type {CatchUpItem} from '@/components/crm/catch-up-block';
 import ContactDealsKanban from '@/components/crm/contact-deals-kanban';
 import { SkeletonRecord } from '@/components/crm/empty-room';
-import { useInertiaLoading } from '@/hooks/use-inertia-loading';
-import RecordProperties, { type AttributeBag } from '@/components/crm/record-properties';
 import {
     ActivityTabs,
     AssociationCard,
@@ -13,8 +13,11 @@ import {
     RecordBack,
     RecordShell,
 } from '@/components/crm/record-chrome';
+import RecordProperties from '@/components/crm/record-properties';
+import type {AttributeBag} from '@/components/crm/record-properties';
 import { Avatar, AvatarFallback } from '@/components/ui/aurora/avatar';
 import { Button } from '@/components/ui/button';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
 
 type Contact = {

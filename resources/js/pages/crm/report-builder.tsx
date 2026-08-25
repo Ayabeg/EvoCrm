@@ -1,6 +1,5 @@
 import { Form, Link } from '@inertiajs/react';
 import { ReportsShell } from '@/components/crm/reports-shell';
-import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 

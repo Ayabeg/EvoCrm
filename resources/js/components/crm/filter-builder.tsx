@@ -1,12 +1,11 @@
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import type { FilterGroup, FilterRule, ListFieldDef, ListViewFilters } from '@/lib/list-view-config';
 import { defaultFilterGroups } from '@/lib/list-view-config';
-import { Button } from '@/components/ui/button';
 
 type Member = { id: number; name: string };
 
 export default function FilterBuilder({
-    entity,
     fields,
     value,
     members = [],
@@ -73,6 +72,7 @@ export default function FilterBuilder({
 
     const optionsForField = (fieldId: string): { value: string; label: string }[] => {
         const field = fields.find((item) => item.id === fieldId);
+
         if (!field) {
             return [];
         }

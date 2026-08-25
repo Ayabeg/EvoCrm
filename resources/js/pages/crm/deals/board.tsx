@@ -1,14 +1,15 @@
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import type { DragEvent } from 'react';
+import { CrmKpiStrip  } from '@/components/crm/crm-kpi-strip';
+import type {KpiTile} from '@/components/crm/crm-kpi-strip';
 import { CrmShell } from '@/components/crm/crm-shell';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
-import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
+import PageHeader from '@/components/page-header';
 import { formatDzd } from '@/lib/money';
 import { stageUnderlineColor } from '@/lib/stage-colors';
-import PageHeader from '@/components/page-header';
 import { cn } from '@/lib/utils';
 
 type PipelineOption = {

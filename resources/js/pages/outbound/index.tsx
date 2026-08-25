@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
+import { CrmKpiStrip  } from '@/components/crm/crm-kpi-strip';
+import type {KpiTile} from '@/components/crm/crm-kpi-strip';
 import { OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';

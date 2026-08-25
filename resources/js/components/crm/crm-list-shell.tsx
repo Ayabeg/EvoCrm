@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { ListView } from '@/components/crm/list-chrome';
-import ListToolbar from '@/components/crm/list-toolbar';
 import { CrmListHeader } from '@/components/crm/list-chrome';
-import type { ListViewColumn, ListViewMeta, SavedView } from '@/lib/list-view-config';
+import ListToolbar from '@/components/crm/list-toolbar';
 import type { StagePill } from '@/components/crm/stage-pills';
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ListViewColumn, ListViewMeta, SavedView } from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -58,6 +59,8 @@ export function CrmListShell({
     const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
 
     useEffect(() => {
+        // Inertia can replace the active saved view without remounting this shell.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setColumns(listView?.columns ?? []);
     }, [listView?.columns]);
 

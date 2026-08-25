@@ -1,6 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { RoomShell, type RoomTab } from '@/components/crm/room-shell';
+import { RoomShell  } from '@/components/crm/room-shell';
+import type {RoomTab} from '@/components/crm/room-shell';
 
 const DESK_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {

@@ -1,11 +1,11 @@
 import { Form, Link, router } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { DeskShell } from '@/components/crm/desk-shell';
 import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { OfficialDeskConnector } from '@/types';
-import { useMemo, useState } from 'react';
 
 type Contact = {
     id: number;

@@ -1,7 +1,7 @@
 import { Form } from '@inertiajs/react';
-import { formatDzd } from '@/lib/money';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { formatDzd } from '@/lib/money';
 
 export type CatalogProduct = {
     id: number;

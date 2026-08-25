@@ -12,6 +12,7 @@ export type OutboundDetailProps = {
 
 export function OutboundReportsDetail({ totals, perSequence, perCampaign, daily }: OutboundDetailProps) {
     const max = Math.max(...daily.map((d) => d.sent), 1);
+
     return (
         <section className="mt-10 space-y-4">
             <h2 className="text-sm font-medium">Outbound operations</h2>

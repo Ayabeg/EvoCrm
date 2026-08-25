@@ -1,11 +1,11 @@
 import { Link } from '@inertiajs/react';
-import { AdsShell } from '@/components/crm/ads-shell';
 import { FunnelBoard } from '@/components/ads/funnel';
 import type { FunnelCounts } from '@/components/ads/funnel';
-import { formatDzd } from '@/lib/money';
+import { AdsShell } from '@/components/crm/ads-shell';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { formatDzd } from '@/lib/money';
 
 type AdRow = { id: number; name: string; status: string; kind: string };
 type AdSetRow = {

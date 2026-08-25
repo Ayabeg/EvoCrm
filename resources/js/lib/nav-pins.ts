@@ -18,11 +18,13 @@ export function readPins(): string[] {
 
     try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
+
         if (!raw) {
             return [...DEFAULT_PINNED];
         }
 
         const parsed = JSON.parse(raw);
+
         if (!Array.isArray(parsed) || parsed.length === 0) {
             return [...DEFAULT_PINNED];
         }

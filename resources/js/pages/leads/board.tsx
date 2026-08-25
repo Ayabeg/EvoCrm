@@ -16,8 +16,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import { stageUnderlineColor } from '@/lib/stage-colors';
+import { cn } from '@/lib/utils';
 
 type Stage = {
     id: number;

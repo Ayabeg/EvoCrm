@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 import { PillGroup, PillTrigger, TabsContent } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 export type WorkspacePanelKey = 'left' | 'center' | 'right';
 

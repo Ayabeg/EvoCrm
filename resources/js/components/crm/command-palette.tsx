@@ -18,9 +18,10 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import {
-    CommandPalette as AuroraCommandPalette,
-    type CommandItem,
+    CommandPalette as AuroraCommandPalette
+    
 } from '@/components/aurora/command-palette';
+import type {CommandItem} from '@/components/aurora/command-palette';
 
 const NAV_ITEMS = [
     { label: 'Home', href: '/dashboard', icon: Home, keywords: 'dashboard command center' },
@@ -59,6 +60,7 @@ export function CommandPalette({
         () =>
             NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
+
                 return {
                     id: item.href,
                     label: item.label,
@@ -83,8 +85,13 @@ export function CommandPalette({
             placeholder="Search contacts, deals, or navigate…"
             filter={(query, item) => {
                 const needle = query.trim().toLowerCase();
-                if (!needle) return 1;
+
+                if (!needle) {
+return 1;
+}
+
                 const hay = `${item.label} ${item.description ?? ''}`.toLowerCase();
+
                 return hay.includes(needle) ? 1 : 0;
             }}
             onSelect={(item) => item.onSelect?.()}
@@ -101,6 +108,7 @@ export function useCommandPaletteShortcut(onOpen: () => void) {
             }
         };
         window.addEventListener('keydown', handler);
+
         return () => window.removeEventListener('keydown', handler);
     }, [onOpen]);
 }

@@ -1,15 +1,18 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
+import { CrmKpiStrip  } from '@/components/crm/crm-kpi-strip';
+import type {KpiTile} from '@/components/crm/crm-kpi-strip';
 import { ReportsShell } from '@/components/crm/reports-shell';
-import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
 import {
-    FunnelStageBoard,
-    type FunnelStageRow,
+    FunnelStageBoard
+    
 } from '@/components/funnels/funnel-stage-board';
+import type {FunnelStageRow} from '@/components/funnels/funnel-stage-board';
 import {
-    SourceBreakdownTable,
-    type SourceBreakdownRow,
+    SourceBreakdownTable
+    
 } from '@/components/funnels/source-breakdown-table';
+import type {SourceBreakdownRow} from '@/components/funnels/source-breakdown-table';
 
 type FunnelSummary = {
     id: number;

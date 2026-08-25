@@ -15,15 +15,12 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
-export function AppSidebarHeader({
-    breadcrumbs: _breadcrumbs = [],
-}: {
-    breadcrumbs?: BreadcrumbItemType[];
-}) {
+export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     const { auth } = usePage().props;
     const initials = useInitials();
     const user = auth.user;
     const [paletteOpen, setPaletteOpen] = useState(false);
+    void breadcrumbs;
 
     useCommandPaletteShortcut(() => setPaletteOpen(true));
 

@@ -1,5 +1,5 @@
-import { Label } from '@/components/ui/label';
 import FilterBuilder from '@/components/crm/filter-builder';
+import { Label } from '@/components/ui/label';
 import type { ListFieldDef, ListViewFilters } from '@/lib/list-view-config';
 import { defaultFilterGroups } from '@/lib/list-view-config';
 

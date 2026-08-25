@@ -92,6 +92,7 @@ export function readRecordLayout(objectType: RecordObjectType): RecordLayoutStat
     }
 
     const raw = localStorage.getItem(storageKey(objectType));
+
     if (!raw) {
         return defaultLayout(objectType);
     }

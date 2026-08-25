@@ -1,6 +1,13 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useMemo  } from 'react';
+import type {ReactNode} from 'react';
 import { useRecordLayout } from '@/hooks/use-record-layout';
-import { orderedVisibleIds, type RecordColumn, type RecordObjectType } from '@/lib/record-layout';
+import {
+    orderedVisibleIds
+    
+    
+    
+} from '@/lib/record-layout';
+import type {RecordColumn, RecordLayoutState, RecordObjectType} from '@/lib/record-layout';
 
 type RecordLayoutContextValue = ReturnType<typeof useRecordLayout> & {
     objectType: RecordObjectType;
@@ -38,6 +45,7 @@ export function RecordLayoutProvider({
 
 export function useRecordLayoutContext() {
     const context = useContext(RecordLayoutContext);
+
     if (!context) {
         throw new Error('useRecordLayoutContext must be used within RecordLayoutProvider');
     }

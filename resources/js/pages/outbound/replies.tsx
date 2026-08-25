@@ -23,7 +23,10 @@ type Reply = {
 };
 
 function primaryLead(contact: NonNullable<Reply['contact']>): Lead | null {
-    if (!contact.leads?.length) return null;
+    if (!contact.leads?.length) {
+return null;
+}
+
     return contact.leads.find((l) => l.status !== 'qualified') ?? contact.leads[0] ?? null;
 }
 
@@ -45,6 +48,7 @@ export default function Replies({ replies, imapNote }: { replies: Reply[]; imapN
                         <tbody>
                             {replies.map((reply) => {
                                 const lead = reply.contact ? primaryLead(reply.contact) : null;
+
                                 return (
                                     <tr key={reply.id} className="border-t border-hairline align-top">
                                         <td className="px-4 py-2">

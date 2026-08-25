@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { cn } from '@/lib/utils';
 import { stagePillClass } from '@/lib/stage-colors';
+import { cn } from '@/lib/utils';
 
 export type StagePill = {
     id: number;

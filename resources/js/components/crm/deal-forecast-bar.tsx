@@ -8,12 +8,10 @@ type Forecast = {
 };
 
 type ForecastBand = {
-    weighted_cents: number;
     low_cents: number;
     high_cents: number;
     band_label: string;
     narrative?: string | null;
-    source: string;
 };
 
 export default function DealForecastBar({

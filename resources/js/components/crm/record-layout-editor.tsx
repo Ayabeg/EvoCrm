@@ -1,8 +1,9 @@
 import { ChevronDown, ChevronUp, Columns3, RotateCcw } from 'lucide-react';
+import { useRecordLayoutContext } from '@/components/crm/record-layout-context';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { useRecordLayoutContext } from '@/components/crm/record-layout-context';
-import { cardsForObject, type RecordColumn } from '@/lib/record-layout';
+import { cardsForObject  } from '@/lib/record-layout';
+import type {RecordColumn} from '@/lib/record-layout';
 
 const COLUMN_LABELS: Record<RecordColumn, string> = {
     main: 'Main column',

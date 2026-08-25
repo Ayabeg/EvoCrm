@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
-import Heading from '@/components/heading';
+import { RecordLayoutProvider, useRecordLayoutContext } from '@/components/crm/record-layout-context';
 import {
     RecordLayoutCustomizeButton,
     RecordLayoutEditor,
 } from '@/components/crm/record-layout-editor';
-import { RecordLayoutProvider, useRecordLayoutContext } from '@/components/crm/record-layout-context';
+import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import SettingsLayout from '@/layouts/settings/layout';
 import type { RecordLayoutState, RecordObjectType } from '@/lib/record-layout';

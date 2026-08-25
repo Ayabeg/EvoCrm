@@ -1,5 +1,5 @@
-import type { ButtonSize as AuroraButtonSize, ButtonVariant as AuroraButtonVariant } from '@/components/ui/aurora/button';
 import type { BadgeFill, BadgeTone } from '@/components/ui/aurora/badge';
+import type { ButtonSize as AuroraButtonSize, ButtonVariant as AuroraButtonVariant } from '@/components/ui/aurora/button';
 
 export type ShadcnButtonVariant =
     | 'default'
@@ -34,9 +34,18 @@ export function mapButtonVariant(
 }
 
 export function mapButtonSize(size?: ShadcnButtonSize): AuroraButtonSize {
-    if (size === 'sm') return 'sm';
-    if (size === 'lg') return 'lg';
-    if (size === 'icon') return 'icon';
+    if (size === 'sm') {
+return 'sm';
+}
+
+    if (size === 'lg') {
+return 'lg';
+}
+
+    if (size === 'icon') {
+return 'icon';
+}
+
     return 'default';
 }
 

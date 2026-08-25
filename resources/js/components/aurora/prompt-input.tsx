@@ -1,4 +1,3 @@
-import * as React from "react"
 import {
   AtSign,
   ChevronDown,
@@ -12,6 +11,7 @@ import {
   UserRound,
   X,
 } from "lucide-react"
+import * as React from "react"
 import { Button } from "@/components/ui/aurora/button"
 import { Textarea } from "@/components/ui/aurora/textarea"
 
@@ -418,14 +418,22 @@ function insertTrigger(current: string, char: string, setter: (v: string) => voi
 
 function FileIcon({ kind }: { kind: "file" | "agent" | "folder" }) {
   const iconProps = { size: 13, strokeWidth: 1.6, "aria-hidden": true } as const
-  if (kind === "folder") return <Folder {...iconProps} />
-  if (kind === "agent") return <UserRound {...iconProps} />
+
+  if (kind === "folder") {
+return <Folder {...iconProps} />
+}
+
+  if (kind === "agent") {
+return <UserRound {...iconProps} />
+}
+
   return <FileText {...iconProps} />
 }
 
 function getMentionKindLabel(item: MentionItem) {
   const label = item.label.toLowerCase()
   const kind = item.kind.toLowerCase()
+
   return label.includes(kind) ? null : item.kind
 }
 
@@ -475,7 +483,11 @@ export function PromptInput({
 
   React.useEffect(() => {
     const el = textareaRef.current
-    if (!el) return
+
+    if (!el) {
+return
+}
+
     el.style.height = "auto"
     el.style.height = Math.min(el.scrollHeight, 200) + "px"
   }, [value])
@@ -545,40 +557,66 @@ export function PromptInput({
       if (e.key === "ArrowDown") {
         e.preventDefault()
         setSlashIndex((i) => (i + 1) % Math.max(filteredSlash.length, 1))
+
         return
       }
+
       if (e.key === "ArrowUp") {
         e.preventDefault()
         setSlashIndex((i) => (i - 1 + filteredSlash.length) % Math.max(filteredSlash.length, 1))
+
         return
       }
+
       if (e.key === "Enter") {
         e.preventDefault()
         const cmd = filteredSlash[slashActiveIndex]
-        if (cmd) insertSlashCommand(cmd)
+
+        if (cmd) {
+insertSlashCommand(cmd)
+}
+
         return
       }
-      if (e.key === "Escape") { setSlashOpen(false); return }
+
+      if (e.key === "Escape") {
+ setSlashOpen(false);
+
+ return 
+}
     }
 
     if (mentionOpen) {
       if (e.key === "ArrowDown") {
         e.preventDefault()
         setMentionIndex((i) => (i + 1) % Math.max(filteredMentions.length, 1))
+
         return
       }
+
       if (e.key === "ArrowUp") {
         e.preventDefault()
         setMentionIndex((i) => (i - 1 + filteredMentions.length) % Math.max(filteredMentions.length, 1))
+
         return
       }
+
       if (e.key === "Enter") {
         e.preventDefault()
         const item = filteredMentions[mentionActiveIndex]
-        if (item) insertMention(item)
+
+        if (item) {
+insertMention(item)
+}
+
         return
       }
-      if (e.key === "Escape") { setMentionOpen(false); return }
+
+      if (e.key === "Escape") {
+ setMentionOpen(false);
+
+ return 
+}
     }
 
     if (e.key === "Enter" && !e.shiftKey && !isStreaming) {
@@ -592,6 +630,7 @@ export function PromptInput({
     onChange(v)
 
     const slashMatch = v.match(/(?:^|\s)\/(\w*)$/)
+
     if (slashMatch) {
       setSlashQuery(slashMatch[1])
       setSlashIndex(0)
@@ -602,6 +641,7 @@ export function PromptInput({
     }
 
     const mentionMatch = v.match(/@(\w*)$/)
+
     if (mentionMatch) {
       setMentionQuery(mentionMatch[1])
       setMentionIndex(0)
@@ -632,7 +672,10 @@ export function PromptInput({
   }
 
   function handleSubmit() {
-    if (!value.trim() && attachments.length === 0) return
+    if (!value.trim() && attachments.length === 0) {
+return
+}
+
     onSubmit(value, attachments)
     setSelectedMentions([])
   }
@@ -642,6 +685,7 @@ export function PromptInput({
     files.forEach((f) => {
       const isImage = f.type.startsWith("image/")
       let url: string | undefined
+
       if (isImage) {
         try {
           url = URL.createObjectURL(f)
@@ -650,9 +694,11 @@ export function PromptInput({
           if (process.env.NODE_ENV !== "production") {
             console.error("[Aurora PromptInput] Failed to create object URL for image:", f.name, err)
           }
+
           return
         }
       }
+
       const att: Attachment = {
         id:
           typeof crypto !== "undefined" && crypto.randomUUID
@@ -670,7 +716,10 @@ export function PromptInput({
   React.useEffect(() => {
     return () => {
       objectUrlsRef.current.forEach((u) => URL.revokeObjectURL(u))
-      if (blurTimerRef.current) clearTimeout(blurTimerRef.current)
+
+      if (blurTimerRef.current) {
+clearTimeout(blurTimerRef.current)
+}
     }
   }, [])
 
@@ -712,6 +761,7 @@ export function PromptInput({
           <div style={S.popupHeader}>Mention</div>
           {filteredMentions.map((item, i) => {
             const kindLabel = getMentionKindLabel(item)
+
             return (
               <Button
                 variant="plain"
@@ -744,7 +794,9 @@ export function PromptInput({
               id={`${reactId}-model-${m.id}`}
               role="option"
               aria-selected={m.id === model}
-              onClick={() => { onModelChange?.(m.id); setShowModelMenu(false) }}
+              onClick={() => {
+ onModelChange?.(m.id); setShowModelMenu(false) 
+}}
               style={modelRowStyle(m.id === model)}
             >
               {m.label}
@@ -796,6 +848,7 @@ export function PromptInput({
                         URL.revokeObjectURL(att.url)
                         objectUrlsRef.current = objectUrlsRef.current.filter((u) => u !== att.url)
                       }
+
                       onRemoveAttachment(att.id)
                     }}
                     aria-label={`Remove ${att.name}`}
@@ -815,10 +868,16 @@ export function PromptInput({
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => { clearBlurTimer(); setIsFocused(true) }}
+          onFocus={() => {
+ clearBlurTimer(); setIsFocused(true) 
+}}
           onBlur={() => {
             setIsFocused(false)
-            if (blurTimerRef.current) clearTimeout(blurTimerRef.current)
+
+            if (blurTimerRef.current) {
+clearTimeout(blurTimerRef.current)
+}
+
             blurTimerRef.current = setTimeout(() => {
               setSlashOpen(false)
               setMentionOpen(false)
@@ -900,7 +959,9 @@ export function PromptInput({
             id={modelButtonId}
             variant="neutral"
             size="sm"
-            onClick={() => { clearBlurTimer(); setShowModelMenu((o) => !o); setSlashOpen(false); setMentionOpen(false) }}
+            onClick={() => {
+ clearBlurTimer(); setShowModelMenu((o) => !o); setSlashOpen(false); setMentionOpen(false) 
+}}
             aria-haspopup="listbox"
             aria-expanded={showModelMenu}
             aria-controls={modelListboxId}

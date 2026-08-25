@@ -1,7 +1,9 @@
 import { Form, Link } from '@inertiajs/react';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { crmListHref, filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
+import type { ListViewFilters } from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };
 
@@ -25,8 +27,8 @@ export default function ColumnFilterRow({
     wilayas?: string[];
     exportHref?: string;
     columns?: { id: string; visible: boolean; order: number }[];
-    filterGroups?: import('@/lib/list-view-config').ListViewFilters;
-    filterBuilder?: React.ReactNode;
+    filterGroups?: ListViewFilters;
+    filterBuilder?: ReactNode;
 }) {
     const [advanced, setAdvanced] = useState(false);
     const fields = filterFields(activeFilters);

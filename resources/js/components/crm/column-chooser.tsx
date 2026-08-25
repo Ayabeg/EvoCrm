@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
 
 export default function ColumnChooser({
     columnDefs,
@@ -35,6 +35,7 @@ export default function ColumnChooser({
         const sorted = [...ordered];
         const index = sorted.findIndex((column) => column.id === id);
         const target = index + direction;
+
         if (index < 0 || target < 0 || target >= sorted.length) {
             return;
         }
@@ -54,6 +55,7 @@ export default function ColumnChooser({
             open={open}
             onOpenChange={(next) => {
                 setOpen(next);
+
                 if (next) {
                     setDraft(columns);
                 }

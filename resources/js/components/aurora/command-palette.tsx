@@ -1,5 +1,5 @@
-import * as React from "react"
 import { Clock3, Navigation, Search, Sparkles, Star, Zap } from "lucide-react"
+import * as React from "react"
 import { Button } from "@/components/ui/aurora/button"
 import { Input } from "@/components/ui/input"
 
@@ -58,6 +58,7 @@ export function useCommandPalette() {
       }
     }
     document.addEventListener("keydown", handler)
+
     return () => document.removeEventListener("keydown", handler)
   }, [])
 
@@ -218,7 +219,11 @@ export function CommandPalette({
   // Group by section in order
   const grouped = sections.flatMap(({ id, label }) => {
     const sectionItems = filtered.filter((i) => i.section === id)
-    if (sectionItems.length === 0) return []
+
+    if (sectionItems.length === 0) {
+return []
+}
+
     return [{ section: id, label, items: sectionItems }]
   })
 
@@ -235,13 +240,17 @@ export function CommandPalette({
 
   // Escape key
   React.useEffect(() => {
-    if (!open) return
+    if (!open) {
+return
+}
+
     function handler(e: KeyboardEvent) {
       if (e.key === "Escape") {
         onOpenChange(false)
       }
     }
     document.addEventListener("keydown", handler)
+
     return () => document.removeEventListener("keydown", handler)
   }, [open, onOpenChange])
 
@@ -255,7 +264,10 @@ export function CommandPalette({
     } else if (e.key === "Enter") {
       e.preventDefault()
       const item = flatItems[activeIdx]
-      if (item) fire(item)
+
+      if (item) {
+fire(item)
+}
     }
   }
 
@@ -269,12 +281,17 @@ export function CommandPalette({
 
   // Scroll active item into view
   React.useEffect(() => {
-    if (!listRef.current) return
+    if (!listRef.current) {
+return
+}
+
     const el = listRef.current.querySelector(`[data-active="true"]`) as HTMLElement | null
     el?.scrollIntoView({ block: "nearest" })
   }, [activeIdx])
 
-  if (!open) return null
+  if (!open) {
+return null
+}
 
   let flatIndex = 0
 
@@ -410,6 +427,7 @@ export function CommandPalette({
                 {sItems.map((item) => {
                   const idx = flatIndex++
                   const isActive = idx === activeIdx
+
                   return (
                     <Button variant="plain" size="unstyled"
                       key={item.id}

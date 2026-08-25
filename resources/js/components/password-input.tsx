@@ -11,6 +11,7 @@ export default function PasswordInput({
     ...props
 }: Omit<ComponentProps<'input'>, 'type'> & { ref?: Ref<HTMLInputElement> }) {
     const [showPassword, setShowPassword] = useState(false);
+    void _nativeSize;
 
     return (
         <div className="relative">

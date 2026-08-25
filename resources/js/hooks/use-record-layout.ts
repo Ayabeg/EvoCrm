@@ -3,10 +3,9 @@ import {
     defaultLayout,
     normalizeLayout,
     readRecordLayout,
-    type RecordLayoutState,
-    type RecordObjectType,
     writeRecordLayout,
 } from '@/lib/record-layout';
+import type { RecordLayoutState, RecordObjectType } from '@/lib/record-layout';
 
 function csrfToken(): string {
     return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
@@ -68,6 +67,8 @@ export function useRecordLayout(
 
     useEffect(() => {
         if (mode === 'workspace') {
+            // Workspace defaults can be replaced without remounting the editor.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLayout(
                 options?.seedLayout
                     ? normalizeLayout(objectType, options.seedLayout)
@@ -125,11 +126,13 @@ export function useRecordLayout(
         (cardId: string, direction: 'up' | 'down') => {
             const defs = normalizeLayout(objectType, layout).cards;
             const index = defs.findIndex((card) => card.id === cardId);
+
             if (index < 0) {
                 return;
             }
 
             const swapWith = direction === 'up' ? index - 1 : index + 1;
+
             if (swapWith < 0 || swapWith >= defs.length) {
                 return;
             }
@@ -150,6 +153,7 @@ export function useRecordLayout(
 
     const saveWorkspaceDefault = useCallback(async () => {
         setSavingDefault(true);
+
         try {
             await saveWorkspaceDefaultLayout(objectType, layout);
         } finally {

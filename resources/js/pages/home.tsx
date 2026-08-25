@@ -1,15 +1,18 @@
 import { Head, Link } from '@inertiajs/react';
-import { ActivityFeed, type ActivityFeedItem } from '@/components/dashboard/activity-feed';
+import { CrmKpiStrip  } from '@/components/crm/crm-kpi-strip';
+import type {KpiTile} from '@/components/crm/crm-kpi-strip';
+import { ActivityFeed  } from '@/components/dashboard/activity-feed';
+import type {ActivityFeedItem} from '@/components/dashboard/activity-feed';
 import {
-    AttentionList,
-    type AttentionItem,
+    AttentionList
+    
 } from '@/components/dashboard/attention-list';
+import type {AttentionItem} from '@/components/dashboard/attention-list';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
 import { QuickActions } from '@/components/dashboard/quick-actions';
-import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
-import { EvoVizChart } from '@/evoviz/evo-viz-chart';
 import type { EvoVizPayload } from '@/evoviz/contract';
+import { EvoVizChart } from '@/evoviz/evo-viz-chart';
 
 type Owner = { id: number; name: string };
 

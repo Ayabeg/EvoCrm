@@ -1,15 +1,16 @@
-import ColumnFilterRow from '@/components/crm/column-filter-row';
-import ColumnChooser from '@/components/crm/column-chooser';
-import FilterBuilder from '@/components/crm/filter-builder';
-import { crmListHref, filterFields } from '@/components/crm/list-query';
-import SavedViewTabs from '@/components/crm/saved-view-tabs';
-import { StagePills, type StagePill } from '@/components/crm/stage-pills';
-import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
-import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import ColumnChooser from '@/components/crm/column-chooser';
+import ColumnFilterRow from '@/components/crm/column-filter-row';
+import FilterBuilder from '@/components/crm/filter-builder';
+import { crmListHref, filterFields } from '@/components/crm/list-query';
+import SavedViewTabs from '@/components/crm/saved-view-tabs';
+import { StagePills } from '@/components/crm/stage-pills';
+import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
+import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
+import { filterGroupsFromActive } from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -26,8 +27,6 @@ export default function ListToolbar({
     members = [],
     cities = [],
     wilayas = [],
-    companies = [],
-    contacts = [],
     stages = [],
     stagePills = [],
     exportHref,
@@ -59,11 +58,15 @@ export default function ListToolbar({
     const [filterGroups, setFilterGroups] = useState<ListViewFilters>(() => filterGroupsFromActive(activeFilters));
 
     useEffect(() => {
+        // Server-provided filters can change during an Inertia partial reload.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFilterGroups(filterGroupsFromActive(activeFilters));
     }, [activeFilters]);
 
     useEffect(() => {
         if (controlledColumns === undefined) {
+            // Keep uncontrolled columns aligned with the selected saved view.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setInternalColumns(listView?.columns ?? []);
         }
     }, [controlledColumns, listView?.columns]);

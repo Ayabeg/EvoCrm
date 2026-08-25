@@ -5,9 +5,10 @@ import {
     Send,
     Users,
     UserCircle,
-    Plug,
-    type LucideIcon,
+    Plug
+    
 } from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Department = {

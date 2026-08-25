@@ -78,6 +78,7 @@ export function defaultFilterGroups(): ListViewFilters {
 
 export function filterGroupsFromActive(activeFilters: Record<string, unknown>): ListViewFilters {
     const stored = activeFilters.filter_groups as ListViewFilters | undefined;
+
     if (stored?.groups?.length) {
         return stored;
     }
@@ -100,6 +101,7 @@ export function filterGroupsFromActive(activeFilters: Record<string, unknown>): 
     if (activeFilters.unanswered) {
         rules.push({ field: 'unanswered', operator: 'is_true' });
     }
+
     if (activeFilters.unassigned) {
         rules.push({ field: 'unassigned', operator: 'is_true' });
     }

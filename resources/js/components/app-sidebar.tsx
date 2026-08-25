@@ -331,6 +331,8 @@ export function AppSidebar() {
 
     useEffect(() => {
         if (isMobile && !openMobile) {
+            // Closing the mobile sidebar also resets its nested "More" menu.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setMoreOpen(false);
         }
     }, [isMobile, openMobile]);
@@ -342,6 +344,7 @@ export function AppSidebar() {
 
         const updatePosition = () => {
             const anchor = moreRef.current;
+
             if (!anchor) {
                 return;
             }
@@ -360,9 +363,11 @@ export function AppSidebar() {
         const onPointerDown = (event: MouseEvent) => {
             if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
                 const panel = document.getElementById('sidebar-more-panel');
+
                 if (panel && panel.contains(event.target as Node)) {
                     return;
                 }
+
                 setMoreOpen(false);
             }
         };
@@ -388,6 +393,7 @@ export function AppSidebar() {
 
     const catalog = useMemo(() => {
         const extras = MORE_ITEMS.filter((item) => !PRIMARY.some((row) => row.id === item.id));
+
         return [...PRIMARY, ...extras];
     }, []);
 
@@ -460,6 +466,7 @@ export function AppSidebar() {
                                 onPinsChange={setPins}
                                 onNavigate={() => {
                                     setMoreOpen(false);
+
                                     if (openMobile) {
                                         toggleSidebar();
                                     }

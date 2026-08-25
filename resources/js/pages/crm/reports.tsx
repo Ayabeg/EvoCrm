@@ -1,9 +1,8 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
+import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
+import type { KpiTile } from '@/components/crm/crm-kpi-strip';
 import { ReportsShell, reportsBasePath } from '@/components/crm/reports-shell';
-import { OutboundReportsDetail, type OutboundDetailProps } from '@/components/outbound/reports-detail';
-import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
-import { formatDzd } from '@/lib/money';
 import {
     Dialog,
     DialogContent,
@@ -13,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { EvoVizChart, WidgetPicker } from '@/evoviz';
 import type { EvoVizPayload, ReportWidgetCatalogItem } from '@/evoviz';
+import { formatDzd } from '@/lib/money';
 
 type KpiFormat = 'number' | 'money' | 'percent';
 
@@ -73,7 +73,6 @@ type OpenDashboard = {
 
 type Props = {
     activeCategory?: string;
-    outboundDetail?: OutboundDetailProps | null;
     window: {
         from: string;
         to: string;
@@ -227,7 +226,6 @@ function filterQuery(
 
 export default function Reports({
     activeCategory = 'overview',
-    outboundDetail = null,
     window,
     categories,
     owners,

@@ -1,16 +1,16 @@
 import { Form, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { CrmShell } from '@/components/crm/crm-shell';
-import { CrmListShell } from '@/components/crm/crm-list-shell';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { SkeletonList } from '@/components/crm/empty-room';
 import { CreateDrawer } from '@/components/crm/create-drawer';
+import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { CrmShell } from '@/components/crm/crm-shell';
+import { SkeletonList } from '@/components/crm/empty-room';
+import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import ListViewTable from '@/components/crm/list-view-table';
-import { useInertiaLoading } from '@/hooks/use-inertia-loading';
-import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 
 type Contact = {
     id: number;

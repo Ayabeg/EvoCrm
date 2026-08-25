@@ -1,10 +1,10 @@
 import { Form, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { crmListHref, filterFields } from '@/components/crm/list-query';
-import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
-import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
+import { filterGroupsFromActive } from '@/lib/list-view-config';
 
 export default function SavedViewTabs({
     basePath,
