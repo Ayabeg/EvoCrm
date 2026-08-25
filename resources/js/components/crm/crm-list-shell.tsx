@@ -1,3 +1,4 @@
+import type { ListView } from '@/components/crm/list-chrome';
 import ListToolbar from '@/components/crm/list-toolbar';
 import { CrmListHeader } from '@/components/crm/list-chrome';
 import type { ListViewColumn, ListViewMeta, SavedView } from '@/lib/list-view-config';
@@ -27,6 +28,9 @@ export function CrmListShell({
     stagePills = [],
     exportHref,
     banner,
+    views = [],
+    activeView = '',
+    headerActions,
     children,
 }: {
     title: string;
@@ -46,6 +50,9 @@ export function CrmListShell({
     stagePills?: StagePill[];
     exportHref?: string;
     banner?: ReactNode;
+    views?: ListView[];
+    activeView?: string;
+    headerActions?: ReactNode;
     children: ReactNode | ((columns: ListViewColumn[]) => ReactNode);
 }) {
     const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
@@ -58,12 +65,13 @@ export function CrmListShell({
         <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
             <CrmListHeader
                 title={title}
-                views={[]}
-                activeView=""
+                views={views}
+                activeView={activeView}
                 primaryLabel={primaryLabel}
                 onPrimary={() => {
                     window.location.href = `${basePath}?create=1`;
                 }}
+                headerActions={headerActions}
             />
             {banner}
             <ListToolbar

@@ -82,8 +82,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::redirect('/leads', '/crm/deals/board')->name('leads.index');
 
-    Route::get('/crm/activities', [ActivityController::class, 'index'])->name('crm.activities.index');
-
     Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
     Route::post('/desk/threads/{thread}/reply', [InboxController::class, 'reply'])->name('desk.reply');
@@ -104,6 +102,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/reports/dashboards/{dashboard}', [DashboardController::class, 'destroy'])->name('reports.dashboards.destroy');
     Route::post('/reports/dashboards/{dashboard}/widgets', [DashboardController::class, 'addWidget'])->name('reports.dashboards.widgets.store');
     Route::delete('/reports/dashboards/{dashboard}/widgets', [DashboardController::class, 'removeWidget'])->name('reports.dashboards.widgets.destroy');
+    Route::get('/crm/activities', [ActivityController::class, 'index'])->name('crm.activities.index');
     Route::post('/crm/activities', [ActivityController::class, 'store'])->name('crm.activities.store');
     Route::post('/crm/activities/{activity}/complete', [ActivityController::class, 'complete'])->name('crm.activities.complete');
     Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');

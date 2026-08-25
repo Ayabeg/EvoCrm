@@ -28,7 +28,14 @@ const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
             !pathname.startsWith('/crm/deals/board'),
     },
     {
-        label: 'Pipelines',
+        label: 'Activities',
+        href: '/crm/activities',
+        match: (pathname) =>
+            pathname === '/crm/activities' ||
+            pathname.startsWith('/crm/activities/'),
+    },
+    {
+        label: 'Pipeline',
         href: '/crm/deals/board',
         match: (pathname) =>
             pathname === '/crm/deals/board' || pathname.startsWith('/crm/deals/board/'),

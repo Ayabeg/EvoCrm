@@ -18,6 +18,7 @@ export function CrmListHeader({
     onAddView,
     primaryLabel,
     onPrimary,
+    headerActions,
 }: {
     title: string;
     views: ListView[];
@@ -25,6 +26,7 @@ export function CrmListHeader({
     onAddView?: () => void;
     primaryLabel: string;
     onPrimary: () => void;
+    headerActions?: ReactNode;
 }) {
     return (
         <div className="border-b border-hairline bg-canvas px-6 pt-5">
@@ -36,12 +38,15 @@ export function CrmListHeader({
                     {title}
                     <ChevronDown className="size-4 text-muted-foreground" />
                 </button>
-                <Button
-                    onClick={onPrimary}
-                    className="h-8 rounded-sm bg-ink px-3 text-[13px] text-canvas hover:bg-ink/90"
-                >
-                    {primaryLabel}
-                </Button>
+                <div className="flex items-center gap-2">
+                    {headerActions}
+                    <Button
+                        onClick={onPrimary}
+                        className="h-8 rounded-sm bg-ink px-3 text-[13px] text-canvas hover:bg-ink/90"
+                    >
+                        {primaryLabel}
+                    </Button>
+                </div>
             </div>
             <div className="mt-3 flex items-end gap-4">
                 {views.map((view) => (

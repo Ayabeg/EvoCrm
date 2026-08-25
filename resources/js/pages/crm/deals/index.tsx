@@ -2,6 +2,7 @@ import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CreateDrawer } from '@/components/crm/create-drawer';
@@ -81,6 +82,12 @@ export default function DealsIndex({
                 contacts={contacts}
                 stages={stages}
                 stagePills={stagePills}
+                views={[
+                    { key: 'list', label: 'List', href: '/crm/deals' },
+                    { key: 'board', label: 'Board', href: '/crm/deals/board' },
+                ]}
+                activeView="list"
+                headerActions={<DealLayoutToggle current="list" />}
             >
                 {(columns) => (
                     <>
