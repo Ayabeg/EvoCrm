@@ -262,14 +262,14 @@ export function ActivityTabs({
     onChange: (key: string) => void;
 }) {
     return (
-        <div className="flex flex-wrap gap-4 border-b border-hairline">
+        <div className="flex flex-wrap gap-x-5 gap-y-1 border-b border-hairline pb-1">
             {tabs.map((tab) => (
                 <button
                     key={tab.key}
                     type="button"
                     onClick={() => onChange(tab.key)}
                     className={cn(
-                        'border-b-2 pb-2 text-[13px]',
+                        'border-b-2 px-1 pb-3 pt-1 text-[13px]',
                         active === tab.key
                             ? 'border-brand font-medium text-ink'
                             : 'border-transparent text-muted-foreground',
@@ -296,8 +296,8 @@ export function AssociationCard({
     addLabel?: string;
 }) {
     return (
-        <section className="rounded-md border border-hairline bg-canvas">
-            <div className="flex items-center justify-between border-b border-hairline px-3 py-2">
+        <section className="rounded-lg border border-hairline bg-canvas">
+            <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
                 <h3 className="text-[12px] font-semibold tracking-wide text-ink uppercase">
                     {title}
                 </h3>
@@ -312,7 +312,7 @@ export function AssociationCard({
                     <span className="text-[12px] font-medium text-muted-foreground">{addLabel}</span>
                 )}
             </div>
-            <div className="px-3 py-2 text-[13px]">
+            <div className="px-4 py-3 text-[13px] leading-relaxed">
                 {children ?? (
                     <p className="text-muted-foreground">{empty ?? 'None'}</p>
                 )}

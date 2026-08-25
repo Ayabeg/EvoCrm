@@ -129,7 +129,7 @@ function DealCard({
             onDragStart={(event) => onDragStart(event, deal.id)}
             onDragEnd={onDragEnd}
             className={cn(
-                'group cursor-grab rounded-lg border bg-card p-3 text-sm shadow-xs transition-opacity',
+                'group cursor-grab rounded-lg border border-hairline bg-canvas p-4 text-sm shadow-xs transition-opacity',
                 dragging && 'opacity-40',
             )}
             data-testid={`deal-card-${deal.id}`}
@@ -332,7 +332,7 @@ export default function LeadsBoard({
                     ))}
                 </div>
 
-                <div className="flex items-start gap-3 overflow-x-auto pb-6">
+                <div className="flex items-start gap-4 overflow-x-auto pb-2 sm:gap-5">
                     {stages.map((stage, stageIndex) => {
                         const cards = deals.filter(
                             (deal) => deal.stage_id === stage.id,
@@ -357,13 +357,13 @@ export default function LeadsBoard({
                                 }
                                 onDrop={(event) => onDrop(event, stage)}
                                 className={cn(
-                                    'w-64 shrink-0 rounded-xl border bg-canvas-soft/60 p-2 transition-shadow',
+                                    'w-72 shrink-0 rounded-xl border border-hairline bg-canvas p-3 shadow-xs transition-shadow',
                                     overStage === stage.id &&
                                         'ring-2 ring-brand/50',
                                 )}
                                 data-testid={`stage-column-${stage.slug}`}
                             >
-                                <header className="px-1.5 pt-1 pb-2">
+                                <header className="px-1 pb-3">
                                     <div className="flex items-center justify-between gap-2">
                                         <h2 className="truncate text-sm font-semibold">
                                             {stage.name}
@@ -385,7 +385,7 @@ export default function LeadsBoard({
                                     />
                                 </header>
 
-                                <div className="grid min-h-16 gap-2">
+                                <div className="grid min-h-16 gap-3">
                                     {cards.map((deal) => (
                                         <DealCard
                                             key={deal.id}

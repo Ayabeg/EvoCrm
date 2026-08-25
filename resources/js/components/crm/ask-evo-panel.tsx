@@ -25,7 +25,7 @@ export default function AskEvoPanel({
     return (
         <section
             data-testid="ask-evo"
-            className="rounded-md border border-hairline bg-canvas p-3 text-ui text-ink shadow-xs"
+            className="rounded-lg border border-hairline bg-canvas p-4 text-ui text-ink shadow-xs"
             style={{
                 backgroundImage:
                     'radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, #EC6025 16%, transparent) 0%, transparent 64%)',
@@ -48,14 +48,14 @@ export default function AskEvoPanel({
                     {insight.answer}
                 </p>
             ) : null}
-            <Form action={action} method="post" className="mt-2 flex gap-1" resetOnSuccess options={{ preserveScroll: true }}>
+            <Form action={action} method="post" className="mt-3 flex flex-col gap-2" resetOnSuccess options={{ preserveScroll: true }}>
                 <Input
                     name="question"
                     placeholder="Ask about this record…"
                     required
-                    className="h-7 border-hairline bg-canvas text-ui"
+                    className="h-8 border-hairline bg-canvas text-ui"
                 />
-                <Button className="h-7 shrink-0 text-[11px]">Ask Evo</Button>
+                <Button className="h-8 w-full text-[12px] sm:w-auto">Ask Evo</Button>
             </Form>
         </section>
     );

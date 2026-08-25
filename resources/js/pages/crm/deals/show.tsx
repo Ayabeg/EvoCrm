@@ -88,8 +88,8 @@ export default function DealShow({
             {loading ? (
                 <SkeletonRecord />
             ) : (
-            <div className="flex h-app-workspace flex-col bg-canvas text-[13px] text-ink">
-                <div className="shrink-0 border-b border-hairline px-4 py-3 sm:px-6">
+            <div className="flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink">
+                <div className="shrink-0 border-b border-hairline bg-canvas px-5 py-4 sm:px-6 sm:py-5">
                     <RecordBack href="/crm/deals" label="Back to Deals" />
                     <div className="mt-3 flex items-start gap-3">
                         <div className="grid size-10 place-items-center rounded-full bg-ink text-[12px] font-medium text-canvas">

@@ -21,19 +21,22 @@ export default function ContactDealsKanban({
     stages,
     deals,
     contactId,
+    layout = 'stack',
 }: {
     pipelineName: string;
     stages: KanbanStage[];
     deals: KanbanDeal[];
     contactId?: number;
+    /** stack = vertical stage list for record right rail; board = horizontal columns for wide surfaces */
+    layout?: 'stack' | 'board';
 }) {
     if (stages.length === 0) {
         return null;
     }
 
     return (
-        <section className="rounded-md border border-hairline bg-canvas">
-            <div className="flex items-center justify-between border-b border-hairline px-3 py-2">
+        <section className="rounded-lg border border-hairline bg-canvas">
+            <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
                 <h3 className="text-[12px] font-semibold tracking-wide text-ink uppercase">
                     Deals · {pipelineName}
                 </h3>
@@ -44,50 +47,45 @@ export default function ContactDealsKanban({
                     Add deal
                 </Link>
             </div>
-            <div className="overflow-x-auto p-3">
-                <div className="flex min-w-max gap-2">
+
+            {layout === 'board' ? (
+                <div className="overflow-x-auto p-4">
+                    <div className="flex min-w-max gap-3">
+                        {stages.map((stage) => (
+                            <StageColumn
+                                key={stage.id}
+                                stage={stage}
+                                deals={deals.filter((deal) => deal.stage_id === stage.id)}
+                            />
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div className="space-y-3 p-4">
                     {stages.map((stage) => {
                         const columnDeals = deals.filter((deal) => deal.stage_id === stage.id);
 
                         return (
                             <div
                                 key={stage.id}
-                                className="w-[140px] shrink-0 rounded-md border border-hairline bg-canvas-soft"
+                                className="rounded-md border border-hairline bg-canvas-soft"
                                 data-testid={`contact-kanban-${stage.slug}`}
                             >
                                 <div
-                                    className="border-b-2 px-2 py-1.5"
+                                    className="border-b-2 px-3 py-2"
                                     style={{ borderColor: stageUnderlineColor(stage.slug) }}
                                 >
-                                    <p className="truncate text-[11px] font-semibold text-ink">
-                                        {stage.name}
-                                    </p>
-                                    <p className="text-[10px] text-muted-foreground">
+                                    <p className="text-[12px] font-semibold text-ink">{stage.name}</p>
+                                    <p className="text-[11px] text-muted-foreground">
                                         {columnDeals.length} deal{columnDeals.length === 1 ? '' : 's'}
                                     </p>
                                 </div>
-                                <div className="space-y-1.5 p-1.5">
+                                <div className="space-y-2 p-3">
                                     {columnDeals.length === 0 ? (
-                                        <p className="px-1 py-2 text-[10px] text-muted-foreground">—</p>
+                                        <p className="text-[12px] text-muted-foreground">No deals in this stage</p>
                                     ) : (
                                         columnDeals.map((deal) => (
-                                            <Link
-                                                key={deal.id}
-                                                href={`/crm/deals/${deal.id}`}
-                                                className={cn(
-                                                    'block rounded border border-hairline bg-canvas px-2 py-1.5',
-                                                    'hover:border-brand/40 hover:shadow-xs',
-                                                )}
-                                            >
-                                                <p className="truncate text-[11px] font-medium text-ink">
-                                                    {deal.title}
-                                                </p>
-                                                {deal.amount_cents > 0 ? (
-                                                    <p className="money mt-0.5 text-[10px] font-semibold text-ink">
-                                                        {formatDzd(deal.amount_cents)}
-                                                    </p>
-                                                ) : null}
-                                            </Link>
+                                            <DealChip key={deal.id} deal={deal} />
                                         ))
                                     )}
                                 </div>
@@ -95,7 +93,58 @@ export default function ContactDealsKanban({
                         );
                     })}
                 </div>
-            </div>
+            )}
         </section>
+    );
+}
+
+function StageColumn({
+    stage,
+    deals,
+}: {
+    stage: KanbanStage;
+    deals: KanbanDeal[];
+}) {
+    return (
+        <div
+            className="w-40 shrink-0 rounded-md border border-hairline bg-canvas-soft"
+            data-testid={`contact-kanban-${stage.slug}`}
+        >
+            <div
+                className="border-b-2 px-3 py-2"
+                style={{ borderColor: stageUnderlineColor(stage.slug) }}
+            >
+                <p className="truncate text-[12px] font-semibold text-ink">{stage.name}</p>
+                <p className="text-[11px] text-muted-foreground">
+                    {deals.length} deal{deals.length === 1 ? '' : 's'}
+                </p>
+            </div>
+            <div className="space-y-2 p-3">
+                {deals.length === 0 ? (
+                    <p className="text-[12px] text-muted-foreground">—</p>
+                ) : (
+                    deals.map((deal) => <DealChip key={deal.id} deal={deal} />)
+                )}
+            </div>
+        </div>
+    );
+}
+
+function DealChip({ deal }: { deal: KanbanDeal }) {
+    return (
+        <Link
+            href={`/crm/deals/${deal.id}`}
+            className={cn(
+                'block rounded-md border border-hairline bg-canvas px-3 py-2',
+                'hover:border-brand/40 hover:shadow-xs',
+            )}
+        >
+            <p className="truncate text-[12px] font-medium text-ink">{deal.title}</p>
+            {deal.amount_cents > 0 ? (
+                <p className="money mt-1 text-[11px] font-semibold text-ink">
+                    {formatDzd(deal.amount_cents)}
+                </p>
+            ) : null}
+        </Link>
     );
 }
