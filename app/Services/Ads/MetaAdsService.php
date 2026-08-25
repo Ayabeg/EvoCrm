@@ -146,5 +146,4 @@ class MetaAdsService
 
         return "https://graph.facebook.com/{$version}".'/'.ltrim($path, '/');
     }
-
 }

@@ -21,7 +21,9 @@ use Inertia\Response;
 
 class AdsCenterController extends Controller
 {
-    public function __construct(private WorkspaceMetaCredentials $metaCredentials) {}
+    public function __construct(private WorkspaceMetaCredentials $metaCredentials)
+    {
+    }
 
     public function index(Request $request, AdsFunnel $funnel): Response
     {
