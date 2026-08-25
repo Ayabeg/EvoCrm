@@ -275,7 +275,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=LeadConversionTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: qualify one lead into a new deal and another into an existing deal.
 
 **Dependencies:** Task 5
@@ -300,7 +300,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=GoogleMailSyncTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: send and receive staging messages, sync twice, and confirm no duplicates.
 
 **Dependencies:** Tasks 1, 2, 3
@@ -325,7 +325,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=GoogleCalendarSyncTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: create, move, and cancel a staging meeting and inspect the timeline.
 
 **Dependencies:** Tasks 1, 2, 3; shared Google sync contract from Task 11
@@ -350,7 +350,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=DealGuidanceTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: compare stale, active, won, and low-data deals.
 
 **Dependencies:** Task 10
@@ -383,7 +383,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=DealLineItemTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: modify quantities and prices and confirm all totals refresh.
 
 **Dependencies:** Task 5
@@ -408,7 +408,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=DealSplitTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: create valid and invalid split allocations.
 
 **Dependencies:** Task 5
@@ -433,7 +433,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=QuoteDeliveryTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: send a quote and compare the email/PDF with its saved snapshot.
 
 **Dependencies:** Tasks 1, 14
@@ -458,7 +458,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=QuoteAcceptanceTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: accept once, retry, expire/revoke a link, and attempt cross-quote access.
 
 **Dependencies:** Task 16
@@ -476,8 +476,8 @@
 
 - [x] Tasks 14–17 acceptance criteria pass.
 - [ ] Deal and quote totals remain consistent under concurrent updates.
-- [ ] Sent quote versions are immutable.
-- [ ] Public quote access passes authorization and leakage tests.
+- [x] Sent quote versions are immutable.
+- [x] Public quote access passes authorization and leakage tests.
 - [ ] A full lead-to-accepted-quote staging walkthrough succeeds.
 
 ## Task 18: Process real outbound bounce events
@@ -491,7 +491,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=OutboundBounceTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: replay soft and hard bounce fixtures and inspect reporting/suppression.
 
 **Dependencies:** Tasks 1, 3
@@ -516,7 +516,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=SegmentExitWorkflowTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: move a contact into, out of, and back into a segment.
 
 **Dependencies:** Task 1
@@ -541,7 +541,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=ScheduledReportDeliveryTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: schedule a staging report and inspect content, filters, recipients, and status.
 
 **Dependencies:** Tasks 1, 2
@@ -566,7 +566,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=DealListPipelineTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: switch among pipelines and verify counts, records, creation, and export.
 
 **Dependencies:** Task 5
@@ -583,10 +583,10 @@
 ## Checkpoint: Complete
 
 - [x] Tasks 18–21 acceptance criteria pass.
-- [ ] Full regression suite passes: `composer test`.
+- [x] Full regression suite passes: `composer test`.
 - [ ] Backend quality passes: `composer lint:check && composer types:check`.
-- [ ] Frontend quality passes: `npm run lint:check && npm run types:check && npm run build`.
+- [x] Frontend quality passes: `npm run lint:check && npm run types:check && npm run build`.
 - [ ] Security review covers webhooks, imports, bulk operations, Google data, and public quotes.
 - [ ] Performance review covers import batches, synchronization, segment matching, and campaign expansion.
-- [ ] Documentation reflects implemented behavior and removes superseded stub claims.
+- [x] Documentation reflects implemented behavior and removes superseded stub claims.
 - [ ] Human acceptance walkthrough completed.

@@ -1,7 +1,7 @@
 import { Form } from '@inertiajs/react';
+import type { CatalogProduct } from '@/components/crm/deal-line-items';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { CatalogProduct } from '@/components/crm/deal-line-items';
 import { formatDzd } from '@/lib/money';
 
 type QuoteItem = {
