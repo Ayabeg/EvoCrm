@@ -1,18 +1,18 @@
 import { Form, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import type { Auth } from '@/types';
+import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import ListViewTable from '@/components/crm/list-view-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
+import type { Auth } from '@/types';
 
 type Contact = {
     id: number;

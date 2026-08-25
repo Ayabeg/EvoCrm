@@ -28,22 +28,13 @@ export function BulkActionBar({
     const actionPath = entity === 'deal' ? '/crm/deals/bulk' : '/crm/contacts/bulk';
 
     function submit() {
-        const payload: Record<string, unknown> = {
+        const payload = {
             action,
             ids: selectedIds,
+            owner_id: action === 'assign_owner' ? Number(ownerId) : null,
+            sequence_id: action === 'enroll_sequence' ? Number(sequenceId) : null,
+            stage_id: action === 'move_stage' ? Number(stageId) : null,
         };
-
-        if (action === 'assign_owner') {
-            payload.owner_id = Number(ownerId);
-        }
-
-        if (action === 'enroll_sequence') {
-            payload.sequence_id = Number(sequenceId);
-        }
-
-        if (action === 'move_stage') {
-            payload.stage_id = Number(stageId);
-        }
 
         router.post(actionPath, payload, {
             preserveScroll: true,

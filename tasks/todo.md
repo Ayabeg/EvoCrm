@@ -258,11 +258,11 @@
 
 ## Checkpoint: Migration
 
-- [ ] Tasks 6–9 acceptance criteria pass.
-- [ ] Import and bulk operations remain workspace-isolated under load.
-- [ ] Representative HubSpot exports import twice without duplicates.
-- [ ] Contact merge preserves every tested relationship.
-- [ ] Full backend and frontend verification commands pass.
+- [x] Tasks 6–9 acceptance criteria pass.
+- [x] Import and bulk operations remain workspace-isolated under load.
+- [x] Representative HubSpot exports import twice without duplicates.
+- [x] Contact merge preserves every tested relationship.
+- [x] Full backend and frontend verification commands pass.
 
 ## Task 10: Convert a qualified lead into a linked deal
 

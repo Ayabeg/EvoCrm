@@ -35,6 +35,7 @@ const FIELDS: Array<{ key: keyof MergeContact; label: string }> = [
 
 function fieldValue(contact: MergeContact, key: keyof MergeContact): string {
     const value = contact[key];
+
     return value === null || value === undefined || value === '' ? '' : String(value);
 }
 
