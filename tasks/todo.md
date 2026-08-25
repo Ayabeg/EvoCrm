@@ -602,7 +602,7 @@
 
 **Verification:**
 - [x] Tests pass: `php artisan test --filter=SegmentMembershipHistoryTest`
-- [ ] Build succeeds: `npm run build`
+- [x] Build succeeds: `npm run build`
 - [ ] Manual check: move a contact out of and back into a segment and inspect history.
 
 **Dependencies:** Task 19
