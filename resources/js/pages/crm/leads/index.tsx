@@ -8,10 +8,13 @@ import { Label } from '@/components/ui/label';
 
 export default function LeadsIndex({ leads, contacts }: { leads: any[]; contacts: any[] }) {
     return (
-        <CrmShell title="Leads">
+        <CrmShell title="Leads list">
             <div className="h-full overflow-y-auto">
                 <div className="flex-1 space-y-6 p-6">
-                    <PageHeader title="Leads" description="Qualify inbound interest before it becomes a Deal." />
+                    <PageHeader
+                        title="Leads list"
+                        description="Table of inbound Lead records. For the kanban pipeline, open Lead board (/leads)."
+                    />
                     <Card className="p-4">
                         <Form action="/crm/leads" method="post" className="grid gap-3 md:grid-cols-4" resetOnSuccess>
                             {({ processing }) => (

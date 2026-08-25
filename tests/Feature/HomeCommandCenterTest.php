@@ -26,7 +26,7 @@ function homeDeal(User $user, string $stageSlug = 'new'): Deal
     ]);
 }
 
-it('serves the table-first command center', function () {
+it('serves the data-first command center', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
@@ -35,9 +35,12 @@ it('serves the table-first command center', function () {
         ->assertInertia(fn ($page) => $page
             ->component('home')
             ->has('today', 6)
-            ->has('nextSteps')
-            ->has('inboxPreview')
-            ->has('recentDeals')
+            ->has('owners')
+            ->has('filters')
+            ->has('dataAsOf')
+            ->missing('nextSteps')
+            ->missing('inboxPreview')
+            ->missing('recentDeals')
             ->missing('departments')
             ->missing('charts'));
 });
@@ -103,27 +106,17 @@ it('counts real numbers in the today strip', function () {
             ->where('today.2.value', 3)
             ->where('today.3.key', 'leads_new')
             ->where('today.4.value', 1)
-            ->where('today.5.value', 1)
-            ->has('inboxPreview', 1)
-            ->has('recentDeals', 2));
+            ->where('today.5.value', 1));
 });
 
-it('caps next steps at ten open tasks', function () {
+it('filters open deals by owner in the KPI strip', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $other = User::factory()->create(['workspace_id' => $user->workspace_id]);
 
-    foreach (range(1, 12) as $h) {
-        Activity::query()->create([
-            'workspace_id' => $user->workspace_id,
-            'type' => 'task',
-            'subject' => "Task {$h}",
-            'due_at' => now()->addHours($h),
-            'done' => false,
-            'contact_id' => $contact->id,
-        ]);
-    }
+    homeDeal($user, 'new')->forceFill(['owner_id' => $user->id])->save();
+    homeDeal($user, 'new')->forceFill(['owner_id' => $other->id])->save();
 
     $this->actingAs($user)
-        ->get('/dashboard')
-        ->assertInertia(fn ($page) => $page->has('nextSteps', 10));
+        ->get('/dashboard?owner_id='.$user->id)
+        ->assertInertia(fn ($page) => $page->where('today.0.value', 1));
 });

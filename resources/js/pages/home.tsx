@@ -1,45 +1,8 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowRight, CheckCircle2, Inbox, Star } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { Star } from 'lucide-react';
+import { useState } from 'react';
 import { CrmKpiStrip, type KpiTile } from '@/components/crm/crm-kpi-strip';
-import { formatDzd } from '@/lib/money';
 import type { Auth } from '@/types';
-
-type Task = {
-    id: number;
-    subject?: string | null;
-    body?: string | null;
-    due_at?: string | null;
-    contact?: {
-        id: number;
-        first_name: string;
-        last_name?: string | null;
-    } | null;
-    deal?: { id: number; title: string } | null;
-};
-
-type InboxThread = {
-    id: number;
-    subject?: string | null;
-    unread_count: number;
-    last_message_at?: string | null;
-    contact?: {
-        id: number;
-        first_name: string;
-        last_name?: string | null;
-    } | null;
-    channel?: { name: string } | null;
-};
-
-type RecentDeal = {
-    id: number;
-    title: string;
-    amount_cents: number;
-    last_activity_at?: string | null;
-    contact?: { first_name: string; last_name?: string | null } | null;
-    stage?: { name: string } | null;
-    owner?: { name: string } | null;
-};
 
 type Owner = { id: number; name: string };
 
@@ -49,19 +12,23 @@ type Filters = {
 
 type Props = {
     today: KpiTile[];
-    nextSteps: Task[];
-    inboxPreview: InboxThread[];
-    recentDeals: RecentDeal[];
     owners?: Owner[];
     filters?: Filters;
     dataAsOf?: string;
 };
 
+const QUICK_LINKS = [
+    ['Activities', '/crm/activities'],
+    ['Inbox', '/inbox'],
+    ['Deals', '/crm/deals'],
+    ['Pipeline', '/crm/deals/board'],
+    ['Lead board', '/leads'],
+    ['Leads list', '/crm/leads'],
+    ['Contacts', '/crm/contacts'],
+] as const;
+
 export default function Home({
     today,
-    nextSteps,
-    inboxPreview,
-    recentDeals,
     owners = [],
     filters = {},
     dataAsOf,
@@ -93,7 +60,7 @@ export default function Home({
                                 {`Good ${greeting()}, ${firstName}`}
                             </h1>
                             <p className="mt-1 text-[13px] text-muted-foreground">
-                                Tasks, inbox, and pipeline — what needs you right now.
+                                Headline KPIs — open a module below to work the queue.
                             </p>
                         </div>
                         <div className="shrink-0">
@@ -163,14 +130,7 @@ export default function Home({
                         aria-label="Quick links"
                         className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[12px]"
                     >
-                        {[
-                            ['Activities', '/crm/activities'],
-                            ['Inbox', '/inbox'],
-                            ['Deals', '/crm/deals'],
-                            ['Pipeline', '/crm/deals/board'],
-                            ['Leads', '/crm/leads'],
-                            ['Contacts', '/crm/contacts'],
-                        ].map(([label, href]) => (
+                        {QUICK_LINKS.map(([label, href]) => (
                             <Link
                                 key={href}
                                 href={href}
@@ -180,125 +140,6 @@ export default function Home({
                             </Link>
                         ))}
                     </nav>
-
-                    <div className="mt-8 grid gap-6 lg:grid-cols-3">
-                        <OperationalTable
-                            title="Tasks & next steps"
-                            href="/crm/activities"
-                            linkLabel="All activities"
-                            empty="Nothing due — you're caught up."
-                        >
-                            {nextSteps.length === 0 ? null : (
-                                <ul className="divide-y divide-hairline">
-                                    {nextSteps.map((task) => (
-                                        <li
-                                            key={task.id}
-                                            className="flex items-start gap-2 py-2.5 first:pt-0 last:pb-0"
-                                        >
-                                            <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-                                            <div className="min-w-0">
-                                                <p className="truncate text-[13px] text-ink">
-                                                    {task.subject ??
-                                                        task.body ??
-                                                        'Task'}
-                                                </p>
-                                                <p className="truncate text-[11px] text-muted-foreground">
-                                                    {task.deal?.title ??
-                                                        [
-                                                            task.contact
-                                                                ?.first_name,
-                                                            task.contact
-                                                                ?.last_name,
-                                                        ]
-                                                            .filter(Boolean)
-                                                            .join(' ') ??
-                                                        '—'}
-                                                    {task.due_at
-                                                        ? ` · due ${task.due_at}`
-                                                        : ''}
-                                                </p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </OperationalTable>
-
-                        <OperationalTable
-                            title="Unread inbox"
-                            href="/inbox"
-                            linkLabel="Open desk"
-                            empty="Inbox clear — no unread threads."
-                        >
-                            {inboxPreview.length === 0 ? null : (
-                                <ul className="divide-y divide-hairline">
-                                    {inboxPreview.map((thread) => (
-                                        <li
-                                            key={thread.id}
-                                            className="flex items-start gap-2 py-2.5 first:pt-0 last:pb-0"
-                                        >
-                                            <Inbox className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-                                            <div className="min-w-0">
-                                                <p className="truncate text-[13px] text-ink">
-                                                    {thread.contact
-                                                        ? [
-                                                              thread.contact
-                                                                  .first_name,
-                                                              thread.contact
-                                                                  .last_name,
-                                                          ]
-                                                              .filter(Boolean)
-                                                              .join(' ')
-                                                        : (thread.subject ??
-                                                          'Conversation')}
-                                                </p>
-                                                <p className="truncate text-[11px] text-muted-foreground">
-                                                    {thread.channel?.name ??
-                                                        'Channel'}
-                                                    {thread.unread_count > 0
-                                                        ? ` · ${thread.unread_count} unread`
-                                                        : ''}
-                                                </p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </OperationalTable>
-
-                        <OperationalTable
-                            title="Recent pipeline"
-                            href="/crm/deals"
-                            linkLabel="All deals"
-                            empty="No recent deal activity."
-                        >
-                            {recentDeals.length === 0 ? null : (
-                                <ul className="divide-y divide-hairline">
-                                    {recentDeals.map((deal) => (
-                                        <li
-                                            key={deal.id}
-                                            className="py-2.5 first:pt-0 last:pb-0"
-                                        >
-                                            <Link
-                                                href={`/crm/deals/${deal.id}`}
-                                                className="block truncate text-[13px] font-medium text-ink hover:text-brand"
-                                            >
-                                                {deal.title}
-                                            </Link>
-                                            <p className="truncate text-[11px] text-muted-foreground">
-                                                {deal.stage?.name ?? '—'}
-                                                {' · '}
-                                                {formatDzd(deal.amount_cents)}
-                                                {deal.owner?.name
-                                                    ? ` · ${deal.owner.name}`
-                                                    : ''}
-                                            </p>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </OperationalTable>
-                    </div>
 
                     {dataAsOf ? (
                         <footer className="mt-10 border-t border-hairline pt-4 text-[11px] text-muted-foreground">
@@ -312,41 +153,6 @@ export default function Home({
                 </div>
             </div>
         </>
-    );
-}
-
-function OperationalTable({
-    title,
-    href,
-    linkLabel,
-    empty,
-    children,
-}: {
-    title: string;
-    href: string;
-    linkLabel: string;
-    empty: string;
-    children: ReactNode;
-}) {
-    return (
-        <section
-            aria-label={title}
-            className="rounded-lg border border-hairline bg-canvas p-4"
-        >
-            <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-[13px] font-medium text-ink">{title}</h2>
-                <Link
-                    href={href}
-                    className="inline-flex items-center gap-1 text-[12px] text-brand hover:underline"
-                >
-                    {linkLabel}
-                    <ArrowRight className="size-3" />
-                </Link>
-            </div>
-            {children ?? (
-                <p className="text-[13px] text-muted-foreground">{empty}</p>
-            )}
-        </section>
     );
 }
 

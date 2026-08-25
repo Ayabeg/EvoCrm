@@ -4,7 +4,7 @@ use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\User;
 
-it('creates a task on a contact timeline and lists it as a home next step', function () {
+it('creates a task on a contact timeline and reflects it in activities and home KPIs', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
 
@@ -32,6 +32,11 @@ it('creates a task on a contact timeline and lists it as a home next step', func
         ->assertInertia(fn ($page) => $page
             ->where('today.1.key', 'tasks_due')
             ->where('today.1.value', 1)
-            ->has('nextSteps', 1)
+            ->missing('nextSteps')
         );
+
+    $this->actingAs($user)
+        ->get('/crm/activities?type=task')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->has('activities', 1));
 });
