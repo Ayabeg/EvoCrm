@@ -7,6 +7,8 @@
 
 **Product target (not feature-count parity):** a 5–20 seat Algeria-first sales OS that a team can migrate into, use as system of record, and carry lead → quote. Explicitly deferred: custom objects, tickets, CMS, SAML, marketplace, visual workflow canvas, full CPQ/payments/e-sign, Breeze-scale RAG, Laravel live chat.
 
+**Capability matrix (HubSpot | EvoSales | verdict):** [hubspot-side-by-side.md](./hubspot-side-by-side.md) · [visual](./hubspot-side-by-side.html)
+
 ---
 
 ## Executive summary
@@ -327,6 +329,7 @@ Use [production](https://crm.evotechly.com) after merge, or local with the seede
 
 ## Related docs
 
+- [Side-by-side capability matrix](./hubspot-side-by-side.md)
 - [EvoCells roadmap & dimension scorecard](./evocells-roadmap.md)
 - [Production processes](./production-processes.md)
 - [Object model](./OBJECT_MODEL.md)

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HubSpot vs EvoSales — side by side</title>
+  <style>
+    :root {
+      --canvas: #ffffff;
+      --soft: #f7f7f6;
+      --ink: #111111;
+      --mute: #525252;
+      --hair: #e5e5e5;
+      --mark: #ec6025;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--soft);
+      color: var(--ink);
+      font: 14px/1.45 "Geist", "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 48px 32px 28px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header p.kicker {
+      color: var(--mark);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 11px;
+      margin: 0 0 10px;
+    }
+    h1 {
+      font-size: 40px;
+      letter-spacing: -0.04em;
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+    .lede { color: var(--mute); max-width: 62ch; margin: 0; }
+    .score {
+      display: flex;
+      gap: 24px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .score b { display: block; font-size: 28px; letter-spacing: -0.04em; }
+    .score span { color: var(--mute); font-size: 12px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--canvas);
+    }
+    main { max-width: 1100px; margin: 0 auto 80px; padding: 0 32px; }
+    section {
+      margin: 28px 0 0;
+      border: 1px solid var(--hair);
+      background: var(--canvas);
+    }
+    section h2 {
+      margin: 0;
+      padding: 14px 16px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--hair);
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--hair);
+      vertical-align: top;
+    }
+    th {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--mute);
+      background: var(--soft);
+    }
+    td:first-child { width: 22%; font-weight: 550; }
+    td:nth-child(2), td:nth-child(3) { width: 31%; color: var(--mute); }
+    .v {
+      width: 16%;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .Match { color: #17633a; }
+    .Ahead { color: var(--mark); }
+    .Partial { color: #8a5a00; }
+    .Gap, .Deferred { color: #8a2c16; }
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px 48px;
+      color: var(--mute);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="kicker">Evotechly · 25 Aug 2026 · d139f6e</p>
+    <h1>HubSpot vs EvoSales</h1>
+    <p class="lede">Capability-by-capability for a 5–20 seat Algeria-first sales team. HubSpot is Sales + Service + Marketing Hub 2026. EvoSales is this branch, scored only when a route, UI, and test exist.</p>
+    <div class="score">
+      <div><b>~85</b><span>EvoSales M1–M11</span></div>
+      <div><b>100</b><span>HubSpot reference</span></div>
+      <div><b>No</b><span>Omega ≥95</span></div>
+    </div>
+  </header>
+  <main>
+    <section>
+      <h2>CRM core · 96</h2>
+      <table>
+        <tr><th>Capability</th><th>HubSpot</th><th>EvoSales</th><th>Verdict</th></tr>
+        <tr><td>Objects</td><td>Contacts, companies, deals, tickets, custom objects</td><td>Contacts, companies, deals, leads</td><td class="v Match">Match</td></tr>
+        <tr><td>Leads</td><td>Deal or custom object</td><td>First-class lead + qualify → deal</td><td class="v Ahead">Ahead</td></tr>
+        <tr><td>Import / merge</td><td>Import tool + merge</td><td>Preview CSV + transactional merge</td><td class="v Match">Match</td></tr>
+        <tr><td>Quotes</td><td>Commerce Hub, e-sign, payments</td><td>PDF, email, public accept</td><td class="v Partial">Partial</td></tr>
+        <tr><td>Tickets / custom objects</td><td>Service + Enterprise</td><td>Not in plan</td><td class="v Deferred">Deferred</td></tr>
+      </table>
+    </section>
+    <section>
+      <h2>Lists, pipelines, records</h2>
+      <table>
+        <tr><th>Capability</th><th>HubSpot</th><th>EvoSales</th><th>Verdict</th></tr>
+        <tr><td>Saved views + AND/OR</td><td>Yes</td><td>FilterBuilder + save-view on chrome lists</td><td class="v Match">Match</td></tr>
+        <tr><td>Bulk + import + pipeline</td><td>Yes</td><td>Assign/enroll/move/delete; CSV; list switcher</td><td class="v Match">Match</td></tr>
+        <tr><td>Calculated columns</td><td>List formulas</td><td>Record formulas only</td><td class="v Partial">Partial</td></tr>
+        <tr><td>Kanban + forecast</td><td>AI / revenue workspace</td><td>Board + weighted band + deal health</td><td class="v Partial">Partial</td></tr>
+        <tr><td>Record chrome</td><td>Highlights / timeline / Breeze</td><td>3-column, Ask Evo, properties, commerce</td><td class="v Match">Match</td></tr>
+        <tr><td>Playbooks</td><td>Professional</td><td>None</td><td class="v Gap">Gap</td></tr>
+      </table>
+    </section>
+    <section>
+      <h2>Automation, sequences, desk</h2>
+      <table>
+        <tr><th>Capability</th><th>HubSpot</th><th>EvoSales</th><th>Verdict</th></tr>
+        <tr><td>Segment enter / exit</td><td>Active lists</td><td>Both triggers + Meta audience</td><td class="v Match">Match</td></tr>
+        <tr><td>Workflow builder</td><td>Visual canvas, 100+ actions</td><td>Form UI, 7 triggers, 8 actions</td><td class="v Deferred">Deferred</td></tr>
+        <tr><td>Email sequences</td><td>Native, send caps</td><td>Owned SMTP, warmup, bounce suppress</td><td class="v Ahead">Ahead</td></tr>
+        <tr><td>WhatsApp</td><td>Channel / app</td><td>Evolution Cloud native</td><td class="v Ahead">Ahead</td></tr>
+        <tr><td>Inbox</td><td>Email, chat, SMS, bots</td><td>EvoDesk + WA/email; SMS stub</td><td class="v Partial">Partial</td></tr>
+      </table>
+    </section>
+    <section>
+      <h2>Reporting, admin, AI, platform</h2>
+      <table>
+        <tr><th>Capability</th><th>HubSpot</th><th>EvoSales</th><th>Verdict</th></tr>
+        <tr><td>Reports + schedule</td><td>Explorer + email</td><td>EvoViz rooms + real HTML cron</td><td class="v Match">Match</td></tr>
+        <tr><td>Permissions</td><td>Fine RBAC + SSO</td><td>Matrix UI, no SAML</td><td class="v Partial">Partial</td></tr>
+        <tr><td>Google / Meta</td><td>Native + marketplace</td><td>Gmail/Calendar sync, workspace Meta</td><td class="v Match">Match</td></tr>
+        <tr><td>AI</td><td>Breeze agents, Smart Deal Progression</td><td>Ask Evo + deterministic health</td><td class="v Partial">Partial</td></tr>
+        <tr><td>Algeria / hosting</td><td>Generic i18n, HubSpot cloud</td><td>Wilaya, DZD, Algiers TZ, self-host</td><td class="v Ahead">Ahead</td></tr>
+      </table>
+    </section>
+  </main>
+  <footer>Source: docs/hubspot-side-by-side.md · Scores require route + UI + tests · Deferred items stay gaps.</footer>
+</body>
+</html>

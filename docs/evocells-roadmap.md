@@ -2,7 +2,7 @@
 
 **Production baseline:** commit `0304154` (pre-EvoCells) → **`3c271d8`** on `main` (EvoCells 1–6 + HubSpot chrome, 2026-08-24) → **`d139f6e`** on `cursor/hubspot-gap-remaining-waves-fd45` (Waves 1–5, 2026-08-25).
 
-**Full side-by-side audit:** [hubspot-parity-comparison.md](./hubspot-parity-comparison.md)
+**Full side-by-side audit:** [hubspot-side-by-side.md](./hubspot-side-by-side.md) · [scores](./hubspot-parity-comparison.md)
 
 **Omega target:** ≥95 composite on M1–M11, ≥105 on moat dimensions (M7, M8, M12, M13).
 
