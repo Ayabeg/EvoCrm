@@ -1,7 +1,27 @@
 <?php
 
+use App\Models\Contact;
+use App\Models\Deal;
 use App\Models\Pipeline;
 use App\Models\User;
+
+function pipelineDealFor(User $user, string $stageSlug, int $amountCents, array $overrides = []): Deal
+{
+    $workspace = $user->workspace;
+    $pipeline = $overrides['pipeline'] ?? $workspace->defaultPipeline();
+    $contact = Contact::factory()->create(['workspace_id' => $workspace->id]);
+
+    return Deal::query()->create([
+        'workspace_id' => $workspace->id,
+        'contact_id' => $contact->id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stageBySlug($stageSlug)->id,
+        'title' => $overrides['title'] ?? 'Pipeline '.$stageSlug,
+        'amount_cents' => $amountCents,
+        'currency' => 'DZD',
+        'owner_id' => $user->id,
+    ]);
+}
 
 it('scopes the deals list hub to the selected pipeline', function () {
     $user = User::factory()->create();
@@ -26,11 +46,11 @@ it('scopes the deals list hub to the selected pipeline', function () {
         ]);
     }
 
-    $salesDeal = boardDealFor($user, 'new', 3_000_000, [
+    $salesDeal = pipelineDealFor($user, 'new', 3_000_000, [
         'title' => 'Sales list card',
         'pipeline' => $sales,
     ]);
-    boardDealFor($user, 'proposal', 12_000_000, [
+    pipelineDealFor($user, 'proposal', 12_000_000, [
         'title' => 'Enterprise list card',
         'pipeline' => $enterprise,
     ]);

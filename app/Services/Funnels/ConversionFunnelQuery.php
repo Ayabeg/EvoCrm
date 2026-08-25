@@ -110,7 +110,9 @@ class ConversionFunnelQuery
             $eventType = $stage->matcher_config['event_type'] ?? $stage->key;
             $counts[$stage->key] = $events
                 ->where('event_type', $eventType)
-                ->unique(fn (FunnelEvent $event) => $event->subject_type.'-'.$event->subject_id)
+                ->unique(fn (FunnelEvent $event) => filled($event->subject_type) && filled($event->subject_id)
+                    ? $event->subject_type.'-'.$event->subject_id
+                    : 'event-'.$event->id)
                 ->count();
         }
 
