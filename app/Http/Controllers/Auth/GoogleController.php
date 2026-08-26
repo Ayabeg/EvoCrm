@@ -16,7 +16,6 @@ use Inertia\Inertia;
 use Laravel\Fortify\Events\TwoFactorAuthenticationChallenged;
 use Laravel\Fortify\Fortify;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
-use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class GoogleController extends Controller
@@ -28,7 +27,7 @@ class GoogleController extends Controller
     {
         abort_unless(GoogleAuth::enabled(), 404);
 
-        return Socialite::driver('google')->redirect();
+        return GoogleAuth::driver()->redirect();
     }
 
     /**
@@ -44,7 +43,7 @@ class GoogleController extends Controller
     {
         abort_unless(GoogleAuth::enabled(), 404);
 
-        $googleUser = Socialite::driver('google')->user();
+        $googleUser = GoogleAuth::driver()->user();
 
         if ($request->user()) {
             $completed = $this->completeConnectorIfReconnecting($request, $googleUser);

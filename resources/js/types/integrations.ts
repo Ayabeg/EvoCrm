@@ -64,6 +64,7 @@ export type MarketplaceApp = {
     connect_url: string | null;
     manage_url: string | null;
     callback_url?: string;
+    origin_url?: string;
     webmail_url?: string | null;
     mailboxes?: number;
     unlocks: AppUnlock[];

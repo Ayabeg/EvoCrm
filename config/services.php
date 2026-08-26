@@ -42,7 +42,9 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT_URI', 'https://crm.evotechly.com/auth/google/callback'),
+        // Empty string in .env must not win over the default — Google rejects
+        // a blank redirect_uri as Error 400 redirect_uri_mismatch.
+        'redirect' => env('GOOGLE_REDIRECT_URI') ?: 'https://crm.evotechly.com/auth/google/callback',
         /*
         | Extra scopes on the SAME OAuth client as sign-in. Leave empty when
         | the current client does not have Gmail / Calendar APIs enabled —

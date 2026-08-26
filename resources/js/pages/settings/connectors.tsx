@@ -138,11 +138,13 @@ function GoogleConnectorCard({
 export default function ConnectorsSettings({
     googleEnabled,
     googleCallback,
+    googleOrigin,
     deskConnectors,
     googleConnectors,
 }: {
     googleEnabled: boolean;
     googleCallback: string;
+    googleOrigin: string;
     deskConnectors: OfficialDeskConnector[];
     googleConnectors: GoogleWorkspaceConnector[];
 }) {
@@ -161,9 +163,13 @@ export default function ConnectorsSettings({
                 <div className="space-y-3">
                     <h2 className="text-sm font-medium">Google</h2>
                     <p className="text-xs text-muted-foreground">
-                        Callback stays{' '}
+                        Authorized JavaScript origin{' '}
+                        <code className="font-mono break-all text-brand">{googleOrigin}</code>
+                        . Authorized redirect URI stays{' '}
                         <code className="font-mono break-all text-brand">{googleCallback}</code>
-                        . EvoSales does not send mail from these connectors.
+                        — Google Error 400 redirect_uri_mismatch means that URI
+                        is missing on the OAuth client. EvoSales does not send
+                        mail from these connectors.
                     </p>
                     {googleConnectors.map((connector) => (
                         <GoogleConnectorCard

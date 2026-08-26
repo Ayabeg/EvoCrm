@@ -4,6 +4,7 @@ namespace Tests\Feature\Settings;
 
 use App\Models\Integration;
 use App\Models\User;
+use App\Support\GoogleAuth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -46,6 +47,8 @@ class AppsMarketplaceTest extends TestCase
                     ->where('apps.0.connected', false)
                     ->where('apps.0.configured', false)
                     ->where('apps.1.key', 'google')
+                    ->where('apps.1.callback_url', GoogleAuth::callbackUrl())
+                    ->where('apps.1.origin_url', GoogleAuth::javascriptOrigin())
                     ->where('apps.2.key', 'smtp')
             );
     }

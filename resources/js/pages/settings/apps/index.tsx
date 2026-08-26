@@ -113,12 +113,32 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                         </div>
                     )}
 
-                    {app.key === 'google' && app.connected && (
-                        <p className="mt-2 text-xs text-muted-foreground">
-                            Sign-in with Google is live on the login screen.
-                            Gmail and Calendar reuse that same OAuth client —
-                            they never add a second Google login.
-                        </p>
+                    {app.key === 'google' && (
+                        <div className="mt-3 space-y-1 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
+                            <p className="font-medium text-foreground">
+                                Google Cloud Console
+                            </p>
+                            <p>
+                                On this OAuth client, Authorized JavaScript
+                                origin must be exactly:
+                            </p>
+                            {app.origin_url ? (
+                                <p className="font-mono break-all text-brand">
+                                    {app.origin_url}
+                                </p>
+                            ) : null}
+                            <p>
+                                Authorized redirect URI must be exactly (no
+                                trailing slash). Error 400
+                                redirect_uri_mismatch means this URI is missing
+                                on the client:
+                            </p>
+                            {app.callback_url ? (
+                                <p className="font-mono break-all text-brand">
+                                    {app.callback_url}
+                                </p>
+                            ) : null}
+                        </div>
                     )}
 
                     {app.key === 'smtp' && (

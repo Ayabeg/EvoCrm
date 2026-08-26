@@ -23,7 +23,8 @@ class ConnectorController extends Controller
 
         return Inertia::render('settings/connectors', [
             'googleEnabled' => GoogleAuth::enabled(),
-            'googleCallback' => (string) config('services.google.redirect'),
+            'googleCallback' => GoogleAuth::callbackUrl(),
+            'googleOrigin' => GoogleAuth::javascriptOrigin(),
             'deskConnectors' => $registrar->deskCatalog($workspace),
             'googleConnectors' => $registrar->googleCatalog($workspace),
         ]);
