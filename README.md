@@ -89,7 +89,9 @@ GOOGLE_CLIENT_SECRET=
 GOOGLE_REDIRECT_URI=https://crm.evotechly.com/auth/google/callback
 ```
 
-Leave the vars empty and the "Continue with Google" button stays hidden (the routes return 404, never 500). For local dev, also add `http://localhost:8000` as a JS origin and `http://localhost:8000/auth/google/callback` as a redirect URI on the same OAuth client, and point `GOOGLE_REDIRECT_URI` at the local callback.
+Leave the client ID/secret empty and the "Continue with Google" button stays hidden (the routes return 404, never 500). Leave `GOOGLE_REDIRECT_URI` empty to derive `${APP_URL}/auth/google/callback`. For local dev, also add `http://localhost:8000` as a JS origin and `http://localhost:8000/auth/google/callback` as a redirect URI on the same OAuth client.
+
+**Error 400 `redirect_uri_mismatch`:** the app is sending `https://crm.evotechly.com/auth/google/callback` (or your `APP_URL` + `/auth/google/callback`). Google Cloud Console → the **same** Web application OAuth client that owns `GOOGLE_CLIENT_ID` → **Authorized redirect URIs** must contain that exact string — `https` not `http`, no trailing slash, no `www`. Authorized JavaScript origins get the origin only (`https://crm.evotechly.com`). Saving the client can take a minute to apply. The same URI is printed on Settings → Apps and Settings → Connectors.
 
 ### People (Settings → People)
 

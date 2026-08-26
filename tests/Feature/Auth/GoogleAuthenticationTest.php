@@ -35,6 +35,7 @@ class GoogleAuthenticationTest extends TestCase
     private function mockSocialiteCallback(SocialiteUserContract $googleUser): void
     {
         $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
         $provider->shouldReceive('user')->once()->andReturn($googleUser);
 
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
@@ -50,11 +51,51 @@ class GoogleAuthenticationTest extends TestCase
         );
     }
 
+    public function test_redirect_pins_the_canonical_callback_url_on_socialite()
+    {
+        $this->enableGoogle();
+        config()->set('app.url', 'https://crm.evotechly.com');
+        config()->set('services.google.redirect', '');
+
+        $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')
+            ->once()
+            ->with('https://crm.evotechly.com/auth/google/callback')
+            ->andReturnSelf();
+        $provider->shouldReceive('redirect')->once()->andReturn(
+            redirect('https://accounts.google.com/o/oauth2/v2/auth?client_id=test-client-id&redirect_uri=https%3A%2F%2Fcrm.evotechly.com%2Fauth%2Fgoogle%2Fcallback')
+        );
+
+        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
+
+        $this->get(route('auth.google'))->assertRedirect();
+    }
+
+    public function test_callback_pins_the_same_canonical_url_for_the_token_exchange()
+    {
+        $this->enableGoogle();
+        config()->set('app.url', 'https://crm.evotechly.com');
+        config()->set('services.google.redirect', '');
+
+        $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')
+            ->once()
+            ->with('https://crm.evotechly.com/auth/google/callback')
+            ->andReturnSelf();
+        $provider->shouldReceive('user')->once()->andReturn($this->fakeGoogleUser());
+
+        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
+
+        $this->get(route('auth.google.callback'))->assertRedirect();
+        $this->assertAuthenticated();
+    }
+
     public function test_redirect_route_sends_guests_to_google_when_configured()
     {
         $this->enableGoogle();
 
         $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
         $provider->shouldReceive('redirect')->once()->andReturn(
             redirect('https://accounts.google.com/o/oauth2/v2/auth?client_id=test-client-id')
         );

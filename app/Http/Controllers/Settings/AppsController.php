@@ -49,7 +49,8 @@ class AppsController extends Controller
                     'connected_at' => null,
                     'connect_url' => null,
                     'manage_url' => '/settings/connectors',
-                    'callback_url' => (string) config('services.google.redirect'),
+                    'callback_url' => GoogleAuth::callbackUrl(),
+                    'origin_url' => GoogleAuth::javascriptOrigin(),
                     'unlocks' => [],
                 ],
                 [

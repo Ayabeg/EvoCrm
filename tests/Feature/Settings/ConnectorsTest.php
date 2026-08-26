@@ -6,6 +6,7 @@ use App\Enums\ConnectorProvider;
 use App\Enums\ConnectorStatus;
 use App\Models\Connector;
 use App\Models\User;
+use App\Support\GoogleAuth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as GoogleUser;
@@ -35,6 +36,8 @@ class ConnectorsTest extends TestCase
                 fn ($page) => $page
                     ->component('settings/connectors')
                     ->where('googleEnabled', false)
+                    ->where('googleCallback', GoogleAuth::callbackUrl())
+                    ->where('googleOrigin', GoogleAuth::javascriptOrigin())
                     ->has('googleConnectors', 2)
                     ->where('googleConnectors.0.provider', 'gmail')
                     ->where('googleConnectors.1.provider', 'google_calendar')
@@ -82,6 +85,7 @@ class ConnectorsTest extends TestCase
         config()->set('services.google.gmail_scope', 'https://www.googleapis.com/auth/gmail.readonly');
 
         $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
         $provider->shouldReceive('scopes')->once()->with([
             'https://www.googleapis.com/auth/gmail.readonly',
         ])->andReturnSelf();
@@ -118,6 +122,7 @@ class ConnectorsTest extends TestCase
         ]);
 
         $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
         $provider->shouldReceive('user')->once()->andReturn($googleUser);
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
 
@@ -147,6 +152,7 @@ class ConnectorsTest extends TestCase
         config()->set('services.google.calendar_scope', 'https://www.googleapis.com/auth/calendar.readonly');
 
         $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
         $provider->shouldReceive('scopes')->never();
         $provider->shouldReceive('redirect')->once()->andReturn(
             redirect('https://accounts.google.com/o/oauth2/v2/auth?client_id=test-client-id')
