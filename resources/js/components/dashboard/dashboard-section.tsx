@@ -21,7 +21,7 @@ export function DashboardSection({
                 className,
             )}
         >
-            <header className="flex flex-row flex-wrap items-end justify-between gap-3 px-5 pt-5 pb-3">
+            <header className="flex flex-row flex-wrap items-end justify-between gap-2 px-4 pt-4 pb-2 md:gap-3 md:px-5 md:pt-5 md:pb-3">
                 <div className="min-w-0">
                     <h2 className="text-[15px] font-semibold tracking-tight text-ink">
                         {title}
@@ -34,7 +34,7 @@ export function DashboardSection({
                 </div>
                 {action ? <div className="shrink-0">{action}</div> : null}
             </header>
-            <div className="px-5 pb-5">{children}</div>
+            <div className="px-4 pb-4 md:px-5 md:pb-5">{children}</div>
         </section>
     );
 }

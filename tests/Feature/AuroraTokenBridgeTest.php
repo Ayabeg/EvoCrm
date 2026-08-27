@@ -95,6 +95,28 @@ it('keeps the Apple cabinet rail at 240px on desktop and the existing mobile She
     expect($sidebar)->toContain('<SheetContent');
     expect($sidebar)->toContain('background: "var(--sidebar)"');
     expect($sidebar)->toContain('width: SIDEBAR_WIDTH_MOBILE');
+    expect($sidebar)->toContain('w-[min(var(--sidebar-width),92vw)]');
+    expect($sidebar)->not->toContain('w-[min(396px,92vw)]');
+});
+
+it('keeps Home KPI values on the Brand Book --text-kpi scale', function () {
+    $card = file_get_contents(resource_path('js/components/crm/evo-kpi-card.tsx'));
+
+    expect($card)->toContain('text-kpi');
+    expect($card)->not->toContain('text-[1.875rem]');
+    expect($card)->not->toContain('min-h-[7.5rem]');
+});
+
+it('uses compact mobile spacing tokens on Home chrome', function () {
+    $home = file_get_contents(resource_path('js/pages/home.tsx'));
+    $header = file_get_contents(resource_path('js/components/dashboard/dashboard-header.tsx'));
+    $strip = file_get_contents(resource_path('js/components/crm/crm-kpi-strip.tsx'));
+
+    expect($home)->toContain('px-4 py-5 md:px-8 md:py-8');
+    expect($home)->toContain('gap-4 md:gap-6');
+    expect($header)->toContain('text-page-title');
+    expect($header)->toContain('mb-5 flex flex-col gap-3 md:mb-8 md:gap-5');
+    expect($strip)->toContain('grid-cols-2');
 });
 
 it('uses a soft rail pill instead of an orange active bar', function () {

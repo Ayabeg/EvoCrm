@@ -33,12 +33,10 @@ export function DashboardHeader({
     };
 
     return (
-        <header className="mb-8 flex flex-col gap-5">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <header className="mb-5 flex flex-col gap-3 md:mb-8 md:gap-5">
+            <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <h1 className="text-[1.75rem] font-semibold tracking-tight text-ink">
-                        Home
-                    </h1>
+                    <h1 className="text-page-title text-ink">Home</h1>
                     <p className="mt-1 text-[12px] leading-5 text-mute">
                         {subtitle}
                     </p>
@@ -52,14 +50,14 @@ export function DashboardHeader({
                 </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-hairline bg-canvas px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-hairline bg-canvas px-3 py-2 md:px-4 md:py-3">
                 <Input
                     type="date"
                     size="sm"
                     value={filters.from ?? ''}
                     onChange={(e) => apply({ from: e.target.value })}
                     aria-label="From date"
-                    className="w-[9.5rem]"
+                    className="min-w-0 flex-1 sm:w-[9.5rem] sm:flex-none"
                 />
                 <span className="text-[12px] text-mute">-</span>
                 <Input
@@ -68,7 +66,7 @@ export function DashboardHeader({
                     value={filters.to ?? ''}
                     onChange={(e) => apply({ to: e.target.value })}
                     aria-label="To date"
-                    className="w-[9.5rem]"
+                    className="min-w-0 flex-1 sm:w-[9.5rem] sm:flex-none"
                 />
                 <NativeSelect
                     value={filters.owner_id ?? ''}
@@ -80,7 +78,7 @@ export function DashboardHeader({
                         })
                     }
                     aria-label="Filter by owner"
-                    className="w-[11rem]"
+                    className="min-w-0 flex-1 sm:w-[11rem] sm:flex-none"
                 >
                     <option value="">All owners</option>
                     {owners.map((owner) => (

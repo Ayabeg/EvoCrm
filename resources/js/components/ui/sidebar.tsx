@@ -188,7 +188,8 @@ function Sidebar({
           data-mobile="true"
           hideClose
           className={cn(
-            "text-sidebar-foreground w-(--sidebar-width) border-sidebar-border p-0",
+            // Aurora Sheet min(token, 92vw) contract, bound to the 240px rail.
+            "text-sidebar-foreground w-[min(var(--sidebar-width),92vw)] max-w-[var(--sidebar-width)] border-sidebar-border p-0",
             className,
           )}
           style={

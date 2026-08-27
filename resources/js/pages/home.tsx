@@ -73,7 +73,7 @@ export default function Home({
         <>
             <Head title="Home" />
             <div className="flex-1">
-                <div className="mx-auto w-full max-w-7xl px-5 py-8 md:px-8">
+                <div className="mx-auto w-full max-w-7xl px-4 py-5 md:px-8 md:py-8">
                     <DashboardHeader
                         subtitle={subtitle}
                         owners={owners}
@@ -81,13 +81,16 @@ export default function Home({
                     />
 
                     {kpis.length > 0 ? (
-                        <section aria-label="Command KPIs" className="mb-8">
+                        <section
+                            aria-label="Command KPIs"
+                            className="mb-5 md:mb-8"
+                        >
                             <CrmKpiStrip kpis={kpis} columns={5} />
                         </section>
                     ) : null}
 
-                    <div className="grid gap-6 lg:grid-cols-3">
-                        <div className="space-y-6 lg:col-span-2">
+                    <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
+                        <div className="space-y-4 md:space-y-6 lg:col-span-2">
                             {primaryChart ? (
                                 <DashboardSection
                                     title="Performance"
@@ -189,7 +192,7 @@ export default function Home({
                             ) : null}
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-4 md:space-y-6">
                             <DashboardSection title="Needs attention">
                                 <AttentionList items={attention} />
                             </DashboardSection>
@@ -214,7 +217,7 @@ export default function Home({
                         </div>
                     </div>
 
-                    <footer className="mt-10 border-t border-hairline pt-4 text-[11px] text-mute">
+                    <footer className="mt-6 border-t border-hairline pt-3 text-[11px] text-mute md:mt-10 md:pt-4">
                         {dataAsOf
                             ? `Data as of ${dataAsOf} · ${window.timezone}`
                             : `Data as of now · ${window.timezone}`}

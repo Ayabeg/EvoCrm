@@ -26,7 +26,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
 
     return (
         <>
-            <header className="app-topbar sticky top-0 z-20 flex shrink-0 items-center gap-2 px-3 sm:gap-3 sm:px-4">
+            <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-2 px-3 sm:gap-3 sm:px-4">
                 <SidebarTrigger className="-ml-1 shrink-0 text-ink md:hidden" />
                 <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl">
                     <Input
@@ -40,7 +40,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         startAdornment={
                             <Search className="size-4" aria-hidden />
                         }
-                        className="cursor-pointer rounded-full pr-12 sm:pr-16"
+                        className="cursor-pointer rounded-full pr-3 sm:pr-16"
                     />
                     <span className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 font-sans text-[var(--text-section-label)] text-mute sm:inline">
                         ⌘K

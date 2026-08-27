@@ -39,7 +39,7 @@ export function CrmKpiStrip({
     return (
         <div
             className={cn(
-                'grid grid-cols-1 gap-3 sm:gap-4',
+                'grid grid-cols-2 gap-2 sm:gap-4',
                 columnClass,
                 className,
             )}
