@@ -13,7 +13,7 @@ export default function AppSidebarLayout({
             <AppSidebar />
             <AppContent
                 variant="sidebar"
-                className="aurora-page-shell min-w-0 overflow-x-clip !bg-[var(--aurora-shell-bg)]"
+                className="aurora-page-shell min-w-0 overflow-x-clip !bg-[var(--aurora-shell-bg)] font-sans"
             >
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 {children}

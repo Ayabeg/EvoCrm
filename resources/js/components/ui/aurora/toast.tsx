@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Aurora toast primitive.
+ *
+ * Not the application notification bus. EvoSales flash toasts use Sonner
+ * (`ui/sonner` + `useFlashToast`). Keep this file as the vendored Aurora
+ * primitive; do not mount `<ToastProvider>` beside Sonner.
+ */
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { CircleCheck, Info, TriangleAlert, X, CircleX } from "lucide-react";

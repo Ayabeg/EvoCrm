@@ -2,10 +2,75 @@ import { Link } from '@inertiajs/react';
 import { EMPTY_FUNNEL } from '@/components/ads/funnel';
 import type { FunnelCounts } from '@/components/ads/funnel';
 import { AdsShell } from '@/components/crm/ads-shell';
-import PageHeader from '@/components/page-header';
-import { Card } from '@/components/ui/card';
+import { HairlinePanel } from '@/components/surface/hairline-panel';
+import {
+    HairlineRow,
+    HairlineTable,
+    HairlineTd,
+    HairlineTh,
+} from '@/components/surface/hairline-table';
+import { SurfaceHeader } from '@/components/surface/surface-header';
 import { formatDzd } from '@/lib/money';
 
-export default function AdsCampaignsIndex({ campaigns, funnels }: { campaigns: Array<{ id: number; name: string; status: string; account?: { name: string } | null }>; funnels: Record<number, FunnelCounts>; meta: { connected: boolean } }) {
-    return (<AdsShell title="Campaigns"><div className="p-6 space-y-4"><PageHeader title="Campaigns" description="Meta campaigns." /><Card className="overflow-hidden"><table className="w-full text-sm"><tbody>{campaigns.map((c) => (<tr key={c.id} className="border-t border-hairline"><td className="px-4 py-3"><Link href={`/ads/campaigns/${c.id}`} className="text-brand">{c.name}</Link></td><td className="px-4 py-3">{c.account?.name ?? '—'}</td><td className="px-4 py-3">{c.status}</td><td className="px-4 py-3 text-right">{formatDzd((funnels[c.id] ?? EMPTY_FUNNEL).spend_cents)}</td></tr>))}</tbody></table></Card></div></AdsShell>);
+export default function AdsCampaignsIndex({
+    campaigns,
+    funnels,
+}: {
+    campaigns: Array<{
+        id: number;
+        name: string;
+        status: string;
+        account?: { name: string } | null;
+    }>;
+    funnels: Record<number, FunnelCounts>;
+    meta: { connected: boolean };
+}) {
+    return (
+        <AdsShell title="Campaigns">
+            <div className="space-y-5 p-6">
+                <SurfaceHeader title="Campaigns" description="Meta campaigns synced into this workspace." />
+                <HairlinePanel>
+                    <HairlineTable>
+                        <thead>
+                            <tr className="border-b border-hairline">
+                                <HairlineTh>Campaign</HairlineTh>
+                                <HairlineTh>Account</HairlineTh>
+                                <HairlineTh>Status</HairlineTh>
+                                <HairlineTh align="right">Spend</HairlineTh>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {campaigns.length === 0 ? (
+                                <HairlineRow>
+                                    <HairlineTd colSpan={4} className="py-6 text-mute">
+                                        No campaigns yet.
+                                    </HairlineTd>
+                                </HairlineRow>
+                            ) : (
+                                campaigns.map((campaign) => (
+                                    <HairlineRow key={campaign.id}>
+                                        <HairlineTd>
+                                            <Link
+                                                href={`/ads/campaigns/${campaign.id}`}
+                                                className="font-medium text-brand hover:underline"
+                                            >
+                                                {campaign.name}
+                                            </Link>
+                                        </HairlineTd>
+                                        <HairlineTd className="text-mute">
+                                            {campaign.account?.name ?? '-'}
+                                        </HairlineTd>
+                                        <HairlineTd>{campaign.status}</HairlineTd>
+                                        <HairlineTd align="right" className="money tabular-nums">
+                                            {formatDzd((funnels[campaign.id] ?? EMPTY_FUNNEL).spend_cents)}
+                                        </HairlineTd>
+                                    </HairlineRow>
+                                ))
+                            )}
+                        </tbody>
+                    </HairlineTable>
+                </HairlinePanel>
+            </div>
+        </AdsShell>
+    );
 }

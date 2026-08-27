@@ -25,9 +25,10 @@ import { cn } from "@/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// HubSpot sales chrome: ~220px label rail, 56px icon rail.
-const SIDEBAR_WIDTH = "220px"
-const SIDEBAR_WIDTH_MOBILE = "min(16rem, 86vw)"
+// Apple / Aurora Light Cabinet: 240px labeled rail, 56px icon rail.
+// Mobile stays the existing Aurora Sheet — opaque 240px, not a drawer rewrite.
+const SIDEBAR_WIDTH = "240px"
+const SIDEBAR_WIDTH_MOBILE = "240px"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -153,6 +154,7 @@ function Sidebar({
   variant = "sidebar",
   collapsible = "offcanvas",
   className,
+  style,
   children,
   ...props
 }: React.ComponentProps<"div"> & {
@@ -179,28 +181,39 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-        <SheetHeader className="sr-only">
-          <SheetTitle>Sidebar</SheetTitle>
-          <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-        </SheetHeader>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="text-sidebar-foreground w-(--sidebar-width) border-sidebar-border p-0 [&>button]:hidden"
+          hideClose
+          className={cn(
+            "text-sidebar-foreground w-(--sidebar-width) border-sidebar-border p-0",
+            className,
+          )}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              width: SIDEBAR_WIDTH_MOBILE,
+              maxWidth: SIDEBAR_WIDTH_MOBILE,
               background: "var(--sidebar)",
               borderColor: "var(--sidebar-border)",
               color: "var(--sidebar-foreground)",
-              boxShadow: "0 24px 48px rgba(0,0,0,0.32)",
+              boxShadow: "var(--aurora-shadow-strong)",
+              isolation: "isolate",
+              ...style,
             } as React.CSSProperties
           }
+          overlayStyle={{ backgroundColor: "var(--sidebar-overlay)" }}
           side={side}
         >
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <SheetHeader className="sr-only">
+            <SheetTitle>Sidebar</SheetTitle>
+            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+          </SheetHeader>
+          <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
+            {children}
+          </div>
         </SheetContent>
       </Sheet>
     )
@@ -238,6 +251,7 @@ function Sidebar({
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
           className
         )}
+        style={style}
         {...props}
       >
         <div

@@ -27,31 +27,39 @@ function formatValue(value: number): string {
 
 function ChartFrame({
     payload,
+    framed,
     children,
 }: {
     payload: EvoVizPayload;
+    framed: boolean;
     children: ReactNode;
 }) {
     const body = (
-        <div className="rounded-lg border border-hairline bg-canvas px-4 py-3">
+        <div
+            className={
+                framed
+                    ? 'rounded-2xl border border-hairline bg-canvas px-5 py-5'
+                    : ''
+            }
+        >
             <div className="flex items-baseline justify-between gap-3">
-                <p className="text-[11px] tracking-wide text-muted-foreground uppercase">
+                <p className="text-[11px] leading-4 text-mute">
                     {payload.title}
                 </p>
                 {payload.total !== undefined &&
                 payload.id !== 'evoviz.kpi-spark' ? (
-                    <p className="money text-[12px] text-muted-foreground">
+                    <p className="money text-[12px] text-mute">
                         {formatValue(payload.total)}
                         {payload.valueLabel ? ` ${payload.valueLabel}` : ''}
                     </p>
                 ) : null}
             </div>
             {payload.series.length > 1 ? (
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
                     {payload.series.map((series, i) => (
                         <span
                             key={series.name}
-                            className="flex items-center gap-1.5 text-[11px] text-muted-foreground"
+                            className="flex items-center gap-1.5 text-[11px] text-mute"
                         >
                             <span
                                 className="size-2 shrink-0 rounded-full"
@@ -67,7 +75,7 @@ function ChartFrame({
                     ))}
                 </div>
             ) : null}
-            <div className="mt-2">{children}</div>
+            <div className="mt-4">{children}</div>
         </div>
     );
 
@@ -285,7 +293,7 @@ function HorizontalBars({
         <ul className="flex flex-col gap-2" aria-label={payload.title}>
             {rows.map((row) => (
                 <li key={row.label} className="flex items-center gap-3">
-                    <span className="w-20 shrink-0 truncate text-[12px] text-muted-foreground">
+                    <span className="w-20 shrink-0 truncate text-[12px] text-mute">
                         {row.label}
                     </span>
                     <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-hairline/50">
@@ -398,9 +406,7 @@ function DonutChart({ payload }: { payload: EvoVizPayload }) {
                                     EVOVIZ_PALETTE[i % EVOVIZ_PALETTE.length],
                             }}
                         />
-                        <span className="truncate text-muted-foreground">
-                            {label}
-                        </span>
+                        <span className="truncate text-mute">{label}</span>
                         <span className="money ml-auto pl-3">
                             {formatValue(values[i])}
                         </span>
@@ -436,10 +442,10 @@ function KpiSpark({ payload }: { payload: EvoVizPayload }) {
 
     return (
         <div>
-            <p className="money text-2xl font-semibold text-ink">
+            <p className="money text-kpi font-semibold tracking-tight text-ink">
                 {formatValue(total)}
                 {payload.valueLabel ? (
-                    <span className="ml-1 text-[12px] font-normal text-muted-foreground">
+                    <span className="ml-1 text-[12px] font-normal text-mute">
                         {payload.valueLabel}
                     </span>
                 ) : null}
@@ -470,7 +476,13 @@ function KpiSpark({ payload }: { payload: EvoVizPayload }) {
 /* Entry point                                                         */
 /* ------------------------------------------------------------------ */
 
-export function EvoVizChart({ payload }: { payload: EvoVizPayload }) {
+export function EvoVizChart({
+    payload,
+    framed = true,
+}: {
+    payload: EvoVizPayload;
+    framed?: boolean;
+}) {
     if (evovizIsEmpty(payload)) {
         return null;
     }
@@ -501,5 +513,9 @@ export function EvoVizChart({ payload }: { payload: EvoVizPayload }) {
             break;
     }
 
-    return <ChartFrame payload={payload}>{chart}</ChartFrame>;
+    return (
+        <ChartFrame payload={payload} framed={framed}>
+            {chart}
+        </ChartFrame>
+    );
 }

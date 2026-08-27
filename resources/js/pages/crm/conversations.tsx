@@ -1,9 +1,17 @@
 import { Form, Link, router } from '@inertiajs/react';
+import { MessageCircle } from 'lucide-react';
 import { DeskShell } from '@/components/crm/desk-shell';
-import PageHeader from '@/components/page-header';
+import { Avatar } from '@/components/ui/aurora/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 
 type Contact = {
@@ -47,157 +55,238 @@ function nameOf(contact?: Contact | null) {
     return `${contact.first_name} ${contact.last_name ?? ''}`.trim();
 }
 
+function initialsOf(contact?: Contact | null) {
+    const name = nameOf(contact);
+
+    return name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0] ?? '')
+        .join('')
+        .toUpperCase();
+}
+
 export default function ConversationHistory({ threads, selected }: Props) {
     return (
         <DeskShell title="Conversations">
-            <div className="h-full overflow-y-auto">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Conversation history"
-                    description="CRM context only — threads synced from the sold Desk (EvoDesk / Chatwoot Community). This is not the Chatwoot clone."
-                >
-                    <Button asChild>
-                        <Link href="/inbox">Open inbox</Link>
-                    </Button>
-                </PageHeader>
-
-                <Card className="border-hairline bg-canvas p-4 text-sm">
-                    <p>
-                        The live desk is embedded at{' '}
-                        <Link href="/inbox" className="font-medium text-brand underline">
-                            My Inbox
-                        </Link>{' '}
-                        — it never leaves EvoSales. Use this list to see which Contact and Deal a conversation
-                        belongs to.
-                    </p>
-                </Card>
-
-                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-                    <Card className="overflow-hidden">
-                        <table className="w-full text-sm">
-                            <thead className="bg-muted/50 text-left">
-                                <tr>
-                                    <th className="px-4 py-2">Contact</th>
-                                    <th className="px-4 py-2">Company</th>
-                                    <th className="px-4 py-2">Last</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {threads.length === 0 ? (
-                                    <tr>
-                                        <td className="px-4 py-6 text-muted-foreground" colSpan={3}>
-                                            No synced history yet.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    threads.map((thread) => (
-                                        <tr
-                                            key={thread.id}
-                                            className={`cursor-pointer border-t hover:bg-muted/40 ${
-                                                selected?.id === thread.id ? 'bg-muted/60' : ''
-                                            }`}
-                                            onClick={() =>
-                                                router.get(
-                                                    '/conversations',
-                                                    { thread: thread.id },
-                                                    { preserveState: true },
-                                                )
-                                            }
-                                        >
-                                            <td className="px-4 py-2">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium">{nameOf(thread.contact)}</span>
-                                                    {(thread.unread_count ?? 0) > 0 ? (
-                                                        <Badge variant="secondary">{thread.unread_count}</Badge>
-                                                    ) : null}
-                                                </div>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {thread.contact.phone_e164 ?? 'No phone'}
-                                                </p>
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                {thread.contact.company?.name ?? '—'}
-                                            </td>
-                                            <td className="px-4 py-2 text-xs text-muted-foreground">
-                                                {thread.messages?.[0]?.body ?? thread.subject ?? '—'}
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </Card>
-
-                    <Card className="space-y-4 p-4">
-                        {selected ? (
-                            <>
-                                <div>
-                                    <h2 className="font-medium">{nameOf(selected.contact)}</h2>
-                                    <p className="text-sm text-muted-foreground">
-                                        {selected.contact.company?.name ?? 'No company'} ·{' '}
-                                        {selected.contact.phone_e164 ?? 'No phone'}
-                                    </p>
-                                </div>
-                                <div className="space-y-2 text-sm">
-                                    {(selected.messages ?? []).map((message) => (
-                                        <div key={message.id} className="rounded-md border px-3 py-2">
-                                            <p className="text-xs text-muted-foreground">
-                                                {message.direction} · {message.status}
-                                                {message.failure_reason ? ` · ${message.failure_reason}` : ''}
-                                            </p>
-                                            <p>{message.body}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                <Form
-                                    action={`/desk/threads/${selected.id}/reply`}
-                                    method="post"
-                                    className="flex gap-2"
-                                    resetOnSuccess={['body']}
-                                >
-                                    {({ processing }) => (
-                                        <>
-                                            <Input
-                                                name="body"
-                                                placeholder="Log a session reply (Evolution Cloud if connected)"
-                                                required
-                                            />
-                                            <Button disabled={processing}>Send</Button>
-                                        </>
-                                    )}
-                                </Form>
-                                <div className="space-y-1 text-sm">
-                                    <p className="font-medium">Open deal</p>
-                                    {(selected.contact.deals ?? []).length === 0 ? (
-                                        <p className="text-muted-foreground">No open deal on this contact.</p>
-                                    ) : (
-                                        selected.contact.deals?.map((deal) => (
-                                            <Link
-                                                key={deal.id}
-                                                href={`/crm/deals/${deal.id}`}
-                                                className="block text-brand"
-                                            >
-                                                {deal.title} · {deal.stage?.name}
-                                            </Link>
-                                        ))
-                                    )}
-                                    <Link
-                                        href={`/crm/contacts/${selected.contact.id}`}
-                                        className="inline-block text-brand"
-                                    >
-                                        Open CRM record
-                                    </Link>
-                                </div>
-                            </>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">
-                                Select a row to see contact ↔ deal context. Reply here only if you need a CRM-side
-                                session note — the sold desk is EvoDesk.
+            <div className="h-full overflow-y-auto bg-canvas-soft">
+                <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-5 sm:px-6">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <h2 className="text-page-title">
+                                Conversation history
+                            </h2>
+                            <p className="aurora-text-ui mt-1 max-w-[65ch] text-muted-foreground">
+                                CRM context only. Threads synced from the sold
+                                Desk. This is not a Chatwoot clone.
                             </p>
-                        )}
-                    </Card>
+                        </div>
+                        {threads.length > 0 ? (
+                            <Link
+                                href="/inbox"
+                                className="aurora-text-ui font-medium text-brand"
+                            >
+                                Open inbox
+                            </Link>
+                        ) : null}
+                    </div>
+
+                    {threads.length === 0 ? (
+                        <div className="mx-auto w-full max-w-lg py-8">
+                            <EmptyState
+                                as="h2"
+                                icon={<MessageCircle className="size-6" />}
+                                title="No conversation history"
+                                description="Threads appear after official Desk traffic."
+                                action={
+                                    <Button asChild>
+                                        <Link href="/inbox">Open inbox</Link>
+                                    </Button>
+                                }
+                            />
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+                            <Card
+                                elevated={false}
+                                className="overflow-hidden p-0"
+                            >
+                                <ul className="divide-y divide-hairline">
+                                    {threads.map((thread) => (
+                                        <li key={thread.id}>
+                                            <button
+                                                type="button"
+                                                className={`flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+                                                    selected?.id === thread.id
+                                                        ? 'bg-brand/8'
+                                                        : 'hover:bg-canvas-soft'
+                                                }`}
+                                                onClick={() =>
+                                                    router.get(
+                                                        '/conversations',
+                                                        { thread: thread.id },
+                                                        { preserveState: true },
+                                                    )
+                                                }
+                                            >
+                                                <Avatar
+                                                    size="md"
+                                                    shape="square"
+                                                    initials={initialsOf(
+                                                        thread.contact,
+                                                    )}
+                                                    alt={nameOf(thread.contact)}
+                                                    className="shrink-0"
+                                                />
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="truncate font-medium">
+                                                            {nameOf(
+                                                                thread.contact,
+                                                            )}
+                                                        </span>
+                                                        {(thread.unread_count ??
+                                                            0) > 0 ? (
+                                                            <Badge variant="secondary">
+                                                                {
+                                                                    thread.unread_count
+                                                                }
+                                                            </Badge>
+                                                        ) : null}
+                                                    </div>
+                                                    <p className="aurora-text-caption text-muted-foreground">
+                                                        {thread.contact.company
+                                                            ?.name ??
+                                                            'No company'}
+                                                    </p>
+                                                    <p className="aurora-text-ui mt-1 truncate text-muted-foreground">
+                                                        {thread.messages?.[0]
+                                                            ?.body ??
+                                                            thread.subject ??
+                                                            'No preview'}
+                                                    </p>
+                                                </div>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </Card>
+
+                            <Card className="p-0">
+                                {selected ? (
+                                    <>
+                                        <CardHeader>
+                                            <CardTitle as="h2">
+                                                {nameOf(selected.contact)}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {selected.contact.company
+                                                    ?.name ?? 'No company'}{' '}
+                                                ·{' '}
+                                                {selected.contact.phone_e164 ??
+                                                    'No phone'}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="space-y-2">
+                                                {(selected.messages ?? []).map(
+                                                    (message) => (
+                                                        <div
+                                                            key={message.id}
+                                                            className="rounded-[16px] bg-canvas-soft px-3.5 py-2.5"
+                                                        >
+                                                            <p className="aurora-text-caption text-muted-foreground">
+                                                                {
+                                                                    message.direction
+                                                                }{' '}
+                                                                ·{' '}
+                                                                {message.status}
+                                                                {message.failure_reason
+                                                                    ? ` · ${message.failure_reason}`
+                                                                    : ''}
+                                                            </p>
+                                                            <p className="aurora-text-body mt-1">
+                                                                {message.body}
+                                                            </p>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                            <Form
+                                                action={`/desk/threads/${selected.id}/reply`}
+                                                method="post"
+                                                className="flex gap-2"
+                                                resetOnSuccess={['body']}
+                                            >
+                                                {({ processing }) => (
+                                                    <>
+                                                        <Input
+                                                            name="body"
+                                                            placeholder="Log a session reply"
+                                                            required
+                                                        />
+                                                        <Button
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                        >
+                                                            Send
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </Form>
+                                            <div className="aurora-text-ui space-y-1">
+                                                <p className="font-medium">
+                                                    Open deal
+                                                </p>
+                                                {(selected.contact.deals ?? [])
+                                                    .length === 0 ? (
+                                                    <p className="text-muted-foreground">
+                                                        No open deal on this
+                                                        contact.
+                                                    </p>
+                                                ) : (
+                                                    selected.contact.deals?.map(
+                                                        (deal) => (
+                                                            <Link
+                                                                key={deal.id}
+                                                                href={`/crm/deals/${deal.id}`}
+                                                                className="block text-brand"
+                                                            >
+                                                                {deal.title} ·{' '}
+                                                                {
+                                                                    deal.stage
+                                                                        ?.name
+                                                                }
+                                                            </Link>
+                                                        ),
+                                                    )
+                                                )}
+                                                <Link
+                                                    href={`/crm/contacts/${selected.contact.id}`}
+                                                    className="inline-block font-medium text-brand"
+                                                >
+                                                    Open CRM record
+                                                </Link>
+                                            </div>
+                                        </CardContent>
+                                    </>
+                                ) : (
+                                    <div className="grid place-items-center px-6 py-10">
+                                        <EmptyState
+                                            as="h2"
+                                            icon={
+                                                <MessageCircle className="size-6" />
+                                            }
+                                            title="Select a conversation"
+                                            description="See contact and deal context from the sold Desk."
+                                        />
+                                    </div>
+                                )}
+                            </Card>
+                        </div>
+                    )}
                 </div>
-            </div>
             </div>
         </DeskShell>
     );

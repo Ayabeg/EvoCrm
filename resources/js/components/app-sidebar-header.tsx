@@ -26,19 +26,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
 
     return (
         <>
-            <header
-                className="flex h-[52px] shrink-0 items-center gap-2 border-b px-3 sm:gap-3 sm:px-4"
-                style={{
-                    borderColor: 'var(--aurora-border-default)',
-                    background:
-                        'linear-gradient(180deg, var(--aurora-panel-strong-top), var(--aurora-panel-strong))',
-                    boxShadow: 'var(--aurora-highlight-medium)',
-                }}
-            >
-                <SidebarTrigger
-                    className="-ml-1 shrink-0 md:hidden"
-                    style={{ color: 'var(--aurora-text-primary)' }}
-                />
+            <header className="app-topbar sticky top-0 z-20 flex shrink-0 items-center gap-2 px-3 sm:gap-3 sm:px-4">
+                <SidebarTrigger className="-ml-1 shrink-0 text-ink md:hidden" />
                 <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl">
                     <Input
                         readOnly
@@ -53,14 +42,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         }
                         className="cursor-pointer rounded-full pr-12 sm:pr-16"
                     />
-                    <span
-                        className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 sm:inline"
-                        style={{
-                            color: 'var(--aurora-text-muted)',
-                            fontFamily: 'var(--aurora-font-sans)',
-                            fontSize: 'var(--aurora-type-caption)',
-                        }}
-                    >
+                    <span className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 font-sans text-[var(--text-section-label)] text-mute sm:inline">
                         ⌘K
                     </span>
                 </div>
@@ -69,7 +51,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         <DropdownMenuTrigger asChild>
                             <Button
                                 type="button"
-                                variant="outline"
+                                variant="default"
                                 size="icon"
                                 title="Create"
                                 className="rounded-full"
@@ -105,11 +87,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                     type="button"
                                     variant="secondary"
                                     size="icon"
-                                    className="rounded-full text-[11px] font-medium"
-                                    style={{
-                                        background: 'var(--aurora-text-primary)',
-                                        color: 'var(--aurora-panel-strong)',
-                                    }}
+                                    className="rounded-full bg-ink text-[11px] font-medium text-canvas"
                                     title={user.name}
                                 >
                                     {initials(user.name)}

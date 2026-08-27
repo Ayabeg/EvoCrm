@@ -1,3 +1,12 @@
+/**
+ * Product form-error compound wrapper.
+ *
+ * Authority: Aurora Callout (`ui/aurora/callout`) is the canonical status
+ * primitive (info / success / warn / error / neutral). This file keeps the
+ * shadcn Alert / AlertTitle / AlertDescription API used by existing
+ * form-error surfaces. Destructive maps onto Aurora error tokens — it does
+ * not invent a third alert system.
+ */
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
@@ -8,9 +17,10 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-background text-foreground",
+        default:
+          "bg-[var(--evosales-canvas)] text-[var(--evosales-ink)] border-[var(--evosales-hairline)]",
         destructive:
-          "text-destructive-foreground [&>svg]:text-current *:data-[slot=alert-description]:text-destructive-foreground/80",
+          "bg-[var(--aurora-error-surface)] text-[var(--aurora-error-foreground)] border-[var(--aurora-error-border)] [&>svg]:text-[var(--aurora-error)] *:data-[slot=alert-description]:text-[var(--aurora-error-foreground)]",
       },
     },
     defaultVariants: {

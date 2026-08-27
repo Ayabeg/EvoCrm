@@ -16,6 +16,9 @@ type SheetSide = "left" | "right" | "top" | "bottom"
 export interface SheetContentProps extends React.ComponentProps<typeof DialogPrimitive.Content> {
   side?: SheetSide
   hideClose?: boolean
+  /** Optional overlay paint. Defaults to `--aurora-overlay`. */
+  overlayStyle?: React.CSSProperties
+  overlayClassName?: string
 }
 
 const sideClass: Record<SheetSide, string> = {
@@ -25,15 +28,18 @@ const sideClass: Record<SheetSide, string> = {
   bottom: "bottom-0 left-0 h-[min(420px,82vh)] w-full data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom",
 }
 
-function SheetContent({ ref, className, children, side = "right", style, hideClose = false, ...props }: SheetContentProps & { ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Content>> }) {
+function SheetContent({ ref, className, children, side = "right", style, hideClose = false, overlayStyle, overlayClassName, ...props }: SheetContentProps & { ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Content>> }) {
   // Portal into a scoped container when one is provided (e.g. a scaled catalog
   // preview tile) so the overlay stays contained instead of escaping to body.
   const portalContainer = usePortalContainer()
   return (
     <SheetPortal container={portalContainer ?? undefined}>
       <DialogPrimitive.Overlay
-        className="fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-        style={{ backgroundColor: "var(--aurora-overlay)" }}
+        className={cn(
+          "fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          overlayClassName,
+        )}
+        style={{ backgroundColor: "var(--aurora-overlay)", ...overlayStyle }}
       />
       <DialogPrimitive.Content
         ref={ref}

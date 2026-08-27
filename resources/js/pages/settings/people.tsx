@@ -1,10 +1,18 @@
 import { Form, Head, router } from '@inertiajs/react';
+import { useState } from 'react';
 import PeopleController from '@/actions/App/Http/Controllers/Settings/PeopleController';
-import Heading from '@/components/heading';
+import { CreateDrawer } from '@/components/crm/create-drawer';
 import InputError from '@/components/input-error';
+import { HairlinePanel } from '@/components/surface/hairline-panel';
+import {
+    HairlineRow,
+    HairlineTable,
+    HairlineTd,
+    HairlineTh,
+} from '@/components/surface/hairline-table';
+import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
     Dialog,
     DialogClose,
@@ -16,6 +24,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
 import type { WorkspaceRole } from '@/types/auth';
 
 type PersonRow = {
@@ -38,7 +47,7 @@ type Props = {
 
 function formatDate(iso: string | null): string {
     if (!iso) {
-        return '—';
+        return '-';
     }
 
     const date = new Date(iso);
@@ -71,17 +80,17 @@ export default function People({
     actorRole,
     hasEnabledMailbox,
 }: Props) {
+    const [inviteOpen, setInviteOpen] = useState(false);
+
     const canTouchRow = (person: PersonRow): boolean => {
         if (person.is_self) {
             return false;
         }
 
-        // Nobody below an owner modifies an owner.
         if (person.role === 'owner' && actorRole !== 'owner') {
             return false;
         }
 
-        // The last owner keeps their role and their seat.
         if (person.role === 'owner' && ownerCount <= 1) {
             return false;
         }
@@ -95,143 +104,66 @@ export default function People({
 
             <h1 className="sr-only">People</h1>
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
+            <div className="space-y-5">
+                <SurfaceHeader
                     title="People"
-                    description="Who can sign in to this Evotechly workspace, their role, and their first-login email"
-                />
-
-                <Card className="p-4">
-                    <h2 className="mb-1 font-medium">Invite someone</h2>
-                    <p className="mb-3 text-sm text-muted-foreground">
-                        They get a login email from the workspace mailbox with a
-                        single-use link to set their password on
-                        crm.evotechly.com — never a password in the mail.
-                        Invites are admin or member; this workspace has one
-                        owner.
-                    </p>
-
-                    {!hasEnabledMailbox && (
-                        <div className="mb-3 rounded-md border border-brand/30 bg-brand/5 p-3 text-sm">
-                            No enabled mailbox — the person is added as pending,
-                            but the login email cannot leave until a mailbox is
-                            enabled under Outbound → Mailboxes. You can resend
-                            the invite from their row afterwards.
-                        </div>
-                    )}
-
-                    <Form
-                        {...PeopleController.store.form()}
-                        options={{ preserveScroll: true }}
-                        className="grid gap-3 md:grid-cols-4"
-                        resetOnSuccess
+                    description="Who can sign in to this Evotechly workspace, their role, and their first-login email."
+                >
+                    <Button
+                        size="sm"
+                        onClick={() => setInviteOpen(true)}
+                        data-test="invite-person-open"
                     >
-                        {({ processing, errors }) => (
-                            <>
-                                <div>
-                                    <Label htmlFor="invite-name">Name</Label>
-                                    <Input
-                                        id="invite-name"
-                                        name="name"
-                                        required
-                                        placeholder="Full name"
-                                    />
-                                    <InputError message={errors.name} />
-                                </div>
-                                <div>
-                                    <Label htmlFor="invite-email">Email</Label>
-                                    <Input
-                                        id="invite-email"
-                                        name="email"
-                                        type="email"
-                                        required
-                                        placeholder="teammate@evotechly.com"
-                                    />
-                                    <InputError message={errors.email} />
-                                </div>
-                                <div>
-                                    <Label htmlFor="invite-role">Role</Label>
-                                    <select
-                                        id="invite-role"
-                                        name="role"
-                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                        defaultValue="member"
-                                    >
-                                        <option value="member">Member</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
-                                    <InputError message={errors.role} />
-                                </div>
-                                <div className="flex items-end">
-                                    <Button
-                                        disabled={processing}
-                                        data-test="invite-person-button"
-                                    >
-                                        Send invite
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </Card>
+                        Invite
+                    </Button>
+                </SurfaceHeader>
 
-                <Card className="overflow-x-auto p-0">
-                    <table className="w-full min-w-[640px] text-sm">
+                <HairlinePanel>
+                    <HairlineTable minWidth="40rem">
                         <thead>
-                            <tr className="border-b text-left text-xs text-muted-foreground">
-                                <th className="px-4 py-3 font-medium">Name</th>
-                                <th className="px-4 py-3 font-medium">Email</th>
-                                <th className="px-4 py-3 font-medium">Role</th>
-                                <th className="px-4 py-3 font-medium">
-                                    Last login / invited
-                                </th>
-                                <th className="px-4 py-3 font-medium">
-                                    Status
-                                </th>
-                                <th className="px-4 py-3 text-right font-medium">
-                                    Actions
-                                </th>
+                            <tr className="border-b border-hairline">
+                                <HairlineTh>Name</HairlineTh>
+                                <HairlineTh>Email</HairlineTh>
+                                <HairlineTh>Role</HairlineTh>
+                                <HairlineTh>Last login / invited</HairlineTh>
+                                <HairlineTh>Status</HairlineTh>
+                                <HairlineTh align="right">Actions</HairlineTh>
                             </tr>
                         </thead>
-                        <tbody className="divide-y">
+                        <tbody>
                             {people.map((person) => (
-                                <tr key={person.id}>
-                                    <td className="px-4 py-3 font-medium">
+                                <HairlineRow key={person.id}>
+                                    <HairlineTd className="font-medium">
                                         {person.name}
                                         {person.is_self ? (
-                                            <span className="ml-1 text-xs text-muted-foreground">
+                                            <span className="aurora-text-caption ml-1 text-mute">
                                                 (you)
                                             </span>
                                         ) : null}
-                                    </td>
-                                    <td className="px-4 py-3 text-muted-foreground">
+                                    </HairlineTd>
+                                    <HairlineTd className="text-mute">
                                         {person.email}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Badge
-                                            variant={roleVariant(person.role)}
-                                        >
+                                    </HairlineTd>
+                                    <HairlineTd>
+                                        <Badge variant={roleVariant(person.role)}>
                                             {person.role}
                                         </Badge>
-                                    </td>
-                                    <td className="px-4 py-3 text-muted-foreground">
+                                    </HairlineTd>
+                                    <HairlineTd className="text-mute">
                                         {person.last_login_at
                                             ? formatDate(person.last_login_at)
                                             : `Invited ${formatDate(person.invited_at)}`}
-                                    </td>
-                                    <td className="px-4 py-3">
+                                    </HairlineTd>
+                                    <HairlineTd>
                                         {person.status === 'active' ? (
-                                            <Badge variant="default">
-                                                Active
-                                            </Badge>
+                                            <Badge variant="default">Active</Badge>
                                         ) : (
                                             <Badge variant="secondary">
                                                 Invite pending
                                             </Badge>
                                         )}
-                                    </td>
-                                    <td className="px-4 py-3">
+                                    </HairlineTd>
+                                    <HairlineTd>
                                         <div className="flex items-center justify-end gap-2">
                                             {person.status === 'pending' ? (
                                                 <Button
@@ -249,13 +181,13 @@ export default function People({
                                                         )
                                                     }
                                                 >
-                                                    Resend invite
+                                                    Resend
                                                 </Button>
                                             ) : null}
 
-                                            <select
+                                            <NativeSelect
                                                 aria-label={`Role for ${person.name}`}
-                                                className="h-8 rounded-md border bg-background px-2 text-sm disabled:opacity-50"
+                                                className="h-8 w-[7.5rem]"
                                                 value={person.role}
                                                 disabled={!canTouchRow(person)}
                                                 onChange={(event) =>
@@ -278,13 +210,11 @@ export default function People({
                                                         Owner
                                                     </option>
                                                 ) : null}
-                                                <option value="admin">
-                                                    Admin
-                                                </option>
+                                                <option value="admin">Admin</option>
                                                 <option value="member">
                                                     Member
                                                 </option>
-                                            </select>
+                                            </NativeSelect>
 
                                             {!person.is_self &&
                                             (person.role !== 'owner' ||
@@ -302,8 +232,7 @@ export default function People({
                                                     </DialogTrigger>
                                                     <DialogContent>
                                                         <DialogTitle>
-                                                            Remove {person.name}
-                                                            ?
+                                                            Remove {person.name}?
                                                         </DialogTitle>
                                                         <DialogDescription>
                                                             They lose access to
@@ -311,13 +240,11 @@ export default function People({
                                                             workspace
                                                             immediately. Their
                                                             contacts and deals
-                                                            stay — they just
+                                                            stay - they just
                                                             become unassigned.
                                                         </DialogDescription>
                                                         <DialogFooter className="gap-2">
-                                                            <DialogClose
-                                                                asChild
-                                                            >
+                                                            <DialogClose asChild>
                                                                 <Button variant="secondary">
                                                                     Cancel
                                                                 </Button>
@@ -342,13 +269,99 @@ export default function People({
                                                 </Dialog>
                                             ) : null}
                                         </div>
-                                    </td>
-                                </tr>
+                                    </HairlineTd>
+                                </HairlineRow>
                             ))}
                         </tbody>
-                    </table>
-                </Card>
+                    </HairlineTable>
+                </HairlinePanel>
             </div>
+
+            <CreateDrawer
+                open={inviteOpen}
+                onOpenChange={setInviteOpen}
+                title="Invite someone"
+                description="They get a login email from the workspace mailbox with a single-use link to set their password. Invites are admin or member."
+                showFormLink={false}
+            >
+                {!hasEnabledMailbox ? (
+                    <div className="mb-4 rounded-lg border border-hairline bg-brand/5 p-3">
+                        <p className="aurora-text-body-sm text-ink">
+                            No enabled mailbox - the person is added as pending,
+                            but the login email cannot leave until a mailbox is
+                            enabled under Outbound → Mailboxes. You can resend
+                            the invite from their row afterwards.
+                        </p>
+                    </div>
+                ) : null}
+
+                <Form
+                    {...PeopleController.store.form()}
+                    options={{ preserveScroll: true }}
+                    className="space-y-3"
+                    resetOnSuccess
+                    onSuccess={() => setInviteOpen(false)}
+                >
+                    {({ processing, errors }) => (
+                        <>
+                            <div>
+                                <Label htmlFor="invite-name" className="mb-1 block">
+                                    Name
+                                </Label>
+                                <Input
+                                    id="invite-name"
+                                    name="name"
+                                    required
+                                    placeholder="Full name"
+                                />
+                                <InputError message={errors.name} />
+                            </div>
+                            <div>
+                                <Label htmlFor="invite-email" className="mb-1 block">
+                                    Email
+                                </Label>
+                                <Input
+                                    id="invite-email"
+                                    name="email"
+                                    type="email"
+                                    required
+                                    placeholder="teammate@evotechly.com"
+                                />
+                                <InputError message={errors.email} />
+                            </div>
+                            <div>
+                                <Label htmlFor="invite-role" className="mb-1 block">
+                                    Role
+                                </Label>
+                                <NativeSelect
+                                    id="invite-role"
+                                    name="role"
+                                    defaultValue="member"
+                                >
+                                    <option value="member">Member</option>
+                                    <option value="admin">Admin</option>
+                                </NativeSelect>
+                                <InputError message={errors.role} />
+                            </div>
+                            <div className="flex justify-end gap-2 pt-2">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => setInviteOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    disabled={processing}
+                                    data-test="invite-person-button"
+                                >
+                                    Send invite
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </Form>
+            </CreateDrawer>
         </>
     );
 }

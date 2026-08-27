@@ -1,51 +1,83 @@
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
-import * as React from "react"
+/**
+ * Product avatar wrapper.
+ *
+ * Authority: Aurora (`ui/aurora/avatar`) owns the primitive — sizes, status,
+ * tone, a11y. This file is the EvoSales compound adapter so existing
+ * `<Avatar><AvatarImage /><AvatarFallback /></Avatar>` call sites keep
+ * working. Default chrome stays Brand Book muted (ink tone, no Aurora
+ * accent ring). Pass Aurora props (`size`, `status`, `tone`, `ring`)
+ * through when a surface needs the full primitive.
+ */
+import * as React from 'react';
+import {
+    Avatar as AuroraAvatar,
+    AvatarFallback as AuroraAvatarFallback,
+    AvatarGroup,
+    AvatarImage as AuroraAvatarImage,
+    type AvatarProps as AuroraAvatarProps,
+} from '@/components/ui/aurora/avatar';
 
-import { cn } from "@/lib/utils"
+function isElement(
+    child: React.ReactNode,
+): child is React.ReactElement<Record<string, unknown>> {
+    return React.isValidElement(child);
+}
 
 function Avatar({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
-  return (
-    <AvatarPrimitive.Root
-      data-slot="avatar"
-      className={cn(
-        "relative flex size-8 shrink-0 overflow-hidden rounded-full",
-        className
-      )}
-      {...props}
-    />
-  )
+    className,
+    children,
+    ...props
+}: AuroraAvatarProps) {
+    let src = props.src;
+    let alt = props.alt ?? '';
+    let initials = props.initials ?? props.fallback;
+
+    React.Children.forEach(children, (child) => {
+        if (!isElement(child)) {
+            return;
+        }
+
+        if (child.type === AvatarImage) {
+            src = (child.props.src as string | undefined) ?? src;
+            alt = (child.props.alt as string | undefined) ?? alt;
+        }
+
+        if (child.type === AvatarFallback) {
+            const label = child.props.children;
+            if (typeof label === 'string' && label.length > 0) {
+                initials = label;
+            }
+        }
+    });
+
+    return (
+        <AuroraAvatar
+            {...props}
+            src={src}
+            alt={alt}
+            initials={initials}
+            fallback={initials}
+            size={props.size ?? 'md'}
+            tone={props.tone ?? 'var(--evosales-ink)'}
+            ring={props.ring ?? false}
+            className={className}
+            style={{ boxShadow: 'none', ...props.style }}
+        />
+    );
 }
 
 function AvatarImage({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
-  return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
-      {...props}
-    />
-  )
+    className,
+    ...props
+}: React.ComponentProps<typeof AuroraAvatarImage>) {
+    return <AuroraAvatarImage className={className} {...props} />;
 }
 
 function AvatarFallback({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
-  return (
-    <AvatarPrimitive.Fallback
-      data-slot="avatar-fallback"
-      className={cn(
-        "bg-muted flex size-full items-center justify-center rounded-full",
-        className
-      )}
-      {...props}
-    />
-  )
+    className,
+    ...props
+}: React.ComponentProps<typeof AuroraAvatarFallback>) {
+    return <AuroraAvatarFallback className={className} {...props} />;
 }
 
-export { Avatar, AvatarImage, AvatarFallback }
+export { Avatar, AvatarFallback, AvatarGroup, AvatarImage };

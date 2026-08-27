@@ -119,7 +119,9 @@ export function CrmListToolbar({
                             name="sort"
                             defaultValue={sort ?? sortOptions[0]?.value}
                             className="bg-transparent text-ink outline-none"
-                            onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                            onChange={(event) =>
+                                event.currentTarget.form?.requestSubmit()
+                            }
                         >
                             {sortOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -214,7 +216,7 @@ export function CrmListFooter({
     exportHref?: string;
 }) {
     return (
-        <div className="flex items-center justify-between border-t border-hairline bg-canvas px-6 py-2 text-[12px] text-muted-foreground">
+        <div className="flex items-center justify-between border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
             <span>
                 {count} {noun}
             </span>
@@ -239,15 +241,11 @@ export function CrmEmptyState({
     return (
         <div className="grid flex-1 place-items-center bg-canvas px-6 py-16">
             <div className="max-w-sm text-center">
-                <div className="mx-auto mb-4 size-10 rounded-full border border-hairline bg-canvas-soft" />
+                <div className="mx-auto mb-4 size-10 rounded-xl border border-hairline bg-canvas-soft" />
                 <p className="text-[14px] text-ink">{line}</p>
-                <button
-                    type="button"
-                    onClick={onAction}
-                    className="mt-3 rounded-sm px-3 py-1.5 text-ui font-medium text-brand transition-colors hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                >
+                <Button type="button" onClick={onAction} className="mt-3">
                     {actionLabel}
-                </button>
+                </Button>
             </div>
         </div>
     );

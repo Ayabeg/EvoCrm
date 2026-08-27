@@ -37,6 +37,8 @@ type Props = {
  * "Continue with Google" — rendered only when the Google OAuth client is
  * configured (canLoginWithGoogle). Plain anchor on purpose: /auth/google
  * leaves Inertia and redirects to the consent screen.
+ *
+ * Outline / secondary only. The form submit remains the single primary CTA.
  */
 export default function GoogleAuthButton({
     separator = 'Or continue with email',
@@ -54,8 +56,8 @@ export default function GoogleAuthButton({
                 <div className="absolute inset-0 flex items-center">
                     <Separator className="w-full" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">
+                <div className="relative flex justify-center">
+                    <span className="aurora-text-caption bg-canvas px-2 text-mute">
                         {separator}
                     </span>
                 </div>

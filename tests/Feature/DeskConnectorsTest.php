@@ -162,6 +162,8 @@ it('never offers Baileys or unofficial WhatsApp on the desk page source', functi
         ->toContain('officialConnectors')
         ->toContain('WhatsApp Cloud')
         ->toContain('No Baileys')
+        ->toContain('EmptyState')
         ->not->toContain('WHATSAPP-BAILEYS')
-        ->not->toContain('connectWithQr');
+        ->not->toContain('connectWithQr')
+        ->not->toContain('/outbound/replies');
 });
