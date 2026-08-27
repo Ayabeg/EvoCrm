@@ -83,7 +83,10 @@ class ResearchBrief
             "Name: {$company->name}\nDomain: ".($company->domain ?: 'none')."\nIndustry: ".($company->industry ?: 'none')."\nPlace: ".($place !== '' ? $place : 'unknown')."\nRecord: {$summary}",
         );
 
-        $answer = $this->sanitize((string) ($live['text'] ?? $this->stubCompany($company, $place, $summary)));
+        $answer = $this->withoutInventedEmails(
+            (string) ($live['text'] ?? $this->stubCompany($company, $place, $summary)),
+            $company,
+        );
 
         return AiInsight::query()->create([
             'workspace_id' => $company->workspace_id,
@@ -108,7 +111,10 @@ class ResearchBrief
             "Deal: {$deal->title}\nPlace: ".($place !== '' ? $place : 'unknown')."\nRecord: {$summary}",
         );
 
-        $answer = $this->sanitize((string) ($live['text'] ?? $this->stubPlace($deal, $place, $summary)));
+        $answer = $this->withoutInventedEmails(
+            (string) ($live['text'] ?? $this->stubPlace($deal, $place, $summary)),
+            $deal,
+        );
 
         return AiInsight::query()->create([
             'workspace_id' => $deal->workspace_id,
@@ -137,12 +143,19 @@ class ResearchBrief
         return $deal->title.' · '.($place !== '' ? $place : 'place unknown').'. '.$summary;
     }
 
-    protected function sanitize(string $text): string
+    protected function withoutInventedEmails(string $text, Company|Deal $record): string
     {
         $clean = trim($text);
+        $known = $record instanceof Company
+            ? $record->contacts->pluck('email')->filter()->map(fn ($email) => strtolower((string) $email))->all()
+            : array_filter([strtolower((string) ($record->contact?->email ?? ''))]);
 
-        if (preg_match('/invented|made-up|probably [a-z0-9._%+-]+@/i', $clean)) {
-            return 'Only the fields on this record are known. No invented emails or contacts.';
+        preg_match_all('/\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i', $clean, $matches);
+
+        foreach ($matches[0] as $email) {
+            if (! in_array(strtolower($email), $known, true)) {
+                $clean = str_replace($email, '[not on record]', $clean);
+            }
         }
 
         return $clean;
