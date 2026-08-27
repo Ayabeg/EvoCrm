@@ -4,6 +4,8 @@ import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
+import EnrichmentPanel from '@/components/crm/enrichment-panel';
+import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import ContactDealsKanban from '@/components/crm/contact-deals-kanban';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import PlaybookCard from '@/components/crm/playbook-card';
@@ -71,6 +73,8 @@ export default function ContactShow({
     catchUp,
     dealsKanban,
     playbooks,
+    enrichmentRuns = [],
+    enrichAction,
 }: {
     contact: Contact;
     associations: {
@@ -85,6 +89,8 @@ export default function ContactShow({
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     dealsKanban?: DealKanban | null;
     playbooks?: Array<{ id: number; name: string; body: string }>;
+    enrichmentRuns?: EnrichmentRunRow[];
+    enrichAction?: string;
 }) {
     const [tab, setTab] = useState('catchup');
     const loading = useInertiaLoading();
@@ -175,6 +181,12 @@ export default function ContactShow({
                                     action={`/crm/contacts/${contact.id}/ask`}
                                     insight={askEvo}
                                 />
+                                {enrichAction ? (
+                                    <EnrichmentPanel
+                                        action={enrichAction}
+                                        runs={enrichmentRuns}
+                                    />
+                                ) : null}
                                 <PlaybookCard playbooks={playbooks} />
                                 {proactiveSummary ? (
                                     <p className="rounded-xl border border-hairline bg-canvas-soft px-3 py-2 text-[12px] text-mute">

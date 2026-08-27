@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Services\Crm\LeadConverter;
 use App\Services\Crm\PipelineManager;
+use App\Services\Enrichment\EnrichmentService;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,7 +49,7 @@ class LeadController extends Controller
         return back();
     }
 
-    public function show(Request $request, Lead $lead, CrmHub $hub, PipelineManager $pipelines): Response
+    public function show(Request $request, Lead $lead, CrmHub $hub, PipelineManager $pipelines, EnrichmentService $enrichment): Response
     {
         abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -80,6 +82,8 @@ class LeadController extends Controller
                 'title' => $deal->title,
                 'stage' => $deal->stage?->name,
             ])->values() ?? [],
+            'enrichmentRuns' => $enrichment->history($workspace, EnrichmentRun::TARGET_LEAD, (int) $lead->id),
+            'enrichAction' => "/crm/leads/{$lead->id}/enrich",
         ]);
     }
 

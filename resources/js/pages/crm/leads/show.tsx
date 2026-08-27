@@ -1,4 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import EnrichmentPanel from '@/components/crm/enrichment-panel';
+import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import LeadConversionDialog from '@/components/crm/lead-conversion-dialog';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -10,6 +12,8 @@ export default function LeadShow({
     pipelines = [],
     members = [],
     contactDeals = [],
+    enrichmentRuns = [],
+    enrichAction,
 }: {
     lead: any;
     associations?: any;
@@ -21,6 +25,8 @@ export default function LeadShow({
     }[];
     members?: { id: number; name: string }[];
     contactDeals?: { id: number; title: string; stage?: string | null }[];
+    enrichmentRuns?: EnrichmentRunRow[];
+    enrichAction?: string;
 }) {
     return (
         <>
@@ -103,6 +109,9 @@ export default function LeadShow({
                         <p key={enrollment.id}>Enrollment · {enrollment.sequence?.name ?? enrollment.id}</p>
                     ))}
                 </Card>
+                {enrichAction ? (
+                    <EnrichmentPanel action={enrichAction} runs={enrichmentRuns} />
+                ) : null}
             </div>
         </>
     );
