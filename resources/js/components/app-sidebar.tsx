@@ -85,6 +85,7 @@ const MORE_ITEMS: MoreItem[] = [
     { id: 'activities', label: 'Activities', href: '/crm/activities', icon: SquareKanban, category: 'CRM' },
     { id: 'lead-board', label: 'Lead board', href: '/leads', icon: SquareKanban, category: 'CRM' },
     { id: 'leads', label: 'Leads list', href: '/crm/leads', icon: SquareKanban, category: 'CRM' },
+    { id: 'lead-captures', label: 'Captures', href: '/crm/leads/captures', icon: Inbox, category: 'CRM' },
     { id: 'pipelines', label: 'Pipeline', href: '/crm/deals/board', icon: SquareKanban, category: 'CRM' },
     { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users, category: 'CRM' },
     { id: 'workflows', label: 'Automation', href: '/crm/workflows', icon: Workflow, category: 'CRM' },

@@ -18,6 +18,7 @@ use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\DealSplitController;
 use App\Http\Controllers\Crm\FunnelController;
 use App\Http\Controllers\Crm\LeadBoardController;
+use App\Http\Controllers\Crm\LeadCaptureController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\RecordLayoutController;
@@ -191,6 +192,12 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
 
     Route::get('/crm/leads', [LeadController::class, 'index'])->name('crm.leads.index');
     Route::post('/crm/leads', [LeadController::class, 'store'])->name('crm.leads.store');
+    Route::get('/crm/leads/captures', [LeadCaptureController::class, 'index'])->name('crm.leads.captures');
+    Route::post('/crm/leads/captures/csv', [LeadCaptureController::class, 'csv'])->name('crm.leads.captures.csv');
+    Route::post('/crm/leads/captures/url', [LeadCaptureController::class, 'url'])->name('crm.leads.captures.url');
+    Route::post('/crm/leads/captures/maps', [LeadCaptureController::class, 'maps'])->name('crm.leads.captures.maps');
+    Route::post('/crm/leads/captures/{capture}/accept', [LeadCaptureController::class, 'accept'])->name('crm.leads.captures.accept');
+    Route::post('/crm/leads/captures/{capture}/reject', [LeadCaptureController::class, 'reject'])->name('crm.leads.captures.reject');
     Route::get('/crm/leads/{lead}', [LeadController::class, 'show'])->name('crm.leads.show');
     Route::put('/crm/leads/{lead}', [LeadController::class, 'update'])->name('crm.leads.update');
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
