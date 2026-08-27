@@ -68,12 +68,15 @@ export default function LeadCapturesIndex({
         const params = new URLSearchParams();
         const source = next.source ?? filters.source;
         const status = next.status ?? filters.status;
+
         if (source) {
             params.set('source', source);
         }
+
         if (status) {
             params.set('status', status);
         }
+
         const query = params.toString();
 
         return query ? `/crm/leads/captures?${query}` : '/crm/leads/captures';
@@ -251,7 +254,8 @@ export default function LeadCapturesIndex({
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <p className="text-ui text-mute">
-                                                        Chosen result {index + 1}
+                                                        Chosen result{' '}
+                                                        {index + 1}
                                                     </p>
                                                     {results.length > 1 ? (
                                                         <button
@@ -261,7 +265,10 @@ export default function LeadCapturesIndex({
                                                             onClick={() =>
                                                                 setResults(
                                                                     results.filter(
-                                                                        (_, row) =>
+                                                                        (
+                                                                            _,
+                                                                            row,
+                                                                        ) =>
                                                                             row !==
                                                                             index,
                                                                     ),
@@ -379,15 +386,23 @@ export default function LeadCapturesIndex({
                             ]}
                             rows={captures.map((capture) => ({
                                 id: capture.id,
-                                mobileTitle: capture.name || capture.phone || capture.email || 'Capture',
+                                mobileTitle:
+                                    capture.name ||
+                                    capture.phone ||
+                                    capture.email ||
+                                    'Capture',
                                 mobileMeta: [
                                     {
                                         label: 'Source',
-                                        value: SOURCE_LABELS[capture.source] ?? capture.source,
+                                        value:
+                                            SOURCE_LABELS[capture.source] ??
+                                            capture.source,
                                     },
                                     {
                                         label: 'Status',
-                                        value: STATUS_LABELS[capture.status] ?? capture.status,
+                                        value:
+                                            STATUS_LABELS[capture.status] ??
+                                            capture.status,
                                     },
                                     {
                                         label: 'Phone',
@@ -417,13 +432,16 @@ export default function LeadCapturesIndex({
                                             ) : null}
                                         </div>
                                     ),
-                                    source: SOURCE_LABELS[capture.source] ?? capture.source,
+                                    source:
+                                        SOURCE_LABELS[capture.source] ??
+                                        capture.source,
                                     status: (
                                         <Badge
                                             variant={
                                                 capture.status === 'error'
                                                     ? 'destructive'
-                                                    : capture.status === 'merged'
+                                                    : capture.status ===
+                                                        'merged'
                                                       ? 'default'
                                                       : 'outline'
                                             }
@@ -441,7 +459,9 @@ export default function LeadCapturesIndex({
                                                 `Lead ${capture.matched_lead_id}`}
                                         </Link>
                                     ) : (
-                                        <span className="text-mute">Not merged</span>
+                                        <span className="text-mute">
+                                            Not merged
+                                        </span>
                                     ),
                                     actions:
                                         capture.status === 'new' ? (

@@ -111,13 +111,13 @@ class LeadCaptureDeduper
             'source' => $source,
         ]);
 
-        if ($company && ! $contact->company_id) {
-            $contact->forceFill(['company_id' => $company->id])->save();
-        }
-
-        if ($capture->wilaya && ! $contact->wilaya) {
-            $contact->forceFill(['wilaya' => $capture->wilaya])->save();
-        }
+        $contact->forceFill(array_filter([
+            'phone' => $capture->phone,
+            'phone_e164' => $capture->phone,
+            'email' => $capture->email,
+            'company_id' => $company?->id ?? $contact->company_id,
+            'wilaya' => $capture->wilaya ?? $contact->wilaya,
+        ], fn ($value) => $value !== null && $value !== ''))->save();
 
         $lead = $this->findExistingLead($capture, $contact);
 
