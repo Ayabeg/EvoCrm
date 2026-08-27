@@ -1,3 +1,10 @@
+/**
+ * Canonical application toast.
+ *
+ * Authority: EvoSales notifications (Inertia flash via `useFlashToast`)
+ * use Sonner. Aurora `ui/aurora/toast` remains an unused primitive — do
+ * not mount a second toaster and do not delete the Aurora file.
+ */
 import { useFlashToast } from '@/hooks/use-flash-toast';
 import { useAppearance } from '@/hooks/use-appearance';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
