@@ -1,6 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
-import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/hooks/use-current-url';
@@ -142,15 +141,18 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
     return (
         <div className="px-4 py-6">
-            <Heading
-                title="Settings"
-                description="Workspace profile, the apps marketplace, official connectors, Evolution Cloud, Meta, and channels"
-            />
+            <header className="mb-8">
+                <h1 className="aurora-text-display-2 text-ink">Settings</h1>
+                <p className="aurora-text-lead mt-1 max-w-[65ch] text-mute">
+                    Workspace profile, the apps marketplace, official connectors,
+                    Evolution Cloud, Meta, and channels
+                </p>
+            </header>
 
-            <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl lg:w-64">
+            <div className="flex flex-col lg:flex-row lg:gap-10">
+                <aside className="w-full max-w-xl lg:w-56">
                     <nav
-                        className="flex flex-col space-y-1 space-x-0"
+                        className="flex flex-col gap-0.5 rounded-xl border border-hairline bg-canvas p-2"
                         aria-label="Settings"
                     >
                         {items.map((item, index) => (
@@ -160,7 +162,11 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': isCurrentOrParentUrl(item.href),
+                                    'bg-brand/10 text-ink': isCurrentOrParentUrl(
+                                        item.href,
+                                    ),
+                                    'text-mute hover:text-ink':
+                                        !isCurrentOrParentUrl(item.href),
                                 })}
                             >
                                 <Link href={item.href}>
