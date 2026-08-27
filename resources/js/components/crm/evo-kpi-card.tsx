@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-import { StatCard } from '@/components/ui/aurora/stat-card';
 import { cn } from '@/lib/utils';
 
 export function EvoKpiCard({
@@ -9,7 +7,6 @@ export function EvoKpiCard({
     change,
     changeLabel,
     format = 'number',
-    icon,
     className,
 }: {
     label: string;
@@ -18,7 +15,6 @@ export function EvoKpiCard({
     change?: number | null;
     changeLabel?: string;
     format?: 'number' | 'money' | 'percent';
-    icon?: ReactNode;
     className?: string;
 }) {
     const display =
@@ -38,29 +34,43 @@ export function EvoKpiCard({
 
     const changeDisplay =
         change === null || change === undefined
-            ? undefined
+            ? null
             : `${change > 0 ? '+' : ''}${change}%`;
 
-    const trend =
-        change === null || change === undefined
-            ? undefined
-            : change > 0
-              ? ('up' as const)
-              : change < 0
-                ? ('down' as const)
-                : ('flat' as const);
-
-    const description = [changeLabel, hint].filter(Boolean).join(' · ') || undefined;
+    const context = [changeLabel, hint].filter(Boolean).join(' · ');
 
     return (
-        <StatCard
-            label={label}
-            value={<span className="money">{display}</span>}
-            delta={changeDisplay}
-            trend={trend}
-            description={description}
-            icon={icon}
-            className={cn('h-full @container/kpi', className)}
-        />
+        <article
+            className={cn(
+                'flex h-full min-h-[7.5rem] flex-col gap-3 rounded-2xl border border-hairline bg-canvas px-5 py-5',
+                className,
+            )}
+        >
+            <p className="text-[11px] leading-4 text-mute">{label}</p>
+            <p
+                className={cn(
+                    'money text-ink tracking-tight',
+                    format === 'money'
+                        ? 'text-[1.875rem] leading-none sm:text-[2rem]'
+                        : 'text-kpi leading-none',
+                )}
+            >
+                {display}
+            </p>
+            {changeDisplay || context ? (
+                <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                    {changeDisplay ? (
+                        <span className="text-[11px] leading-4 text-mute">
+                            {changeDisplay}
+                        </span>
+                    ) : null}
+                    {context ? (
+                        <span className="text-[12px] leading-4 text-mute">
+                            {context}
+                        </span>
+                    ) : null}
+                </div>
+            ) : null}
+        </article>
     );
 }

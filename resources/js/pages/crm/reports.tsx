@@ -141,14 +141,14 @@ function BackingTable({ table }: { table: ReportTable }) {
     }
 
     return (
-        <div className="overflow-hidden rounded-lg border border-hairline bg-canvas">
+        <div className="overflow-hidden rounded-2xl border border-hairline bg-canvas">
             <table className="w-full">
-                <thead className="bg-canvas-soft text-left text-[11px] tracking-wide text-muted-foreground uppercase">
+                <thead className="bg-canvas-soft text-left text-[11px] text-mute">
                     <tr>
                         {table.columns.map((column) => (
                             <th
                                 key={column.key}
-                                className={`px-3 py-2 font-medium ${column.align === 'right' ? 'text-right' : ''}`}
+                                className={`px-4 py-2.5 font-medium ${column.align === 'right' ? 'text-right' : ''}`}
                             >
                                 {column.label}
                             </th>
@@ -165,7 +165,7 @@ function BackingTable({ table }: { table: ReportTable }) {
                                 return (
                                     <td
                                         key={column?.key ?? j}
-                                        className={`px-3 py-2 ${right ? 'money text-right' : ''} ${cell === null || cell === 0 ? 'text-muted-foreground' : ''}`}
+                                        className={`px-4 py-2.5 text-[13px] ${right ? 'money text-right' : ''} ${cell === null || cell === 0 ? 'text-mute' : 'text-ink'}`}
                                     >
                                         {typeof cell === 'number'
                                             ? formatValue(
@@ -188,24 +188,22 @@ function BackingTable({ table }: { table: ReportTable }) {
 
 function CategorySection({ category }: { category: ReportCategory }) {
     return (
-        <section aria-label={category.title} className="mt-10 first:mt-0">
-            <div className="mb-3 flex items-baseline justify-between gap-3">
-                <div>
-                    <h2 className="text-sm font-medium text-ink">
-                        {category.title}
-                    </h2>
-                    {category.description ? (
-                        <p className="mt-0.5 text-[12px] text-muted-foreground">
-                            {category.description}
-                        </p>
-                    ) : null}
-                </div>
+        <section aria-label={category.title} className="mt-12 first:mt-0">
+            <div className="mb-5">
+                <h2 className="text-[15px] font-semibold tracking-tight text-ink">
+                    {category.title}
+                </h2>
+                {category.description ? (
+                    <p className="mt-1 text-[12px] leading-5 text-mute">
+                        {category.description}
+                    </p>
+                ) : null}
             </div>
 
             <KpiStrip kpis={category.kpis} />
 
             {category.charts.length > 0 ? (
-                <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {category.charts.map((chart) => (
                         <EvoVizChart
                             key={`${chart.id}-${chart.title}`}
@@ -216,7 +214,7 @@ function CategorySection({ category }: { category: ReportCategory }) {
             ) : null}
 
             {category.table ? (
-                <div className="mt-3">
+                <div className="mt-5">
                     <BackingTable table={category.table} />
                 </div>
             ) : null}
@@ -352,7 +350,7 @@ export default function Reports({
             <ReportsShell
                 title={title}
                 pageTitle={title}
-                description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only — empty categories stay hidden.`}
+                description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only. Empty categories stay hidden.`}
                 filters={
                     <form
                         onSubmit={apply}
@@ -463,12 +461,12 @@ export default function Reports({
                             New dashboard
                         </button>
                     </nav>
-                    <section className="mb-6 rounded-lg border border-hairline bg-canvas p-3 text-sm">
-                        <h2 className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <section className="mb-8 rounded-2xl border border-hairline bg-canvas p-5 text-sm">
+                        <h2 className="mb-3 text-[11px] text-mute">
                             Scheduled reports
                         </h2>
                         {schedules.length === 0 ? (
-                            <p className="mb-2 text-[12px] text-muted-foreground">No schedules yet.</p>
+                            <p className="mb-3 text-[12px] text-mute">No schedules yet.</p>
                         ) : (
                             <ul className="mb-3 space-y-1 text-[12px]">
                                 {schedules.map((schedule) => (
@@ -545,7 +543,7 @@ export default function Reports({
                     {dashboard ? (
                         <section aria-label={dashboard.name}>
                             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                <p className="text-[12px] text-muted-foreground">
+                                <p className="text-[12px] text-mute">
                                     {dashboard.owner.name
                                         ? `Owned by ${dashboard.owner.name}`
                                         : 'Saved dashboard'}
@@ -570,18 +568,18 @@ export default function Reports({
                             </div>
 
                             {dashboard.widgets.length === 0 ? (
-                                <div className="rounded-lg border border-hairline bg-canvas px-4 py-10 text-center">
-                                    <p className="text-sm font-medium">
+                                <div className="rounded-2xl border border-hairline bg-canvas px-5 py-12 text-center">
+                                    <p className="text-[15px] font-semibold tracking-tight text-ink">
                                         No widgets on this dashboard
                                     </p>
-                                    <p className="mt-1 text-[13px] text-muted-foreground">
+                                    <p className="mt-1 text-[12px] text-mute">
                                         Add an existing EvoViz chart from the
-                                        rooms — pipeline, leads, outbound, ads,
-                                        desk, or activity.
+                                        rooms: pipeline, leads, outbound, desk,
+                                        or activity.
                                     </p>
                                 </div>
                             ) : (
-                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                                     {dashboard.widgets.map((widget) => (
                                         <div
                                             key={widget.key}
@@ -602,11 +600,11 @@ export default function Reports({
                                                     payload={widget.chart}
                                                 />
                                             ) : (
-                                                <div className="rounded-lg border border-hairline bg-canvas px-4 py-8 text-center">
+                                                <div className="rounded-2xl border border-hairline bg-canvas px-5 py-10 text-center">
                                                     <p className="text-[13px] font-medium text-ink">
                                                         {widget.title}
                                                     </p>
-                                                    <p className="mt-1 text-[12px] text-muted-foreground">
+                                                    <p className="mt-1 text-[12px] text-mute">
                                                         No rows in this window
                                                     </p>
                                                 </div>
@@ -617,14 +615,14 @@ export default function Reports({
                             )}
                         </section>
                     ) : categories.length === 0 ? (
-                        <div className="rounded-lg border border-hairline bg-canvas px-4 py-10 text-center">
-                            <p className="text-sm font-medium">
+                        <div className="rounded-2xl border border-hairline bg-canvas px-5 py-12 text-center">
+                            <p className="text-[15px] font-semibold tracking-tight text-ink">
                                 Nothing to report in this window
                             </p>
-                            <p className="mt-1 text-[13px] text-muted-foreground">
-                                Deals, leads, outbound sends, ad rows,
-                                conversations, and activities appear here as
-                                soon as they exist — no placeholders.
+                            <p className="mt-1 text-[12px] text-mute">
+                                Deals, leads, outbound sends, conversations, and
+                                activities appear here as soon as they exist. No
+                                placeholders.
                             </p>
                         </div>
                     ) : (

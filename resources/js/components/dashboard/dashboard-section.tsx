@@ -1,12 +1,4 @@
 import type { ReactNode } from 'react';
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 export function DashboardSection({
@@ -23,17 +15,26 @@ export function DashboardSection({
     className?: string;
 }) {
     return (
-        <Card className={cn('@container/dashboard-section', className)}>
-            <CardHeader className="flex flex-row flex-wrap items-end justify-between gap-2">
-                <div>
-                    <CardTitle as="h2">{title}</CardTitle>
+        <section
+            className={cn(
+                'rounded-2xl border border-hairline bg-canvas',
+                className,
+            )}
+        >
+            <header className="flex flex-row flex-wrap items-end justify-between gap-3 px-5 pt-5 pb-3">
+                <div className="min-w-0">
+                    <h2 className="text-[15px] font-semibold tracking-tight text-ink">
+                        {title}
+                    </h2>
                     {description ? (
-                        <CardDescription>{description}</CardDescription>
+                        <p className="mt-1 text-[12px] leading-5 text-mute">
+                            {description}
+                        </p>
                     ) : null}
                 </div>
-                {action ? <CardAction>{action}</CardAction> : null}
-            </CardHeader>
-            <CardContent>{children}</CardContent>
-        </Card>
+                {action ? <div className="shrink-0">{action}</div> : null}
+            </header>
+            <div className="px-5 pb-5">{children}</div>
+        </section>
     );
 }

@@ -33,11 +33,13 @@ export function DashboardHeader({
     };
 
     return (
-        <header className="mb-6 flex flex-col gap-4">
+        <header className="mb-8 flex flex-col gap-5">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <h1 className="aurora-text-display-1">Home</h1>
-                    <p className="aurora-text-lead mt-1 text-mute">
+                    <h1 className="text-[1.75rem] font-semibold tracking-tight text-ink">
+                        Home
+                    </h1>
+                    <p className="mt-1 text-[12px] leading-5 text-mute">
                         {subtitle}
                     </p>
                 </div>
@@ -46,7 +48,7 @@ export function DashboardHeader({
                 </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-hairline bg-canvas p-3">
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-hairline bg-canvas px-4 py-3">
                 <Input
                     type="date"
                     size="sm"
@@ -55,9 +57,7 @@ export function DashboardHeader({
                     aria-label="From date"
                     className="w-[9.5rem]"
                 />
-                <span className="aurora-text-caption text-mute">
-                    –
-                </span>
+                <span className="text-[12px] text-mute">-</span>
                 <Input
                     type="date"
                     size="sm"

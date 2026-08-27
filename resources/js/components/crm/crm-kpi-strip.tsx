@@ -1,13 +1,5 @@
-import {
-    Activity,
-    CircleDollarSign,
-    Handshake,
-    Percent,
-    TrendingUp,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { EvoKpiCard } from '@/components/crm/evo-kpi-card';
-import { StatGrid } from '@/components/ui/aurora/stat-card';
+import { cn } from '@/lib/utils';
 
 export type KpiTile = {
     key: string;
@@ -18,14 +10,6 @@ export type KpiTile = {
     href?: string;
     change?: number | null;
     changeLabel?: string;
-};
-
-const KPI_ICONS: Record<string, LucideIcon> = {
-    revenue: CircleDollarSign,
-    pipeline: TrendingUp,
-    win_rate: Percent,
-    open_deals: Handshake,
-    activities: Activity,
 };
 
 export function CrmKpiStrip({
@@ -41,23 +25,26 @@ export function CrmKpiStrip({
         return null;
     }
 
+    const columnClass =
+        columns >= 6
+            ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'
+            : columns === 5
+              ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
+              : columns === 4
+                ? 'sm:grid-cols-2 xl:grid-cols-4'
+                : columns === 3
+                  ? 'sm:grid-cols-3'
+                  : 'sm:grid-cols-2';
+
     return (
-        <StatGrid
-            className={className}
-            style={{
-                gridTemplateColumns:
-                    columns >= 5
-                        ? 'repeat(auto-fill, minmax(180px, 1fr))'
-                        : undefined,
-            }}
+        <div
+            className={cn('grid grid-cols-1 gap-3 sm:gap-4', columnClass, className)}
         >
             {kpis.map((kpi) => {
                 const displayValue =
                     kpi.format === 'money' && typeof kpi.value === 'number'
                         ? kpi.value / 100
                         : kpi.value;
-
-                const Icon = KPI_ICONS[kpi.key];
 
                 const card = (
                     <EvoKpiCard
@@ -67,11 +54,10 @@ export function CrmKpiStrip({
                         hint={kpi.hint}
                         change={kpi.change}
                         changeLabel={kpi.changeLabel}
-                        icon={Icon ? <Icon className="size-4" /> : undefined}
                         className={
                             kpi.href
-                                ? 'h-full cursor-pointer transition-transform duration-150 hover:-translate-y-0.5'
-                                : 'h-full'
+                                ? 'transition-colors duration-150 hover:bg-canvas-soft'
+                                : undefined
                         }
                     />
                 );
@@ -81,7 +67,7 @@ export function CrmKpiStrip({
                         <a
                             key={kpi.key}
                             href={kpi.href}
-                            className="block no-underline"
+                            className="block rounded-2xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         >
                             {card}
                         </a>
@@ -90,6 +76,6 @@ export function CrmKpiStrip({
 
                 return <div key={kpi.key}>{card}</div>;
             })}
-        </StatGrid>
+        </div>
     );
 }

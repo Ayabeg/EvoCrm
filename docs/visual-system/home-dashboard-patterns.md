@@ -16,10 +16,18 @@ Canonical reference for EvoSales command-center surfaces after the Shopify-inspi
 
 ## Design authority
 
-- Tokens: `resources/css/app.css`
+- Tokens: `resources/css/app.css` Brand Book aliases (`bg-canvas`, `border-hairline`, `text-ink`, `text-mute`, `text-kpi`)
 - Brand rules: `docs/brandbook/`
 - Charts: `resources/js/evoviz/contract.ts`
 - Visual foundation: PR #80 (`stage-colors`, tokenized Desk, typography utilities)
+- Home chrome must not use raw `--aurora-*` (PR #101)
+
+## Visual language (Apple + Aurora)
+
+- **Surfaces** — airy white (or Dark Cabinet canvas) hairline cards, `rounded-2xl`, no Aurora StatCard/Card shadows on Home
+- **KPI values** — 28–32px tabular DZD via `.money` + `--text-kpi` / 30–32px money
+- **Labels** — mute 11–12px, sentence case
+- **Reports / EvoViz** — same hairline frame; Home charts sit unframed inside the section card
 
 ## KPI pattern
 
