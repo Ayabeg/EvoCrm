@@ -56,7 +56,7 @@ export default function CatchUpBlock({
     outbound?: CatchUpItem[];
 }) {
     return (
-        <section className="rounded-lg border border-hairline bg-canvas p-4 text-sm">
+        <section className="rounded-xl border border-hairline bg-canvas p-4 text-sm">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-mute">Catch-up</h3>
             <div className="grid gap-4 md:grid-cols-2">
                 <div>

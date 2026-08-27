@@ -68,97 +68,128 @@ export default function ContactsIndex({
         <>
             <CrmShell title="Contacts">
                 <CrmListShell
-                title="Contacts"
-                entity="contact"
-                basePath="/crm/contacts"
-                primaryLabel="Add contacts"
-                activeFilters={activeFilters}
-                savedFilters={savedFilters}
-                listView={listView}
-                recordCount={recordCount}
-                members={members}
-                cities={cities}
-                wilayas={wilayas}
-                companies={companies}
-                exportHref="/crm/contacts/export"
-                headerActions={
-                    <div className="flex items-center gap-3">
-                        {canMerge ? (
-                            <Link href="/crm/contacts/duplicates" className="text-ui font-medium text-brand">
-                                Duplicates
-                            </Link>
-                        ) : null}
-                        {canImport ? (
-                            <Link href="/crm/contacts/import" className="text-ui font-medium text-brand">
-                                Import
-                            </Link>
-                        ) : null}
-                    </div>
-                }
-                banner={
-                    !hasMailbox ? (
-                        <div className="border-b border-hairline bg-canvas-soft px-6 py-2">
-                            Connect email to log outbound from this list.{' '}
-                            <Link href="/outbound/mailboxes" className="font-medium text-brand">
-                                Connect email
-                            </Link>
+                    title="Contacts"
+                    entity="contact"
+                    basePath="/crm/contacts"
+                    primaryLabel="Add contacts"
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    listView={listView}
+                    recordCount={recordCount}
+                    members={members}
+                    cities={cities}
+                    wilayas={wilayas}
+                    companies={companies}
+                    exportHref="/crm/contacts/export"
+                    headerActions={
+                        <div className="flex items-center gap-3">
+                            {canMerge ? (
+                                <Link
+                                    href="/crm/contacts/duplicates"
+                                    className="text-ui font-medium text-brand"
+                                >
+                                    Duplicates
+                                </Link>
+                            ) : null}
+                            {canImport ? (
+                                <Link
+                                    href="/crm/contacts/import"
+                                    className="text-ui font-medium text-brand"
+                                >
+                                    Import
+                                </Link>
+                            ) : null}
                         </div>
-                    ) : null
-                }
-            >
-                {(columns) => (
-                    <>
-                        {canBulk && selectedIds.length > 0 ? (
-                            <BulkActionBar
-                                entity="contact"
-                                selectedIds={selectedIds}
-                                members={members}
-                                sequences={bulk?.sequences ?? []}
-                                onClear={() => setSelectedIds([])}
-                            />
-                        ) : null}
-                        {loading ? (
-                            <SkeletonList />
-                        ) : contacts.length === 0 ? (
-                            <CrmEmptyState
-                                line="No contacts in this view."
-                                actionLabel="Add contacts"
-                                onAction={() => setDrawer(true)}
-                            />
-                        ) : (
-                            <div className="min-h-0 flex-1 overflow-auto">
-                                <ListViewTable
-                                    entity="contact"
-                                    rows={contacts}
-                                    columnDefs={listView.columnDefs}
-                                    columns={columns}
-                                    basePath="/crm/contacts"
-                                    selectable={canBulk}
-                                    selectedIds={selectedIds}
-                                    onToggle={(id) =>
-                                        setSelectedIds((current) =>
-                                            current.includes(id)
-                                                ? current.filter((value) => value !== id)
-                                                : [...current, id],
-                                        )
-                                    }
-                                    onTogglePage={() =>
-                                        setSelectedIds((current) => {
-                                            const pageIds = contacts.map((contact) => contact.id);
-                                            const allSelected = pageIds.every((id) => current.includes(id));
-
-                                            return allSelected
-                                                ? current.filter((id) => !pageIds.includes(id))
-                                                : [...new Set([...current, ...pageIds])];
-                                        })
-                                    }
-                                />
+                    }
+                    banner={
+                        !hasMailbox ? (
+                            <div className="border-b border-hairline bg-canvas-soft px-4 py-2.5 text-[13px] text-mute sm:px-6">
+                                Connect email to log outbound from this list.{' '}
+                                <Link
+                                    href="/outbound/mailboxes"
+                                    className="font-medium text-brand"
+                                >
+                                    Connect email
+                                </Link>
                             </div>
-                        )}
-                        <CrmListFooter count={contacts.length} noun="contacts" exportHref="/crm/contacts/export" />
-                    </>
-                )}
-            </CrmListShell>
+                        ) : null
+                    }
+                >
+                    {(columns) => (
+                        <>
+                            {canBulk && selectedIds.length > 0 ? (
+                                <BulkActionBar
+                                    entity="contact"
+                                    selectedIds={selectedIds}
+                                    members={members}
+                                    sequences={bulk?.sequences ?? []}
+                                    onClear={() => setSelectedIds([])}
+                                />
+                            ) : null}
+                            {loading ? (
+                                <SkeletonList />
+                            ) : contacts.length === 0 ? (
+                                <CrmEmptyState
+                                    line="No contacts in this view."
+                                    actionLabel="Add contacts"
+                                    onAction={() => setDrawer(true)}
+                                />
+                            ) : (
+                                <div className="min-h-0 flex-1 overflow-auto">
+                                    <ListViewTable
+                                        entity="contact"
+                                        rows={contacts}
+                                        columnDefs={listView.columnDefs}
+                                        columns={columns}
+                                        basePath="/crm/contacts"
+                                        selectable={canBulk}
+                                        selectedIds={selectedIds}
+                                        onToggle={(id) =>
+                                            setSelectedIds((current) =>
+                                                current.includes(id)
+                                                    ? current.filter(
+                                                          (value) =>
+                                                              value !== id,
+                                                      )
+                                                    : [...current, id],
+                                            )
+                                        }
+                                        onTogglePage={() =>
+                                            setSelectedIds((current) => {
+                                                const pageIds = contacts.map(
+                                                    (contact) => contact.id,
+                                                );
+                                                const allSelected =
+                                                    pageIds.every((id) =>
+                                                        current.includes(id),
+                                                    );
+
+                                                return allSelected
+                                                    ? current.filter(
+                                                          (id) =>
+                                                              !pageIds.includes(
+                                                                  id,
+                                                              ),
+                                                      )
+                                                    : [
+                                                          ...new Set([
+                                                              ...current,
+                                                              ...pageIds,
+                                                          ]),
+                                                      ];
+                                            })
+                                        }
+                                    />
+                                </div>
+                            )}
+                            <CrmListFooter
+                                count={contacts.length}
+                                noun="contacts"
+                                exportHref="/crm/contacts/export"
+                            />
+                        </>
+                    )}
+                </CrmListShell>
             </CrmShell>
 
             <CreateDrawer
@@ -177,38 +208,52 @@ export default function ContactsIndex({
                         <>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    First name <span className="text-brand">*</span>
+                                    First name{' '}
+                                    <span className="text-brand">*</span>
                                 </Label>
                                 <Input name="first_name" required />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Last name</Label>
+                                <Label className="mb-1 block text-[12px]">
+                                    Last name
+                                </Label>
                                 <Input name="last_name" />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Email</Label>
+                                <Label className="mb-1 block text-[12px]">
+                                    Email
+                                </Label>
                                 <Input name="email" type="email" />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Phone</Label>
+                                <Label className="mb-1 block text-[12px]">
+                                    Phone
+                                </Label>
                                 <Input name="phone" placeholder="0550…" />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Company</Label>
+                                <Label className="mb-1 block text-[12px]">
+                                    Company
+                                </Label>
                                 <select
                                     name="company_id"
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
                                 >
                                     <option value="">None</option>
                                     {companies.map((company) => (
-                                        <option key={company.id} value={company.id}>
+                                        <option
+                                            key={company.id}
+                                            value={company.id}
+                                        >
                                             {company.name}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Lead status</Label>
+                                <Label className="mb-1 block text-[12px]">
+                                    Lead status
+                                </Label>
                                 <select
                                     name="lead_status"
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
@@ -216,11 +261,17 @@ export default function ContactsIndex({
                                     <option value="">None</option>
                                     <option value="new">New</option>
                                     <option value="open">Open</option>
-                                    <option value="unqualified">Unqualified</option>
+                                    <option value="unqualified">
+                                        Unqualified
+                                    </option>
                                 </select>
                             </div>
                             <div className="flex justify-end gap-2 pt-2">
-                                <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => setDrawer(false)}
+                                >
                                     Cancel
                                 </Button>
                                 <Button

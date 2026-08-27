@@ -27,7 +27,7 @@ export default function DealSplits({
     }
 
     return (
-        <section className="rounded border border-hairline bg-canvas p-3 text-sm">
+        <section className="rounded-xl border border-hairline bg-canvas p-3 text-sm">
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-mute">Deal splits</h3>
             {splits.length > 0 ? (
                 <ul className="mb-2 space-y-1 text-[12px]">

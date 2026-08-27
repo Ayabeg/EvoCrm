@@ -75,16 +75,19 @@ export default function AskEvoPanel({
         <>
             <Card
                 data-testid="ask-evo"
-                accent="cyan"
                 elevated={false}
                 className="hidden py-0 md:block"
                 style={{
+                    borderRadius: 12,
                     backgroundImage:
                         'radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--evosales-mark) 16%, transparent) 0%, transparent 64%)',
                 }}
             >
                 <CardHeader className="flex flex-row items-center justify-between gap-2 py-3">
-                    <CardTitle as="h3" className="flex items-center gap-1.5 text-section-label uppercase">
+                    <CardTitle
+                        as="h3"
+                        className="flex items-center gap-1.5 text-section-label uppercase"
+                    >
                         <Sparkles className="size-3.5 text-brand" aria-hidden />
                         Ask Evo
                     </CardTitle>
@@ -110,10 +113,16 @@ export default function AskEvoPanel({
                         Ask Evo
                     </Button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto">
+                <SheetContent
+                    side="bottom"
+                    className="max-h-[85dvh] overflow-y-auto"
+                >
                     <SheetHeader className="border-b border-hairline pb-3">
                         <SheetTitle className="flex items-center gap-1.5 text-section-label uppercase">
-                            <Sparkles className="size-3.5 text-brand" aria-hidden />
+                            <Sparkles
+                                className="size-3.5 text-brand"
+                                aria-hidden
+                            />
                             Ask Evo
                         </SheetTitle>
                         <p className="text-[10px] text-mute">
