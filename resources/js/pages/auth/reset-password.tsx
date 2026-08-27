@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
+import { FieldError } from '@/components/ui/aurora/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,7 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                 resetOnSuccess={['password', 'password_confirmation']}
             >
                 {({ processing, errors }) => (
-                    <div className="grid gap-6">
+                    <div className="grid gap-5">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
@@ -33,13 +33,12 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 name="email"
                                 autoComplete="email"
                                 value={email}
-                                className="mt-1 block w-full"
+                                className="w-full"
                                 readOnly
                             />
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
+                            {errors.email ? (
+                                <FieldError>{errors.email}</FieldError>
+                            ) : null}
                         </div>
 
                         <div className="grid gap-2">
@@ -48,12 +47,14 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 id="password"
                                 name="password"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
+                                className="w-full"
                                 autoFocus
                                 placeholder="Password"
                                 passwordrules={passwordRules}
                             />
-                            <InputError message={errors.password} />
+                            {errors.password ? (
+                                <FieldError>{errors.password}</FieldError>
+                            ) : null}
                         </div>
 
                         <div className="grid gap-2">
@@ -64,19 +65,20 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 id="password_confirmation"
                                 name="password_confirmation"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
+                                className="w-full"
                                 placeholder="Confirm password"
                                 passwordrules={passwordRules}
                             />
-                            <InputError
-                                message={errors.password_confirmation}
-                                className="mt-2"
-                            />
+                            {errors.password_confirmation ? (
+                                <FieldError>
+                                    {errors.password_confirmation}
+                                </FieldError>
+                            ) : null}
                         </div>
 
                         <Button
                             type="submit"
-                            className="mt-4 w-full"
+                            className="w-full"
                             disabled={processing}
                             data-test="reset-password-button"
                         >

@@ -1,17 +1,14 @@
-import AuthLayoutTemplate from '@/layouts/auth/auth-card-layout';
+import AuthScreen from '@/pages/auth/auth-screen';
+import type { AuthLayoutProps } from '@/types';
 
 export default function AuthLayout({
     title = '',
     description = '',
     children,
-}: {
-    title?: string;
-    description?: string;
-    children: React.ReactNode;
-}) {
+}: AuthLayoutProps) {
     return (
-        <AuthLayoutTemplate title={title} description={description}>
+        <AuthScreen title={title} description={description}>
             {children}
-        </AuthLayoutTemplate>
+        </AuthScreen>
     );
 }

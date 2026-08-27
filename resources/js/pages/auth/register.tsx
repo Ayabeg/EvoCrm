@@ -1,8 +1,8 @@
 import { Form, Head } from '@inertiajs/react';
 import GoogleAuthButton from '@/components/google-auth-button';
-import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
+import { FieldError } from '@/components/ui/aurora/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,7 +30,7 @@ export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-5">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -43,10 +43,9 @@ export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
                                     name="name"
                                     placeholder="Full name"
                                 />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
+                                {errors.name ? (
+                                    <FieldError>{errors.name}</FieldError>
+                                ) : null}
                             </div>
 
                             <div className="grid gap-2">
@@ -60,7 +59,9 @@ export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
                                     name="email"
                                     placeholder="email@example.com"
                                 />
-                                <InputError message={errors.email} />
+                                {errors.email ? (
+                                    <FieldError>{errors.email}</FieldError>
+                                ) : null}
                             </div>
 
                             <div className="grid gap-2">
@@ -74,7 +75,9 @@ export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
                                     placeholder="Password"
                                     passwordrules={passwordRules}
                                 />
-                                <InputError message={errors.password} />
+                                {errors.password ? (
+                                    <FieldError>{errors.password}</FieldError>
+                                ) : null}
                             </div>
 
                             <div className="grid gap-2">
@@ -90,14 +93,16 @@ export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
                                     placeholder="Confirm password"
                                     passwordrules={passwordRules}
                                 />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                                {errors.password_confirmation ? (
+                                    <FieldError>
+                                        {errors.password_confirmation}
+                                    </FieldError>
+                                ) : null}
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-2 w-full"
+                                className="w-full"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
@@ -106,12 +111,12 @@ export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+                        <p className="aurora-text-body-sm text-center text-mute">
                             Already have an account?{' '}
                             <TextLink href={login()} tabIndex={6}>
                                 Log in
                             </TextLink>
-                        </div>
+                        </p>
                     </>
                 )}
             </Form>
