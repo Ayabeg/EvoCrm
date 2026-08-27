@@ -1,6 +1,10 @@
 import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { RoomShell, outboundSubTabs, outboundTabs } from '@/components/crm/room-shell';
+import {
+    RoomShell,
+    outboundSubTabs,
+    outboundTabs,
+} from '@/components/crm/room-shell';
 
 export function OutboundShell({
     title,

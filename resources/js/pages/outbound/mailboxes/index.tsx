@@ -62,7 +62,9 @@ function MailboxActions({
             <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.post(`/outbound/mailboxes/${box.id}/toggle`)}
+                onClick={() =>
+                    router.post(`/outbound/mailboxes/${box.id}/toggle`)
+                }
             >
                 {box.enabled ? 'Disable' : 'Enable'}
             </Button>
@@ -333,7 +335,11 @@ export default function MailboxesIndex({
                         mobileTitle: (
                             <span className="flex flex-wrap items-center gap-2">
                                 {box.name}
-                                <Badge variant={statusVariant(box.effective_status)}>
+                                <Badge
+                                    variant={statusVariant(
+                                        box.effective_status,
+                                    )}
+                                >
                                     {box.effective_status}
                                 </Badge>
                             </span>
@@ -349,7 +355,9 @@ export default function MailboxesIndex({
                             },
                             {
                                 label: 'IMAP',
-                                value: box.imap_configured ? 'replies on' : 'off',
+                                value: box.imap_configured
+                                    ? 'replies on'
+                                    : 'off',
                             },
                             {
                                 label: 'Sent today',
@@ -400,7 +408,9 @@ export default function MailboxesIndex({
                             ),
                             status: (
                                 <Badge
-                                    variant={statusVariant(box.effective_status)}
+                                    variant={statusVariant(
+                                        box.effective_status,
+                                    )}
                                 >
                                     {box.effective_status}
                                 </Badge>
@@ -412,9 +422,7 @@ export default function MailboxesIndex({
                             ),
                             imap: (
                                 <span className="aurora-text-caption text-mute">
-                                    {box.imap_configured
-                                        ? 'replies on'
-                                        : 'off'}
+                                    {box.imap_configured ? 'replies on' : 'off'}
                                 </span>
                             ),
                             sent: (

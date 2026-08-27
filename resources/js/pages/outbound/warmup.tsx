@@ -1,11 +1,11 @@
 import { Form, router } from '@inertiajs/react';
 import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
+import { StatCard, StatGrid } from '@/components/ui/aurora/stat-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { StatCard, StatGrid } from '@/components/ui/aurora/stat-card';
 import { EvoVizChart } from '@/evoviz';
 import type { EvoVizPayload } from '@/evoviz';
 
@@ -169,12 +169,15 @@ export default function WarmupIndex({
                             >
                                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                                     {[
-                                        ['Today\'s cap', box.cap],
+                                        ["Today's cap", box.cap],
                                         ['Sent today', box.sent_today],
                                         ['Remaining', box.remaining],
-                                        ['Fail rate · 14d', `${box.fail_rate}%`],
                                         [
-                                            'Tomorrow\'s cap',
+                                            'Fail rate · 14d',
+                                            `${box.fail_rate}%`,
+                                        ],
+                                        [
+                                            "Tomorrow's cap",
                                             box.warming && box.next_cap !== null
                                                 ? box.next_cap === box.cap
                                                     ? `${box.cap} · holds`
@@ -283,77 +286,82 @@ export default function WarmupIndex({
                                 out of warmup unless you opt them in.
                             </p>
                         </div>
-                    <HairlineTable
-                        minWidth={520}
-                        empty="No system mailboxes."
-                        columns={[
-                            { key: 'mailbox', header: 'System mailbox' },
-                            { key: 'state', header: 'State' },
-                            { key: 'actions', header: '', align: 'right' },
-                        ]}
-                        rows={systemMailboxes.map((box) => ({
-                            id: box.id,
-                            mobileTitle: box.name,
-                            mobileMeta: [
-                                { label: 'Address', value: box.from_address },
-                                {
-                                    label: 'State',
-                                    value: box.enabled
-                                        ? 'enabled'
-                                        : 'disabled',
-                                },
-                            ],
-                            mobileFooter: (
-                                <div className="mt-3 flex justify-end">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            router.post(
-                                                `/outbound/warmup/${box.id}/include`,
-                                            )
-                                        }
-                                    >
-                                        {box.opted_in
-                                            ? 'Remove from warmup'
-                                            : 'Include in warmup'}
-                                    </Button>
-                                </div>
-                            ),
-                            cells: {
-                                mailbox: (
-                                    <div>
-                                        <span className="font-medium text-ink">
-                                            {box.name}
-                                        </span>
-                                        <span className="aurora-text-caption block text-mute">
-                                            {box.from_address}
-                                        </span>
+                        <HairlineTable
+                            minWidth={520}
+                            empty="No system mailboxes."
+                            columns={[
+                                { key: 'mailbox', header: 'System mailbox' },
+                                { key: 'state', header: 'State' },
+                                { key: 'actions', header: '', align: 'right' },
+                            ]}
+                            rows={systemMailboxes.map((box) => ({
+                                id: box.id,
+                                mobileTitle: box.name,
+                                mobileMeta: [
+                                    {
+                                        label: 'Address',
+                                        value: box.from_address,
+                                    },
+                                    {
+                                        label: 'State',
+                                        value: box.enabled
+                                            ? 'enabled'
+                                            : 'disabled',
+                                    },
+                                ],
+                                mobileFooter: (
+                                    <div className="mt-3 flex justify-end">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                router.post(
+                                                    `/outbound/warmup/${box.id}/include`,
+                                                )
+                                            }
+                                        >
+                                            {box.opted_in
+                                                ? 'Remove from warmup'
+                                                : 'Include in warmup'}
+                                        </Button>
                                     </div>
                                 ),
-                                state: (
-                                    <span className="aurora-text-caption text-mute">
-                                        {box.enabled ? 'enabled' : 'disabled'}
-                                    </span>
-                                ),
-                                actions: (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            router.post(
-                                                `/outbound/warmup/${box.id}/include`,
-                                            )
-                                        }
-                                    >
-                                        {box.opted_in
-                                            ? 'Remove from warmup'
-                                            : 'Include in warmup'}
-                                    </Button>
-                                ),
-                            },
-                        }))}
-                    />
+                                cells: {
+                                    mailbox: (
+                                        <div>
+                                            <span className="font-medium text-ink">
+                                                {box.name}
+                                            </span>
+                                            <span className="aurora-text-caption block text-mute">
+                                                {box.from_address}
+                                            </span>
+                                        </div>
+                                    ),
+                                    state: (
+                                        <span className="aurora-text-caption text-mute">
+                                            {box.enabled
+                                                ? 'enabled'
+                                                : 'disabled'}
+                                        </span>
+                                    ),
+                                    actions: (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                router.post(
+                                                    `/outbound/warmup/${box.id}/include`,
+                                                )
+                                            }
+                                        >
+                                            {box.opted_in
+                                                ? 'Remove from warmup'
+                                                : 'Include in warmup'}
+                                        </Button>
+                                    ),
+                                },
+                            }))}
+                        />
                     </div>
                 ) : null}
             </OutboundPage>

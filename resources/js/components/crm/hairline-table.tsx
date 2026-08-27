@@ -43,7 +43,8 @@ export function HairlineTable({
                                         key={column.key}
                                         className={cn(
                                             'px-4 py-2.5 font-medium text-mute',
-                                            column.align === 'right' && 'text-right',
+                                            column.align === 'right' &&
+                                                'text-right',
                                         )}
                                     >
                                         {column.header}
@@ -70,7 +71,8 @@ export function HairlineTable({
                                                     key={column.key}
                                                     className={cn(
                                                         'px-4 py-2.5 align-middle',
-                                                        column.align === 'right' &&
+                                                        column.align ===
+                                                            'right' &&
                                                             'text-right',
                                                     )}
                                                 >
@@ -157,7 +159,9 @@ export function HairlinePanel({
             {title ? (
                 <header className="flex flex-wrap items-end justify-between gap-3 border-b border-hairline px-4 py-3">
                     <div>
-                        <h3 className="aurora-text-section text-ink">{title}</h3>
+                        <h3 className="aurora-text-section text-ink">
+                            {title}
+                        </h3>
                         {description ? (
                             <p className="aurora-text-body-sm mt-0.5 text-mute">
                                 {description}

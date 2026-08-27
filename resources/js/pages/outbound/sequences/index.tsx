@@ -24,7 +24,11 @@ function channelLabel(channel: string): string {
     return channel === 'whatsapp_cloud' ? 'WhatsApp Cloud' : 'Email SMTP';
 }
 
-export default function SequencesIndex({ sequences }: { sequences: SequenceRow[] }) {
+export default function SequencesIndex({
+    sequences,
+}: {
+    sequences: SequenceRow[];
+}) {
     return (
         <OutboundShell title="Sequences">
             <OutboundPage
@@ -50,20 +54,26 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="sequence-channel">Channel</Label>
+                                    <Label htmlFor="sequence-channel">
+                                        Channel
+                                    </Label>
                                     <NativeSelect
                                         id="sequence-channel"
                                         name="channel"
                                         defaultValue="email"
                                     >
-                                        <option value="email">Email SMTP</option>
+                                        <option value="email">
+                                            Email SMTP
+                                        </option>
                                         <option value="whatsapp_cloud">
                                             WhatsApp Cloud template
                                         </option>
                                     </NativeSelect>
                                 </div>
                                 <div className="flex items-end">
-                                    <Button disabled={processing}>Create</Button>
+                                    <Button disabled={processing}>
+                                        Create
+                                    </Button>
                                 </div>
                             </>
                         )}
@@ -95,8 +105,14 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                             </Link>
                         ),
                         mobileMeta: [
-                            { label: 'Channel', value: channelLabel(sequence.channel) },
-                            { label: 'Steps', value: sequence.steps?.length ?? 0 },
+                            {
+                                label: 'Channel',
+                                value: channelLabel(sequence.channel),
+                            },
+                            {
+                                label: 'Steps',
+                                value: sequence.steps?.length ?? 0,
+                            },
                             {
                                 label: 'Enrolled',
                                 value: `${sequence.enrollments_count} · ${sequence.enrollments_active} active`,
@@ -112,7 +128,9 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                                     variant="outline"
                                     size="sm"
                                     onClick={() =>
-                                        router.post(`/outbound/sequences/${sequence.id}/toggle`)
+                                        router.post(
+                                            `/outbound/sequences/${sequence.id}/toggle`,
+                                        )
                                     }
                                 >
                                     {sequence.active ? 'Pause' : 'Activate'}
@@ -136,7 +154,9 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                                 </div>
                             ),
                             channel: (
-                                <span className="text-ink">{channelLabel(sequence.channel)}</span>
+                                <span className="text-ink">
+                                    {channelLabel(sequence.channel)}
+                                </span>
                             ),
                             steps: (
                                 <span className="money tabular-nums">
@@ -164,7 +184,11 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                                 </span>
                             ),
                             state: (
-                                <Badge variant={sequence.active ? 'default' : 'outline'}>
+                                <Badge
+                                    variant={
+                                        sequence.active ? 'default' : 'outline'
+                                    }
+                                >
                                     {sequence.active ? 'active' : 'draft'}
                                 </Badge>
                             ),
@@ -173,7 +197,9 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                                     variant="outline"
                                     size="sm"
                                     onClick={() =>
-                                        router.post(`/outbound/sequences/${sequence.id}/toggle`)
+                                        router.post(
+                                            `/outbound/sequences/${sequence.id}/toggle`,
+                                        )
                                     }
                                 >
                                     {sequence.active ? 'Pause' : 'Activate'}

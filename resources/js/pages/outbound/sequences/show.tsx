@@ -85,14 +85,18 @@ function StepFields({
                     defaultValue={step?.channel ?? defaultChannel}
                 >
                     <option value="email">Email</option>
-                    <option value="whatsapp_cloud">WhatsApp Cloud template</option>
+                    <option value="whatsapp_cloud">
+                        WhatsApp Cloud template
+                    </option>
                 </NativeSelect>
             </div>
             <div className="space-y-1.5">
                 <Label>Mailbox</Label>
                 <NativeSelect
                     name="mailbox_id"
-                    defaultValue={step?.mailbox_id ? String(step.mailbox_id) : ''}
+                    defaultValue={
+                        step?.mailbox_id ? String(step.mailbox_id) : ''
+                    }
                 >
                     <option value="">Default enabled mailbox</option>
                     {mailboxes.map((box) => (
@@ -266,7 +270,7 @@ export default function SequenceShow({
                                         Step {row.position}: {row.name} (
                                         {row.step_type})
                                     </span>
-                                    <span className="aurora-text-caption money tabular-nums text-mute">
+                                    <span className="aurora-text-caption money text-mute tabular-nums">
                                         {row.enrolled} enrolled · {row.sent}{' '}
                                         sent
                                     </span>
@@ -555,14 +559,19 @@ export default function SequenceShow({
                         { key: 'actions', header: '', align: 'right' },
                     ]}
                     rows={(sequence.enrollments ?? []).map((enrollment) => {
-                        const name = `${enrollment.contact?.first_name ?? ''} ${enrollment.contact?.last_name ?? ''}`.trim();
+                        const name =
+                            `${enrollment.contact?.first_name ?? ''} ${enrollment.contact?.last_name ?? ''}`.trim();
 
                         return {
                             id: enrollment.id,
-                            mobileTitle: name || enrollment.contact?.email || 'Contact',
+                            mobileTitle:
+                                name || enrollment.contact?.email || 'Contact',
                             mobileMeta: [
                                 { label: 'Status', value: enrollment.status },
-                                { label: 'Next step', value: enrollment.next_step },
+                                {
+                                    label: 'Next step',
+                                    value: enrollment.next_step,
+                                },
                                 {
                                     label: 'Next run',
                                     value: enrollment.next_run_at ?? '-',
