@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\EnrichmentRun;
 use App\Models\Lead;
+use App\Services\Ai\RecordInsight;
 use App\Services\Crm\LeadConverter;
+use App\Services\Crm\LeadScorer;
 use App\Services\Crm\PipelineManager;
 use App\Services\Enrichment\EnrichmentService;
 use App\Support\CrmHub;
@@ -22,7 +24,7 @@ class LeadController extends Controller
         $workspace = $request->user()->workspace;
 
         return Inertia::render('crm/leads/index', [
-            'leads' => Lead::query()->forWorkspace($workspace)->with('contact')->latest()->limit(100)->get(),
+            'leads' => Lead::query()->forWorkspace($workspace)->with(['contact', 'latestScore'])->latest()->limit(100)->get(),
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
         ]);
     }
@@ -37,7 +39,7 @@ class LeadController extends Controller
 
         $contact = Contact::query()->forWorkspace($request->user()->workspace)->findOrFail($data['contact_id']);
 
-        Lead::query()->create([
+        $lead = Lead::query()->create([
             'workspace_id' => $request->user()->workspace_id,
             'contact_id' => $contact->id,
             'company_id' => $contact->company_id,
@@ -46,18 +48,22 @@ class LeadController extends Controller
             'status' => 'new',
         ]);
 
+        app(LeadScorer::class)->score($lead, $request->user());
+
         return back();
     }
 
-    public function show(Request $request, Lead $lead, CrmHub $hub, PipelineManager $pipelines, EnrichmentService $enrichment): Response
+    public function show(Request $request, Lead $lead, CrmHub $hub, PipelineManager $pipelines, RecordInsight $insight, EnrichmentService $enrichment): Response
     {
         abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
-        $lead->load(['contact.company', 'contact.threads', 'contact.enrollments.sequence', 'contact.deals.stage', 'company', 'deal.stage']);
+        $lead->load(['contact.company', 'contact.threads', 'contact.enrollments.sequence', 'contact.deals.stage', 'company', 'deal.stage', 'latestScore']);
 
         return Inertia::render('crm/leads/show', [
             'lead' => $lead,
+            'leadScore' => $lead->latestScore?->present(),
+            'askEvo' => $insight->forLead($lead),
             'associations' => [
                 'contact' => $lead->contact,
                 'company' => $lead->company,

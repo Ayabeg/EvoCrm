@@ -113,6 +113,17 @@ return [
     'stage_probability_fallback' => 20,
 
     /*
+    | Formula lead score thresholds (0–100). Crossing qualify marks the Lead
+    | qualified. Crossing convert uses LeadConverter — never a second path.
+    | Hold moves new → working. Workspaces may override via lead_score_settings.
+    */
+    'lead_score' => [
+        'hold' => 40,
+        'qualify' => 60,
+        'convert' => 80,
+    ],
+
+    /*
     | Default deep conversion funnel (Visits → Orders → Confirmed → Delivered).
     | matcher_type is resolved by ConversionFunnelQuery; FunnelEventRecorder
     | writes event_type rows for the bottom three stages plus visits.

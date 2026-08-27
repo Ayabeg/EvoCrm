@@ -204,6 +204,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/leads/{lead}', [LeadController::class, 'show'])->name('crm.leads.show');
     Route::put('/crm/leads/{lead}', [LeadController::class, 'update'])->name('crm.leads.update');
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
+    Route::post('/crm/leads/{lead}/ask', [AskEvoController::class, 'lead'])->name('crm.leads.ask');
     Route::post('/crm/leads/{lead}/enrich', [EnrichmentController::class, 'lead'])->name('crm.leads.enrich');
     Route::post('/crm/enrichment-runs/{run}/apply', [EnrichmentController::class, 'apply'])->name('crm.enrichment.apply');
     Route::post('/crm/enrichment-runs/{run}/dismiss', [EnrichmentController::class, 'dismiss'])->name('crm.enrichment.dismiss');

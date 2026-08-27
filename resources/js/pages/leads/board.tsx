@@ -2,6 +2,7 @@ import { Form, Head, Link, router } from '@inertiajs/react';
 import { CalendarClock, Ellipsis, Plus, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
+import LeadScorePill from '@/components/crm/lead-score-pill';
 import {
     PipelineKanban,
     PipelineKanbanCard,
@@ -52,6 +53,10 @@ type BoardDeal = {
     task_overdue: boolean;
     created_today: boolean;
     url: string;
+    lead_score?: {
+        score: number;
+        reason: string | null;
+    } | null;
 };
 
 type Counts = {
@@ -175,6 +180,10 @@ function DealCard({
             <p className="money mt-1.5 text-sm font-semibold text-ink">
                 {formatAmount(deal.amount_cents, deal.currency)}
             </p>
+
+            {deal.lead_score ? (
+                <LeadScorePill compact score={deal.lead_score} />
+            ) : null}
 
             {deal.next_task ? (
                 <p

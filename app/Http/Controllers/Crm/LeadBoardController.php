@@ -35,7 +35,7 @@ class LeadBoardController extends Controller
 
         $deals = Deal::query()
             ->forWorkspace($workspace)
-            ->with(['contact', 'company', 'stage', 'owner'])
+            ->with(['contact', 'company', 'stage', 'owner', 'lead.latestScore'])
             ->orderByDesc('last_activity_at')
             ->orderByDesc('id')
             ->get();
@@ -133,6 +133,24 @@ class LeadBoardController extends Controller
             'task_overdue' => $next !== null && ($next->due_at?->isPast() ?? false),
             'created_today' => $deal->created_at?->isToday() ?? false,
             'url' => "/crm/deals/{$deal->id}",
+            'lead_score' => $this->leadScore($deal),
+        ];
+    }
+
+    /**
+     * @return array{score: int, reason: string|null}|null
+     */
+    private function leadScore(Deal $deal): ?array
+    {
+        $lead = $deal->lead;
+
+        if (! $lead || ! $lead->latestScore) {
+            return null;
+        }
+
+        return [
+            'score' => (int) $lead->score,
+            'reason' => $lead->latestScore->reason,
         ];
     }
 

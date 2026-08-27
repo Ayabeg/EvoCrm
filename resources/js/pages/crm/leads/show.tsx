@@ -1,13 +1,19 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import AskEvoPanel from '@/components/crm/ask-evo-panel';
+import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import EnrichmentPanel from '@/components/crm/enrichment-panel';
 import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import LeadConversionDialog from '@/components/crm/lead-conversion-dialog';
+import LeadScorePill from '@/components/crm/lead-score-pill';
+import type { LeadScorePayload } from '@/components/crm/lead-score-pill';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 export default function LeadShow({
     lead,
+    leadScore,
+    askEvo,
     associations,
     pipelines = [],
     members = [],
@@ -16,6 +22,8 @@ export default function LeadShow({
     enrichAction,
 }: {
     lead: any;
+    leadScore?: LeadScorePayload | null;
+    askEvo?: AskEvoPayload | null;
     associations?: any;
     pipelines?: {
         id: number;
@@ -54,7 +62,9 @@ export default function LeadShow({
                     </p>
                     <p>Source: {lead.source ?? '—'}</p>
                     <p>Qualified at: {lead.qualified_at ?? '—'}</p>
+                    <LeadScorePill score={leadScore ?? (lead.score !== undefined ? { score: lead.score, reason: lead.latest_score?.reason } : null)} />
                 </Card>
+                <AskEvoPanel action={`/crm/leads/${lead.id}/ask`} insight={askEvo} />
                 <Card className="p-4">
                     <Form action={`/crm/leads/${lead.id}`} method="put" className="grid gap-3 md:grid-cols-3">
                         {({ processing }) => (
