@@ -1,11 +1,19 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import Heading from '@/components/heading';
+import { CreateDrawer } from '@/components/crm/create-drawer';
+import { HairlinePanel } from '@/components/surface/hairline-panel';
+import {
+    HairlineRow,
+    HairlineTable,
+    HairlineTd,
+    HairlineTh,
+} from '@/components/surface/hairline-table';
+import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
 
 type FillRate = {
     filled: number;
@@ -53,30 +61,32 @@ function TypeFields({
     return (
         <>
             <div>
-                <Label htmlFor={`${idPrefix}-type`}>Type</Label>
-                <select
+                <Label htmlFor={`${idPrefix}-type`} className="mb-1 block">
+                    Type
+                </Label>
+                <NativeSelect
                     id={`${idPrefix}-type`}
                     name="type"
                     value={type}
                     onChange={(event) => setType(event.target.value)}
-                    className="mt-1 h-9 w-full rounded-md border border-hairline bg-canvas px-2 text-sm text-ink"
                 >
                     {types.map((item) => (
                         <option key={item.value} value={item.value}>
                             {item.label}
                         </option>
                     ))}
-                </select>
+                </NativeSelect>
             </div>
             {type === 'list' ? (
                 <div>
-                    <Label htmlFor={`${idPrefix}-options`}>List options (comma)</Label>
+                    <Label htmlFor={`${idPrefix}-options`} className="mb-1 block">
+                        List options (comma)
+                    </Label>
                     <Input
                         id={`${idPrefix}-options`}
                         name="options"
                         defaultValue={(defaultOptions ?? []).join(', ')}
                         placeholder="santé, logistique, retail"
-                        className="mt-1"
                     />
                 </div>
             ) : null}
@@ -84,184 +94,300 @@ function TypeFields({
     );
 }
 
-function DefinitionCard({ definition }: { definition: Definition }) {
+function DefinitionForm({
+    definition,
+    onDone,
+}: {
+    definition?: Definition;
+    onDone: () => void;
+}) {
+    const isEdit = Boolean(definition);
+
     return (
-        <Card className="border-hairline bg-canvas p-3">
-            <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-                <div>
-                    <p className="font-medium text-ink">{definition.label}</p>
-                    <p className="text-sm text-mute">
-                        {definition.entity} · {definition.key} · {definition.group || 'General'}
-                    </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-1.5">
-                    <Badge variant="outline">{definition.type}</Badge>
-                    {definition.required ? (
-                        <Badge className="border-transparent bg-brand/10 text-brand">required</Badge>
+        <Form
+            action={
+                isEdit
+                    ? `/settings/attributes/${definition!.id}`
+                    : '/settings/attributes'
+            }
+            method={isEdit ? 'put' : 'post'}
+            className="space-y-3"
+            resetOnSuccess={!isEdit}
+            onSuccess={onDone}
+        >
+            {({ processing }) => (
+                <>
+                    {!isEdit ? (
+                        <div>
+                            <Label htmlFor="entity" className="mb-1 block">
+                                Entity
+                            </Label>
+                            <NativeSelect id="entity" name="entity">
+                                {entities.map((entity) => (
+                                    <option key={entity.value} value={entity.value}>
+                                        {entity.label}
+                                    </option>
+                                ))}
+                            </NativeSelect>
+                        </div>
                     ) : null}
-                </div>
-            </div>
 
-            {definition.fill_rate ? (
-                <div className="mb-3 space-y-1">
-                    <div className="flex items-center justify-between text-[11px] text-mute">
-                        <span>Fill rate</span>
-                        <span>
-                            {definition.fill_rate.filled} / {definition.fill_rate.total} · {definition.fill_rate.percent}%
-                        </span>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-canvas-soft">
-                        <div className="h-full bg-brand" style={{ width: `${definition.fill_rate.percent}%` }} />
-                    </div>
-                </div>
-            ) : null}
+                    {!isEdit ? (
+                        <div>
+                            <Label htmlFor="key" className="mb-1 block">
+                                Key
+                            </Label>
+                            <Input id="key" name="key" required placeholder="beds" />
+                        </div>
+                    ) : null}
 
-            <Form
-                action={`/settings/attributes/${definition.id}`}
-                method="put"
-                className="grid gap-3"
-            >
-                {({ processing }) => (
-                    <>
-                        <div className="grid gap-3 sm:grid-cols-2">
-                            <div>
-                                <Label htmlFor={`label-${definition.id}`}>Label</Label>
-                                <Input
-                                    id={`label-${definition.id}`}
-                                    name="label"
-                                    defaultValue={definition.label}
-                                    required
-                                    className="mt-1"
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor={`group-${definition.id}`}>Group</Label>
-                                <Input
-                                    id={`group-${definition.id}`}
-                                    name="group"
-                                    defaultValue={definition.group ?? ''}
-                                    placeholder="About"
-                                    className="mt-1"
-                                />
-                            </div>
-                            <TypeFields
-                                idPrefix={`edit-${definition.id}`}
-                                defaultType={definition.type}
-                                defaultOptions={definition.options}
-                            />
-                        </div>
-                        <label className="flex items-center gap-2 text-sm text-ink">
-                            <input
-                                type="checkbox"
-                                name="required"
-                                value="1"
-                                defaultChecked={Boolean(definition.required)}
-                                className="size-4 accent-brand"
-                            />
-                            Required on the record
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                            <Button disabled={processing}>Save changes</Button>
-                        </div>
-                    </>
-                )}
-            </Form>
-            <Form action={`/settings/attributes/${definition.id}`} method="delete" className="mt-2">
-                {({ processing }) => (
-                    <Button type="submit" variant="secondary" className="h-8" disabled={processing}>
-                        Delete
-                    </Button>
-                )}
-            </Form>
-        </Card>
+                    <div>
+                        <Label
+                            htmlFor={isEdit ? `label-${definition!.id}` : 'label'}
+                            className="mb-1 block"
+                        >
+                            Label
+                        </Label>
+                        <Input
+                            id={isEdit ? `label-${definition!.id}` : 'label'}
+                            name="label"
+                            defaultValue={definition?.label}
+                            required
+                            placeholder="Beds"
+                        />
+                    </div>
+
+                    <div>
+                        <Label
+                            htmlFor={isEdit ? `group-${definition!.id}` : 'group'}
+                            className="mb-1 block"
+                        >
+                            Group
+                        </Label>
+                        <Input
+                            id={isEdit ? `group-${definition!.id}` : 'group'}
+                            name="group"
+                            defaultValue={definition?.group ?? ''}
+                            placeholder="About"
+                        />
+                    </div>
+
+                    <TypeFields
+                        idPrefix={isEdit ? `edit-${definition!.id}` : 'create'}
+                        defaultType={definition?.type ?? 'text'}
+                        defaultOptions={definition?.options}
+                    />
+
+                    <label className="flex items-center gap-2 aurora-text-body-sm text-ink">
+                        <input
+                            type="checkbox"
+                            name="required"
+                            value="1"
+                            defaultChecked={Boolean(definition?.required)}
+                            className="size-4 accent-brand"
+                        />
+                        Required on the record
+                    </label>
+
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button type="button" variant="ghost" onClick={onDone}>
+                            Cancel
+                        </Button>
+                        <Button disabled={processing}>
+                            {isEdit ? 'Save changes' : 'Save definition'}
+                        </Button>
+                    </div>
+                </>
+            )}
+        </Form>
     );
 }
 
-export default function AttributeSettings({ definitions }: { definitions: Definition[] }) {
+export default function AttributeSettings({
+    definitions,
+}: {
+    definitions: Definition[];
+}) {
+    const [createOpen, setCreateOpen] = useState(false);
+    const [editing, setEditing] = useState<Definition | null>(null);
+
     const byEntity = entities
         .map((entity) => ({
             ...entity,
-            items: definitions.filter((definition) => definition.entity === entity.value),
+            items: definitions.filter(
+                (definition) => definition.entity === entity.value,
+            ),
         }))
         .filter((entity) => entity.items.length > 0);
 
     return (
         <>
             <Head title="Custom attributes" />
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
+
+            <div className="space-y-5">
+                <SurfaceHeader
                     title="Custom attributes"
                     description="Workspace-defined fields on Contact, Company, and Deal. Add a date or list, group them, then edit or delete the definition."
-                />
+                >
+                    <Button size="sm" onClick={() => setCreateOpen(true)}>
+                        New attribute
+                    </Button>
+                </SurfaceHeader>
 
-                <Card className="border-hairline bg-canvas p-4">
-                    <h2 className="mb-1 font-medium text-ink">New attribute</h2>
-                    <p className="mb-3 text-sm text-mute">
-                        Values are stored per record and shown on the contact or deal hub.
-                    </p>
-                    <Form action="/settings/attributes" method="post" className="grid gap-3" resetOnSuccess>
-                        {({ processing }) => (
-                            <>
-                                <div className="grid gap-3 sm:grid-cols-2">
-                                    <div>
-                                        <Label htmlFor="entity">Entity</Label>
-                                        <select
-                                            id="entity"
-                                            name="entity"
-                                            className="mt-1 h-9 w-full rounded-md border border-hairline bg-canvas px-2 text-sm text-ink"
-                                        >
-                                            {entities.map((entity) => (
-                                                <option key={entity.value} value={entity.value}>
-                                                    {entity.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <TypeFields idPrefix="create" defaultType="text" />
-                                    <div>
-                                        <Label htmlFor="key">Key</Label>
-                                        <Input id="key" name="key" required placeholder="beds" className="mt-1" />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="label">Label</Label>
-                                        <Input id="label" name="label" required placeholder="Beds" className="mt-1" />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="group">Group</Label>
-                                        <Input id="group" name="group" placeholder="About" className="mt-1" />
-                                    </div>
-                                </div>
-                                <label className="flex items-center gap-2 text-sm text-ink">
-                                    <input
-                                        type="checkbox"
-                                        name="required"
-                                        value="1"
-                                        className="size-4 accent-brand"
-                                    />
-                                    Required on the record
-                                </label>
-                                <Button disabled={processing}>Save definition</Button>
-                            </>
-                        )}
-                    </Form>
-                </Card>
-
-                <div className="space-y-4">
-                    {byEntity.length === 0 ? (
-                        <p className="text-sm text-mute">No attributes yet. Start with Contact.</p>
-                    ) : (
-                        byEntity.map((entity) => (
-                            <div key={entity.value} className="space-y-2">
-                                <h2 className="text-sm font-semibold text-ink">{entity.label}</h2>
-                                {entity.items.map((definition) => (
-                                    <DefinitionCard key={definition.id} definition={definition} />
-                                ))}
-                            </div>
-                        ))
-                    )}
-                </div>
+                {byEntity.length === 0 ? (
+                    <HairlinePanel className="px-4 py-8">
+                        <p className="aurora-text-body-sm text-mute">
+                            No attributes yet. Start with Contact.
+                        </p>
+                    </HairlinePanel>
+                ) : (
+                    byEntity.map((entity) => (
+                        <div key={entity.value} className="space-y-2">
+                            <h2 className="aurora-text-eyebrow text-mute">
+                                {entity.label}
+                            </h2>
+                            <HairlinePanel>
+                                <HairlineTable minWidth="36rem">
+                                    <thead>
+                                        <tr className="border-b border-hairline">
+                                            <HairlineTh>Label</HairlineTh>
+                                            <HairlineTh>Key</HairlineTh>
+                                            <HairlineTh>Group</HairlineTh>
+                                            <HairlineTh>Type</HairlineTh>
+                                            <HairlineTh>Fill</HairlineTh>
+                                            <HairlineTh align="right">
+                                                Actions
+                                            </HairlineTh>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {entity.items.map((definition) => (
+                                            <HairlineRow key={definition.id}>
+                                                <HairlineTd className="font-medium">
+                                                    {definition.label}
+                                                    {definition.required ? (
+                                                        <Badge className="ml-2 border-transparent bg-brand/10 text-brand">
+                                                            required
+                                                        </Badge>
+                                                    ) : null}
+                                                </HairlineTd>
+                                                <HairlineTd className="text-mute">
+                                                    {definition.key}
+                                                </HairlineTd>
+                                                <HairlineTd className="text-mute">
+                                                    {definition.group || 'General'}
+                                                </HairlineTd>
+                                                <HairlineTd>
+                                                    <Badge variant="outline">
+                                                        {definition.type}
+                                                    </Badge>
+                                                </HairlineTd>
+                                                <HairlineTd className="text-mute">
+                                                    {definition.fill_rate ? (
+                                                        <span className="money tabular-nums">
+                                                            {definition.fill_rate.filled}
+                                                            /
+                                                            {definition.fill_rate.total}
+                                                            {' · '}
+                                                            {definition.fill_rate.percent}%
+                                                        </span>
+                                                    ) : (
+                                                        '-'
+                                                    )}
+                                                </HairlineTd>
+                                                <HairlineTd>
+                                                    <div className="flex justify-end">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="text-brand"
+                                                            onClick={() =>
+                                                                setEditing(definition)
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                    </div>
+                                                </HairlineTd>
+                                            </HairlineRow>
+                                        ))}
+                                    </tbody>
+                                </HairlineTable>
+                            </HairlinePanel>
+                        </div>
+                    ))
+                )}
             </div>
+
+            <CreateDrawer
+                open={createOpen}
+                onOpenChange={setCreateOpen}
+                title="New attribute"
+                description="Values are stored per record and shown on the contact or deal hub."
+                showFormLink={false}
+            >
+                <DefinitionForm onDone={() => setCreateOpen(false)} />
+            </CreateDrawer>
+
+            <CreateDrawer
+                open={Boolean(editing)}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setEditing(null);
+                    }
+                }}
+                title={editing ? `Edit ${editing.label}` : 'Edit attribute'}
+                description={
+                    editing
+                        ? `${editing.entity} · ${editing.key}`
+                        : undefined
+                }
+                showFormLink={false}
+            >
+                {editing ? (
+                    <div className="space-y-4">
+                        {editing.fill_rate ? (
+                            <div className="space-y-1 rounded-lg border border-hairline bg-canvas-soft p-3">
+                                <div className="flex items-center justify-between aurora-text-caption text-mute">
+                                    <span>Fill rate</span>
+                                    <span className="money tabular-nums">
+                                        {editing.fill_rate.filled} / {editing.fill_rate.total} · {editing.fill_rate.percent}%
+                                    </span>
+                                </div>
+                                <div className="h-1.5 overflow-hidden rounded-full bg-canvas">
+                                    <div
+                                        className="h-full bg-brand"
+                                        style={{
+                                            width: `${editing.fill_rate.percent}%`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        ) : null}
+
+                        <DefinitionForm
+                            key={editing.id}
+                            definition={editing}
+                            onDone={() => setEditing(null)}
+                        />
+
+                        <Form
+                            action={`/settings/attributes/${editing.id}`}
+                            method="delete"
+                        >
+                            {({ processing }) => (
+                                <Button
+                                    type="submit"
+                                    variant="secondary"
+                                    disabled={processing}
+                                >
+                                    Delete
+                                </Button>
+                            )}
+                        </Form>
+                    </div>
+                ) : null}
+            </CreateDrawer>
         </>
     );
 }

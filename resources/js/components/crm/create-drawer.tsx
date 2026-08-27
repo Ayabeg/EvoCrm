@@ -7,6 +7,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 export function CreateDrawer({
     open,
@@ -15,6 +16,8 @@ export function CreateDrawer({
     description,
     children,
     footer,
+    showFormLink = true,
+    className,
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -22,31 +25,38 @@ export function CreateDrawer({
     description?: string;
     children: ReactNode;
     footer?: ReactNode;
+    showFormLink?: boolean;
+    className?: string;
 }) {
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="right"
-                className="w-full gap-0 border-l border-hairline bg-canvas p-0 sm:max-w-md"
+                className={cn(
+                    'w-full gap-0 border-l border-hairline bg-canvas p-0 sm:max-w-md',
+                    className,
+                )}
             >
                 <SheetHeader className="border-b border-hairline px-5 py-4 text-left">
                     <div className="flex items-start justify-between gap-3 pr-6">
                         <div>
-                            <SheetTitle className="text-[18px] font-semibold text-ink">
+                            <SheetTitle className="aurora-text-display-2 text-ink">
                                 {title}
                             </SheetTitle>
                             {description ? (
-                                <SheetDescription className="mt-1 text-[12px]">
+                                <SheetDescription className="aurora-text-caption mt-1 text-mute">
                                     {description}
                                 </SheetDescription>
                             ) : null}
                         </div>
-                        <a
-                            href="#edit-form"
-                            className="shrink-0 text-[12px] font-medium text-brand"
-                        >
-                            Edit this form
-                        </a>
+                        {showFormLink ? (
+                            <a
+                                href="#edit-form"
+                                className="aurora-text-caption shrink-0 font-medium text-brand"
+                            >
+                                Edit this form
+                            </a>
+                        ) : null}
                     </div>
                 </SheetHeader>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">

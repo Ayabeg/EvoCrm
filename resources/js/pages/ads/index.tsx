@@ -1,10 +1,17 @@
 import { Form, Link } from '@inertiajs/react';
 import type { FunnelCounts } from '@/components/ads/funnel';
 import { AdsShell } from '@/components/crm/ads-shell';
-import PageHeader from '@/components/page-header';
+import { HairlinePanel } from '@/components/surface/hairline-panel';
+import {
+    HairlineRow,
+    HairlineTable,
+    HairlineTd,
+    HairlineTh,
+} from '@/components/surface/hairline-table';
+import { KpiMeter } from '@/components/surface/kpi-meter';
+import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { formatDzd } from '@/lib/money';
 
 type Account = {
@@ -69,204 +76,214 @@ function kindOf(campaign: Campaign): string {
 export default function AdsHub({ accounts, campaigns, totals, leads, meta }: Props) {
     return (
         <AdsShell title="Ads">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Ads Hub"
+            <div className="flex-1 space-y-5 p-6">
+                <SurfaceHeader
+                    title="Overview"
                     description="Meta ad accounts, campaigns, and lead intake. Funnel attribution lives on the Attribution tab."
                 >
-                    <div className="flex items-center gap-2">
-                        <Badge variant={meta.connected ? 'default' : 'secondary'}>
-                            {meta.connected ? 'Meta connected' : 'Demo data — Meta not connected'}
-                        </Badge>
-                        <Form action="/ads/sync" method="post">
-                            {({ processing }) => (
-                                <Button variant="outline" disabled={processing}>
-                                    Sync from Meta
-                                </Button>
-                            )}
-                        </Form>
-                    </div>
-                </PageHeader>
+                    <Badge variant={meta.connected ? 'default' : 'secondary'}>
+                        {meta.connected ? 'Meta connected' : 'Demo data'}
+                    </Badge>
+                    <Form action="/ads/sync" method="post">
+                        {({ processing }) => (
+                            <Button size="sm" disabled={processing}>
+                                Sync from Meta
+                            </Button>
+                        )}
+                    </Form>
+                </SurfaceHeader>
 
                 {meta.reason ? (
-                    <Card className="border-hairline bg-canvas p-4 text-sm">
-                        <p className="text-brand">{meta.reason}</p>
-                        <p className="mt-1 text-muted-foreground">
+                    <HairlinePanel className="px-4 py-3">
+                        <p className="aurora-text-body-sm text-brand">{meta.reason}</p>
+                        <p className="aurora-text-caption mt-1 text-mute">
                             Until then this hub runs on local demo data. Lead forms POST to{' '}
                             <code>/webhooks/meta/leads/{'{webhookKey}'}</code> and create Contact +
                             Lead in the resolved workspace.
                         </p>
-                    </Card>
+                    </HairlinePanel>
                 ) : null}
 
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-lg border border-hairline bg-canvas px-4 py-2.5 text-[13px]">
-                    {[
-                        ['Spend', formatDzd(totals.spend_cents)],
-                        ['Impressions', totals.impressions.toLocaleString()],
-                        ['Clicks', totals.clicks.toLocaleString()],
-                        ['Conv. / Leads', String(totals.conversations + totals.form_leads)],
-                        ['Deals', String(totals.deals)],
-                        ['Won', String(totals.won)],
-                    ].map(([label, value]) => (
-                        <div key={label} className="flex items-baseline gap-2">
-                            <span className="text-[11px] uppercase text-muted-foreground">{label}</span>
-                            <span className="font-semibold tabular-nums">{value}</span>
-                        </div>
-                    ))}
-                </div>
+                <KpiMeter
+                    items={[
+                        { label: 'Spend', value: formatDzd(totals.spend_cents) },
+                        { label: 'Impressions', value: totals.impressions.toLocaleString() },
+                        { label: 'Clicks', value: totals.clicks.toLocaleString() },
+                        {
+                            label: 'Conv. / Leads',
+                            value: String(totals.conversations + totals.form_leads),
+                        },
+                        { label: 'Deals', value: String(totals.deals) },
+                        { label: 'Won', value: String(totals.won) },
+                    ]}
+                />
 
-                <p className="text-[13px] text-muted-foreground">
+                <p className="aurora-text-body-sm text-mute">
                     Funnel boards:{' '}
-                    <Link href="/ads/attribution" className="font-medium text-brand">
+                    <Link href="/ads/attribution" className="font-medium text-brand hover:underline">
                         Attribution
                     </Link>
                     . Meta audiences:{' '}
-                    <Link href="/ads/audiences" className="font-medium text-brand">
+                    <Link href="/ads/audiences" className="font-medium text-brand hover:underline">
                         Audiences
                     </Link>
                     .
                 </p>
 
-                <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">Campaigns</h2>
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2">Campaign</th>
-                                <th className="px-4 py-2">Account</th>
-                                <th className="px-4 py-2">Kind</th>
-                                <th className="px-4 py-2">Status</th>
-                                <th className="px-4 py-2">Budget/day</th>
-                                <th className="px-4 py-2">Ad sets</th>
+                <HairlinePanel>
+                    <div className="border-b border-hairline px-4 py-2.5">
+                        <h2 className="aurora-text-ui font-medium text-ink">Campaigns</h2>
+                    </div>
+                    <HairlineTable>
+                        <thead>
+                            <tr className="border-b border-hairline">
+                                <HairlineTh>Campaign</HairlineTh>
+                                <HairlineTh>Account</HairlineTh>
+                                <HairlineTh>Kind</HairlineTh>
+                                <HairlineTh>Status</HairlineTh>
+                                <HairlineTh>Budget/day</HairlineTh>
+                                <HairlineTh align="right">Ad sets</HairlineTh>
                             </tr>
                         </thead>
                         <tbody>
                             {campaigns.length === 0 ? (
-                                <tr>
-                                    <td className="px-4 py-6 text-muted-foreground" colSpan={6}>
-                                        No campaigns yet — sync from Meta or use demo data.
-                                    </td>
-                                </tr>
+                                <HairlineRow>
+                                    <HairlineTd colSpan={6} className="py-6 text-mute">
+                                        No campaigns yet - sync from Meta or use demo data.
+                                    </HairlineTd>
+                                </HairlineRow>
                             ) : (
                                 campaigns.map((campaign) => (
-                                    <tr key={campaign.id} className="border-t border-hairline">
-                                        <td className="px-4 py-2">
+                                    <HairlineRow key={campaign.id}>
+                                        <HairlineTd>
                                             <Link
                                                 href={`/ads/campaigns/${campaign.id}`}
                                                 className="font-medium text-brand hover:underline"
                                             >
                                                 {campaign.name}
                                             </Link>
-                                        </td>
-                                        <td className="px-4 py-2">{campaign.account?.name ?? '—'}</td>
-                                        <td className="px-4 py-2">{kindOf(campaign)}</td>
-                                        <td className="px-4 py-2">{campaign.status}</td>
-                                        <td className="px-4 py-2 money tabular-nums">
+                                        </HairlineTd>
+                                        <HairlineTd className="text-mute">
+                                            {campaign.account?.name ?? '-'}
+                                        </HairlineTd>
+                                        <HairlineTd>{kindOf(campaign)}</HairlineTd>
+                                        <HairlineTd>{campaign.status}</HairlineTd>
+                                        <HairlineTd className="money tabular-nums">
                                             {formatDzd(campaign.daily_budget_cents)}
-                                        </td>
-                                        <td className="px-4 py-2 tabular-nums">{campaign.ad_sets_count}</td>
-                                    </tr>
+                                        </HairlineTd>
+                                        <HairlineTd align="right" className="tabular-nums">
+                                            {campaign.ad_sets_count}
+                                        </HairlineTd>
+                                    </HairlineRow>
                                 ))
                             )}
                         </tbody>
-                    </table>
-                </Card>
+                    </HairlineTable>
+                </HairlinePanel>
 
                 <div className="grid gap-4 lg:grid-cols-2">
-                    <Card className="overflow-hidden">
-                        <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">Ad accounts</h2>
-                        <table className="w-full text-sm">
-                            <thead className="bg-muted/50 text-left">
-                                <tr>
-                                    <th className="px-4 py-2">Account</th>
-                                    <th className="px-4 py-2">Status</th>
-                                    <th className="px-4 py-2">Currency</th>
-                                    <th className="px-4 py-2">Campaigns</th>
+                    <HairlinePanel>
+                        <div className="border-b border-hairline px-4 py-2.5">
+                            <h2 className="aurora-text-ui font-medium text-ink">Ad accounts</h2>
+                        </div>
+                        <HairlineTable>
+                            <thead>
+                                <tr className="border-b border-hairline">
+                                    <HairlineTh>Account</HairlineTh>
+                                    <HairlineTh>Status</HairlineTh>
+                                    <HairlineTh>Currency</HairlineTh>
+                                    <HairlineTh align="right">Campaigns</HairlineTh>
                                 </tr>
                             </thead>
                             <tbody>
                                 {accounts.length === 0 ? (
-                                    <tr>
-                                        <td className="px-4 py-6 text-muted-foreground" colSpan={4}>
+                                    <HairlineRow>
+                                        <HairlineTd colSpan={4} className="py-6 text-mute">
                                             No ad accounts yet.
-                                        </td>
-                                    </tr>
+                                        </HairlineTd>
+                                    </HairlineRow>
                                 ) : (
                                     accounts.map((account) => (
-                                        <tr key={account.id} className="border-t border-hairline">
-                                            <td className="px-4 py-2 font-medium">{account.name}</td>
-                                            <td className="px-4 py-2">{account.status}</td>
-                                            <td className="px-4 py-2">{account.currency}</td>
-                                            <td className="px-4 py-2">{account.campaigns_count}</td>
-                                        </tr>
+                                        <HairlineRow key={account.id}>
+                                            <HairlineTd className="font-medium">{account.name}</HairlineTd>
+                                            <HairlineTd>{account.status}</HairlineTd>
+                                            <HairlineTd>{account.currency}</HairlineTd>
+                                            <HairlineTd align="right">{account.campaigns_count}</HairlineTd>
+                                        </HairlineRow>
                                     ))
                                 )}
                             </tbody>
-                        </table>
-                    </Card>
-                    <Card className="overflow-hidden">
-                        <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">
-                            Latest form leads
-                        </h2>
-                        <table className="w-full text-sm">
-                            <thead className="bg-muted/50 text-left">
-                                <tr>
-                                    <th className="px-4 py-2">Contact</th>
-                                    <th className="px-4 py-2">Campaign</th>
-                                    <th className="px-4 py-2">CRM lead</th>
-                                    <th className="px-4 py-2">Deal</th>
+                        </HairlineTable>
+                    </HairlinePanel>
+
+                    <HairlinePanel>
+                        <div className="border-b border-hairline px-4 py-2.5">
+                            <h2 className="aurora-text-ui font-medium text-ink">Latest form leads</h2>
+                        </div>
+                        <HairlineTable>
+                            <thead>
+                                <tr className="border-b border-hairline">
+                                    <HairlineTh>Contact</HairlineTh>
+                                    <HairlineTh>Campaign</HairlineTh>
+                                    <HairlineTh>CRM lead</HairlineTh>
+                                    <HairlineTh>Deal</HairlineTh>
                                 </tr>
                             </thead>
                             <tbody>
                                 {leads.length === 0 ? (
-                                    <tr>
-                                        <td className="px-4 py-6 text-muted-foreground" colSpan={4}>
+                                    <HairlineRow>
+                                        <HairlineTd colSpan={4} className="py-6 text-mute">
                                             No form submissions yet.
-                                        </td>
-                                    </tr>
+                                        </HairlineTd>
+                                    </HairlineRow>
                                 ) : (
                                     leads.map((row) => (
-                                        <tr key={row.id} className="border-t border-hairline">
-                                            <td className="px-4 py-2">
+                                        <HairlineRow key={row.id}>
+                                            <HairlineTd>
                                                 {row.contact ? (
                                                     <Link
                                                         href={`/crm/contacts/${row.contact.id}`}
-                                                        className="text-brand"
+                                                        className="text-brand hover:underline"
                                                     >
                                                         {row.contact.first_name} {row.contact.last_name ?? ''}
                                                     </Link>
                                                 ) : (
-                                                    '—'
+                                                    '-'
                                                 )}
-                                            </td>
-                                            <td className="px-4 py-2">{row.campaign?.name ?? '—'}</td>
-                                            <td className="px-4 py-2">
+                                            </HairlineTd>
+                                            <HairlineTd className="text-mute">
+                                                {row.campaign?.name ?? '-'}
+                                            </HairlineTd>
+                                            <HairlineTd>
                                                 {row.lead ? (
-                                                    <Link href={`/crm/leads/${row.lead.id}`} className="text-brand">
+                                                    <Link
+                                                        href={`/crm/leads/${row.lead.id}`}
+                                                        className="text-brand hover:underline"
+                                                    >
                                                         {row.lead.status}
                                                     </Link>
                                                 ) : (
-                                                    '—'
+                                                    '-'
                                                 )}
-                                            </td>
-                                            <td className="px-4 py-2">
+                                            </HairlineTd>
+                                            <HairlineTd>
                                                 {row.lead?.deal ? (
                                                     <Link
                                                         href={`/crm/deals/${row.lead.deal.id}`}
-                                                        className="text-brand"
+                                                        className="text-brand hover:underline"
                                                     >
                                                         {row.lead.deal.title}
                                                     </Link>
                                                 ) : (
-                                                    '—'
+                                                    '-'
                                                 )}
-                                            </td>
-                                        </tr>
+                                            </HairlineTd>
+                                        </HairlineRow>
                                     ))
                                 )}
                             </tbody>
-                        </table>
-                    </Card>
+                        </HairlineTable>
+                    </HairlinePanel>
                 </div>
             </div>
         </AdsShell>
