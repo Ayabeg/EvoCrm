@@ -46,15 +46,20 @@ it('maps overlapping Aurora type tokens to the Brand Book --text-* scale', funct
 });
 
 it('keeps Home application chrome on Brand Book tokens rather than raw --aurora-*', function () {
-    $home = file_get_contents(resource_path('js/pages/home.tsx'));
-    $header = file_get_contents(resource_path('js/components/dashboard/dashboard-header.tsx'));
-    $attention = file_get_contents(resource_path('js/components/dashboard/attention-list.tsx'));
-    $activity = file_get_contents(resource_path('js/components/dashboard/activity-feed.tsx'));
+    $files = [
+        'js/pages/home.tsx',
+        'js/components/dashboard/dashboard-header.tsx',
+        'js/components/dashboard/dashboard-section.tsx',
+        'js/components/dashboard/attention-list.tsx',
+        'js/components/dashboard/activity-feed.tsx',
+        'js/components/dashboard/quick-actions.tsx',
+        'js/components/crm/evo-kpi-card.tsx',
+        'js/components/crm/crm-kpi-strip.tsx',
+    ];
 
-    expect($home)->not->toContain('--aurora-');
-    expect($header)->not->toContain('--aurora-');
-    expect($attention)->not->toContain('--aurora-');
-    expect($activity)->not->toContain('--aurora-');
+    foreach ($files as $file) {
+        expect(file_get_contents(resource_path($file)))->not->toContain('--aurora-');
+    }
 });
 
 it('pins the vendored Aurora source revision next to the primitives', function () {

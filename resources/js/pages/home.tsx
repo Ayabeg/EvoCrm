@@ -1,13 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import { CrmKpiStrip  } from '@/components/crm/crm-kpi-strip';
-import type {KpiTile} from '@/components/crm/crm-kpi-strip';
-import { ActivityFeed  } from '@/components/dashboard/activity-feed';
-import type {ActivityFeedItem} from '@/components/dashboard/activity-feed';
-import {
-    AttentionList
-    
-} from '@/components/dashboard/attention-list';
-import type {AttentionItem} from '@/components/dashboard/attention-list';
+import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
+import type { KpiTile } from '@/components/crm/crm-kpi-strip';
+import { ActivityFeed } from '@/components/dashboard/activity-feed';
+import type { ActivityFeedItem } from '@/components/dashboard/activity-feed';
+import { AttentionList } from '@/components/dashboard/attention-list';
+import type { AttentionItem } from '@/components/dashboard/attention-list';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
 import { QuickActions } from '@/components/dashboard/quick-actions';
@@ -76,7 +73,7 @@ export default function Home({
         <>
             <Head title="Home" />
             <div className="flex-1">
-                <div className="mx-auto w-full max-w-7xl px-4 py-5 md:px-6">
+                <div className="mx-auto w-full max-w-7xl px-5 py-8 md:px-8">
                     <DashboardHeader
                         subtitle={subtitle}
                         owners={owners}
@@ -84,19 +81,22 @@ export default function Home({
                     />
 
                     {kpis.length > 0 ? (
-                        <section aria-label="Command KPIs" className="mb-6">
+                        <section aria-label="Command KPIs" className="mb-8">
                             <CrmKpiStrip kpis={kpis} columns={5} />
                         </section>
                     ) : null}
 
-                    <div className="grid gap-5 lg:grid-cols-3">
-                        <div className="space-y-5 lg:col-span-2">
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        <div className="space-y-6 lg:col-span-2">
                             {primaryChart ? (
                                 <DashboardSection
                                     title="Performance"
                                     description="Primary trend for the selected period"
                                 >
-                                    <EvoVizChart payload={primaryChart} />
+                                    <EvoVizChart
+                                        payload={primaryChart}
+                                        framed={false}
+                                    />
                                 </DashboardSection>
                             ) : null}
 
@@ -107,7 +107,7 @@ export default function Home({
                                     action={
                                         <Link
                                             href="/crm/deals/board"
-                                            className="aurora-text-body-sm text-brand transition-colors hover:underline"
+                                            className="text-[12px] text-brand transition-colors hover:underline"
                                         >
                                             Open board
                                         </Link>
@@ -116,19 +116,20 @@ export default function Home({
                                     {pipelineHealth.chart ? (
                                         <EvoVizChart
                                             payload={pipelineHealth.chart}
+                                            framed={false}
                                         />
                                     ) : (
-                                        <ul className="space-y-2 rounded-xl border border-hairline bg-canvas p-4">
+                                        <ul className="space-y-3">
                                             {pipelineHealth.stages.map(
                                                 (stage) => (
                                                     <li
                                                         key={stage.name}
                                                         className="flex items-center justify-between gap-3"
                                                     >
-                                                        <span className="aurora-text-body-sm text-ink">
+                                                        <span className="text-[13px] text-ink">
                                                             {stage.name}
                                                         </span>
-                                                        <span className="aurora-text-caption money text-mute">
+                                                        <span className="money text-[12px] text-mute">
                                                             {stage.count} ·{' '}
                                                             {formatDzd(
                                                                 stage.amount_cents,
@@ -142,23 +143,22 @@ export default function Home({
                                 </DashboardSection>
                             ) : null}
 
-                            {salesPerformance &&
-                            salesPerformance.length > 0 ? (
+                            {salesPerformance && salesPerformance.length > 0 ? (
                                 <DashboardSection
                                     title="Sales performance"
                                     description="Won deals in period by owner"
                                 >
-                                    <div className="overflow-x-auto rounded-xl border border-hairline bg-canvas">
+                                    <div className="overflow-x-auto">
                                         <table className="w-full min-w-[320px]">
                                             <thead>
                                                 <tr className="border-b border-hairline text-left">
-                                                    <th className="aurora-text-eyebrow px-4 py-2 font-medium text-mute">
+                                                    <th className="px-0 py-2 text-[11px] font-medium text-mute">
                                                         Owner
                                                     </th>
-                                                    <th className="aurora-text-eyebrow px-4 py-2 text-right font-medium text-mute">
+                                                    <th className="px-0 py-2 text-right text-[11px] font-medium text-mute">
                                                         Won
                                                     </th>
-                                                    <th className="aurora-text-eyebrow px-4 py-2 text-right font-medium text-mute">
+                                                    <th className="px-0 py-2 text-right text-[11px] font-medium text-mute">
                                                         Revenue
                                                     </th>
                                                 </tr>
@@ -169,13 +169,13 @@ export default function Home({
                                                         key={row.owner}
                                                         className="border-b border-hairline last:border-0"
                                                     >
-                                                        <td className="aurora-text-body-sm px-4 py-2 text-ink">
+                                                        <td className="px-0 py-2.5 text-[13px] text-ink">
                                                             {row.owner}
                                                         </td>
-                                                        <td className="money aurora-text-body-sm px-4 py-2 text-right text-ink">
+                                                        <td className="money px-0 py-2.5 text-right text-[13px] text-ink">
                                                             {row.won}
                                                         </td>
-                                                        <td className="money aurora-text-body-sm px-4 py-2 text-right text-ink">
+                                                        <td className="money px-0 py-2.5 text-right text-[13px] text-ink">
                                                             {formatDzd(
                                                                 row.revenue_cents,
                                                             )}
@@ -189,7 +189,7 @@ export default function Home({
                             ) : null}
                         </div>
 
-                        <div className="space-y-5">
+                        <div className="space-y-6">
                             <DashboardSection title="Needs attention">
                                 <AttentionList items={attention} />
                             </DashboardSection>
@@ -199,7 +199,7 @@ export default function Home({
                                 action={
                                     <Link
                                         href="/crm/activities"
-                                        className="aurora-text-body-sm text-brand transition-colors hover:underline"
+                                        className="text-[12px] text-brand transition-colors hover:underline"
                                     >
                                         View all
                                     </Link>
@@ -214,7 +214,7 @@ export default function Home({
                         </div>
                     </div>
 
-                    <footer className="aurora-text-caption mt-8 border-t border-hairline pt-3 text-mute">
+                    <footer className="mt-10 border-t border-hairline pt-4 text-[11px] text-mute">
                         {dataAsOf
                             ? `Data as of ${dataAsOf} · ${window.timezone}`
                             : `Data as of now · ${window.timezone}`}
