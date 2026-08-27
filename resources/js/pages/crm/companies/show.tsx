@@ -2,6 +2,8 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import EnrichmentPanel from '@/components/crm/enrichment-panel';
+import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import {
     ActivityTabs,
@@ -53,6 +55,8 @@ export default function CompanyShow({
     cities,
     wilayas,
     askEvo,
+    enrichmentRuns = [],
+    enrichAction,
 }: {
     company: Company;
     associations: {
@@ -69,6 +73,8 @@ export default function CompanyShow({
     cities: string[];
     wilayas: string[];
     askEvo?: AskEvoPayload | null;
+    enrichmentRuns?: EnrichmentRunRow[];
+    enrichAction?: string;
 }) {
     const [tab, setTab] = useState('activities');
     const loading = useInertiaLoading();
@@ -118,6 +124,12 @@ export default function CompanyShow({
                                     action={`/crm/companies/${company.id}/ask`}
                                     insight={askEvo}
                                 />
+                                {enrichAction ? (
+                                    <EnrichmentPanel
+                                        action={enrichAction}
+                                        runs={enrichmentRuns}
+                                    />
+                                ) : null}
                                 <RecordSection title="About this company">
                                     <RecordFact
                                         label="Domain"

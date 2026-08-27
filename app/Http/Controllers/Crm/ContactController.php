@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Crm;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Contact;
+use App\Models\EnrichmentRun;
 use App\Models\Mailbox;
 use App\Models\Sequence;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
+use App\Services\Enrichment\EnrichmentService;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -61,7 +63,7 @@ class ContactController extends Controller
         ]);
     }
 
-    public function show(Request $request, Contact $contact, CrmHub $hub, RecordInsight $insight): Response
+    public function show(Request $request, Contact $contact, CrmHub $hub, RecordInsight $insight, EnrichmentService $enrichment): Response
     {
         abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -83,6 +85,8 @@ class ContactController extends Controller
             'askEvo' => $insight->forContact($contact),
             'contactEngagement' => $insight->contactEngagement($contact),
             'proactiveSummary' => $insight->proactiveSummary($contact),
+            'enrichmentRuns' => $enrichment->history($workspace, EnrichmentRun::TARGET_CONTACT, (int) $contact->id),
+            'enrichAction' => "/crm/contacts/{$contact->id}/enrich",
             'dealsKanban' => [
                 'pipeline' => $pipeline->only(['id', 'name']),
                 'stages' => $pipeline->stages->map(fn ($stage) => [

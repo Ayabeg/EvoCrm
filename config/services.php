@@ -53,6 +53,12 @@ return [
         */
         'gmail_scope' => env('GOOGLE_GMAIL_SCOPE'),
         'calendar_scope' => env('GOOGLE_CALENDAR_SCOPE'),
+        /*
+        | Places API (New) server key for first-party company lookup.
+        | Empty = Google Places enricher no-ops and records a skip.
+        | Official Text Search only: https://places.googleapis.com/v1/places:searchText
+        */
+        'places_key' => env('GOOGLE_PLACES_API_KEY'),
     ],
 
     /*

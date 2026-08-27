@@ -16,6 +16,7 @@ use App\Http\Controllers\Crm\DealController;
 use App\Http\Controllers\Crm\DealImportController;
 use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\DealSplitController;
+use App\Http\Controllers\Crm\EnrichmentController;
 use App\Http\Controllers\Crm\FunnelController;
 use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadCaptureController;
@@ -171,6 +172,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/companies/{company}', [CompanyController::class, 'update'])->name('crm.companies.update');
     Route::put('/crm/companies/{company}/attributes', [CompanyController::class, 'updateAttributes'])->name('crm.companies.attributes');
     Route::post('/crm/companies/{company}/ask', [AskEvoController::class, 'company'])->name('crm.companies.ask');
+    Route::post('/crm/companies/{company}/enrich', [EnrichmentController::class, 'company'])->name('crm.companies.enrich');
 
     Route::get('/crm/contacts', [ContactController::class, 'index'])->name('crm.contacts.index');
     Route::get('/crm/contacts/export', [ContactController::class, 'export'])->name('crm.contacts.export');
@@ -189,6 +191,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/contacts/{contact}/attributes', [ContactController::class, 'updateAttributes'])->name('crm.contacts.attributes');
     Route::post('/crm/contacts/{contact}/ask', [AskEvoController::class, 'contact'])->name('crm.contacts.ask');
     Route::post('/crm/contacts/{contact}/draft-email', [AskEvoController::class, 'draftContact'])->name('crm.contacts.draft-email');
+    Route::post('/crm/contacts/{contact}/enrich', [EnrichmentController::class, 'contact'])->name('crm.contacts.enrich');
 
     Route::get('/crm/leads', [LeadController::class, 'index'])->name('crm.leads.index');
     Route::post('/crm/leads', [LeadController::class, 'store'])->name('crm.leads.store');
@@ -201,6 +204,9 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/leads/{lead}', [LeadController::class, 'show'])->name('crm.leads.show');
     Route::put('/crm/leads/{lead}', [LeadController::class, 'update'])->name('crm.leads.update');
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
+    Route::post('/crm/leads/{lead}/enrich', [EnrichmentController::class, 'lead'])->name('crm.leads.enrich');
+    Route::post('/crm/enrichment-runs/{run}/apply', [EnrichmentController::class, 'apply'])->name('crm.enrichment.apply');
+    Route::post('/crm/enrichment-runs/{run}/dismiss', [EnrichmentController::class, 'dismiss'])->name('crm.enrichment.dismiss');
 
     Route::get('/crm/deals/export', [DealController::class, 'export'])->name('crm.deals.export');
     Route::get('/crm/deals/import', [DealImportController::class, 'create'])->name('crm.deals.import');
