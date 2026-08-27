@@ -9,8 +9,6 @@ use App\Models\Lead;
 use App\Models\Workspace;
 use App\Services\Enrichment\EnrichmentService;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class EnrichLeadsCommand extends Command
 {
@@ -44,10 +42,8 @@ class EnrichLeadsCommand extends Command
                 return self::FAILURE;
             }
 
-            $records = $this->query($targetType, $workspaceId, $id)->limit($limit)->get();
-
-            foreach ($records as $record) {
-                $workspace = $record->workspace ?? Workspace::query()->find($record->workspace_id);
+            foreach ($this->records($targetType, $workspaceId, $id, $limit) as $record) {
+                $workspace = Workspace::query()->find($record->workspace_id);
 
                 if (! $workspace instanceof Workspace) {
                     continue;
@@ -69,9 +65,9 @@ class EnrichLeadsCommand extends Command
     }
 
     /**
-     * @return Builder<Model>
+     * @return list<Company|Contact|Lead>
      */
-    private function query(string $type, mixed $workspaceId, mixed $id): Builder
+    private function records(string $type, mixed $workspaceId, mixed $id, int $limit): array
     {
         $query = match ($type) {
             EnrichmentRun::TARGET_CONTACT => Contact::query(),
@@ -87,6 +83,6 @@ class EnrichLeadsCommand extends Command
             $query->where('id', (int) $id);
         }
 
-        return $query->latest('id');
+        return array_values($query->latest('id')->limit($limit)->get()->all());
     }
 }

@@ -9,7 +9,6 @@ use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Models\User;
 use App\Models\Workspace;
-use Illuminate\Support\Collection;
 
 class EnrichmentService
 {
@@ -98,11 +97,11 @@ class EnrichmentService
     }
 
     /**
-     * @return Collection<int, array<string, mixed>>
+     * @return list<array{id: int, source: string, field: string, value: string|null, confidence: float, status: string, error: string|null, created_at: string|null}>
      */
-    public function history(Workspace $workspace, string $targetType, int $targetId): Collection
+    public function history(Workspace $workspace, string $targetType, int $targetId): array
     {
-        return EnrichmentRun::query()
+        return array_values(EnrichmentRun::query()
             ->forWorkspace($workspace)
             ->where('target_type', $targetType)
             ->where('target_id', $targetId)
@@ -119,7 +118,7 @@ class EnrichmentService
                 'error' => $run->error,
                 'created_at' => $run->created_at?->toIso8601String(),
             ])
-            ->values();
+            ->all());
     }
 
     public function resolve(Workspace $workspace, string $type, int $id): Company|Contact|Lead|null

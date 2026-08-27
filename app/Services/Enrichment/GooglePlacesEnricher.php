@@ -50,14 +50,14 @@ class GooglePlacesEnricher
 
         $result = $this->client->searchText($query);
 
-        if (! ($result['ok'] ?? false)) {
+        if (! $result['ok']) {
             $this->runs->persistFailure(
                 $workspace,
                 $targetType,
                 (int) $target->id,
                 EnrichmentRun::SOURCE_GOOGLE_PLACES,
                 'place_id',
-                (string) ($result['error'] ?? 'Google Places lookup failed.'),
+                $result['error'] ?? 'Google Places lookup failed.',
                 ['query' => $query],
             );
 
@@ -132,10 +132,13 @@ class GooglePlacesEnricher
 
     public function queryFor(Company|Contact|Lead $target): ?string
     {
+        $company = $target instanceof Company ? $target : ($target->company instanceof Company ? $target->company : null);
+        $contact = $target instanceof Contact ? $target : ($target instanceof Lead && $target->contact instanceof Contact ? $target->contact : null);
+
         $name = match (true) {
             $target instanceof Company => $target->name,
-            $target instanceof Contact => $target->company?->name ?: $target->displayName(),
-            $target instanceof Lead => $target->company?->name ?: $target->title,
+            $target instanceof Contact => $company?->name ?: $target->displayName(),
+            $target instanceof Lead => $company?->name ?: $target->title,
         };
 
         $name = trim((string) $name);
@@ -144,13 +147,10 @@ class GooglePlacesEnricher
             return null;
         }
 
-        $place = match (true) {
-            $target instanceof Lead => $target->company?->wilaya
-                ?: $target->company?->city
-                ?: $target->contact?->wilaya
-                ?: $target->contact?->city,
-            default => $target->wilaya ?: $target->city,
-        };
+        $place = $company?->wilaya
+            ?: $company?->city
+            ?: $contact?->wilaya
+            ?: $contact?->city;
 
         $place = AlgerianWilaya::normalize(is_string($place) ? $place : null);
         $parts = array_filter([$name, $place, 'Algeria']);

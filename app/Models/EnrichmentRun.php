@@ -85,6 +85,9 @@ class EnrichmentRun extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function decidedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'decided_by');

@@ -63,11 +63,16 @@ final class WebsiteFetcher
 
         $parts = parse_url($value);
 
-        if (! is_array($parts) || empty($parts['host']) || ! in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true)) {
+        if (! is_array($parts) || ! isset($parts['host'], $parts['scheme'])) {
             return null;
         }
 
-        $host = strtolower((string) $parts['host']);
+        $scheme = strtolower($parts['scheme']);
+        $host = strtolower($parts['host']);
+
+        if ($host === '' || ! in_array($scheme, ['http', 'https'], true)) {
+            return null;
+        }
 
         if ($this->isBlockedHost($host)) {
             return null;
@@ -76,7 +81,7 @@ final class WebsiteFetcher
         $path = $parts['path'] ?? '';
         $query = isset($parts['query']) ? '?'.$parts['query'] : '';
 
-        return strtolower((string) $parts['scheme']).'://'.$host.$path.$query;
+        return $scheme.'://'.$host.$path.$query;
     }
 
     private function isBlockedHost(string $host): bool

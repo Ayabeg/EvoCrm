@@ -125,24 +125,17 @@ class EnrichmentPersister
 
     public function currentValue(Company|Contact|Lead $target, string $field): ?string
     {
+        $contact = $this->relatedContact($target);
+        $company = $this->relatedCompany($target);
+
         $value = match ($field) {
-            'email' => $target instanceof Contact
-                ? $target->email
-                : ($target instanceof Lead ? $target->contact?->email : null),
+            'email' => $contact?->email,
             'phone' => $target instanceof Company
-                ? $target->phone
-                : ($target instanceof Contact
-                    ? ($target->phone_e164 ?: $target->phone)
-                    : ($target->contact?->phone_e164 ?: $target->contact?->phone)),
-            'city' => $target instanceof Lead
-                ? ($target->contact?->city ?: $target->company?->city)
-                : $target->city,
-            'wilaya' => $target instanceof Lead
-                ? ($target->contact?->wilaya ?: $target->company?->wilaya)
-                : $target->wilaya,
-            'domain' => $target instanceof Company
-                ? $target->domain
-                : ($target instanceof Contact || $target instanceof Lead ? $target->company?->domain : null),
+                ? $company?->phone
+                : ($contact?->phone_e164 ?: $contact?->phone),
+            'city' => $contact?->city ?: $company?->city,
+            'wilaya' => $contact?->wilaya ?: $company?->wilaya,
+            'domain' => $company?->domain,
             default => null,
         };
 
@@ -169,11 +162,9 @@ class EnrichmentPersister
 
     private function writeEmail(Company|Contact|Lead $target, string $value, bool $force): bool
     {
-        $contact = $target instanceof Contact
-            ? $target
-            : ($target instanceof Lead ? $target->contact : null);
+        $contact = $this->relatedContact($target);
 
-        if (! $contact) {
+        if (! $contact instanceof Contact) {
             return $this->writeExtra($target, 'email', $value);
         }
 
@@ -203,13 +194,16 @@ class EnrichmentPersister
     private function writeScalar(Company|Contact|Lead $target, string $column, string $value, bool $force): bool
     {
         if ($target instanceof Lead) {
-            if ($target->contact && ($force || blank($target->contact->{$column}))) {
-                $target->contact->forceFill([$column => $value])->save();
+            $contact = $this->relatedContact($target);
+            $company = $this->relatedCompany($target);
+
+            if ($contact instanceof Contact && ($force || blank($contact->getAttribute($column)))) {
+                $contact->forceFill([$column => $value])->save();
             }
 
-            if ($target->company && in_array($column, ['phone', 'city', 'wilaya', 'domain'], true)
-                && ($force || blank($target->company->{$column}))) {
-                $target->company->forceFill([$column => $value])->save();
+            if ($company instanceof Company && in_array($column, ['phone', 'city', 'wilaya', 'domain'], true)
+                && ($force || blank($company->getAttribute($column)))) {
+                $company->forceFill([$column => $value])->save();
             }
 
             $this->writeExtra($target, $column, $value);
@@ -217,7 +211,7 @@ class EnrichmentPersister
             return true;
         }
 
-        if (! $force && filled($target->{$column})) {
+        if (! $force && filled($target->getAttribute($column))) {
             return false;
         }
 
@@ -229,7 +223,7 @@ class EnrichmentPersister
     private function writeExtra(Company|Contact|Lead $target, string $field, string $value): bool
     {
         if ($target instanceof Contact) {
-            $meta = is_array($target->meta) ? $target->meta : [];
+            $meta = $this->bag($target->getAttribute('meta'));
             $meta['enrichment'][$field] = $value;
             $target->forceFill(['meta' => $meta])->save();
 
@@ -237,7 +231,7 @@ class EnrichmentPersister
         }
 
         if ($target instanceof Lead) {
-            $payload = is_array($target->payload) ? $target->payload : [];
+            $payload = $this->bag($target->getAttribute('payload'));
             $payload['enrichment'][$field] = $value;
             $target->forceFill(['payload' => $payload])->save();
 
@@ -268,5 +262,49 @@ class EnrichmentPersister
         }
 
         return $value;
+    }
+
+    private function relatedContact(Company|Contact|Lead $target): ?Contact
+    {
+        if ($target instanceof Contact) {
+            return $target;
+        }
+
+        if ($target instanceof Lead) {
+            $related = $target->contact;
+
+            return $related instanceof Contact ? $related : null;
+        }
+
+        return null;
+    }
+
+    private function relatedCompany(Company|Contact|Lead $target): ?Company
+    {
+        if ($target instanceof Company) {
+            return $target;
+        }
+
+        $related = $target->company;
+
+        return $related instanceof Company ? $related : null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function bag(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
     }
 }

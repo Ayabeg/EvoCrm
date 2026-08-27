@@ -36,14 +36,14 @@ class WebsiteEnricher
 
         $fetched = $this->fetcher->get($url);
 
-        if (! ($fetched['ok'] ?? false)) {
+        if (! $fetched['ok']) {
             $this->runs->persistFailure(
                 $workspace,
                 $targetType,
                 (int) $target->id,
                 EnrichmentRun::SOURCE_WEBSITE,
                 'url',
-                (string) ($fetched['error'] ?? 'Website fetch failed.'),
+                $fetched['error'] ?? 'Website fetch failed.',
                 ['url' => $url],
             );
 
@@ -131,25 +131,34 @@ class WebsiteEnricher
         $candidates = [];
 
         if ($target instanceof Company) {
-            $candidates[] = $target->domain;
+            $candidates[] = $target->getAttribute('domain');
         }
 
         if ($target instanceof Contact) {
-            $meta = is_array($target->meta) ? $target->meta : [];
-            $candidates[] = $meta['website'] ?? null;
-            $candidates[] = $meta['url'] ?? null;
-            $candidates[] = $target->company?->domain;
+            $candidates = array_merge($candidates, $this->bagStrings($target->getAttribute('meta'), ['website', 'url']));
+            $company = $target->company;
+            if ($company instanceof Company) {
+                $candidates[] = $company->getAttribute('domain');
+            }
         }
 
         if ($target instanceof Lead) {
-            $payload = is_array($target->payload) ? $target->payload : [];
-            foreach (['website', 'website_url', 'url', 'company_website'] as $key) {
-                $candidates[] = $payload[$key] ?? null;
+            $candidates = array_merge(
+                $candidates,
+                $this->bagStrings($target->getAttribute('payload'), ['website', 'website_url', 'url', 'company_website']),
+            );
+            $company = $target->company;
+            if ($company instanceof Company) {
+                $candidates[] = $company->getAttribute('domain');
             }
-            $candidates[] = $target->company?->domain;
-            $candidates[] = $target->contact?->company?->domain;
-            $meta = is_array($target->contact?->meta) ? $target->contact->meta : [];
-            $candidates[] = $meta['website'] ?? null;
+            $contact = $target->contact;
+            if ($contact instanceof Contact) {
+                $relatedCompany = $contact->company;
+                if ($relatedCompany instanceof Company) {
+                    $candidates[] = $relatedCompany->getAttribute('domain');
+                }
+                $candidates = array_merge($candidates, $this->bagStrings($contact->getAttribute('meta'), ['website']));
+            }
         }
 
         foreach ($candidates as $candidate) {
@@ -165,5 +174,29 @@ class WebsiteEnricher
         }
 
         return null;
+    }
+
+    /**
+     * @param  list<string>  $keys
+     * @return list<mixed>
+     */
+    private function bagStrings(mixed $bag, array $keys): array
+    {
+        if (is_string($bag) && $bag !== '') {
+            $decoded = json_decode($bag, true);
+            $bag = is_array($decoded) ? $decoded : [];
+        }
+
+        if (! is_array($bag)) {
+            return [];
+        }
+
+        $values = [];
+
+        foreach ($keys as $key) {
+            $values[] = $bag[$key] ?? null;
+        }
+
+        return $values;
     }
 }

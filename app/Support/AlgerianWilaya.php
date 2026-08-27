@@ -20,9 +20,6 @@ final class AlgerianWilaya
         'In Salah', 'In Guezzam', 'Touggourt', 'Djanet', "El M'Ghair", 'El Meniaa',
     ];
 
-    /**
-     * @var array<string, string>
-     */
     private const ALIASES = [
         'algiers' => 'Alger',
         'alger centre' => 'Alger',
