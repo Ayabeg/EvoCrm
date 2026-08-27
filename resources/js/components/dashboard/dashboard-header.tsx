@@ -50,14 +50,14 @@ export function DashboardHeader({
                 </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-hairline bg-canvas px-3 py-2 md:px-4 md:py-3">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border border-hairline bg-canvas px-3 py-2 md:flex md:flex-wrap md:px-4 md:py-3">
                 <Input
                     type="date"
                     size="sm"
                     value={filters.from ?? ''}
                     onChange={(e) => apply({ from: e.target.value })}
                     aria-label="From date"
-                    className="min-w-0 flex-1 sm:w-[9.5rem] sm:flex-none"
+                    className="min-w-0 md:w-[9.5rem]"
                 />
                 <span className="text-[12px] text-mute">-</span>
                 <Input
@@ -66,7 +66,7 @@ export function DashboardHeader({
                     value={filters.to ?? ''}
                     onChange={(e) => apply({ to: e.target.value })}
                     aria-label="To date"
-                    className="min-w-0 flex-1 sm:w-[9.5rem] sm:flex-none"
+                    className="min-w-0 md:w-[9.5rem]"
                 />
                 <NativeSelect
                     value={filters.owner_id ?? ''}
@@ -78,7 +78,7 @@ export function DashboardHeader({
                         })
                     }
                     aria-label="Filter by owner"
-                    className="min-w-0 flex-1 sm:w-[11rem] sm:flex-none"
+                    className="col-span-3 min-w-0 md:col-auto md:w-[11rem]"
                 >
                     <option value="">All owners</option>
                     {owners.map((owner) => (

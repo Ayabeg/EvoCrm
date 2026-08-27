@@ -42,12 +42,12 @@ export function EvoKpiCard({
     return (
         <article
             className={cn(
-                'flex h-full flex-col gap-2 rounded-2xl border border-hairline bg-canvas px-4 py-3 md:gap-3 md:px-5 md:py-4',
+                'flex h-full min-w-0 flex-col gap-2 rounded-2xl border border-hairline bg-canvas px-4 py-3 md:gap-3 md:px-5 md:py-4',
                 className,
             )}
         >
             <p className="text-[11px] leading-4 text-mute">{label}</p>
-            <p className="money text-kpi leading-none tracking-tight text-ink">
+            <p className="money min-w-0 text-kpi leading-none tracking-tight break-words text-ink">
                 {display}
             </p>
             {changeDisplay || context ? (

@@ -103,6 +103,7 @@ it('keeps Home KPI values on the Brand Book --text-kpi scale', function () {
     $card = file_get_contents(resource_path('js/components/crm/evo-kpi-card.tsx'));
 
     expect($card)->toContain('text-kpi');
+    expect($card)->toContain('break-words');
     expect($card)->not->toContain('text-[1.875rem]');
     expect($card)->not->toContain('min-h-[7.5rem]');
 });
