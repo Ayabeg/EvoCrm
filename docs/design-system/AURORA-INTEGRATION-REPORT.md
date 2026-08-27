@@ -4,7 +4,11 @@
 
 Aurora is the real [dinglebear-ai/aurora](https://github.com/dinglebear-ai/aurora) shadcn registry (`https://aurora.tootie.tv/r/{name}.json`), already declared in `components.json` as `@aurora`.
 
-It is **vendored**, not an npm package. There is no version pin. Source lives in:
+It is **vendored**, not an npm package. The exact upstream revision is pinned in `resources/js/components/ui/aurora/SOURCE.json`:
+
+`fa53183f7e9a790391198424b8b90afb4b5fa50c` (2026-07-13, “align AI automation accent to Axon orange”).
+
+Source lives in:
 
 - `resources/js/components/aurora.css`
 - `resources/js/components/aurora-components.css`
@@ -156,32 +160,146 @@ No `AuroraButton.tsx` (or similar) was created. Canonical `@/components/ui/butto
 - `resources/js/components/ui/sidebar.tsx`
 - `tests/Feature/AuroraTokenBridgeTest.php`
 
-## 13. Remaining Violations
+## 13. Remaining Violations (after follow-up)
 
 Intentionally left (stop conditions / no mass rewrite):
 
-- Official Aurora Sidebar block not installed (wrong API; no mobile).
+- Official Aurora Sidebar block not installed (wrong API; no mobile). **EvoDesk IA unchanged.**
 - Aurora Drawer TSX not installed (Sheet covers mobile nav).
-- `list-view-table` not migrated to Aurora DataTable.
-- Local `alert.tsx`, `avatar.tsx`, `sonner.tsx` still coexist with Aurora equivalents.
-- Aurora registry not SHA-pinned.
-- Dual type scales (Brand `--text-*` vs Aurora `--aurora-type-*`).
-- Rose / cyan families remain in the vendored Aurora contract (unused as brand).
+- `list-view-table` not migrated to Aurora DataTable. **Intentional.**
+- Aurora toast primitive remains unused at the application layer (Sonner is canonical). Documented, not deleted.
+- Local `alert.tsx` compound API remains for non-form-error call sites; AlertError now uses Callout.
+- Rose family and Aurora status `--aurora-info` cyan remain in the vendored contract (status / secondary, not Brand identity).
+- Non-nav dialogs still use 18% `--aurora-overlay`. Only mobile nav uses `--sidebar-overlay`.
 
 ## 14. Remaining Risks
 
 - **Wayfinder:** `npm run types:check` needs `php artisan wayfinder:generate --with-form` (generated files are gitignored).
 - **ESLint:** `npm run lint:check` still reports 12 pre-existing `import/order` errors in auth/settings files. None are in files from this change. Aurora `ui/aurora/*` and `sidebar.tsx` are ESLint-ignored.
-- **Pinning:** Upstream registry URLs are mutable; vendored files can drift.
-- **Light overlay:** Non-nav dialogs still use 18% `--aurora-overlay` (Aurora light default). Only mobile nav uses `--sidebar-overlay`.
+- **Upstream drift:** Registry URLs are mutable. The pin is the git SHA in `SOURCE.json`, not `latest`.
+- **Light overlay:** Non-nav dialogs still use 18% `--aurora-overlay` (Aurora light default).
 
-### Verification commands
+---
+
+## Follow-up — P1–P3 ownership cleanup
+
+PR #101 already established the foundation. This follow-up does **not** redesign EvoCRM, replace EvoDesk, or migrate CRM tables. It fixes remaining token/component ownership.
+
+### 1. Changes made
+
+| Change | What | Why | Authority |
+|--------|------|-----|-----------|
+| Identity reasserted on `:root, .light` | Same Brand remaps now apply if Aurora's `.light` class is ever set | Aurora navy/cyan still loads first; Brand must win after | Brand Book |
+| Accent surface tokens remapped | `--aurora-accent-primary-surface/border/foreground` recomputed from orange | Those names still said “cyan” even after accent remapped | Brand Book |
+| Dark accent gradient remapped | `--aurora-accent-gradient` reasserted in `.dark` | Dark inherited Aurora's cyan-stop gradient definition | Brand Book |
+| Font cycle broken | `--aurora-font-*` and `--font-sans` are Geist **literals** | `aurora.css` sets `--font-sans: var(--aurora-font-sans)`; pointing back at `--font-sans` is the sidebar cycle class | Brand Book (face) |
+| Type scale bridged | Overlapping `--aurora-type-*` map to `--text-*` | Two scales rendered the same sizes independently | Brand Book size + Aurora primitive consumption |
+| Toast ownership | Sonner remains the app bus; Aurora toast stays a primitive | Dual systems; flash toasts already use Sonner | EvoSales notifications / Aurora primitive |
+| Avatar wrapper | `ui/avatar` consumes Aurora Avatar; muted Brand chrome by default | Local Radix avatar duplicated the primitive | Aurora primitive + EvoSales wrapper |
+| Alert / Callout | AlertError uses Callout `error`; local Alert keeps compound API on Aurora error tokens | Callout is the status primitive; do not blindly replace every Alert | Aurora Callout + EvoSales form-error wrapper |
+| Home chrome | Product panels/links use `--evosales-*` Tailwind aliases; `.aurora-text-*` classes kept | Home was coupled to Aurora implementation tokens | Brand Book identity; Aurora type utilities |
+| SHA pin | `ui/aurora/SOURCE.json` records `fa53183…` + update procedure | Vendored copy had no revision | Reproducibility |
+
+**Not changed:** ListViewTable, AppSidebar / EvoDesk IA, business logic, P0 rail literals (`--sidebar` / `--aurora-nav-bg` `#000000`).
+
+### 2. Files changed (follow-up)
+
+- `resources/css/aurora-evotechly-bridge.css`
+- `resources/js/components/ui/avatar.tsx`
+- `resources/js/components/ui/alert.tsx`
+- `resources/js/components/alert-error.tsx`
+- `resources/js/components/ui/sonner.tsx`
+- `resources/js/components/ui/aurora/toast.tsx` (ownership comment only)
+- `resources/js/components/ui/aurora/SOURCE.json` (new)
+- `resources/js/pages/home.tsx`
+- `resources/js/components/dashboard/dashboard-header.tsx`
+- `resources/js/components/dashboard/attention-list.tsx`
+- `resources/js/components/dashboard/activity-feed.tsx`
+- `tests/Feature/AuroraTokenBridgeTest.php`
+- `docs/design-system/AURORA-INTEGRATION-REPORT.md`
+
+### 3. Token changes
+
+| Token | Before | After | Owner |
+|-------|--------|-------|-------|
+| `--aurora-font-sans` / `--font-sans` | `var(--font-sans)` ↔ `var(--aurora-font-sans)` (cycle) | Geist literals | Brand Book |
+| `--aurora-type-body` | `14px` (Aurora default) | `var(--text-ui-relaxed)` (14px) | Brand Book size |
+| `--aurora-type-body-sm` / `--control` / `--table` | `13px` | `var(--text-ui)` (13px) | Brand Book size |
+| `--aurora-type-caption` | `11px` | `var(--text-section-label)` (11px) | Brand Book size |
+| `--aurora-type-label` / `--micro` | `12px` / `10.5px` | **unchanged** — no Brand equivalent | Aurora |
+| `--aurora-accent-primary-surface` etc. | color-mix of whatever accent was in scope | color-mix of remapped orange | Brand Book |
+| `--aurora-accent-gradient` (`.dark`) | inherited Aurora cyan stops | remapped orange lift/button | Brand Book |
+| `--sidebar` / `--aurora-nav-bg` | `#000000` literals | **unchanged** | Brand Book rail |
+
+`--aurora-info` stays Aurora status cyan. It is not product identity.
+
+### 4. Component changes
+
+| Surface | Decision |
+|---------|----------|
+| Toast | **Sonner** is the canonical application toaster (`app.tsx` + `useFlashToast`). Aurora `toast.tsx` remains available and unused. Do not mount both. |
+| Avatar | **Aurora Avatar** is the primitive. `ui/avatar.tsx` is a compound adapter (ink tone, no accent ring) for user chrome. Contact show already imported Aurora directly. |
+| Alert / Callout | **Callout** is the canonical status primitive. `AlertError` now uses it. `ui/alert.tsx` remains the compound form-error adapter, painted with Aurora error tokens. |
+| ListViewTable | Untouched. Aurora DataTable stays a primitive. |
+| EvoDesk / AppSidebar | Untouched. Official Aurora Sidebar block stays uninstalled. |
+
+### 5. Aurora SHA / revision
+
+| Field | Value |
+|-------|-------|
+| Source | https://github.com/dinglebear-ai/aurora |
+| Registry | https://aurora.tootie.tv/r/{name}.json |
+| License | AGPL-3.0-only |
+| Revision | `fa53183f7e9a790391198424b8b90afb4b5fa50c` |
+| Date | 2026-07-13T23:58:45Z |
+| Match | Vendored `aurora.css` equals that commit's `registry/aurora/styles/aurora.css` minus the 4-line file header stripped by the shadcn registry payload |
+| Pin file | `resources/js/components/ui/aurora/SOURCE.json` |
+| Update | Follow `updateProcedure` in that file. Do not convert to npm. |
+
+### 6. Mobile verification
+
+Pending re-check after this follow-up (P0 composition and rail literals were not modified). Expected unchanged:
+
+- Opaque ~240px drawer (`min(16rem, 86vw)`)
+- Brand overlay `--sidebar-overlay`
+- SheetHeader inside SheetContent
+- One navigation tree
+- No dashboard showing through
+
+Viewports: 320 / 375 / 390 / 430.
+
+### 7. Desktop verification
+
+Pending re-check. EvoDesk rail and ListViewTable were not modified. Viewports: 768 / 1024 / 1280 / 1440 / 1920.
+
+### 8. Tests
+
+Pending this revision. Guards added:
+
+- Font literals / no `--aurora-font-sans: var(--font-sans)`
+- Type-scale mapping
+- `:root, .light` identity reassert
+- `SOURCE.json` 40-char SHA
+- Home / dashboard chrome has no raw `--aurora-*`
+
+### 9. Build
+
+Pending this revision (`npm run types:check`, `npm run build`).
+
+### 10. Remaining P2/P3
+
+- Aurora toast primitive unused (by design).
+- Non-nav dialog overlay still 18% Aurora light default.
+- Official Sidebar / DataTable / Drawer TSX still not product chrome.
+- `--aurora-info` cyan remains as status, not brand.
+
+### Verification commands (follow-up)
 
 | Check | Result |
 |-------|--------|
-| `php artisan test --compact tests/Feature/AuroraTokenBridgeTest.php` | Pass (2) |
-| `tests/Feature/BrandingTest.php` + `DashboardTest.php` + `HomeCommandCenterTest.php` + `CrmCreateDrawerTest.php` | Pass |
-| `npm run types:check` (after wayfinder `--with-form`) | Pass |
-| `npm run lint:check` | Fail — 12 pre-existing `import/order` errors, documented |
-| `npm run build` | Pass |
-| Browser (seeded `owner@evosales.local`) | Pass — see §10 |
+| `php artisan test --compact tests/Feature/AuroraTokenBridgeTest.php` | Pending |
+| `tests/Feature/BrandingTest.php` + `DashboardTest.php` + `HomeCommandCenterTest.php` + `CrmCreateDrawerTest.php` | Pending |
+| `npm run types:check` (after wayfinder `--with-form`) | Pending |
+| `npm run lint:check` | Pre-existing `import/order` errors expected |
+| `npm run build` | Pending |
+| Browser (seeded `owner@evosales.local`) | Pending — P0 must not regress |
