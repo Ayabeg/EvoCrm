@@ -20,7 +20,11 @@ export function ActivityFeed({
     viewAllHref?: string;
 }) {
     if (items.length === 0) {
-        return <p className="text-[13px] leading-5 text-mute">No recent activity.</p>;
+        return (
+            <p className="text-[13px] leading-5 text-mute">
+                No recent activity.
+            </p>
+        );
     }
 
     return (

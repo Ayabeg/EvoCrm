@@ -24,12 +24,21 @@ function tabActive(pathname: string, tab: TabDef): boolean {
 }
 
 const REPORTS_TABS: TabDef[] = [
-    { label: 'Overview', href: '/reports', exact: true, activePaths: ['/crm/reports'] },
+    {
+        label: 'Overview',
+        href: '/reports',
+        exact: true,
+        activePaths: ['/crm/reports'],
+    },
     { label: 'Sales', href: '/reports/sales' },
     { label: 'Pipeline', href: '/reports/pipeline' },
     { label: 'Outbound', href: '/reports/outbound' },
     { label: 'Ads', href: '/reports/ads' },
-    { label: 'Custom', href: '/crm/report-builder', activePaths: ['/reports/funnels', '/crm/report-builder'] },
+    {
+        label: 'Custom',
+        href: '/crm/report-builder',
+        activePaths: ['/reports/funnels', '/crm/report-builder'],
+    },
 ];
 
 export function reportsTabs(pathname: string): RoomTab[] {
@@ -41,7 +50,9 @@ export function reportsTabs(pathname: string): RoomTab[] {
 }
 
 export function reportsBasePath(activeCategory: string): string {
-    return activeCategory === 'overview' ? '/reports' : `/reports/${activeCategory}`;
+    return activeCategory === 'overview'
+        ? '/reports'
+        : `/reports/${activeCategory}`;
 }
 
 export function ReportsShell({
@@ -81,7 +92,9 @@ export function ReportsShell({
                                     </p>
                                 ) : null}
                             </div>
-                            {filters ? <div className="shrink-0">{filters}</div> : null}
+                            {filters ? (
+                                <div className="shrink-0">{filters}</div>
+                            ) : null}
                         </header>
                         {children}
                         {footer ? (

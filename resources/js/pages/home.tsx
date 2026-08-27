@@ -143,8 +143,7 @@ export default function Home({
                                 </DashboardSection>
                             ) : null}
 
-                            {salesPerformance &&
-                            salesPerformance.length > 0 ? (
+                            {salesPerformance && salesPerformance.length > 0 ? (
                                 <DashboardSection
                                     title="Sales performance"
                                     description="Won deals in period by owner"

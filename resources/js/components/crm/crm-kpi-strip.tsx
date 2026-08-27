@@ -38,7 +38,11 @@ export function CrmKpiStrip({
 
     return (
         <div
-            className={cn('grid grid-cols-1 gap-3 sm:gap-4', columnClass, className)}
+            className={cn(
+                'grid grid-cols-1 gap-3 sm:gap-4',
+                columnClass,
+                className,
+            )}
         >
             {kpis.map((kpi) => {
                 const displayValue =
@@ -67,7 +71,7 @@ export function CrmKpiStrip({
                         <a
                             key={kpi.key}
                             href={kpi.href}
-                            className="block rounded-2xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                            className="block rounded-2xl no-underline focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
                         >
                             {card}
                         </a>

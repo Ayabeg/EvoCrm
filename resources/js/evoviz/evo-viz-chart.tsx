@@ -406,9 +406,7 @@ function DonutChart({ payload }: { payload: EvoVizPayload }) {
                                     EVOVIZ_PALETTE[i % EVOVIZ_PALETTE.length],
                             }}
                         />
-                        <span className="truncate text-mute">
-                            {label}
-                        </span>
+                        <span className="truncate text-mute">{label}</span>
                         <span className="money ml-auto pl-3">
                             {formatValue(values[i])}
                         </span>

@@ -49,7 +49,7 @@ export function EvoKpiCard({
             <p className="text-[11px] leading-4 text-mute">{label}</p>
             <p
                 className={cn(
-                    'money text-ink tracking-tight',
+                    'money tracking-tight text-ink',
                     format === 'money'
                         ? 'text-[1.875rem] leading-none sm:text-[2rem]'
                         : 'text-kpi leading-none',

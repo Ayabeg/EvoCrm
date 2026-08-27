@@ -43,7 +43,11 @@ export function DashboardHeader({
                         {subtitle}
                     </p>
                 </div>
-                <Button asChild size="sm" className="shrink-0 self-start lg:self-auto">
+                <Button
+                    asChild
+                    size="sm"
+                    className="shrink-0 self-start lg:self-auto"
+                >
                     <Link href="/crm/deals">New deal</Link>
                 </Button>
             </div>

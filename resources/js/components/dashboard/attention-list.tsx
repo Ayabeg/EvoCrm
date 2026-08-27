@@ -34,7 +34,12 @@ export function AttentionList({ items }: { items: AttentionItem[] }) {
                             {item.description}
                         </p>
                     </div>
-                    <Button asChild size="sm" variant="outline" className="shrink-0">
+                    <Button
+                        asChild
+                        size="sm"
+                        variant="outline"
+                        className="shrink-0"
+                    >
                         <Link href={item.href}>{item.actionLabel}</Link>
                     </Button>
                 </li>
