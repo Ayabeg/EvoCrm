@@ -1,11 +1,13 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Form, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import PageHeader from '@/components/page-header';
+import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
+import { Textarea } from '@/components/ui/textarea';
 
 type Step = {
     id: number;
@@ -51,6 +53,10 @@ type MailboxRow = { id: number; name: string; from_address: string };
 
 type FilterRow = { id: number; name: string };
 
+function channelLabel(channel: string): string {
+    return channel === 'whatsapp_cloud' ? 'WhatsApp Cloud' : 'Email';
+}
+
 function StepFields({
     step,
     mailboxes,
@@ -62,7 +68,7 @@ function StepFields({
 }) {
     return (
         <>
-            <div>
+            <div className="space-y-1.5">
                 <Label>Delay (hours)</Label>
                 <Input
                     name="delay_hours"
@@ -72,37 +78,31 @@ function StepFields({
                     required
                 />
             </div>
-            <div>
+            <div className="space-y-1.5">
                 <Label>Channel</Label>
-                <select
+                <NativeSelect
                     name="channel"
                     defaultValue={step?.channel ?? defaultChannel}
-                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
                 >
                     <option value="email">Email</option>
-                    <option value="whatsapp_cloud">
-                        WhatsApp Cloud template
-                    </option>
-                </select>
+                    <option value="whatsapp_cloud">WhatsApp Cloud template</option>
+                </NativeSelect>
             </div>
-            <div>
+            <div className="space-y-1.5">
                 <Label>Mailbox</Label>
-                <select
+                <NativeSelect
                     name="mailbox_id"
-                    defaultValue={
-                        step?.mailbox_id ? String(step.mailbox_id) : ''
-                    }
-                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                    defaultValue={step?.mailbox_id ? String(step.mailbox_id) : ''}
                 >
                     <option value="">Default enabled mailbox</option>
                     {mailboxes.map((box) => (
                         <option key={box.id} value={box.id}>
-                            {box.name} — {box.from_address}
+                            {box.name} - {box.from_address}
                         </option>
                     ))}
-                </select>
+                </NativeSelect>
             </div>
-            <div className="md:col-span-3">
+            <div className="space-y-1.5 md:col-span-3">
                 <Label>Subject</Label>
                 <Input
                     name="subject"
@@ -110,22 +110,22 @@ function StepFields({
                     defaultValue={step?.subject ?? ''}
                 />
             </div>
-            <div className="md:col-span-3">
+            <div className="space-y-1.5 md:col-span-3">
                 <Label>
-                    Body — variables:{' '}
+                    Body (variables:{' '}
                     {
                         '{{first_name}} {{last_name}} {{name}} {{email}} {{phone}} {{company}} {{city}} {{wilaya}} {{unsub}}'
                     }
+                    )
                 </Label>
-                <textarea
+                <Textarea
                     name="body"
                     rows={4}
                     placeholder="Bonjour {{first_name}}, …"
                     defaultValue={step?.body ?? ''}
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
                 />
             </div>
-            <div>
+            <div className="space-y-1.5">
                 <Label>WA template name</Label>
                 <Input
                     name="wa_template_name"
@@ -133,7 +133,7 @@ function StepFields({
                     defaultValue={step?.wa_template_name ?? ''}
                 />
             </div>
-            <div>
+            <div className="space-y-1.5">
                 <Label>WA language</Label>
                 <Input
                     name="wa_template_language"
@@ -165,7 +165,13 @@ export default function SequenceShow({
     templates: TemplateRow[];
     mailboxes: MailboxRow[];
     filters: FilterRow[];
-    stepAnalytics?: Array<{ position: number; name: string; enrolled: number; sent: number; step_type: string }>;
+    stepAnalytics?: Array<{
+        position: number;
+        name: string;
+        enrolled: number;
+        sent: number;
+        step_type: string;
+    }>;
 }) {
     const [selected, setSelected] = useState<number[]>([]);
     const [templateId, setTemplateId] = useState<string>('');
@@ -182,13 +188,11 @@ export default function SequenceShow({
         );
 
     return (
-        <>
-            <Head title={sequence.name} />
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title={sequence.name}
-                    description={`Channel: ${sequence.channel} · ${sequence.active ? 'active — the runner sends due steps every minute' : 'draft — activate to start sending'}`}
-                >
+        <OutboundShell title={sequence.name}>
+            <OutboundPage
+                title={sequence.name}
+                description={`${channelLabel(sequence.channel)} · ${sequence.active ? 'active - the runner sends due steps every minute' : 'draft - activate to start sending'}`}
+                actions={
                     <div className="flex items-center gap-2">
                         <Button
                             variant="ghost"
@@ -211,11 +215,10 @@ export default function SequenceShow({
                                 : 'Activate sequence'}
                         </Button>
                     </div>
-                </PageHeader>
-
+                }
+            >
                 {editingSequence ? (
-                    <Card className="p-4">
-                        <h2 className="mb-3 font-medium">Edit sequence</h2>
+                    <HairlinePanel title="Edit sequence">
                         <Form
                             action={`/outbound/sequences/${sequence.id}`}
                             method="put"
@@ -223,7 +226,7 @@ export default function SequenceShow({
                         >
                             {({ processing }) => (
                                 <>
-                                    <div>
+                                    <div className="space-y-1.5">
                                         <Label>Name</Label>
                                         <Input
                                             name="name"
@@ -231,7 +234,7 @@ export default function SequenceShow({
                                             defaultValue={sequence.name}
                                         />
                                     </div>
-                                    <div className="md:col-span-2">
+                                    <div className="space-y-1.5 md:col-span-2">
                                         <Label>Description</Label>
                                         <Input
                                             name="description"
@@ -248,59 +251,63 @@ export default function SequenceShow({
                                 </>
                             )}
                         </Form>
-                    </Card>
+                    </HairlinePanel>
                 ) : null}
 
                 {stepAnalytics.length > 0 ? (
-                    <Card className="p-4">
-                        <h2 className="mb-3 font-medium">Step funnel</h2>
-                        <div className="space-y-1 text-sm">
+                    <HairlinePanel title="Step funnel" padded={false}>
+                        <ul className="divide-y divide-hairline">
                             {stepAnalytics.map((row) => (
-                                <div key={row.position} className="flex items-center justify-between rounded border border-hairline px-3 py-2">
-                                    <span>
-                                        Step {row.position}: {row.name} ({row.step_type})
+                                <li
+                                    key={row.position}
+                                    className="flex items-center justify-between px-4 py-2.5"
+                                >
+                                    <span className="aurora-text-body-sm text-ink">
+                                        Step {row.position}: {row.name} (
+                                        {row.step_type})
                                     </span>
-                                    <span className="text-muted-foreground tabular-nums">
-                                        {row.enrolled} enrolled · {row.sent} sent
+                                    <span className="aurora-text-caption money tabular-nums text-mute">
+                                        {row.enrolled} enrolled · {row.sent}{' '}
+                                        sent
                                     </span>
-                                </div>
+                                </li>
                             ))}
-                        </div>
-                    </Card>
+                        </ul>
+                    </HairlinePanel>
                 ) : null}
 
-                <Card className="p-4">
-                    <h2 className="mb-3 font-medium">Steps</h2>
-                    <div className="space-y-2 text-sm">
+                <HairlinePanel title="Steps">
+                    <div className="space-y-2">
                         {(sequence.steps ?? []).map((step) => (
                             <div
                                 key={step.id}
-                                className="rounded-md border border-hairline px-3 py-2"
+                                className="rounded-xl border border-hairline px-3 py-2.5"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
-                                        <p className="font-medium">
+                                        <p className="aurora-text-body-sm font-medium text-ink">
                                             Step {step.position} · +
-                                            {step.delay_hours}h · {step.channel}
+                                            {step.delay_hours}h ·{' '}
+                                            {channelLabel(step.channel)}
                                             {step.mailbox ? (
-                                                <span className="text-muted-foreground">
+                                                <span className="text-mute">
                                                     {' '}
                                                     · via {step.mailbox.name}
                                                 </span>
                                             ) : null}
                                         </p>
                                         {step.subject ? (
-                                            <p className="text-muted-foreground">
+                                            <p className="aurora-text-caption mt-0.5 text-mute">
                                                 Subject: {step.subject}
                                             </p>
                                         ) : null}
                                         {step.body ? (
-                                            <p className="mt-1 whitespace-pre-wrap text-muted-foreground">
+                                            <p className="aurora-text-body-sm mt-1 whitespace-pre-wrap text-mute">
                                                 {step.body}
                                             </p>
                                         ) : null}
                                         {step.wa_template_name ? (
-                                            <p className="text-muted-foreground">
+                                            <p className="aurora-text-caption text-mute">
                                                 Template {step.wa_template_name}{' '}
                                                 (
                                                 {step.wa_template_language ??
@@ -369,24 +376,23 @@ export default function SequenceShow({
                             </div>
                         ))}
                         {(sequence.steps ?? []).length === 0 ? (
-                            <p className="text-muted-foreground">
-                                No steps — add the first one below.
+                            <p className="aurora-text-body-sm text-mute">
+                                No steps - add the first one below.
                             </p>
                         ) : null}
                     </div>
-                </Card>
+                </HairlinePanel>
 
-                <Card className="p-4">
-                    <h2 className="mb-3 font-medium">Add step</h2>
+                <HairlinePanel title="Add step">
                     {templates.length > 0 && sequence.channel === 'email' ? (
-                        <div className="mb-3">
+                        <div className="mb-3 space-y-1.5">
                             <Label>Prefill from template</Label>
-                            <select
+                            <NativeSelect
                                 value={templateId}
                                 onChange={(event) =>
                                     setTemplateId(event.target.value)
                                 }
-                                className="h-9 w-full rounded-md border bg-background px-2 text-sm md:w-72"
+                                className="md:w-72"
                             >
                                 <option value="">No template</option>
                                 {templates.map((t) => (
@@ -394,7 +400,7 @@ export default function SequenceShow({
                                         {t.name}
                                     </option>
                                 ))}
-                            </select>
+                            </NativeSelect>
                         </div>
                     ) : null}
                     <Form
@@ -435,10 +441,9 @@ export default function SequenceShow({
                             </>
                         )}
                     </Form>
-                </Card>
+                </HairlinePanel>
 
-                <Card className="p-4">
-                    <h2 className="mb-3 font-medium">Enroll contacts</h2>
+                <HairlinePanel title="Enroll contacts">
                     {filters.length > 0 ? (
                         <Form
                             action={`/outbound/sequences/${sequence.id}/enroll`}
@@ -446,12 +451,12 @@ export default function SequenceShow({
                             className="mb-4"
                         >
                             {({ processing }) => (
-                                <div className="flex flex-wrap items-end gap-3 rounded-md border border-hairline p-3">
-                                    <div>
+                                <div className="flex flex-wrap items-end gap-3 rounded-xl border border-hairline p-3">
+                                    <div className="space-y-1.5">
                                         <Label>Enroll a CRM list</Label>
-                                        <select
+                                        <NativeSelect
                                             name="saved_filter_id"
-                                            className="h-9 w-full rounded-md border bg-background px-2 text-sm md:w-72"
+                                            className="md:w-72"
                                             required
                                         >
                                             <option value="">
@@ -465,7 +470,7 @@ export default function SequenceShow({
                                                     {filter.name}
                                                 </option>
                                             ))}
-                                        </select>
+                                        </NativeSelect>
                                     </div>
                                     <Button
                                         variant="outline"
@@ -473,7 +478,7 @@ export default function SequenceShow({
                                     >
                                         Enroll list
                                     </Button>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="aurora-text-caption text-mute">
                                         Lists come from the CRM contacts hub
                                         (saved filters). Suppressed contacts are
                                         skipped.
@@ -488,11 +493,11 @@ export default function SequenceShow({
                     >
                         {({ processing }) => (
                             <>
-                                <div className="grid max-h-56 gap-1 overflow-y-auto rounded-md border border-hairline p-2 md:grid-cols-3">
+                                <div className="grid max-h-56 gap-1 overflow-y-auto rounded-xl border border-hairline p-2 md:grid-cols-3">
                                     {contacts.map((contact) => (
                                         <label
                                             key={contact.id}
-                                            className="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-muted/40"
+                                            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-canvas-soft"
                                         >
                                             <input
                                                 type="checkbox"
@@ -504,11 +509,12 @@ export default function SequenceShow({
                                                 onChange={() =>
                                                     toggleContact(contact.id)
                                                 }
+                                                className="size-4 accent-[var(--evosales-mark)]"
                                             />
                                             <span>
                                                 {contact.first_name}{' '}
                                                 {contact.last_name}
-                                                <span className="block text-xs text-muted-foreground">
+                                                <span className="block text-xs text-mute">
                                                     {contact.email ??
                                                         'no email'}
                                                 </span>
@@ -527,7 +533,7 @@ export default function SequenceShow({
                                             ? `${selected.length} contact(s)`
                                             : ''}
                                     </Button>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="aurora-text-caption text-mute">
                                         Suppressed contacts are skipped. The
                                         runner sends step 1 immediately unless
                                         quiet hours defer it.
@@ -536,123 +542,137 @@ export default function SequenceShow({
                             </>
                         )}
                     </Form>
-                </Card>
+                </HairlinePanel>
 
-                <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">
-                        Enrollments
-                    </h2>
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2">Contact</th>
-                                <th className="px-4 py-2">Status</th>
-                                <th className="px-4 py-2">Next step</th>
-                                <th className="px-4 py-2">Next run</th>
-                                <th className="px-4 py-2"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(sequence.enrollments ?? []).length === 0 ? (
-                                <tr>
-                                    <td
-                                        className="px-4 py-6 text-muted-foreground"
-                                        colSpan={5}
+                <HairlineTable
+                    minWidth={640}
+                    empty="Nobody enrolled yet."
+                    columns={[
+                        { key: 'contact', header: 'Contact' },
+                        { key: 'status', header: 'Status' },
+                        { key: 'next', header: 'Next step' },
+                        { key: 'run', header: 'Next run' },
+                        { key: 'actions', header: '', align: 'right' },
+                    ]}
+                    rows={(sequence.enrollments ?? []).map((enrollment) => {
+                        const name = `${enrollment.contact?.first_name ?? ''} ${enrollment.contact?.last_name ?? ''}`.trim();
+
+                        return {
+                            id: enrollment.id,
+                            mobileTitle: name || enrollment.contact?.email || 'Contact',
+                            mobileMeta: [
+                                { label: 'Status', value: enrollment.status },
+                                { label: 'Next step', value: enrollment.next_step },
+                                {
+                                    label: 'Next run',
+                                    value: enrollment.next_run_at ?? '-',
+                                },
+                            ],
+                            mobileFooter: (
+                                <EnrollmentActions enrollment={enrollment} />
+                            ),
+                            cells: {
+                                contact: (
+                                    <div>
+                                        {enrollment.contact ? (
+                                            <Link
+                                                href={`/crm/contacts/${enrollment.contact.id}`}
+                                                className="font-medium text-brand hover:underline"
+                                            >
+                                                {name}
+                                            </Link>
+                                        ) : (
+                                            <span className="font-medium text-ink">
+                                                {name || 'Contact'}
+                                            </span>
+                                        )}
+                                        <span className="aurora-text-caption block text-mute">
+                                            {enrollment.contact?.email ?? '-'}
+                                        </span>
+                                    </div>
+                                ),
+                                status: (
+                                    <Badge
+                                        variant={
+                                            enrollment.status === 'active'
+                                                ? 'default'
+                                                : enrollment.status ===
+                                                    'finished'
+                                                  ? 'secondary'
+                                                  : 'outline'
+                                        }
                                     >
-                                        Nobody enrolled yet.
-                                    </td>
-                                </tr>
-                            ) : (
-                                (sequence.enrollments ?? []).map(
-                                    (enrollment) => (
-                                        <tr
-                                            key={enrollment.id}
-                                            className="border-t border-hairline"
-                                        >
-                                            <td className="px-4 py-2">
-                                                {enrollment.contact?.first_name}{' '}
-                                                {enrollment.contact?.last_name}
-                                                <span className="block text-xs text-muted-foreground">
-                                                    {enrollment.contact
-                                                        ?.email ?? '—'}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                <Badge
-                                                    variant={
-                                                        enrollment.status ===
-                                                        'active'
-                                                            ? 'default'
-                                                            : enrollment.status ===
-                                                                'finished'
-                                                              ? 'secondary'
-                                                              : 'outline'
-                                                    }
-                                                >
-                                                    {enrollment.status}
-                                                </Badge>
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                {enrollment.next_step}
-                                            </td>
-                                            <td className="px-4 py-2 text-xs text-muted-foreground">
-                                                {enrollment.next_run_at ?? '—'}
-                                            </td>
-                                            <td className="px-4 py-2 text-right">
-                                                {enrollment.status ===
-                                                'active' ? (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            router.post(
-                                                                `/outbound/enrollments/${enrollment.id}/pause`,
-                                                            )
-                                                        }
-                                                    >
-                                                        Pause
-                                                    </Button>
-                                                ) : null}
-                                                {enrollment.status ===
-                                                'paused' ? (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            router.post(
-                                                                `/outbound/enrollments/${enrollment.id}/resume`,
-                                                            )
-                                                        }
-                                                    >
-                                                        Resume
-                                                    </Button>
-                                                ) : null}
-                                                {['active', 'paused'].includes(
-                                                    enrollment.status,
-                                                ) ? (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-brand"
-                                                        onClick={() =>
-                                                            router.post(
-                                                                `/outbound/enrollments/${enrollment.id}/cancel`,
-                                                            )
-                                                        }
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                ) : null}
-                                            </td>
-                                        </tr>
-                                    ),
-                                )
-                            )}
-                        </tbody>
-                    </table>
-                </Card>
-            </div>
-        </>
+                                        {enrollment.status}
+                                    </Badge>
+                                ),
+                                next: (
+                                    <span className="money tabular-nums">
+                                        {enrollment.next_step}
+                                    </span>
+                                ),
+                                run: (
+                                    <span className="aurora-text-caption text-mute">
+                                        {enrollment.next_run_at ?? '-'}
+                                    </span>
+                                ),
+                                actions: (
+                                    <EnrollmentActions
+                                        enrollment={enrollment}
+                                    />
+                                ),
+                            },
+                        };
+                    })}
+                />
+            </OutboundPage>
+        </OutboundShell>
+    );
+}
+
+function EnrollmentActions({ enrollment }: { enrollment: EnrollmentRow }) {
+    return (
+        <div className="mt-3 flex flex-wrap justify-end gap-1 @[480px]/hairline:mt-0">
+            {enrollment.status === 'active' ? (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                        router.post(
+                            `/outbound/enrollments/${enrollment.id}/pause`,
+                        )
+                    }
+                >
+                    Pause
+                </Button>
+            ) : null}
+            {enrollment.status === 'paused' ? (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                        router.post(
+                            `/outbound/enrollments/${enrollment.id}/resume`,
+                        )
+                    }
+                >
+                    Resume
+                </Button>
+            ) : null}
+            {['active', 'paused'].includes(enrollment.status) ? (
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-brand"
+                    onClick={() =>
+                        router.post(
+                            `/outbound/enrollments/${enrollment.id}/cancel`,
+                        )
+                    }
+                >
+                    Cancel
+                </Button>
+            ) : null}
+        </div>
     );
 }
 

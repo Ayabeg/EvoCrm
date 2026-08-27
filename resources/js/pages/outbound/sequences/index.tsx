@@ -1,11 +1,11 @@
 import { Form, Link, router } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
 
 type SequenceRow = {
     id: number;
@@ -20,28 +20,47 @@ type SequenceRow = {
     enrollments_finished: number;
 };
 
+function channelLabel(channel: string): string {
+    return channel === 'whatsapp_cloud' ? 'WhatsApp Cloud' : 'Email SMTP';
+}
+
 export default function SequencesIndex({ sequences }: { sequences: SequenceRow[] }) {
     return (
         <OutboundShell title="Sequences">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Sequences"
-                    description="Email steps with {{variables}}. Quiet hours (Africa/Algiers) defer sends; suppression cancels enrollment. WhatsApp steps use official Cloud templates only."
-                />
-                <Card className="p-4">
-                    <Form action="/outbound/sequences" method="post" className="grid gap-3 md:grid-cols-3" resetOnSuccess>
+            <OutboundPage
+                title="Sequences"
+                description="Email steps with {{variables}}. Quiet hours (Africa/Algiers) defer sends; suppression cancels enrollment. WhatsApp steps use official Cloud templates only."
+            >
+                <HairlinePanel title="Create sequence">
+                    <Form
+                        action="/outbound/sequences"
+                        method="post"
+                        className="grid gap-3 md:grid-cols-3"
+                        resetOnSuccess
+                    >
                         {({ processing }) => (
                             <>
-                                <div>
-                                    <Label>Name</Label>
-                                    <Input name="name" required placeholder="Clinic email nurture" />
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="sequence-name">Name</Label>
+                                    <Input
+                                        id="sequence-name"
+                                        name="name"
+                                        required
+                                        placeholder="Clinic email nurture"
+                                    />
                                 </div>
-                                <div>
-                                    <Label>Channel</Label>
-                                    <select name="channel" className="h-9 w-full rounded-md border bg-background px-2 text-sm">
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="sequence-channel">Channel</Label>
+                                    <NativeSelect
+                                        id="sequence-channel"
+                                        name="channel"
+                                        defaultValue="email"
+                                    >
                                         <option value="email">Email SMTP</option>
-                                        <option value="whatsapp_cloud">WhatsApp Cloud template</option>
-                                    </select>
+                                        <option value="whatsapp_cloud">
+                                            WhatsApp Cloud template
+                                        </option>
+                                    </NativeSelect>
                                 </div>
                                 <div className="flex items-end">
                                     <Button disabled={processing}>Create</Button>
@@ -49,67 +68,121 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                             </>
                         )}
                     </Form>
-                </Card>
-                <Card className="overflow-hidden">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2">Sequence</th>
-                                <th className="px-4 py-2">Channel</th>
-                                <th className="px-4 py-2">Steps</th>
-                                <th className="px-4 py-2">Enrolled</th>
-                                <th className="px-4 py-2">Active</th>
-                                <th className="px-4 py-2">Paused</th>
-                                <th className="px-4 py-2">Finished</th>
-                                <th className="px-4 py-2">State</th>
-                                <th className="px-4 py-2"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sequences.length === 0 ? (
-                                <tr>
-                                    <td className="px-4 py-6 text-muted-foreground" colSpan={9}>
-                                        No sequences yet.
-                                    </td>
-                                </tr>
-                            ) : (
-                                sequences.map((sequence) => (
-                                    <tr key={sequence.id} className="border-t border-hairline">
-                                        <td className="px-4 py-2">
-                                            <Link href={`/outbound/sequences/${sequence.id}`} className="font-medium text-brand">
-                                                {sequence.name}
-                                            </Link>
-                                            {sequence.description ? (
-                                                <p className="text-xs text-muted-foreground">{sequence.description}</p>
-                                            ) : null}
-                                        </td>
-                                        <td className="px-4 py-2">{sequence.channel}</td>
-                                        <td className="px-4 py-2">{sequence.steps?.length ?? 0}</td>
-                                        <td className="px-4 py-2">{sequence.enrollments_count}</td>
-                                        <td className="px-4 py-2">{sequence.enrollments_active}</td>
-                                        <td className="px-4 py-2">{sequence.enrollments_paused}</td>
-                                        <td className="px-4 py-2">{sequence.enrollments_finished}</td>
-                                        <td className="px-4 py-2">
-                                            <Badge variant={sequence.active ? 'default' : 'outline'}>
-                                                {sequence.active ? 'active' : 'draft'}
-                                            </Badge>
-                                        </td>
-                                        <td className="px-4 py-2 text-right">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => router.post(`/outbound/sequences/${sequence.id}/toggle`)}
-                                            >
-                                                {sequence.active ? 'Pause' : 'Activate'}
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </Card>
-            </div>
+                </HairlinePanel>
+
+                <HairlineTable
+                    minWidth={760}
+                    empty="No sequences yet. Create one above."
+                    columns={[
+                        { key: 'sequence', header: 'Sequence' },
+                        { key: 'channel', header: 'Channel' },
+                        { key: 'steps', header: 'Steps' },
+                        { key: 'enrolled', header: 'Enrolled' },
+                        { key: 'active', header: 'Active' },
+                        { key: 'paused', header: 'Paused' },
+                        { key: 'finished', header: 'Finished' },
+                        { key: 'state', header: 'State' },
+                        { key: 'actions', header: '', align: 'right' },
+                    ]}
+                    rows={sequences.map((sequence) => ({
+                        id: sequence.id,
+                        mobileTitle: (
+                            <Link
+                                href={`/outbound/sequences/${sequence.id}`}
+                                className="font-medium text-brand hover:underline"
+                            >
+                                {sequence.name}
+                            </Link>
+                        ),
+                        mobileMeta: [
+                            { label: 'Channel', value: channelLabel(sequence.channel) },
+                            { label: 'Steps', value: sequence.steps?.length ?? 0 },
+                            {
+                                label: 'Enrolled',
+                                value: `${sequence.enrollments_count} · ${sequence.enrollments_active} active`,
+                            },
+                            {
+                                label: 'State',
+                                value: sequence.active ? 'active' : 'draft',
+                            },
+                        ],
+                        mobileFooter: (
+                            <div className="mt-3 flex justify-end">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        router.post(`/outbound/sequences/${sequence.id}/toggle`)
+                                    }
+                                >
+                                    {sequence.active ? 'Pause' : 'Activate'}
+                                </Button>
+                            </div>
+                        ),
+                        cells: {
+                            sequence: (
+                                <div>
+                                    <Link
+                                        href={`/outbound/sequences/${sequence.id}`}
+                                        className="font-medium text-brand hover:underline"
+                                    >
+                                        {sequence.name}
+                                    </Link>
+                                    {sequence.description ? (
+                                        <p className="aurora-text-caption mt-0.5 text-mute">
+                                            {sequence.description}
+                                        </p>
+                                    ) : null}
+                                </div>
+                            ),
+                            channel: (
+                                <span className="text-ink">{channelLabel(sequence.channel)}</span>
+                            ),
+                            steps: (
+                                <span className="money tabular-nums">
+                                    {sequence.steps?.length ?? 0}
+                                </span>
+                            ),
+                            enrolled: (
+                                <span className="money tabular-nums">
+                                    {sequence.enrollments_count}
+                                </span>
+                            ),
+                            active: (
+                                <span className="money tabular-nums">
+                                    {sequence.enrollments_active}
+                                </span>
+                            ),
+                            paused: (
+                                <span className="money tabular-nums">
+                                    {sequence.enrollments_paused}
+                                </span>
+                            ),
+                            finished: (
+                                <span className="money tabular-nums">
+                                    {sequence.enrollments_finished}
+                                </span>
+                            ),
+                            state: (
+                                <Badge variant={sequence.active ? 'default' : 'outline'}>
+                                    {sequence.active ? 'active' : 'draft'}
+                                </Badge>
+                            ),
+                            actions: (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        router.post(`/outbound/sequences/${sequence.id}/toggle`)
+                                    }
+                                >
+                                    {sequence.active ? 'Pause' : 'Activate'}
+                                </Button>
+                            ),
+                        },
+                    }))}
+                />
+            </OutboundPage>
         </OutboundShell>
     );
 }
