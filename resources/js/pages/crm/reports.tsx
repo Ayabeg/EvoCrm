@@ -2,6 +2,10 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
 import type { KpiTile } from '@/components/crm/crm-kpi-strip';
+import LeadOsGraphStatus from '@/components/crm/lead-os-graph-status';
+import type { LeadOsGraphPayload } from '@/components/crm/lead-os-graph-status';
+import LostReviewList from '@/components/crm/lost-review-list';
+import type { LostReviewRow } from '@/components/crm/lost-review-list';
 import { ReportsShell, reportsBasePath } from '@/components/crm/reports-shell';
 import { OutboundReportsDetail } from '@/components/outbound/reports-detail';
 import type { OutboundDetailProps } from '@/components/outbound/reports-detail';
@@ -100,6 +104,8 @@ type Props = {
         last_sent_at?: string | null;
     }[];
     savedReports?: { id: number; name: string }[];
+    leadOsGraph?: LeadOsGraphPayload | null;
+    lostReview?: LostReviewRow[];
 };
 
 const NUMBER = new Intl.NumberFormat('en-US');
@@ -247,6 +253,8 @@ export default function Reports({
     widgetCatalog,
     schedules = [],
     savedReports = [],
+    leadOsGraph = null,
+    lostReview = [],
 }: Props) {
     const reportsPath = reportsBasePath(activeCategory);
     const [from, setFrom] = useState(window.from);
@@ -420,6 +428,10 @@ export default function Reports({
                 }
                 footer={`Reports window ${window.from} → ${window.to} · ${window.timezone}`}
             >
+                <div className="mb-8">
+                    <LeadOsGraphStatus graph={leadOsGraph} compact />
+                </div>
+                <LostReviewList items={lostReview} />
                 <nav
                     aria-label="Dashboards"
                     className="mb-8 flex flex-wrap items-center gap-2"

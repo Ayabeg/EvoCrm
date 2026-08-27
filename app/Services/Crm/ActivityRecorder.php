@@ -2,6 +2,7 @@
 
 namespace App\Services\Crm;
 
+use App\Jobs\LeadOs\DraftAfterTouch;
 use App\Models\Activity;
 use App\Models\Company;
 use App\Models\Contact;
@@ -37,6 +38,10 @@ class ActivityRecorder
         ]);
 
         $this->touch($activity);
+
+        if ($activity->deal_id && in_array($activity->type, ['note', 'call', 'email'], true)) {
+            DraftAfterTouch::dispatch($activity->id);
+        }
 
         return $activity;
     }

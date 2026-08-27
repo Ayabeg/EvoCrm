@@ -5,21 +5,34 @@ export type DealHealthPayload = {
     reason?: string;
 };
 
-export default function DealHealthPill({ health }: { health?: DealHealthPayload | null }) {
+function bandClass(band?: string): string {
+    if (band === 'healthy') {
+        return 'border-brand bg-brand text-canvas';
+    }
+
+    if (band === 'stalled' || band === 'risk') {
+        return 'border-hairline bg-canvas text-ink';
+    }
+
+    return 'border-hairline bg-canvas text-ink';
+}
+
+export default function DealHealthPill({
+    health,
+}: {
+    health?: DealHealthPayload | null;
+}) {
     if (!health) {
         return null;
     }
 
-    const strong = health.band === 'healthy';
-
     return (
-        <section data-testid="deal-health" className="flex flex-wrap items-center gap-2 text-sm">
+        <section
+            data-testid="deal-health"
+            className="flex flex-wrap items-center gap-2 text-sm"
+        >
             <span
-                className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium ${
-                    strong
-                        ? 'border-brand bg-brand text-canvas'
-                        : 'border-hairline bg-canvas text-ink'
-                }`}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium ${bandClass(health.band)}`}
             >
                 <span>Deal health</span>
                 <span className="tabular-nums">{health.score}</span>

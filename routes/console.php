@@ -18,3 +18,5 @@ Schedule::command('outbound:sync-mailboxes')->name('outbound:sync-mailboxes')->e
 // Warmup advances once per Africa/Algiers day, just after the default quiet
 // hours end, so peer pings (when opted in) are allowed to send immediately.
 Schedule::command('outbound:warmup')->name('outbound:warmup')->dailyAt('08:05')->timezone('Africa/Algiers')->withoutOverlapping();
+Schedule::command('lead-os:graph')->name('lead-os:graph')->dailyAt('02:15')->timezone('Africa/Algiers')->withoutOverlapping();
+Schedule::command('deals:lost-review')->name('deals:lost-review')->weeklyOn(1, '07:30')->timezone('Africa/Algiers')->withoutOverlapping();
