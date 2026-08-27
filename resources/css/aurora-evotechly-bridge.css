@@ -10,7 +10,13 @@
  * See docs/visual-system/aurora-adoption.md
  */
 
-:root {
+/*
+ * Light cabinet. Include `.light` so Aurora's `.light` navy/cyan block
+ * cannot win if that class is ever applied (EvoSales light mode is
+ * `:root` without `.dark`; it does not currently set `.light`).
+ */
+:root,
+.light {
     /* Surfaces — EvoSales Light Cabinet */
     --aurora-page-bg: var(--evosales-canvas-soft);
     --aurora-bg: var(--evosales-canvas-soft);
@@ -63,6 +69,22 @@
         var(--aurora-accent-lift) 0%,
         var(--aurora-accent-button) 100%
     );
+    /* Recompute cyan-named surface tokens from the remapped orange accent. */
+    --aurora-accent-primary-surface: color-mix(
+        in srgb,
+        var(--aurora-accent-primary) 10%,
+        var(--aurora-panel-medium)
+    );
+    --aurora-accent-primary-border: color-mix(
+        in srgb,
+        var(--aurora-accent-primary) 30%,
+        transparent
+    );
+    --aurora-accent-primary-foreground: color-mix(
+        in srgb,
+        var(--aurora-accent-primary) 45%,
+        var(--evosales-ink)
+    );
 
     /* Rose — outbound / secondary agent affordances (muted, not brand) */
     --aurora-accent-pink: #d63a6f;
@@ -104,10 +126,29 @@
     --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.72);
     --aurora-highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 
-    /* Typography — Geist per Brandbook; Aurora scale preserved */
-    --aurora-font-display: var(--font-sans);
-    --aurora-font-sans: var(--font-sans);
+    /*
+     * Typography — Geist literals (Brand Book face).
+     * aurora.css sets `--font-sans: var(--aurora-font-sans)`. Pointing
+     * `--aurora-font-sans` back at `--font-sans` is the same cycle class
+     * as `--sidebar` ↔ `--aurora-nav-bg`.
+     */
+    --aurora-font-display: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --aurora-font-sans: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
     --aurora-font-mono: ui-monospace, Menlo, monospace;
+    --font-display: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, Menlo, monospace;
+
+    /*
+     * Type scale — one rendered system.
+     * Aurora primitives read `--aurora-type-*`. Product UI reads `--text-*`.
+     * Map overlapping sizes; keep Aurora-only steps (label 12px, micro 10.5px).
+     */
+    --aurora-type-body: var(--text-ui-relaxed);
+    --aurora-type-body-sm: var(--text-ui);
+    --aurora-type-control: var(--text-ui);
+    --aurora-type-table: var(--text-ui);
+    --aurora-type-caption: var(--text-section-label);
 
     /* shadcn bridge — EvoSales remains canonical for legacy components */
     --background: var(--evosales-canvas-soft);
@@ -168,6 +209,26 @@
     --aurora-accent-lift: #f28555;
     --aurora-accent-button: var(--evosales-mark);
     --aurora-accent-foreground: #ffffff;
+    --aurora-accent-gradient: linear-gradient(
+        180deg,
+        var(--aurora-accent-lift) 0%,
+        var(--aurora-accent-button) 100%
+    );
+    --aurora-accent-primary-surface: color-mix(
+        in srgb,
+        var(--aurora-accent-primary) 12%,
+        var(--aurora-panel-medium)
+    );
+    --aurora-accent-primary-border: color-mix(
+        in srgb,
+        var(--aurora-accent-primary) 34%,
+        transparent
+    );
+    --aurora-accent-primary-foreground: color-mix(
+        in srgb,
+        var(--aurora-accent-primary) 88%,
+        white
+    );
 
     --axon-orange: var(--evosales-mark);
     --axon-orange-strong: #f07340;
@@ -186,6 +247,19 @@
         0 2px 8px color-mix(in srgb, var(--evosales-mark) 18%, transparent);
 
     --aurora-shell-bg: var(--evosales-canvas-soft);
+
+    --aurora-font-display: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --aurora-font-sans: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --aurora-font-mono: ui-monospace, Menlo, monospace;
+    --font-display: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, Menlo, monospace;
+
+    --aurora-type-body: var(--text-ui-relaxed);
+    --aurora-type-body-sm: var(--text-ui);
+    --aurora-type-control: var(--text-ui);
+    --aurora-type-table: var(--text-ui);
+    --aurora-type-caption: var(--text-section-label);
 
     --aurora-radius-1: 12px;
     --aurora-radius-2: 16px;

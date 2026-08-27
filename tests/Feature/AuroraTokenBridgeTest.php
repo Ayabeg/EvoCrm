@@ -26,3 +26,57 @@ it('places the mobile sidebar dialog title inside SheetContent', function () {
     expect($headerPos)->not->toBeFalse();
     expect($headerPos)->toBeGreaterThan($contentPos);
 });
+
+it('re-asserts Geist faces as literals so --font-sans cannot cycle with --aurora-font-sans', function () {
+    $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
+
+    expect($bridge)->toMatch("/--aurora-font-sans:\s*'Geist Sans'/");
+    expect($bridge)->toMatch("/--font-sans:\s*'Geist Sans'/");
+    expect($bridge)->not->toMatch('/--aurora-font-sans:\s*var\(--font-sans\)/');
+});
+
+it('maps overlapping Aurora type tokens to the Brand Book --text-* scale', function () {
+    $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
+
+    expect($bridge)->toContain('--aurora-type-body: var(--text-ui-relaxed)');
+    expect($bridge)->toContain('--aurora-type-body-sm: var(--text-ui)');
+    expect($bridge)->toContain('--aurora-type-control: var(--text-ui)');
+    expect($bridge)->toContain('--aurora-type-table: var(--text-ui)');
+    expect($bridge)->toContain('--aurora-type-caption: var(--text-section-label)');
+});
+
+it('keeps Home application chrome on Brand Book tokens rather than raw --aurora-*', function () {
+    $home = file_get_contents(resource_path('js/pages/home.tsx'));
+    $header = file_get_contents(resource_path('js/components/dashboard/dashboard-header.tsx'));
+    $attention = file_get_contents(resource_path('js/components/dashboard/attention-list.tsx'));
+    $activity = file_get_contents(resource_path('js/components/dashboard/activity-feed.tsx'));
+
+    expect($home)->not->toContain('--aurora-');
+    expect($header)->not->toContain('--aurora-');
+    expect($attention)->not->toContain('--aurora-');
+    expect($activity)->not->toContain('--aurora-');
+});
+
+it('pins the vendored Aurora source revision next to the primitives', function () {
+    $pin = file_get_contents(resource_path('js/components/ui/aurora/SOURCE.json'));
+
+    expect($pin)->toBeString();
+
+    $data = json_decode($pin, true);
+
+    expect($data)->toBeArray();
+    expect($data['repository'])->toBe('https://github.com/dinglebear-ai/aurora');
+    expect($data['revision'])->toMatch('/^[0-9a-f]{40}$/');
+    expect($data['vendoredPaths'])->toContain('resources/js/components/aurora.css');
+    expect($data['vendoredPaths'])->toContain('resources/js/components/ui/aurora/');
+});
+
+it('re-asserts Brand identity after Aurora defaults, including the unused .light selector', function () {
+    $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
+
+    expect($bridge)->toMatch('/:root,\s*\.light\s*\{/');
+    expect($bridge)->toContain('--aurora-accent-primary: var(--evosales-mark)');
+    expect($bridge)->toContain('--aurora-accent-primary-surface:');
+    expect($bridge)->not->toMatch('/--aurora-accent-primary:\s*#29b6f6/');
+    expect($bridge)->not->toMatch('/--aurora-accent-primary:\s*#0288d1/');
+});
