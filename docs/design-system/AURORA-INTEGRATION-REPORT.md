@@ -394,11 +394,18 @@ Targeted refinement only. No navigation rewrite, no token-bridge change, no new 
 
 ### Verification (this pass)
 
+Headless Chrome, seeded `owner@evosales.local`. Drawer via `getBoundingClientRect` on `[data-mobile="true"][data-slot="sidebar"]`.
+
 | Width | Drawer | Top bar | Home |
 |-------|--------|---------|------|
-| 320 | 240px opaque Sheet | trigger + Find or Ask + + + bell + avatar, no overflow | 2-col KPIs, tighter stack |
-| 375 | 240px | same | same |
-| 390 | 240px | same | same |
-| 430 | 240px | same | same |
-| 768 | icon rail | full topbar | desktop spacing starts |
-| 1024–1920 | labeled 240px rail | unchanged | desktop density unchanged |
+| 320 | **240×** `rgb(0,0,0)`, 1 tree | no overflow; search 148px; + / bell / avatar visible | 2-col KPIs; DZD wraps (`break-words`); dates on one row |
+| 375 | 240px opaque | no overflow | 2-col; title 22px; KPI value 28px |
+| 390 | 240px opaque | no overflow | same |
+| 430 | 240px opaque | no overflow | same |
+| 768 | desktop rail 240px `#000`, no Sheet | complete | desktop spacing |
+| 1024–1920 | labeled 240px rail `#000`, no Sheet | complete | desktop density unchanged |
+
+Light `:root`: `--sidebar` / `--aurora-nav-bg` `#000`, accent `#ec6025`, canvas `#f7f7f6`.  
+Dark `html.dark`: `--sidebar` / `--aurora-nav-bg` `#000`, page `#000`, drawer 240px opaque. Escape closes the Sheet.
+
+`php artisan test` 430 passed; 1 pre-existing `DeskEmptyStateTest` (`No Baileys` copy) unrelated. `AuroraTokenBridgeTest`, `types:check`, `lint:check`, `build` passed.
