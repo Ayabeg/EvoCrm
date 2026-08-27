@@ -7,12 +7,14 @@ use App\Models\AiInsight;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Lead;
 use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\DealBoardForecast;
+use App\Services\Crm\LeadScorer;
 use App\Services\Crm\PipelineManager;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -20,7 +22,11 @@ use Illuminate\Support\Str;
 
 class RecordInsight
 {
-    public function __construct(private LlmClient $llm, private CustomAttributes $attributes) {}
+    public function __construct(
+        private LlmClient $llm,
+        private CustomAttributes $attributes,
+        private LeadScorer $leadScores,
+    ) {}
 
     /**
      * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
@@ -50,6 +56,103 @@ class RecordInsight
         $company->loadMissing(['owner', 'contacts', 'deals.stage']);
 
         return $this->present('company', $company->id, $this->summarizeCompany($company));
+    }
+
+    /**
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     */
+    public function forLead(Lead $lead): array
+    {
+        $lead->loadMissing(['contact', 'latestScore']);
+
+        return $this->present('lead', $lead->id, $this->summarizeLead($lead));
+    }
+
+    /**
+     * Writes a short human reason for the current formula score. Never sets Lead.score.
+     *
+     * @return array{answer: string, source: string, summary: string, score: int}
+     */
+    public function explainLeadScore(Lead $lead, string $question): array
+    {
+        $lead->loadMissing(['contact', 'latestScore']);
+        $scoreBefore = (int) $lead->score;
+        $summary = $this->summarizeLead($lead);
+        $facts = $this->leadFacts($lead);
+
+        $stub = 'Score '.$scoreBefore.' stays '.$scoreBefore.' — formula only. '
+            .($facts['Reason'] ?? 'Fit, intent, and timing set the number.');
+        $live = $this->llm->complete(
+            $this->systemPrompt(),
+            'Write one short sentence explaining this lead score. Never propose a new number. Score stays '.$scoreBefore.'. Facts: '.json_encode($facts).' Question: '.$question,
+        );
+
+        $answer = $live['text'] ?? $stub;
+        $source = $live['source'] ?? 'fields';
+
+        $this->leadScores->writeReason($lead, $answer);
+
+        $lead->refresh();
+
+        AiInsight::query()->create([
+            'workspace_id' => $lead->workspace_id,
+            'subject_type' => 'lead',
+            'subject_id' => $lead->id,
+            'question' => trim($question),
+            'answer' => $answer,
+            'source' => $source,
+        ]);
+
+        return [
+            'answer' => $answer,
+            'source' => $source,
+            'summary' => $summary,
+            'score' => (int) $lead->score,
+        ];
+    }
+
+    public function summarizeLead(Lead $lead): string
+    {
+        $facts = $this->leadFacts($lead);
+        $bits = array_filter([
+            $facts['Title'] ?? 'This lead',
+            isset($facts['Score']) ? 'score '.$facts['Score'] : null,
+            isset($facts['Status']) ? 'status '.$facts['Status'] : null,
+            isset($facts['Wilaya']) ? $facts['Wilaya'] : null,
+            isset($facts['Reason']) ? $facts['Reason'] : null,
+        ]);
+
+        return implode(' · ', $bits).'.';
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function leadFacts(Lead $lead): array
+    {
+        $score = $lead->latestScore;
+        $facts = [
+            'Title' => $lead->title,
+            'Score' => (string) (int) $lead->score,
+            'Status' => (string) $lead->status,
+            'Source' => (string) ($lead->source ?? ''),
+        ];
+
+        if ($lead->contact?->wilaya) {
+            $facts['Wilaya'] = $lead->contact->wilaya;
+        }
+
+        if ($score?->reason) {
+            $facts['Reason'] = $score->reason;
+        }
+
+        if ($score) {
+            $facts['Fit'] = (string) $score->fit;
+            $facts['Intent'] = (string) $score->intent;
+            $facts['Timing'] = (string) $score->timing;
+        }
+
+        return array_filter($facts);
     }
 
     /**

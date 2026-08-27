@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\AuditTrailController;
+use App\Http\Controllers\Settings\LeadScoreSettingsController;
 use App\Http\Controllers\Settings\PeopleController;
 use App\Http\Controllers\Settings\PlaybookController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -33,6 +34,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['can-manage-settings', EnforceProductPermissions::class])->group(function () {
         Route::get('settings/system-health', SystemHealthController::class)->name('settings.system-health');
         Route::get('settings/audit', AuditTrailController::class)->name('settings.audit');
+        Route::get('settings/qualify', [LeadScoreSettingsController::class, 'edit'])->name('settings.qualify');
+        Route::put('settings/qualify', [LeadScoreSettingsController::class, 'update'])->name('settings.qualify.update');
         Route::get('settings/playbooks', [PlaybookController::class, 'index'])->name('settings.playbooks');
         Route::post('settings/playbooks', [PlaybookController::class, 'store'])->name('settings.playbooks.store');
         Route::put('settings/playbooks/{playbook}', [PlaybookController::class, 'update'])->name('settings.playbooks.update');

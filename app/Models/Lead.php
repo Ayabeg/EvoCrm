@@ -32,6 +32,7 @@ class Lead extends Model
     {
         return [
             'payload' => 'array',
+            'score' => 'integer',
             'qualified_at' => 'datetime',
         ];
     }
@@ -59,6 +60,16 @@ class Lead extends Model
     public function captures(): HasMany
     {
         return $this->hasMany(LeadCapture::class, 'matched_lead_id');
+    }
+
+    public function scores(): HasMany
+    {
+        return $this->hasMany(LeadScore::class);
+    }
+
+    public function latestScore(): HasOne
+    {
+        return $this->hasOne(LeadScore::class)->latestOfMany();
     }
 
     public function qualify(): void

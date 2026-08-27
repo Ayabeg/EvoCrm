@@ -1,5 +1,6 @@
 import { Form, Link } from '@inertiajs/react';
 import { CrmShell } from '@/components/crm/crm-shell';
+import LeadScorePill from '@/components/crm/lead-score-pill';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -56,6 +57,7 @@ export default function LeadsIndex({ leads, contacts }: { leads: any[]; contacts
                                     <th className="px-4 py-2">Title</th>
                                     <th className="px-4 py-2">Contact</th>
                                     <th className="px-4 py-2">Status</th>
+                                    <th className="px-4 py-2">Score</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -70,6 +72,19 @@ export default function LeadsIndex({ leads, contacts }: { leads: any[]; contacts
                                             {lead.contact?.first_name} {lead.contact?.last_name}
                                         </td>
                                         <td className="px-4 py-2">{lead.status}</td>
+                                        <td className="px-4 py-2">
+                                            <LeadScorePill
+                                                compact
+                                                score={
+                                                    lead.latest_score
+                                                        ? {
+                                                              score: lead.score,
+                                                              reason: lead.latest_score.reason,
+                                                          }
+                                                        : null
+                                                }
+                                            />
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

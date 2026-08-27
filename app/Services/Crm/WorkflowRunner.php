@@ -5,6 +5,7 @@ namespace App\Services\Crm;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Enrollment;
+use App\Models\Lead;
 use App\Models\Mailbox;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
@@ -122,6 +123,28 @@ class WorkflowRunner
             } catch (Throwable) {
             }
         }
+    }
+
+    public function handleLeadScored(Lead $lead): void
+    {
+        $this->runLeadTrigger($lead, Workflow::TRIGGER_LEAD_SCORED);
+    }
+
+    public function handleLeadQualified(Lead $lead): void
+    {
+        $this->runLeadTrigger($lead, Workflow::TRIGGER_LEAD_QUALIFIED);
+    }
+
+    private function runLeadTrigger(Lead $lead, string $trigger): void
+    {
+        $lead->loadMissing(['workspace', 'contact', 'deal']);
+        $workspace = $lead->workspace ?? Workspace::query()->find($lead->workspace_id);
+
+        if (! $workspace instanceof Workspace) {
+            return;
+        }
+
+        $this->run($workspace, $trigger, $lead->contact, $lead->deal);
     }
 
     public function handleEnrollmentReplied(Contact $contact, Enrollment $enrollment): void

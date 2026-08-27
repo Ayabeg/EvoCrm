@@ -65,6 +65,10 @@ class Workflow extends Model
 
     public const TRIGGER_ENROLLMENT_REPLIED = 'enrollment.replied';
 
+    public const TRIGGER_LEAD_SCORED = 'lead.scored';
+
+    public const TRIGGER_LEAD_QUALIFIED = 'lead.qualified';
+
     public const ACTION_CREATE_TASK = 'create_task';
 
     public const ACTION_ENROLL_SEQUENCE = 'enroll_sequence';
@@ -116,6 +120,8 @@ class Workflow extends Model
             self::TRIGGER_SEGMENT_ENTERED,
             self::TRIGGER_SEGMENT_EXITED,
             self::TRIGGER_ENROLLMENT_REPLIED,
+            self::TRIGGER_LEAD_SCORED,
+            self::TRIGGER_LEAD_QUALIFIED,
         ];
     }
 
