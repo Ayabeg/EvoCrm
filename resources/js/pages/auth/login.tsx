@@ -1,8 +1,8 @@
 import { Form, Head } from '@inertiajs/react';
 import GoogleAuthButton from '@/components/google-auth-button';
-import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
+import { FieldError } from '@/components/ui/aurora/field';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import AuthStatus from './auth-status';
 
 type Props = {
     status?: string;
@@ -27,6 +28,8 @@ export default function Login({
         <>
             <Head title="Log in" />
 
+            {status ? <AuthStatus>{status}</AuthStatus> : null}
+
             {canLoginWithGoogle && <GoogleAuthButton />}
 
             <Form
@@ -36,7 +39,7 @@ export default function Login({
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-5">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
@@ -49,7 +52,9 @@ export default function Login({
                                     autoComplete="email"
                                     placeholder="email@example.com"
                                 />
-                                <InputError message={errors.email} />
+                                {errors.email ? (
+                                    <FieldError>{errors.email}</FieldError>
+                                ) : null}
                             </div>
 
                             <div className="grid gap-2">
@@ -58,7 +63,7 @@ export default function Login({
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="aurora-text-caption ml-auto"
                                             tabIndex={5}
                                         >
                                             Forgot your password?
@@ -73,10 +78,12 @@ export default function Login({
                                     autoComplete="current-password"
                                     placeholder="Password"
                                 />
-                                <InputError message={errors.password} />
+                                {errors.password ? (
+                                    <FieldError>{errors.password}</FieldError>
+                                ) : null}
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center gap-3">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
@@ -87,7 +94,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="w-full"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -97,21 +104,15 @@ export default function Login({
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+                        <p className="aurora-text-body-sm text-center text-mute">
                             Don't have an account?{' '}
                             <TextLink href={register()} tabIndex={5}>
                                 Sign up
                             </TextLink>
-                        </div>
+                        </p>
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }

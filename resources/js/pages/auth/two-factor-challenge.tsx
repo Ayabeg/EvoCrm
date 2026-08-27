@@ -1,7 +1,7 @@
 import { Form, Head, setLayoutProps } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
-import InputError from '@/components/input-error';
+import { FieldError } from '@/components/ui/aurora/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -53,10 +53,10 @@ export default function TwoFactorChallenge() {
         <>
             <Head title="Two-factor authentication" />
 
-            <div className="space-y-6">
+            <div className="flex flex-col gap-6">
                 <Form
                     {...store.form()}
-                    className="space-y-4"
+                    className="flex flex-col gap-5"
                     resetOnError
                     resetOnSuccess={!showRecoveryInput}
                 >
@@ -71,12 +71,14 @@ export default function TwoFactorChallenge() {
                                         autoFocus={showRecoveryInput}
                                         required
                                     />
-                                    <InputError
-                                        message={errors.recovery_code}
-                                    />
+                                    {errors.recovery_code ? (
+                                        <FieldError>
+                                            {errors.recovery_code}
+                                        </FieldError>
+                                    ) : null}
                                 </>
                             ) : (
-                                <div className="flex flex-col items-center justify-center space-y-3 text-center">
+                                <div className="flex flex-col items-center justify-center gap-3 text-center">
                                     <div className="flex w-full items-center justify-center">
                                         <InputOTP
                                             name="code"
@@ -100,7 +102,9 @@ export default function TwoFactorChallenge() {
                                             </InputOTPGroup>
                                         </InputOTP>
                                     </div>
-                                    <InputError message={errors.code} />
+                                    {errors.code ? (
+                                        <FieldError>{errors.code}</FieldError>
+                                    ) : null}
                                 </div>
                             )}
 
@@ -112,18 +116,18 @@ export default function TwoFactorChallenge() {
                                 Continue
                             </Button>
 
-                            <div className="text-center text-sm text-muted-foreground">
+                            <p className="aurora-text-body-sm text-center text-mute">
                                 <span>or you can </span>
                                 <button
                                     type="button"
-                                    className="cursor-pointer text-brand underline decoration-brand/30 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-brand"
+                                    className="cursor-pointer text-brand underline decoration-brand/30 underline-offset-4 transition-colors duration-[var(--motion-duration-medium)] hover:decoration-brand"
                                     onClick={() =>
                                         toggleRecoveryMode(clearErrors)
                                     }
                                 >
                                     {authConfigContent.toggleText}
                                 </button>
-                            </div>
+                            </p>
                         </>
                     )}
                 </Form>
