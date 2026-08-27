@@ -35,7 +35,7 @@ export default function DealQuotes({
     const catalog = products ?? [];
 
     return (
-        <section className="rounded border border-hairline bg-canvas p-3 text-sm">
+        <section className="rounded-xl border border-hairline bg-canvas p-3 text-sm">
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-mute">Quotes</h3>
             {quotes.length === 0 ? (
                 <p className="mb-2 text-[12px] text-mute">No quotes yet.</p>

@@ -350,3 +350,18 @@ Guards added and passing:
 | `npm run lint:check` | Pass |
 | `npm run build` | Pass |
 | Browser (seeded `owner@evosales.local`) | Pass — see §6–7 |
+
+## Follow-up — CRM record hubs (Apple + Aurora)
+
+Visual pass on contacts / companies / deals **hub + show** only. Brand Book identity, Aurora adapters, no HubSpot chrome, no ListViewTable swap.
+
+| Surface | Decision |
+|---------|----------|
+| Hub list header | `RecordHubHeader` — page title + `#EC6025` CTA. No object-dropdown chrome |
+| Hub table | Still product `ListViewTable`, framed in a 12px hairline panel |
+| Saved views | Orange/hairline chips, not ink-filled HubSpot pills |
+| Record show | `RecordPageFrame` + Aurora Avatar adapter + Aurora Cards/Tabs |
+| Workspace | `RecordShell` → `AdaptiveWorkspaceShell` unchanged |
+| Ask Evo / line items | Kept. Ask Evo no longer uses the cyan accent name |
+
+**Not changed:** `list-view-table.tsx`, RoomShell / EvoDesk rail, official Aurora DataTable / Sidebar.

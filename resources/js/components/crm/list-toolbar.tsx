@@ -9,7 +9,12 @@ import SavedViewTabs from '@/components/crm/saved-view-tabs';
 import { StagePills } from '@/components/crm/stage-pills';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
-import type { ListViewColumn, ListViewFilters, ListViewMeta, SavedView } from '@/lib/list-view-config';
+import type {
+    ListViewColumn,
+    ListViewFilters,
+    ListViewMeta,
+    SavedView,
+} from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };
@@ -52,10 +57,14 @@ export default function ListToolbar({
 }) {
     const { auth } = usePage().props as { auth: { user: { role: string } } };
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
-    const [internalColumns, setInternalColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
+    const [internalColumns, setInternalColumns] = useState<ListViewColumn[]>(
+        listView?.columns ?? [],
+    );
     const columns = controlledColumns ?? internalColumns;
     const setColumns = onColumnsChange ?? setInternalColumns;
-    const [filterGroups, setFilterGroups] = useState<ListViewFilters>(() => filterGroupsFromActive(activeFilters));
+    const [filterGroups, setFilterGroups] = useState<ListViewFilters>(() =>
+        filterGroupsFromActive(activeFilters),
+    );
 
     useEffect(() => {
         // Server-provided filters can change during an Inertia partial reload.
@@ -89,9 +98,18 @@ export default function ListToolbar({
                 </div>
                 <div className="flex items-center gap-1">
                     {listView ? (
-                        <ColumnChooser columnDefs={listView.columnDefs} columns={columns} onChange={setColumns} />
+                        <ColumnChooser
+                            columnDefs={listView.columnDefs}
+                            columns={columns}
+                            onChange={setColumns}
+                        />
                     ) : null}
-                    <Button asChild size="sm" className="h-7 rounded-sm text-[11px]">
+                    <Button
+                        asChild
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-[11px]"
+                    >
                         <Link href={`${basePath}?create=1`}>
                             <Plus className="mr-1 size-3" />
                             Create
@@ -127,9 +145,15 @@ export default function ListToolbar({
             {entity === 'deal' ? (
                 <StagePills
                     stages={stagePills}
-                    activeSlug={typeof activeFilters.stage === 'string' ? activeFilters.stage : null}
+                    activeSlug={
+                        typeof activeFilters.stage === 'string'
+                            ? activeFilters.stage
+                            : null
+                    }
                     hrefFor={(slug) =>
-                        crmListHref(basePath, filterFields(activeFilters), { stage: slug })
+                        crmListHref(basePath, filterFields(activeFilters), {
+                            stage: slug,
+                        })
                     }
                 />
             ) : null}

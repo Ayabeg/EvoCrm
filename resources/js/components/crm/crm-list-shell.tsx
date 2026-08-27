@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ListView } from '@/components/crm/list-chrome';
-import { CrmListHeader } from '@/components/crm/list-chrome';
 import ListToolbar from '@/components/crm/list-toolbar';
+import { RecordHubHeader, RecordHubPanel } from '@/components/crm/record-hub';
 import type { StagePill } from '@/components/crm/stage-pills';
-import type { ListViewColumn, ListViewMeta, SavedView } from '@/lib/list-view-config';
+import type {
+    ListViewColumn,
+    ListViewMeta,
+    SavedView,
+} from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -58,7 +62,9 @@ export function CrmListShell({
     headerActions?: ReactNode;
     children: ReactNode | ((columns: ListViewColumn[]) => ReactNode);
 }) {
-    const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
+    const [columns, setColumns] = useState<ListViewColumn[]>(
+        listView?.columns ?? [],
+    );
 
     useEffect(() => {
         // Inertia can replace the active saved view without remounting this shell.
@@ -67,8 +73,8 @@ export function CrmListShell({
     }, [listView?.columns]);
 
     return (
-        <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
-            <CrmListHeader
+        <div className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink">
+            <RecordHubHeader
                 title={title}
                 views={views}
                 activeView={activeView}
@@ -97,7 +103,13 @@ export function CrmListShell({
                 columns={columns}
                 onColumnsChange={setColumns}
             />
-            {typeof children === 'function' ? children(columns) : children}
+            <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-4">
+                <RecordHubPanel>
+                    {typeof children === 'function'
+                        ? children(columns)
+                        : children}
+                </RecordHubPanel>
+            </div>
         </div>
     );
 }

@@ -40,7 +40,11 @@ export function RecordBack({ href, label }: { href: string; label: string }) {
 
 type ActionType = 'note' | 'email' | 'call' | 'task' | 'meeting';
 
-const ACTION_DEFS: { type: ActionType; label: string; icon: typeof NotebookPen }[] = [
+const ACTION_DEFS: {
+    type: ActionType;
+    label: string;
+    icon: typeof NotebookPen;
+}[] = [
     { type: 'note', label: 'Note', icon: NotebookPen },
     { type: 'email', label: 'Email', icon: Mail },
     { type: 'call', label: 'Call', icon: Phone },
@@ -76,7 +80,9 @@ export function RecordActions({
                             size="sm"
                             variant={selected ? 'default' : 'outline'}
                             shape="pill"
-                            onClick={() => setActive(selected ? null : action.type)}
+                            onClick={() =>
+                                setActive(selected ? null : action.type)
+                            }
                             className="min-h-11 sm:min-h-8"
                         >
                             <Icon className="size-4 shrink-0 sm:size-3.5" />
@@ -94,13 +100,17 @@ export function RecordActions({
                             className="min-h-11 min-w-11 sm:min-h-8 sm:min-w-8"
                         >
                             <MoreHorizontal className="size-4 sm:size-3.5" />
-                            <span className="sr-only">More actions for record {entityId}</span>
+                            <span className="sr-only">
+                                More actions for record {entityId}
+                            </span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-48">
                         {contactId ? (
                             <DropdownMenuItem asChild>
-                                <Link href={`/crm/deals?create=1&contact_id=${contactId}`}>
+                                <Link
+                                    href={`/crm/deals?create=1&contact_id=${contactId}`}
+                                >
                                     <Handshake className="size-3.5" />
                                     Create deal
                                 </Link>
@@ -138,7 +148,10 @@ export function RecordActions({
                                     options={{ preserveScroll: true }}
                                     className="w-full"
                                 >
-                                    <button type="submit" className="flex w-full items-center gap-2 px-2 py-1.5 text-sm">
+                                    <button
+                                        type="submit"
+                                        className="flex w-full items-center gap-2 px-2 py-1.5 text-sm"
+                                    >
                                         <Mail className="size-3.5" />
                                         Draft email with Evo
                                     </button>
@@ -174,20 +187,30 @@ export function RecordActions({
                 <Form
                     action="/crm/activities"
                     method="post"
-                    className="rounded-md border border-hairline bg-canvas-soft p-3"
+                    className="rounded-xl border border-hairline bg-canvas-soft p-3"
                     resetOnSuccess
                     onSuccess={() => setActive(null)}
                     options={{ preserveScroll: true }}
                 >
                     <input type="hidden" name="type" value={active} />
                     {contactId ? (
-                        <input type="hidden" name="contact_id" value={contactId} />
+                        <input
+                            type="hidden"
+                            name="contact_id"
+                            value={contactId}
+                        />
                     ) : null}
-                    {dealId ? <input type="hidden" name="deal_id" value={dealId} /> : null}
+                    {dealId ? (
+                        <input type="hidden" name="deal_id" value={dealId} />
+                    ) : null}
                     {companyId ? (
-                        <input type="hidden" name="company_id" value={companyId} />
+                        <input
+                            type="hidden"
+                            name="company_id"
+                            value={companyId}
+                        />
                     ) : null}
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <p className="mb-2 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
                         Log {active}
                     </p>
                     <div className="grid gap-2">
@@ -197,7 +220,11 @@ export function RecordActions({
                             required
                             className="h-8 bg-canvas"
                         />
-                        <Input name="body" placeholder="Details (optional)" className="h-8 bg-canvas" />
+                        <Input
+                            name="body"
+                            placeholder="Details (optional)"
+                            className="h-8 bg-canvas"
+                        />
                         {active === 'task' || active === 'meeting' ? (
                             <Input
                                 name="due_at"
@@ -264,7 +291,7 @@ export function ActivityTabs({
 }) {
     return (
         <Tabs value={active} onValueChange={onChange} className="w-full">
-            <TabsList className="no-scrollbar h-auto w-full min-h-11 justify-start gap-0 border-b-0 bg-transparent p-0">
+            <TabsList className="no-scrollbar h-auto min-h-11 w-full justify-start gap-0 border-b-0 bg-transparent p-0">
                 {tabs.map((tab) => (
                     <TabsTrigger
                         key={tab.key}
@@ -293,9 +320,16 @@ export function AssociationCard({
     addLabel?: string;
 }) {
     return (
-        <Card elevated={false} className="overflow-hidden py-0">
+        <Card
+            elevated={false}
+            className="overflow-hidden py-0"
+            style={{ borderRadius: 12 }}
+        >
             <CardHeader className="flex flex-row items-center justify-between py-3">
-                <CardTitle as="h3" className="text-[12px] uppercase tracking-wide">
+                <CardTitle
+                    as="h3"
+                    className="text-[12px] tracking-wide uppercase"
+                >
                     {title}
                 </CardTitle>
                 {addHref ? (
@@ -306,7 +340,9 @@ export function AssociationCard({
                         {addLabel}
                     </Link>
                 ) : (
-                    <span className="text-[12px] font-medium text-muted-foreground">{addLabel}</span>
+                    <span className="text-[12px] font-medium text-muted-foreground">
+                        {addLabel}
+                    </span>
                 )}
             </CardHeader>
             <CardContent className="py-3 text-[13px] leading-relaxed">
