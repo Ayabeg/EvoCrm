@@ -258,23 +258,70 @@ PR #101 already established the foundation. This follow-up does **not** redesign
 
 ### 6. Mobile verification
 
-Pending re-check after this follow-up (P0 composition and rail literals were not modified). Expected unchanged:
+Re-checked after this follow-up (P0 composition and rail literals were not modified):
 
-- Opaque ~240px drawer (`min(16rem, 86vw)`)
-- Brand overlay `--sidebar-overlay`
+- Opaque black drawer; dashboard does not show through
+- Width ≈ 240px at 375+; at 320 uses `min(16rem, 86vw)` (~275px)
+- Brand overlay (dark ~80%)
 - SheetHeader inside SheetContent
 - One navigation tree
-- No dashboard showing through
+- Close via backdrop, Close menu, Escape
 
-Viewports: 320 / 375 / 390 / 430.
+| Width | Result |
+|-------|--------|
+| 320 | Pass |
+| 375 | Pass |
+| 390 | Pass |
+| 430 | Pass |
 
 ### 7. Desktop verification
 
-Pending re-check. EvoDesk rail and ListViewTable were not modified. Viewports: 768 / 1024 / 1280 / 1440 / 1920.
+EvoDesk rail and ListViewTable were not modified. Home remains a dense command center. Accent links are `#EC6025`, not cyan.
+
+| Width | Result |
+|-------|--------|
+| 768 | Pass — icon rail (`md`) |
+| 1024 | Pass — rail, not mobile Sheet |
+| 1280 | Pass — full rail |
+| 1440 | Pass |
+| 1920 | Pass |
+
+Runtime probe (logged-in Home, computed styles):
+
+```json
+{
+  "light": {
+    "sidebar": "#000",
+    "auroraNavBg": "#000",
+    "auroraPageBg": "#f7f7f6",
+    "auroraAccent": "#ec6025",
+    "evosalesMark": "#ec6025",
+    "fontSans": "\"Geist Sans\", Geist, ui-sans-serif, system-ui, sans-serif",
+    "auroraFontSans": "\"Geist Sans\", Geist, ui-sans-serif, system-ui, sans-serif",
+    "auroraTypeBody": ".872rem",
+    "textUiRelaxed": ".872rem",
+    "auroraShellBg": "#f7f7f6"
+  },
+  "dark": {
+    "sidebar": "#000",
+    "auroraNavBg": "#000",
+    "auroraPageBg": "#000",
+    "auroraAccent": "#ec6025",
+    "evosalesMark": "#ec6025",
+    "fontSans": "\"Geist Sans\", Geist, ui-sans-serif, system-ui, sans-serif",
+    "auroraFontSans": "\"Geist Sans\", Geist, ui-sans-serif, system-ui, sans-serif",
+    "auroraTypeBody": ".872rem",
+    "textUiRelaxed": ".872rem",
+    "auroraShellBg": "#000"
+  }
+}
+```
+
+No token cycle. No navy/cyan identity. Type scale renders as one system.
 
 ### 8. Tests
 
-Pending this revision. Guards added:
+Guards added and passing:
 
 - Font literals / no `--aurora-font-sans: var(--font-sans)`
 - Type-scale mapping
@@ -284,7 +331,7 @@ Pending this revision. Guards added:
 
 ### 9. Build
 
-Pending this revision (`npm run types:check`, `npm run build`).
+`npm run types:check` (after wayfinder `--with-form`) and `npm run build` passed.
 
 ### 10. Remaining P2/P3
 
@@ -297,9 +344,9 @@ Pending this revision (`npm run types:check`, `npm run build`).
 
 | Check | Result |
 |-------|--------|
-| `php artisan test --compact tests/Feature/AuroraTokenBridgeTest.php` | Pending |
-| `tests/Feature/BrandingTest.php` + `DashboardTest.php` + `HomeCommandCenterTest.php` + `CrmCreateDrawerTest.php` | Pending |
-| `npm run types:check` (after wayfinder `--with-form`) | Pending |
-| `npm run lint:check` | Pre-existing `import/order` errors expected |
-| `npm run build` | Pending |
-| Browser (seeded `owner@evosales.local`) | Pending — P0 must not regress |
+| `php artisan test --compact tests/Feature/AuroraTokenBridgeTest.php` | Pass (8) |
+| `tests/Feature/BrandingTest.php` + `DashboardTest.php` + `HomeCommandCenterTest.php` + `CrmCreateDrawerTest.php` | Pass (19 total with bridge tests) |
+| `npm run types:check` (after wayfinder `--with-form`) | Pass |
+| `npm run lint:check` | Pass |
+| `npm run build` | Pass |
+| Browser (seeded `owner@evosales.local`) | Pass — see §6–7 |
