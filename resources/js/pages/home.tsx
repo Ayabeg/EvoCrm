@@ -5,6 +5,8 @@ import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import type { ActivityFeedItem } from '@/components/dashboard/activity-feed';
 import { AttentionList } from '@/components/dashboard/attention-list';
 import type { AttentionItem } from '@/components/dashboard/attention-list';
+import LeadOsGraphStatus from '@/components/crm/lead-os-graph-status';
+import type { LeadOsGraphPayload } from '@/components/crm/lead-os-graph-status';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
 import { QuickActions } from '@/components/dashboard/quick-actions';
@@ -44,6 +46,7 @@ type Props = {
     owners?: Owner[];
     filters?: Filters;
     dataAsOf?: string;
+    leadOsGraph?: LeadOsGraphPayload | null;
 };
 
 function formatDzd(cents: number): string {
@@ -66,6 +69,7 @@ export default function Home({
     owners = [],
     filters = {},
     dataAsOf,
+    leadOsGraph,
 }: Props) {
     const subtitle = `Sales command center · ${window.from} → ${window.to}`;
 
@@ -79,6 +83,10 @@ export default function Home({
                         owners={owners}
                         filters={filters}
                     />
+
+                    <div className="mb-8">
+                        <LeadOsGraphStatus graph={leadOsGraph} />
+                    </div>
 
                     {kpis.length > 0 ? (
                         <section aria-label="Command KPIs" className="mb-8">

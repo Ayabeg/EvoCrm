@@ -19,6 +19,8 @@ use App\Models\Sequence;
 use App\Models\Thread;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\LeadOs\GraphRunner;
+use App\Services\LeadOs\LostReview;
 use App\Support\ReportWidgets;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -165,6 +167,8 @@ class ReportController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'name'])
                 ->all(),
+            'leadOsGraph' => app(GraphRunner::class)->latest($workspace)?->present(),
+            'lostReview' => app(LostReview::class)->present($workspace),
         ]);
     }
 

@@ -2,6 +2,9 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AskEvoPanel from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import DealHealthPill from '@/components/crm/deal-health-pill';
+import DealSuggestionCard from '@/components/crm/deal-suggestion-card';
+import type { DealSuggestionPayload } from '@/components/crm/deal-suggestion-card';
 import DealLineItems from '@/components/crm/deal-line-items';
 import type {
     CatalogProduct,
@@ -65,6 +68,8 @@ export default function DealShow({
     attributes,
     askEvo,
     dealHealth,
+    nextMove,
+    afterTouch,
     products,
     members,
     splits,
@@ -106,11 +111,14 @@ export default function DealShow({
     askEvo?: AskEvoPayload | null;
     dealHealth?: {
         score: number;
+        band?: string;
         label: string;
         reason: string;
         factors?: { key: string; label: string; detail: string }[];
         next_action?: string;
     } | null;
+    nextMove?: DealSuggestionPayload | null;
+    afterTouch?: DealSuggestionPayload | null;
     products?: CatalogProduct[];
     members?: { id: number; name: string }[];
     splits?: {
@@ -164,18 +172,11 @@ export default function DealShow({
                                 }
                                 meta={
                                     <>
-                                        {dealHealth ? (
-                                            <p className="pt-1 text-[12px] leading-relaxed text-mute">
-                                                <span className="font-medium text-ink">
-                                                    {dealHealth.label}
-                                                </span>{' '}
-                                                ({dealHealth.score}/100)
-                                                <span className="hidden sm:inline">
-                                                    {' '}
-                                                    · {dealHealth.reason}
-                                                </span>
-                                            </p>
-                                        ) : null}
+                                        <div className="pt-1">
+                                            <DealHealthPill
+                                                health={dealHealth}
+                                            />
+                                        </div>
                                         <div className="mt-2 grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:gap-6">
                                             <RecordFact
                                                 label="Amount"
@@ -222,6 +223,16 @@ export default function DealShow({
                                 <AskEvoPanel
                                     action={`/crm/deals/${deal.id}/ask`}
                                     insight={askEvo}
+                                />
+                                <DealSuggestionCard
+                                    dealId={deal.id}
+                                    suggestion={nextMove}
+                                    title="Next move"
+                                />
+                                <DealSuggestionCard
+                                    dealId={deal.id}
+                                    suggestion={afterTouch}
+                                    title="After-touch draft"
                                 />
                                 <PlaybookCard playbooks={playbooks} />
                                 <RecordSection title="About this deal">

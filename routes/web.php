@@ -19,6 +19,7 @@ use App\Http\Controllers\Crm\DealSplitController;
 use App\Http\Controllers\Crm\FunnelController;
 use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadController;
+use App\Http\Controllers\Crm\LeadOsController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\RecordLayoutController;
 use App\Http\Controllers\Crm\ReportController;
@@ -103,6 +104,8 @@ Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::cla
 
 Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
+    Route::post('/lead-os/graph', [LeadOsController::class, 'runGraph'])->name('lead-os.graph');
+    Route::post('/crm/lost-reviews/{suggestion}/confirm', [LeadOsController::class, 'confirmLost'])->name('crm.lost-reviews.confirm');
 
     // Meta workspace OAuth (Facebook Login). 404 unless META_* env is set.
     Route::get('/auth/meta', [MetaController::class, 'redirect'])->name('auth.meta');
@@ -213,6 +216,8 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'update'])->name('crm.deals.line-items.update');
     Route::delete('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'destroy'])->name('crm.deals.line-items.destroy');
     Route::post('/crm/deals/{deal}/ask', [AskEvoController::class, 'deal'])->name('crm.deals.ask');
+    Route::post('/crm/deals/{deal}/suggestions/{suggestion}/apply', [LeadOsController::class, 'applySuggestion'])->name('crm.deals.suggestions.apply');
+    Route::post('/crm/deals/{deal}/suggestions/{suggestion}/dismiss', [LeadOsController::class, 'dismissSuggestion'])->name('crm.deals.suggestions.dismiss');
     Route::post('/crm/deals/{deal}/draft-email', [AskEvoController::class, 'draftDeal'])->name('crm.deals.draft-email');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
