@@ -14,7 +14,22 @@
     /* Surfaces — EvoSales Light Cabinet */
     --aurora-page-bg: var(--evosales-canvas-soft);
     --aurora-bg: var(--evosales-canvas-soft);
-    --aurora-nav-bg: var(--sidebar);
+    /*
+     * EvoDesk rail — literals only.
+     * aurora.css sets `--sidebar: var(--aurora-nav-bg)`. Pointing
+     * `--aurora-nav-bg` back at `--sidebar` made both invalid at
+     * computed-value time (transparent rail / mobile sheet) in light mode.
+     * Brand Book: rail is true black in both cabinets.
+     */
+    --aurora-nav-bg: #000000;
+    --sidebar: #000000;
+    --sidebar-foreground: #d4d4d4;
+    --sidebar-primary: #f5f5f5;
+    --sidebar-primary-foreground: #000000;
+    --sidebar-accent: rgba(236, 96, 37, 0.22);
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: #1f1f1f;
+    --sidebar-ring: #ec6025;
     --aurora-panel-medium: var(--evosales-canvas);
     --aurora-panel-medium-top: rgba(255, 255, 255, 0.5);
     --aurora-panel-strong: var(--evosales-canvas);
@@ -74,18 +89,8 @@
         0 0 0 1px color-mix(in srgb, var(--evosales-mark) 28%, transparent),
         0 2px 8px color-mix(in srgb, var(--evosales-mark) 18%, transparent);
 
-    /* Page shell — warm EvoTechly wash (visible Aurora tier-0, not flat gray) */
-    --aurora-shell-bg: radial-gradient(
-            circle at 14% -10%,
-            color-mix(in srgb, var(--evosales-mark) 7%, transparent),
-            transparent 34%
-        ),
-        radial-gradient(
-            circle at 88% 0%,
-            color-mix(in srgb, var(--evosales-mark) 4%, transparent),
-            transparent 28%
-        ),
-        var(--evosales-canvas-soft);
+    /* Page shell — Brand Book canvas wash only. No decorative Aurora radials. */
+    --aurora-shell-bg: var(--evosales-canvas-soft);
 
     /* Radii — Aurora optical scale (visible card roundness) */
     --aurora-radius-1: 12px;
@@ -129,7 +134,15 @@
     /* Surfaces — EvoSales Dark Cabinet (true black, never navy) */
     --aurora-page-bg: var(--evosales-canvas-soft);
     --aurora-bg: var(--evosales-canvas-soft);
-    --aurora-nav-bg: var(--sidebar);
+    --aurora-nav-bg: #000000;
+    --sidebar: #000000;
+    --sidebar-foreground: #a3a3a3;
+    --sidebar-primary: #f5f5f5;
+    --sidebar-primary-foreground: #000000;
+    --sidebar-accent: #171717;
+    --sidebar-accent-foreground: #f5f5f5;
+    --sidebar-border: #1f1f1f;
+    --sidebar-ring: #ec6025;
     --aurora-panel-medium: var(--evosales-canvas);
     --aurora-panel-medium-top: rgba(10, 10, 10, 0.96);
     --aurora-panel-strong: var(--evosales-canvas);
