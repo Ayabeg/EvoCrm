@@ -194,6 +194,8 @@ function Sidebar({
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              width: SIDEBAR_WIDTH_MOBILE,
+              maxWidth: SIDEBAR_WIDTH_MOBILE,
               background: "var(--sidebar)",
               borderColor: "var(--sidebar-border)",
               color: "var(--sidebar-foreground)",

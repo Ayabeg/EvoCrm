@@ -89,6 +89,7 @@ it('keeps the Apple cabinet rail at 240px on desktop and the existing mobile She
     expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "220px"');
     expect($sidebar)->toContain('<SheetContent');
     expect($sidebar)->toContain('background: "var(--sidebar)"');
+    expect($sidebar)->toContain('width: SIDEBAR_WIDTH_MOBILE');
 });
 
 it('uses a soft rail pill instead of an orange active bar', function () {
@@ -122,4 +123,6 @@ it('paints the topbar as a frosted hairline instead of an Aurora panel gradient'
     expect($header)->not->toContain('linear-gradient(180deg, var(--aurora-panel-strong-top)');
     expect($css)->toContain('.app-topbar');
     expect($css)->toContain('backdrop-filter: blur(20px)');
+    expect($css)->toContain('rgb(255 255 255 / 0.78)');
+    expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
 });

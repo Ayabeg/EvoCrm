@@ -404,7 +404,7 @@ export function AppSidebar() {
     const railItems = pinnedItems.length > 0 ? pinnedItems : PRIMARY.filter((item) => DEFAULT_PINNED.includes(item.id as (typeof DEFAULT_PINNED)[number]));
 
     return (
-        <Sidebar collapsible="icon" className="bg-sidebar">
+        <Sidebar collapsible="icon" className="bg-sidebar" data-cabinet="rail">
             <section className={cn('grid text-sm', collapsed ? 'mt-4 mb-4 gap-3' : 'mt-3 mb-4 gap-2')}>
                 <div className={cn('flex min-w-0 items-center gap-2.5', collapsed ? 'justify-center px-1' : 'px-3')}>
                     <Link href="/dashboard" title="Evotechly" className="grid place-content-center">
