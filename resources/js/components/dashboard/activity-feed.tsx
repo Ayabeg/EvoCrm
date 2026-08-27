@@ -21,38 +21,22 @@ export function ActivityFeed({
 }) {
     if (items.length === 0) {
         return (
-            <p
-                className="aurora-text-body-sm rounded-[var(--aurora-radius-1)] border px-4 py-3"
-                style={{
-                    borderColor: 'var(--aurora-border-default)',
-                    background: 'var(--aurora-panel-medium)',
-                    color: 'var(--aurora-text-muted)',
-                }}
-            >
+            <p className="aurora-text-body-sm rounded-xl border border-hairline bg-canvas px-4 py-3 text-mute">
                 No recent activity.
             </p>
         );
     }
 
     return (
-        <div
-            className="overflow-hidden rounded-[var(--aurora-radius-1)] border"
-            style={{
-                borderColor: 'var(--aurora-border-default)',
-                background: 'var(--aurora-panel-medium)',
-            }}
-        >
-            <ul className="divide-y divide-[var(--aurora-border-default)]">
+        <div className="overflow-hidden rounded-xl border border-hairline bg-canvas">
+            <ul className="divide-y divide-hairline">
                 {items.map((item) => (
                     <li key={item.id}>
                         <Link
                             href={item.href}
-                            className="flex flex-col gap-0.5 px-4 py-2.5 transition-colors duration-150 hover:bg-[var(--aurora-hover-bg)]"
+                            className="flex flex-col gap-0.5 px-4 py-2.5 transition-colors duration-150 hover:bg-muted"
                         >
-                            <p
-                                className="aurora-text-body-sm"
-                                style={{ color: 'var(--aurora-text-primary)' }}
-                            >
+                            <p className="aurora-text-body-sm text-ink">
                                 <span className="font-medium">
                                     {item.actor ?? 'Someone'}
                                 </span>
@@ -60,10 +44,7 @@ export function ActivityFeed({
                                 {item.subject}
                                 {item.done ? ' (done)' : ''}
                             </p>
-                            <p
-                                className="aurora-text-caption"
-                                style={{ color: 'var(--aurora-text-muted)' }}
-                            >
+                            <p className="aurora-text-caption text-mute">
                                 {[item.contact, item.deal, item.at]
                                     .filter(Boolean)
                                     .join(' · ')}
@@ -72,14 +53,10 @@ export function ActivityFeed({
                     </li>
                 ))}
             </ul>
-            <div
-                className="border-t px-4 py-2"
-                style={{ borderColor: 'var(--aurora-border-default)' }}
-            >
+            <div className="border-t border-hairline px-4 py-2">
                 <Link
                     href={viewAllHref}
-                    className="aurora-text-body-sm transition-colors hover:underline"
-                    style={{ color: 'var(--aurora-accent-primary)' }}
+                    className="aurora-text-body-sm text-brand transition-colors hover:underline"
                 >
                     View all activity
                 </Link>

@@ -107,8 +107,7 @@ export default function Home({
                                     action={
                                         <Link
                                             href="/crm/deals/board"
-                                            className="aurora-text-body-sm transition-colors hover:underline"
-                                            style={{ color: 'var(--aurora-accent-primary)' }}
+                                            className="aurora-text-body-sm text-brand transition-colors hover:underline"
                                         >
                                             Open board
                                         </Link>
@@ -119,33 +118,17 @@ export default function Home({
                                             payload={pipelineHealth.chart}
                                         />
                                     ) : (
-                                        <ul
-                                            className="space-y-2 rounded-[var(--aurora-radius-1)] border p-4"
-                                            style={{
-                                                borderColor: 'var(--aurora-border-default)',
-                                                background: 'var(--aurora-panel-medium)',
-                                            }}
-                                        >
+                                        <ul className="space-y-2 rounded-xl border border-hairline bg-canvas p-4">
                                             {pipelineHealth.stages.map(
                                                 (stage) => (
                                                     <li
                                                         key={stage.name}
                                                         className="flex items-center justify-between gap-3"
                                                     >
-                                                        <span
-                                                            className="aurora-text-body-sm"
-                                                            style={{
-                                                                color: 'var(--aurora-text-primary)',
-                                                            }}
-                                                        >
+                                                        <span className="aurora-text-body-sm text-ink">
                                                             {stage.name}
                                                         </span>
-                                                        <span
-                                                            className="aurora-text-caption money"
-                                                            style={{
-                                                                color: 'var(--aurora-text-muted)',
-                                                            }}
-                                                        >
+                                                        <span className="aurora-text-caption money text-mute">
                                                             {stage.count} ·{' '}
                                                             {formatDzd(
                                                                 stage.amount_cents,
@@ -165,44 +148,17 @@ export default function Home({
                                     title="Sales performance"
                                     description="Won deals in period by owner"
                                 >
-                                    <div
-                                        className="overflow-x-auto rounded-[var(--aurora-radius-1)] border"
-                                        style={{
-                                            borderColor: 'var(--aurora-border-default)',
-                                            background: 'var(--aurora-panel-medium)',
-                                        }}
-                                    >
+                                    <div className="overflow-x-auto rounded-xl border border-hairline bg-canvas">
                                         <table className="w-full min-w-[320px]">
                                             <thead>
-                                                <tr
-                                                    className="border-b text-left"
-                                                    style={{
-                                                        borderColor:
-                                                            'var(--aurora-border-default)',
-                                                    }}
-                                                >
-                                                    <th
-                                                        className="aurora-text-eyebrow px-4 py-2 font-medium"
-                                                        style={{
-                                                            color: 'var(--aurora-text-muted)',
-                                                        }}
-                                                    >
+                                                <tr className="border-b border-hairline text-left">
+                                                    <th className="aurora-text-eyebrow px-4 py-2 font-medium text-mute">
                                                         Owner
                                                     </th>
-                                                    <th
-                                                        className="aurora-text-eyebrow px-4 py-2 text-right font-medium"
-                                                        style={{
-                                                            color: 'var(--aurora-text-muted)',
-                                                        }}
-                                                    >
+                                                    <th className="aurora-text-eyebrow px-4 py-2 text-right font-medium text-mute">
                                                         Won
                                                     </th>
-                                                    <th
-                                                        className="aurora-text-eyebrow px-4 py-2 text-right font-medium"
-                                                        style={{
-                                                            color: 'var(--aurora-text-muted)',
-                                                        }}
-                                                    >
+                                                    <th className="aurora-text-eyebrow px-4 py-2 text-right font-medium text-mute">
                                                         Revenue
                                                     </th>
                                                 </tr>
@@ -211,34 +167,15 @@ export default function Home({
                                                 {salesPerformance.map((row) => (
                                                     <tr
                                                         key={row.owner}
-                                                        className="border-b last:border-0"
-                                                        style={{
-                                                            borderColor:
-                                                                'var(--aurora-border-default)',
-                                                        }}
+                                                        className="border-b border-hairline last:border-0"
                                                     >
-                                                        <td
-                                                            className="aurora-text-body-sm px-4 py-2"
-                                                            style={{
-                                                                color: 'var(--aurora-text-primary)',
-                                                            }}
-                                                        >
+                                                        <td className="aurora-text-body-sm px-4 py-2 text-ink">
                                                             {row.owner}
                                                         </td>
-                                                        <td
-                                                            className="money aurora-text-body-sm px-4 py-2 text-right"
-                                                            style={{
-                                                                color: 'var(--aurora-text-primary)',
-                                                            }}
-                                                        >
+                                                        <td className="money aurora-text-body-sm px-4 py-2 text-right text-ink">
                                                             {row.won}
                                                         </td>
-                                                        <td
-                                                            className="money aurora-text-body-sm px-4 py-2 text-right"
-                                                            style={{
-                                                                color: 'var(--aurora-text-primary)',
-                                                            }}
-                                                        >
+                                                        <td className="money aurora-text-body-sm px-4 py-2 text-right text-ink">
                                                             {formatDzd(
                                                                 row.revenue_cents,
                                                             )}
@@ -262,8 +199,7 @@ export default function Home({
                                 action={
                                     <Link
                                         href="/crm/activities"
-                                        className="aurora-text-body-sm transition-colors hover:underline"
-                                        style={{ color: 'var(--aurora-accent-primary)' }}
+                                        className="aurora-text-body-sm text-brand transition-colors hover:underline"
                                     >
                                         View all
                                     </Link>
@@ -278,13 +214,7 @@ export default function Home({
                         </div>
                     </div>
 
-                    <footer
-                        className="aurora-text-caption mt-8 border-t pt-3"
-                        style={{
-                            borderColor: 'var(--aurora-border-default)',
-                            color: 'var(--aurora-text-muted)',
-                        }}
-                    >
+                    <footer className="aurora-text-caption mt-8 border-t border-hairline pt-3 text-mute">
                         {dataAsOf
                             ? `Data as of ${dataAsOf} · ${window.timezone}`
                             : `Data as of now · ${window.timezone}`}

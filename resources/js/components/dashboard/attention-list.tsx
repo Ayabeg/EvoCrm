@@ -12,14 +12,7 @@ export type AttentionItem = {
 export function AttentionList({ items }: { items: AttentionItem[] }) {
     if (items.length === 0) {
         return (
-            <p
-                className="aurora-text-body-sm rounded-[var(--aurora-radius-1)] border px-4 py-3"
-                style={{
-                    borderColor: 'var(--aurora-border-default)',
-                    background: 'var(--aurora-panel-medium)',
-                    color: 'var(--aurora-text-muted)',
-                }}
-            >
+            <p className="aurora-text-body-sm rounded-xl border border-hairline bg-canvas px-4 py-3 text-mute">
                 You&apos;re all caught up — nothing requires your attention right
                 now.
             </p>
@@ -27,29 +20,17 @@ export function AttentionList({ items }: { items: AttentionItem[] }) {
     }
 
     return (
-        <ul
-            className="divide-y divide-[var(--aurora-border-default)] overflow-hidden rounded-[var(--aurora-radius-1)] border"
-            style={{
-                borderColor: 'var(--aurora-border-default)',
-                background: 'var(--aurora-panel-medium)',
-            }}
-        >
+        <ul className="divide-y divide-hairline overflow-hidden rounded-xl border border-hairline bg-canvas">
             {items.map((item) => (
                 <li
                     key={item.key}
                     className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
                 >
                     <div className="min-w-0">
-                        <p
-                            className="aurora-text-body-sm font-medium"
-                            style={{ color: 'var(--aurora-text-primary)' }}
-                        >
+                        <p className="aurora-text-body-sm font-medium text-ink">
                             {item.title}
                         </p>
-                        <p
-                            className="aurora-text-caption mt-0.5"
-                            style={{ color: 'var(--aurora-text-muted)' }}
-                        >
+                        <p className="aurora-text-caption mt-0.5 text-mute">
                             {item.description}
                         </p>
                     </div>

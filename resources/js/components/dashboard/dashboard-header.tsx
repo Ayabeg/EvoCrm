@@ -37,10 +37,7 @@ export function DashboardHeader({
             <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                     <h1 className="aurora-text-display-1">Home</h1>
-                    <p
-                        className="aurora-text-lead mt-1"
-                        style={{ color: 'var(--aurora-text-muted)' }}
-                    >
+                    <p className="aurora-text-lead mt-1 text-mute">
                         {subtitle}
                     </p>
                 </div>
@@ -49,16 +46,7 @@ export function DashboardHeader({
                 </Button>
             </div>
 
-            <div
-                className="flex flex-wrap items-center gap-2 rounded-[var(--aurora-radius-2)] border p-3"
-                style={{
-                    borderColor: 'var(--aurora-border-default)',
-                    background:
-                        'linear-gradient(180deg, var(--aurora-panel-medium-top), var(--aurora-panel-medium))',
-                    boxShadow:
-                        'var(--aurora-shadow-medium), var(--aurora-highlight-medium)',
-                }}
-            >
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-hairline bg-canvas p-3">
                 <Input
                     type="date"
                     size="sm"
@@ -67,10 +55,7 @@ export function DashboardHeader({
                     aria-label="From date"
                     className="w-[9.5rem]"
                 />
-                <span
-                    className="aurora-text-caption"
-                    style={{ color: 'var(--aurora-text-muted)' }}
-                >
+                <span className="aurora-text-caption text-mute">
                     –
                 </span>
                 <Input
