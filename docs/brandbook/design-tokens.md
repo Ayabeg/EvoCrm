@@ -39,7 +39,7 @@ Extracted from [`resources/css/app.css`](../../resources/css/app.css) @ `main` �
 | `--destructive` | `oklch(0.577 0.245 27.325)` | same | Delete flows only — **not brand** |
 | `--radius` | `0.5rem` | same | Default `rounded-md`; controls `rounded-sm` |
 
-## Sidebar rail (HubSpot-style, sidebar-only)
+## Sidebar rail (Apple / Aurora Light Cabinet, sidebar-only)
 
 These tokens **never leak into content panels**.
 
@@ -47,10 +47,10 @@ These tokens **never leak into content panels**.
 |-------|-------|------|-------|
 | `--sidebar` | `#000000` | `#000000` | Rail background — true black |
 | `--sidebar-foreground` | `#D4D4D4` | `#A3A3A3` | Nav labels |
-| `--sidebar-accent` | `rgba(236, 96, 37, 0.22)` | `#171717` | Active row — orange wash (light) / neutral (dark) |
-| `--sidebar-accent-foreground` | `#FFFFFF` | `#F5F5F5` | Active label |
+| `--sidebar-accent` | `rgba(255, 255, 255, 0.10)` | `rgba(255, 255, 255, 0.10)` | Active row — soft pill, not an orange bar |
+| `--sidebar-accent-foreground` | `#F5F5F5` | `#F5F5F5` | Active label |
 | `--sidebar-border` | `#1F1F1F` | `#1F1F1F` | Rail divider |
-| `--sidebar-ring` | `#EC6025` | `#EC6025` | Focus |
+| `--sidebar-ring` | `rgba(255, 255, 255, 0.28)` | `rgba(255, 255, 255, 0.28)` | Rail focus — orange stays on CTAs |
 | `--sidebar-well` | `#171717` | `#171717` | Search/compose well |
 | `--sidebar-online` | `#22C55E` | `#22C55E` | Presence dot — **status only**, not brand accent |
 

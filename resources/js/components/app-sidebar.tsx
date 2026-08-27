@@ -133,7 +133,7 @@ function MorePanelItems({
                 return (
                     <div
                         key={`${item.category}-${item.id}`}
-                        className="flex items-center justify-between rounded-md px-2 py-2 hover:bg-sidebar-hover"
+                        className="flex items-center justify-between rounded-[var(--aurora-radius-1)] px-2 py-2 hover:bg-sidebar-hover"
                     >
                         <Link
                             href={item.href}
@@ -404,27 +404,30 @@ export function AppSidebar() {
     const railItems = pinnedItems.length > 0 ? pinnedItems : PRIMARY.filter((item) => DEFAULT_PINNED.includes(item.id as (typeof DEFAULT_PINNED)[number]));
 
     return (
-        <Sidebar collapsible="icon">
-            <section className={cn('grid text-sm', collapsed ? 'mt-3 mb-4 gap-3' : 'mt-2 mb-3 gap-2')}>
-                <div className={cn('flex min-w-0 items-center gap-2', collapsed ? 'justify-center px-1' : 'px-3')}>
+        <Sidebar collapsible="icon" className="bg-sidebar">
+            <section className={cn('grid text-sm', collapsed ? 'mt-4 mb-4 gap-3' : 'mt-3 mb-4 gap-2')}>
+                <div className={cn('flex min-w-0 items-center gap-2.5', collapsed ? 'justify-center px-1' : 'px-3')}>
                     <Link href="/dashboard" title="Evotechly" className="grid place-content-center">
                         <AppLogoIcon className="size-6" />
                     </Link>
                     {!collapsed ? (
-                        <span className="truncate text-sm font-medium text-sidebar-ink">Evotechly</span>
+                        <span className="truncate text-sm font-medium tracking-[-0.01em] text-sidebar-ink">
+                            Evotechly
+                        </span>
                     ) : null}
                 </div>
             </section>
 
             <nav className={cn('no-scrollbar min-h-0 flex-grow overflow-y-auto pb-3', collapsed ? 'px-1' : 'px-2')}>
-                <ul className={cn('m-0 flex list-none flex-col gap-1', collapsed && 'items-center')}>
+                <ul className={cn('m-0 flex list-none flex-col gap-0.5', collapsed && 'items-center')}>
                     {railItems.map((item) => {
                         const Icon = item.icon;
                         const active = pathMatches(currentPath, item.href, item.exact, item.activePaths);
                         const rowClass = cn(
+                            'app-rail-item font-normal',
                             collapsed
-                                ? 'flex size-10 items-center justify-center rounded-md'
-                                : 'flex min-h-11 items-center gap-2.5 rounded-md px-3 text-[13px]',
+                                ? 'flex size-10 items-center justify-center'
+                                : 'flex w-full items-center gap-2.5 px-3 text-[13px]',
                             active
                                 ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                                 : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
@@ -433,7 +436,7 @@ export function AppSidebar() {
                         return (
                             <li key={item.id}>
                                 <Link href={item.href} prefetch title={item.label} className={rowClass}>
-                                    <Icon className="size-4 shrink-0" />
+                                    <Icon className="size-4 shrink-0" strokeWidth={1.75} />
                                     {!collapsed ? <span className="truncate">{item.label}</span> : null}
                                 </Link>
                             </li>
@@ -446,16 +449,17 @@ export function AppSidebar() {
                             aria-expanded={moreOpen}
                             onClick={() => setMoreOpen((open) => !open)}
                             className={cn(
+                                'app-rail-item font-normal',
                                 collapsed
-                                    ? 'flex size-10 items-center justify-center rounded-md'
-                                    : 'flex min-h-11 w-full items-center gap-2.5 rounded-md px-3 text-[13px]',
+                                    ? 'flex size-10 items-center justify-center'
+                                    : 'flex w-full items-center gap-2.5 px-3 text-[13px]',
                                 moreOpen
-                                    ? 'bg-sidebar-accent text-sidebar-ink'
+                                    ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                                     : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                             )}
                         >
-                            <MoreHorizontal className="size-4" />
+                            <MoreHorizontal className="size-4" strokeWidth={1.75} />
                             {!collapsed ? <span>More</span> : null}
                         </button>
                         {isMobile && moreOpen ? (
@@ -502,7 +506,7 @@ export function AppSidebar() {
                 {showSetup && !collapsed ? (
                     <Link
                         href="/settings/apps"
-                        className="mx-2 mb-1 rounded-md border border-sidebar-border bg-sidebar-well px-2.5 py-2 text-[11px] text-sidebar-ink"
+                        className="mx-2 mb-1 rounded-[var(--aurora-radius-1)] border border-sidebar-border bg-sidebar-well px-2.5 py-2 text-[11px] text-sidebar-ink"
                     >
                         <p className="font-medium">Set up channels</p>
                         <p className="text-sidebar-mute">Connect WhatsApp Cloud or email.</p>
@@ -513,7 +517,7 @@ export function AppSidebar() {
                     type="button"
                     onClick={toggleSidebar}
                     className={cn(
-                        'flex items-center gap-2 border-t border-sidebar-border px-3 py-3 text-[12px] text-sidebar-mute hover:text-sidebar-ink',
+                        'flex h-10 items-center gap-2 border-t border-sidebar-border px-3 text-[12px] font-normal text-sidebar-mute hover:text-sidebar-ink',
                         collapsed && 'justify-center',
                     )}
                 >
