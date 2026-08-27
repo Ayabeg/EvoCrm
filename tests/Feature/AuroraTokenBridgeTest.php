@@ -80,3 +80,49 @@ it('re-asserts Brand identity after Aurora defaults, including the unused .light
     expect($bridge)->not->toMatch('/--aurora-accent-primary:\s*#29b6f6/');
     expect($bridge)->not->toMatch('/--aurora-accent-primary:\s*#0288d1/');
 });
+
+it('keeps the Apple cabinet rail at 240px on desktop and the existing mobile Sheet', function () {
+    $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
+
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "240px"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "240px"');
+    expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "220px"');
+    expect($sidebar)->toContain('<SheetContent');
+    expect($sidebar)->toContain('background: "var(--sidebar)"');
+    expect($sidebar)->toContain('width: SIDEBAR_WIDTH_MOBILE');
+});
+
+it('uses a soft rail pill instead of an orange active bar', function () {
+    $app = file_get_contents(resource_path('css/app.css'));
+    $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
+    $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+
+    expect($app)->not->toContain('--sidebar-accent: rgba(236, 96, 37, 0.22)');
+    expect($bridge)->not->toContain('--sidebar-accent: rgba(236, 96, 37, 0.22)');
+    expect($app)->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
+    expect($bridge)->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
+    expect($rail)->toContain('app-rail-item');
+    expect($rail)->not->toContain('inset_2px_0_0_0');
+    expect($rail)->toContain("from '@inertiajs/react'");
+});
+
+it('keeps the page shell as a flat Brand canvas with no mesh radials', function () {
+    $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
+    $shell = file_get_contents(resource_path('js/components/app-shell.tsx'));
+
+    expect($bridge)->toContain('--aurora-shell-bg: var(--evosales-canvas-soft)');
+    expect($bridge)->not->toMatch('/--aurora-shell-bg:[^;]*radial-gradient/');
+    expect($shell)->toContain('bg-[var(--aurora-shell-bg)]');
+});
+
+it('paints the topbar as a frosted hairline instead of an Aurora panel gradient', function () {
+    $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+    $css = file_get_contents(resource_path('css/app.css'));
+
+    expect($header)->toContain('app-topbar');
+    expect($header)->not->toContain('linear-gradient(180deg, var(--aurora-panel-strong-top)');
+    expect($css)->toContain('.app-topbar');
+    expect($css)->toContain('backdrop-filter: blur(20px)');
+    expect($css)->toContain('rgb(255 255 255 / 0.78)');
+    expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
+});
