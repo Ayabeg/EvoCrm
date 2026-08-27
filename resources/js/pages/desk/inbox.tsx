@@ -1,10 +1,15 @@
 import { Form, Link, router } from '@inertiajs/react';
+import { MessageCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { DeskShell } from '@/components/crm/desk-shell';
+import { DeskGlass } from '@/components/desk/desk-glass';
 import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
+import { Avatar } from '@/components/ui/aurora/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Textarea } from '@/components/ui/textarea';
 import type { OfficialDeskConnector } from '@/types';
 
 type Contact = {
@@ -55,6 +60,84 @@ function nameOf(contact?: Contact | null) {
     return `${contact.first_name} ${contact.last_name ?? ''}`.trim();
 }
 
+function initialsOf(contact?: Contact | null) {
+    const name = nameOf(contact);
+
+    return name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0] ?? '')
+        .join('')
+        .toUpperCase();
+}
+
+function ConnectWhatsAppCta({
+    connectors,
+}: {
+    connectors: OfficialDeskConnector[];
+}) {
+    const whatsapp = connectors.find(
+        (connector) => connector.provider === 'whatsapp_cloud',
+    );
+
+    return (
+        <Form action="/desk/connectors" method="post">
+            {({ processing }) => (
+                <>
+                    <input
+                        type="hidden"
+                        name="provider"
+                        value={whatsapp?.provider ?? 'whatsapp_cloud'}
+                    />
+                    <Button disabled={processing}>
+                        Connect WhatsApp Cloud
+                    </Button>
+                </>
+            )}
+        </Form>
+    );
+}
+
+function InboxEmpty({
+    embedState,
+    embedReason,
+    configuredUrl,
+    officialConnectors,
+}: {
+    embedState: Props['embedState'];
+    embedReason: string | null;
+    configuredUrl: string | null;
+    officialConnectors: OfficialDeskConnector[];
+}) {
+    return (
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-canvas-soft">
+            {embedState !== 'no-url' ? (
+                <p className="aurora-text-caption border-b border-hairline bg-canvas px-4 py-3 text-muted-foreground">
+                    <span className="font-medium text-ink">
+                        EvoDesk at {configuredUrl} is not framed here.
+                    </span>{' '}
+                    {embedReason}
+                </p>
+            ) : null}
+            <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-10">
+                <EmptyState
+                    as="h2"
+                    icon={<MessageCircle className="size-6" />}
+                    title="No conversations"
+                    description="Connect official WhatsApp Cloud to start. No Baileys."
+                    action={
+                        <ConnectWhatsAppCta connectors={officialConnectors} />
+                    }
+                />
+            </div>
+            <OfficialConnectPanel
+                connectors={officialConnectors}
+                hidePrimaryCta
+            />
+        </div>
+    );
+}
+
 export default function DeskInbox({
     embedUrl,
     embedState,
@@ -67,10 +150,13 @@ export default function DeskInbox({
     if (embedUrl) {
         return (
             <DeskShell title="Desk">
-                <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
-                    <OfficialConnectPanel connectors={officialConnectors} compact />
+                <div className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink">
+                    <OfficialConnectPanel
+                        connectors={officialConnectors}
+                        compact
+                    />
                     <iframe
-                        title="EvoDesk — EvoSales inbox"
+                        title="EvoDesk - EvoSales inbox"
                         src={embedUrl}
                         className="min-h-0 w-full flex-1 border-0 bg-canvas"
                         allow="clipboard-write; microphone; camera"
@@ -84,19 +170,14 @@ export default function DeskInbox({
 
     return (
         <DeskShell title="Desk">
-            <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
+            <div className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink">
                 {empty ? (
-                    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-                        {embedState !== 'no-url' ? (
-                            <p className="border-b border-hairline px-4 py-3 text-xs text-muted-foreground">
-                                <span className="font-medium text-ink">
-                                    EvoDesk at {configuredUrl} is not framed here.
-                                </span>{' '}
-                                {embedReason}
-                            </p>
-                        ) : null}
-                        <OfficialConnectPanel connectors={officialConnectors} />
-                    </div>
+                    <InboxEmpty
+                        embedState={embedState}
+                        embedReason={embedReason}
+                        configuredUrl={configuredUrl}
+                        officialConnectors={officialConnectors}
+                    />
                 ) : (
                     <FrontDesk threads={threads} selected={selected} />
                 )}
@@ -121,19 +202,22 @@ function FrontDesk({
         }
 
         if (folder === 'whatsapp') {
-            return threads.filter((thread) => thread.channel?.type === 'whatsapp_cloud');
+            return threads.filter(
+                (thread) => thread.channel?.type === 'whatsapp_cloud',
+            );
         }
 
         return threads;
     }, [folder, threads]);
 
     const folders = [
-        { key: 'all', label: `All conversations (${threads.length})` },
+        { key: 'all', label: 'All', count: threads.length },
         {
             key: 'unassigned',
-            label: `Unassigned (${threads.filter((thread) => !thread.contact.owner).length})`,
+            label: 'Unassigned',
+            count: threads.filter((thread) => !thread.contact.owner).length,
         },
-        { key: 'whatsapp', label: 'WhatsApp Cloud' },
+        { key: 'whatsapp', label: 'WhatsApp Cloud', count: null },
     ];
 
     return (
@@ -143,32 +227,42 @@ function FrontDesk({
             rightLabel="Conversation"
             defaultPanel="center"
             left={
-                <>
-                    <p className="text-section-label mb-2 text-muted-foreground">
-                        Shared inbox
-                    </p>
-                    {folders.map((item) => (
-                        <button
-                            key={item.key}
-                            type="button"
-                            onClick={() => setFolder(item.key)}
-                            className={`mb-1 block w-full rounded-md px-2 py-1.5 text-left ${
-                                folder === item.key
-                                    ? 'bg-brand/12 font-medium text-ink'
-                                    : 'text-muted-foreground'
-                            }`}
-                        >
-                            {item.label}
-                        </button>
-                    ))}
-                    <p className="text-section-label mt-4 mb-2 text-muted-foreground">
-                        Channels
-                    </p>
-                    <p className="px-2 text-ui text-muted-foreground">WhatsApp Cloud</p>
-                    <Link href="/outbound/replies" className="mt-2 block px-2 text-ui text-brand">
-                        Email
-                    </Link>
-                </>
+                <div className="space-y-5">
+                    <div>
+                        <p className="aurora-text-label mb-2 text-muted-foreground">
+                            Shared inbox
+                        </p>
+                        <div className="grid gap-1">
+                            {folders.map((item) => (
+                                <button
+                                    key={item.key}
+                                    type="button"
+                                    onClick={() => setFolder(item.key)}
+                                    className={`flex w-full items-center justify-between rounded-[12px] px-3 py-2 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+                                        folder === item.key
+                                            ? 'bg-brand/12 font-medium text-ink'
+                                            : 'text-muted-foreground hover:bg-canvas-soft hover:text-ink'
+                                    }`}
+                                >
+                                    <span>{item.label}</span>
+                                    {item.count !== null ? (
+                                        <span className="aurora-text-caption tabular-nums">
+                                            {item.count}
+                                        </span>
+                                    ) : null}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <p className="aurora-text-label mb-2 text-muted-foreground">
+                            Channels
+                        </p>
+                        <p className="aurora-text-ui px-3 text-ink">
+                            WhatsApp Cloud
+                        </p>
+                    </div>
+                </div>
             }
             center={
                 <>
@@ -177,76 +271,111 @@ function FrontDesk({
                             key={thread.id}
                             type="button"
                             onClick={() =>
-                                router.get('/inbox', { thread: thread.id }, { preserveState: true })
+                                router.get(
+                                    '/inbox',
+                                    { thread: thread.id },
+                                    { preserveState: true },
+                                )
                             }
-                            className={`block w-full border-b border-hairline px-3 py-3 text-left ${
+                            className={`flex w-full items-start gap-3 border-b border-hairline px-4 py-3.5 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
                                 selected?.id === thread.id
                                     ? 'bg-brand/8'
                                     : 'hover:bg-canvas-soft'
                             }`}
                         >
-                            <div className="flex items-center justify-between gap-2">
-                                <span className="font-medium">{nameOf(thread.contact)}</span>
-                                {(thread.unread_count ?? 0) > 0 ? (
-                                    <Badge variant="secondary">{thread.unread_count}</Badge>
-                                ) : null}
+                            <Avatar
+                                size="md"
+                                shape="square"
+                                initials={initialsOf(thread.contact)}
+                                alt={nameOf(thread.contact)}
+                                className="shrink-0"
+                            />
+                            <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="truncate font-medium">
+                                        {nameOf(thread.contact)}
+                                    </span>
+                                    {(thread.unread_count ?? 0) > 0 ? (
+                                        <Badge variant="default">
+                                            {thread.unread_count}
+                                        </Badge>
+                                    ) : null}
+                                </div>
+                                <p className="aurora-text-ui mt-0.5 truncate text-muted-foreground">
+                                    {thread.messages?.[0]?.body ??
+                                        thread.subject ??
+                                        'No preview'}
+                                </p>
+                                <p className="aurora-text-caption mt-1 text-muted-foreground">
+                                    {thread.contact.owner?.name ?? 'Unassigned'}
+                                </p>
                             </div>
-                            <p className="truncate text-ui text-muted-foreground">
-                                {thread.messages?.[0]?.body ?? thread.subject ?? '—'}
-                            </p>
-                            <p className="mt-1 text-section-label text-muted-foreground normal-case tracking-normal">
-                                {thread.contact.owner?.name ?? 'Unassigned'}
-                            </p>
                         </button>
                     ))}
                 </>
             }
             right={
                 selected ? (
-                    <div className="flex min-h-0 flex-1 flex-col">
-                        <header className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline px-4 py-3">
-                            <div className="min-w-0">
-                                <h2 className="font-semibold">{nameOf(selected.contact)}</h2>
-                                <p className="text-ui text-muted-foreground">
-                                    {selected.contact.owner?.name ?? 'Unassigned'} · Official WhatsApp
-                                </p>
+                    <div className="flex min-h-0 flex-1 flex-col bg-canvas">
+                        <DeskGlass
+                            as="header"
+                            className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3"
+                        >
+                            <div className="flex min-w-0 items-center gap-3">
+                                <Avatar
+                                    size="md"
+                                    shape="square"
+                                    initials={initialsOf(selected.contact)}
+                                    alt={nameOf(selected.contact)}
+                                />
+                                <div className="min-w-0">
+                                    <h2 className="truncate font-semibold">
+                                        {nameOf(selected.contact)}
+                                    </h2>
+                                    <p className="aurora-text-caption text-muted-foreground">
+                                        {selected.contact.owner?.name ??
+                                            'Unassigned'}{' '}
+                                        · Official WhatsApp
+                                    </p>
+                                </div>
                             </div>
                             <Link
                                 href={`/crm/contacts/${selected.contact.id}`}
-                                className="shrink-0 text-ui text-brand"
+                                className="aurora-text-ui shrink-0 font-medium text-brand"
                             >
                                 Open contact
                             </Link>
-                        </header>
-                        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-4">
+                        </DeskGlass>
+                        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-canvas-soft p-4">
                             {(selected.messages ?? []).map((message) => (
                                 <div
                                     key={message.id}
-                                    className={`max-w-[80%] rounded-md border border-hairline px-3 py-2 ${
+                                    className={`max-w-[80%] rounded-[18px] px-3.5 py-2.5 ${
                                         message.type === 'note'
                                             ? 'bg-muted text-ink'
                                             : message.direction === 'outbound'
-                                              ? 'ml-auto border-transparent bg-canvas-soft'
-                                              : 'border-transparent bg-muted'
+                                              ? 'ml-auto bg-brand/12 text-ink'
+                                              : 'bg-canvas text-ink shadow-[var(--aurora-shadow-medium)]'
                                     }`}
                                 >
                                     {message.type === 'note' ? (
-                                        <p className="text-section-label mb-1 font-medium text-brand normal-case tracking-normal">
-                                            Private note — only visible to agents
+                                        <p className="aurora-text-caption mb-1 font-medium text-brand">
+                                            Private note, only visible to agents
                                         </p>
                                     ) : null}
-                                    <p>{message.body}</p>
+                                    <p className="aurora-text-body">
+                                        {message.body}
+                                    </p>
                                 </div>
                             ))}
                         </div>
                         <Form
                             action={`/desk/threads/${selected.id}/reply`}
                             method="post"
-                            className="border-t border-hairline p-3"
                             resetOnSuccess={['body']}
                         >
                             {({ processing }) => (
-                                <>
+                                <DeskGlass as="footer" className="border-t p-3">
                                     <div className="mb-2 flex gap-3">
                                         <button
                                             type="button"
@@ -272,19 +401,23 @@ function FrontDesk({
                                         </button>
                                     </div>
                                     {mode === 'note' ? (
-                                        <input type="hidden" name="as_note" value="1" />
+                                        <input
+                                            type="hidden"
+                                            name="as_note"
+                                            value="1"
+                                        />
                                     ) : null}
-                                    <textarea
+                                    <Textarea
                                         name="body"
                                         required
                                         placeholder={
                                             mode === 'note'
-                                                ? 'Private note…'
-                                                : 'Type your message…'
+                                                ? 'Private note'
+                                                : 'Type your message'
                                         }
-                                        className="min-h-20 w-full rounded-md border border-hairline p-2 text-ui"
+                                        className="min-h-20"
                                     />
-                                    <div className="mt-2 flex justify-end gap-2">
+                                    <div className="mt-2 flex justify-end">
                                         {mode === 'reply' ? (
                                             <Button
                                                 name="resolve"
@@ -294,20 +427,27 @@ function FrontDesk({
                                                 Send as resolved
                                             </Button>
                                         ) : (
-                                            <Button disabled={processing}>Add note</Button>
+                                            <Button disabled={processing}>
+                                                Add note
+                                            </Button>
                                         )}
                                     </div>
-                                </>
+                                </DeskGlass>
                             )}
                         </Form>
                     </div>
                 ) : (
-                    <div className="grid flex-1 place-items-center p-6 text-center text-muted-foreground">
-                        Select a conversation.
+                    <div className="grid flex-1 place-items-center bg-canvas-soft p-6">
+                        <EmptyState
+                            as="h2"
+                            icon={<MessageCircle className="size-6" />}
+                            title="Select a conversation"
+                            description="Pick a thread from the inbox."
+                        />
                     </div>
                 )
             }
-            leftClassName="p-3"
+            leftClassName="p-4"
             centerClassName="p-0"
             rightClassName="p-0"
             scrollPanels={{ left: true, center: true, right: false }}
