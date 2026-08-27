@@ -14,7 +14,11 @@ export default function LeadsIndex({ leads, contacts }: { leads: any[]; contacts
                     <PageHeader
                         title="Leads list"
                         description="Table of inbound Lead records. For the kanban pipeline, open Lead board (/leads)."
-                    />
+                    >
+                        <Link href="/crm/leads/captures" className="text-ui font-medium text-brand">
+                            Capture inbox
+                        </Link>
+                    </PageHeader>
                     <Card className="p-4">
                         <Form action="/crm/leads" method="post" className="grid gap-3 md:grid-cols-4" resetOnSuccess>
                             {({ processing }) => (

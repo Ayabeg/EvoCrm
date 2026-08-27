@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
@@ -53,6 +54,11 @@ class Lead extends Model
     public function deal(): HasOne
     {
         return $this->hasOne(Deal::class);
+    }
+
+    public function captures(): HasMany
+    {
+        return $this->hasMany(LeadCapture::class, 'matched_lead_id');
     }
 
     public function qualify(): void
