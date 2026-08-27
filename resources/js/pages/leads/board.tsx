@@ -1,12 +1,15 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
-import {
-    CalendarClock,
-    Ellipsis,
-    Plus,
-    Search,
-} from 'lucide-react';
+import { CalendarClock, Ellipsis, Plus, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
+import {
+    PipelineKanban,
+    PipelineKanbanCard,
+    PipelineKanbanColumn,
+    PipelineKanbanEmpty,
+    PipelineKanbanHeader,
+    PipelineKanbanStack,
+} from '@/components/crm/pipeline-kanban';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { formatDzd } from '@/lib/money';
 import { stageUnderlineColor } from '@/lib/stage-colors';
 import { cn } from '@/lib/utils';
 
@@ -66,10 +70,9 @@ const STRIP: { key: string; label: string }[] = [
     { key: 'new_today', label: 'New today' },
 ];
 
-
 function formatAmount(cents: number, currency: string): string {
     if (currency === 'DZD') {
-        return `${new Intl.NumberFormat('fr-DZ', { maximumFractionDigits: 0 }).format(cents / 100)} DZD`;
+        return formatDzd(cents);
     }
 
     return new Intl.NumberFormat('en', {
@@ -124,15 +127,12 @@ function DealCard({
     };
 
     return (
-        <div
-            draggable
+        <PipelineKanbanCard
+            dragging={dragging}
+            testId={`deal-card-${deal.id}`}
             onDragStart={(event) => onDragStart(event, deal.id)}
             onDragEnd={onDragEnd}
-            className={cn(
-                'group cursor-grab rounded-lg border border-hairline bg-canvas p-4 text-sm shadow-xs transition-opacity',
-                dragging && 'opacity-40',
-            )}
-            data-testid={`deal-card-${deal.id}`}
+            className="group"
         >
             <div className="flex items-start justify-between gap-1">
                 <Link
@@ -146,7 +146,7 @@ function DealCard({
                         <button
                             type="button"
                             aria-label={`Move ${deal.title}`}
-                            className="grid size-6 shrink-0 place-content-center rounded text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted"
+                            className="grid size-6 shrink-0 place-content-center rounded text-mute opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted"
                         >
                             <Ellipsis className="size-4" />
                         </button>
@@ -166,13 +166,13 @@ function DealCard({
                 </DropdownMenu>
             </div>
 
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            <p className="mt-0.5 truncate text-xs text-mute">
                 {[deal.contact_name, deal.company_name]
                     .filter(Boolean)
                     .join(' · ') || 'No contact'}
             </p>
 
-            <p className="mt-1.5 text-sm font-semibold">
+            <p className="money mt-1.5 text-sm font-semibold text-ink">
                 {formatAmount(deal.amount_cents, deal.currency)}
             </p>
 
@@ -184,22 +184,22 @@ function DealCard({
                             ? 'text-destructive'
                             : deal.task_due_today
                               ? 'text-brand'
-                              : 'text-muted-foreground',
+                              : 'text-mute',
                     )}
                 >
                     <CalendarClock className="size-3.5 shrink-0" />
                     <span className="truncate">{deal.next_task.subject}</span>
-                    <span className="shrink-0">
+                    <span className="shrink-0 tabular-nums">
                         · {dueLabel(deal.next_task)}
                     </span>
                 </p>
             ) : (
-                <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                <p className="mt-1.5 flex items-center gap-1.5 text-xs text-mute/70">
                     <CalendarClock className="size-3.5 shrink-0" />
                     No task
                 </p>
             )}
-        </div>
+        </PipelineKanbanCard>
     );
 }
 
@@ -278,7 +278,7 @@ export default function LeadsBoard({
         }
 
         router.post(
-            `/crm/deals/${dealId}/move`,
+            `/crm/deals/${deal.id}/move`,
             { stage_id: stage.id },
             { preserveScroll: true },
         );
@@ -287,13 +287,13 @@ export default function LeadsBoard({
     return (
         <>
             <Head title="Leads" />
-            <div className="flex-1 p-6">
+            <div className="flex-1 bg-canvas-soft px-4 py-5 text-ink sm:px-6 sm:py-6">
                 <PageHeader
                     title="Leads"
                     description={`${pipeline.name} pipeline — drag a card to another stage to update the deal.`}
                 >
                     <div className="relative w-full sm:w-64">
-                        <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+                        <Search className="absolute top-2.5 left-2.5 size-4 text-mute" />
                         <Input
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
@@ -314,16 +314,16 @@ export default function LeadsBoard({
                                 'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
                                 filter === chip.key
                                     ? 'border-brand bg-brand text-primary-foreground'
-                                    : 'bg-card text-muted-foreground hover:text-foreground',
+                                    : 'border-hairline bg-canvas text-mute hover:text-ink',
                             )}
                         >
                             {chip.label}
                             <span
                                 className={cn(
-                                    'ml-1.5',
+                                    'ml-1.5 tabular-nums',
                                     filter === chip.key
                                         ? 'text-primary-foreground/80'
-                                        : 'text-muted-foreground/70',
+                                        : 'text-mute/70',
                                 )}
                             >
                                 {counts[chip.key as keyof Counts]}
@@ -332,7 +332,7 @@ export default function LeadsBoard({
                     ))}
                 </div>
 
-                <div className="flex items-start gap-4 overflow-x-auto pb-2 sm:gap-5">
+                <PipelineKanban>
                     {stages.map((stage, stageIndex) => {
                         const cards = deals.filter(
                             (deal) => deal.stage_id === stage.id,
@@ -343,8 +343,10 @@ export default function LeadsBoard({
                         );
 
                         return (
-                            <section
+                            <PipelineKanbanColumn
                                 key={stage.id}
+                                testId={`stage-column-${stage.slug}`}
+                                over={overStage === stage.id}
                                 onDragOver={(event) => {
                                     event.preventDefault();
                                     event.dataTransfer.dropEffect = 'move';
@@ -356,36 +358,15 @@ export default function LeadsBoard({
                                     )
                                 }
                                 onDrop={(event) => onDrop(event, stage)}
-                                className={cn(
-                                    'w-72 shrink-0 rounded-xl border border-hairline bg-canvas p-3 shadow-xs transition-shadow',
-                                    overStage === stage.id &&
-                                        'ring-2 ring-brand/50',
-                                )}
-                                data-testid={`stage-column-${stage.slug}`}
                             >
-                                <header className="px-1 pb-3">
-                                    <div className="flex items-center justify-between gap-2">
-                                        <h2 className="truncate text-sm font-semibold">
-                                            {stage.name}
-                                        </h2>
-                                        <span className="text-xs text-muted-foreground">
-                                            {cards.length}
-                                        </span>
-                                    </div>
-                                    <p className="mt-0.5 text-xs text-muted-foreground">
-                                        {formatAmount(total, 'DZD')}
-                                    </p>
-                                    <div
-                                        className="mt-2 h-1 rounded-full"
-                                        style={{
-                                            backgroundColor: stageUnderlineColor(
-                                                stage.slug,
-                                            ),
-                                        }}
-                                    />
-                                </header>
+                                <PipelineKanbanHeader
+                                    name={stage.name}
+                                    count={cards.length}
+                                    amount={formatAmount(total, 'DZD')}
+                                    accent={stageUnderlineColor(stage.slug)}
+                                />
 
-                                <div className="grid min-h-16 gap-3">
+                                <PipelineKanbanStack>
                                     {cards.map((deal) => (
                                         <DealCard
                                             key={deal.id}
@@ -400,11 +381,9 @@ export default function LeadsBoard({
                                         />
                                     ))}
 
-                                    {cards.length === 0 && (
-                                        <p className="rounded-lg border border-dashed px-3 py-4 text-center text-xs text-muted-foreground">
-                                            Drop a card here
-                                        </p>
-                                    )}
+                                    {cards.length === 0 ? (
+                                        <PipelineKanbanEmpty />
+                                    ) : null}
 
                                     {stageIndex === 0 &&
                                         (adding ? (
@@ -415,7 +394,7 @@ export default function LeadsBoard({
                                                 onSuccess={() =>
                                                     setAdding(false)
                                                 }
-                                                className="grid gap-2 rounded-lg border bg-card p-2"
+                                                className="grid gap-2 rounded-[var(--aurora-radius-1)] border border-hairline bg-canvas p-3 shadow-[var(--aurora-shadow-medium)]"
                                             >
                                                 {({ processing }) => (
                                                     <>
@@ -466,17 +445,17 @@ export default function LeadsBoard({
                                             <button
                                                 type="button"
                                                 onClick={() => setAdding(true)}
-                                                className="flex items-center justify-center gap-1.5 rounded-lg border border-dashed px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand"
+                                                className="flex items-center justify-center gap-1.5 rounded-[var(--aurora-radius-1)] border border-dashed border-hairline px-3 py-2 text-xs font-medium text-mute transition-colors hover:border-brand hover:text-brand"
                                             >
                                                 <Plus className="size-3.5" />
                                                 Quick add
                                             </button>
                                         ))}
-                                </div>
-                            </section>
+                                </PipelineKanbanStack>
+                            </PipelineKanbanColumn>
                         );
                     })}
-                </div>
+                </PipelineKanban>
             </div>
         </>
     );
