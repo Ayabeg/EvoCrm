@@ -111,11 +111,12 @@ export default function CompanyShow({
                                                 >
                                                     {editing ? 'Close edit' : 'Edit'}
                                                 </Button>
-                                                <AskEvoTrigger
-                                                    action={askAction}
-                                                    insight={askEvo}
-                                                    className="lg:hidden"
-                                                />
+                                                <div className="md:hidden">
+                                                    <AskEvoTrigger
+                                                        action={askAction}
+                                                        insight={askEvo}
+                                                    />
+                                                </div>
                                             </>
                                         }
                                     />

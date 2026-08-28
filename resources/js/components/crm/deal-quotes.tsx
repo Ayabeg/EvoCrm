@@ -59,7 +59,7 @@ export default function DealQuotes({
                                 </Button>
                                 <Form action={`/crm/quotes/${quote.id}/send`} method="post" className="flex gap-1">
                                     <Input name="to" type="email" placeholder="Customer email" className="h-7 w-44" />
-                                    <Button className="h-7 text-[11px]">Email quote</Button>
+                                    <Button variant="outline" className="h-7 text-[11px]">Email quote</Button>
                                 </Form>
                             </div>
                         </div>
@@ -81,7 +81,7 @@ export default function DealQuotes({
                     <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
                 </div>
                 <Input name="notes" placeholder="Notes" className="h-7" />
-                <Button className="h-7 text-[11px]">Create quote</Button>
+                <Button variant="outline" className="h-7 text-[11px]">Create quote</Button>
             </Form>
         </section>
     );

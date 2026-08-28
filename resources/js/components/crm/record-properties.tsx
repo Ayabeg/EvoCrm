@@ -127,7 +127,11 @@ export default function RecordProperties({
                                     </div>
                                 </div>
                             ))}
-                            <Button className="h-8" disabled={processing}>
+                            <Button
+                                variant="outline"
+                                className="h-8"
+                                disabled={processing}
+                            >
                                 Save attributes
                             </Button>
                         </>

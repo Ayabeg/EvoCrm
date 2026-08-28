@@ -93,7 +93,7 @@ export default function DealLineItems({
                                                 defaultValue={(row.unit_cents / 100).toFixed(2)}
                                                 className="h-6"
                                             />
-                                            <Button className="h-6 px-2 text-[11px]">Save</Button>
+                                            <Button variant="outline" className="h-6 px-2 text-[11px]">Save</Button>
                                         </Form>
                                     </td>
                                     <td className="py-1.5 pl-2 text-right">
@@ -124,7 +124,7 @@ export default function DealLineItems({
                 <Input name="quantity" type="number" min={1} defaultValue={1} className="h-7" />
                 <Input name="name" placeholder="Ad hoc name" className="col-span-2 h-7" />
                 <Input name="unit_dzd" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
-                <Button className="col-span-3 h-7 text-[11px]">Add line item</Button>
+                <Button variant="outline" className="col-span-3 h-7 text-[11px]">Add line item</Button>
             </Form>
         </section>
     );

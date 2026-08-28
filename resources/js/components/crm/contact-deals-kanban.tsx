@@ -60,37 +60,35 @@ export default function ContactDealsKanban({
                     </div>
                 </div>
             ) : (
-                <div className="mt-2 space-y-2">
-                    {stages.map((stage) => {
-                        const columnDeals = deals.filter((deal) => deal.stage_id === stage.id);
+                <div className="mt-2 space-y-1">
+                    {deals.length === 0 ? (
+                        <p className="text-[13px] text-mute">No deals</p>
+                    ) : (
+                        stages
+                            .filter((stage) =>
+                                deals.some((deal) => deal.stage_id === stage.id),
+                            )
+                            .map((stage) => {
+                                const columnDeals = deals.filter(
+                                    (deal) => deal.stage_id === stage.id,
+                                );
 
-                        return (
-                            <div
-                                key={stage.id}
-                                className="border-b border-hairline last:border-b-0"
-                                data-testid={`contact-kanban-${stage.slug}`}
-                            >
-                                <div
-                                    className="border-b-2 px-3 py-2"
-                                    style={{ borderColor: stageUnderlineColor(stage.slug) }}
-                                >
-                                    <p className="text-[12px] font-semibold text-ink">{stage.name}</p>
-                                    <p className="text-[11px] text-muted-foreground">
-                                        {columnDeals.length} deal{columnDeals.length === 1 ? '' : 's'}
-                                    </p>
-                                </div>
-                                <div className="space-y-2 p-3">
-                                    {columnDeals.length === 0 ? (
-                                        <p className="text-[12px] text-muted-foreground">No deals in this stage</p>
-                                    ) : (
-                                        columnDeals.map((deal) => (
+                                return (
+                                    <div
+                                        key={stage.id}
+                                        className="border-b border-hairline last:border-b-0"
+                                        data-testid={`contact-kanban-${stage.slug}`}
+                                    >
+                                        <p className="pt-2 text-[11px] font-medium text-mute">
+                                            {stage.name}
+                                        </p>
+                                        {columnDeals.map((deal) => (
                                             <DealChip key={deal.id} deal={deal} />
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
+                                        ))}
+                                    </div>
+                                );
+                            })
+                    )}
                 </div>
             )}
         </section>

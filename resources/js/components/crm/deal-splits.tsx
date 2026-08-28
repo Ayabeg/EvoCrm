@@ -94,7 +94,7 @@ export default function DealSplits({
                         >
                             Add teammate
                         </Button>
-                        <Button className="h-7 text-[11px]">Save splits</Button>
+                        <Button variant="outline" className="h-7 text-[11px]">Save splits</Button>
                     </div>
                 </Form>
             ) : null}
