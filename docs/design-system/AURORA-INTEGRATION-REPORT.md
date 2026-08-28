@@ -1,5 +1,8 @@
 # Aurora Integration Report
 
+Pro product redesign (proposed, not implemented): [`PRO-PRODUCT-DIRECTION.md`](./PRO-PRODUCT-DIRECTION.md).
+
+
 ## 1. Aurora Discovery
 
 Aurora is the real [dinglebear-ai/aurora](https://github.com/dinglebear-ai/aurora) shadcn registry (`https://aurora.tootie.tv/r/{name}.json`), already declared in `components.json` as `@aurora`.
