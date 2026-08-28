@@ -1,7 +1,7 @@
-import { Form, Head, Link } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
-import AskEvoPanel from '@/components/crm/ask-evo-panel';
+import { Form, Head } from '@inertiajs/react';
+import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import type { CatchUpItem } from '@/components/crm/catch-up-block';
 import DealLineItems from '@/components/crm/deal-line-items';
 import type {
     CatalogProduct,
@@ -11,20 +11,22 @@ import DealQuotes from '@/components/crm/deal-quotes';
 import DealSplits from '@/components/crm/deal-splits';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import PlaybookCard from '@/components/crm/playbook-card';
+import RecordActivityPanel from '@/components/crm/record-activity-panel';
+import type { RecordActivity } from '@/components/crm/record-activity';
 import {
-    ActivityTabs,
     AssociationCard,
     RecordActions,
     RecordBack,
     RecordShell,
+    RelatedRecordLink,
 } from '@/components/crm/record-chrome';
 import {
     RecordFact,
+    RecordFactList,
     RecordIdentity,
     RecordPageFrame,
     RecordSection,
     RecordStatusBadge,
-    RecordTimelineItem,
 } from '@/components/crm/record-hub';
 import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
@@ -48,15 +50,6 @@ type Deal = {
     pipeline?: { name: string; stages?: { id: number; name: string }[] } | null;
 };
 
-type Activity = {
-    id: number;
-    type: string;
-    subject?: string | null;
-    body?: string | null;
-    done?: boolean;
-    created_at?: string;
-};
-
 export default function DealShow({
     deal,
     associations,
@@ -65,6 +58,7 @@ export default function DealShow({
     attributes,
     askEvo,
     dealHealth,
+    catchUp,
     products,
     members,
     splits,
@@ -100,7 +94,7 @@ export default function DealShow({
         quotes?: unknown[];
         line_items?: DealLineItemRow[];
     } | null;
-    timeline: Activity[];
+    timeline: RecordActivity[];
     stages: { id: number; name: string }[];
     attributes?: AttributeBag;
     askEvo?: AskEvoPayload | null;
@@ -111,6 +105,7 @@ export default function DealShow({
         factors?: { key: string; label: string; detail: string }[];
         next_action?: string;
     } | null;
+    catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     products?: CatalogProduct[];
     members?: { id: number; name: string }[];
     splits?: {
@@ -121,24 +116,10 @@ export default function DealShow({
     canManageSplits?: boolean;
     playbooks?: Array<{ id: number; name: string; body: string }>;
 }) {
-    const [tab, setTab] = useState('all');
     const loading = useInertiaLoading();
-
-    const items = useMemo(() => {
-        if (tab === 'all') {
-            return timeline;
-        }
-
-        const map: Record<string, string> = {
-            notes: 'note',
-            emails: 'email',
-            calls: 'call',
-            tasks: 'task',
-            meetings: 'meeting',
-        };
-
-        return timeline.filter((item) => item.type === map[tab]);
-    }, [tab, timeline]);
+    const askAction = `/crm/deals/${deal.id}/ask`;
+    const contact = associations?.contact ?? null;
+    const company = associations?.company ?? null;
 
     return (
         <>
@@ -155,6 +136,20 @@ export default function DealShow({
                             />
                             <RecordIdentity
                                 title={deal.title}
+                                kind="Deal"
+                                subtitle={
+                                    <>
+                                        <span className="money font-medium text-ink">
+                                            {formatDzd(deal.amount_cents)}
+                                        </span>
+                                        {deal.pipeline?.name
+                                            ? ` · ${deal.pipeline.name}`
+                                            : ''}
+                                        {deal.owner?.name
+                                            ? ` · ${deal.owner.name}`
+                                            : ''}
+                                    </>
+                                }
                                 badge={
                                     deal.stage?.name ? (
                                         <RecordStatusBadge>
@@ -163,46 +158,18 @@ export default function DealShow({
                                     ) : null
                                 }
                                 meta={
-                                    <>
-                                        {dealHealth ? (
-                                            <p className="pt-1 text-[12px] leading-relaxed text-mute">
-                                                <span className="font-medium text-ink">
-                                                    {dealHealth.label}
-                                                </span>{' '}
-                                                ({dealHealth.score}/100)
-                                                <span className="hidden sm:inline">
-                                                    {' '}
-                                                    · {dealHealth.reason}
-                                                </span>
-                                            </p>
-                                        ) : null}
-                                        <div className="mt-2 grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:gap-6">
-                                            <RecordFact
-                                                label="Amount"
-                                                value={formatDzd(
-                                                    deal.amount_cents,
-                                                )}
-                                                money
-                                            />
-                                            <RecordFact
-                                                label="Close date"
-                                                value={
-                                                    deal.close_date
-                                                        ? String(
-                                                              deal.close_date,
-                                                          ).slice(0, 10)
-                                                        : '—'
-                                                }
-                                            />
-                                            <RecordFact
-                                                label="Pipeline"
-                                                value={
-                                                    deal.pipeline?.name ??
-                                                    'Sales pipeline'
-                                                }
-                                            />
-                                        </div>
-                                    </>
+                                    dealHealth ? (
+                                        <p className="text-[11px] leading-snug text-mute">
+                                            <span className="font-medium text-ink">
+                                                {dealHealth.label}
+                                            </span>{' '}
+                                            ({dealHealth.score}/100)
+                                            <span className="hidden sm:inline">
+                                                {' '}
+                                                · {dealHealth.reason}
+                                            </span>
+                                        </p>
+                                    ) : null
                                 }
                                 actions={
                                     <RecordActions
@@ -210,6 +177,13 @@ export default function DealShow({
                                         dealId={deal.id}
                                         contactId={deal.contact_id}
                                         companyId={deal.company_id}
+                                        secondary={
+                                            <AskEvoTrigger
+                                                action={askAction}
+                                                insight={askEvo}
+                                                className="lg:hidden"
+                                            />
+                                        }
                                     />
                                 }
                             />
@@ -218,38 +192,51 @@ export default function DealShow({
                 >
                     <RecordShell
                         left={
-                            <div className="space-y-4">
-                                <AskEvoPanel
-                                    action={`/crm/deals/${deal.id}/ask`}
-                                    insight={askEvo}
-                                />
-                                <PlaybookCard playbooks={playbooks} />
-                                <RecordSection title="About this deal">
-                                    <RecordFact
-                                        label="Deal owner"
-                                        value={deal.owner?.name ?? 'Unassigned'}
-                                    />
-                                    <RecordFact
-                                        label="Last contacted"
-                                        value={
-                                            deal.last_activity_at
-                                                ? String(
-                                                      deal.last_activity_at,
-                                                  ).slice(0, 10)
-                                                : '—'
-                                        }
-                                    />
-                                    <RecordFact
-                                        label="Deal type"
-                                        value={deal.type ?? '—'}
-                                    />
-                                    <RecordFact
-                                        label="Priority"
-                                        value={deal.priority ?? '—'}
-                                    />
+                            <div className="space-y-5">
+                                <RecordSection title="Deal information">
+                                    <RecordFactList>
+                                        <RecordFact
+                                            label="Amount"
+                                            value={formatDzd(deal.amount_cents)}
+                                            money
+                                            hideEmpty={false}
+                                        />
+                                        <RecordFact
+                                            label="Owner"
+                                            value={deal.owner?.name}
+                                        />
+                                        <RecordFact
+                                            label="Close date"
+                                            value={
+                                                deal.close_date
+                                                    ? String(
+                                                          deal.close_date,
+                                                      ).slice(0, 10)
+                                                    : null
+                                            }
+                                        />
+                                        <RecordFact
+                                            label="Last activity"
+                                            value={
+                                                deal.last_activity_at
+                                                    ? String(
+                                                          deal.last_activity_at,
+                                                      ).slice(0, 10)
+                                                    : null
+                                            }
+                                        />
+                                        <RecordFact
+                                            label="Type"
+                                            value={deal.type}
+                                        />
+                                        <RecordFact
+                                            label="Priority"
+                                            value={deal.priority}
+                                        />
+                                    </RecordFactList>
                                 </RecordSection>
-                                {dealHealth?.factors ? (
-                                    <RecordSection title="Health factors">
+                                {dealHealth?.factors?.length ? (
+                                    <RecordSection title="Health">
                                         {dealHealth.factors.map((factor) => (
                                             <p
                                                 key={factor.key}
@@ -261,11 +248,6 @@ export default function DealShow({
                                                 {factor.detail}
                                             </p>
                                         ))}
-                                        {dealHealth.next_action ? (
-                                            <p className="pt-1 text-[12px] text-ink">
-                                                {dealHealth.next_action}
-                                            </p>
-                                        ) : null}
                                     </RecordSection>
                                 ) : null}
                                 <DealLineItems
@@ -298,7 +280,11 @@ export default function DealShow({
                                                 key={stage.id}
                                                 name="stage_id"
                                                 value={stage.id}
-                                                variant="outline"
+                                                variant={
+                                                    deal.stage?.id === stage.id
+                                                        ? 'secondary'
+                                                        : 'outline'
+                                                }
                                                 className="h-7 text-[11px]"
                                             >
                                                 {stage.name}
@@ -306,6 +292,7 @@ export default function DealShow({
                                         ))}
                                     </Form>
                                 </RecordSection>
+                                <PlaybookCard playbooks={playbooks} />
                                 {attributes ? (
                                     <RecordProperties
                                         action={`/crm/deals/${deal.id}/attributes`}
@@ -315,83 +302,56 @@ export default function DealShow({
                             </div>
                         }
                         center={
-                            <div>
-                                <ActivityTabs
-                                    tabs={[
-                                        { key: 'all', label: 'All' },
-                                        { key: 'notes', label: 'Notes' },
-                                        { key: 'emails', label: 'Emails' },
-                                        { key: 'calls', label: 'Calls' },
-                                        { key: 'tasks', label: 'Tasks' },
-                                        { key: 'meetings', label: 'Meetings' },
-                                    ]}
-                                    active={tab}
-                                    onChange={setTab}
-                                />
-                                <div className="mt-4 space-y-3">
-                                    {items.length === 0 ? (
-                                        <p className="text-mute">
-                                            No activity yet.
-                                        </p>
-                                    ) : (
-                                        items.map((item) => (
-                                            <RecordTimelineItem
-                                                key={item.id}
-                                                type={item.type}
-                                                title={
-                                                    item.subject ?? item.body
-                                                }
-                                            >
-                                                {item.type === 'task' &&
-                                                !item.done ? (
-                                                    <Form
-                                                        action={`/crm/activities/${item.id}/complete`}
-                                                        method="post"
-                                                    >
-                                                        <Button
-                                                            variant="secondary"
-                                                            className="mt-1 h-6 text-[11px]"
-                                                        >
-                                                            Done
-                                                        </Button>
-                                                    </Form>
-                                                ) : null}
-                                            </RecordTimelineItem>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
+                            <RecordActivityPanel
+                                timeline={timeline}
+                                catchUp={catchUp}
+                                dealNext={dealHealth?.next_action}
+                            />
                         }
                         right={
-                            <div className="space-y-3">
-                                <AssociationCard title="Contacts">
-                                    {associations?.contact ? (
-                                        <Link
-                                            href={`/crm/contacts/${associations.contact.id}`}
-                                            className="text-brand"
+                            <div className="space-y-5">
+                                <AssociationCard
+                                    title="Contact"
+                                    addHref={
+                                        contact
+                                            ? `/crm/contacts/${contact.id}`
+                                            : '/crm/contacts?create=1'
+                                    }
+                                    addLabel={contact ? 'View' : 'Add'}
+                                >
+                                    {contact ? (
+                                        <RelatedRecordLink
+                                            href={`/crm/contacts/${contact.id}`}
                                         >
-                                            {associations.contact.first_name}{' '}
-                                            {associations.contact.last_name}
-                                        </Link>
+                                            {contact.first_name}{' '}
+                                            {contact.last_name}
+                                        </RelatedRecordLink>
                                     ) : (
                                         <p className="text-mute">No contact</p>
                                     )}
                                 </AssociationCard>
-                                <AssociationCard title="Companies">
-                                    {associations?.company ? (
-                                        <Link
-                                            href={`/crm/companies/${associations.company.id}`}
-                                            className="text-brand"
+                                <AssociationCard
+                                    title="Company"
+                                    addHref={
+                                        company
+                                            ? `/crm/companies/${company.id}`
+                                            : '/crm/companies?create=1'
+                                    }
+                                    addLabel={company ? 'View' : 'Add'}
+                                >
+                                    {company ? (
+                                        <RelatedRecordLink
+                                            href={`/crm/companies/${company.id}`}
                                         >
-                                            {associations.company.name}
-                                        </Link>
+                                            {company.name}
+                                        </RelatedRecordLink>
                                     ) : (
                                         <p className="text-mute">No company</p>
                                     )}
                                 </AssociationCard>
-                                <AssociationCard
-                                    title="Tickets"
-                                    empty="No tickets"
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
                                 />
                             </div>
                         }

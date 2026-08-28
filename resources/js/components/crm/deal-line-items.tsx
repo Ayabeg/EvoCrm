@@ -37,9 +37,9 @@ export default function DealLineItems({
     const rolledUp = rows.length > 0;
 
     return (
-        <section className="rounded-xl border border-hairline bg-canvas p-3 text-sm">
+        <section className="text-sm">
             <div className="mb-2 flex items-center justify-between gap-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-mute">Line items</h3>
+                <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">Line items</h3>
                 {rolledUp ? (
                     <span className="money text-[11px] text-ink">{formatDzd(subtotal)}</span>
                 ) : (

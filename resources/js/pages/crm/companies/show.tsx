@@ -1,21 +1,23 @@
-import { Form, Head, Link } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
-import AskEvoPanel from '@/components/crm/ask-evo-panel';
+import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
+import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import { SkeletonRecord } from '@/components/crm/empty-room';
+import RecordActivityPanel from '@/components/crm/record-activity-panel';
+import type { RecordActivity } from '@/components/crm/record-activity';
 import {
-    ActivityTabs,
     AssociationCard,
     RecordActions,
     RecordBack,
     RecordShell,
+    RelatedRecordLink,
 } from '@/components/crm/record-chrome';
 import {
     RecordFact,
+    RecordFactList,
     RecordIdentity,
     RecordPageFrame,
     RecordSection,
-    RecordTimelineItem,
 } from '@/components/crm/record-hub';
 import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
@@ -34,14 +36,6 @@ type Company = {
     country?: string | null;
     owner?: { id: number; name: string } | null;
     owner_id?: number | null;
-};
-
-type Activity = {
-    id: number;
-    type: string;
-    subject?: string | null;
-    body?: string | null;
-    done?: boolean;
 };
 
 export default function CompanyShow({
@@ -63,27 +57,21 @@ export default function CompanyShow({
         }[];
         deals?: { id: number; title: string; stage?: { name: string } }[];
     } | null;
-    timeline: Activity[];
+    timeline: RecordActivity[];
     attributes?: AttributeBag;
     members: { id: number; name: string }[];
     cities: string[];
     wilayas: string[];
     askEvo?: AskEvoPayload | null;
 }) {
-    const [tab, setTab] = useState('activities');
     const loading = useInertiaLoading();
-    const items = useMemo(() => {
-        if (tab === 'activities') {
-            return timeline;
-        }
-
-        return timeline.filter((item) => item.type === tab.replace(/s$/, ''));
-    }, [tab, timeline]);
-
-    const location =
-        [company.city, company.wilaya, company.country]
-            .filter(Boolean)
-            .join(' · ') || 'No location';
+    const [editing, setEditing] = useState(false);
+    const askAction = `/crm/companies/${company.id}/ask`;
+    const contacts = associations?.contacts ?? [];
+    const deals = associations?.deals ?? [];
+    const location = [company.city, company.wilaya, company.country]
+        .filter(Boolean)
+        .join(' · ');
 
     return (
         <>
@@ -100,11 +88,36 @@ export default function CompanyShow({
                             />
                             <RecordIdentity
                                 title={company.name}
-                                subtitle={location}
+                                kind="Company"
+                                subtitle={
+                                    [company.domain, location, company.owner?.name]
+                                        .filter(Boolean)
+                                        .join(' · ') || undefined
+                                }
                                 actions={
                                     <RecordActions
                                         entityId={company.id}
                                         companyId={company.id}
+                                        secondary={
+                                            <>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    aria-expanded={editing}
+                                                    onClick={() =>
+                                                        setEditing((open) => !open)
+                                                    }
+                                                >
+                                                    {editing ? 'Close edit' : 'Edit'}
+                                                </Button>
+                                                <AskEvoTrigger
+                                                    action={askAction}
+                                                    insight={askEvo}
+                                                    className="lg:hidden"
+                                                />
+                                            </>
+                                        }
                                     />
                                 }
                             />
@@ -113,104 +126,119 @@ export default function CompanyShow({
                 >
                     <RecordShell
                         left={
-                            <div className="space-y-4">
-                                <AskEvoPanel
-                                    action={`/crm/companies/${company.id}/ask`}
-                                    insight={askEvo}
-                                />
-                                <RecordSection title="About this company">
-                                    <RecordFact
-                                        label="Domain"
-                                        value={company.domain ?? '—'}
-                                    />
-                                    <RecordFact
-                                        label="Phone"
-                                        value={company.phone ?? '—'}
-                                    />
-                                    <RecordFact
-                                        label="Industry"
-                                        value={company.industry ?? '—'}
-                                    />
-                                    <RecordFact
-                                        label="Owner"
-                                        value={
-                                            company.owner?.name ?? 'Unassigned'
-                                        }
-                                    />
+                            <div className="space-y-5">
+                                <RecordSection title="Company information">
+                                    <RecordFactList>
+                                        <RecordFact
+                                            label="Domain"
+                                            value={company.domain}
+                                        />
+                                        <RecordFact
+                                            label="Phone"
+                                            value={company.phone}
+                                        />
+                                        <RecordFact
+                                            label="Industry"
+                                            value={company.industry}
+                                        />
+                                        <RecordFact
+                                            label="Owner"
+                                            value={company.owner?.name}
+                                        />
+                                        <RecordFact
+                                            label="Location"
+                                            value={location || null}
+                                        />
+                                    </RecordFactList>
                                 </RecordSection>
-                                <RecordSection title="Edit">
-                                    <Form
-                                        action={`/crm/companies/${company.id}`}
-                                        method="put"
-                                        className="space-y-2"
-                                    >
-                                        <Input
-                                            name="name"
-                                            defaultValue={company.name}
-                                            required
-                                            className="h-8"
-                                        />
-                                        <Input
-                                            name="domain"
-                                            defaultValue={company.domain ?? ''}
-                                            placeholder="Domain"
-                                            className="h-8"
-                                        />
-                                        <Input
-                                            name="phone"
-                                            defaultValue={company.phone ?? ''}
-                                            placeholder="Phone"
-                                            className="h-8"
-                                        />
-                                        <select
-                                            name="city"
-                                            defaultValue={company.city ?? ''}
-                                            className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
+                                {editing ? (
+                                    <RecordSection title="Edit company">
+                                        <Form
+                                            action={`/crm/companies/${company.id}`}
+                                            method="put"
+                                            className="space-y-2"
                                         >
-                                            <option value="">City</option>
-                                            {cities.map((city) => (
-                                                <option key={city} value={city}>
-                                                    {city}
+                                            <Input
+                                                name="name"
+                                                defaultValue={company.name}
+                                                required
+                                                className="h-8"
+                                            />
+                                            <Input
+                                                name="domain"
+                                                defaultValue={
+                                                    company.domain ?? ''
+                                                }
+                                                placeholder="Domain"
+                                                className="h-8"
+                                            />
+                                            <Input
+                                                name="phone"
+                                                defaultValue={
+                                                    company.phone ?? ''
+                                                }
+                                                placeholder="Phone"
+                                                className="h-8"
+                                            />
+                                            <select
+                                                name="city"
+                                                defaultValue={
+                                                    company.city ?? ''
+                                                }
+                                                className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
+                                            >
+                                                <option value="">City</option>
+                                                {cities.map((city) => (
+                                                    <option
+                                                        key={city}
+                                                        value={city}
+                                                    >
+                                                        {city}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                name="wilaya"
+                                                defaultValue={
+                                                    company.wilaya ?? ''
+                                                }
+                                                className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
+                                            >
+                                                <option value="">Wilaya</option>
+                                                {wilayas.map((wilaya) => (
+                                                    <option
+                                                        key={wilaya}
+                                                        value={wilaya}
+                                                    >
+                                                        {wilaya}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                name="owner_id"
+                                                defaultValue={
+                                                    company.owner_id ?? ''
+                                                }
+                                                className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
+                                            >
+                                                <option value="">
+                                                    Unassigned
                                                 </option>
-                                            ))}
-                                        </select>
-                                        <select
-                                            name="wilaya"
-                                            defaultValue={company.wilaya ?? ''}
-                                            className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
-                                        >
-                                            <option value="">Wilaya</option>
-                                            {wilayas.map((wilaya) => (
-                                                <option
-                                                    key={wilaya}
-                                                    value={wilaya}
-                                                >
-                                                    {wilaya}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <select
-                                            name="owner_id"
-                                            defaultValue={
-                                                company.owner_id ?? ''
-                                            }
-                                            className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
-                                        >
-                                            <option value="">Unassigned</option>
-                                            {members.map((member) => (
-                                                <option
-                                                    key={member.id}
-                                                    value={member.id}
-                                                >
-                                                    {member.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <Button className="h-8 w-full">
-                                            Save company
-                                        </Button>
-                                    </Form>
-                                </RecordSection>
+                                                {members.map((member) => (
+                                                    <option
+                                                        key={member.id}
+                                                        value={member.id}
+                                                    >
+                                                        {member.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <Button className="h-8">
+                                                Save company
+                                            </Button>
+                                        </Form>
+                                    </RecordSection>
+                                ) : null}
                                 {attributes ? (
                                     <RecordProperties
                                         action={`/crm/companies/${company.id}/attributes`}
@@ -219,81 +247,46 @@ export default function CompanyShow({
                                 ) : null}
                             </div>
                         }
-                        center={
-                            <div>
-                                <ActivityTabs
-                                    tabs={[
-                                        {
-                                            key: 'activities',
-                                            label: 'Activities',
-                                        },
-                                        { key: 'notes', label: 'Notes' },
-                                        { key: 'tasks', label: 'Tasks' },
-                                    ]}
-                                    active={tab}
-                                    onChange={setTab}
-                                />
-                                <div className="mt-4 space-y-3">
-                                    {items.length === 0 ? (
-                                        <p className="text-mute">
-                                            No activity yet.
-                                        </p>
-                                    ) : (
-                                        items.map((item) => (
-                                            <RecordTimelineItem
-                                                key={item.id}
-                                                type={item.type}
-                                                title={
-                                                    item.subject ?? item.body
-                                                }
-                                            />
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        }
+                        center={<RecordActivityPanel timeline={timeline} />}
                         right={
-                            <div className="space-y-3">
-                                <AssociationCard title="Contacts">
-                                    {(associations?.contacts ?? []).length ===
-                                    0 ? (
+                            <div className="space-y-5">
+                                <AssociationCard
+                                    title="Contacts"
+                                    addHref="/crm/contacts?create=1"
+                                >
+                                    {contacts.length === 0 ? (
                                         <p className="text-mute">No contacts</p>
                                     ) : (
-                                        (associations?.contacts ?? []).map(
-                                            (contact) => (
-                                                <Link
-                                                    key={contact.id}
-                                                    href={`/crm/contacts/${contact.id}`}
-                                                    className="block text-brand"
-                                                >
-                                                    {contact.first_name}{' '}
-                                                    {contact.last_name ?? ''}
-                                                </Link>
-                                            ),
-                                        )
+                                        contacts.map((contact) => (
+                                            <RelatedRecordLink
+                                                key={contact.id}
+                                                href={`/crm/contacts/${contact.id}`}
+                                            >
+                                                {contact.first_name}{' '}
+                                                {contact.last_name ?? ''}
+                                            </RelatedRecordLink>
+                                        ))
                                     )}
                                 </AssociationCard>
                                 <AssociationCard title="Deals">
-                                    {(associations?.deals ?? []).length ===
-                                    0 ? (
+                                    {deals.length === 0 ? (
                                         <p className="text-mute">No deals</p>
                                     ) : (
-                                        (associations?.deals ?? []).map(
-                                            (deal) => (
-                                                <Link
-                                                    key={deal.id}
-                                                    href={`/crm/deals/${deal.id}`}
-                                                    className="block text-brand"
-                                                >
-                                                    {deal.title}
-                                                    {deal.stage
-                                                        ? ` · ${deal.stage.name}`
-                                                        : ''}
-                                                </Link>
-                                            ),
-                                        )
+                                        deals.map((deal) => (
+                                            <RelatedRecordLink
+                                                key={deal.id}
+                                                href={`/crm/deals/${deal.id}`}
+                                                meta={deal.stage?.name}
+                                            >
+                                                {deal.title}
+                                            </RelatedRecordLink>
+                                        ))
                                     )}
                                 </AssociationCard>
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
                             </div>
                         }
                     />

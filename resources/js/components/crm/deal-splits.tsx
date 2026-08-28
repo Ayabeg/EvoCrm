@@ -27,8 +27,8 @@ export default function DealSplits({
     }
 
     return (
-        <section className="rounded-xl border border-hairline bg-canvas p-3 text-sm">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-mute">Deal splits</h3>
+        <section className="text-sm">
+            <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">Deal splits</h3>
             {splits.length > 0 ? (
                 <ul className="mb-2 space-y-1 text-[12px]">
                     {splits.map((split) => (

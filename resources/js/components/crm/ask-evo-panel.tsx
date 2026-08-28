@@ -1,7 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
     Sheet,
@@ -33,9 +32,9 @@ function AskEvoBody({
 
     return (
         <>
-            <p className="text-[12px] leading-5">{summary}</p>
+            <p className="text-[12px] leading-5 text-mute">{summary}</p>
             {insight?.answer ? (
-                <p className="border-l-2 border-brand pl-2 text-[12px] leading-5">
+                <p className="border-l-2 border-hairline pl-2 text-[12px] leading-5">
                     {insight.question ? (
                         <span className="text-mute">{insight.question} — </span>
                     ) : null}
@@ -56,11 +55,55 @@ function AskEvoBody({
                     size="sm"
                     className="text-ui"
                 />
-                <Button type="submit" size="sm" className="w-full sm:w-auto">
+                <Button type="submit" variant="outline" size="sm" className="w-full sm:w-auto">
                     Ask Evo
                 </Button>
             </Form>
         </>
+    );
+}
+
+export function AskEvoTrigger({
+    action,
+    insight,
+    className,
+}: {
+    action: string;
+    insight?: AskEvoPayload | null;
+    className?: string;
+}) {
+    return (
+        <Sheet>
+            <SheetTrigger asChild>
+                <Button
+                    data-testid="ask-evo-trigger"
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className={className}
+                >
+                    <Sparkles className="size-3.5 text-mute" aria-hidden />
+                    Ask Evo
+                </Button>
+            </SheetTrigger>
+            <SheetContent
+                side="bottom"
+                className="max-h-[85dvh] overflow-y-auto"
+            >
+                <SheetHeader className="border-b border-hairline pb-3">
+                    <SheetTitle className="flex items-center gap-1.5 text-[13px] font-semibold">
+                        <Sparkles className="size-3.5 text-mute" aria-hidden />
+                        Ask Evo
+                    </SheetTitle>
+                    <p className="text-[10px] text-mute">
+                        {insight?.live ? 'Evo + model' : 'This record'}
+                    </p>
+                </SheetHeader>
+                <div className="space-y-3 pt-4 text-ui">
+                    <AskEvoBody action={action} insight={insight} />
+                </div>
+            </SheetContent>
+        </Sheet>
     );
 }
 
@@ -72,68 +115,17 @@ export default function AskEvoPanel({
     insight?: AskEvoPayload | null;
 }) {
     return (
-        <>
-            <Card
-                data-testid="ask-evo"
-                elevated={false}
-                className="hidden py-0 md:block"
-                style={{
-                    borderRadius: 12,
-                    backgroundImage:
-                        'radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--evosales-mark) 16%, transparent) 0%, transparent 64%)',
-                }}
-            >
-                <CardHeader className="flex flex-row items-center justify-between gap-2 py-3">
-                    <CardTitle
-                        as="h3"
-                        className="flex items-center gap-1.5 text-section-label uppercase"
-                    >
-                        <Sparkles className="size-3.5 text-brand" aria-hidden />
-                        Ask Evo
-                    </CardTitle>
-                    <span className="text-[10px] text-mute">
-                        {insight?.live ? 'Evo + model' : 'This record'}
-                    </span>
-                </CardHeader>
-                <CardContent className="space-y-3 pb-4 text-ui">
-                    <AskEvoBody action={action} insight={insight} />
-                </CardContent>
-            </Card>
-
-            <Sheet>
-                <SheetTrigger asChild>
-                    <Button
-                        data-testid="ask-evo"
-                        type="button"
-                        variant="default"
-                        size="sm"
-                        className="fixed end-4 bottom-20 z-40 gap-1.5 shadow-lg md:hidden"
-                    >
-                        <Sparkles className="size-3.5" aria-hidden />
-                        Ask Evo
-                    </Button>
-                </SheetTrigger>
-                <SheetContent
-                    side="bottom"
-                    className="max-h-[85dvh] overflow-y-auto"
-                >
-                    <SheetHeader className="border-b border-hairline pb-3">
-                        <SheetTitle className="flex items-center gap-1.5 text-section-label uppercase">
-                            <Sparkles
-                                className="size-3.5 text-brand"
-                                aria-hidden
-                            />
-                            Ask Evo
-                        </SheetTitle>
-                        <p className="text-[10px] text-mute">
-                            {insight?.live ? 'Evo + model' : 'This record'}
-                        </p>
-                    </SheetHeader>
-                    <div className="space-y-3 pt-4 text-ui">
-                        <AskEvoBody action={action} insight={insight} />
-                    </div>
-                </SheetContent>
-            </Sheet>
-        </>
+        <section data-testid="ask-evo" className="space-y-2 border-t border-hairline pt-4">
+            <div className="flex items-center justify-between gap-2">
+                <h3 className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-mute uppercase">
+                    <Sparkles className="size-3.5 text-mute" aria-hidden />
+                    Ask Evo
+                </h3>
+                <span className="text-[10px] text-mute">
+                    {insight?.live ? 'Evo + model' : 'This record'}
+                </span>
+            </div>
+            <AskEvoBody action={action} insight={insight} />
+        </section>
     );
 }

@@ -4,11 +4,13 @@ import type { ListView } from '@/components/crm/list-chrome';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 /** Brand Book + Aurora surface radius for CRM record hubs. */
 export const RECORD_HUB_RADIUS = 12;
+
+const ALGIERS = 'Africa/Algiers';
 
 export function recordInitials(name: string): string {
     return name
@@ -18,6 +20,28 @@ export function recordInitials(name: string): string {
         .map((part) => part[0] ?? '')
         .join('')
         .toUpperCase();
+}
+
+export function formatRecordWhen(iso?: string | null): string | null {
+    if (!iso) {
+        return null;
+    }
+
+    try {
+        return new Intl.DateTimeFormat('en-GB', {
+            timeZone: ALGIERS,
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(iso));
+    } catch {
+        return iso.slice(0, 10);
+    }
+}
+
+function isEmptyFact(value?: string | null): boolean {
+    return value == null || value === '' || value === '—';
 }
 
 export function RecordHubHeader({
@@ -85,15 +109,18 @@ export function RecordHubPanel({
     className?: string;
 }) {
     return (
-        <div
+        <Card
+            elevated={false}
             className={cn(
-                'flex min-h-0 flex-1 flex-col overflow-hidden border border-hairline bg-canvas',
+                'flex min-h-0 flex-1 flex-col overflow-hidden py-0',
                 className,
             )}
             style={{ borderRadius: RECORD_HUB_RADIUS }}
         >
-            {children}
-        </div>
+            <CardContent className="flex min-h-0 flex-1 flex-col p-0">
+                {children}
+            </CardContent>
+        </Card>
     );
 }
 
@@ -106,7 +133,7 @@ export function RecordPageFrame({
 }) {
     return (
         <div className="h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink">
-            <div className="shrink-0 border-b border-hairline bg-canvas px-4 py-4 sm:px-6 sm:py-5">
+            <div className="shrink-0 border-b border-hairline bg-canvas px-4 py-3 sm:px-6">
                 {header}
             </div>
             {children}
@@ -117,6 +144,7 @@ export function RecordPageFrame({
 export function RecordIdentity({
     title,
     initials,
+    kind,
     subtitle,
     meta,
     badge,
@@ -124,34 +152,44 @@ export function RecordIdentity({
 }: {
     title: string;
     initials?: string;
+    kind?: string;
     subtitle?: ReactNode;
     meta?: ReactNode;
     badge?: ReactNode;
     actions?: ReactNode;
 }) {
     return (
-        <div className="mt-3 flex items-start gap-3">
-            <Avatar
-                size="lg"
-                initials={initials || recordInitials(title) || '?'}
-                alt={title}
-                className="shrink-0"
-            />
-            <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-record-title leading-snug font-semibold tracking-tight">
-                        {title}
-                    </h1>
-                    {badge}
-                </div>
-                {subtitle ? (
-                    <div className="text-[13px] leading-relaxed text-mute">
-                        {subtitle}
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 items-start gap-3">
+                <Avatar
+                    size="md"
+                    initials={initials || recordInitials(title) || '?'}
+                    alt={title}
+                    className="shrink-0"
+                />
+                <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <h1 className="text-record-title leading-snug font-semibold tracking-tight">
+                            {title}
+                        </h1>
+                        {badge}
+                        {kind ? (
+                            <span className="text-[11px] text-mute">{kind}</span>
+                        ) : null}
                     </div>
-                ) : null}
-                {meta}
-                {actions ? <div className="pt-3">{actions}</div> : null}
+                    {subtitle ? (
+                        <div className="text-[13px] leading-snug text-mute">
+                            {subtitle}
+                        </div>
+                    ) : null}
+                    {meta}
+                </div>
             </div>
+            {actions ? (
+                <div className="min-w-0 shrink-0 sm:max-w-[22rem] sm:pt-0.5">
+                    {actions}
+                </div>
+            ) : null}
         </div>
     );
 }
@@ -160,11 +198,17 @@ export function RecordFact({
     label,
     value,
     money = false,
+    hideEmpty = true,
 }: {
     label: string;
-    value: string;
+    value?: string | null;
     money?: boolean;
+    hideEmpty?: boolean;
 }) {
+    if (hideEmpty && isEmptyFact(value)) {
+        return null;
+    }
+
     return (
         <div className="min-w-0">
             <p className="text-[11px] text-mute">{label}</p>
@@ -174,8 +218,27 @@ export function RecordFact({
                     money && 'money font-medium',
                 )}
             >
-                {value}
+                {isEmptyFact(value) ? '—' : value}
             </p>
+        </div>
+    );
+}
+
+export function RecordFactList({
+    children,
+    className,
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
+    return (
+        <div
+            className={cn(
+                'grid grid-cols-2 gap-x-4 gap-y-2',
+                className,
+            )}
+        >
+            {children}
         </div>
     );
 }
@@ -192,49 +255,83 @@ export function RecordSection({
     className?: string;
 }) {
     return (
-        <Card
-            elevated={false}
-            className={cn('overflow-hidden py-0', className)}
-            style={{ borderRadius: RECORD_HUB_RADIUS }}
-        >
+        <section className={cn('space-y-2', className)}>
             {title ? (
-                <CardHeader className="flex flex-row items-center justify-between gap-2 py-3">
-                    <CardTitle as="h3" className="text-[12px] tracking-wide">
+                <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">
                         {title}
-                    </CardTitle>
+                    </h3>
                     {action}
-                </CardHeader>
+                </div>
             ) : null}
-            <CardContent className="space-y-3 py-3 text-[13px] leading-relaxed">
+            <div className="space-y-2 text-[13px] leading-relaxed">
                 {children}
-            </CardContent>
-        </Card>
+            </div>
+        </section>
     );
 }
 
 export function RecordTimelineItem({
     type,
     title,
+    at,
+    author,
     children,
 }: {
     type: string;
     title?: ReactNode;
+    at?: string | null;
+    author?: string | null;
     children?: ReactNode;
 }) {
+    const when = formatRecordWhen(at);
+
     return (
-        <article
-            className="border border-hairline bg-canvas px-3 py-2.5"
-            style={{ borderRadius: RECORD_HUB_RADIUS }}
-        >
-            <p className="text-[11px] font-medium text-mute capitalize">
-                {type}
-            </p>
-            {title ? <p className="font-medium text-ink">{title}</p> : null}
+        <article className="border-b border-hairline py-2.5 last:border-b-0">
+            <div className="flex items-baseline justify-between gap-3">
+                <p className="text-[11px] font-medium tracking-wide text-mute capitalize">
+                    {type}
+                </p>
+                {when ? (
+                    <time className="shrink-0 text-[11px] text-mute" dateTime={at ?? undefined}>
+                        {when}
+                    </time>
+                ) : null}
+            </div>
+            {title ? (
+                <p className="mt-0.5 text-[13px] font-medium text-ink">{title}</p>
+            ) : null}
+            {author ? <p className="text-[11px] text-mute">{author}</p> : null}
             {children}
         </article>
     );
 }
 
 export function RecordStatusBadge({ children }: { children: ReactNode }) {
-    return <Badge variant="default">{children}</Badge>;
+    return <Badge variant="outline">{children}</Badge>;
+}
+
+export function RecordNextAction({
+    title,
+    detail,
+    action,
+}: {
+    title: string;
+    detail?: string;
+    action?: ReactNode;
+}) {
+    return (
+        <div className="flex items-start justify-between gap-3 border-b border-hairline pb-3">
+            <div className="min-w-0">
+                <p className="text-[11px] font-medium tracking-wide text-mute uppercase">
+                    Next
+                </p>
+                <p className="mt-0.5 text-[13px] font-medium text-ink">{title}</p>
+                {detail ? (
+                    <p className="text-[11px] text-mute">{detail}</p>
+                ) : null}
+            </div>
+            {action}
+        </div>
+    );
 }

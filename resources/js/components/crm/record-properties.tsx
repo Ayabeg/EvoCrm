@@ -98,10 +98,10 @@ export default function RecordProperties({
     }, {});
 
     return (
-        <section className="rounded-xl border border-hairline bg-canvas p-3 text-sm">
+        <section className="text-sm">
             <div className="mb-2 flex items-center justify-between gap-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-mute">Attributes</h3>
-                <Link href="/settings/attributes" className="text-[11px] text-brand">
+                <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">Attributes</h3>
+                <Link href="/settings/attributes" className="text-[11px] text-ink hover:underline">
                     Manage
                 </Link>
             </div>

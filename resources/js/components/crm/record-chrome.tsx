@@ -1,16 +1,13 @@
 import { Form, Link } from '@inertiajs/react';
 import {
     Bolt,
-    Calendar,
     Handshake,
     Inbox,
     Mail,
     MoreHorizontal,
-    NotebookPen,
-    Phone,
     Send,
     SendHorizonal,
-    SquareCheck,
+    UserPlus,
     Users,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -26,12 +23,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 export function RecordBack({ href, label }: { href: string; label: string }) {
     return (
         <Link
             href={href}
-            className="inline-flex items-center text-[12px] font-medium text-brand"
+            className="inline-flex items-center text-[11px] font-medium text-mute hover:text-ink"
         >
             ← {label}
         </Link>
@@ -40,16 +38,12 @@ export function RecordBack({ href, label }: { href: string; label: string }) {
 
 type ActionType = 'note' | 'email' | 'call' | 'task' | 'meeting';
 
-const ACTION_DEFS: {
-    type: ActionType;
-    label: string;
-    icon: typeof NotebookPen;
-}[] = [
-    { type: 'note', label: 'Note', icon: NotebookPen },
-    { type: 'email', label: 'Email', icon: Mail },
-    { type: 'call', label: 'Call', icon: Phone },
-    { type: 'task', label: 'Task', icon: SquareCheck },
-    { type: 'meeting', label: 'Meeting', icon: Calendar },
+const ACTION_DEFS: { type: ActionType; label: string }[] = [
+    { type: 'note', label: 'Note' },
+    { type: 'email', label: 'Email' },
+    { type: 'call', label: 'Call' },
+    { type: 'task', label: 'Task' },
+    { type: 'meeting', label: 'Meeting' },
 ];
 
 export function RecordActions({
@@ -57,55 +51,44 @@ export function RecordActions({
     contactId,
     dealId,
     companyId,
+    secondary,
 }: {
     entityId: number;
     contactId?: number | null;
     dealId?: number | null;
     companyId?: number | null;
+    secondary?: ReactNode;
 }) {
     const [active, setActive] = useState<ActionType | null>(null);
 
     return (
-        <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
-                {ACTION_DEFS.map((action) => {
-                    const Icon = action.icon;
-                    const selected = active === action.type;
-
-                    return (
-                        <Button
-                            key={action.type}
-                            type="button"
-                            title={action.label}
-                            size="sm"
-                            variant={selected ? 'default' : 'outline'}
-                            shape="pill"
-                            onClick={() =>
-                                setActive(selected ? null : action.type)
-                            }
-                            className="min-h-11 sm:min-h-8"
-                        >
-                            <Icon className="size-4 shrink-0 sm:size-3.5" />
-                            <span className="truncate">{action.label}</span>
-                        </Button>
-                    );
-                })}
+        <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+                <Button
+                    type="button"
+                    size="sm"
+                    aria-expanded={active !== null}
+                    onClick={() => setActive(active ? null : 'note')}
+                >
+                    Log activity
+                </Button>
+                {secondary}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
                             type="button"
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             title="More actions"
-                            className="min-h-11 min-w-11 sm:min-h-8 sm:min-w-8"
                         >
-                            <MoreHorizontal className="size-4 sm:size-3.5" />
+                            <MoreHorizontal className="size-3.5" />
                             <span className="sr-only">
                                 More actions for record {entityId}
                             </span>
+                            More
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-48">
+                    <DropdownMenuContent align="end" className="w-48">
                         {contactId ? (
                             <DropdownMenuItem asChild>
                                 <Link
@@ -113,6 +96,14 @@ export function RecordActions({
                                 >
                                     <Handshake className="size-3.5" />
                                     Create deal
+                                </Link>
+                            </DropdownMenuItem>
+                        ) : null}
+                        {companyId && !contactId ? (
+                            <DropdownMenuItem asChild>
+                                <Link href="/crm/contacts?create=1">
+                                    <UserPlus className="size-3.5" />
+                                    Add contact
                                 </Link>
                             </DropdownMenuItem>
                         ) : null}
@@ -187,7 +178,7 @@ export function RecordActions({
                 <Form
                     action="/crm/activities"
                     method="post"
-                    className="rounded-xl border border-hairline bg-canvas-soft p-3"
+                    className="border-t border-hairline pt-2"
                     resetOnSuccess
                     onSuccess={() => setActive(null)}
                     options={{ preserveScroll: true }}
@@ -201,7 +192,11 @@ export function RecordActions({
                         />
                     ) : null}
                     {dealId ? (
-                        <input type="hidden" name="deal_id" value={dealId} />
+                        <input
+                            type="hidden"
+                            name="deal_id"
+                            value={dealId}
+                        />
                     ) : null}
                     {companyId ? (
                         <input
@@ -210,9 +205,33 @@ export function RecordActions({
                             value={companyId}
                         />
                     ) : null}
-                    <p className="mb-2 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
-                        Log {active}
-                    </p>
+                    <div
+                        className="mb-2 flex flex-wrap gap-1"
+                        role="tablist"
+                        aria-label="Activity type"
+                    >
+                        {ACTION_DEFS.map((action) => {
+                            const selected = active === action.type;
+
+                            return (
+                                <button
+                                    key={action.type}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={selected}
+                                    onClick={() => setActive(action.type)}
+                                    className={cn(
+                                        'relative h-7 px-2 text-[12px] transition-colors',
+                                        selected
+                                            ? 'font-medium text-ink after:absolute after:inset-x-1 after:bottom-0 after:h-0.5 after:bg-brand'
+                                            : 'text-mute hover:text-ink',
+                                    )}
+                                >
+                                    {action.label}
+                                </button>
+                            );
+                        })}
+                    </div>
                     <div className="grid gap-2">
                         <Input
                             name="subject"
@@ -233,13 +252,13 @@ export function RecordActions({
                             />
                         ) : null}
                         <div className="flex gap-2">
-                            <Button type="submit" className="h-8 text-[12px]">
+                            <Button type="submit" size="sm">
                                 Save {active}
                             </Button>
                             <Button
                                 type="button"
                                 variant="ghost"
-                                className="h-8 text-[12px]"
+                                size="sm"
                                 onClick={() => setActive(null)}
                             >
                                 Cancel
@@ -256,7 +275,7 @@ export function RecordShell({
     left,
     center,
     right,
-    leftLabel = 'Details',
+    leftLabel = 'Context',
     centerLabel = 'Activity',
     rightLabel = 'Related',
 }: {
@@ -276,6 +295,9 @@ export function RecordShell({
             centerLabel={centerLabel}
             rightLabel={rightLabel}
             defaultPanel="center"
+            leftClassName="md:px-4 md:py-4"
+            centerClassName="sm:px-5 sm:py-4"
+            rightClassName="md:px-4 md:py-4"
         />
     );
 }
@@ -291,12 +313,12 @@ export function ActivityTabs({
 }) {
     return (
         <Tabs value={active} onValueChange={onChange} className="w-full">
-            <TabsList className="no-scrollbar h-auto min-h-11 w-full justify-start gap-0 border-b-0 bg-transparent p-0">
+            <TabsList className="no-scrollbar h-auto min-h-9 w-full justify-start gap-0 border-b-0 bg-transparent p-0">
                 {tabs.map((tab) => (
                     <TabsTrigger
                         key={tab.key}
                         value={tab.key}
-                        className="min-h-11 shrink-0 px-3 py-2 sm:min-h-9"
+                        className="min-h-9 shrink-0 px-3 py-1.5 sm:min-h-8"
                     >
                         {tab.label}
                     </TabsTrigger>
@@ -322,34 +344,53 @@ export function AssociationCard({
     return (
         <Card
             elevated={false}
-            className="overflow-hidden py-0"
-            style={{ borderRadius: 12 }}
+            className="overflow-hidden border-0 bg-transparent py-0 shadow-none"
         >
-            <CardHeader className="flex flex-row items-center justify-between py-3">
+            <CardHeader className="flex flex-row items-center justify-between px-0 py-0">
                 <CardTitle
                     as="h3"
-                    className="text-[12px] tracking-wide uppercase"
+                    className="text-[11px] font-semibold tracking-wide text-mute uppercase"
                 >
                     {title}
                 </CardTitle>
                 {addHref ? (
                     <Link
                         href={addHref}
-                        className="text-[12px] font-medium text-brand hover:underline"
+                        className="text-[12px] font-medium text-ink hover:underline"
                     >
                         {addLabel}
                     </Link>
-                ) : (
-                    <span className="text-[12px] font-medium text-muted-foreground">
-                        {addLabel}
-                    </span>
-                )}
+                ) : addLabel !== 'Add' ? (
+                    <span className="text-[12px] text-mute">{addLabel}</span>
+                ) : null}
             </CardHeader>
-            <CardContent className="py-3 text-[13px] leading-relaxed">
+            <CardContent className="space-y-1 px-0 pt-2 pb-0 text-[13px] leading-snug">
                 {children ?? (
-                    <p className="text-muted-foreground">{empty ?? 'None'}</p>
+                    <p className="text-mute">{empty ?? 'None'}</p>
                 )}
             </CardContent>
         </Card>
+    );
+}
+
+export function RelatedRecordLink({
+    href,
+    children,
+    meta,
+}: {
+    href: string;
+    children: ReactNode;
+    meta?: string;
+}) {
+    return (
+        <Link
+            href={href}
+            className="flex items-baseline justify-between gap-2 py-1 text-[13px] text-ink hover:underline"
+        >
+            <span className="min-w-0 truncate">{children}</span>
+            {meta ? (
+                <span className="shrink-0 text-[11px] text-mute">{meta}</span>
+            ) : null}
+        </Link>
     );
 }

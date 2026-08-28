@@ -1,7 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { formatDzd } from '@/lib/money';
 import { stageUnderlineColor } from '@/lib/stage-colors';
-import { cn } from '@/lib/utils';
 
 type KanbanStage = {
     id: number;
@@ -35,14 +34,14 @@ export default function ContactDealsKanban({
     }
 
     return (
-        <section className="rounded-lg border border-hairline bg-canvas">
-            <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-                <h3 className="text-[12px] font-semibold tracking-wide text-ink uppercase">
+        <section>
+            <div className="flex items-center justify-between gap-2">
+                <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">
                     Deals · {pipelineName}
                 </h3>
                 <Link
                     href={contactId ? `/crm/deals?create=1&contact_id=${contactId}` : '/crm/deals?create=1'}
-                    className="text-[12px] font-medium text-brand"
+                    className="text-[12px] font-medium text-ink hover:underline"
                 >
                     Add deal
                 </Link>
@@ -61,14 +60,14 @@ export default function ContactDealsKanban({
                     </div>
                 </div>
             ) : (
-                <div className="space-y-3 p-4">
+                <div className="mt-2 space-y-2">
                     {stages.map((stage) => {
                         const columnDeals = deals.filter((deal) => deal.stage_id === stage.id);
 
                         return (
                             <div
                                 key={stage.id}
-                                className="rounded-md border border-hairline bg-canvas-soft"
+                                className="border-b border-hairline last:border-b-0"
                                 data-testid={`contact-kanban-${stage.slug}`}
                             >
                                 <div
@@ -134,10 +133,7 @@ function DealChip({ deal }: { deal: KanbanDeal }) {
     return (
         <Link
             href={`/crm/deals/${deal.id}`}
-            className={cn(
-                'block rounded-md border border-hairline bg-canvas px-3 py-2',
-                'hover:border-brand/40 hover:shadow-xs',
-            )}
+            className="block py-1.5 hover:underline"
         >
             <p className="truncate text-[12px] font-medium text-ink">{deal.title}</p>
             {deal.amount_cents > 0 ? (

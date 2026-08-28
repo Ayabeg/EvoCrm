@@ -40,9 +40,12 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
     expect($hub)->toContain('@/components/ui/avatar')
         ->and($hub)->toContain('@/components/ui/card')
         ->and($hub)->toContain('RECORD_HUB_RADIUS = 12')
+        ->and($hub)->toContain('variant="outline"')
         ->and($chrome)->toContain('AdaptiveWorkspaceShell')
         ->and($chrome)->toContain('@/components/ui/tabs')
         ->and($chrome)->toContain('@/components/ui/card')
+        ->and($chrome)->toContain('Log activity')
+        ->and($chrome)->not->toContain('text-brand')
         ->and($listTable)->toContain('export default function ListViewTable')
         ->and($dealsShow)->toContain('DealLineItems');
 });

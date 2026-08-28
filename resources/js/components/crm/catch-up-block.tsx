@@ -51,13 +51,23 @@ function CatchUpRow({ item }: { item: CatchUpItem }) {
 export default function CatchUpBlock({
     inbound = [],
     outbound = [],
+    compact = false,
 }: {
     inbound?: CatchUpItem[];
     outbound?: CatchUpItem[];
+    compact?: boolean;
 }) {
     return (
-        <section className="rounded-xl border border-hairline bg-canvas p-4 text-sm">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-mute">Catch-up</h3>
+        <section
+            className={
+                compact
+                    ? 'text-sm'
+                    : 'rounded-xl border border-hairline bg-canvas p-4 text-sm'
+            }
+        >
+            <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">
+                Catch-up
+            </h3>
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
                     <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">Inbound</p>
