@@ -27,8 +27,10 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     return (
         <>
             <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-1.5 px-2 sm:gap-3 sm:px-4">
-                <SidebarTrigger className="-ml-0.5 shrink-0 text-ink md:hidden" />
-                <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl">
+                <div className="md:hidden" data-chrome="menu">
+                    <SidebarTrigger className="-ml-0.5 shrink-0 text-ink" />
+                </div>
+                <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl" data-chrome="search">
                     <Input
                         readOnly
                         size="sm"
@@ -72,16 +74,18 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        title="Notifications"
-                        aria-label="Notifications"
-                        className="hidden rounded-full min-[390px]:inline-flex"
-                    >
-                        <Bell className="size-4" aria-hidden />
-                    </Button>
+                    <div className="hidden min-[390px]:block" data-chrome="notify">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            title="Notifications"
+                            aria-label="Notifications"
+                            className="rounded-full"
+                        >
+                            <Bell className="size-4" aria-hidden />
+                        </Button>
+                    </div>
                     {user ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

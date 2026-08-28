@@ -316,6 +316,17 @@
         backdrop-filter: blur(20px) saturate(1.4);
     }
 
+    /*
+     * Aurora Button is display:inline-flex and wins over Tailwind hidden on
+     * the control. Hide the notification slot itself below 390px so the
+     * 320/375 budget stays menu + Find a page + Create + Account.
+     */
+    @media (max-width: 389px) {
+        .app-topbar [data-chrome='notify'] {
+            display: none;
+        }
+    }
+
     .dark .app-topbar {
         background: rgb(10 10 10 / 0.78);
     }

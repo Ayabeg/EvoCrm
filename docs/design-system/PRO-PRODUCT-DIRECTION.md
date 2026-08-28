@@ -1,6 +1,6 @@
 # EvoSales — Pro product design direction
 
-**Status:** Proposed. No product code in this document’s PR.  
+**Status:** Approved. Implementation is one PR per phase, starting with global chrome.  
 **Baseline:** PR #101 (Aurora architecture) + #114 (responsive) + #115 (a11y / token hygiene).  
 **Date:** 2026-08-28.
 

@@ -176,9 +176,14 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     expect($palette)->toContain('placeholder="Find a page"');
     expect($palette)->not->toContain('Search contacts, deals');
     expect($rail)->not->toContain('Bell');
-    expect($header)->toContain('min-[390px]:inline-flex');
+    expect($header)->toContain('data-chrome="notify"');
+    expect($header)->toContain('data-chrome="menu"');
+    expect($header)->toContain('hidden min-[390px]:block');
+    expect($header)->toContain('<div className="md:hidden" data-chrome="menu">');
     expect($css)->toContain('--app-chrome-height: 44px');
     expect($css)->toContain('--app-chrome-height: 52px');
+    expect($css)->toContain(".app-topbar [data-chrome='notify']");
+    expect($css)->toContain('@media (max-width: 389px)');
 });
 
 it('names More-panel pin controls for assistive tech', function () {
