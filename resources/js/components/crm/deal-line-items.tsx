@@ -1,4 +1,5 @@
 import { Form } from '@inertiajs/react';
+import { RecordDisclose } from '@/components/crm/record-hub';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatDzd } from '@/lib/money';
@@ -46,9 +47,6 @@ export default function DealLineItems({
                     <span className="text-[11px] text-mute">Manual amount</span>
                 )}
             </div>
-            <p className="mb-2 text-[11px] text-mute">
-                Local catalog (DZD) until Evostock sync. Deal amount rolls up when there are items.
-            </p>
             {rows.length === 0 ? (
                 <p className="mb-2 text-[12px] text-mute">No products on this deal yet.</p>
             ) : (
@@ -112,20 +110,25 @@ export default function DealLineItems({
                     </table>
                 </div>
             )}
-            <Form action={`/crm/deals/${dealId}/line-items`} method="post" className="grid grid-cols-3 gap-1" resetOnSuccess>
-                <select name="product_id" className="col-span-2 h-7 rounded border border-hairline bg-canvas px-1 text-[11px] text-ink">
-                    <option value="">Ad hoc or catalog…</option>
-                    {catalog.map((product) => (
-                        <option key={product.id} value={product.id}>
-                            {product.name} · {product.sku} · {formatDzd(product.unit_cents)}
-                        </option>
-                    ))}
-                </select>
-                <Input name="quantity" type="number" min={1} defaultValue={1} className="h-7" />
-                <Input name="name" placeholder="Ad hoc name" className="col-span-2 h-7" />
-                <Input name="unit_dzd" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
-                <Button variant="outline" className="col-span-3 h-7 text-[11px]">Add line item</Button>
-            </Form>
+            <RecordDisclose label="Add line item">
+                <p className="text-[11px] text-mute">
+                    Local catalog (DZD) until Evostock sync. Deal amount rolls up when there are items.
+                </p>
+                <Form action={`/crm/deals/${dealId}/line-items`} method="post" className="grid grid-cols-3 gap-1" resetOnSuccess>
+                    <select name="product_id" className="col-span-2 h-7 rounded border border-hairline bg-canvas px-1 text-[11px] text-ink">
+                        <option value="">Ad hoc or catalog…</option>
+                        {catalog.map((product) => (
+                            <option key={product.id} value={product.id}>
+                                {product.name} · {product.sku} · {formatDzd(product.unit_cents)}
+                            </option>
+                        ))}
+                    </select>
+                    <Input name="quantity" type="number" min={1} defaultValue={1} className="h-7" />
+                    <Input name="name" placeholder="Ad hoc name" className="col-span-2 h-7" />
+                    <Input name="unit_dzd" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
+                    <Button variant="outline" className="col-span-3 h-7 text-[11px]">Add line item</Button>
+                </Form>
+            </RecordDisclose>
         </section>
     );
 }

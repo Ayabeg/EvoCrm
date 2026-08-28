@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 import type { ListView } from '@/components/crm/list-chrome';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -332,6 +333,34 @@ export function RecordNextAction({
                 ) : null}
             </div>
             {action}
+        </div>
+    );
+}
+
+export function RecordDisclose({
+    label,
+    closeLabel = 'Close',
+    children,
+}: {
+    label: string;
+    closeLabel?: string;
+    children: ReactNode;
+}) {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <div className="space-y-2">
+            <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-[11px]"
+                aria-expanded={open}
+                onClick={() => setOpen((current) => !current)}
+            >
+                {open ? closeLabel : label}
+            </Button>
+            {open ? children : null}
         </div>
     );
 }

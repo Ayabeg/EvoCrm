@@ -42,11 +42,18 @@ export function hasCatchUpItems(
     );
 }
 
+export type RecordNext = {
+    title: string;
+    detail?: string;
+    taskId?: number;
+    href?: string | null;
+};
+
 export function deriveRecordNext(input: {
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     timeline?: RecordActivity[];
     dealNext?: string | null;
-}): { title: string; detail?: string } | null {
+}): RecordNext | null {
     const timeline = input.timeline ?? [];
     const now = Date.now();
 
@@ -62,6 +69,7 @@ export function deriveRecordNext(input: {
         return {
             title: overdue.subject ?? overdue.body ?? 'Overdue task',
             detail: 'Task is past due',
+            taskId: overdue.id,
         };
     }
 
@@ -73,6 +81,7 @@ export function deriveRecordNext(input: {
         return {
             title: openTask.subject ?? openTask.body ?? 'Open task',
             detail: 'Waiting on this record',
+            taskId: openTask.id,
         };
     }
 
@@ -86,6 +95,7 @@ export function deriveRecordNext(input: {
         return {
             title: inbound.label,
             detail: 'Inbound to catch up',
+            href: inbound.href,
         };
     }
 

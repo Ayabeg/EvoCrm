@@ -270,27 +270,32 @@ export default function DealShow({
                                     splits={splits ?? []}
                                     canManage={Boolean(canManageSplits)}
                                 />
-                                <RecordSection title="Move stage">
+                                <RecordSection title="Stage">
                                     <Form
                                         action={`/crm/deals/${deal.id}/move`}
                                         method="post"
-                                        className="flex flex-wrap gap-1"
+                                        className="flex flex-wrap items-center gap-2"
                                     >
-                                        {stages.map((stage) => (
-                                            <Button
-                                                key={stage.id}
-                                                name="stage_id"
-                                                value={stage.id}
-                                                variant={
-                                                    deal.stage?.id === stage.id
-                                                        ? 'secondary'
-                                                        : 'outline'
-                                                }
-                                                className="h-7 text-[11px]"
-                                            >
-                                                {stage.name}
-                                            </Button>
-                                        ))}
+                                        <select
+                                            name="stage_id"
+                                            defaultValue={deal.stage?.id ?? ''}
+                                            className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
+                                        >
+                                            {stages.map((stage) => (
+                                                <option
+                                                    key={stage.id}
+                                                    value={stage.id}
+                                                >
+                                                    {stage.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <Button
+                                            variant="outline"
+                                            className="h-8 text-[12px]"
+                                        >
+                                            Move
+                                        </Button>
                                     </Form>
                                 </RecordSection>
                                 <PlaybookCard playbooks={playbooks} />

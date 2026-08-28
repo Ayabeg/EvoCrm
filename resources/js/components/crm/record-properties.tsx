@@ -97,6 +97,19 @@ export default function RecordProperties({
         return acc;
     }, {});
 
+    if (definitions.length === 0) {
+        return (
+            <p className="text-[12px] text-mute">
+                <Link
+                    href="/settings/attributes"
+                    className="font-medium text-ink hover:underline"
+                >
+                    Manage attributes
+                </Link>
+            </p>
+        );
+    }
+
     return (
         <section className="text-sm">
             <div className="mb-2 flex items-center justify-between gap-2">
@@ -105,39 +118,33 @@ export default function RecordProperties({
                     Manage
                 </Link>
             </div>
-            {definitions.length === 0 ? (
-                <p className="text-[12px] text-mute">
-                    No workspace attributes on this record yet. Add them under Settings → Attributes.
-                </p>
-            ) : (
-                <Form action={action} method="put" className="space-y-3">
-                    {({ processing }) => (
-                        <>
-                            {Object.entries(groups).map(([group, fields]) => (
-                                <div key={group} className="space-y-2">
-                                    <p className="text-[11px] font-medium text-ink">{group}</p>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {fields.map((definition) => (
-                                            <AttributeField
-                                                key={definition.id}
-                                                definition={definition}
-                                                value={values[definition.key] ?? ''}
-                                            />
-                                        ))}
-                                    </div>
+            <Form action={action} method="put" className="space-y-3">
+                {({ processing }) => (
+                    <>
+                        {Object.entries(groups).map(([group, fields]) => (
+                            <div key={group} className="space-y-2">
+                                <p className="text-[11px] font-medium text-ink">{group}</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {fields.map((definition) => (
+                                        <AttributeField
+                                            key={definition.id}
+                                            definition={definition}
+                                            value={values[definition.key] ?? ''}
+                                        />
+                                    ))}
                                 </div>
-                            ))}
-                            <Button
-                                variant="outline"
-                                className="h-8"
-                                disabled={processing}
-                            >
-                                Save attributes
-                            </Button>
-                        </>
-                    )}
-                </Form>
-            )}
+                            </div>
+                        ))}
+                        <Button
+                            variant="outline"
+                            className="h-8"
+                            disabled={processing}
+                        >
+                            Save attributes
+                        </Button>
+                    </>
+                )}
+            </Form>
         </section>
     );
 }

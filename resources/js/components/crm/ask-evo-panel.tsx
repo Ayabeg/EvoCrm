@@ -32,7 +32,7 @@ function AskEvoBody({
 
     return (
         <>
-            <p className="text-[12px] leading-5 text-mute">{summary}</p>
+            <p className="line-clamp-3 text-[12px] leading-5 text-mute">{summary}</p>
             {insight?.answer ? (
                 <p className="border-l-2 border-hairline pl-2 text-[12px] leading-5">
                     {insight.question ? (

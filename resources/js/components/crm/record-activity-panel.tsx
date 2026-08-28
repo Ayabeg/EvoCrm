@@ -1,4 +1,4 @@
-import { Form } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
@@ -36,7 +36,34 @@ export default function RecordActivityPanel({
     return (
         <div className="space-y-4">
             {next ? (
-                <RecordNextAction title={next.title} detail={next.detail} />
+                <RecordNextAction
+                    title={next.title}
+                    detail={next.detail}
+                    action={
+                        next.taskId ? (
+                            <Form
+                                action={`/crm/activities/${next.taskId}/complete`}
+                                method="post"
+                                options={{ preserveScroll: true }}
+                            >
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-[11px]"
+                                >
+                                    Mark done
+                                </Button>
+                            </Form>
+                        ) : next.href ? (
+                            <Link
+                                href={next.href}
+                                className="shrink-0 text-[12px] font-medium text-ink hover:underline"
+                            >
+                                Open
+                            </Link>
+                        ) : null
+                    }
+                />
             ) : null}
             {showCatchUp && catchUp ? (
                 <CatchUpBlock

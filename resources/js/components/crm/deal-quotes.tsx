@@ -1,5 +1,6 @@
 import { Form } from '@inertiajs/react';
 import type { CatalogProduct } from '@/components/crm/deal-line-items';
+import { RecordDisclose } from '@/components/crm/record-hub';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatDzd } from '@/lib/money';
@@ -66,23 +67,25 @@ export default function DealQuotes({
                     ))}
                 </div>
             )}
-            <Form action={`/crm/deals/${dealId}/quotes`} method="post" className="grid gap-1" resetOnSuccess>
-                <select name="items[0][product_id]" className="h-7 rounded border border-hairline bg-canvas px-1 text-[11px]">
-                    <option value="">Ad hoc item</option>
-                    {catalog.map((product) => (
-                        <option key={product.id} value={product.id}>
-                            {product.name}
-                        </option>
-                    ))}
-                </select>
-                <Input name="items[0][name]" placeholder="Line name" className="h-7" />
-                <div className="grid grid-cols-2 gap-1">
-                    <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-7" />
-                    <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
-                </div>
-                <Input name="notes" placeholder="Notes" className="h-7" />
-                <Button variant="outline" className="h-7 text-[11px]">Create quote</Button>
-            </Form>
+            <RecordDisclose label="Create quote">
+                <Form action={`/crm/deals/${dealId}/quotes`} method="post" className="grid gap-1" resetOnSuccess>
+                    <select name="items[0][product_id]" className="h-7 rounded border border-hairline bg-canvas px-1 text-[11px]">
+                        <option value="">Ad hoc item</option>
+                        {catalog.map((product) => (
+                            <option key={product.id} value={product.id}>
+                                {product.name}
+                            </option>
+                        ))}
+                    </select>
+                    <Input name="items[0][name]" placeholder="Line name" className="h-7" />
+                    <div className="grid grid-cols-2 gap-1">
+                        <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-7" />
+                        <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
+                    </div>
+                    <Input name="notes" placeholder="Notes" className="h-7" />
+                    <Button variant="outline" className="h-7 text-[11px]">Create quote</Button>
+                </Form>
+            </RecordDisclose>
         </section>
     );
 }

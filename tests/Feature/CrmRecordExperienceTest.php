@@ -36,7 +36,8 @@ it('demotes Ask Evo and keeps a single primary record action', function () {
         ->and($chrome)->toContain('defaultPanel="center"')
         ->and($activity)->toContain("key: 'activity'")
         ->and($activity)->toContain("key: 'tasks'")
-        ->and($activity)->toContain("key: 'notes'");
+        ->and($activity)->toContain("key: 'notes'")
+        ->and($activity)->toContain('taskId');
 });
 
 it('hides empty record facts and keeps status badges off Aurora cyan', function () {

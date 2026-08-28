@@ -1,5 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { useState } from 'react';
+import { RecordDisclose } from '@/components/crm/record-hub';
 import { Button } from '@/components/ui/button';
 
 type Member = { id: number; name: string };
@@ -41,6 +42,7 @@ export default function DealSplits({
                 <p className="mb-2 text-[12px] text-mute">No split yet. Totals must equal 100%.</p>
             )}
             {canManage ? (
+                <RecordDisclose label={splits.length > 0 ? 'Edit splits' : 'Add split'}>
                 <Form action={`/crm/deals/${dealId}/splits`} method="put" className="space-y-2">
                     {rows.map((row, index) => (
                         <div key={index} className="grid grid-cols-[1fr_80px_auto] gap-1">
@@ -97,6 +99,7 @@ export default function DealSplits({
                         <Button variant="outline" className="h-7 text-[11px]">Save splits</Button>
                     </div>
                 </Form>
+                </RecordDisclose>
             ) : null}
         </section>
     );
