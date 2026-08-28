@@ -578,3 +578,4 @@ is still the bridged 12px.
 | `npm run build` | Pass |
 | Token-bridge literals | Unchanged (`--sidebar` / `--aurora-nav-bg` `#000000`) |
 | Layout / Sheet / Home density | Unchanged from PR #114 (320–1920 already measured) |
+| Browser probe (375, seeded owner) | Create / Notifications / `Evotechly Owner account menu` present; no `overflow-x`; light/dark `--sidebar` + `--aurora-nav-bg` `#000`; accent `#ec6025`; `--radius-1` = `--aurora-radius-1` = `12px`; drawer **240×** `rgb(0,0,0)` |
