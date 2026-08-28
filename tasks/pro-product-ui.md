@@ -12,9 +12,9 @@ Keep Brand Book → tokens → Aurora bridge → Aurora primitives → EvoSales 
 
 ## Task list (approved order)
 
-1. Global chrome — #7 + #4 + #10 (this PR)
+1. Global chrome — #7 + #4 + #10 (PR #117)
 2. Navigation — #3 expanded rail
-3. Home — #1 act first
+3. Home — #1 act first (this PR)
 4. CRM lists — #2 one chrome band
 5. Records — #6 identity before Ask Evo
 6. Pipeline — #8 one forecast strip

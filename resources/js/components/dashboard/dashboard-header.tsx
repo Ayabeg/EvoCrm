@@ -33,40 +33,38 @@ export function DashboardHeader({
     };
 
     return (
-        <header className="mb-5 flex flex-col gap-3 md:mb-8 md:gap-5">
-            <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
-                <div>
+        <header className="mb-4 flex flex-col gap-3 md:mb-6">
+            <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
                     <h1 className="text-page-title text-ink">Home</h1>
-                    <p className="mt-1 text-[12px] leading-5 text-mute">
+                    <p className="mt-0.5 text-[12px] leading-5 text-mute">
                         {subtitle}
                     </p>
                 </div>
-                <Button
-                    asChild
-                    size="sm"
-                    className="shrink-0 self-start lg:self-auto"
-                >
+                <Button asChild size="sm" className="shrink-0">
                     <Link href="/crm/deals">New deal</Link>
                 </Button>
             </div>
 
-            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border border-hairline bg-canvas px-3 py-2 md:flex md:flex-wrap md:px-4 md:py-3">
+            <div className="flex flex-wrap items-center gap-2">
                 <Input
                     type="date"
                     size="sm"
                     value={filters.from ?? ''}
                     onChange={(e) => apply({ from: e.target.value })}
                     aria-label="From date"
-                    className="min-w-0 md:w-[9.5rem]"
+                    className="w-[min(100%,9.5rem)]"
                 />
-                <span className="text-[12px] text-mute">-</span>
+                <span className="text-[12px] text-mute" aria-hidden>
+                    -
+                </span>
                 <Input
                     type="date"
                     size="sm"
                     value={filters.to ?? ''}
                     onChange={(e) => apply({ to: e.target.value })}
                     aria-label="To date"
-                    className="min-w-0 md:w-[9.5rem]"
+                    className="w-[min(100%,9.5rem)]"
                 />
                 <NativeSelect
                     value={filters.owner_id ?? ''}
@@ -78,7 +76,7 @@ export function DashboardHeader({
                         })
                     }
                     aria-label="Filter by owner"
-                    className="col-span-3 min-w-0 md:col-auto md:w-[11rem]"
+                    className="w-full min-w-0 sm:w-[11rem]"
                 >
                     <option value="">All owners</option>
                     {owners.map((owner) => (

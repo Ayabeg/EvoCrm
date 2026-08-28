@@ -53,6 +53,7 @@ it('keeps Home application chrome on Brand Book tokens rather than raw --aurora-
         'js/components/dashboard/attention-list.tsx',
         'js/components/dashboard/activity-feed.tsx',
         'js/components/dashboard/quick-actions.tsx',
+        'js/components/dashboard/home-kpi-strip.tsx',
         'js/components/crm/evo-kpi-card.tsx',
         'js/components/crm/crm-kpi-strip.tsx',
     ];
@@ -101,23 +102,35 @@ it('keeps the Apple cabinet rail at 240px on desktop and the existing mobile She
 
 it('keeps Home KPI values on the Brand Book --text-kpi scale', function () {
     $card = file_get_contents(resource_path('js/components/crm/evo-kpi-card.tsx'));
+    $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
 
     expect($card)->toContain('text-kpi');
     expect($card)->toContain('break-words');
     expect($card)->not->toContain('text-[1.875rem]');
     expect($card)->not->toContain('min-h-[7.5rem]');
+    expect($strip)->toContain('text-kpi');
+    expect($strip)->toContain('formatCompactDzd');
 });
 
 it('uses compact mobile spacing tokens on Home chrome', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
     $header = file_get_contents(resource_path('js/components/dashboard/dashboard-header.tsx'));
-    $strip = file_get_contents(resource_path('js/components/crm/crm-kpi-strip.tsx'));
+    $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
 
-    expect($home)->toContain('px-4 py-5 md:px-8 md:py-8');
+    expect($home)->toContain('px-4 py-4 md:px-6 md:py-6');
     expect($home)->toContain('gap-4 md:gap-6');
     expect($header)->toContain('text-page-title');
-    expect($header)->toContain('mb-5 flex flex-col gap-3 md:mb-8 md:gap-5');
+    expect($header)->toContain('mb-4 flex flex-col gap-3 md:mb-6');
     expect($strip)->toContain('grid-cols-2');
+});
+
+it('places Needs attention above Performance on Home', function () {
+    $home = file_get_contents(resource_path('js/pages/home.tsx'));
+
+    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, 'title="Performance"'));
+    expect(strpos($home, 'HomeKpiStrip'))->toBeLessThan(strpos($home, 'Needs attention'));
+    expect($home)->not->toContain('QuickActions');
+    expect($home)->not->toContain('CrmKpiStrip');
 });
 
 it('uses a soft rail pill instead of an orange active bar', function () {

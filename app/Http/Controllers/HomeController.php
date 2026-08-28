@@ -8,7 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Home — Shopify-inspired command center: context → performance → attention → action.
+ * Home — command center: context → KPIs → attention → pipeline → performance.
  */
 class HomeController extends Controller
 {

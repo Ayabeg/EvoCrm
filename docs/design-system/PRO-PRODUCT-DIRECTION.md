@@ -434,9 +434,9 @@ Operator journey. One PR per phase. Do not restyle the same chrome twice.
 
 | Phase | Items | Status |
 |-------|-------|--------|
-| 1. Global chrome | #7 top bar · #4 orange discipline (chrome) · #10 mobile chrome budget | In progress |
+| 1. Global chrome | #7 top bar · #4 orange discipline (chrome) · #10 mobile chrome budget | Done (PR #117) |
 | 2. Navigation | #3 expanded rail CRM objects | Not started |
-| 3. Home | #1 act first | Not started |
+| 3. Home | #1 act first | In progress (this PR; after chrome, before nav) |
 | 4. CRM lists | #2 one chrome band | Not started |
 | 5. Records | #6 identity before Ask Evo | Not started |
 | 6. Pipeline | #8 one forecast strip | Not started |
