@@ -354,7 +354,7 @@ function FrontDesk({
                                         message.type === 'note'
                                             ? 'bg-muted text-ink'
                                             : message.direction === 'outbound'
-                                              ? 'ml-auto bg-brand/12 text-ink'
+                                              ? 'ml-auto border border-hairline bg-canvas text-ink'
                                               : 'bg-canvas text-ink shadow-[var(--aurora-shadow-medium)]'
                                     }`}
                                 >

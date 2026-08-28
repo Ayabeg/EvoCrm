@@ -63,6 +63,8 @@ it('excludes won and lost deals from the active strip', function () {
 });
 
 it('filters the strip: tasks today, without tasks, overdue, new today', function () {
+    $this->travelTo(now()->timezone(config('app.timezone'))->startOfDay()->setTime(10, 0));
+
     $user = User::factory()->create();
 
     $dueToday = boardDeal($user, 'new', ['title' => 'Due today']);
