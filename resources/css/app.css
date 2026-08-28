@@ -30,14 +30,20 @@
  * (labeled ~240px, soft active pill). Tokens never leak into content.
  */
 :root {
-    /* Top command bar height — keep in sync with .app-topbar */
-    --app-chrome-height: 52px;
+    /* Top command bar — 44px on phones so work appears earlier; 52px from sm. */
+    --app-chrome-height: 44px;
     --evosales-canvas: #ffffff;
     --evosales-canvas-soft: #f7f7f6;
     --evosales-ink: #111111;
     --evosales-mute: #525252;
     --evosales-hairline: #e5e5e5;
     --evosales-mark: #ec6025;
+}
+
+@media (min-width: 640px) {
+    :root {
+        --app-chrome-height: 52px;
+    }
 }
 
 @theme {
@@ -295,6 +301,10 @@
      * Frosted / minimal topbar — web glass approximation, not Apple Liquid Glass.
      * Do not color-mix with `transparent` (that interpolates toward black).
      * Hairline only. No product-shadow on chrome.
+     */
+    /*
+     * Orange discipline on chrome: the bar itself is canvas/hairline.
+     * The only filled mark-orange control is the Create button in the header.
      */
     .app-topbar {
         height: var(--app-chrome-height);

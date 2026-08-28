@@ -26,15 +26,15 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
 
     return (
         <>
-            <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-2 px-3 sm:gap-3 sm:px-4">
-                <SidebarTrigger className="-ml-1 shrink-0 text-ink md:hidden" />
+            <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-1.5 px-2 sm:gap-3 sm:px-4">
+                <SidebarTrigger className="-ml-0.5 shrink-0 text-ink md:hidden" />
                 <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl">
                     <Input
                         readOnly
                         size="sm"
                         value=""
-                        placeholder="Find or Ask"
-                        aria-label="Open command palette"
+                        placeholder="Find a page"
+                        aria-label="Find a page"
                         onClick={() => setPaletteOpen(true)}
                         onFocus={() => setPaletteOpen(true)}
                         startAdornment={
@@ -78,7 +78,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         size="icon"
                         title="Notifications"
                         aria-label="Notifications"
-                        className="rounded-full"
+                        className="hidden rounded-full min-[390px]:inline-flex"
                     >
                         <Bell className="size-4" aria-hidden />
                     </Button>

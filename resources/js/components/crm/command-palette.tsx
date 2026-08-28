@@ -82,7 +82,7 @@ export function CommandPalette({
             onOpenChange={onOpenChange}
             items={items}
             sections={[{ id: 'navigate', label: 'Navigate' }]}
-            placeholder="Search contacts, deals, or navigate…"
+            placeholder="Find a page"
             filter={(query, item) => {
                 const needle = query.trim().toLowerCase();
 

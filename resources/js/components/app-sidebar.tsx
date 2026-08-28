@@ -1,6 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    Bell,
     Bolt,
     Building2,
     ChartSpline,
@@ -524,7 +523,6 @@ export function AppSidebar() {
                 >
                     <ChevronLeft className={cn('size-4', collapsed && 'rotate-180')} />
                     {!collapsed ? <span>{isMobile ? 'Close menu' : 'Collapse'}</span> : null}
-                    {!collapsed ? <Bell className="ms-auto size-3.5" /> : null}
                 </button>
             </section>
         </Sidebar>

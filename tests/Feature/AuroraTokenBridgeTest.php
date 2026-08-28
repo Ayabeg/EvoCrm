@@ -163,6 +163,24 @@ it('names topbar icon-only actions for assistive tech', function () {
     expect($header)->toContain('aria-label={`${user.name} account menu`}');
 });
 
+it('keeps the top bar as one honest instrument without a second bell', function () {
+    $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+    $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
+    $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+    $css = file_get_contents(resource_path('css/app.css'));
+
+    expect($header)->toContain('placeholder="Find a page"');
+    expect($header)->toContain('aria-label="Find a page"');
+    expect($header)->not->toContain('Find or Ask');
+    expect($header)->not->toContain('unread');
+    expect($palette)->toContain('placeholder="Find a page"');
+    expect($palette)->not->toContain('Search contacts, deals');
+    expect($rail)->not->toContain('Bell');
+    expect($header)->toContain('min-[390px]:inline-flex');
+    expect($css)->toContain('--app-chrome-height: 44px');
+    expect($css)->toContain('--app-chrome-height: 52px');
+});
+
 it('names More-panel pin controls for assistive tech', function () {
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 

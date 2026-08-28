@@ -428,22 +428,22 @@ Aurora `--motion-duration-fast` / `--motion-ease-out` for Sheet, Dialog, command
 
 ---
 
-## Implementation order (after approval)
+## Implementation order (approved)
 
-Do **not** start until this document is accepted.
+Operator journey. One PR per phase. Do not restyle the same chrome twice.
 
-1. Application shell + orange discipline + top-bar copy  
-2. Sidebar CRM grouping (AppSidebar only)  
-3. Home reorder + compact KPIs + filter strip  
-4. CRM list chrome (Contacts / Companies / Deals — not Leads list rewrite)  
-5. Record identity-first  
-6. Pipeline forecast strip  
-7. Desk quieter frame  
-8. Forms consistency on create drawers only  
-9. Empty/loading copy pass  
-10. Mobile Sheet for filters + visual QA 320–1920 light/dark  
+| Phase | Items | Status |
+|-------|-------|--------|
+| 1. Global chrome | #7 top bar · #4 orange discipline (chrome) · #10 mobile chrome budget | In progress |
+| 2. Navigation | #3 expanded rail CRM objects | Not started |
+| 3. Home | #1 act first | Not started |
+| 4. CRM lists | #2 one chrome band | Not started |
+| 5. Records | #6 identity before Ask Evo | Not started |
+| 6. Pipeline | #8 one forecast strip | Not started |
+| 7. Desk | #9 quieter frame | Not started |
+| 8. Command | #5 honesty + Actions | Not started |
 
-Each phase: small PR, `AuroraTokenBridgeTest` + focused Pest, then full suite, `types:check`, `lint:check`, build, breakpoint probe.
+Each phase: `AuroraTokenBridgeTest` + focused Pest, then full suite, `types:check`, `lint:check`, build, breakpoint probe.
 
 **Architecture impact allowed:** frontend composition only.  
 **Architecture impact forbidden:** Aurora replacement, token cycle, AppSidebar rewrite, ListViewTable migration, Inertia rewrite, API/DB, `migrate:fresh`, Baileys.
