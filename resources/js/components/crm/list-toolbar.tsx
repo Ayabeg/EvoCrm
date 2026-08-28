@@ -1,8 +1,8 @@
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { CrmActiveFilters } from '@/components/crm/crm-active-filters';
 import ColumnChooser from '@/components/crm/column-chooser';
 import ColumnFilterRow from '@/components/crm/column-filter-row';
+import { CrmActiveFilters } from '@/components/crm/crm-active-filters';
 import FilterBuilder from '@/components/crm/filter-builder';
 import { crmListHref, filterFields, listFilterChips } from '@/components/crm/list-query';
 import SavedViewTabs from '@/components/crm/saved-view-tabs';

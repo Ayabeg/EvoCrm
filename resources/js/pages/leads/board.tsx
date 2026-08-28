@@ -2,6 +2,7 @@ import { Form, Head, Link, router } from '@inertiajs/react';
 import { CalendarClock, Ellipsis, Plus, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
+import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import {
     PipelineKanban,
     PipelineKanbanCard,
@@ -10,7 +11,6 @@ import {
     PipelineKanbanHeader,
     PipelineKanbanStack,
 } from '@/components/crm/pipeline-kanban';
-import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
