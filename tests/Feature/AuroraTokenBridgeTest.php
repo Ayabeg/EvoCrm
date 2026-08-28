@@ -154,3 +154,49 @@ it('paints the topbar as a frosted hairline instead of an Aurora panel gradient'
     expect($css)->toContain('rgb(255 255 255 / 0.78)');
     expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
 });
+
+it('names topbar icon-only actions for assistive tech', function () {
+    $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+
+    expect($header)->toContain('aria-label="Create"');
+    expect($header)->toContain('aria-label="Notifications"');
+    expect($header)->toContain('aria-label={`${user.name} account menu`}');
+});
+
+it('names More-panel pin controls for assistive tech', function () {
+    $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+
+    expect($rail)->toContain("aria-label={pinned ? 'Unpin from sidebar' : 'Pin to sidebar'}");
+});
+
+it('keeps remaining application chrome off raw Aurora radius and muted-text tokens', function () {
+    $files = [
+        'js/pages/auth/auth-screen.tsx',
+        'js/pages/settings/connectors.tsx',
+        'js/pages/leads/board.tsx',
+        'js/components/desk/official-connect-panel.tsx',
+        'js/components/crm/pipeline-kanban.tsx',
+    ];
+
+    foreach ($files as $file) {
+        $src = file_get_contents(resource_path($file));
+        expect($src)->not->toContain('--aurora-radius-');
+        expect($src)->not->toContain('--aurora-text-muted');
+    }
+});
+
+it('paints the More panel with Brand Book surfaces instead of raw Aurora identity tokens', function () {
+    $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+
+    expect($rail)->toContain("borderColor: 'var(--evosales-hairline)'");
+    expect($rail)->toContain("background: 'var(--evosales-canvas-soft)'");
+    expect($rail)->toContain("background: 'var(--evosales-canvas)'");
+    expect($rail)->toContain("color: 'var(--evosales-ink)'");
+    expect($rail)->toContain('text-[var(--evosales-mute)]');
+    expect($rail)->not->toContain("borderColor: 'var(--aurora-border-default)'");
+    expect($rail)->not->toContain("background: 'var(--aurora-control-surface)'");
+    expect($rail)->not->toContain("background: 'var(--aurora-panel-strong)'");
+    expect($rail)->not->toContain('--aurora-text-muted');
+    expect($rail)->not->toContain('--aurora-text-primary');
+    expect($rail)->not->toContain('--aurora-radius-');
+});

@@ -409,3 +409,160 @@ Light `:root`: `--sidebar` / `--aurora-nav-bg` `#000`, accent `#ec6025`, canvas 
 Dark `html.dark`: `--sidebar` / `--aurora-nav-bg` `#000`, page `#000`, drawer 240px opaque. Escape closes the Sheet.
 
 `php artisan test` 430 passed; 1 pre-existing `DeskEmptyStateTest` (`No Baileys` copy) unrelated. `AuroraTokenBridgeTest`, `types:check`, `lint:check`, `build` passed.
+
+---
+
+## Follow-up — post-#101/#114 design-system audit (this pass)
+
+Read-only audit first, then only high-confidence P1/P2 fixes. Skills used:
+`frontend-ui-engineering`, `code-review-and-quality`, `documentation-and-adrs`,
+`incremental-implementation`, `test-driven-development`. Named skills
+`ui-ux-pro-max` / `ui-design-brain` / `design-systems-frontend-architecture`
+are **not installed** in this repo; they were not treated as a second design
+authority. Existing ownership always wins.
+
+### Architecture findings
+
+| Layer | Authority | Status |
+|-------|-----------|--------|
+| Identity (rail `#000000`, mark `#EC6025`, Geist, `--evosales-*`) | **Brand Book** | Intact. No Aurora navy/cyan as product identity. |
+| Primitives, overlays, a11y, motion, elevation | **Aurora** (`dinglebear-ai/aurora`, SHA `fa53183…`) | Intact. Adapters in `@/components/ui/*`. |
+| IA, AppSidebar, EvoDesk, ListViewTable, CRM workflows | **EvoSales** | Intact. Official Aurora Sidebar / DataTable not adopted. |
+
+PR #101 + PR #114 remain the baseline. Token cycle is broken. Mobile nav is
+still **EvoSales IA → Aurora Sheet → opaque 240px drawer**. Do not replace
+with Aurora Sidebar.
+
+`AURORA-AUDIT.md` was stale (unpinned SHA, 220px rail, open P0s). Updated as
+a discovery record; this report stays the live decision log.
+
+### UX findings
+
+- Home / KPI / top-bar density were corrected in PR #114. No further density rewrite.
+- Notifications is an icon-only control with no feed. Naming it is enough;
+  inventing a notifications product is out of scope.
+- `AppHeader` / header-layout Sheet is unused. Left alone.
+- Desk glass (`desk-glass.tsx`) is existing Desk chrome, not a new wash.
+  After the bridge, panel tokens are Brand canvas — not Aurora navy.
+  **Not redesigned.**
+- Empty / loading / error states already use EmptyState / Skeleton / Callout
+  on the surfaces that have them. No new empty-state system.
+
+### Accessibility findings
+
+| Issue | Sev | Decision |
+|-------|-----|----------|
+| Create / Notifications / account trigger used `title` only | P1 | Add `aria-label`. **OWNER: Aurora a11y + EvoSales chrome.** |
+| More-panel pin controls used `title` only | P1 | Add `aria-label`. **OWNER: EvoSales IA.** |
+| Record layout up/down icon buttons unnamed | P1 | Add `aria-label`. **OWNER: EvoSales record chrome.** |
+| Icon-only Aurora buttons are 32px | P2 | Meets WCAG 2.5.8 (24px). Enlarging to 44px would break the 320 top bar. **No change.** |
+| Sheet / Dialog / Command palette | — | Radix focus trap + `#101` header-inside-content. **No change.** |
+| Non-nav dialog overlay 18% | P3 | Aurora light default. Nav uses Brand 80%. **No global change.** |
+
+### Responsive findings
+
+PR #114 verified 320–1920 (drawer 240px opaque, top bar fits, KPI 2-col).
+This pass does not change layout, Sheet width, or Home spacing.
+
+At 768, `SidebarTrigger` still renders (`md:hidden` + `useIsMobile` 767px
+boundary). Pre-existing; hamburger then collapses the desktop rail. **Not
+treated as a regression.**
+
+### Token findings
+
+No circular `--sidebar` ↔ `--aurora-nav-bg`. No new token layer.
+
+Application code still used raw `--aurora-radius-*`, `--aurora-text-muted`,
+and More-panel identity tokens (`--aurora-panel-strong`, `--aurora-control-surface`,
+`--aurora-border-default`, `--aurora-text-primary`). Those map 1:1 to Brand
+aliases after the bridge.
+
+**Kept on Aurora (no Brand equivalent, Aurora owns the concern):**
+
+- `--aurora-shadow-*` (elevation)
+- `--aurora-focus-ring-strong` (focus)
+- `--aurora-shell-bg` on `AppShell` (already flattened to canvas-soft)
+- Vendored `command-palette` / `prompt-input` / `ui/aurora/*` contracts
+- `desk-glass` panel mixes (existing Desk chrome)
+
+### Component duplication findings
+
+| Primitive | Aurora? | Used? | Duplicate? | Migrate? |
+|-----------|---------|-------|------------|----------|
+| Button / Input / Select / Dialog / Sheet / Dropdown / Popover / Tooltip / Card / Tabs / Badge | Yes | Via adapters | No | No |
+| Toast | Yes (`toast.tsx`) | **Sonner** is the app bus | Dual files, one mount | **No.** Do not mount both. |
+| Avatar | Yes | Adapter + a few direct imports | Wrapper is intentional | **No.** |
+| Alert / Callout | Callout yes | `AlertError` → Callout | Local Alert keeps compound API | **No.** Almost unused. |
+| Breadcrumb | Yes | Local shadcn `ui/breadcrumb` via `breadcrumbs.tsx` | True duplicate | **No.** No engineering benefit; crumbs are unused on the top bar today. |
+| Table | DataTable only | `ListViewTable` | Product table | **No.** |
+| Sidebar | Official block not installed | Product `AppSidebar` + Aurora Sheet | Intentional | **No.** |
+
+### Recommended vs implemented
+
+| ID | Sev | Recommendation | This pass |
+|----|-----|----------------|-----------|
+| — | P0 | None remaining after #101/#114 | — |
+| A11Y-1 | P1 | Name topbar icon actions | **Done** |
+| A11Y-2 | P1 | Name More pin controls | **Done** |
+| A11Y-3 | P1 | Name record-layout move buttons | **Done** |
+| TOK-1 | P2 | Product pages: Brand mute / radius aliases | **Done** |
+| TOK-2 | P2 | More panel: Brand surfaces | **Done** |
+| DOC-1 | P3 | Un-stale `AURORA-AUDIT.md` | **Done** |
+| TOAST | P2 | Leave Sonner canonical | Deferred (by design) |
+| CRUMB | P2 | Leave local breadcrumb | Deferred (no benefit) |
+| OVERLAY | P3 | Leave non-nav 18% overlay | Deferred |
+| GLASS | — | Do not restyle Desk glass | Deferred |
+| TABLE | — | Do not migrate ListViewTable | Deferred |
+
+### Changes made
+
+| File | Change | Why | OWNER |
+|------|--------|-----|-------|
+| `resources/js/components/app-sidebar-header.tsx` | `aria-label` on Create / Notifications / account; `aria-hidden` on decorative icons | Icon-only controls must expose an accessible name | Aurora a11y + EvoSales chrome |
+| `resources/js/components/app-sidebar.tsx` | Pin `aria-label`; More panel surfaces/text/border/radius → Brand aliases; keep `--aurora-shadow-strong` + `--aurora-focus-ring-strong` | Identity tokens belong to Brand Book; elevation/focus stay Aurora | Brand Book + Aurora + EvoSales IA |
+| `resources/js/pages/auth/auth-screen.tsx` | `--radius-2`, `--evosales-mute` | Auth chrome is Brand identity | Brand Book |
+| `resources/js/pages/settings/connectors.tsx` | `--radius-1` | Same class of Home ownership fix | Brand Book |
+| `resources/js/pages/leads/board.tsx` | `--radius-1`; keep Aurora shadow | Radius alias; elevation stays Aurora | Brand Book + Aurora |
+| `resources/js/components/crm/pipeline-kanban.tsx` | `--radius-1`; keep Aurora shadow/motion | Same | Brand Book + Aurora |
+| `resources/js/components/desk/official-connect-panel.tsx` | `--radius-1` | Same | Brand Book |
+| `resources/js/components/crm/record-layout-editor.tsx` | Move up/down `aria-label` | Icon-only | EvoSales |
+| `tests/Feature/AuroraTokenBridgeTest.php` | Guards for names + Brand token ownership | Regression lock | EvoSales tests |
+| `docs/design-system/AURORA-AUDIT.md` | Baseline status, SHA, 240px, resolved P0s | Stale discovery record was misleading | Docs |
+| `docs/design-system/AURORA-INTEGRATION-REPORT.md` | This section | Decision log | Docs |
+
+### Not changed
+
+- Token-bridge literals (`--sidebar` / `--aurora-nav-bg` `#000000`)
+- Sheet composition, 240px mobile drawer, Brand overlay
+- AppSidebar / EvoDesk IA structure
+- ListViewTable
+- Sonner / Aurora toast split
+- Local breadcrumb
+- `desk-glass.tsx`
+- Non-nav dialog overlay
+- Backend, API, database, Inertia architecture
+
+### Token decisions
+
+| Token | Before (app code) | After | OWNER |
+|-------|-------------------|-------|-------|
+| Radius on product chrome | `--aurora-radius-1/2` | `--radius-1/2` (Aurora alias, same 12/16px) | Aurora radius scale, consumed via alias |
+| Muted copy | `--aurora-text-muted` | `--evosales-mute` | Brand Book |
+| More panel fill / border / ink | `--aurora-panel-strong` / `--control-surface` / `--border-default` / `--text-*` | `--evosales-canvas` / `--canvas-soft` / `--hairline` / `--ink` / `--mute` | Brand Book |
+| Shadows / focus ring | `--aurora-shadow-*` / `--aurora-focus-ring-strong` | **unchanged** | Aurora |
+| Rail | `#000000` literals | **unchanged** | Brand Book |
+
+No tokens deleted. No new token layer. `--radius-1` is the existing
+`aurora.css` alias (`--radius-1: var(--aurora-radius-1)`); computed value
+is still the bridged 12px.
+
+### Remaining issues
+
+- Aurora toast primitive unused (Sonner canonical).
+- Local breadcrumb unused by the top bar; Aurora breadcrumb unused.
+- Non-nav dialog overlay still 18%.
+- `--aurora-info` cyan remains status, not brand.
+- `DeskEmptyStateTest` vs connectors “No Baileys” copy is a pre-existing
+  product/test mismatch. Not touched (do not introduce Baileys).
+- Notifications control is named but still has no feed.
+- 768px hamburger / rail-collapse interaction remains as before.

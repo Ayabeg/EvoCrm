@@ -87,7 +87,7 @@ function GoogleConnectorCard({
                 ) : null}
 
                 {connector.sync ? (
-                    <div className="aurora-text-caption rounded-[var(--aurora-radius-1)] border border-hairline bg-canvas-soft p-3 text-muted-foreground">
+                    <div className="aurora-text-caption rounded-[var(--radius-1)] border border-hairline bg-canvas-soft p-3 text-muted-foreground">
                         <p className="font-medium text-foreground">
                             Sync {connector.sync.status}
                         </p>

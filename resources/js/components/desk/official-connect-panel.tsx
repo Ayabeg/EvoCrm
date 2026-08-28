@@ -94,7 +94,7 @@ export function OfficialConnectPanel({
                     return (
                         <div
                             key={connector.provider}
-                            className="rounded-[var(--aurora-radius-1)] border border-hairline bg-canvas p-3"
+                            className="rounded-[var(--radius-1)] border border-hairline bg-canvas p-3"
                         >
                             <div className="flex items-start justify-between gap-2">
                                 <div className="flex items-center gap-2">

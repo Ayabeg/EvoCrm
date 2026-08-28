@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
  * Does not own drag or weighted math — callers keep those.
  */
 
-const cardRadius = 'rounded-[var(--aurora-radius-1)]';
+const cardRadius = 'rounded-[var(--radius-1)]';
 const motion =
     'duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-out)]';
 

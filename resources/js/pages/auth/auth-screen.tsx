@@ -12,7 +12,7 @@ const hairlineCardStyle = {
     background: 'var(--evosales-canvas)',
     backgroundImage: 'none',
     borderColor: 'var(--evosales-hairline)',
-    borderRadius: 'var(--aurora-radius-2)',
+    borderRadius: 'var(--radius-2)',
     boxShadow: 'none',
 } as const;
 
@@ -50,7 +50,7 @@ export default function AuthScreen({
                         {description ? (
                             <p
                                 className="aurora-text-body-sm mt-2 text-pretty"
-                                style={{ color: 'var(--aurora-text-muted)' }}
+                                style={{ color: 'var(--evosales-mute)' }}
                             >
                                 {description}
                             </p>

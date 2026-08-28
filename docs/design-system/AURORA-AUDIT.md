@@ -1,8 +1,17 @@
 # Aurora Audit
 
+> **Status after PR #101 + PR #114 (architectural baseline).**
+> P0 token cycle and mobile Sheet composition are **fixed**. The vendored
+> revision is pinned in `resources/js/components/ui/aurora/SOURCE.json`
+> (`fa53183f7e9a790391198424b8b90afb4b5fa50c`). The live rail is **240px**
+> (desktop and mobile Sheet). Home no longer uses raw `--aurora-*`.
+> Treat sections below as the original discovery record. Current decisions
+> and remaining work live in [`AURORA-INTEGRATION-REPORT.md`](./AURORA-INTEGRATION-REPORT.md).
+
 ## Aurora Status
 
-**FOUND BUT PARTIALLY INTEGRATED**
+**FOUND AND BRIDGED.** P0 light-mode `--sidebar` ↔ `--aurora-nav-bg` cycle
+and `SheetHeader`-outside-`SheetContent` are resolved. Do not re-open them.
 
 Aurora is a real, third-party shadcn-compatible registry. It is vendored into this repository, remapped through an EvoTechly token bridge, and consumed by most canonical `@/components/ui/*` adapters. It is **not** invented locally. It is also **not** fully installed: many official registry primitives and all domain blocks except Command Palette / Prompt Input are absent. The official Aurora Sidebar block is **not** the EvoCRM rail and is not installed.
 
@@ -46,11 +55,11 @@ No Git submodule. No `node_modules` Aurora package. No `@aurora` npm dependency.
 |----------|--------|
 | npm package | **None.** Not in `package.json` or lockfile. |
 | Registry URL | `https://aurora.tootie.tv/r/{name}.json` (mutable discovery URL) |
-| Pinned git SHA | **Not pinned.** Adoption doc says production should pin a commit per [Aurora versioning docs](https://github.com/dinglebear-ai/aurora/blob/main/docs/versioning.md). This repo does not. |
+| Pinned git SHA | **Pinned** in `resources/js/components/ui/aurora/SOURCE.json` (`fa53183f7e9a790391198424b8b90afb4b5fa50c`). |
 | Local copy | Source files under `resources/js/components/ui/aurora/` and `resources/js/components/aurora.css` |
 | App stack fit | shadcn + Radix + Tailwind v4 + CVA + React 19 (matches Aurora) |
 
-Exact upstream commit of the vendored files is **not recorded** in-repo.
+Exact upstream commit of the vendored files is recorded in `SOURCE.json`.
 
 ---
 
@@ -243,9 +252,9 @@ Vendored `Sheet` uses Tailwind `z-50` (not these tokens).
 
 | Token | Value |
 |-------|-------|
-| `--sidebar-width` | `220px` (runtime, `sidebar.tsx`) |
+| `--sidebar-width` | `240px` (runtime, `sidebar.tsx`; Brand Book / Apple cabinet) |
 | `--sidebar-width-icon` | `3.5rem` |
-| Mobile sheet width | `min(16rem, 86vw)` |
+| Mobile sheet width | `min(var(--sidebar-width), 92vw)` bound to **240px** (PR #114). Aurora default `min(396px, 92vw)` remains for non-nav Sheets. |
 
 Official Aurora Sidebar block uses `240px` / `60px` inline. **Not installed.**
 
@@ -371,21 +380,12 @@ Button and Badge wrap Aurora and map shadcn variants via `lib/aurora/shadcn-brid
 
 ## Violations
 
-### P0 — broken / unusable
+### P0 — broken / unusable — **RESOLVED in PR #101**
 
-1. **Cyclic `--sidebar` ↔ `--aurora-nav-bg` in light mode**
-   - `aurora.css` sets `--sidebar: var(--aurora-nav-bg)`
-   - bridge sets `--aurora-nav-bg: var(--sidebar)`
-   - Light `:root` never re-asserts `--sidebar` as a literal after those imports
-   - `.dark` in `app.css` **does** re-assert `--sidebar: #000000`, so dark mode escapes the cycle
-   - Cyclic custom properties are invalid at computed-value time → `background: var(--sidebar)` becomes **transparent**
-   - Mobile `SheetContent` overrides Aurora’s opaque `--aurora-panel-strong` with `background: var(--sidebar)` → **page content shows through the nav**
-   - This matches the screenshot: transparency, duplicated content, wrong layering
-
-2. **`SheetHeader` rendered outside `SheetContent`**
-   - `ui/sidebar.tsx` mobile branch places `SheetHeader` as a sibling of `SheetContent` (child of Radix `Dialog.Root`)
-   - Title/description are not in the portaled dialog; a11y contract is wrong
-   - `{...props}` (div leftovers) are spread onto `Sheet`
+1. **Cyclic `--sidebar` ↔ `--aurora-nav-bg` in light mode** — **fixed.**
+   Bridge re-asserts both as `#000000` literals. `AuroraTokenBridgeTest` guards the pair.
+2. **`SheetHeader` rendered outside `SheetContent`** — **fixed.**
+   Title/description live inside the portaled dialog. Mobile nav uses Brand `--sidebar-overlay`.
 
 ### P1 — major design-system violation
 

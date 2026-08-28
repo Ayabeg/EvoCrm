@@ -394,7 +394,7 @@ export default function LeadsBoard({
                                                 onSuccess={() =>
                                                     setAdding(false)
                                                 }
-                                                className="grid gap-2 rounded-[var(--aurora-radius-1)] border border-hairline bg-canvas p-3 shadow-[var(--aurora-shadow-medium)]"
+                                                className="grid gap-2 rounded-[var(--radius-1)] border border-hairline bg-canvas p-3 shadow-[var(--aurora-shadow-medium)]"
                                             >
                                                 {({ processing }) => (
                                                     <>
@@ -445,7 +445,7 @@ export default function LeadsBoard({
                                             <button
                                                 type="button"
                                                 onClick={() => setAdding(true)}
-                                                className="flex items-center justify-center gap-1.5 rounded-[var(--aurora-radius-1)] border border-dashed border-hairline px-3 py-2 text-xs font-medium text-mute transition-colors hover:border-brand hover:text-brand"
+                                                className="flex items-center justify-center gap-1.5 rounded-[var(--radius-1)] border border-dashed border-hairline px-3 py-2 text-xs font-medium text-mute transition-colors hover:border-brand hover:text-brand"
                                             >
                                                 <Plus className="size-3.5" />
                                                 Quick add

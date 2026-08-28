@@ -133,7 +133,7 @@ function MorePanelItems({
                 return (
                     <div
                         key={`${item.category}-${item.id}`}
-                        className="flex items-center justify-between rounded-[var(--aurora-radius-1)] px-2 py-2 hover:bg-sidebar-hover"
+                        className="flex items-center justify-between rounded-[var(--radius-1)] px-2 py-2 hover:bg-sidebar-hover"
                     >
                         <Link
                             href={item.href}
@@ -146,10 +146,11 @@ function MorePanelItems({
                         <button
                             type="button"
                             title={pinned ? 'Unpin' : 'Pin'}
+                            aria-label={pinned ? 'Unpin from sidebar' : 'Pin to sidebar'}
                             onClick={() => onPinsChange(togglePin(item.id, pins))}
                             className="ms-2 shrink-0 rounded p-1 text-sidebar-mute hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                         >
-                            {pinned ? <Pin className="size-4" /> : <PinOff className="size-4" />}
+                            {pinned ? <Pin className="size-4" aria-hidden /> : <PinOff className="size-4" aria-hidden />}
                         </button>
                     </div>
                 );
@@ -176,8 +177,8 @@ function MorePanelDesktop({
             <div
                 className="w-40 border-r py-2"
                 style={{
-                    borderColor: 'var(--aurora-border-default)',
-                    background: 'var(--aurora-control-surface)',
+                    borderColor: 'var(--evosales-hairline)',
+                    background: 'var(--evosales-canvas-soft)',
                 }}
             >
                 {CATEGORIES.map((name) => (
@@ -189,13 +190,13 @@ function MorePanelDesktop({
                             'block w-full px-3 py-1.5 text-left text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--aurora-focus-ring-strong)]',
                             category === name
                                 ? 'font-medium'
-                                : 'text-[var(--aurora-text-muted)]',
+                                : 'text-[var(--evosales-mute)]',
                         )}
                         style={
                             category === name
                                 ? {
-                                      background: 'var(--aurora-panel-strong)',
-                                      color: 'var(--aurora-text-primary)',
+                                      background: 'var(--evosales-canvas)',
+                                      color: 'var(--evosales-ink)',
                                   }
                                 : undefined
                         }
@@ -480,12 +481,12 @@ export function AppSidebar() {
                         {!isMobile && moreOpen && morePos ? (
                             <div
                                 id="sidebar-more-panel"
-                                className="fixed z-[100] flex h-[420px] w-[520px] max-w-[calc(100vw-1rem)] overflow-hidden rounded-[var(--aurora-radius-2)] border shadow-xl"
+                                className="fixed z-[100] flex h-[420px] w-[520px] max-w-[calc(100vw-1rem)] overflow-hidden rounded-[var(--radius-2)] border shadow-xl"
                                 style={{
                                     top: morePos.top,
                                     left: morePos.left,
-                                    borderColor: 'var(--aurora-border-default)',
-                                    background: 'var(--aurora-panel-strong)',
+                                    borderColor: 'var(--evosales-hairline)',
+                                    background: 'var(--evosales-canvas)',
                                     boxShadow: 'var(--aurora-shadow-strong)',
                                 }}
                             >
@@ -506,7 +507,7 @@ export function AppSidebar() {
                 {showSetup && !collapsed ? (
                     <Link
                         href="/settings/apps"
-                        className="mx-2 mb-1 rounded-[var(--aurora-radius-1)] border border-sidebar-border bg-sidebar-well px-2.5 py-2 text-[11px] text-sidebar-ink"
+                        className="mx-2 mb-1 rounded-[var(--radius-1)] border border-sidebar-border bg-sidebar-well px-2.5 py-2 text-[11px] text-sidebar-ink"
                     >
                         <p className="font-medium">Set up channels</p>
                         <p className="text-sidebar-mute">Connect WhatsApp Cloud or email.</p>

@@ -74,18 +74,20 @@ export function RecordLayoutEditor() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="size-7"
+                                                    aria-label={`Move ${def.label} up`}
                                                     onClick={() => moveCard(def.id, 'up')}
                                                 >
-                                                    <ChevronUp className="size-4" />
+                                                    <ChevronUp className="size-4" aria-hidden />
                                                 </Button>
                                                 <Button
                                                     type="button"
                                                     variant="ghost"
                                                     size="icon"
                                                     className="size-7"
+                                                    aria-label={`Move ${def.label} down`}
                                                     onClick={() => moveCard(def.id, 'down')}
                                                 >
-                                                    <ChevronDown className="size-4" />
+                                                    <ChevronDown className="size-4" aria-hidden />
                                                 </Button>
                                             </div>
                                         </div>

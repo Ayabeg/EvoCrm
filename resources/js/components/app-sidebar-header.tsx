@@ -54,9 +54,10 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                 variant="default"
                                 size="icon"
                                 title="Create"
+                                aria-label="Create"
                                 className="rounded-full"
                             >
-                                <Plus className="size-4" />
+                                <Plus className="size-4" aria-hidden />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44">
@@ -76,9 +77,10 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         variant="ghost"
                         size="icon"
                         title="Notifications"
+                        aria-label="Notifications"
                         className="rounded-full"
                     >
-                        <Bell className="size-4" />
+                        <Bell className="size-4" aria-hidden />
                     </Button>
                     {user ? (
                         <DropdownMenu>
@@ -89,6 +91,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                     size="icon"
                                     className="rounded-full bg-ink text-[11px] font-medium text-canvas"
                                     title={user.name}
+                                    aria-label={`${user.name} account menu`}
                                 >
                                     {initials(user.name)}
                                 </Button>
