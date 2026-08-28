@@ -18,7 +18,7 @@ export function CrmObjectHeader({
 }) {
     return (
         <header
-            className="flex items-center justify-between gap-3 border-b border-hairline bg-canvas px-4 py-3 sm:px-6"
+            className="flex flex-col gap-2 border-b border-hairline bg-canvas px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-6"
             data-crm="object-header"
         >
             <div className="min-w-0">
@@ -26,12 +26,12 @@ export function CrmObjectHeader({
                     {title}
                 </h1>
                 {description ? (
-                    <p className="mt-0.5 truncate text-[11px] leading-4 text-mute">
+                    <p className="mt-0.5 text-[11px] leading-4 text-mute">
                         {description}
                     </p>
                 ) : null}
             </div>
-            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                 {secondary}
                 <Button
                     type="button"
