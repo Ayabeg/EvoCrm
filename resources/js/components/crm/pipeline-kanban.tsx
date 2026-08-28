@@ -2,9 +2,8 @@ import type { DragEvent, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Apple + Aurora kanban chrome for the deals board and leads kanban.
- * White (canvas) cards, hairline column gutters, Aurora radius/shadow/motion.
- * Does not own drag or weighted math — callers keep those.
+ * Shared kanban chrome for the deals pipeline and the leads board.
+ * Callers own drag payloads, move requests, and weighted math.
  */
 
 const cardRadius = 'rounded-[var(--radius-1)]';
@@ -14,16 +13,21 @@ const motion =
 export function PipelineKanban({
     children,
     className,
+    busy = false,
 }: {
     children: ReactNode;
     className?: string;
+    busy?: boolean;
 }) {
     return (
         <div
             className={cn(
-                'flex min-h-[28rem] items-stretch overflow-x-auto',
+                'flex min-h-[22rem] items-stretch overflow-x-auto',
                 className,
             )}
+            data-testid="pipeline-kanban"
+            aria-busy={busy || undefined}
+            aria-hidden={busy || undefined}
         >
             {children}
         </div>
@@ -42,9 +46,9 @@ export function PipelineKanbanColumn({
     children: ReactNode;
     over?: boolean;
     testId?: string;
-    onDragOver: (event: DragEvent) => void;
-    onDragLeave: () => void;
-    onDrop: (event: DragEvent) => void;
+    onDragOver?: (event: DragEvent) => void;
+    onDragLeave?: () => void;
+    onDrop?: (event: DragEvent) => void;
     className?: string;
 }) {
     return (
@@ -54,9 +58,9 @@ export function PipelineKanbanColumn({
             onDrop={onDrop}
             data-testid={testId}
             className={cn(
-                'flex w-72 shrink-0 flex-col border-r border-hairline px-3 py-1 last:border-r-0',
+                'flex w-72 shrink-0 flex-col border-r border-hairline px-2.5 py-2 last:border-r-0',
                 over &&
-                    'bg-[color-mix(in_srgb,var(--evosales-mark)_5%,transparent)]',
+                    'bg-canvas-soft outline outline-1 outline-offset-[-1px] outline-[color-mix(in_srgb,var(--evosales-ink)_22%,var(--evosales-hairline))]',
                 className,
             )}
         >
@@ -81,15 +85,17 @@ export function PipelineKanbanHeader({
     accent: string;
 }) {
     return (
-        <header className="mb-3 px-0.5">
-            <div className="flex items-baseline justify-between gap-2">
-                <h2 className="aurora-text-section truncate">{name}</h2>
-                <span className="text-[12px] text-mute tabular-nums">
-                    {count}
-                </span>
-            </div>
+        <header className="mb-2 px-0.5">
+            <h2 className="truncate text-[13px] font-semibold tracking-tight text-ink">
+                {name}
+            </h2>
+            <p className="mt-0.5 text-[11px] tabular-nums text-mute">
+                {count} {count === 1 ? 'deal' : 'deals'}
+            </p>
             {amount ? (
-                <p className="money mt-1 text-[13px] text-ink">{amount}</p>
+                <p className="money mt-1 break-words text-[13px] font-semibold tabular-nums text-ink">
+                    {amount}
+                </p>
             ) : null}
             {weighted ? (
                 <p className="mt-0.5 text-[11px] text-mute">
@@ -98,7 +104,7 @@ export function PipelineKanbanHeader({
                 </p>
             ) : null}
             <div
-                className="mt-2 h-px w-full"
+                className="mt-1.5 h-px w-full"
                 style={{ backgroundColor: accent }}
                 aria-hidden
             />
@@ -127,15 +133,17 @@ export function PipelineKanbanCard({
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             data-testid={testId}
+            aria-grabbed={dragging}
             className={cn(
                 cardRadius,
-                'cursor-grab border border-hairline bg-canvas p-3.5 text-sm shadow-[var(--aurora-shadow-medium)]',
-                'transition-[transform,box-shadow,opacity]',
+                'cursor-grab select-none border border-hairline bg-canvas px-2.5 py-2 text-[13px] shadow-[var(--aurora-shadow-medium)]',
+                'transition-[box-shadow,opacity,border-color]',
                 motion,
-                'hover:-translate-y-px hover:shadow-[var(--aurora-shadow-strong)]',
+                'hover:border-[color-mix(in_srgb,var(--evosales-ink)_16%,var(--evosales-hairline))] hover:shadow-[var(--aurora-shadow-strong)]',
                 'active:cursor-grabbing',
-                'motion-reduce:transition-none motion-reduce:hover:translate-y-0',
-                dragging && 'opacity-40',
+                'motion-reduce:transition-none',
+                dragging &&
+                    'cursor-grabbing opacity-50 shadow-[var(--aurora-shadow-strong)]',
                 className,
             )}
         >
@@ -145,18 +153,22 @@ export function PipelineKanbanCard({
 }
 
 export function PipelineKanbanStack({ children }: { children: ReactNode }) {
-    return <div className="grid min-h-16 gap-2">{children}</div>;
+    return <div className="grid min-h-16 gap-1.5">{children}</div>;
 }
 
-export function PipelineKanbanEmpty() {
+export function PipelineKanbanEmpty({
+    label = 'No deals',
+}: {
+    label?: string;
+}) {
     return (
         <p
             className={cn(
                 cardRadius,
-                'border border-dashed border-hairline px-3 py-5 text-center text-[12px] text-mute',
+                'border border-dashed border-hairline px-2.5 py-3 text-center text-[11px] text-mute',
             )}
         >
-            Drop a card here
+            {label}
         </p>
     );
 }

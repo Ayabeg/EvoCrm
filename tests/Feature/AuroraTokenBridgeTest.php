@@ -225,6 +225,8 @@ it('keeps remaining application chrome off raw Aurora radius and muted-text toke
         'js/pages/auth/auth-screen.tsx',
         'js/pages/settings/connectors.tsx',
         'js/pages/leads/board.tsx',
+        'js/pages/crm/deals/board.tsx',
+        'js/components/crm/deal-forecast-bar.tsx',
         'js/components/desk/official-connect-panel.tsx',
         'js/components/crm/pipeline-kanban.tsx',
     ];

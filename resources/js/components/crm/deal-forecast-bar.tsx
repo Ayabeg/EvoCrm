@@ -1,4 +1,5 @@
 import { formatDzd } from '@/lib/money';
+import { cn } from '@/lib/utils';
 
 type Forecast = {
     count: number;
@@ -14,6 +15,32 @@ type ForecastBand = {
     narrative?: string | null;
 };
 
+function ForecastFact({
+    label,
+    value,
+    money = false,
+}: {
+    label: string;
+    value: string;
+    money?: boolean;
+}) {
+    return (
+        <div className="min-w-0 shrink-0">
+            <p className="text-[10px] leading-3 tracking-wide text-mute">
+                {label}
+            </p>
+            <p
+                className={cn(
+                    'mt-0.5 text-[13px] font-semibold tabular-nums text-ink',
+                    money && 'money break-words',
+                )}
+            >
+                {value}
+            </p>
+        </div>
+    );
+}
+
 export default function DealForecastBar({
     forecast,
     forecastBand,
@@ -23,46 +50,38 @@ export default function DealForecastBar({
 }) {
     return (
         <div
-            className="flex flex-wrap items-center gap-x-6 gap-y-2 border-y border-hairline py-3 text-sm"
+            className="flex items-end gap-x-5 gap-y-2 overflow-x-auto border-b border-hairline bg-canvas px-4 py-2 sm:px-6"
             data-testid="forecast-totals"
         >
-            <div>
-                <p className="text-[10px] tracking-wide text-mute">Deals</p>
-                <p className="font-semibold tabular-nums">{forecast.count}</p>
-            </div>
-            <div>
-                <p className="text-[10px] tracking-wide text-mute">Total</p>
-                <p className="money font-semibold text-ink">
-                    {formatDzd(forecast.amount_cents)}
-                </p>
-            </div>
-            <div>
-                <p className="text-[10px] tracking-wide text-mute">Weighted</p>
-                <p className="money font-semibold text-brand">
-                    {formatDzd(forecast.weighted_cents)}
-                </p>
-            </div>
+            <ForecastFact
+                label="Pipeline"
+                value={formatDzd(forecast.amount_cents)}
+                money
+            />
+            <ForecastFact label="Open deals" value={String(forecast.count)} />
+            <ForecastFact
+                label="Weighted"
+                value={formatDzd(forecast.weighted_cents)}
+                money
+            />
             {typeof forecast.open_cents === 'number' ? (
-                <div>
-                    <p className="text-[10px] tracking-wide text-mute">
-                        Open pipeline
-                    </p>
-                    <p className="money font-semibold text-ink">
-                        {formatDzd(forecast.open_cents)}
-                    </p>
-                </div>
+                <ForecastFact
+                    label="Open pipeline"
+                    value={formatDzd(forecast.open_cents)}
+                    money
+                />
             ) : null}
             {forecastBand ? (
-                <div className="min-w-[140px]">
-                    <p className="text-[10px] tracking-wide text-mute">
-                        AI band · {forecastBand.band_label}
+                <div className="min-w-0 shrink-0 border-l border-hairline pl-5">
+                    <p className="text-[10px] leading-3 tracking-wide text-mute">
+                        Band · {forecastBand.band_label}
                     </p>
-                    <p className="money text-xs text-ink">
+                    <p className="money mt-0.5 break-words text-[12px] tabular-nums text-mute">
                         {formatDzd(forecastBand.low_cents)} –{' '}
                         {formatDzd(forecastBand.high_cents)}
                     </p>
                     {forecastBand.narrative ? (
-                        <p className="mt-0.5 text-[10px] text-mute">
+                        <p className="mt-0.5 max-w-[18rem] text-[10px] leading-4 text-mute">
                             {forecastBand.narrative}
                         </p>
                     ) : null}

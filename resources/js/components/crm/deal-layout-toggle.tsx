@@ -19,6 +19,7 @@ export default function DealLayoutToggle({
         >
             <Link
                 href={listHref}
+                aria-current={current === 'list' ? 'page' : undefined}
                 className={cn(
                     'px-2.5 py-1',
                     current === 'list'
@@ -30,6 +31,7 @@ export default function DealLayoutToggle({
             </Link>
             <Link
                 href={boardHref}
+                aria-current={current === 'board' ? 'page' : undefined}
                 className={cn(
                     'px-2.5 py-1',
                     current === 'board'

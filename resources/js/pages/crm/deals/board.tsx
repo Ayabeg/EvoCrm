@@ -1,8 +1,8 @@
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import type { DragEvent } from 'react';
-import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
-import type { KpiTile } from '@/components/crm/crm-kpi-strip';
+import { toast } from 'sonner';
+import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
@@ -15,7 +15,8 @@ import {
     PipelineKanbanStack,
 } from '@/components/crm/pipeline-kanban';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
-import PageHeader from '@/components/page-header';
+import { Button } from '@/components/ui/button';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatDzd } from '@/lib/money';
 import { stageUnderlineColor } from '@/lib/stage-colors';
 
@@ -57,6 +58,10 @@ type Forecast = {
     weighted_cents: number;
 };
 
+function createDealHref(pipelineId: number): string {
+    return `/crm/deals?pipeline=${pipelineId}&create=1`;
+}
+
 function DealCard({
     deal,
     dragging,
@@ -68,6 +73,10 @@ function DealCard({
     onDragStart: (event: DragEvent, dealId: number) => void;
     onDragEnd: () => void;
 }) {
+    const association =
+        [deal.company_name, deal.contact_name].filter(Boolean).join(' · ') ||
+        'No company';
+
     return (
         <PipelineKanbanCard
             dragging={dragging}
@@ -77,16 +86,14 @@ function DealCard({
         >
             <Link
                 href={deal.url}
-                className="block truncate font-medium hover:text-brand"
+                className="block truncate font-medium text-ink hover:underline"
             >
                 {deal.title}
             </Link>
-            <p className="mt-0.5 truncate text-xs text-mute">
-                {[deal.contact_name, deal.company_name]
-                    .filter(Boolean)
-                    .join(' · ') || 'No contact'}
+            <p className="mt-0.5 truncate text-[11px] text-mute">
+                {association}
             </p>
-            <p className="money mt-1.5 text-sm font-semibold text-ink">
+            <p className="money mt-1.5 break-words text-[13px] font-semibold tabular-nums text-ink">
                 {formatDzd(deal.amount_cents)}
             </p>
             <p className="mt-0.5 truncate text-[11px] text-mute">
@@ -94,6 +101,26 @@ function DealCard({
                 {deal.close_date ? ` · ${deal.close_date}` : ''}
             </p>
         </PipelineKanbanCard>
+    );
+}
+
+function PipelineBoardSkeleton({ columns = 6 }: { columns?: number }) {
+    return (
+        <PipelineKanban className="h-full px-2 sm:px-3" busy>
+            {Array.from({ length: columns }).map((_, index) => (
+                <PipelineKanbanColumn key={index}>
+                    <div className="mb-2 space-y-1.5 px-0.5">
+                        <div className="h-3.5 w-24 animate-pulse rounded bg-hairline" />
+                        <div className="h-2.5 w-14 animate-pulse rounded bg-hairline" />
+                        <div className="h-3 w-20 animate-pulse rounded bg-hairline" />
+                    </div>
+                    <div className="grid gap-1.5">
+                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-canvas" />
+                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-canvas" />
+                    </div>
+                </PipelineKanbanColumn>
+            ))}
+        </PipelineKanban>
     );
 }
 
@@ -119,6 +146,8 @@ export default function DealBoard({
 }) {
     const [draggingId, setDraggingId] = useState<number | null>(null);
     const [overStage, setOverStage] = useState<number | null>(null);
+    const loading = useInertiaLoading();
+    const createHref = createDealHref(pipeline.id);
 
     const onDragStart = (event: DragEvent, dealId: number) => {
         event.dataTransfer.setData('text/plain', String(dealId));
@@ -141,42 +170,30 @@ export default function DealBoard({
         router.post(
             `/crm/deals/${dealId}/move`,
             { stage_id: stage.id },
-            { preserveScroll: true },
+            {
+                preserveScroll: true,
+                onError: () => {
+                    toast.error('Could not move this deal. Try again.');
+                },
+            },
         );
     };
 
-    const pipelineKpis: KpiTile[] = [
-        {
-            key: 'deals',
-            label: 'Open deals',
-            value: forecast.count,
-            hint: 'In this pipeline',
-        },
-        {
-            key: 'amount',
-            label: 'Pipeline value',
-            value: forecast.amount_cents,
-            format: 'money',
-            hint: 'Total deal amount',
-        },
-        {
-            key: 'weighted',
-            label: 'Weighted forecast',
-            value: forecast.weighted_cents,
-            format: 'money',
-            hint: 'Stage probability applied',
-        },
-    ];
-
     return (
-        <CrmShell title="Deals board">
-            <div className="h-full overflow-y-auto">
-                <div className="flex-1 space-y-5 bg-canvas-soft px-4 py-5 text-ink sm:px-6 sm:py-6">
-                    <PageHeader
-                        title="Deals board"
-                        description={`${pipeline.name} — drag a card to move its stage. Column totals update live.`}
-                    >
-                        <div className="flex flex-wrap items-center gap-2">
+        <CrmShell title="Pipeline" chrome="workspace">
+            <div
+                className="flex h-full min-h-0 flex-col bg-canvas-soft"
+                data-crm="pipeline-workspace"
+            >
+                <CrmObjectHeader
+                    title="Pipeline"
+                    description={pipeline.name}
+                    primaryLabel="New deal"
+                    onPrimary={() => {
+                        window.location.href = createHref;
+                    }}
+                    secondary={
+                        <>
                             <PipelineSwitcher
                                 pipelineId={pipeline.id}
                                 pipelines={pipelines}
@@ -186,75 +203,112 @@ export default function DealBoard({
                                 current="board"
                                 pipelineId={pipeline.id}
                             />
-                        </div>
-                    </PageHeader>
+                        </>
+                    }
+                />
 
-                    <CrmKpiStrip kpis={pipelineKpis} columns={3} />
-                    <DealForecastBar
-                        forecast={forecast}
-                        forecastBand={forecastBand}
-                    />
+                <DealForecastBar
+                    forecast={forecast}
+                    forecastBand={forecastBand}
+                />
 
-                    <PipelineKanban>
-                        {stages.map((stage) => {
-                            const cards = deals.filter(
-                                (deal) => deal.stage_id === stage.id,
-                            );
+                {deals.length === 0 && !loading ? (
+                    <div
+                        className="border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6"
+                        data-crm="pipeline-empty"
+                    >
+                        <p className="text-[13px] font-medium text-ink">
+                            No deals in this pipeline
+                        </p>
+                        <p className="mt-0.5 text-[12px] text-mute">
+                            Create your first deal to start tracking
+                            opportunities.
+                        </p>
+                        <Button
+                            type="button"
+                            size="sm"
+                            className="mt-2 h-8"
+                            onClick={() => {
+                                window.location.href = createHref;
+                            }}
+                        >
+                            New deal
+                        </Button>
+                    </div>
+                ) : null}
 
-                            return (
-                                <PipelineKanbanColumn
-                                    key={stage.id}
-                                    testId={`stage-column-${stage.slug}`}
-                                    over={overStage === stage.id}
-                                    onDragOver={(event) => {
-                                        event.preventDefault();
-                                        event.dataTransfer.dropEffect = 'move';
-                                        setOverStage(stage.id);
-                                    }}
-                                    onDragLeave={() =>
-                                        setOverStage((current) =>
-                                            current === stage.id
-                                                ? null
-                                                : current,
-                                        )
-                                    }
-                                    onDrop={(event) => onDrop(event, stage)}
-                                >
-                                    <PipelineKanbanHeader
-                                        name={stage.name}
-                                        count={stage.count}
-                                        amount={formatDzd(stage.amount_cents)}
-                                        weighted={formatDzd(
-                                            stage.weighted_cents,
-                                        )}
-                                        probability={stage.probability}
-                                        accent={stageUnderlineColor(stage.slug)}
-                                    />
+                <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-canvas">
+                    {loading ? (
+                        <PipelineBoardSkeleton columns={stages.length || 6} />
+                    ) : (
+                        <PipelineKanban className="h-full min-h-[22rem] px-1 sm:px-2">
+                            {stages.map((stage) => {
+                                const cards = deals.filter(
+                                    (deal) => deal.stage_id === stage.id,
+                                );
 
-                                    <PipelineKanbanStack>
-                                        {cards.map((deal) => (
-                                            <DealCard
-                                                key={deal.id}
-                                                deal={deal}
-                                                dragging={
-                                                    draggingId === deal.id
-                                                }
-                                                onDragStart={onDragStart}
-                                                onDragEnd={() => {
-                                                    setDraggingId(null);
-                                                    setOverStage(null);
-                                                }}
-                                            />
-                                        ))}
+                                return (
+                                    <PipelineKanbanColumn
+                                        key={stage.id}
+                                        testId={`stage-column-${stage.slug}`}
+                                        over={overStage === stage.id}
+                                        onDragOver={(event) => {
+                                            event.preventDefault();
+                                            event.dataTransfer.dropEffect =
+                                                'move';
+                                            setOverStage(stage.id);
+                                        }}
+                                        onDragLeave={() =>
+                                            setOverStage((current) =>
+                                                current === stage.id
+                                                    ? null
+                                                    : current,
+                                            )
+                                        }
+                                        onDrop={(event) =>
+                                            onDrop(event, stage)
+                                        }
+                                    >
+                                        <PipelineKanbanHeader
+                                            name={stage.name}
+                                            count={stage.count}
+                                            amount={formatDzd(
+                                                stage.amount_cents,
+                                            )}
+                                            weighted={formatDzd(
+                                                stage.weighted_cents,
+                                            )}
+                                            probability={stage.probability}
+                                            accent={stageUnderlineColor(
+                                                stage.slug,
+                                            )}
+                                        />
 
-                                        {cards.length === 0 ? (
-                                            <PipelineKanbanEmpty />
-                                        ) : null}
-                                    </PipelineKanbanStack>
-                                </PipelineKanbanColumn>
-                            );
-                        })}
-                    </PipelineKanban>
+                                        <PipelineKanbanStack>
+                                            {cards.map((deal) => (
+                                                <DealCard
+                                                    key={deal.id}
+                                                    deal={deal}
+                                                    dragging={
+                                                        draggingId === deal.id
+                                                    }
+                                                    onDragStart={onDragStart}
+                                                    onDragEnd={() => {
+                                                        setDraggingId(null);
+                                                        setOverStage(null);
+                                                    }}
+                                                />
+                                            ))}
+
+                                            {cards.length === 0 ? (
+                                                <PipelineKanbanEmpty />
+                                            ) : null}
+                                        </PipelineKanbanStack>
+                                    </PipelineKanbanColumn>
+                                );
+                            })}
+                        </PipelineKanban>
+                    )}
                 </div>
             </div>
         </CrmShell>
@@ -264,6 +318,6 @@ export default function DealBoard({
 DealBoard.layout = {
     breadcrumbs: [
         { title: 'Deals', href: '/crm/deals' },
-        { title: 'Board', href: '/crm/deals/board' },
+        { title: 'Pipeline', href: '/crm/deals/board' },
     ],
 };
