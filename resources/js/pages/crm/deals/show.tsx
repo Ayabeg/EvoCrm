@@ -11,8 +11,8 @@ import DealQuotes from '@/components/crm/deal-quotes';
 import DealSplits from '@/components/crm/deal-splits';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import PlaybookCard from '@/components/crm/playbook-card';
-import RecordActivityPanel from '@/components/crm/record-activity-panel';
 import type { RecordActivity } from '@/components/crm/record-activity';
+import RecordActivityPanel from '@/components/crm/record-activity-panel';
 import {
     AssociationCard,
     RecordActions,

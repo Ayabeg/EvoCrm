@@ -5,8 +5,8 @@ import type { CatchUpItem } from '@/components/crm/catch-up-block';
 import ContactDealsKanban from '@/components/crm/contact-deals-kanban';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import PlaybookCard from '@/components/crm/playbook-card';
-import RecordActivityPanel from '@/components/crm/record-activity-panel';
 import type { RecordActivity } from '@/components/crm/record-activity';
+import RecordActivityPanel from '@/components/crm/record-activity-panel';
 import {
     AssociationCard,
     RecordActions,

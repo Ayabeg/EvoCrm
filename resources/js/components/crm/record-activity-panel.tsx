@@ -2,12 +2,12 @@ import { Form } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
+import type { RecordActivity } from '@/components/crm/record-activity';
 import {
     deriveRecordNext,
     filterRecordActivity,
     hasCatchUpItems,
     RECORD_ACTIVITY_TABS,
-    type RecordActivity,
 } from '@/components/crm/record-activity';
 import { ActivityTabs } from '@/components/crm/record-chrome';
 import {

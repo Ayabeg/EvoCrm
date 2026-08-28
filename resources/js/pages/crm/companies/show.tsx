@@ -3,8 +3,8 @@ import { useState } from 'react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import { SkeletonRecord } from '@/components/crm/empty-room';
-import RecordActivityPanel from '@/components/crm/record-activity-panel';
 import type { RecordActivity } from '@/components/crm/record-activity';
+import RecordActivityPanel from '@/components/crm/record-activity-panel';
 import {
     AssociationCard,
     RecordActions,
