@@ -5,6 +5,7 @@ import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import ListViewTable from '@/components/crm/list-view-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,12 +48,12 @@ export default function CompaniesIndex({
 
     return (
         <>
-            <CrmShell title="Companies">
+            <CrmShell title="Companies" chrome="workspace">
                 <CrmListShell
                 title="Companies"
                 entity="company"
                 basePath="/crm/companies"
-                primaryLabel="Add company"
+                primaryLabel="Create company"
                 activeFilters={activeFilters}
                 savedFilters={savedFilters}
                 listView={listView}
@@ -67,9 +68,26 @@ export default function CompaniesIndex({
                             <SkeletonList />
                         ) : companies.length === 0 ? (
                             <CrmEmptyState
-                                line="No companies in this view."
-                                actionLabel="Add company"
-                                onAction={() => setDrawer(true)}
+                                title={
+                                    hasActiveListFilters(activeFilters)
+                                        ? 'No companies match these filters'
+                                        : 'No companies yet'
+                                }
+                                line={
+                                    hasActiveListFilters(activeFilters)
+                                        ? 'Clear filters or save a different view to see records.'
+                                        : 'Create a company to keep accounts next to their contacts and deals.'
+                                }
+                                actionLabel={
+                                    hasActiveListFilters(activeFilters)
+                                        ? undefined
+                                        : 'Create company'
+                                }
+                                onAction={
+                                    hasActiveListFilters(activeFilters)
+                                        ? undefined
+                                        : () => setDrawer(true)
+                                }
                             />
                         ) : (
                             <div className="min-h-0 flex-1 overflow-auto">
@@ -82,7 +100,11 @@ export default function CompaniesIndex({
                                 />
                             </div>
                         )}
-                        <CrmListFooter count={companies.length} noun="companies" />
+                        <CrmListFooter
+                            count={companies.length}
+                            total={recordCount}
+                            noun="companies"
+                        />
                     </>
                 )}
             </CrmListShell>

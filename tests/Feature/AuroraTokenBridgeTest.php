@@ -56,6 +56,14 @@ it('keeps Home application chrome on Brand Book tokens rather than raw --aurora-
         'js/components/dashboard/home-kpi-strip.tsx',
         'js/components/crm/evo-kpi-card.tsx',
         'js/components/crm/crm-kpi-strip.tsx',
+        'js/components/crm/crm-list-shell.tsx',
+        'js/components/crm/crm-object-header.tsx',
+        'js/components/crm/crm-active-filters.tsx',
+        'js/components/crm/list-toolbar.tsx',
+        'js/pages/crm/contacts/index.tsx',
+        'js/pages/crm/companies/index.tsx',
+        'js/pages/crm/deals/index.tsx',
+        'js/pages/crm/leads/index.tsx',
     ];
 
     foreach ($files as $file) {

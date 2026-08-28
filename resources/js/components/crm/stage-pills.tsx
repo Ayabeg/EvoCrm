@@ -1,5 +1,4 @@
 import { Link } from '@inertiajs/react';
-import { stagePillClass } from '@/lib/stage-colors';
 import { cn } from '@/lib/utils';
 
 export type StagePill = {
@@ -18,20 +17,25 @@ export function StagePills({
     activeSlug?: string | null;
     hrefFor: (slug: string) => string;
 }) {
+    if (stages.length === 0) {
+        return null;
+    }
+
     return (
-        <div className="flex flex-wrap gap-2 px-6 py-3">
-            {stages.map((stage, index) => (
+        <div className="flex flex-wrap gap-1.5 px-4 pb-2 sm:px-6">
+            {stages.map((stage) => (
                 <Link
                     key={stage.id}
                     href={hrefFor(stage.slug)}
                     className={cn(
-                        'inline-flex items-center gap-2 rounded-full px-3 py-1 text-ui font-medium',
-                        stagePillClass(index),
-                        activeSlug === stage.slug && 'ring-2 ring-brand/40',
+                        'inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px]',
+                        activeSlug === stage.slug
+                            ? 'border-ink bg-canvas-soft font-medium text-ink'
+                            : 'border-hairline text-mute hover:text-ink',
                     )}
                 >
                     {stage.name}
-                    <span className="tabular-nums opacity-80">{stage.count}</span>
+                    <span className="tabular-nums">{stage.count}</span>
                 </Link>
             ))}
         </div>

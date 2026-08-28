@@ -1,7 +1,7 @@
 import { Form, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { crmListHref, filterFields } from '@/components/crm/list-query';
+import { filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import type { ListViewFilters } from '@/lib/list-view-config';
 
@@ -14,7 +14,6 @@ export default function ColumnFilterRow({
     members = [],
     cities = [],
     wilayas = [],
-    exportHref,
     columns = [],
     filterGroups,
     filterBuilder,
@@ -47,7 +46,7 @@ export default function ColumnFilterRow({
               ];
 
     return (
-        <div className="border-b border-hairline bg-canvas px-3 py-2">
+        <div className="border-t border-hairline bg-canvas px-4 py-3 sm:px-6">
             <Form action={action} method="get" className="flex flex-wrap items-end gap-2">
                 <input type="hidden" name="view" value={String(fields.view ?? 'all')} />
                 {fields.filter_id ? <input type="hidden" name="filter_id" value={String(fields.filter_id)} /> : null}
@@ -55,12 +54,12 @@ export default function ColumnFilterRow({
                 {filterGroups ? (
                     <input type="hidden" name="filter_groups" value={JSON.stringify(filterGroups)} />
                 ) : null}
-                <label className="grid gap-0.5 text-[10px] text-mute">
+                <label className="grid gap-0.5 text-[11px] text-mute">
                     Owner
                     <select
                         name="owner"
                         defaultValue={String(fields.owner ?? '')}
-                        className="h-7 rounded border border-hairline bg-background px-1 text-[11px] text-ink"
+                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
                     >
                         <option value="">Anyone</option>
                         <option value="unassigned">Unassigned</option>
@@ -71,12 +70,12 @@ export default function ColumnFilterRow({
                         ))}
                     </select>
                 </label>
-                <label className="grid gap-0.5 text-[10px] text-mute">
+                <label className="grid gap-0.5 text-[11px] text-mute">
                     Create date
                     <select
                         name="created"
                         defaultValue={String(fields.created ?? '')}
-                        className="h-7 rounded border border-hairline bg-background px-1 text-[11px] text-ink"
+                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
                     >
                         <option value="">Any time</option>
                         <option value="today">Today</option>
@@ -85,12 +84,12 @@ export default function ColumnFilterRow({
                         <option value="90d">Last 90 days</option>
                     </select>
                 </label>
-                <label className="grid gap-0.5 text-[10px] text-mute">
+                <label className="grid gap-0.5 text-[11px] text-mute">
                     Last activity
                     <select
                         name="last_activity"
                         defaultValue={String(fields.last_activity ?? '')}
-                        className="h-7 rounded border border-hairline bg-background px-1 text-[11px] text-ink"
+                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
                     >
                         <option value="">Any</option>
                         <option value="7d">7 days</option>
@@ -98,12 +97,12 @@ export default function ColumnFilterRow({
                         <option value="none">None</option>
                     </select>
                 </label>
-                <label className="grid gap-0.5 text-[10px] text-mute">
+                <label className="grid gap-0.5 text-[11px] text-mute">
                     {entity === 'contact' ? 'Lead status' : 'Deal status'}
                     <select
                         name="status"
                         defaultValue={String(fields.status ?? '')}
-                        className="h-7 rounded border border-hairline bg-background px-1 text-[11px] text-ink"
+                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
                     >
                         <option value="">Any</option>
                         {statusOptions.map((option) => (
@@ -113,34 +112,31 @@ export default function ColumnFilterRow({
                         ))}
                     </select>
                 </label>
-                <Button className="h-7 px-2 text-[11px]">Apply</Button>
-                <Link href={action} className="text-[11px] text-mute hover:text-ink">
+                <Button type="submit" variant="outline" size="sm" className="h-8 px-2.5 text-[12px]">
+                    Apply
+                </Button>
+                <Link href={action} className="text-[12px] text-mute hover:text-ink">
                     Clear
                 </Link>
                 <button
                     type="button"
                     onClick={() => setAdvanced((open) => !open)}
-                    className="text-[11px] text-ink underline-offset-2 hover:underline"
+                    className="text-[12px] text-ink underline-offset-2 hover:underline"
                 >
-                    {advanced ? 'Hide advanced filters' : 'Advanced filters'}
+                    {advanced ? 'Hide advanced' : 'Advanced'}
                 </button>
-                {exportHref ? (
-                    <a href={crmListHref(exportHref, fields)} className="ml-auto text-[11px] text-brand">
-                        Export CSV
-                    </a>
-                ) : null}
                 {advanced && filterBuilder ? (
                     <div className="w-full border-t border-hairline pt-2">{filterBuilder}</div>
                 ) : null}
                 {advanced ? (
                     <div className="flex w-full flex-wrap items-end gap-2 border-t border-hairline pt-2">
                         {cities.length > 0 ? (
-                            <label className="grid gap-0.5 text-[10px] text-mute">
+                            <label className="grid gap-0.5 text-[11px] text-mute">
                                 City
                                 <select
                                     name="city"
                                     defaultValue={String(fields.city ?? '')}
-                                    className="h-7 rounded border border-hairline bg-background px-1 text-[11px] text-ink"
+                                    className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
                                 >
                                     <option value="">Any</option>
                                     {cities.map((city) => (
@@ -152,12 +148,12 @@ export default function ColumnFilterRow({
                             </label>
                         ) : null}
                         {wilayas.length > 0 ? (
-                            <label className="grid gap-0.5 text-[10px] text-mute">
+                            <label className="grid gap-0.5 text-[11px] text-mute">
                                 Wilaya
                                 <select
                                     name="wilaya"
                                     defaultValue={String(fields.wilaya ?? '')}
-                                    className="h-7 rounded border border-hairline bg-background px-1 text-[11px] text-ink"
+                                    className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
                                 >
                                     <option value="">Any</option>
                                     {wilayas.map((wilaya) => (
@@ -169,12 +165,12 @@ export default function ColumnFilterRow({
                             </label>
                         ) : null}
                         {entity !== 'company' ? (
-                            <label className="flex items-center gap-1 text-[11px] text-ink">
+                            <label className="flex items-center gap-1 text-[12px] text-ink">
                                 <input type="checkbox" name="unanswered" value="1" defaultChecked={!!fields.unanswered} />
                                 Unanswered
                             </label>
                         ) : null}
-                        <label className="flex items-center gap-1 text-[11px] text-ink">
+                        <label className="flex items-center gap-1 text-[12px] text-ink">
                             <input type="checkbox" name="unassigned" value="1" defaultChecked={!!fields.unassigned} />
                             Unassigned
                         </label>

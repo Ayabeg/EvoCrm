@@ -1,7 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { RoomShell  } from '@/components/crm/room-shell';
-import type {RoomTab} from '@/components/crm/room-shell';
+import { RoomShell } from '@/components/crm/room-shell';
+import type { RoomTab } from '@/components/crm/room-shell';
 
 const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
@@ -60,12 +60,25 @@ export function crmTabs(pathname: string): RoomTab[] {
 export function CrmShell({
     title,
     children,
+    chrome = 'room',
 }: {
     title: string;
     children: ReactNode;
+    chrome?: 'room' | 'workspace';
 }) {
     const { url } = usePage();
     const pathname = url.split('?')[0] ?? '/crm/contacts';
+
+    if (chrome === 'workspace') {
+        return (
+            <>
+                <Head title={title} />
+                <div className="flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink">
+                    {children}
+                </div>
+            </>
+        );
+    }
 
     return (
         <>

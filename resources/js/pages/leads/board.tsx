@@ -10,7 +10,7 @@ import {
     PipelineKanbanHeader,
     PipelineKanbanStack,
 } from '@/components/crm/pipeline-kanban';
-import PageHeader from '@/components/page-header';
+import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -287,50 +287,48 @@ export default function LeadsBoard({
     return (
         <>
             <Head title="Leads" />
-            <div className="flex-1 bg-canvas-soft px-4 py-5 text-ink sm:px-6 sm:py-6">
-                <PageHeader
-                    title="Leads"
-                    description={`${pipeline.name} pipeline — drag a card to another stage to update the deal.`}
-                >
-                    <div className="relative w-full sm:w-64">
-                        <Search className="absolute top-2.5 left-2.5 size-4 text-mute" />
+            <div className="flex min-h-0 flex-1 flex-col bg-canvas-soft text-ink">
+                <CrmObjectHeader
+                    title="Lead board"
+                    description={`${pipeline.name} · drag a card to update the stage`}
+                    primaryLabel="New lead"
+                    onPrimary={() => setAdding(true)}
+                />
+
+                <div className="border-b border-hairline bg-canvas px-4 py-2 sm:px-6">
+                    <div className="relative mb-2 max-w-md">
+                        <Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-mute" />
                         <Input
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
-                            placeholder="Search title, contact, company…"
-                            className="pl-8"
+                            placeholder="Search leads..."
+                            className="h-8 pl-7 text-[12px]"
                             aria-label="Search leads"
                         />
                     </div>
-                </PageHeader>
-
-                <div className="mb-4 flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
                     {STRIP.map((chip) => (
                         <Link
                             key={chip.key}
                             href={`/leads?filter=${chip.key}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
                             preserveScroll
                             className={cn(
-                                'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                                'inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px]',
                                 filter === chip.key
-                                    ? 'border-brand bg-brand text-primary-foreground'
-                                    : 'border-hairline bg-canvas text-mute hover:text-ink',
+                                    ? 'border-ink bg-canvas-soft font-medium text-ink'
+                                    : 'border-hairline text-mute hover:text-ink',
                             )}
                         >
                             {chip.label}
-                            <span
-                                className={cn(
-                                    'ml-1.5 tabular-nums',
-                                    filter === chip.key
-                                        ? 'text-primary-foreground/80'
-                                        : 'text-mute/70',
-                                )}
-                            >
+                            <span className="tabular-nums">
                                 {counts[chip.key as keyof Counts]}
                             </span>
                         </Link>
                     ))}
+                    </div>
                 </div>
+
+                <div className="min-h-0 flex-1 overflow-auto px-4 py-3 sm:px-6">
 
                 <PipelineKanban>
                     {stages.map((stage, stageIndex) => {
@@ -394,7 +392,7 @@ export default function LeadsBoard({
                                                 onSuccess={() =>
                                                     setAdding(false)
                                                 }
-                                                className="grid gap-2 rounded-[var(--radius-1)] border border-hairline bg-canvas p-3 shadow-[var(--aurora-shadow-medium)]"
+                                                className="grid gap-2 rounded-[var(--radius-1)] border border-hairline bg-canvas p-3"
                                             >
                                                 {({ processing }) => (
                                                     <>
@@ -445,7 +443,7 @@ export default function LeadsBoard({
                                             <button
                                                 type="button"
                                                 onClick={() => setAdding(true)}
-                                                className="flex items-center justify-center gap-1.5 rounded-[var(--radius-1)] border border-dashed border-hairline px-3 py-2 text-xs font-medium text-mute transition-colors hover:border-brand hover:text-brand"
+                                                className="flex items-center justify-center gap-1.5 rounded-[var(--radius-1)] border border-dashed border-hairline px-3 py-2 text-xs font-medium text-mute transition-colors hover:border-ink hover:text-ink"
                                             >
                                                 <Plus className="size-3.5" />
                                                 Quick add
@@ -456,6 +454,7 @@ export default function LeadsBoard({
                         );
                     })}
                 </PipelineKanban>
+                </div>
             </div>
         </>
     );

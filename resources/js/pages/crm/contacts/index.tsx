@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import ListViewTable from '@/components/crm/list-view-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,12 +68,12 @@ export default function ContactsIndex({
 
     return (
         <>
-            <CrmShell title="Contacts">
+            <CrmShell title="Contacts" chrome="workspace">
                 <CrmListShell
                     title="Contacts"
                     entity="contact"
                     basePath="/crm/contacts"
-                    primaryLabel="Add contacts"
+                    primaryLabel="Create contact"
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -82,32 +84,26 @@ export default function ContactsIndex({
                     companies={companies}
                     exportHref="/crm/contacts/export"
                     headerActions={
-                        <div className="flex items-center gap-3">
+                        <>
                             {canMerge ? (
-                                <Link
-                                    href="/crm/contacts/duplicates"
-                                    className="text-ui font-medium text-brand"
-                                >
+                                <CrmObjectSecondaryLink href="/crm/contacts/duplicates">
                                     Duplicates
-                                </Link>
+                                </CrmObjectSecondaryLink>
                             ) : null}
                             {canImport ? (
-                                <Link
-                                    href="/crm/contacts/import"
-                                    className="text-ui font-medium text-brand"
-                                >
+                                <CrmObjectSecondaryLink href="/crm/contacts/import">
                                     Import
-                                </Link>
+                                </CrmObjectSecondaryLink>
                             ) : null}
-                        </div>
+                        </>
                     }
                     banner={
                         !hasMailbox ? (
-                            <div className="border-b border-hairline bg-canvas-soft px-4 py-2.5 text-[13px] text-mute sm:px-6">
+                            <div className="border-b border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
                                 Connect email to log outbound from this list.{' '}
                                 <Link
                                     href="/outbound/mailboxes"
-                                    className="font-medium text-brand"
+                                    className="text-ink underline-offset-2 hover:underline"
                                 >
                                     Connect email
                                 </Link>
@@ -130,9 +126,26 @@ export default function ContactsIndex({
                                 <SkeletonList />
                             ) : contacts.length === 0 ? (
                                 <CrmEmptyState
-                                    line="No contacts in this view."
-                                    actionLabel="Add contacts"
-                                    onAction={() => setDrawer(true)}
+                                    title={
+                                        hasActiveListFilters(activeFilters)
+                                            ? 'No contacts match these filters'
+                                            : 'No contacts yet'
+                                    }
+                                    line={
+                                        hasActiveListFilters(activeFilters)
+                                            ? 'Clear filters or save a different view to see records.'
+                                            : 'Add your first contact to start building your customer workspace.'
+                                    }
+                                    actionLabel={
+                                        hasActiveListFilters(activeFilters)
+                                            ? undefined
+                                            : 'Create contact'
+                                    }
+                                    onAction={
+                                        hasActiveListFilters(activeFilters)
+                                            ? undefined
+                                            : () => setDrawer(true)
+                                    }
                                 />
                             ) : (
                                 <div className="min-h-0 flex-1 overflow-auto">
@@ -184,6 +197,7 @@ export default function ContactsIndex({
                             )}
                             <CrmListFooter
                                 count={contacts.length}
+                                total={recordCount}
                                 noun="contacts"
                                 exportHref="/crm/contacts/export"
                             />

@@ -170,12 +170,12 @@ export default function ListViewTable({
     return (
         <div className="@container/list min-h-0 flex-1">
             {/* Desktop / tablet: Aurora-styled table in controlled scroll region */}
-            <div className="hidden overflow-x-auto rounded-lg border border-hairline bg-canvas @[480px]/list:block">
-                <table className="aurora-text-table w-full min-w-[640px] border-collapse">
+            <div className="hidden overflow-x-auto bg-canvas @[480px]/list:block">
+                <table className="w-full min-w-[640px] border-collapse text-[13px]">
                     <thead>
                         <tr className="border-b border-hairline bg-canvas-soft text-left">
                             {selectable ? (
-                                <th className="w-10 px-3 py-2.5">
+                                <th className="w-10 px-4 py-2 sm:px-6">
                                     <input
                                         type="checkbox"
                                         checked={allSelected}
@@ -187,7 +187,7 @@ export default function ListViewTable({
                             {visible.map((column) => (
                                 <th
                                     key={column.id}
-                                    className="px-4 py-2.5 font-medium text-muted-foreground"
+                                    className="px-4 py-2 text-[11px] font-medium text-mute first:sm:pl-6 last:sm:pr-6"
                                 >
                                     {columnLabel(columnDefs, column.id)}
                                 </th>
@@ -195,16 +195,22 @@ export default function ListViewTable({
                         </tr>
                     </thead>
                     <tbody>
-                        {rows.map((row) => (
+                        {rows.map((row) => {
+                            const selected = selectedIds.includes(row.id);
+
+                            return (
                             <tr
                                 key={row.id}
-                                className="border-t border-hairline transition-colors hover:bg-canvas-soft/80"
+                                className={cn(
+                                    'border-b border-hairline transition-colors hover:bg-canvas-soft',
+                                    selected && 'bg-canvas-soft',
+                                )}
                             >
                                 {selectable ? (
-                                    <td className="px-3 py-2.5">
+                                    <td className="px-4 py-2 sm:px-6">
                                         <input
                                             type="checkbox"
-                                            checked={selectedIds.includes(row.id)}
+                                            checked={selected}
                                             onChange={() => onToggle?.(row.id)}
                                             aria-label={`Select ${row.id}`}
                                         />
@@ -222,11 +228,19 @@ export default function ListViewTable({
                                                 );
 
                                     return (
-                                        <td key={column.id} className="px-4 py-2.5">
+                                        <td
+                                            key={column.id}
+                                            className={cn(
+                                                'px-4 py-2 first:sm:pl-6 last:sm:pr-6',
+                                                column.id === primaryId
+                                                    ? 'font-medium text-ink'
+                                                    : 'text-mute',
+                                            )}
+                                        >
                                             {column.id === primaryId ? (
                                                 <Link
                                                     href={`${basePath}/${row.id}`}
-                                                    className="font-medium text-brand hover:underline"
+                                                    className="font-medium text-ink hover:underline"
                                                 >
                                                     {label}
                                                 </Link>
@@ -237,13 +251,14 @@ export default function ListViewTable({
                                     );
                                 })}
                             </tr>
-                        ))}
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
 
             {/* Mobile: prioritized card rows — no page-level horizontal scroll */}
-            <ul className="space-y-2 @[480px]/list:hidden">
+            <ul className="divide-y divide-hairline @[480px]/list:hidden">
                 {rows.map((row) => {
                     const primaryLabel =
                         entity === 'contact'
@@ -253,11 +268,11 @@ export default function ListViewTable({
                               : renderCompanyCell(primaryId, row as CompanyRow);
 
                     return (
-                        <li key={row.id} className="flex items-start gap-2">
+                        <li key={row.id} className="flex items-start gap-2 px-4 py-2.5">
                             {selectable ? (
                                 <input
                                     type="checkbox"
-                                    className="mt-4"
+                                    className="mt-1"
                                     checked={selectedIds.includes(row.id)}
                                     onChange={() => onToggle?.(row.id)}
                                     aria-label={`Select ${row.id}`}
@@ -265,13 +280,10 @@ export default function ListViewTable({
                             ) : null}
                             <Link
                                 href={`${basePath}/${row.id}`}
-                                className={cn(
-                                    'block min-w-0 flex-1 rounded-lg border border-hairline bg-canvas p-3 no-underline',
-                                    'transition-colors hover:border-brand/40 hover:bg-canvas-soft',
-                                )}
+                                className="block min-w-0 flex-1 no-underline"
                             >
-                                <p className="font-medium text-brand">{primaryLabel}</p>
-                                <dl className="mt-2 grid gap-1.5 text-[12px]">
+                                <p className="font-medium text-ink">{primaryLabel}</p>
+                                <dl className="mt-1 grid gap-1 text-[11px]">
                                     {visible
                                         .filter((column) => column.id !== primaryId)
                                         .slice(0, 3)

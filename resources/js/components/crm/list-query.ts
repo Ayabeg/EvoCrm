@@ -46,3 +46,88 @@ export function filterFields(filters: ListFilters): ListFilters {
         filter_groups: filters.filter_groups,
     };
 }
+
+const CREATED_LABELS: Record<string, string> = {
+    today: 'Today',
+    '7d': 'Last 7 days',
+    '30d': 'Last 30 days',
+    '90d': 'Last 90 days',
+};
+
+const ACTIVITY_LABELS: Record<string, string> = {
+    '7d': '7 days',
+    '30d': '30 days',
+    none: 'None',
+};
+
+export function hasActiveListFilters(filters: ListFilters): boolean {
+    return listFilterChips(filters).length > 0 || (filters.view != null && filters.view !== 'all');
+}
+
+export function listFilterChips(
+    filters: ListFilters,
+    members: { id: number; name: string }[] = [],
+): { key: string; label: string; value: string }[] {
+    const fields = filterFields(filters);
+    const chips: { key: string; label: string; value: string }[] = [];
+    const owner = fields.owner == null ? '' : String(fields.owner);
+
+    if (owner === 'unassigned') {
+        chips.push({ key: 'owner', label: 'Owner', value: 'Unassigned' });
+    } else if (owner) {
+        const member = members.find((row) => String(row.id) === owner);
+        chips.push({
+            key: 'owner',
+            label: 'Owner',
+            value: member?.name ?? owner,
+        });
+    }
+
+    if (fields.created) {
+        const key = String(fields.created);
+        chips.push({
+            key: 'created',
+            label: 'Created',
+            value: CREATED_LABELS[key] ?? key,
+        });
+    }
+
+    if (fields.last_activity) {
+        const key = String(fields.last_activity);
+        chips.push({
+            key: 'last_activity',
+            label: 'Last activity',
+            value: ACTIVITY_LABELS[key] ?? key,
+        });
+    }
+
+    if (fields.status) {
+        chips.push({
+            key: 'status',
+            label: 'Status',
+            value: String(fields.status).replace(/_/g, ' '),
+        });
+    }
+
+    if (fields.stage) {
+        chips.push({ key: 'stage', label: 'Stage', value: String(fields.stage) });
+    }
+
+    if (fields.city) {
+        chips.push({ key: 'city', label: 'City', value: String(fields.city) });
+    }
+
+    if (fields.wilaya) {
+        chips.push({ key: 'wilaya', label: 'Wilaya', value: String(fields.wilaya) });
+    }
+
+    if (fields.unanswered) {
+        chips.push({ key: 'unanswered', label: 'Unanswered', value: 'Yes' });
+    }
+
+    if (fields.unassigned) {
+        chips.push({ key: 'unassigned', label: 'Unassigned', value: 'Yes' });
+    }
+
+    return chips;
+}

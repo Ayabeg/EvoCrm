@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { cn } from '@/lib/utils';
 
 export default function DealLayoutToggle({
     current,
@@ -18,21 +19,23 @@ export default function DealLayoutToggle({
         >
             <Link
                 href={listHref}
-                className={`px-2.5 py-1 ${
+                className={cn(
+                    'px-2.5 py-1',
                     current === 'list'
-                        ? 'bg-brand text-primary-foreground'
-                        : 'bg-canvas text-ink hover:bg-canvas-soft'
-                }`}
+                        ? 'bg-canvas-soft font-medium text-ink'
+                        : 'bg-canvas text-mute hover:text-ink',
+                )}
             >
                 List
             </Link>
             <Link
                 href={boardHref}
-                className={`px-2.5 py-1 ${
+                className={cn(
+                    'px-2.5 py-1',
                     current === 'board'
-                        ? 'bg-brand text-primary-foreground'
-                        : 'bg-canvas text-ink hover:bg-canvas-soft'
-                }`}
+                        ? 'bg-canvas-soft font-medium text-ink'
+                        : 'bg-canvas text-mute hover:text-ink',
+                )}
             >
                 Board
             </Link>

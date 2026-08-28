@@ -1,14 +1,21 @@
-import { Link, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { CrmActiveFilters } from '@/components/crm/crm-active-filters';
 import ColumnChooser from '@/components/crm/column-chooser';
 import ColumnFilterRow from '@/components/crm/column-filter-row';
 import FilterBuilder from '@/components/crm/filter-builder';
-import { crmListHref, filterFields } from '@/components/crm/list-query';
+import { crmListHref, filterFields, listFilterChips } from '@/components/crm/list-query';
 import SavedViewTabs from '@/components/crm/saved-view-tabs';
 import { StagePills } from '@/components/crm/stage-pills';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 import type {
     ListViewColumn,
     ListViewFilters,
@@ -34,7 +41,6 @@ export default function ListToolbar({
     wilayas = [],
     stages = [],
     stagePills = [],
-    exportHref,
     columns: controlledColumns,
     onColumnsChange,
 }: {
@@ -57,6 +63,8 @@ export default function ListToolbar({
 }) {
     const { auth } = usePage().props as { auth: { user: { role: string } } };
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
+    const isMobile = useIsMobile();
+    const [filtersOpen, setFiltersOpen] = useState(false);
     const [internalColumns, setInternalColumns] = useState<ListViewColumn[]>(
         listView?.columns ?? [],
     );
@@ -65,6 +73,7 @@ export default function ListToolbar({
     const [filterGroups, setFilterGroups] = useState<ListViewFilters>(() =>
         filterGroupsFromActive(activeFilters),
     );
+    const activeCount = listFilterChips(activeFilters, members).length;
 
     useEffect(() => {
         // Server-provided filters can change during an Inertia partial reload.
@@ -80,68 +89,92 @@ export default function ListToolbar({
         }
     }, [controlledColumns, listView?.columns]);
 
-    return (
-        <div className="border-b border-hairline bg-canvas">
-            <div className="flex items-center justify-between gap-2 pr-3">
-                <div className="min-w-0 flex-1">
-                    <SavedViewTabs
-                        basePath={basePath}
+    const filterPanel = (
+        <ColumnFilterRow
+            action={basePath}
+            entity={entity}
+            activeFilters={activeFilters}
+            members={members}
+            cities={cities}
+            wilayas={wilayas}
+            columns={columns}
+            filterGroups={filterGroups}
+            filterBuilder={
+                listView ? (
+                    <FilterBuilder
                         entity={entity}
-                        activeFilters={activeFilters}
-                        savedFilters={savedFilters}
-                        columns={columns}
-                        listView={listView}
-                        recordCount={recordCount}
-                        filterGroups={filterGroups}
-                        canManageSettings={canManageSettings}
+                        fields={listView.filterFields}
+                        value={filterGroups}
+                        onChange={setFilterGroups}
+                        members={members}
+                        cities={cities}
+                        wilayas={wilayas}
+                        stages={stages}
                     />
+                ) : null
+            }
+        />
+    );
+
+    return (
+        <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar">
+            <div className="flex items-center gap-2 px-4 py-2 sm:px-6">
+                <div className="min-w-0 flex-1">
+                <SavedViewTabs
+                    basePath={basePath}
+                    entity={entity}
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    columns={columns}
+                    listView={listView}
+                    recordCount={recordCount}
+                    filterGroups={filterGroups}
+                    canManageSettings={canManageSettings}
+                />
                 </div>
-                <div className="flex items-center gap-1">
-                    {listView ? (
-                        <ColumnChooser
-                            columnDefs={listView.columnDefs}
-                            columns={columns}
-                            onChange={setColumns}
-                        />
-                    ) : null}
-                    <Button
-                        asChild
-                        size="sm"
-                        variant="outline"
-                        className="h-7 text-[11px]"
-                    >
-                        <Link href={`${basePath}?create=1`}>
-                            <Plus className="mr-1 size-3" />
-                            Create
-                        </Link>
-                    </Button>
-                </div>
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2.5 text-[12px]"
+                    aria-expanded={filtersOpen}
+                    aria-controls="crm-list-filters"
+                    onClick={() => setFiltersOpen((open) => !open)}
+                >
+                    Filter{activeCount > 0 ? ` ${activeCount}` : ''}
+                </Button>
+                {listView ? (
+                    <ColumnChooser
+                        columnDefs={listView.columnDefs}
+                        columns={columns}
+                        onChange={setColumns}
+                    />
+                ) : null}
             </div>
-            <ColumnFilterRow
-                action={basePath}
-                entity={entity}
+            <CrmActiveFilters
+                basePath={basePath}
                 activeFilters={activeFilters}
                 members={members}
-                cities={cities}
-                wilayas={wilayas}
-                exportHref={exportHref}
-                columns={columns}
-                filterGroups={filterGroups}
-                filterBuilder={
-                    listView ? (
-                        <FilterBuilder
-                            entity={entity}
-                            fields={listView.filterFields}
-                            value={filterGroups}
-                            onChange={setFilterGroups}
-                            members={members}
-                            cities={cities}
-                            wilayas={wilayas}
-                            stages={stages}
-                        />
-                    ) : null
-                }
             />
+            {isMobile ? (
+                <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+                    <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+                        <SheetHeader>
+                            <SheetTitle>
+                                Filter{' '}
+                                {entity === 'deal'
+                                    ? 'deals'
+                                    : entity === 'company'
+                                      ? 'companies'
+                                      : 'contacts'}
+                            </SheetTitle>
+                        </SheetHeader>
+                        <div id="crm-list-filters">{filterPanel}</div>
+                    </SheetContent>
+                </Sheet>
+            ) : filtersOpen ? (
+                <div id="crm-list-filters">{filterPanel}</div>
+            ) : null}
             {entity === 'deal' ? (
                 <StagePills
                     stages={stagePills}

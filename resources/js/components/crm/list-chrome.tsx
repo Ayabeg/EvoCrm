@@ -209,19 +209,24 @@ export function ColumnFilter({
 export function CrmListFooter({
     count,
     noun,
+    total,
     exportHref,
 }: {
     count: number;
     noun: string;
+    total?: number;
     exportHref?: string;
 }) {
+    const label =
+        typeof total === 'number' && total > count
+            ? `Showing ${count.toLocaleString()} of ${total.toLocaleString()} ${noun}`
+            : `${count.toLocaleString()} ${noun}`;
+
     return (
-        <div className="flex items-center justify-between border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
-            <span>
-                {count} {noun}
-            </span>
+        <div className="flex items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
+            <span>{label}</span>
             {exportHref ? (
-                <a href={exportHref} className="font-medium text-brand">
+                <a href={exportHref} className="hover:text-ink">
                     Export
                 </a>
             ) : null}
@@ -230,22 +235,26 @@ export function CrmListFooter({
 }
 
 export function CrmEmptyState({
+    title,
     line,
     actionLabel,
     onAction,
 }: {
+    title: string;
     line: string;
-    actionLabel: string;
-    onAction: () => void;
+    actionLabel?: string;
+    onAction?: () => void;
 }) {
     return (
-        <div className="grid flex-1 place-items-center bg-canvas px-6 py-16">
+        <div className="grid flex-1 place-items-center bg-canvas px-4 py-10 sm:px-6">
             <div className="max-w-sm text-center">
-                <div className="mx-auto mb-4 size-10 rounded-xl border border-hairline bg-canvas-soft" />
-                <p className="text-[14px] text-ink">{line}</p>
-                <Button type="button" onClick={onAction} className="mt-3">
-                    {actionLabel}
-                </Button>
+                <p className="text-[13px] font-medium text-ink">{title}</p>
+                <p className="mt-1 text-[12px] leading-5 text-mute">{line}</p>
+                {actionLabel && onAction ? (
+                    <Button type="button" size="sm" onClick={onAction} className="mt-3">
+                        {actionLabel}
+                    </Button>
+                ) : null}
             </div>
         </div>
     );

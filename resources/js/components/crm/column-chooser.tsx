@@ -62,7 +62,7 @@ export default function ColumnChooser({
             }}
         >
             <SheetTrigger asChild>
-                <Button type="button" variant="secondary" className="h-7 px-2 text-[11px]">
+                <Button type="button" variant="outline" size="sm" className="h-8 px-2.5 text-[12px]">
                     Columns
                 </Button>
             </SheetTrigger>

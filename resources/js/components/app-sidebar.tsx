@@ -50,6 +50,13 @@ export type NavLeaf = {
 
 type MoreItem = NavLeaf & { category: string };
 
+const CRM_RAIL_OBJECTS: NavLeaf[] = [
+    { id: 'contacts', label: 'Contacts', href: '/crm/contacts', icon: Contact },
+    { id: 'companies', label: 'Companies', href: '/crm/companies', icon: Building2 },
+    { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake },
+    { id: 'lead-board', label: 'Lead board', href: '/leads', icon: SquareKanban },
+];
+
 const PRIMARY: NavLeaf[] = [
     { id: 'home', label: 'Home', href: '/dashboard', icon: House, activePaths: ['/'] },
     {
@@ -57,7 +64,7 @@ const PRIMARY: NavLeaf[] = [
         label: 'CRM',
         href: '/crm/contacts',
         icon: Contact,
-        activePaths: ['/crm'],
+        activePaths: ['/crm', '/leads'],
     },
     {
         id: 'desk',
@@ -278,6 +285,17 @@ function pathMatches(current: string, href: string, exact?: boolean, extra: stri
     return current === href || current.startsWith(`${href}/`) || extra.some((path) => current === path || current.startsWith(`${path}/`));
 }
 
+function crmObjectActive(current: string, href: string): boolean {
+    if (href === '/crm/deals') {
+        return (
+            (current === '/crm/deals' || current.startsWith('/crm/deals/')) &&
+            !current.startsWith('/crm/deals/board')
+        );
+    }
+
+    return current === href || current.startsWith(`${href}/`);
+}
+
 function ChannelChips({ collapsed }: { collapsed: boolean }) {
     const { integrations } = usePage().props;
     const meta = integrations?.meta;
@@ -402,6 +420,8 @@ export function AppSidebar() {
         .filter((item): item is NavLeaf => Boolean(item));
 
     const railItems = pinnedItems.length > 0 ? pinnedItems : PRIMARY.filter((item) => DEFAULT_PINNED.includes(item.id as (typeof DEFAULT_PINNED)[number]));
+    const pinnedIds = new Set(railItems.map((item) => item.id));
+    const crmChildren = CRM_RAIL_OBJECTS.filter((item) => !pinnedIds.has(item.id));
 
     return (
         <Sidebar collapsible="icon" className="bg-sidebar" data-cabinet="rail">
@@ -432,6 +452,7 @@ export function AppSidebar() {
                                 ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                                 : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                         );
+                        const showCrmChildren = item.id === 'crm' && !collapsed && crmChildren.length > 0;
 
                         return (
                             <li key={item.id}>
@@ -439,6 +460,34 @@ export function AppSidebar() {
                                     <Icon className="size-4 shrink-0" strokeWidth={1.75} />
                                     {!collapsed ? <span className="truncate">{item.label}</span> : null}
                                 </Link>
+                                {showCrmChildren ? (
+                                    <ul
+                                        className="mt-0.5 mb-1 ml-3 flex list-none flex-col gap-0.5 border-l border-sidebar-border pl-2"
+                                        data-nav="crm-objects"
+                                    >
+                                        {crmChildren.map((child) => {
+                                            const childActive = crmObjectActive(currentPath, child.href);
+
+                                            return (
+                                                <li key={child.id}>
+                                                    <Link
+                                                        href={child.href}
+                                                        prefetch
+                                                        title={child.label}
+                                                        className={cn(
+                                                            'app-rail-item flex w-full items-center px-2 text-[12px] font-normal',
+                                                            childActive
+                                                                ? 'bg-sidebar-accent font-medium text-sidebar-ink'
+                                                                : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
+                                                        )}
+                                                    >
+                                                        <span className="truncate">{child.label}</span>
+                                                    </Link>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                ) : null}
                             </li>
                         );
                     })}

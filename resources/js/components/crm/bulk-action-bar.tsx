@@ -43,8 +43,13 @@ export function BulkActionBar({
     }
 
     return (
-        <div className="flex flex-wrap items-center gap-2 border-b border-hairline bg-canvas-soft px-4 py-2 sm:px-6">
-            <p className="text-ui text-ink">{selectedIds.length} selected</p>
+        <div
+            className="flex flex-wrap items-center gap-2 border-b border-hairline bg-canvas-soft px-4 py-2 sm:px-6"
+            data-crm="bulk-actions"
+        >
+            <p className="text-[13px] font-medium text-ink">
+                {selectedIds.length} selected
+            </p>
             <select
                 value={action}
                 onChange={(event) => setAction(event.target.value)}
@@ -100,7 +105,7 @@ export function BulkActionBar({
             <Button type="button" size="sm" onClick={submit} disabled={selectedIds.length === 0}>
                 Apply
             </Button>
-            <button type="button" onClick={onClear} className="text-[12px] font-medium text-brand">
+            <button type="button" onClick={onClear} className="text-[12px] text-mute hover:text-ink">
                 Clear
             </button>
         </div>

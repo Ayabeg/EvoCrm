@@ -1,12 +1,14 @@
-import { Form, Link, usePage } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import ListViewTable from '@/components/crm/list-view-table';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import type { StagePill } from '@/components/crm/stage-pills';
@@ -77,12 +79,12 @@ export default function DealsIndex({
 
     return (
         <>
-            <CrmShell title="Deals">
+            <CrmShell title="Deals" chrome="workspace">
                 <CrmListShell
                 title="Deals"
                 entity="deal"
                 basePath="/crm/deals"
-                primaryLabel="Create deal"
+                primaryLabel="New deal"
                 activeFilters={activeFilters}
                 savedFilters={savedFilters}
                 listView={listView}
@@ -95,17 +97,12 @@ export default function DealsIndex({
                 stagePills={stagePills}
                 exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
                 createHref={`/crm/deals?pipeline=${pipeline.id}&create=1`}
-                views={[
-                    { key: 'list', label: 'List', href: `/crm/deals?pipeline=${pipeline.id}` },
-                    { key: 'board', label: 'Board', href: `/crm/deals/board?pipeline=${pipeline.id}` },
-                ]}
-                activeView="list"
                 headerActions={
                     <>
                         {canImport ? (
-                            <Link href="/crm/deals/import" className="text-ui font-medium text-brand">
+                            <CrmObjectSecondaryLink href="/crm/deals/import">
                                 Import
-                            </Link>
+                            </CrmObjectSecondaryLink>
                         ) : null}
                         <PipelineSwitcher
                             pipelineId={pipeline.id}
@@ -131,9 +128,26 @@ export default function DealsIndex({
                             <SkeletonList />
                         ) : deals.length === 0 ? (
                             <CrmEmptyState
-                                line="No deals in this view."
-                                actionLabel="Create deal"
-                                onAction={() => setDrawer(true)}
+                                title={
+                                    hasActiveListFilters(activeFilters)
+                                        ? 'No deals match these filters'
+                                        : 'No deals yet'
+                                }
+                                line={
+                                    hasActiveListFilters(activeFilters)
+                                        ? 'Clear filters or pick another stage to see records.'
+                                        : 'Create a deal to start working your pipeline from this list.'
+                                }
+                                actionLabel={
+                                    hasActiveListFilters(activeFilters)
+                                        ? undefined
+                                        : 'New deal'
+                                }
+                                onAction={
+                                    hasActiveListFilters(activeFilters)
+                                        ? undefined
+                                        : () => setDrawer(true)
+                                }
                             />
                         ) : (
                             <div className="min-h-0 flex-1 overflow-auto">
@@ -165,7 +179,12 @@ export default function DealsIndex({
                                 />
                             </div>
                         )}
-                        <CrmListFooter count={deals.length} noun="deals" />
+                        <CrmListFooter
+                            count={deals.length}
+                            total={recordCount}
+                            noun="deals"
+                            exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
+                        />
                     </>
                 )}
             </CrmListShell>

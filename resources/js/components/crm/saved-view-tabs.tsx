@@ -1,7 +1,15 @@
 import { Form, Link, usePage } from '@inertiajs/react';
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { crmListHref, filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import type {
     ListViewColumn,
@@ -10,6 +18,12 @@ import type {
     SavedView,
 } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
+
+const OBJECT_NOUNS: Record<'contact' | 'company' | 'deal', string> = {
+    contact: 'contacts',
+    company: 'companies',
+    deal: 'deals',
+};
 
 export default function SavedViewTabs({
     basePath,
@@ -41,6 +55,7 @@ export default function SavedViewTabs({
     const filterId = Number(activeFilters.filter_id ?? 0) || null;
     const fields = filterFields(activeFilters);
     const groups = filterGroups ?? filterGroupsFromActive(activeFilters);
+    const nouns = OBJECT_NOUNS[entity];
 
     const allHref = crmListHref(basePath, fields, {
         view: 'all',
@@ -53,49 +68,72 @@ export default function SavedViewTabs({
         filter_id: null,
     });
 
-    const chip = (active: boolean) =>
-        `rounded-xl border px-2.5 py-1 text-[11px] font-medium transition-colors ${
-            active
-                ? 'border-brand bg-brand text-primary-foreground'
-                : 'border-hairline text-ink hover:bg-canvas-soft'
-        }`;
-
-    const badge = (count?: number) =>
-        typeof count === 'number' ? (
-            <span className="ml-1 text-[9px] opacity-80">{count}</span>
-        ) : null;
+    const saved = savedFilters.find((filter) => filter.id === filterId);
+    const currentLabel = saved
+        ? saved.name
+        : view === 'my'
+          ? `My ${nouns}`
+          : `All ${nouns}`;
 
     return (
-        <div className="flex flex-wrap items-center gap-1.5 border-b border-hairline bg-canvas px-3 py-2">
-            <Link href={allHref} className={chip(view === 'all' && !filterId)}>
-                All{badge(recordCount)}
-            </Link>
-            <Link href={myHref} className={chip(view === 'my' && !filterId)}>
-                My
-            </Link>
-            {savedFilters.map((filter) => (
-                <Link
-                    key={filter.id}
-                    href={crmListHref(basePath, { filter_id: filter.id })}
-                    className={chip(filterId === filter.id)}
-                    title={
-                        filter.visibility === 'workspace'
-                            ? 'Shared with workspace'
-                            : filter.visibility === 'team'
-                              ? 'Shared with team'
-                              : 'Private view'
-                    }
-                >
-                    {filter.visibility === 'workspace'
-                        ? '◆ '
-                        : filter.visibility === 'team'
-                          ? '◇ '
-                          : ''}
-                    {filter.name}
-                    {filter.is_workspace_default ? ' ★' : ''}
-                    {badge(filter.record_count)}
-                </Link>
-            ))}
+        <div className="flex min-w-0 items-center gap-1.5" data-crm="views">
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-full min-w-0 justify-between gap-1 px-2.5 text-[12px] sm:max-w-[12rem]"
+                        aria-label="Saved view"
+                    >
+                        <span className="truncate">{currentLabel}</span>
+                        <ChevronDown className="size-3 shrink-0 text-mute" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuItem asChild>
+                        <Link href={allHref}>
+                            All {nouns}
+                            {typeof recordCount === 'number' && view === 'all' && !filterId
+                                ? ` · ${recordCount}`
+                                : ''}
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={myHref}>My {nouns}</Link>
+                    </DropdownMenuItem>
+                    {savedFilters.length > 0 ? <DropdownMenuSeparator /> : null}
+                    {savedFilters.map((filter) => (
+                        <DropdownMenuItem key={filter.id} asChild>
+                            <Link
+                                href={crmListHref(basePath, { filter_id: filter.id })}
+                                title={
+                                    filter.visibility === 'workspace'
+                                        ? 'Shared with workspace'
+                                        : filter.visibility === 'team'
+                                          ? 'Shared with team'
+                                          : 'Private view'
+                                }
+                            >
+                                {filter.name}
+                                {filter.is_workspace_default ? ' ★' : ''}
+                                {typeof filter.record_count === 'number'
+                                    ? ` · ${filter.record_count}`
+                                    : ''}
+                            </Link>
+                        </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        onSelect={(event) => {
+                            event.preventDefault();
+                            setNaming(true);
+                        }}
+                    >
+                        Save current view
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
             {naming ? (
                 <Form
                     action="/crm/filters"
@@ -174,7 +212,7 @@ export default function SavedViewTabs({
                         name="name"
                         placeholder="View name"
                         required
-                        className="h-7 w-32 text-[11px]"
+                        className="h-8 w-32 text-[12px]"
                     />
                     {canManageSettings ? (
                         <select
@@ -183,17 +221,19 @@ export default function SavedViewTabs({
                             onChange={(event) =>
                                 setVisibility(
                                     event.target.value as
-                                        'private' | 'team' | 'workspace',
+                                        | 'private'
+                                        | 'team'
+                                        | 'workspace',
                                 )
                             }
-                            className="h-7 rounded border bg-background px-1 text-[11px]"
+                            className="h-8 rounded border border-hairline bg-background px-1 text-[12px]"
                         >
                             <option value="private">Private</option>
                             <option value="team">Team</option>
                             <option value="workspace">Workspace</option>
                         </select>
                     ) : null}
-                    <label className="flex items-center gap-1 text-[10px] text-mute">
+                    <label className="flex items-center gap-1 text-[11px] text-mute">
                         <input
                             type="checkbox"
                             name="is_workspace_default"
@@ -204,26 +244,20 @@ export default function SavedViewTabs({
                         />
                         Team default
                     </label>
-                    <Button className="h-7 px-2 text-[11px]">Save</Button>
+                    <Button type="submit" variant="outline" size="sm" className="h-8 px-2 text-[12px]">
+                        Save
+                    </Button>
                     <Button
                         type="button"
-                        variant="secondary"
-                        className="h-7 px-2 text-[11px]"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-[12px]"
                         onClick={() => setNaming(false)}
                     >
                         Cancel
                     </Button>
                 </Form>
-            ) : (
-                <button
-                    type="button"
-                    onClick={() => setNaming(true)}
-                    className="rounded-xl border border-hairline px-2.5 py-1 text-[11px] text-ink hover:bg-canvas-soft"
-                    aria-label="Save view"
-                >
-                    +
-                </button>
-            )}
+            ) : null}
         </div>
     );
 }
