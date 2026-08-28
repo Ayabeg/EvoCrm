@@ -47,44 +47,47 @@ export function DashboardHeader({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-                <Input
-                    type="date"
-                    size="sm"
-                    value={filters.from ?? ''}
-                    onChange={(e) => apply({ from: e.target.value })}
-                    aria-label="From date"
-                    className="w-[min(100%,9.5rem)]"
-                />
+                <div className="w-[9.5rem] max-w-[calc(50%-0.75rem)] shrink-0">
+                    <Input
+                        type="date"
+                        size="sm"
+                        value={filters.from ?? ''}
+                        onChange={(e) => apply({ from: e.target.value })}
+                        aria-label="From date"
+                    />
+                </div>
                 <span className="text-[12px] text-mute" aria-hidden>
                     -
                 </span>
-                <Input
-                    type="date"
-                    size="sm"
-                    value={filters.to ?? ''}
-                    onChange={(e) => apply({ to: e.target.value })}
-                    aria-label="To date"
-                    className="w-[min(100%,9.5rem)]"
-                />
-                <NativeSelect
-                    value={filters.owner_id ?? ''}
-                    onChange={(e) =>
-                        apply({
-                            owner_id: e.target.value
-                                ? Number(e.target.value)
-                                : null,
-                        })
-                    }
-                    aria-label="Filter by owner"
-                    className="w-full min-w-0 sm:w-[11rem]"
-                >
-                    <option value="">All owners</option>
-                    {owners.map((owner) => (
-                        <option key={owner.id} value={owner.id}>
-                            {owner.name}
-                        </option>
-                    ))}
-                </NativeSelect>
+                <div className="w-[9.5rem] max-w-[calc(50%-0.75rem)] shrink-0">
+                    <Input
+                        type="date"
+                        size="sm"
+                        value={filters.to ?? ''}
+                        onChange={(e) => apply({ to: e.target.value })}
+                        aria-label="To date"
+                    />
+                </div>
+                <div className="w-full min-w-0 sm:w-[11rem] sm:shrink-0">
+                    <NativeSelect
+                        value={filters.owner_id ?? ''}
+                        onChange={(e) =>
+                            apply({
+                                owner_id: e.target.value
+                                    ? Number(e.target.value)
+                                    : null,
+                            })
+                        }
+                        aria-label="Filter by owner"
+                    >
+                        <option value="">All owners</option>
+                        {owners.map((owner) => (
+                            <option key={owner.id} value={owner.id}>
+                                {owner.name}
+                            </option>
+                        ))}
+                    </NativeSelect>
+                </div>
             </div>
         </header>
     );

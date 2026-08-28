@@ -38,15 +38,15 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             ? null
                             : `${kpi.change > 0 ? '+' : ''}${kpi.change}%`;
                     const body = (
-                        <article className="flex min-w-0 flex-col gap-1 px-3 py-3 md:px-4 md:py-3.5">
+                        <article className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2 md:gap-1 md:px-4 md:py-3">
                             <p className="text-[11px] font-medium leading-4 text-mute">
                                 {kpi.label}
                             </p>
-                            <p className="money text-kpi leading-none tracking-tight break-words text-ink">
+                            <p className="money text-[1.375rem] leading-none tracking-tight break-words text-ink md:text-kpi">
                                 {value}
                             </p>
                             {change || kpi.hint ? (
-                                <p className="truncate text-[11px] leading-4 text-mute">
+                                <p className="hidden truncate text-[11px] leading-4 text-mute sm:block">
                                     {[change, kpi.hint]
                                         .filter(Boolean)
                                         .join(' · ')}
