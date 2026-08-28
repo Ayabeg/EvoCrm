@@ -80,11 +80,9 @@ export function RecordActions({
                             variant="outline"
                             size="sm"
                             title="More actions"
+                            aria-label={`More actions for record ${entityId}`}
                         >
-                            <MoreHorizontal className="size-3.5" />
-                            <span className="sr-only">
-                                More actions for record {entityId}
-                            </span>
+                            <MoreHorizontal className="size-3.5" aria-hidden />
                             More
                         </Button>
                     </DropdownMenuTrigger>
