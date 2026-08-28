@@ -42,7 +42,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             <p className="text-[11px] font-medium leading-4 text-mute">
                                 {kpi.label}
                             </p>
-                            <p className="money text-[1.375rem] leading-none tracking-tight break-words text-ink md:text-kpi">
+                            <p className="money text-[1.375rem] leading-none tracking-tight whitespace-nowrap text-ink md:text-kpi">
                                 {value}
                             </p>
                             {change || kpi.hint ? (
