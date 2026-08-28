@@ -30,7 +30,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
 
     return (
         <section aria-label="Command KPIs">
-            <div className="grid grid-cols-2 divide-hairline border-y border-hairline min-[430px]:grid-cols-3 lg:grid-cols-5 lg:divide-x">
+            <div className="grid grid-cols-2 divide-hairline border-y border-hairline min-[430px]:grid-cols-3 md:grid-cols-5 md:divide-x">
                 {kpis.map((kpi) => {
                     const value = formatKpiValue(kpi);
                     const change =

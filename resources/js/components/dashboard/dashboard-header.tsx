@@ -46,7 +46,7 @@ export function DashboardHeader({
                 </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 md:flex-nowrap">
                 <div className="w-[9.5rem] max-w-[calc(50%-0.75rem)] shrink-0">
                     <Input
                         type="date"
