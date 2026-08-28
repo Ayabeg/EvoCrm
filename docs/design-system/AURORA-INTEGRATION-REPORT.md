@@ -521,7 +521,7 @@ aliases after the bridge.
 | `resources/js/components/app-sidebar-header.tsx` | `aria-label` on Create / Notifications / account; `aria-hidden` on decorative icons | Icon-only controls must expose an accessible name | Aurora a11y + EvoSales chrome |
 | `resources/js/components/app-sidebar.tsx` | Pin `aria-label`; More panel surfaces/text/border/radius → Brand aliases; keep `--aurora-shadow-strong` + `--aurora-focus-ring-strong` | Identity tokens belong to Brand Book; elevation/focus stay Aurora | Brand Book + Aurora + EvoSales IA |
 | `resources/js/pages/auth/auth-screen.tsx` | `--radius-2`, `--evosales-mute` | Auth chrome is Brand identity | Brand Book |
-| `resources/js/pages/settings/connectors.tsx` | `--radius-1` | Same class of Home ownership fix | Brand Book |
+| `resources/js/pages/settings/connectors.tsx` | `--radius-1`; keep “No Baileys” on one line | Radius alias; policy string was wrapped and failed `DeskEmptyStateTest` | Brand Book + EvoSales Desk policy |
 | `resources/js/pages/leads/board.tsx` | `--radius-1`; keep Aurora shadow | Radius alias; elevation stays Aurora | Brand Book + Aurora |
 | `resources/js/components/crm/pipeline-kanban.tsx` | `--radius-1`; keep Aurora shadow/motion | Same | Brand Book + Aurora |
 | `resources/js/components/desk/official-connect-panel.tsx` | `--radius-1` | Same | Brand Book |
@@ -562,7 +562,19 @@ is still the bridged 12px.
 - Local breadcrumb unused by the top bar; Aurora breadcrumb unused.
 - Non-nav dialog overlay still 18%.
 - `--aurora-info` cyan remains status, not brand.
-- `DeskEmptyStateTest` vs connectors “No Baileys” copy is a pre-existing
-  product/test mismatch. Not touched (do not introduce Baileys).
+- Connectors “No Baileys” policy string is now contiguous (was wrapped
+  across two JSX lines, which broke `DeskEmptyStateTest`). Copy unchanged.
 - Notifications control is named but still has no feed.
 - 768px hamburger / rail-collapse interaction remains as before.
+
+### Verification (this pass)
+
+| Check | Result |
+|-------|--------|
+| `php artisan test --compact tests/Feature/AuroraTokenBridgeTest.php` | Pass (17) |
+| `php artisan test --compact` | **435 passed** (DeskEmptyStateTest now that the connectors policy string is contiguous) |
+| `npm run types:check` (after wayfinder `--with-form`) | Pass |
+| `npm run lint:check` | Pass |
+| `npm run build` | Pass |
+| Token-bridge literals | Unchanged (`--sidebar` / `--aurora-nav-bg` `#000000`) |
+| Layout / Sheet / Home density | Unchanged from PR #114 (320–1920 already measured) |
