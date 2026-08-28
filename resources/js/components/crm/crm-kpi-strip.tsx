@@ -1,4 +1,4 @@
-import { EvoKpiCard } from '@/components/crm/evo-kpi-card';
+import { formatCompactDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
 export type KpiTile = {
@@ -11,6 +11,26 @@ export type KpiTile = {
     change?: number | null;
     changeLabel?: string;
 };
+
+function formatKpiValue(kpi: KpiTile): string {
+    if (kpi.value === null || kpi.value === undefined) {
+        return '—';
+    }
+
+    if (kpi.format === 'money' && typeof kpi.value === 'number') {
+        return formatCompactDzd(kpi.value);
+    }
+
+    if (kpi.format === 'percent' && typeof kpi.value === 'number') {
+        return `${kpi.value}%`;
+    }
+
+    if (typeof kpi.value === 'number') {
+        return new Intl.NumberFormat('en-US').format(kpi.value);
+    }
+
+    return kpi.value;
+}
 
 export function CrmKpiStrip({
     kpis,
@@ -27,43 +47,46 @@ export function CrmKpiStrip({
 
     const columnClass =
         columns >= 6
-            ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'
+            ? 'min-[430px]:grid-cols-3 xl:grid-cols-6'
             : columns === 5
-              ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
+              ? 'min-[430px]:grid-cols-3 xl:grid-cols-5'
               : columns === 4
-                ? 'sm:grid-cols-2 xl:grid-cols-4'
+                ? 'min-[430px]:grid-cols-2 xl:grid-cols-4'
                 : columns === 3
-                  ? 'sm:grid-cols-3'
-                  : 'sm:grid-cols-2';
+                  ? 'min-[430px]:grid-cols-3'
+                  : 'min-[430px]:grid-cols-2';
 
     return (
-        <div
+        <section
+            aria-label="Key figures"
             className={cn(
-                'grid grid-cols-2 gap-2 sm:gap-4',
+                'grid grid-cols-2 divide-hairline border-y border-hairline',
                 columnClass,
                 className,
             )}
         >
             {kpis.map((kpi) => {
-                const displayValue =
-                    kpi.format === 'money' && typeof kpi.value === 'number'
-                        ? kpi.value / 100
-                        : kpi.value;
-
-                const card = (
-                    <EvoKpiCard
-                        label={kpi.label}
-                        value={displayValue}
-                        format={kpi.format ?? 'number'}
-                        hint={kpi.hint}
-                        change={kpi.change}
-                        changeLabel={kpi.changeLabel}
-                        className={
-                            kpi.href
-                                ? 'transition-colors duration-150 hover:bg-canvas-soft'
-                                : undefined
-                        }
-                    />
+                const value = formatKpiValue(kpi);
+                const change =
+                    kpi.change === null || kpi.change === undefined
+                        ? null
+                        : `${kpi.change > 0 ? '+' : ''}${kpi.change}%`;
+                const body = (
+                    <article className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2 md:px-3 md:py-2.5">
+                        <p className="text-[11px] font-medium leading-4 text-mute">
+                            {kpi.label}
+                        </p>
+                        <p className="money text-[1.375rem] leading-none tracking-tight text-ink md:text-kpi">
+                            {value}
+                        </p>
+                        {change || kpi.hint || kpi.changeLabel ? (
+                            <p className="hidden truncate text-[11px] leading-4 text-mute sm:block">
+                                {[change, kpi.changeLabel, kpi.hint]
+                                    .filter(Boolean)
+                                    .join(' · ')}
+                            </p>
+                        ) : null}
+                    </article>
                 );
 
                 if (kpi.href) {
@@ -71,15 +94,20 @@ export function CrmKpiStrip({
                         <a
                             key={kpi.key}
                             href={kpi.href}
-                            className="block rounded-2xl no-underline focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                            className="min-w-0 no-underline transition-colors hover:bg-canvas-soft focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                            aria-label={`${kpi.label} ${value}`}
                         >
-                            {card}
+                            {body}
                         </a>
                     );
                 }
 
-                return <div key={kpi.key}>{card}</div>;
+                return (
+                    <div key={kpi.key} className="min-w-0">
+                        {body}
+                    </div>
+                );
             })}
-        </div>
+        </section>
     );
 }

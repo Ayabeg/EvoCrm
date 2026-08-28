@@ -127,7 +127,7 @@ export default function CompanyShow({
                 >
                     <RecordShell
                         left={
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                                 <RecordSection title="Company information">
                                     <RecordFactList>
                                         <RecordFact
@@ -250,7 +250,7 @@ export default function CompanyShow({
                         }
                         center={<RecordActivityPanel timeline={timeline} />}
                         right={
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                                 <AssociationCard
                                     title="Contacts"
                                     addHref="/crm/contacts?create=1"

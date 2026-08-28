@@ -132,10 +132,12 @@ it('uses compact mobile spacing tokens on Home chrome', function () {
     $header = file_get_contents(resource_path('js/components/dashboard/dashboard-header.tsx'));
     $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
 
-    expect($home)->toContain('px-4 py-4 md:px-6 md:py-6');
-    expect($home)->toContain('gap-4 md:gap-6');
+    expect($home)->toContain('px-4 py-3 md:px-5 md:py-4');
+    expect($home)->toContain('data-home="workspace"');
+    expect($home)->not->toContain('max-w-6xl');
     expect($header)->toContain('text-page-title');
-    expect($header)->toContain('mb-4 flex flex-col gap-3 md:mb-6');
+    expect($header)->toContain('flex flex-col gap-2');
+    expect($header)->toContain('create=1');
     expect($strip)->toContain('grid-cols-2');
 });
 

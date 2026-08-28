@@ -295,8 +295,8 @@ export default function LeadsBoard({
                     onPrimary={() => setAdding(true)}
                 />
 
-                <div className="border-b border-hairline bg-canvas px-4 py-2 sm:px-6">
-                    <div className="relative mb-2 max-w-md">
+                <div className="border-b border-hairline bg-canvas px-4 py-1.5 sm:px-6">
+                    <div className="relative mb-1.5 max-w-md">
                         <Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-mute" />
                         <Input
                             value={query}
@@ -328,7 +328,7 @@ export default function LeadsBoard({
                     </div>
                 </div>
 
-                <div className="min-h-0 flex-1 overflow-auto px-4 py-3 sm:px-6">
+                <div className="min-h-0 flex-1 overflow-auto px-2 py-2 sm:px-3">
 
                 <PipelineKanban>
                     {stages.map((stage, stageIndex) => {

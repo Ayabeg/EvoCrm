@@ -38,7 +38,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             ? null
                             : `${kpi.change > 0 ? '+' : ''}${kpi.change}%`;
                     const body = (
-                        <article className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2 md:gap-1 md:px-4 md:py-3">
+                        <article className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2 md:gap-1 md:px-3 md:py-2.5">
                             <p className="text-[11px] font-medium leading-4 text-mute">
                                 {kpi.label}
                             </p>

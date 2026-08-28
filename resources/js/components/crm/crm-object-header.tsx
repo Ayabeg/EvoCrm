@@ -18,7 +18,7 @@ export function CrmObjectHeader({
 }) {
     return (
         <header
-            className="flex flex-col gap-2 border-b border-hairline bg-canvas px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-6"
+            className="flex flex-col gap-2 border-b border-hairline bg-canvas px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-6"
             data-crm="object-header"
         >
             <div className="min-w-0">

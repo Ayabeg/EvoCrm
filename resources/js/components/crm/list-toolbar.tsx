@@ -118,7 +118,7 @@ export default function ListToolbar({
 
     return (
         <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar">
-            <div className="flex items-center gap-2 px-4 py-2 sm:px-6">
+            <div className="flex items-center gap-2 px-4 py-1.5 sm:px-6">
                 <div className="min-w-0 flex-1">
                 <SavedViewTabs
                     basePath={basePath}

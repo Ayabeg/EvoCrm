@@ -134,7 +134,7 @@ export function RecordPageFrame({
 }) {
     return (
         <div className="h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink">
-            <div className="shrink-0 border-b border-hairline bg-canvas px-4 py-3 sm:px-6">
+            <div className="shrink-0 border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6">
                 {header}
             </div>
             {children}
@@ -160,7 +160,7 @@ export function RecordIdentity({
     actions?: ReactNode;
 }) {
     return (
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex min-w-0 items-start gap-3">
                 <Avatar
                     size="md"

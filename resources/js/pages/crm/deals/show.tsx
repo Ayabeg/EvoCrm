@@ -193,7 +193,7 @@ export default function DealShow({
                 >
                     <RecordShell
                         left={
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                                 <RecordSection title="Deal information">
                                     <RecordFactList>
                                         <RecordFact
@@ -315,7 +315,7 @@ export default function DealShow({
                             />
                         }
                         right={
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                                 <AssociationCard
                                     title="Contact"
                                     addHref={

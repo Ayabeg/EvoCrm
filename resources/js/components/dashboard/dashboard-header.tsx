@@ -33,16 +33,18 @@ export function DashboardHeader({
     };
 
     return (
-        <header className="mb-4 flex flex-col gap-3 md:mb-6">
+        <header className="flex flex-col gap-2">
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                    <h1 className="text-page-title text-ink">Home</h1>
-                    <p className="mt-0.5 text-[12px] leading-5 text-mute">
+                    <h1 className="text-page-title font-semibold tracking-tight text-ink">
+                        Home
+                    </h1>
+                    <p className="mt-0.5 text-[11px] leading-4 text-mute">
                         {subtitle}
                     </p>
                 </div>
-                <Button asChild size="sm" className="shrink-0">
-                    <Link href="/crm/deals">New deal</Link>
+                <Button asChild size="sm" className="h-8 shrink-0">
+                    <Link href="/crm/deals?create=1">New deal</Link>
                 </Button>
             </div>
 

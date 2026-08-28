@@ -32,7 +32,7 @@ export function AttentionList({ items }: { items: AttentionItem[] }) {
                 return (
                     <li
                         key={item.key}
-                        className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0 sm:items-center"
+                        className="flex items-start gap-3 py-2 first:pt-0 last:pb-0 sm:items-center"
                     >
                         {count ? (
                             <span className="money w-8 shrink-0 pt-0.5 text-[15px] font-semibold tabular-nums text-ink sm:pt-0">

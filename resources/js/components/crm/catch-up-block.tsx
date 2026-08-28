@@ -58,13 +58,7 @@ export default function CatchUpBlock({
     compact?: boolean;
 }) {
     return (
-        <section
-            className={
-                compact
-                    ? 'text-sm'
-                    : 'rounded-xl border border-hairline bg-canvas p-4 text-sm'
-            }
-        >
+        <section className={compact ? 'text-sm' : 'text-sm'}>
             <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">
                 Catch-up
             </h3>

@@ -227,7 +227,7 @@ function FrontDesk({
             rightLabel="Conversation"
             defaultPanel="center"
             left={
-                <div className="space-y-5">
+                <div className="space-y-3">
                     <div>
                         <p className="aurora-text-label mb-2 text-muted-foreground">
                             Shared inbox
@@ -238,9 +238,9 @@ function FrontDesk({
                                     key={item.key}
                                     type="button"
                                     onClick={() => setFolder(item.key)}
-                                    className={`flex w-full items-center justify-between rounded-[12px] px-3 py-2 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+                                    className={`flex w-full items-center justify-between rounded-[var(--radius-1)] px-3 py-1.5 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
                                         folder === item.key
-                                            ? 'bg-brand/12 font-medium text-ink'
+                                            ? 'bg-canvas-soft font-medium text-ink'
                                             : 'text-muted-foreground hover:bg-canvas-soft hover:text-ink'
                                     }`}
                                 >
@@ -277,9 +277,9 @@ function FrontDesk({
                                     { preserveState: true },
                                 )
                             }
-                            className={`flex w-full items-start gap-3 border-b border-hairline px-4 py-3.5 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+                            className={`flex w-full items-start gap-3 border-b border-hairline px-4 py-2.5 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
                                 selected?.id === thread.id
-                                    ? 'bg-brand/8'
+                                    ? 'bg-canvas-soft'
                                     : 'hover:bg-canvas-soft'
                             }`}
                         >

@@ -54,12 +54,12 @@ export function RoomShell({
 }) {
     return (
         <div className="flex h-app-workspace flex-col bg-canvas text-[13px] text-ink">
-            <div className="border-b border-hairline bg-canvas px-4 pt-4 sm:px-6">
+            <div className="border-b border-hairline bg-canvas px-4 pt-3 sm:px-6">
                 <div className="flex items-center justify-between gap-3">
-                    <h1 className="text-[22px] font-semibold tracking-tight">{title}</h1>
+                    <h1 className="text-page-title font-semibold tracking-tight">{title}</h1>
                     {actions}
                 </div>
-                <nav className="mt-3 flex gap-4 overflow-x-auto">
+                <nav className="mt-2 flex gap-4 overflow-x-auto">
                     {tabs.map((tab) => (
                         <Link
                             key={tab.href}

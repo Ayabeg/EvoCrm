@@ -152,7 +152,7 @@ export default function ContactShow({
                 >
                     <RecordShell
                         left={
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                                 <RecordSection title="Contact information">
                                     <RecordFactList>
                                         <RecordFact
@@ -208,7 +208,7 @@ export default function ContactShow({
                             />
                         }
                         right={
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                                 <AssociationCard
                                     title="Company"
                                     addHref={

@@ -17,7 +17,8 @@ Keep Brand Book → tokens → Aurora bridge → Aurora primitives → EvoSales 
 3. CRM lists + expanded rail objects — #2 + #3 (this PR)
 4. Records — #6 identity before Ask Evo
 5. Pipeline — #8 one forecast strip (PR #121)
-6. Desk — #9 quieter frame
-7. Command — #5 honesty + Actions
+6. Product polish — shared workspace density (this PR)
+7. Desk — #9 quieter frame
+8. Command — #5 honesty + Actions
 
 Each step is its own reviewable PR with Pest + types + lint + build.
