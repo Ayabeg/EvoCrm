@@ -1,8 +1,6 @@
 import { Form } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -13,12 +11,11 @@ export default function QuietHoursEdit({
 }) {
     return (
         <OutboundShell title="Quiet hours">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Quiet hours"
-                    description="Automated outbound is blocked in this window. Default 21:00–08:00 Africa/Algiers."
-                />
-                <Card className="p-4">
+            <OutboundPage
+                title="Quiet hours"
+                description="Automated outbound is blocked in this window. Default 21:00–08:00 Africa/Algiers."
+            >
+                <section className="border-t border-hairline pt-3">
                     <Form action="/outbound/quiet-hours" method="post" className="grid gap-3 md:grid-cols-2">
                         {({ processing }) => (
                             <>
@@ -51,8 +48,8 @@ export default function QuietHoursEdit({
                             </>
                         )}
                     </Form>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

@@ -1,10 +1,8 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -81,13 +79,11 @@ export default function CampaignsIndex({
 
     return (
         <OutboundShell title="Campaigns">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Broadcast campaigns"
-                    description="One-shot sends to a CRM audience — the newsletter path. Every recipient is logged in the outbox; quiet hours, suppression, and daily caps still apply."
-                />
-
-                <Card className="p-4">
+            <OutboundPage
+                title="Broadcast campaigns"
+                description="One-shot sends to a CRM audience — the newsletter path. Every recipient is logged in the outbox; quiet hours, suppression, and daily caps still apply."
+            >
+                <section className="border-t border-hairline pt-3">
                     <h2 className="mb-3 font-medium">New campaign</h2>
                     <Form
                         action="/outbound/campaigns"
@@ -264,9 +260,9 @@ export default function CampaignsIndex({
                             </>
                         )}
                     </Form>
-                </Card>
+                </section>
 
-                <Card className="overflow-hidden">
+                <section className="overflow-x-auto border-t border-hairline">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-left">
                             <tr>
@@ -298,7 +294,7 @@ export default function CampaignsIndex({
                                         <td className="px-4 py-2">
                                             <Link
                                                 href={`/outbound/campaigns/${campaign.id}`}
-                                                className="font-medium text-brand"
+                                                className="font-medium text-ink hover:underline"
                                             >
                                                 {campaign.name}
                                             </Link>
@@ -375,7 +371,7 @@ export default function CampaignsIndex({
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                     onClick={() => {
                                                         if (
                                                             window.confirm(
@@ -397,8 +393,8 @@ export default function CampaignsIndex({
                             )}
                         </tbody>
                     </table>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

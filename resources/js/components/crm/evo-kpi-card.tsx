@@ -42,7 +42,7 @@ export function EvoKpiCard({
     return (
         <article
             className={cn(
-                'flex h-full min-w-0 flex-col gap-2 rounded-2xl border border-hairline bg-canvas px-4 py-3 md:gap-3 md:px-5 md:py-4',
+                'flex h-full min-w-0 flex-col gap-1 border-t border-hairline px-2.5 py-2 md:px-3 md:py-2.5',
                 className,
             )}
         >

@@ -1,9 +1,7 @@
 import { Form, Link } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 
 type Lead = { id: number; title: string; status: string };
 type Reply = {
@@ -33,9 +31,8 @@ return null;
 export default function Replies({ replies, imapNote }: { replies: Reply[]; imapNote: string }) {
     return (
         <OutboundShell title="Replies">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader title="Replies" description={imapNote} />
-                <Card className="overflow-hidden">
+            <OutboundPage title="Replies" description={imapNote}>
+                <section className="overflow-x-auto border-t border-hairline">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-left">
                             <tr>
@@ -53,7 +50,7 @@ export default function Replies({ replies, imapNote }: { replies: Reply[]; imapN
                                     <tr key={reply.id} className="border-t border-hairline align-top">
                                         <td className="px-4 py-2">
                                             {reply.contact ? (
-                                                <Link href={`/crm/contacts/${reply.contact.id}`} className="text-brand">
+                                                <Link href={`/crm/contacts/${reply.contact.id}`} className="text-ink hover:underline">
                                                     {reply.contact.first_name} {reply.contact.last_name ?? ''}
                                                 </Link>
                                             ) : (
@@ -64,7 +61,7 @@ export default function Replies({ replies, imapNote }: { replies: Reply[]; imapN
                                         <td className="px-4 py-2">
                                             {lead ? (
                                                 <div className="flex items-center gap-2">
-                                                    <Link href={`/crm/leads/${lead.id}`} className="text-brand">
+                                                    <Link href={`/crm/leads/${lead.id}`} className="text-ink hover:underline">
                                                         {lead.title}
                                                     </Link>
                                                     {lead.status !== 'qualified' ? (
@@ -93,8 +90,8 @@ export default function Replies({ replies, imapNote }: { replies: Reply[]; imapN
                             })}
                         </tbody>
                     </table>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

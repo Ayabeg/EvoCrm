@@ -1,8 +1,6 @@
 import { Link, router } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 
 type Message = {
     id: number;
@@ -44,11 +42,10 @@ export default function Outbox({
 }) {
     return (
         <OutboundShell title="Outbox">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Outbox"
-                    description="Every dispatch attempt is logged here — queued, deferred by quiet hours or a daily cap, sent, or failed with the reason."
-                />
+            <OutboundPage
+                title="Outbox"
+                description="Every dispatch attempt is logged here — queued, deferred by quiet hours or a daily cap, sent, or failed with the reason."
+            >
 
                 <div className="flex flex-wrap gap-2">
                     {FILTERS.map((filter) => (
@@ -64,8 +61,8 @@ export default function Outbox({
                             }
                             className={`rounded-full border border-hairline px-3 py-1 text-xs ${
                                 status === filter
-                                    ? 'bg-brand text-canvas'
-                                    : 'bg-canvas text-ink'
+                                    ? 'bg-canvas-soft text-ink'
+                                    : 'bg-canvas text-mute'
                             }`}
                         >
                             {filter === ''
@@ -75,7 +72,7 @@ export default function Outbox({
                     ))}
                 </div>
 
-                <Card className="overflow-hidden">
+                <section className="overflow-x-auto border-t border-hairline">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-left">
                             <tr>
@@ -109,7 +106,7 @@ export default function Outbox({
                                             {message.contact ? (
                                                 <Link
                                                     href={`/crm/contacts/${message.contact.id}`}
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                 >
                                                     {message.contact.first_name}{' '}
                                                     {message.contact
@@ -140,14 +137,14 @@ export default function Outbox({
                                             {message.sequence ? (
                                                 <Link
                                                     href={`/outbound/sequences/${message.sequence.id}`}
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                 >
                                                     {message.sequence.name}
                                                 </Link>
                                             ) : message.campaign ? (
                                                 <Link
                                                     href={`/outbound/campaigns/${message.campaign.id}`}
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                 >
                                                     {message.campaign.name}
                                                 </Link>
@@ -210,8 +207,8 @@ export default function Outbox({
                             )}
                         </tbody>
                     </table>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

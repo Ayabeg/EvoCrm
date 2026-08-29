@@ -1,8 +1,7 @@
-import { Form, Head, Link, router } from '@inertiajs/react';
-import PageHeader from '@/components/page-header';
+import { Form, Link, router } from '@inertiajs/react';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -64,17 +63,15 @@ export default function CampaignShow({
     const editable = ['draft', 'scheduled'].includes(campaign.status);
 
     return (
-        <>
-            <Head title={campaign.name} />
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title={campaign.name}
-                    description={`${campaign.saved_filter ? `List: ${campaign.saved_filter.name}` : 'All contacts with email'} · ${
-                        campaign.mailbox
-                            ? `Mailbox: ${campaign.mailbox.name}`
-                            : 'Default mailbox'
-                    } · ${campaign.status}`}
-                >
+        <OutboundShell title={campaign.name}>
+            <OutboundPage
+                title={campaign.name}
+                description={`${campaign.saved_filter ? `List: ${campaign.saved_filter.name}` : 'All contacts with email'} · ${
+                    campaign.mailbox
+                        ? `Mailbox: ${campaign.mailbox.name}`
+                        : 'Default mailbox'
+                } · ${campaign.status}`}
+                actions={
                     <div className="flex items-center gap-2">
                         {editable ? (
                             <Button
@@ -108,7 +105,8 @@ export default function CampaignShow({
                             </Button>
                         ) : null}
                     </div>
-                </PageHeader>
+                }
+            >
 
                 <div className="grid gap-3 md:grid-cols-4">
                     {(
@@ -127,21 +125,21 @@ export default function CampaignShow({
                             ['Replied', campaign.counts.replied],
                         ] as [string, number][]
                     ).map(([label, value]) => (
-                        <Card key={label} className="p-3">
+                        <div key={label} className="border-t border-hairline py-2">
                             <p className="text-[11px] text-muted-foreground uppercase">
                                 {label}
                             </p>
                             <p className="mt-1 text-lg font-semibold">
                                 {value}
                             </p>
-                        </Card>
+                        </div>
                     ))}
                 </div>
 
                 {campaign.status === 'draft' ||
                 campaign.status === 'scheduled' ? (
-                    <Card className="p-4">
-                        <h2 className="mb-3 font-medium">Schedule</h2>
+                    <section className="border-t border-hairline pt-3">
+                        <h2 className="mb-3 text-[13px] font-medium">Schedule</h2>
                         <Form
                             action={`/outbound/campaigns/${campaign.id}/schedule`}
                             method="post"
@@ -171,21 +169,21 @@ export default function CampaignShow({
                             due, then sends within quiet hours and the mailbox
                             daily cap.
                         </p>
-                    </Card>
+                    </section>
                 ) : null}
 
-                <Card className="p-4">
-                    <h2 className="mb-2 font-medium">Content</h2>
+                <section className="border-t border-hairline pt-3">
+                    <h2 className="mb-2 text-[13px] font-medium">Content</h2>
                     <p className="text-sm text-muted-foreground">
                         Subject: {campaign.subject ?? '—'}
                     </p>
                     <p className="mt-2 rounded-md bg-canvas-soft p-3 text-sm whitespace-pre-wrap text-muted-foreground">
                         {campaign.body}
                     </p>
-                </Card>
+                </section>
 
-                <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">
+                <section className="overflow-x-auto border-t border-hairline">
+                    <h2 className="py-2 text-[13px] font-medium">
                         Messages
                     </h2>
                     <table className="w-full text-sm">
@@ -220,7 +218,7 @@ export default function CampaignShow({
                                             {message.contact ? (
                                                 <Link
                                                     href={`/crm/contacts/${message.contact.id}`}
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                 >
                                                     {message.contact.first_name}{' '}
                                                     {message.contact
@@ -283,9 +281,9 @@ export default function CampaignShow({
                             )}
                         </tbody>
                     </table>
-                </Card>
-            </div>
-        </>
+                </section>
+            </OutboundPage>
+        </OutboundShell>
     );
 }
 

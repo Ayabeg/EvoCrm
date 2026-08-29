@@ -77,3 +77,27 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
         ->and($list)->toContain('py-1.5')
         ->and($board)->toContain("toLocaleDateString('en-GB'");
 });
+
+it('destacks leftover Reports charts, Outbound rooms, and extra orange primaries', function () {
+    $chart = file_get_contents(resource_path('js/evoviz/evo-viz-chart.tsx'));
+    $reports = file_get_contents(resource_path('js/pages/crm/reports.tsx'));
+    $campaigns = file_get_contents(resource_path('js/pages/outbound/campaigns/index.tsx'));
+    $templates = file_get_contents(resource_path('js/pages/outbound/templates/index.tsx'));
+    $outbox = file_get_contents(resource_path('js/pages/outbound/outbox.tsx'));
+    $domains = file_get_contents(resource_path('js/pages/outbound/domains/index.tsx'));
+
+    expect($chart)->not->toContain('rounded-2xl')
+        ->and($chart)->toContain('border border-hairline px-4 py-3')
+        ->and($campaigns)->toContain('OutboundPage')
+        ->and($campaigns)->not->toContain('PageHeader')
+        ->and($campaigns)->not->toContain("from '@/components/ui/card'")
+        ->and($templates)->toContain('OutboundPage')
+        ->and($templates)->not->toContain('PageHeader')
+        ->and($outbox)->toContain('OutboundPage')
+        ->and($outbox)->not->toContain('PageHeader')
+        ->and($domains)->toContain('OutboundPage')
+        ->and($domains)->not->toContain('PageHeader');
+
+    expect(substr_count($reports, 'bg-brand'))->toBe(1)
+        ->and($reports)->toContain('Add widget');
+});

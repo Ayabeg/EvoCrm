@@ -403,7 +403,7 @@ export default function Reports({
                         </label>
                         <button
                             type="submit"
-                            className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink hover:bg-canvas-soft"
                         >
                             Apply
                         </button>
@@ -585,7 +585,7 @@ export default function Reports({
                         />
                         <button
                             type="submit"
-                            className="h-8 rounded-md bg-brand px-3 text-[13px] text-white md:col-span-4"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink hover:bg-canvas-soft md:col-span-4"
                         >
                             Create schedule
                         </button>
@@ -730,7 +730,7 @@ export default function Reports({
                         </label>
                         <button
                             type="submit"
-                            className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] font-medium text-ink hover:bg-canvas-soft"
                         >
                             Create
                         </button>

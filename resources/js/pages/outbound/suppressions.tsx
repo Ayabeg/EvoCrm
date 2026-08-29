@@ -1,8 +1,6 @@
 import { Form, router } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -19,12 +17,11 @@ export default function SuppressionsIndex({
 }) {
     return (
         <OutboundShell title="Suppressions">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Suppressions"
-                    description="Suppressed emails and phones never receive automated outbound — sequences skip them, campaigns fail them honestly, and the public unsubscribe link lands here."
-                />
-                <Card className="p-4">
+            <OutboundPage
+                title="Suppressions"
+                description="Suppressed emails and phones never receive automated outbound — sequences skip them, campaigns fail them honestly, and the public unsubscribe link lands here."
+            >
+                <section className="border-t border-hairline pt-3">
                     <Form
                         action="/outbound/suppressions"
                         method="post"
@@ -60,8 +57,8 @@ export default function SuppressionsIndex({
                             </>
                         )}
                     </Form>
-                </Card>
-                <Card className="overflow-hidden">
+                </section>
+                <section className="overflow-x-auto border-t border-hairline">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-left">
                             <tr>
@@ -83,7 +80,7 @@ export default function SuppressionsIndex({
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="text-brand"
+                                            className="text-ink hover:underline"
                                             onClick={() => {
                                                 if (
                                                     window.confirm(
@@ -103,8 +100,8 @@ export default function SuppressionsIndex({
                             ))}
                         </tbody>
                     </table>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

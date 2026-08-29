@@ -38,7 +38,7 @@ function ChartFrame({
         <div
             className={
                 framed
-                    ? 'rounded-2xl border border-hairline bg-canvas px-5 py-5'
+                    ? 'border border-hairline px-4 py-3'
                     : ''
             }
         >

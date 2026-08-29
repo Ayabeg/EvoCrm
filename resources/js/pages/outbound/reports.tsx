@@ -1,8 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 
 type Totals = {
     queued: number;
@@ -70,13 +68,11 @@ export default function OutboundReports({
 
     return (
         <OutboundShell title="Outbound reports">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Outbound reports"
-                    description="Honest numbers: what EvoSales tracks directly, and what needs an ESP webhook."
-                />
-
-                <div className="grid gap-3 md:grid-cols-7">
+            <OutboundPage
+                title="Outbound reports"
+                description="Honest numbers: what EvoSales tracks directly, and what needs an ESP webhook."
+            >
+                <div className="grid gap-3 border-t border-hairline pt-3 md:grid-cols-7">
                     {(
                         [
                             ['Sent', totals.sent, 'sent'],
@@ -88,9 +84,9 @@ export default function OutboundReports({
                             ['Queued', totals.queued, null],
                         ] as [string, number, keyof typeof tracking | null][]
                     ).map(([label, value, key]) => (
-                        <Card
+                        <div
                             key={label}
-                            className="p-3"
+                            className="border-t border-hairline py-2"
                             title={key ? tracking[key] : undefined}
                         >
                             <p className="text-[11px] text-muted-foreground uppercase">
@@ -104,11 +100,11 @@ export default function OutboundReports({
                                     {tracking[key]}
                                 </p>
                             ) : null}
-                        </Card>
+                        </div>
                     ))}
                 </div>
 
-                <Card className="space-y-3 p-4">
+                <section className="space-y-3 border-t border-hairline pt-3">
                     <h2 className="text-sm font-medium">
                         Sent per day · last 30 days
                     </h2>
@@ -130,10 +126,10 @@ export default function OutboundReports({
                             ))}
                         </div>
                     )}
-                </Card>
+                </section>
 
-                <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">
+                <section className="overflow-x-auto border-t border-hairline">
+                    <h2 className="py-2 text-[13px] font-medium">
                         Per campaign
                     </h2>
                     <table className="w-full text-sm">
@@ -167,7 +163,7 @@ export default function OutboundReports({
                                         <td className="px-4 py-2">
                                             <Link
                                                 href={`/outbound/campaigns/${campaign.id}`}
-                                                className="font-medium text-brand"
+                                                className="font-medium text-ink hover:underline"
                                             >
                                                 {campaign.name}
                                             </Link>{' '}
@@ -222,10 +218,10 @@ export default function OutboundReports({
                             )}
                         </tbody>
                     </table>
-                </Card>
+                </section>
 
-                <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 text-sm font-medium">
+                <section className="overflow-x-auto border-t border-hairline">
+                    <h2 className="py-2 text-[13px] font-medium">
                         Per sequence
                     </h2>
                     <table className="w-full text-sm">
@@ -259,7 +255,7 @@ export default function OutboundReports({
                                         <td className="px-4 py-2">
                                             <Link
                                                 href={`/outbound/sequences/${sequence.id}`}
-                                                className="font-medium text-brand"
+                                                className="font-medium text-ink hover:underline"
                                             >
                                                 {sequence.name}
                                             </Link>{' '}
@@ -310,8 +306,8 @@ export default function OutboundReports({
                             )}
                         </tbody>
                     </table>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

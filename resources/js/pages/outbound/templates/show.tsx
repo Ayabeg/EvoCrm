@@ -1,7 +1,6 @@
-import { Form, Head, router } from '@inertiajs/react';
-import PageHeader from '@/components/page-header';
+import { Form, router } from '@inertiajs/react';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -21,16 +20,13 @@ export default function TemplateShow({
     preview: { contact: string; subject?: string | null; html: string };
 }) {
     return (
-        <>
-            <Head title={template.name} />
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title={template.name}
-                    description="Edit the template and check the rendered preview. Variables: {{first_name}} {{last_name}} {{name}} {{email}} {{phone}} {{company}} {{city}} {{wilaya}} {{unsub}}."
-                >
+        <OutboundShell title={template.name}>
+            <OutboundPage
+                title={template.name}
+                description="Edit the template and check the rendered preview. Variables: {{first_name}} {{last_name}} {{name}} {{email}} {{phone}} {{company}} {{city}} {{wilaya}} {{unsub}}."
+                actions={
                     <Button
                         variant="ghost"
-                        className="text-brand"
                         onClick={() => {
                             if (
                                 window.confirm(
@@ -45,10 +41,10 @@ export default function TemplateShow({
                     >
                         Delete
                     </Button>
-                </PageHeader>
-
-                <div className="grid gap-4 lg:grid-cols-2">
-                    <Card className="p-4">
+                }
+            >
+                <div className="grid gap-4 border-t border-hairline pt-3 lg:grid-cols-2">
+                    <section>
                         <h2 className="mb-3 font-medium">Edit template</h2>
                         <Form
                             action={`/outbound/templates/${template.id}`}
@@ -106,9 +102,9 @@ export default function TemplateShow({
                                 </>
                             )}
                         </Form>
-                    </Card>
+                    </section>
 
-                    <Card className="p-4">
+                    <section>
                         <h2 className="mb-1 font-medium">Preview</h2>
                         <p className="mb-3 text-xs text-muted-foreground">
                             Rendered for {preview.contact}. The unsubscribe link
@@ -124,10 +120,10 @@ export default function TemplateShow({
                             className="rounded-md border border-hairline bg-canvas p-4 text-sm [&_a]:text-brand"
                             dangerouslySetInnerHTML={{ __html: preview.html }}
                         />
-                    </Card>
+                    </section>
                 </div>
-            </div>
-        </>
+            </OutboundPage>
+        </OutboundShell>
     );
 }
 

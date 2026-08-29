@@ -1,9 +1,7 @@
 import { Form, Link } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -27,13 +25,11 @@ export default function TemplatesIndex({
 }) {
     return (
         <OutboundShell title="Templates">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Email templates"
-                    description="Reusable subject + text/HTML body with {{first_name}}, {{last_name}}, {{name}}, {{email}}, {{phone}}, {{company}}, {{city}}, {{wilaya}}, {{unsub}}. Sequence steps and campaigns prefill from these. The unsubscribe link always points at this CRM host."
-                />
-
-                <Card className="p-4">
+            <OutboundPage
+                title="Email templates"
+                description="Reusable subject + text/HTML body with {{first_name}}, {{last_name}}, {{name}}, {{email}}, {{phone}}, {{company}}, {{city}}, {{wilaya}}, {{unsub}}. Sequence steps and campaigns prefill from these. The unsubscribe link always points at this CRM host."
+            >
+                <section className="border-t border-hairline pt-3">
                     <h2 className="mb-3 font-medium">New template</h2>
                     <Form
                         action="/outbound/templates"
@@ -91,18 +87,18 @@ export default function TemplatesIndex({
                             </>
                         )}
                     </Form>
-                </Card>
+                </section>
 
-                <div className="grid gap-3 lg:grid-cols-2">
+                <div className="grid gap-3 border-t border-hairline pt-3 lg:grid-cols-2">
                     {templates.length === 0 ? (
-                        <Card className="p-6 text-sm text-muted-foreground">
+                        <p className="py-4 text-[13px] text-muted-foreground">
                             No templates yet.
-                        </Card>
+                        </p>
                     ) : null}
                     {templates.map((template) => (
-                        <Card
+                        <article
                             key={template.id}
-                            className="space-y-2 p-4 text-sm"
+                            className="space-y-2 border-t border-hairline pt-3 text-sm"
                         >
                             <div className="flex items-center justify-between">
                                 <p className="font-medium">
@@ -130,11 +126,11 @@ export default function TemplatesIndex({
                             <p className="rounded-md bg-canvas-soft p-3 whitespace-pre-wrap text-muted-foreground">
                                 {template.body}
                             </p>
-                        </Card>
+                        </article>
                     ))}
                 </div>
 
-                <Card className="p-4">
+                <section className="border-t border-hairline pt-3">
                     <h2 className="mb-1 font-medium">
                         Official WhatsApp Cloud template send
                     </h2>
@@ -188,8 +184,8 @@ export default function TemplatesIndex({
                             </>
                         )}
                     </Form>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

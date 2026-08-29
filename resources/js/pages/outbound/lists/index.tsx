@@ -1,16 +1,19 @@
 import { Link } from '@inertiajs/react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
-import { Card } from '@/components/ui/card';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 
 export default function OutboundListsIndex({ lists }: { lists: Array<{ id: number; name: string; count: number; campaigns: Array<{ id: number; name: string; status: string }> }> }) {
     return (
         <OutboundShell title="Lists">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader title="Audience lists" description="Contact segments for outbound campaigns.">
-                    <Link href="/crm/segments" className="text-[13px] text-brand">Manage segments</Link>
-                </PageHeader>
-                <Card className="overflow-hidden">
+            <OutboundPage
+                title="Audience lists"
+                description="Contact segments for outbound campaigns."
+                actions={
+                    <Link href="/crm/segments" className="text-[13px] text-ink underline-offset-2 hover:underline">
+                        Manage segments
+                    </Link>
+                }
+            >
+                <section className="overflow-x-auto border-t border-hairline">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-left text-[11px] uppercase text-muted-foreground">
                             <tr><th className="px-4 py-2">List</th><th className="px-4 py-2 text-right">Contacts</th><th className="px-4 py-2">Campaigns</th><th className="px-4 py-2">Open</th></tr>
@@ -22,14 +25,14 @@ export default function OutboundListsIndex({ lists }: { lists: Array<{ id: numbe
                                 <tr key={list.id} className="border-t border-hairline">
                                     <td className="px-4 py-3 font-medium">{list.name}</td>
                                     <td className="px-4 py-3 text-right">{list.count}</td>
-                                    <td className="px-4 py-3">{list.campaigns.map((c) => <Link key={c.id} href={`/outbound/campaigns/${c.id}`} className="me-2 text-brand">{c.name}</Link>)}</td>
-                                    <td className="px-4 py-3"><Link href={`/crm/contacts?filter_id=${list.id}`} className="text-brand">View</Link></td>
+                                    <td className="px-4 py-3">{list.campaigns.map((c) => <Link key={c.id} href={`/outbound/campaigns/${c.id}`} className="me-2 text-ink hover:underline">{c.name}</Link>)}</td>
+                                    <td className="px-4 py-3"><Link href={`/crm/contacts?filter_id=${list.id}`} className="text-ink hover:underline">View</Link></td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </Card>
-            </div>
+                </section>
+            </OutboundPage>
         </OutboundShell>
     );
 }

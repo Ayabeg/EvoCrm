@@ -1,11 +1,9 @@
 import { Form, router } from '@inertiajs/react';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
-import { OutboundShell } from '@/components/crm/outbound-shell';
-import PageHeader from '@/components/page-header';
+import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -58,13 +56,11 @@ function CopyRecord({ value }: { value: string }) {
 export default function DomainsIndex({ domains }: { domains: DomainRow[] }) {
     return (
         <OutboundShell title="Sending domains">
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader
-                    title="Sending domains"
-                    description="The domains your mailboxes send from. Publish the SPF, DKIM, and DMARC records at your DNS provider, then mark the domain verified. EvoSales stores the checklist — it never calls a DNS API."
-                />
-
-                <Card className="p-4">
+            <OutboundPage
+                title="Sending domains"
+                description="The domains your mailboxes send from. Publish the SPF, DKIM, and DMARC records at your DNS provider, then mark the domain verified. EvoSales stores the checklist — it never calls a DNS API."
+            >
+                <section className="border-t border-hairline pt-3">
                     <h2 className="mb-3 font-medium">Add domain</h2>
                     <Form
                         action="/outbound/domains"
@@ -126,17 +122,17 @@ export default function DomainsIndex({ domains }: { domains: DomainRow[] }) {
                             </>
                         )}
                     </Form>
-                </Card>
+                </section>
 
                 <div className="space-y-3">
                     {domains.length === 0 ? (
-                        <Card className="p-6 text-sm text-muted-foreground">
+                        <p className="border-t border-hairline py-4 text-[13px] text-muted-foreground">
                             No sending domain yet. Add the domain your From
                             addresses use.
-                        </Card>
+                        </p>
                     ) : null}
                     {domains.map((domain) => (
-                        <Card key={domain.id} className="space-y-3 p-4 text-sm">
+                        <article key={domain.id} className="space-y-3 border-t border-hairline pt-3 text-sm">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-medium">
                                     {domain.domain}
@@ -172,7 +168,7 @@ export default function DomainsIndex({ domains }: { domains: DomainRow[] }) {
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="text-brand"
+                                        className="text-ink hover:underline"
                                         onClick={() => {
                                             if (
                                                 window.confirm(
@@ -318,10 +314,10 @@ export default function DomainsIndex({ domains }: { domains: DomainRow[] }) {
                                     )}
                                 </Form>
                             </details>
-                        </Card>
+                        </article>
                     ))}
                 </div>
-            </div>
+            </OutboundPage>
         </OutboundShell>
     );
 }

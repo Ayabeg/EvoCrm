@@ -105,7 +105,7 @@ See P1.4. Also RoomShell active tabs correctly use a 2px brand underline — kee
 
 - Deal board has no keyboard move menu (Lead board does). Do not invent.
 - Home period comparison (`+100%`) can be noisy on short windows. Data is real; leave the number, keep it mute.
-- Campaigns / templates / other Outbound `PageHeader` pages remain tightened, not destacked. Do not restyle those rooms in this pass.
+- Warmup still uses Aurora `StatCard` for live mailbox meters. Do not invent a second meter.
 
 ---
 
@@ -137,6 +137,16 @@ Composition only. No second design system.
 | Home KPI strip | One horizontal strip on narrow viewports; `md:grid-cols-5` |
 | Pipeline cards | Real `close_date` formatted as day + month (`en-GB`) |
 | `DeskGlass` | Canvas + hairline. Empty thread is a mute line, not an EmptyState card |
+
+---
+
+## Increment 3 — leftover destack
+
+| Surface | Change |
+|---|---|
+| `EvoVizChart` | Hairline frame, no `rounded-2xl` |
+| Outbound rooms | Campaigns, templates, lists, outbox, replies, domains, suppressions, quiet hours, outbound reports use `OutboundPage` |
+| Reports primaries | Only **Add widget** stays orange. Apply / Create schedule / Create are hairline |
 
 ---
 
