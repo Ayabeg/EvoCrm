@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
 
 export function RecordBack({ href, label }: { href: string; label: string }) {
     return (
@@ -64,113 +63,135 @@ export function RecordActions({
     return (
         <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-                <Button
-                    type="button"
-                    size="sm"
-                    aria-expanded={active !== null}
-                    onClick={() => setActive(active ? null : 'note')}
+                <div
+                    role="toolbar"
+                    aria-label="Record actions"
+                    className="record-action-group"
                 >
-                    Log activity
-                </Button>
-                {secondary}
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            title="More actions"
-                            aria-label={`More actions for record ${entityId}`}
-                        >
-                            <MoreHorizontal className="size-3.5" aria-hidden />
-                            More
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href={`/crm/deals?create=1&contact_id=${contactId}`}
-                                >
-                                    <Handshake className="size-3.5" />
-                                    Create deal
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {companyId && !contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/crm/contacts?create=1">
-                                    <UserPlus className="size-3.5" />
-                                    Add contact
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/outbound/sequences">
-                                    <Bolt className="size-3.5" />
-                                    Enroll in sequence
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/outbound/campaigns">
-                                    <SendHorizonal className="size-3.5" />
-                                    Add to campaign
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/crm/segments">
-                                    <Users className="size-3.5" />
-                                    View segments
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Form
-                                    action={`/crm/contacts/${contactId}/draft-email`}
-                                    method="post"
-                                    options={{ preserveScroll: true }}
-                                    className="w-full"
-                                >
-                                    <button
-                                        type="submit"
-                                        className="flex w-full items-center gap-2 px-2 py-1.5 text-sm"
+                    {ACTION_DEFS.map((action) => {
+                        const selected = active === action.type;
+
+                        return (
+                            <Button
+                                key={action.type}
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                aria-pressed={selected}
+                                title={action.label}
+                                onClick={() =>
+                                    setActive(selected ? null : action.type)
+                                }
+                                className="h-8 px-2 text-[12px] font-medium"
+                            >
+                                {action.label}
+                            </Button>
+                        );
+                    })}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                title="More actions"
+                                aria-label={`More actions for record ${entityId}`}
+                                className="h-8 px-2 text-[12px] font-medium"
+                            >
+                                <MoreHorizontal
+                                    className="size-3.5"
+                                    aria-hidden
+                                />
+                                More
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href={`/crm/deals?create=1&contact_id=${contactId}`}
                                     >
-                                        <Mail className="size-3.5" />
-                                        Draft email with Evo
-                                    </button>
-                                </Form>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
+                                        <Handshake className="size-3.5" />
+                                        Create deal
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {companyId && !contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/crm/contacts?create=1">
+                                        <UserPlus className="size-3.5" />
+                                        Add contact
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/outbound/sequences">
+                                        <Bolt className="size-3.5" />
+                                        Enroll in sequence
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/outbound/campaigns">
+                                        <SendHorizonal className="size-3.5" />
+                                        Add to campaign
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/crm/segments">
+                                        <Users className="size-3.5" />
+                                        View segments
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Form
+                                        action={`/crm/contacts/${contactId}/draft-email`}
+                                        method="post"
+                                        options={{ preserveScroll: true }}
+                                        className="w-full"
+                                    >
+                                        <button
+                                            type="submit"
+                                            className="flex w-full items-center gap-2 px-2 py-1.5 text-sm"
+                                        >
+                                            <Mail className="size-3.5" />
+                                            Draft email with Evo
+                                        </button>
+                                    </Form>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/inbox">
+                                        <Inbox className="size-3.5" />
+                                        Open in Desk
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/outbound">
+                                        <Send className="size-3.5" />
+                                        Email via Outbound
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
                             <DropdownMenuItem asChild>
-                                <Link href="/inbox">
-                                    <Inbox className="size-3.5" />
-                                    Open in Desk
+                                <Link href="/crm/deals/board">
+                                    <Handshake className="size-3.5" />
+                                    View deal board
                                 </Link>
                             </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/outbound">
-                                    <Send className="size-3.5" />
-                                    Email via Outbound
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        <DropdownMenuItem asChild>
-                            <Link href="/crm/deals/board">
-                                <Handshake className="size-3.5" />
-                                View deal board
-                            </Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+                {secondary}
             </div>
             {active ? (
                 <Form
@@ -190,11 +211,7 @@ export function RecordActions({
                         />
                     ) : null}
                     {dealId ? (
-                        <input
-                            type="hidden"
-                            name="deal_id"
-                            value={dealId}
-                        />
+                        <input type="hidden" name="deal_id" value={dealId} />
                     ) : null}
                     {companyId ? (
                         <input
@@ -203,33 +220,6 @@ export function RecordActions({
                             value={companyId}
                         />
                     ) : null}
-                    <div
-                        className="mb-2 flex flex-wrap gap-1"
-                        role="tablist"
-                        aria-label="Activity type"
-                    >
-                        {ACTION_DEFS.map((action) => {
-                            const selected = active === action.type;
-
-                            return (
-                                <button
-                                    key={action.type}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={selected}
-                                    onClick={() => setActive(action.type)}
-                                    className={cn(
-                                        'relative h-7 px-2 text-[12px] transition-colors',
-                                        selected
-                                            ? 'font-medium text-ink after:absolute after:inset-x-1 after:bottom-0 after:h-0.5 after:bg-brand'
-                                            : 'text-mute hover:text-ink',
-                                    )}
-                                >
-                                    {action.label}
-                                </button>
-                            );
-                        })}
-                    </div>
                     <div className="grid gap-2">
                         <Input
                             name="subject"
@@ -316,7 +306,7 @@ export function ActivityTabs({
                     <TabsTrigger
                         key={tab.key}
                         value={tab.key}
-                        className="min-h-9 shrink-0 px-3 py-1.5 sm:min-h-8"
+                        className="min-h-9 shrink-0 px-3 py-1.5 after:shadow-none data-[state=active]:after:shadow-none sm:min-h-8"
                     >
                         {tab.label}
                     </TabsTrigger>
@@ -363,9 +353,7 @@ export function AssociationCard({
                 ) : null}
             </CardHeader>
             <CardContent className="space-y-1 px-0 pt-2 pb-0 text-[13px] leading-snug">
-                {children ?? (
-                    <p className="text-mute">{empty ?? 'None'}</p>
-                )}
+                {children ?? <p className="text-mute">{empty ?? 'None'}</p>}
             </CardContent>
         </Card>
     );

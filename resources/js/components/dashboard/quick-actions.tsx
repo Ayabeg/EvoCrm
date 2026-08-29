@@ -7,9 +7,9 @@ export function QuickActions({
     actions: { label: string; href: string }[];
 }) {
     return (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-1">
             {actions.map((action) => (
-                <Button key={action.href} asChild size="sm" variant="outline">
+                <Button key={action.href} asChild size="sm" variant="ghost">
                     <Link href={action.href}>{action.label}</Link>
                 </Button>
             ))}

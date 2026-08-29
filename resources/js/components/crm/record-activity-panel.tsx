@@ -47,7 +47,7 @@ export default function RecordActivityPanel({
                                 options={{ preserveScroll: true }}
                             >
                                 <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="sm"
                                     className="h-7 text-[11px]"
                                 >
@@ -107,7 +107,7 @@ export default function RecordActivityPanel({
                                     options={{ preserveScroll: true }}
                                 >
                                     <Button
-                                        variant="outline"
+                                        variant="ghost"
                                         size="sm"
                                         className="mt-1.5 h-7 text-[11px]"
                                     >
