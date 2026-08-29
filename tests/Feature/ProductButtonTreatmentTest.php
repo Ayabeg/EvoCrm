@@ -21,12 +21,18 @@ it('restyles Aurora buttons at the EvoSales layer without rewriting Aurora CSS',
 
     expect($aurora)->toContain('box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.34), 0 2px 6px rgba(0,0,0,0.16)')
         ->and($product)->toContain('EvoSales button composition')
+        ->and($product)->toContain('Unlayered so it wins over @layer aurora-components')
         ->and($product)->toContain('.aurora-btn {')
         ->and($product)->toContain('box-shadow: none')
         ->and($product)->toContain('.aurora-btn--filled.aurora-btn--aurora')
         ->and($product)->toContain('color: #ffffff')
         ->and($product)->toContain('background: var(--evosales-mark)')
         ->and($product)->toContain('.record-action-group');
+
+    $beforeComposition = strstr($product, 'Unlayered so it wins over @layer aurora-components', true);
+    expect($beforeComposition)->toBeString()
+        ->and($beforeComposition)->toContain('@layer utilities')
+        ->and($beforeComposition)->not->toContain('.aurora-btn {');
 });
 
 it('keeps record actions as a quiet grouped toolbar instead of floating cards', function () {
