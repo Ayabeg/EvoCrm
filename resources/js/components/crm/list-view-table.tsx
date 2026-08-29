@@ -175,7 +175,7 @@ export default function ListViewTable({
                     <thead>
                         <tr className="border-b border-hairline bg-canvas-soft text-left">
                             {selectable ? (
-                                <th className="w-10 px-4 py-2 sm:px-6">
+                                <th className="w-10 px-4 py-1.5 sm:px-6">
                                     <input
                                         type="checkbox"
                                         checked={allSelected}
@@ -187,7 +187,7 @@ export default function ListViewTable({
                             {visible.map((column) => (
                                 <th
                                     key={column.id}
-                                    className="px-4 py-2 text-[11px] font-medium text-mute first:sm:pl-6 last:sm:pr-6"
+                                    className="px-4 py-1.5 text-[11px] font-medium text-mute first:sm:pl-6 last:sm:pr-6"
                                 >
                                     {columnLabel(columnDefs, column.id)}
                                 </th>
@@ -207,7 +207,7 @@ export default function ListViewTable({
                                 )}
                             >
                                 {selectable ? (
-                                    <td className="px-4 py-2 sm:px-6">
+                                    <td className="px-4 py-1.5 sm:px-6">
                                         <input
                                             type="checkbox"
                                             checked={selected}
@@ -231,7 +231,7 @@ export default function ListViewTable({
                                         <td
                                             key={column.id}
                                             className={cn(
-                                                'px-4 py-2 first:sm:pl-6 last:sm:pr-6',
+                                                'px-4 py-1.5 first:sm:pl-6 last:sm:pr-6',
                                                 column.id === primaryId
                                                     ? 'font-medium text-ink'
                                                     : 'text-mute',
@@ -268,7 +268,7 @@ export default function ListViewTable({
                               : renderCompanyCell(primaryId, row as CompanyRow);
 
                     return (
-                        <li key={row.id} className="flex items-start gap-2 px-4 py-2.5">
+                        <li key={row.id} className="flex items-start gap-2 px-4 py-2">
                             {selectable ? (
                                 <input
                                     type="checkbox"

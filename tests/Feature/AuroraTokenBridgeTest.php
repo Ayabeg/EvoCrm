@@ -138,7 +138,8 @@ it('uses compact mobile spacing tokens on Home chrome', function () {
     expect($header)->toContain('text-page-title');
     expect($header)->toContain('flex flex-col gap-2');
     expect($header)->toContain('create=1');
-    expect($strip)->toContain('grid-cols-2');
+    expect($strip)->toContain('overflow-x-auto');
+    expect($strip)->toContain('md:grid-cols-5');
 });
 
 it('places Needs attention above Performance on Home', function () {

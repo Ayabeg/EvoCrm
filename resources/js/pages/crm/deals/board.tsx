@@ -62,6 +62,23 @@ function createDealHref(pipelineId: number): string {
     return `/crm/deals?pipeline=${pipelineId}&create=1`;
 }
 
+function formatCloseDate(value: string): string {
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+
+    if (!match) {
+        return value;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+    });
+}
+
 function DealCard({
     deal,
     dragging,
@@ -98,7 +115,7 @@ function DealCard({
             </p>
             <p className="mt-0.5 truncate text-[11px] text-mute">
                 {deal.owner_name ?? 'Unassigned'}
-                {deal.close_date ? ` · ${deal.close_date}` : ''}
+                {deal.close_date ? ` · ${formatCloseDate(deal.close_date)}` : ''}
             </p>
         </PipelineKanbanCard>
     );

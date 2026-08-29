@@ -39,6 +39,7 @@ it('tightens record and Desk work surfaces without changing IA', function () {
     $workspace = file_get_contents(resource_path('js/components/crm/adaptive-workspace-shell.tsx'));
     $identity = file_get_contents(resource_path('js/components/crm/record-hub.tsx'));
     $desk = file_get_contents(resource_path('js/pages/desk/inbox.tsx'));
+    $glass = file_get_contents(resource_path('js/components/desk/desk-glass.tsx'));
     $catchUp = file_get_contents(resource_path('js/components/crm/catch-up-block.tsx'));
 
     expect($workspace)->toContain('px-4 py-3')
@@ -46,7 +47,33 @@ it('tightens record and Desk work surfaces without changing IA', function () {
         ->and($identity)->toContain('mt-1 flex flex-col gap-2')
         ->and($desk)->toContain('DeskShell')
         ->and($desk)->toContain('AdaptiveWorkspaceShell')
+        ->and($desk)->toContain('Select a conversation')
         ->and($desk)->not->toContain('bg-brand/12')
         ->and($desk)->not->toContain('bg-brand/8')
+        ->and($glass)->toContain('bg-canvas')
+        ->and($glass)->not->toContain('aurora-panel-strong')
         ->and($catchUp)->not->toContain('rounded-xl');
+});
+
+it('destacks Outbound and Reports chrome without inventing a second system', function () {
+    $reports = file_get_contents(resource_path('js/components/crm/reports-shell.tsx'));
+    $outbound = file_get_contents(resource_path('js/components/crm/outbound-shell.tsx'));
+    $index = file_get_contents(resource_path('js/pages/outbound/index.tsx'));
+    $page = file_get_contents(resource_path('js/pages/crm/reports.tsx'));
+    $list = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
+
+    expect($reports)->toContain('text-page-title')
+        ->and($reports)->toContain('px-4 py-3 md:px-5 md:py-4')
+        ->and($reports)->not->toContain('max-w-7xl')
+        ->and($reports)->not->toContain('text-[1.75rem]')
+        ->and($outbound)->toContain('space-y-4 px-4 py-3')
+        ->and($outbound)->not->toContain('max-w-7xl')
+        ->and($index)->not->toContain('from \'@/components/ui/card\'')
+        ->and($index)->not->toContain('text-brand')
+        ->and($page)->not->toContain('rounded-2xl')
+        ->and($page)->not->toContain('mb-8')
+        ->and($page)->toContain('Add widget')
+        ->and($list)->toContain('py-1.5')
+        ->and($board)->toContain("toLocaleDateString('en-GB'");
 });

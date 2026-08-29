@@ -1,9 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { CrmKpiStrip  } from '@/components/crm/crm-kpi-strip';
-import type {KpiTile} from '@/components/crm/crm-kpi-strip';
+import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
+import type { KpiTile } from '@/components/crm/crm-kpi-strip';
 import { OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 
 type Stats = {
     mailboxes: number;
@@ -113,19 +112,19 @@ export default function OutboundIndex({
 }) {
     return (
         <OutboundShell title="Outbound">
-            <div className="space-y-4 p-4 text-ui md:p-6">
-                <p className="text-muted-foreground">
+            <div className="space-y-4 px-4 py-3 md:px-5 md:py-4">
+                <p className="text-ui text-muted-foreground">
                     Mailboxes, sending domains, templates, sequences, broadcast campaigns,
                     suppression, and quiet hours. WhatsApp stays official Cloud templates only.
                 </p>
 
-                <Card className="flex flex-wrap items-center gap-3 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-hairline pb-3">
                     <div>
-                        <h2 className="font-medium">Live mail stack</h2>
-                        <p className="text-muted-foreground">
-                            SMTP {mail_stack.smtp_host}:{mail_stack.smtp_port} ·
-                            IMAP {mail_stack.imap_host}:{mail_stack.imap_port} ·
-                            webmail is Roundcube on the same host.{' '}
+                        <h2 className="text-[13px] font-medium text-ink">Live mail stack</h2>
+                        <p className="mt-1 max-w-3xl text-[11px] text-muted-foreground">
+                            SMTP {mail_stack.smtp_host}:{mail_stack.smtp_port} · IMAP{' '}
+                            {mail_stack.imap_host}:{mail_stack.imap_port} · webmail is Roundcube
+                            on the same host.{' '}
                             {mail_stack.configured
                                 ? 'Mailboxes sync from the stack automatically.'
                                 : 'Set EVOSALES_MAIL_API_TOKEN to sync mailboxes automatically.'}{' '}
@@ -133,78 +132,68 @@ export default function OutboundIndex({
                         </p>
                     </div>
                     <a
-                        className="ms-auto text-brand"
+                        className="shrink-0 text-[13px] text-ink underline-offset-2 hover:underline"
                         href={mail_stack.roundcube_url}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
                         Open Roundcube
                     </a>
-                </Card>
+                </div>
 
                 <CrmKpiStrip kpis={outboundKpis(stats)} columns={4} />
 
-                <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 font-medium">
+                <section className="overflow-x-auto border-t border-hairline">
+                    <h2 className="py-2 text-[13px] font-medium text-ink">
                         Mailbox health{' '}
                         <span className="font-normal text-muted-foreground">
                             — {stats.mailboxes_enabled}/{stats.mailboxes} enabled
                         </span>
                     </h2>
-                    <table className="w-full">
-                        <thead className="bg-muted/50 text-left">
+                    <table className="w-full text-ui">
+                        <thead className="text-left text-[11px] text-muted-foreground">
                             <tr>
-                                <th className="px-4 py-2">Mailbox</th>
-                                <th className="px-4 py-2">Status</th>
-                                <th className="px-4 py-2">IMAP replies</th>
-                                <th className="px-4 py-2">Sent today</th>
-                                <th className="px-4 py-2">Last test</th>
+                                <th className="py-1.5 font-medium">Mailbox</th>
+                                <th className="py-1.5 font-medium">Status</th>
+                                <th className="py-1.5 font-medium">IMAP replies</th>
+                                <th className="py-1.5 font-medium">Sent today</th>
+                                <th className="py-1.5 font-medium">Last test</th>
                             </tr>
                         </thead>
                         <tbody>
                             {mailboxHealth.length === 0 ? (
                                 <tr>
-                                    <td
-                                        className="px-4 py-6 text-muted-foreground"
-                                        colSpan={5}
-                                    >
+                                    <td className="py-4 text-muted-foreground" colSpan={5}>
                                         No mailbox yet — add one under Mailboxes, enable it, and
                                         send a test.
                                     </td>
                                 </tr>
                             ) : (
                                 mailboxHealth.map((box) => (
-                                    <tr
-                                        key={box.id}
-                                        className="border-t border-hairline"
-                                    >
-                                        <td className="px-4 py-2">
+                                    <tr key={box.id} className="border-t border-hairline">
+                                        <td className="py-1.5">
                                             <Link
                                                 href="/outbound/mailboxes"
-                                                className="font-medium text-brand"
+                                                className="font-medium text-ink hover:underline"
                                             >
                                                 {box.name}
                                             </Link>
-                                            <span className="block text-ui text-muted-foreground">
+                                            <span className="block text-[11px] text-muted-foreground">
                                                 {box.from_address}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-2">
-                                            <Badge
-                                                variant={healthVariant(
-                                                    box.effective_status,
-                                                )}
-                                            >
+                                        <td className="py-1.5">
+                                            <Badge variant={healthVariant(box.effective_status)}>
                                                 {box.effective_status}
                                             </Badge>
                                         </td>
-                                        <td className="px-4 py-2 text-muted-foreground">
+                                        <td className="py-1.5 text-muted-foreground">
                                             {box.imap_configured ? 'on' : 'off'}
                                         </td>
-                                        <td className="px-4 py-2 text-muted-foreground">
+                                        <td className="py-1.5 text-muted-foreground">
                                             {box.sent_today}/{box.daily_limit}
                                         </td>
-                                        <td className="px-4 py-2 text-muted-foreground">
+                                        <td className="py-1.5 text-muted-foreground">
                                             {box.last_tested_at ?? 'never'}
                                         </td>
                                     </tr>
@@ -212,40 +201,32 @@ export default function OutboundIndex({
                             )}
                         </tbody>
                     </table>
-                </Card>
+                </section>
 
-                <Card className="overflow-hidden">
-                    <h2 className="border-b border-hairline px-4 py-2 font-medium">
-                        Recent activity
-                    </h2>
-                    <table className="w-full">
-                        <thead className="bg-muted/50 text-left">
+                <section className="overflow-x-auto border-t border-hairline">
+                    <h2 className="py-2 text-[13px] font-medium text-ink">Recent activity</h2>
+                    <table className="w-full text-ui">
+                        <thead className="text-left text-[11px] text-muted-foreground">
                             <tr>
-                                <th className="px-4 py-2">Direction</th>
-                                <th className="px-4 py-2">Contact</th>
-                                <th className="px-4 py-2">Subject</th>
-                                <th className="px-4 py-2">Source</th>
-                                <th className="px-4 py-2">Status</th>
+                                <th className="py-1.5 font-medium">Direction</th>
+                                <th className="py-1.5 font-medium">Contact</th>
+                                <th className="py-1.5 font-medium">Subject</th>
+                                <th className="py-1.5 font-medium">Source</th>
+                                <th className="py-1.5 font-medium">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {recent.length === 0 ? (
                                 <tr>
-                                    <td
-                                        className="px-4 py-6 text-muted-foreground"
-                                        colSpan={5}
-                                    >
+                                    <td className="py-4 text-muted-foreground" colSpan={5}>
                                         Nothing sent yet. Create a mailbox, then enroll contacts
                                         in a sequence or send a campaign.
                                     </td>
                                 </tr>
                             ) : (
                                 recent.map((message) => (
-                                    <tr
-                                        key={message.id}
-                                        className="border-t border-hairline"
-                                    >
-                                        <td className="px-4 py-2">
+                                    <tr key={message.id} className="border-t border-hairline">
+                                        <td className="py-1.5">
                                             <Badge
                                                 variant={
                                                     message.direction === 'in'
@@ -258,11 +239,11 @@ export default function OutboundIndex({
                                                     : message.channel}
                                             </Badge>
                                         </td>
-                                        <td className="px-4 py-2">
+                                        <td className="py-1.5">
                                             {message.contact ? (
                                                 <Link
                                                     href={`/crm/contacts/${message.contact.id}`}
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                 >
                                                     {message.contact.first_name}{' '}
                                                     {message.contact.last_name ?? ''}
@@ -271,21 +252,19 @@ export default function OutboundIndex({
                                                 message.to_address
                                             )}
                                         </td>
-                                        <td className="px-4 py-2">
-                                            {message.subject ?? '—'}
-                                        </td>
-                                        <td className="px-4 py-2">
+                                        <td className="py-1.5">{message.subject ?? '—'}</td>
+                                        <td className="py-1.5">
                                             {message.sequence ? (
                                                 <Link
                                                     href={`/outbound/sequences/${message.sequence.id}`}
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                 >
                                                     {message.sequence.name}
                                                 </Link>
                                             ) : message.campaign ? (
                                                 <Link
                                                     href={`/outbound/campaigns/${message.campaign.id}`}
-                                                    className="text-brand"
+                                                    className="text-ink hover:underline"
                                                 >
                                                     {message.campaign.name}
                                                 </Link>
@@ -293,15 +272,12 @@ export default function OutboundIndex({
                                                 '—'
                                             )}
                                         </td>
-                                        <td className="px-4 py-2">
+                                        <td className="py-1.5">
                                             {message.status}
                                             {message.defer_reason ? (
-                                                <span className="block text-ui text-muted-foreground">
+                                                <span className="block text-[11px] text-muted-foreground">
                                                     deferred ·{' '}
-                                                    {message.defer_reason.replace(
-                                                        '_',
-                                                        ' ',
-                                                    )}
+                                                    {message.defer_reason.replace('_', ' ')}
                                                 </span>
                                             ) : null}
                                         </td>
@@ -310,7 +286,7 @@ export default function OutboundIndex({
                             )}
                         </tbody>
                     </table>
-                </Card>
+                </section>
             </div>
         </OutboundShell>
     );

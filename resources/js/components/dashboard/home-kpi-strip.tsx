@@ -30,7 +30,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
 
     return (
         <section aria-label="Command KPIs">
-            <div className="grid grid-cols-2 divide-hairline border-y border-hairline min-[430px]:grid-cols-3 md:grid-cols-5 md:divide-x">
+            <div className="flex overflow-x-auto border-y border-hairline md:grid md:grid-cols-5 md:divide-x md:overflow-visible">
                 {kpis.map((kpi) => {
                     const value = formatKpiValue(kpi);
                     const change =
@@ -38,7 +38,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             ? null
                             : `${kpi.change > 0 ? '+' : ''}${kpi.change}%`;
                     const body = (
-                        <article className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2 md:gap-1 md:px-3 md:py-2.5">
+                        <article className="flex min-w-[7.5rem] flex-col gap-0.5 px-2.5 py-2 md:min-w-0 md:gap-1 md:px-3 md:py-2.5">
                             <p className="text-[11px] font-medium leading-4 text-mute">
                                 {kpi.label}
                             </p>
@@ -61,7 +61,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                                 key={kpi.key}
                                 href={kpi.href}
                                 className={cn(
-                                    'min-w-0 no-underline transition-colors duration-150',
+                                    'min-w-[7.5rem] shrink-0 no-underline transition-colors duration-150 md:min-w-0',
                                     'hover:bg-canvas-soft focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
                                 )}
                                 aria-label={`${kpi.label} ${value}`}
@@ -72,7 +72,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                     }
 
                     return (
-                        <div key={kpi.key} className="min-w-0">
+                        <div key={kpi.key} className="min-w-[7.5rem] shrink-0 md:min-w-0">
                             {body}
                         </div>
                     );

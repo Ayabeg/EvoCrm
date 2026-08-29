@@ -141,7 +141,7 @@ function BackingTable({ table }: { table: ReportTable }) {
     }
 
     return (
-        <div className="overflow-hidden rounded-2xl border border-hairline bg-canvas">
+        <div className="overflow-x-auto border-t border-hairline">
             <table className="w-full">
                 <thead className="bg-canvas-soft text-left text-[11px] text-mute">
                     <tr>
@@ -188,8 +188,8 @@ function BackingTable({ table }: { table: ReportTable }) {
 
 function CategorySection({ category }: { category: ReportCategory }) {
     return (
-        <section aria-label={category.title} className="mt-12 first:mt-0">
-            <div className="mb-5">
+        <section aria-label={category.title} className="mt-6 first:mt-0">
+            <div className="mb-3">
                 <h2 className="text-[15px] font-semibold tracking-tight text-ink">
                     {category.title}
                 </h2>
@@ -422,7 +422,7 @@ export default function Reports({
             >
                 <nav
                     aria-label="Dashboards"
-                    className="mb-8 flex flex-wrap items-center gap-2"
+                    className="mb-4 flex flex-wrap items-center gap-2"
                 >
                     <button
                         type="button"
@@ -430,7 +430,7 @@ export default function Reports({
                         className={`h-8 rounded-md px-3 text-[13px] ${
                             dashboard
                                 ? 'border border-hairline bg-canvas text-muted-foreground hover:text-ink'
-                                : 'bg-brand text-white'
+                                : 'bg-canvas-soft text-ink'
                         }`}
                     >
                         Rooms
@@ -442,7 +442,7 @@ export default function Reports({
                             onClick={() => openDashboard(board.id)}
                             className={`h-8 rounded-md px-3 text-[13px] ${
                                 dashboard?.id === board.id
-                                    ? 'bg-brand text-white'
+                                    ? 'bg-canvas-soft text-ink'
                                     : 'border border-hairline bg-canvas text-muted-foreground hover:text-ink'
                             }`}
                         >
@@ -462,7 +462,7 @@ export default function Reports({
                         New dashboard
                     </button>
                 </nav>
-                <section className="mb-8 rounded-2xl border border-hairline bg-canvas p-5 text-sm">
+                <section className="mb-4 border-t border-hairline pt-3 text-sm">
                     <h2 className="mb-3 text-[11px] text-mute">
                         Scheduled reports
                     </h2>
@@ -499,7 +499,7 @@ export default function Reports({
                                         >
                                             <button
                                                 type="submit"
-                                                className="text-brand"
+                                                className="text-ink hover:underline"
                                             >
                                                 {schedule.active
                                                     ? 'Pause'
@@ -620,8 +620,8 @@ export default function Reports({
                         </div>
 
                         {dashboard.widgets.length === 0 ? (
-                            <div className="rounded-2xl border border-hairline bg-canvas px-5 py-12 text-center">
-                                <p className="text-[15px] font-semibold tracking-tight text-ink">
+                            <div className="border-t border-hairline py-6">
+                                <p className="text-[13px] font-medium tracking-tight text-ink">
                                     No widgets on this dashboard
                                 </p>
                                 <p className="mt-1 text-[12px] text-mute">
@@ -649,7 +649,7 @@ export default function Reports({
                                                 payload={widget.chart}
                                             />
                                         ) : (
-                                            <div className="rounded-2xl border border-hairline bg-canvas px-5 py-10 text-center">
+                                            <div className="border border-hairline px-4 py-6">
                                                 <p className="text-[13px] font-medium text-ink">
                                                     {widget.title}
                                                 </p>
@@ -664,8 +664,8 @@ export default function Reports({
                         )}
                     </section>
                 ) : categories.length === 0 ? (
-                    <div className="rounded-2xl border border-hairline bg-canvas px-5 py-12 text-center">
-                        <p className="text-[15px] font-semibold tracking-tight text-ink">
+                    <div className="border-t border-hairline py-6">
+                        <p className="text-[13px] font-medium tracking-tight text-ink">
                             Nothing to report in this window
                         </p>
                         <p className="mt-1 text-[12px] text-mute">

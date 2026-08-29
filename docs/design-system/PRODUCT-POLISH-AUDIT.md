@@ -103,10 +103,9 @@ See P1.4. Also RoomShell active tabs correctly use a 2px brand underline — kee
 
 ### P3 — optional refinement
 
-- Close dates on pipeline cards remain raw API dates.
 - Deal board has no keyboard move menu (Lead board does). Do not invent.
 - Home period comparison (`+100%`) can be noisy on short windows. Data is real; leave the number, keep it mute.
-- Outbound/Reports page bodies are still `PageHeader` + cards. Shared `PageHeader` + `CrmKpiStrip` fixes the worst of it; a later pass can destack those rooms.
+- Campaigns / templates / other Outbound `PageHeader` pages remain tightened, not destacked. Do not restyle those rooms in this pass.
 
 ---
 
@@ -121,7 +120,23 @@ See P1.4. Also RoomShell active tabs correctly use a 2px brand underline — kee
 7. Desk selection surfaces (ink, not orange wash)
 8. Catch-up + Lead board toolbar tightness
 
-Do **not** touch: AppSidebar, ListViewTable implementation, drawer architecture, command palette contract, backend, tokens.
+Do **not** touch: AppSidebar, ListViewTable implementation (row padding only), drawer architecture, command palette contract, backend, tokens.
+
+---
+
+## Increment 2 — shipped on this branch
+
+Composition only. No second design system.
+
+| Surface | Change |
+|---|---|
+| `ReportsShell` | Destacked: `text-page-title`, compact padding, no `max-w-7xl` / 28px title |
+| `OutboundPage` | Compact 13px title + 11px mute. Index tables are hairline, not `Card` |
+| `crm/reports.tsx` | Hairline groups, quieter dashboard pills, one orange primary (`Add widget`) |
+| `ListViewTable` | Row padding only (`py-1.5` / mobile `py-2`) |
+| Home KPI strip | One horizontal strip on narrow viewports; `md:grid-cols-5` |
+| Pipeline cards | Real `close_date` formatted as day + month (`en-GB`) |
+| `DeskGlass` | Canvas + hairline. Empty thread is a mute line, not an EmptyState card |
 
 ---
 

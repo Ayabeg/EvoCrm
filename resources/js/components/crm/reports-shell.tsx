@@ -78,16 +78,16 @@ export function ReportsShell({
         <>
             <Head title={title} />
             <RoomShell title="Reports" tabs={reportsTabs(pathname)}>
-                <div className="h-full overflow-y-auto">
-                    <div className="mx-auto w-full max-w-7xl px-5 py-8 md:px-8">
+                <div className="h-full overflow-y-auto bg-canvas-soft">
+                    <div className="px-4 py-3 md:px-5 md:py-4">
                         {hero}
-                        <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                            <div>
-                                <h2 className="text-[1.75rem] font-semibold tracking-tight text-ink">
+                        <header className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+                            <div className="min-w-0">
+                                <h2 className="text-page-title font-semibold tracking-tight text-ink">
                                     {pageTitle ?? title}
                                 </h2>
                                 {description ? (
-                                    <p className="mt-1 max-w-2xl text-[12px] leading-5 text-mute">
+                                    <p className="mt-0.5 max-w-2xl text-[11px] leading-4 text-mute">
                                         {description}
                                     </p>
                                 ) : null}
@@ -98,7 +98,7 @@ export function ReportsShell({
                         </header>
                         {children}
                         {footer ? (
-                            <footer className="mt-10 border-t border-hairline pt-4 text-[11px] text-mute">
+                            <footer className="mt-4 border-t border-hairline pt-2.5 text-[11px] text-mute">
                                 {footer}
                             </footer>
                         ) : null}

@@ -437,13 +437,10 @@ function FrontDesk({
                         </Form>
                     </div>
                 ) : (
-                    <div className="grid flex-1 place-items-center bg-canvas-soft p-6">
-                        <EmptyState
-                            as="h2"
-                            icon={<MessageCircle className="size-6" />}
-                            title="Select a conversation"
-                            description="Pick a thread from the inbox."
-                        />
+                    <div className="flex flex-1 items-start bg-canvas px-5 py-6">
+                        <p className="text-[13px] text-mute">
+                            Select a conversation
+                        </p>
                     </div>
                 )
             }

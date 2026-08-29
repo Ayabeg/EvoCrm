@@ -42,12 +42,14 @@ export function OutboundPage({
     children: ReactNode;
 }) {
     return (
-        <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-5 md:px-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                    <h2 className="aurora-text-section text-ink">{title}</h2>
+        <div className="space-y-4 px-4 py-3 md:px-5 md:py-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0">
+                    <h2 className="text-[13px] font-semibold tracking-tight text-ink">
+                        {title}
+                    </h2>
                     {description ? (
-                        <p className="aurora-text-body-sm mt-1 max-w-[65ch] text-mute">
+                        <p className="mt-0.5 max-w-[65ch] text-[11px] leading-4 text-mute">
                             {description}
                         </p>
                     ) : null}
