@@ -21,7 +21,7 @@ class ScoreNode extends GraphNodeJob
     protected function runNode(Workspace $workspace, GraphRun $run): array
     {
         return app(SiblingCommand::class)->invoke('leads:score', [
-            '--workspace' => $workspace->id,
+            'workspace' => $workspace->id,
         ]);
     }
 }

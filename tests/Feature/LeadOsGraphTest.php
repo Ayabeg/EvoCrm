@@ -38,14 +38,14 @@ function graphDeal(User $user, string $stageSlug, array $attributes = []): Deal
     ], $attributes));
 }
 
-it('runs the Lead OS graph end to end and skips missing Q E S commands', function () {
+it('runs the Lead OS graph end to end now that capture, enrich, and score have landed', function () {
     $user = User::factory()->create();
     $workspace = $user->workspace;
     graphDeal($user, 'proposal');
 
-    expect(array_key_exists('leads:capture-drain', Artisan::all()))->toBeFalse()
-        ->and(array_key_exists('leads:enrich', Artisan::all()))->toBeFalse()
-        ->and(array_key_exists('leads:score', Artisan::all()))->toBeFalse();
+    expect(array_key_exists('leads:capture-drain', Artisan::all()))->toBeTrue()
+        ->and(array_key_exists('leads:enrich', Artisan::all()))->toBeTrue()
+        ->and(array_key_exists('leads:score', Artisan::all()))->toBeTrue();
 
     $this->artisan('lead-os:graph', [
         '--workspace' => $workspace->id,
@@ -61,16 +61,15 @@ it('runs the Lead OS graph end to end and skips missing Q E S commands', functio
 
     $nodes = $run->nodeMap();
 
-    expect($nodes['capture-drain']['status'])->toBe(GraphRun::NODE_SKIPPED)
-        ->and($nodes['capture-drain']['error'])->toContain('leads:capture-drain')
-        ->and($nodes['enrich']['status'])->toBe(GraphRun::NODE_SKIPPED)
-        ->and($nodes['score']['status'])->toBe(GraphRun::NODE_SKIPPED)
+    expect($nodes['capture-drain']['status'])->toBe(GraphRun::NODE_OK)
+        ->and($nodes['enrich']['status'])->toBe(GraphRun::NODE_OK)
+        ->and($nodes['score']['status'])->toBe(GraphRun::NODE_OK)
         ->and($nodes['research']['status'])->toBe(GraphRun::NODE_SKIPPED)
         ->and($nodes['research']['error'])->toContain('Ask Evo')
         ->and($nodes['deal-health']['status'])->toBe(GraphRun::NODE_OK)
         ->and($nodes['next-move']['status'])->toBe(GraphRun::NODE_OK)
-        ->and($run->skipped_count)->toBe(4)
-        ->and($run->ok_count)->toBe(2)
+        ->and($run->skipped_count)->toBe(1)
+        ->and($run->ok_count)->toBe(5)
         ->and($run->failed_count)->toBe(0);
 
     expect(DealHealthSnapshot::query()->where('workspace_id', $workspace->id)->count())->toBe(1)
@@ -80,12 +79,12 @@ it('runs the Lead OS graph end to end and skips missing Q E S commands', functio
 it('skips missing sibling commands without failing the graph', function () {
     $user = User::factory()->create();
 
-    $result = app(\App\Services\LeadOs\SiblingCommand::class)->invoke('leads:score', [
+    $result = app(\App\Services\LeadOs\SiblingCommand::class)->invoke('leads:not-registered', [
         '--workspace' => $user->workspace_id,
     ]);
 
     expect($result['status'])->toBe('skipped')
-        ->and($result['error'])->toBe('leads:score is not registered');
+        ->and($result['error'])->toBe('leads:not-registered is not registered');
 });
 
 it('invokes a registered sibling command when the parallel PR has landed', function () {
