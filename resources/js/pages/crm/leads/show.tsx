@@ -217,6 +217,7 @@ export default function LeadShow({
                                             <div className="sm:col-span-2">
                                                 <Button
                                                     size="sm"
+                                                    variant="outline"
                                                     className="h-8"
                                                     disabled={processing}
                                                 >

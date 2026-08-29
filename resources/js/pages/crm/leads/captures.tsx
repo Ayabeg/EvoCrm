@@ -167,6 +167,7 @@ export default function LeadCapturesIndex({
                                         <Button
                                             type="submit"
                                             size="sm"
+                                            variant="outline"
                                             disabled={processing}
                                         >
                                             Upload CSV
@@ -204,6 +205,7 @@ export default function LeadCapturesIndex({
                                         <Button
                                             type="submit"
                                             size="sm"
+                                            variant="outline"
                                             disabled={processing}
                                         >
                                             Capture URL
@@ -358,6 +360,7 @@ export default function LeadCapturesIndex({
                                             <Button
                                                 type="submit"
                                                 size="sm"
+                                                variant="outline"
                                                 disabled={processing}
                                             >
                                                 Store search
