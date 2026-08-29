@@ -106,88 +106,88 @@ export function RecordActions({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href={`/crm/deals?create=1&contact_id=${contactId}`}
-                                >
-                                    <Handshake className="size-3.5" />
-                                    Create deal
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {companyId && !contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/crm/contacts?create=1">
-                                    <UserPlus className="size-3.5" />
-                                    Add contact
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/outbound/sequences">
-                                    <Bolt className="size-3.5" />
-                                    Enroll in sequence
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/outbound/campaigns">
-                                    <SendHorizonal className="size-3.5" />
-                                    Add to campaign
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/crm/segments">
-                                    <Users className="size-3.5" />
-                                    View segments
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Form
-                                    action={`/crm/contacts/${contactId}/draft-email`}
-                                    method="post"
-                                    options={{ preserveScroll: true }}
-                                    className="w-full"
-                                >
-                                    <button
-                                        type="submit"
-                                        className="flex w-full items-center gap-2 px-2 py-1.5 text-sm"
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href={`/crm/deals?create=1&contact_id=${contactId}`}
                                     >
-                                        <Mail className="size-3.5" />
-                                        Draft email with Evo
-                                    </button>
-                                </Form>
-                            </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
+                                        <Handshake className="size-3.5" />
+                                        Create deal
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {companyId && !contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/crm/contacts?create=1">
+                                        <UserPlus className="size-3.5" />
+                                        Add contact
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/outbound/sequences">
+                                        <Bolt className="size-3.5" />
+                                        Enroll in sequence
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/outbound/campaigns">
+                                        <SendHorizonal className="size-3.5" />
+                                        Add to campaign
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/crm/segments">
+                                        <Users className="size-3.5" />
+                                        View segments
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Form
+                                        action={`/crm/contacts/${contactId}/draft-email`}
+                                        method="post"
+                                        options={{ preserveScroll: true }}
+                                        className="w-full"
+                                    >
+                                        <button
+                                            type="submit"
+                                            className="flex w-full items-center gap-2 px-2 py-1.5 text-sm"
+                                        >
+                                            <Mail className="size-3.5" />
+                                            Draft email with Evo
+                                        </button>
+                                    </Form>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/inbox">
+                                        <Inbox className="size-3.5" />
+                                        Open in Desk
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
+                            {contactId ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/outbound">
+                                        <Send className="size-3.5" />
+                                        Email via Outbound
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : null}
                             <DropdownMenuItem asChild>
-                                <Link href="/inbox">
-                                    <Inbox className="size-3.5" />
-                                    Open in Desk
+                                <Link href="/crm/deals/board">
+                                    <Handshake className="size-3.5" />
+                                    View deal board
                                 </Link>
                             </DropdownMenuItem>
-                        ) : null}
-                        {contactId ? (
-                            <DropdownMenuItem asChild>
-                                <Link href="/outbound">
-                                    <Send className="size-3.5" />
-                                    Email via Outbound
-                                </Link>
-                            </DropdownMenuItem>
-                        ) : null}
-                        <DropdownMenuItem asChild>
-                            <Link href="/crm/deals/board">
-                                <Handshake className="size-3.5" />
-                                View deal board
-                            </Link>
-                        </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -211,11 +211,7 @@ export function RecordActions({
                         />
                     ) : null}
                     {dealId ? (
-                        <input
-                            type="hidden"
-                            name="deal_id"
-                            value={dealId}
-                        />
+                        <input type="hidden" name="deal_id" value={dealId} />
                     ) : null}
                     {companyId ? (
                         <input
@@ -357,9 +353,7 @@ export function AssociationCard({
                 ) : null}
             </CardHeader>
             <CardContent className="space-y-1 px-0 pt-2 pb-0 text-[13px] leading-snug">
-                {children ?? (
-                    <p className="text-mute">{empty ?? 'None'}</p>
-                )}
+                {children ?? <p className="text-mute">{empty ?? 'None'}</p>}
             </CardContent>
         </Card>
     );
