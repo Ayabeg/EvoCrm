@@ -48,3 +48,12 @@ it('keeps record actions as a quiet grouped toolbar instead of floating cards', 
 
     expect($chrome)->toContain('More actions for record');
 });
+
+it('keeps launch tiles as hairline surfaces without hover elevation', function () {
+    $grid = file_get_contents(resource_path('js/components/crm/quick-launch-grid.tsx'));
+
+    expect($grid)->toContain('border-hairline')
+        ->and($grid)->not->toContain('hover:shadow-sm')
+        ->and($grid)->not->toContain('shadow-md')
+        ->and($grid)->not->toContain('shadow-lg');
+});

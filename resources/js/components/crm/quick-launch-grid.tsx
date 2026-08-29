@@ -48,8 +48,8 @@ export function QuickLaunchGrid({
                         key={department.key}
                         href={department.href}
                         className={cn(
-                            'group flex items-start gap-3 rounded-lg border border-hairline bg-canvas p-4 transition-all',
-                            'hover:border-brand/40 hover:shadow-sm',
+                            'group flex items-start gap-3 rounded-lg border border-hairline bg-canvas p-4 transition-colors',
+                            'hover:border-brand/40',
                             disconnected && 'opacity-70',
                         )}
                     >
