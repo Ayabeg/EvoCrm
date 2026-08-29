@@ -35,7 +35,7 @@ export function AttentionList({ items }: { items: AttentionItem[] }) {
                         className="flex items-start gap-3 py-2 first:pt-0 last:pb-0 sm:items-center"
                     >
                         {count ? (
-                            <span className="money w-8 shrink-0 pt-0.5 text-[15px] font-semibold tabular-nums text-ink sm:pt-0">
+                            <span className="money w-8 shrink-0 pt-0.5 text-[15px] font-semibold text-ink tabular-nums sm:pt-0">
                                 {count}
                             </span>
                         ) : null}
@@ -50,7 +50,7 @@ export function AttentionList({ items }: { items: AttentionItem[] }) {
                         <Button
                             asChild
                             size="sm"
-                            variant="outline"
+                            variant="ghost"
                             className="shrink-0"
                         >
                             <Link href={item.href}>{item.actionLabel}</Link>

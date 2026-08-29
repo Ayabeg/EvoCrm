@@ -306,7 +306,7 @@ export function ActivityTabs({
                     <TabsTrigger
                         key={tab.key}
                         value={tab.key}
-                        className="min-h-9 shrink-0 px-3 py-1.5 sm:min-h-8"
+                        className="min-h-9 shrink-0 px-3 py-1.5 after:shadow-none data-[state=active]:after:shadow-none sm:min-h-8"
                     >
                         {tab.label}
                     </TabsTrigger>

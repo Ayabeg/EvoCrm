@@ -63,3 +63,19 @@ it('keeps launch tiles as hairline surfaces without hover elevation', function (
         ->and($grid)->not->toContain('shadow-md')
         ->and($grid)->not->toContain('shadow-lg');
 });
+
+it('keeps leftover row and workspace actions off floating pill chrome', function () {
+    $attention = file_get_contents(resource_path('js/components/dashboard/attention-list.tsx'));
+    $activity = file_get_contents(resource_path('js/components/crm/record-activity-panel.tsx'));
+    $workspace = file_get_contents(resource_path('js/components/crm/adaptive-workspace-shell.tsx'));
+
+    expect($attention)->toContain('variant="ghost"')
+        ->and($attention)->not->toContain('variant="outline"')
+        ->and($activity)->toContain('Mark done')
+        ->and($activity)->toContain('variant="ghost"')
+        ->and($activity)->not->toContain('variant="outline"')
+        ->and($workspace)->toContain('TabsTrigger')
+        ->and($workspace)->not->toContain('PillGroup')
+        ->and($workspace)->not->toContain('PillTrigger')
+        ->and($workspace)->not->toContain('min-h-11');
+});

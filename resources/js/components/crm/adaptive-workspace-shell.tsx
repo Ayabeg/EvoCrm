@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { PillGroup, PillTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 export type WorkspacePanelKey = 'left' | 'center' | 'right';
@@ -23,7 +23,9 @@ function ScrollPanel({
         <div
             className={cn(
                 'min-h-0 bg-canvas',
-                scrollable ? 'overflow-y-auto' : 'flex flex-col overflow-hidden',
+                scrollable
+                    ? 'overflow-y-auto'
+                    : 'flex flex-col overflow-hidden',
                 className,
             )}
         >
@@ -44,33 +46,34 @@ export function WorkspacePanelSwitcher({
     className?: string;
 }) {
     return (
-        <PillGroup
+        <Tabs
             value={active}
             onValueChange={(value) => onChange(value as WorkspacePanelKey)}
-            className={cn('w-full shrink-0 border-b border-hairline bg-canvas p-2 lg:hidden', className)}
-            panels={
-                <>
-                    {panels.map((panel) => (
-                        <TabsContent
-                            key={panel.key}
-                            value={panel.key}
-                            className="sr-only"
-                            aria-hidden
-                        />
-                    ))}
-                </>
-            }
+            className={cn(
+                'w-full shrink-0 border-b border-hairline bg-canvas lg:hidden',
+                className,
+            )}
         >
+            <TabsList className="no-scrollbar h-auto w-full justify-stretch gap-0 bg-transparent p-0">
+                {panels.map((panel) => (
+                    <TabsTrigger
+                        key={panel.key}
+                        value={panel.key}
+                        className="min-h-9 flex-1 justify-center px-2 py-2 text-center text-[12px] font-medium after:shadow-none data-[state=active]:after:shadow-none"
+                    >
+                        {panel.label}
+                    </TabsTrigger>
+                ))}
+            </TabsList>
             {panels.map((panel) => (
-                <PillTrigger
+                <TabsContent
                     key={panel.key}
                     value={panel.key}
-                    className="min-h-11 flex-1 justify-center px-2 py-2.5 text-center text-[12px] font-medium"
-                >
-                    {panel.label}
-                </PillTrigger>
+                    className="sr-only"
+                    aria-hidden
+                />
             ))}
-        </PillGroup>
+        </Tabs>
     );
 }
 
@@ -105,7 +108,8 @@ export function AdaptiveWorkspaceShell({
     rightClassName?: string;
     scrollPanels?: Partial<Record<WorkspacePanelKey, boolean>>;
 }) {
-    const [activePanel, setActivePanel] = useState<WorkspacePanelKey>(defaultPanel);
+    const [activePanel, setActivePanel] =
+        useState<WorkspacePanelKey>(defaultPanel);
 
     const panels: PanelDef[] = [
         { key: 'left', label: leftLabel },
@@ -147,12 +151,18 @@ export function AdaptiveWorkspaceShell({
                     </ScrollPanel>
                 ) : null}
                 {activePanel === 'center' ? (
-                    <ScrollPanel className={centerRegion} scrollable={centerScroll}>
+                    <ScrollPanel
+                        className={centerRegion}
+                        scrollable={centerScroll}
+                    >
                         {center}
                     </ScrollPanel>
                 ) : null}
                 {activePanel === 'right' ? (
-                    <ScrollPanel className={rightRegion} scrollable={rightScroll}>
+                    <ScrollPanel
+                        className={rightRegion}
+                        scrollable={rightScroll}
+                    >
                         {right}
                     </ScrollPanel>
                 ) : null}
@@ -161,15 +171,24 @@ export function AdaptiveWorkspaceShell({
             {/* Tablet: details full-width OR activity + related side-by-side */}
             <div className="hidden min-h-0 flex-1 overflow-hidden md:flex md:flex-col lg:hidden">
                 {activePanel === 'left' ? (
-                    <ScrollPanel className={cn(leftRegion, 'flex-1')} scrollable={leftScroll}>
+                    <ScrollPanel
+                        className={cn(leftRegion, 'flex-1')}
+                        scrollable={leftScroll}
+                    >
                         {left}
                     </ScrollPanel>
                 ) : (
                     <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] gap-px overflow-hidden bg-hairline">
-                        <ScrollPanel className={centerRegion} scrollable={centerScroll}>
+                        <ScrollPanel
+                            className={centerRegion}
+                            scrollable={centerScroll}
+                        >
                             {center}
                         </ScrollPanel>
-                        <ScrollPanel className={rightRegion} scrollable={rightScroll}>
+                        <ScrollPanel
+                            className={rightRegion}
+                            scrollable={rightScroll}
+                        >
                             {right}
                         </ScrollPanel>
                     </div>
