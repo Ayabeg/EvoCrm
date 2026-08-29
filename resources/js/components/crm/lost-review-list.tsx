@@ -23,7 +23,7 @@ export default function LostReviewList({
     return (
         <section
             data-testid="lost-review"
-            className="mb-8 rounded-2xl border border-hairline bg-canvas px-5 py-4"
+            className="border-t border-hairline bg-canvas py-3"
         >
             <header className="mb-3">
                 <h2 className="text-[15px] font-semibold tracking-tight text-ink">
@@ -43,7 +43,7 @@ export default function LostReviewList({
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <Link
                                 href={`/crm/deals/${row.deal_id}`}
-                                className="text-[13px] font-medium text-ink hover:text-brand"
+                                className="text-[13px] font-medium text-ink hover:underline"
                             >
                                 {row.title}
                             </Link>

@@ -428,9 +428,7 @@ export default function Reports({
                 }
                 footer={`Reports window ${window.from} → ${window.to} · ${window.timezone}`}
             >
-                <div className="mb-8">
-                    <LeadOsGraphStatus graph={leadOsGraph} compact />
-                </div>
+                <LeadOsGraphStatus graph={leadOsGraph} compact />
                 <LostReviewList items={lostReview} />
                 <nav
                     aria-label="Dashboards"
