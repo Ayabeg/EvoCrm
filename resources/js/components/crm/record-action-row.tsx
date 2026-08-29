@@ -28,14 +28,19 @@ export default function RecordActionRow({
     const [type, setType] = useState<ActionType | null>(null);
 
     return (
-        <section className="rounded border border-hairline bg-canvas p-3">
-            <div className="flex flex-wrap gap-1">
+        <section className="rounded-md border border-hairline bg-canvas p-3">
+            <div
+                role="toolbar"
+                aria-label="Record actions"
+                className="record-action-group"
+            >
                 {actions.map((action) => (
                     <Button
                         key={action.type}
                         type="button"
-                        variant={type === action.type ? 'default' : 'secondary'}
-                        className="h-7 px-2 text-[11px]"
+                        variant="ghost"
+                        aria-pressed={type === action.type}
+                        className="h-8 gap-1.5 px-2 text-[12px] font-medium"
                         onClick={() => setType(action.type)}
                     >
                         <action.icon className="size-3.5" />

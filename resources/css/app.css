@@ -335,6 +335,123 @@
         height: 40px;
         border-radius: var(--aurora-radius-1);
     }
+
+    /*
+     * EvoSales button composition.
+     * Aurora Button stays the primitive. This removes the glass / elevation
+     * treatment so ordinary controls are quiet and hairline-bound.
+     * Heights, padding, and radius stay on Aurora + local className.
+     * Dialogs, popovers, and dropdowns keep Aurora overlay elevation.
+     */
+    .aurora-btn {
+        border-color: var(--evosales-hairline);
+        box-shadow: none;
+    }
+
+    .aurora-btn:hover,
+    .aurora-btn:active {
+        box-shadow: none;
+    }
+
+    .aurora-btn:focus-visible {
+        box-shadow:
+            0 0 0 1px color-mix(in srgb, var(--evosales-mark) 45%, transparent),
+            0 0 0 3px color-mix(in srgb, var(--evosales-mark) 22%, transparent);
+    }
+
+    .aurora-btn--neutral,
+    .aurora-btn--aurora:not(.aurora-btn--filled),
+    .aurora-btn--rose:not(.aurora-btn--filled),
+    .aurora-btn--success:not(.aurora-btn--filled),
+    .aurora-btn--warn:not(.aurora-btn--filled),
+    .aurora-btn--destructive:not(.aurora-btn--filled) {
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .aurora-btn--neutral:hover,
+    .aurora-btn--aurora:not(.aurora-btn--filled):hover,
+    .aurora-btn--rose:not(.aurora-btn--filled):hover,
+    .aurora-btn--success:not(.aurora-btn--filled):hover,
+    .aurora-btn--warn:not(.aurora-btn--filled):hover,
+    .aurora-btn--destructive:not(.aurora-btn--filled):hover {
+        background: var(--aurora-hover-bg);
+        box-shadow: none;
+    }
+
+    .aurora-btn--aurora:not(.aurora-btn--filled) {
+        color: var(--evosales-ink);
+        border-color: var(--evosales-hairline);
+    }
+
+    .aurora-btn--filled.aurora-btn--aurora {
+        background: var(--evosales-mark);
+        border-color: var(--evosales-mark);
+        color: #ffffff;
+        box-shadow: none;
+    }
+
+    .aurora-btn--filled.aurora-btn--aurora:hover {
+        background: color-mix(in srgb, var(--evosales-mark) 88%, #111111);
+        border-color: color-mix(in srgb, var(--evosales-mark) 88%, #111111);
+        color: #ffffff;
+        box-shadow: none;
+    }
+
+    .aurora-btn--filled.aurora-btn--rose,
+    .aurora-btn--filled.aurora-btn--success,
+    .aurora-btn--filled.aurora-btn--warn,
+    .aurora-btn--filled.aurora-btn--destructive {
+        box-shadow: none;
+    }
+
+    .aurora-btn--ghost,
+    .aurora-btn--plain {
+        border-color: transparent;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .aurora-btn--ghost:hover {
+        color: var(--evosales-ink);
+        background: var(--aurora-hover-bg);
+        box-shadow: none;
+    }
+
+    .aurora-btn--plain:hover {
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .aurora-btn--unstyled {
+        box-shadow: none;
+        background: transparent;
+        border-color: transparent;
+    }
+
+    .record-action-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1px;
+        width: fit-content;
+        max-width: 100%;
+        padding: 2px;
+        border: 1px solid var(--evosales-hairline);
+        border-radius: 6px;
+        background: transparent;
+    }
+
+    .record-action-group .aurora-btn {
+        border-color: transparent;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .record-action-group .aurora-btn[aria-pressed='true'] {
+        background: var(--aurora-hover-bg);
+        color: var(--evosales-mark);
+    }
 }
 
 @media (prefers-reduced-transparency: reduce) {
