@@ -65,6 +65,8 @@ const triggerLabel: Record<string, string> = {
     'segment.entered': 'Segment entered',
     'segment.exited': 'Segment exited',
     'enrollment.replied': 'Sequence reply received',
+    'lead.scored': 'Lead scored',
+    'lead.qualified': 'Lead qualified',
 };
 
 const actionLabel: Record<string, string> = {
@@ -524,6 +526,12 @@ export default function WorkflowsIndex({
                                     </option>
                                     <option value="enrollment.replied">
                                         Sequence reply received
+                                    </option>
+                                    <option value="lead.scored">
+                                        Lead scored
+                                    </option>
+                                    <option value="lead.qualified">
+                                        Lead qualified
                                     </option>
                                 </NativeSelect>
                             </div>

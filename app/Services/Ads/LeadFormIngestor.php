@@ -6,12 +6,14 @@ use App\Models\AdAccount;
 use App\Models\AdCampaign;
 use App\Models\AdLead;
 use App\Models\Lead;
+use App\Models\LeadCapture;
 use App\Models\Workspace;
-use App\Services\Crm\ContactIdentity;
+use App\Services\Crm\LeadCaptureDeduper;
+use App\Support\LeadCaptureNormalizer;
 
 class LeadFormIngestor
 {
-    public function __construct(private ContactIdentity $contacts) {}
+    public function __construct(private LeadCaptureDeduper $captures) {}
 
     /**
      * @param  array<string, mixed>  $payload
@@ -21,13 +23,28 @@ class LeadFormIngestor
         $fields = $payload['fields'] ?? $payload['field_data'] ?? [];
         $mapped = $this->mapFields(is_array($fields) ? $fields : []);
 
-        $contact = $this->contacts->findOrCreate($workspace, [
-            'first_name' => $mapped['first_name'] ?? ($mapped['full_name'] ?? 'Lead'),
-            'last_name' => $mapped['last_name'] ?? null,
-            'email' => $mapped['email'] ?? null,
-            'phone' => $mapped['phone'] ?? $mapped['phone_number'] ?? null,
-            'source' => 'meta_lead_form',
-        ]);
+        $name = trim((string) ($mapped['full_name'] ?? ''));
+        if ($name === '') {
+            $name = trim(($mapped['first_name'] ?? '').' '.($mapped['last_name'] ?? ''));
+        }
+
+        $capture = $this->captures->record(
+            $workspace->id,
+            LeadCapture::SOURCE_META_FORM,
+            LeadCaptureNormalizer::normalize([
+                'name' => $name !== '' ? $name : ($payload['title'] ?? null),
+                'phone' => $mapped['phone'] ?? $mapped['phone_number'] ?? null,
+                'email' => $mapped['email'] ?? null,
+                'company' => $mapped['company'] ?? $mapped['company_name'] ?? null,
+                'wilaya' => $mapped['wilaya'] ?? $mapped['city'] ?? null,
+            ]),
+            $payload,
+        );
+        $capture = $this->captures->process($capture);
+        $capture->loadMissing('matchedLead.contact');
+
+        $lead = $capture->matchedLead;
+        $contact = $lead?->contact;
 
         $account = null;
         if (! empty($payload['ad_account_id']) || ! empty($payload['account_id'])) {
@@ -60,23 +77,16 @@ class LeadFormIngestor
             );
         }
 
-        $lead = Lead::query()->create([
-            'workspace_id' => $workspace->id,
-            'contact_id' => $contact->id,
-            'company_id' => $contact->company_id,
-            'ad_campaign_id' => $campaign?->id,
-            'title' => $payload['title'] ?? ('Meta lead — '.$contact->displayName()),
-            'status' => 'new',
-            'source' => 'meta_lead_form',
-            'payload' => $payload,
-        ]);
+        if ($lead && $campaign && ! $lead->ad_campaign_id) {
+            $lead->forceFill(['ad_campaign_id' => $campaign->id])->save();
+        }
 
         return AdLead::query()->create([
             'workspace_id' => $workspace->id,
             'ad_account_id' => $account?->id,
             'ad_campaign_id' => $campaign?->id,
-            'contact_id' => $contact->id,
-            'lead_id' => $lead->id,
+            'contact_id' => $contact?->id,
+            'lead_id' => $lead?->id,
             'external_id' => $payload['leadgen_id'] ?? $payload['external_id'] ?? null,
             'form_id' => $payload['form_id'] ?? null,
             'fields' => $mapped,

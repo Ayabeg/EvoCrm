@@ -42,5 +42,15 @@ return [
             'cadence' => 'Every fifteen minutes',
             'stale_after_seconds' => 1800,
         ],
+        'lead-os:graph' => [
+            'label' => 'Lead OS nightly graph',
+            'cadence' => 'Daily at 02:15 Africa/Algiers',
+            'stale_after_seconds' => 97200,
+        ],
+        'deals:lost-review' => [
+            'label' => 'Weekly lost deal review',
+            'cadence' => 'Mondays at 07:30 Africa/Algiers',
+            'stale_after_seconds' => 700000,
+        ],
     ],
 ];

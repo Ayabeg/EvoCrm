@@ -1,9 +1,13 @@
 import { Form, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
-import { CrmObjectHeader } from '@/components/crm/crm-object-header';
+import {
+    CrmObjectHeader,
+    CrmObjectSecondaryLink,
+} from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import LeadScorePill from '@/components/crm/lead-score-pill';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +16,9 @@ type Lead = {
     id: number;
     title: string;
     status?: string | null;
+    score?: number | null;
     contact?: { first_name?: string; last_name?: string | null } | null;
+    latest_score?: { score: number; reason?: string | null } | null;
 };
 
 type ContactOption = {
@@ -32,12 +38,20 @@ export default function LeadsIndex({
 
     return (
         <CrmShell title="Leads" chrome="workspace">
-            <div className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink" data-crm="list-workspace">
+            <div
+                className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink"
+                data-crm="list-workspace"
+            >
                 <CrmObjectHeader
                     title="Leads"
                     description={`${leads.length.toLocaleString()} leads`}
                     primaryLabel="Create lead"
                     onPrimary={() => setDrawer(true)}
+                    secondary={
+                        <CrmObjectSecondaryLink href="/crm/leads/captures">
+                            Capture inbox
+                        </CrmObjectSecondaryLink>
+                    }
                 />
                 <div className="flex min-h-0 flex-1 flex-col bg-canvas">
                     {leads.length === 0 ? (
@@ -52,14 +66,17 @@ export default function LeadsIndex({
                             <table className="w-full min-w-[480px] border-collapse text-[13px]">
                                 <thead>
                                     <tr className="border-b border-hairline bg-canvas-soft text-left">
-                                        <th className="px-4 py-2 text-[11px] font-medium text-mute sm:px-6">
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:px-6">
                                             Title
                                         </th>
-                                        <th className="px-4 py-2 text-[11px] font-medium text-mute">
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
                                             Contact
                                         </th>
-                                        <th className="px-4 py-2 text-[11px] font-medium text-mute sm:pr-6">
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
                                             Status
+                                        </th>
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pr-6">
+                                            Score
                                         </th>
                                     </tr>
                                 </thead>
@@ -69,7 +86,7 @@ export default function LeadsIndex({
                                             key={lead.id}
                                             className="border-b border-hairline hover:bg-canvas-soft"
                                         >
-                                            <td className="px-4 py-2 sm:px-6">
+                                            <td className="px-4 py-1.5 sm:px-6">
                                                 <Link
                                                     href={`/crm/leads/${lead.id}`}
                                                     className="font-medium text-ink hover:underline"
@@ -77,13 +94,35 @@ export default function LeadsIndex({
                                                     {lead.title}
                                                 </Link>
                                             </td>
-                                            <td className="px-4 py-2 text-mute">
-                                                {[lead.contact?.first_name, lead.contact?.last_name]
+                                            <td className="px-4 py-1.5 text-mute">
+                                                {[
+                                                    lead.contact?.first_name,
+                                                    lead.contact?.last_name,
+                                                ]
                                                     .filter(Boolean)
                                                     .join(' ') || '—'}
                                             </td>
-                                            <td className="px-4 py-2 text-mute capitalize sm:pr-6">
+                                            <td className="px-4 py-1.5 text-mute capitalize">
                                                 {lead.status ?? '—'}
+                                            </td>
+                                            <td className="px-4 py-1.5 sm:pr-6">
+                                                <LeadScorePill
+                                                    compact
+                                                    score={
+                                                        lead.latest_score
+                                                            ? {
+                                                                  score:
+                                                                      lead.score ??
+                                                                      lead
+                                                                          .latest_score
+                                                                          .score,
+                                                                  reason: lead
+                                                                      .latest_score
+                                                                      .reason,
+                                                              }
+                                                            : null
+                                                    }
+                                                />
                                             </td>
                                         </tr>
                                     ))}
@@ -95,7 +134,11 @@ export default function LeadsIndex({
                 </div>
             </div>
 
-            <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create lead">
+            <CreateDrawer
+                open={drawer}
+                onOpenChange={setDrawer}
+                title="Create lead"
+            >
                 <Form
                     action="/crm/leads"
                     method="post"
@@ -113,7 +156,8 @@ export default function LeadsIndex({
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Contact <span className="text-brand">*</span>
+                                    Contact{' '}
+                                    <span className="text-brand">*</span>
                                 </Label>
                                 <select
                                     name="contact_id"
@@ -122,14 +166,20 @@ export default function LeadsIndex({
                                 >
                                     <option value="">Select</option>
                                     {contacts.map((contact) => (
-                                        <option key={contact.id} value={contact.id}>
-                                            {contact.first_name} {contact.last_name}
+                                        <option
+                                            key={contact.id}
+                                            value={contact.id}
+                                        >
+                                            {contact.first_name}{' '}
+                                            {contact.last_name}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Source</Label>
+                                <Label className="mb-1 block text-[12px]">
+                                    Source
+                                </Label>
                                 <Input name="source" placeholder="manual" />
                             </div>
                             <div className="flex justify-end gap-2 pt-2">

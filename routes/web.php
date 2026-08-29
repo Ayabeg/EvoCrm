@@ -16,9 +16,12 @@ use App\Http\Controllers\Crm\DealController;
 use App\Http\Controllers\Crm\DealImportController;
 use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\DealSplitController;
+use App\Http\Controllers\Crm\EnrichmentController;
 use App\Http\Controllers\Crm\FunnelController;
 use App\Http\Controllers\Crm\LeadBoardController;
+use App\Http\Controllers\Crm\LeadCaptureController;
 use App\Http\Controllers\Crm\LeadController;
+use App\Http\Controllers\Crm\LeadOsController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\RecordLayoutController;
 use App\Http\Controllers\Crm\ReportController;
@@ -103,6 +106,8 @@ Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::cla
 
 Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
+    Route::post('/lead-os/graph', [LeadOsController::class, 'runGraph'])->name('lead-os.graph');
+    Route::post('/crm/lost-reviews/{suggestion}/confirm', [LeadOsController::class, 'confirmLost'])->name('crm.lost-reviews.confirm');
 
     // Meta workspace OAuth (Facebook Login). 404 unless META_* env is set.
     Route::get('/auth/meta', [MetaController::class, 'redirect'])->name('auth.meta');
@@ -170,6 +175,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/companies/{company}', [CompanyController::class, 'update'])->name('crm.companies.update');
     Route::put('/crm/companies/{company}/attributes', [CompanyController::class, 'updateAttributes'])->name('crm.companies.attributes');
     Route::post('/crm/companies/{company}/ask', [AskEvoController::class, 'company'])->name('crm.companies.ask');
+    Route::post('/crm/companies/{company}/enrich', [EnrichmentController::class, 'company'])->name('crm.companies.enrich');
 
     Route::get('/crm/contacts', [ContactController::class, 'index'])->name('crm.contacts.index');
     Route::get('/crm/contacts/export', [ContactController::class, 'export'])->name('crm.contacts.export');
@@ -188,12 +194,23 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/contacts/{contact}/attributes', [ContactController::class, 'updateAttributes'])->name('crm.contacts.attributes');
     Route::post('/crm/contacts/{contact}/ask', [AskEvoController::class, 'contact'])->name('crm.contacts.ask');
     Route::post('/crm/contacts/{contact}/draft-email', [AskEvoController::class, 'draftContact'])->name('crm.contacts.draft-email');
+    Route::post('/crm/contacts/{contact}/enrich', [EnrichmentController::class, 'contact'])->name('crm.contacts.enrich');
 
     Route::get('/crm/leads', [LeadController::class, 'index'])->name('crm.leads.index');
     Route::post('/crm/leads', [LeadController::class, 'store'])->name('crm.leads.store');
+    Route::get('/crm/leads/captures', [LeadCaptureController::class, 'index'])->name('crm.leads.captures');
+    Route::post('/crm/leads/captures/csv', [LeadCaptureController::class, 'csv'])->name('crm.leads.captures.csv');
+    Route::post('/crm/leads/captures/url', [LeadCaptureController::class, 'url'])->name('crm.leads.captures.url');
+    Route::post('/crm/leads/captures/maps', [LeadCaptureController::class, 'maps'])->name('crm.leads.captures.maps');
+    Route::post('/crm/leads/captures/{capture}/accept', [LeadCaptureController::class, 'accept'])->name('crm.leads.captures.accept');
+    Route::post('/crm/leads/captures/{capture}/reject', [LeadCaptureController::class, 'reject'])->name('crm.leads.captures.reject');
     Route::get('/crm/leads/{lead}', [LeadController::class, 'show'])->name('crm.leads.show');
     Route::put('/crm/leads/{lead}', [LeadController::class, 'update'])->name('crm.leads.update');
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
+    Route::post('/crm/leads/{lead}/ask', [AskEvoController::class, 'lead'])->name('crm.leads.ask');
+    Route::post('/crm/leads/{lead}/enrich', [EnrichmentController::class, 'lead'])->name('crm.leads.enrich');
+    Route::post('/crm/enrichment-runs/{run}/apply', [EnrichmentController::class, 'apply'])->name('crm.enrichment.apply');
+    Route::post('/crm/enrichment-runs/{run}/dismiss', [EnrichmentController::class, 'dismiss'])->name('crm.enrichment.dismiss');
 
     Route::get('/crm/deals/export', [DealController::class, 'export'])->name('crm.deals.export');
     Route::get('/crm/deals/import', [DealImportController::class, 'create'])->name('crm.deals.import');
@@ -213,6 +230,8 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'update'])->name('crm.deals.line-items.update');
     Route::delete('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'destroy'])->name('crm.deals.line-items.destroy');
     Route::post('/crm/deals/{deal}/ask', [AskEvoController::class, 'deal'])->name('crm.deals.ask');
+    Route::post('/crm/deals/{deal}/suggestions/{suggestion}/apply', [LeadOsController::class, 'applySuggestion'])->name('crm.deals.suggestions.apply');
+    Route::post('/crm/deals/{deal}/suggestions/{suggestion}/dismiss', [LeadOsController::class, 'dismissSuggestion'])->name('crm.deals.suggestions.dismiss');
     Route::post('/crm/deals/{deal}/draft-email', [AskEvoController::class, 'draftDeal'])->name('crm.deals.draft-email');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');

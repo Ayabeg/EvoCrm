@@ -28,6 +28,7 @@ const NAV_ITEMS = [
     { label: 'Contacts', href: '/crm/contacts', icon: Users, keywords: 'crm people leads' },
     { label: 'Companies', href: '/crm/companies', icon: Building2, keywords: 'accounts organizations' },
     { label: 'Leads', href: '/crm/leads', icon: SquareKanban, keywords: 'pipeline prospects' },
+    { label: 'Captures', href: '/crm/leads/captures', icon: Inbox, keywords: 'inbox capture csv meta maps url' },
     { label: 'Deals', href: '/crm/deals', icon: Handshake, keywords: 'pipeline opportunities' },
     { label: 'Pipelines', href: '/crm/deals/board', icon: SquareKanban, keywords: 'kanban board stages' },
     { label: 'Segments', href: '/crm/segments', icon: Users, keywords: 'saved views audiences filters' },

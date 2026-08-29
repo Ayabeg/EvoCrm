@@ -2,6 +2,8 @@ import { Head } from '@inertiajs/react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
+import EnrichmentPanel from '@/components/crm/enrichment-panel';
+import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import ContactDealsKanban from '@/components/crm/contact-deals-kanban';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import PlaybookCard from '@/components/crm/playbook-card';
@@ -63,6 +65,8 @@ export default function ContactShow({
     catchUp,
     dealsKanban,
     playbooks,
+    enrichmentRuns = [],
+    enrichAction,
 }: {
     contact: Contact;
     associations: {
@@ -77,6 +81,8 @@ export default function ContactShow({
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     dealsKanban?: DealKanban | null;
     playbooks?: Array<{ id: number; name: string; body: string }>;
+    enrichmentRuns?: EnrichmentRunRow[];
+    enrichAction?: string;
 }) {
     const loading = useInertiaLoading();
     const name =
@@ -187,6 +193,12 @@ export default function ContactShow({
                                         />
                                     </RecordFactList>
                                 </RecordSection>
+                                {enrichAction ? (
+                                    <EnrichmentPanel
+                                        action={enrichAction}
+                                        runs={enrichmentRuns}
+                                    />
+                                ) : null}
                                 {proactiveSummary ? (
                                     <p className="text-[12px] leading-relaxed text-mute">
                                         {proactiveSummary}

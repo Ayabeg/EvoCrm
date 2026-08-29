@@ -2,6 +2,8 @@ import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import EnrichmentPanel from '@/components/crm/enrichment-panel';
+import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import type { RecordActivity } from '@/components/crm/record-activity';
 import RecordActivityPanel from '@/components/crm/record-activity-panel';
@@ -47,6 +49,8 @@ export default function CompanyShow({
     cities,
     wilayas,
     askEvo,
+    enrichmentRuns = [],
+    enrichAction,
 }: {
     company: Company;
     associations: {
@@ -63,6 +67,8 @@ export default function CompanyShow({
     cities: string[];
     wilayas: string[];
     askEvo?: AskEvoPayload | null;
+    enrichmentRuns?: EnrichmentRunRow[];
+    enrichAction?: string;
 }) {
     const loading = useInertiaLoading();
     const [editing, setEditing] = useState(false);
@@ -152,6 +158,12 @@ export default function CompanyShow({
                                         />
                                     </RecordFactList>
                                 </RecordSection>
+                                {enrichAction ? (
+                                    <EnrichmentPanel
+                                        action={enrichAction}
+                                        runs={enrichmentRuns}
+                                    />
+                                ) : null}
                                 {editing ? (
                                     <RecordSection title="Edit company">
                                         <Form

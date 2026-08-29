@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
     'inbox_url',
     'evolution_last_webhook_at',
     'evolution_last_event',
+    'lead_score_settings',
 ])]
 class Workspace extends Model
 {
@@ -36,7 +37,34 @@ class Workspace extends Model
     {
         return [
             'evolution_last_webhook_at' => 'datetime',
+            'lead_score_settings' => 'array',
         ];
+    }
+
+    /**
+     * Qualify thresholds. Crossing convert uses LeadConverter — never a second path.
+     *
+     * @return array{hold: int, qualify: int, convert: int}
+     */
+    public function leadScoreThresholds(): array
+    {
+        $defaults = config('evosales.lead_score', [
+            'hold' => 40,
+            'qualify' => 60,
+            'convert' => 80,
+        ]);
+        $stored = is_array($this->lead_score_settings) ? $this->lead_score_settings : [];
+
+        return [
+            'hold' => $this->thresholdValue($stored['hold'] ?? $defaults['hold'] ?? 40),
+            'qualify' => $this->thresholdValue($stored['qualify'] ?? $defaults['qualify'] ?? 60),
+            'convert' => $this->thresholdValue($stored['convert'] ?? $defaults['convert'] ?? 80),
+        ];
+    }
+
+    private function thresholdValue(mixed $value): int
+    {
+        return max(0, min(100, (int) $value));
     }
 
     public function users(): HasMany

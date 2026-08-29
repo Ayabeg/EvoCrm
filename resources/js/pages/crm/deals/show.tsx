@@ -2,6 +2,8 @@ import { Form, Head } from '@inertiajs/react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
+import DealSuggestionCard from '@/components/crm/deal-suggestion-card';
+import type { DealSuggestionPayload } from '@/components/crm/deal-suggestion-card';
 import DealLineItems from '@/components/crm/deal-line-items';
 import type {
     CatalogProduct,
@@ -59,6 +61,8 @@ export default function DealShow({
     askEvo,
     dealHealth,
     catchUp,
+    nextMove,
+    afterTouch,
     products,
     members,
     splits,
@@ -100,12 +104,15 @@ export default function DealShow({
     askEvo?: AskEvoPayload | null;
     dealHealth?: {
         score: number;
+        band?: string;
         label: string;
         reason: string;
         factors?: { key: string; label: string; detail: string }[];
         next_action?: string;
     } | null;
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
+    nextMove?: DealSuggestionPayload | null;
+    afterTouch?: DealSuggestionPayload | null;
     products?: CatalogProduct[];
     members?: { id: number; name: string }[];
     splits?: {
@@ -236,6 +243,20 @@ export default function DealShow({
                                         />
                                     </RecordFactList>
                                 </RecordSection>
+                                {nextMove ? (
+                                    <DealSuggestionCard
+                                        dealId={deal.id}
+                                        suggestion={nextMove}
+                                        title="Next move"
+                                    />
+                                ) : null}
+                                {afterTouch ? (
+                                    <DealSuggestionCard
+                                        dealId={deal.id}
+                                        suggestion={afterTouch}
+                                        title="After-touch draft"
+                                    />
+                                ) : null}
                                 {dealHealth?.factors?.length ? (
                                     <RecordSection title="Health">
                                         {dealHealth.factors.map((factor) => (

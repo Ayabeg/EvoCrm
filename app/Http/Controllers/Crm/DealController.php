@@ -8,8 +8,12 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Product;
 use App\Models\Stage;
+use App\Models\DealHealthSnapshot;
+use App\Models\DealSuggestion;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
+use App\Services\LeadOs\DealHealthScorer;
+use App\Services\LeadOs\NextMoveAdvisor;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\PipelineManager;
@@ -121,12 +125,15 @@ class DealController extends Controller
         ]);
     }
 
-    public function show(Request $request, Deal $deal, CrmHub $hub, RecordInsight $insight): Response
+    public function show(Request $request, Deal $deal, CrmHub $hub, RecordInsight $insight, DealHealthScorer $health, NextMoveAdvisor $moves): Response
     {
         abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
         $deal->load(['contact.company', 'company', 'stage', 'pipeline.stages', 'lead', 'owner', 'quotes.items', 'lineItems.product', 'splits.user']);
+        $snapshot = $health->latestFor($deal);
+        $nextMove = $moves->latestPending($deal);
+        $afterTouch = $moves->latestPending($deal, DealSuggestion::KIND_AFTER_TOUCH);
 
         return Inertia::render('crm/deals/show', [
             'deal' => $deal,
@@ -141,7 +148,11 @@ class DealController extends Controller
             'products' => Product::query()->forWorkspace($workspace)->orderBy('name')->get(),
             'splits' => $deal->splits,
             'canManageSplits' => $request->user()->role->canManageSettings(),
-            'dealHealth' => $insight->dealHealth($deal),
+            'dealHealth' => $snapshot instanceof DealHealthSnapshot
+                ? $snapshot->present()
+                : $insight->dealHealth($deal),
+            'nextMove' => $nextMove?->present(),
+            'afterTouch' => $afterTouch?->present(),
             'askEvo' => $insight->forDeal($deal),
         ]);
     }

@@ -62,6 +62,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Qualify',
+        href: '/settings/qualify',
+        icon: null,
+    },
+    {
         title: 'Record layouts',
         href: '/settings/record-layouts',
         icon: null,
@@ -109,7 +114,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const visibleItems = sidebarNavItems.filter((item) => {
         if (
-            ['/settings/permissions', '/settings/system-health', '/settings/audit', '/settings/playbooks'].includes(
+            ['/settings/permissions', '/settings/system-health', '/settings/audit', '/settings/playbooks', '/settings/qualify'].includes(
                 toUrl(item.href),
             )
         ) {

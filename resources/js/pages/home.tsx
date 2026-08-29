@@ -4,6 +4,8 @@ import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import type { ActivityFeedItem } from '@/components/dashboard/activity-feed';
 import { AttentionList } from '@/components/dashboard/attention-list';
 import type { AttentionItem } from '@/components/dashboard/attention-list';
+import LeadOsGraphStatus from '@/components/crm/lead-os-graph-status';
+import type { LeadOsGraphPayload } from '@/components/crm/lead-os-graph-status';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
 import { HomeKpiStrip } from '@/components/dashboard/home-kpi-strip';
@@ -44,6 +46,7 @@ type Props = {
     owners?: Owner[];
     filters?: Filters;
     dataAsOf?: string;
+    leadOsGraph?: LeadOsGraphPayload | null;
 };
 
 function PipelineSummary({ pipeline }: { pipeline: PipelineHealth }) {
@@ -91,6 +94,7 @@ export default function Home({
     owners = [],
     filters = {},
     dataAsOf,
+    leadOsGraph,
 }: Props) {
     const subtitle = `Sales command center · ${window.from} → ${window.to}`;
 
@@ -107,6 +111,12 @@ export default function Home({
                 </div>
 
                 {kpis.length > 0 ? <HomeKpiStrip kpis={kpis} /> : null}
+
+                {leadOsGraph ? (
+                    <div className="border-b border-hairline bg-canvas px-4 py-3 md:px-5">
+                        <LeadOsGraphStatus graph={leadOsGraph} compact />
+                    </div>
+                ) : null}
 
                 <div className="border-b border-hairline bg-canvas px-4 py-3 md:px-5">
                     <DashboardSection title="Needs attention">

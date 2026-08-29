@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Home\HomeDashboardBuilder;
+use App\Services\LeadOs\GraphRunner;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -34,6 +35,7 @@ class HomeController extends Controller
                 'to' => $to->toDateString(),
             ],
             'dataAsOf' => now('Africa/Algiers')->format('Y-m-d H:i'),
+            'leadOsGraph' => app(GraphRunner::class)->latest($workspace)?->present(),
         ]);
     }
 }
