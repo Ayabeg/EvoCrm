@@ -1,11 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
 import type { KpiTile } from '@/components/crm/crm-kpi-strip';
+import LeadOsGraphStatus from '@/components/crm/lead-os-graph-status';
+import type { LeadOsGraphPayload } from '@/components/crm/lead-os-graph-status';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import type { ActivityFeedItem } from '@/components/dashboard/activity-feed';
 import { AttentionList } from '@/components/dashboard/attention-list';
 import type { AttentionItem } from '@/components/dashboard/attention-list';
-import LeadOsGraphStatus from '@/components/crm/lead-os-graph-status';
-import type { LeadOsGraphPayload } from '@/components/crm/lead-os-graph-status';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
 import { HomeKpiStrip } from '@/components/dashboard/home-kpi-strip';

@@ -6,8 +6,8 @@ import {
     CrmObjectSecondaryLink,
 } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import LeadScorePill from '@/components/crm/lead-score-pill';
+import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

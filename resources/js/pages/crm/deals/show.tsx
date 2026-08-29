@@ -2,8 +2,6 @@ import { Form, Head } from '@inertiajs/react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
-import DealSuggestionCard from '@/components/crm/deal-suggestion-card';
-import type { DealSuggestionPayload } from '@/components/crm/deal-suggestion-card';
 import DealLineItems from '@/components/crm/deal-line-items';
 import type {
     CatalogProduct,
@@ -11,6 +9,8 @@ import type {
 } from '@/components/crm/deal-line-items';
 import DealQuotes from '@/components/crm/deal-quotes';
 import DealSplits from '@/components/crm/deal-splits';
+import type { DealSuggestionPayload } from '@/components/crm/deal-suggestion-card';
+import DealSuggestionCard from '@/components/crm/deal-suggestion-card';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import PlaybookCard from '@/components/crm/playbook-card';
 import type { RecordActivity } from '@/components/crm/record-activity';
