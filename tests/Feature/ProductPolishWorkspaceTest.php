@@ -63,7 +63,8 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
     $list = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
 
-    expect($reports)->toContain('text-page-title')
+    expect($reports)->toContain('title="Reports"')
+        ->and($reports)->not->toContain('text-page-title')
         ->and($reports)->toContain('px-4 py-3 md:px-5 md:py-4')
         ->and($reports)->not->toContain('max-w-7xl')
         ->and($reports)->not->toContain('text-[1.75rem]')
@@ -76,6 +77,14 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
         ->and($page)->toContain('Add widget')
         ->and($list)->toContain('py-1.5')
         ->and($board)->toContain("toLocaleDateString('en-GB'");
+});
+
+it('keeps Reports room identity singular and destacks leftover rooms', function () {
+    $shell = file_get_contents(resource_path('js/components/crm/reports-shell.tsx'));
+
+    expect($shell)->toContain('title="Reports"')
+        ->and($shell)->not->toContain('text-page-title')
+        ->and($shell)->toContain("innerTitle !== 'Reports'");
 });
 
 it('destacks leftover Reports charts, Outbound rooms, and extra orange primaries', function () {

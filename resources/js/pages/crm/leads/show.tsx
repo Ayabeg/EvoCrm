@@ -1,14 +1,41 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import AskEvoPanel from '@/components/crm/ask-evo-panel';
+import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import { SkeletonRecord } from '@/components/crm/empty-room';
 import EnrichmentPanel from '@/components/crm/enrichment-panel';
 import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import LeadConversionDialog from '@/components/crm/lead-conversion-dialog';
 import LeadScorePill from '@/components/crm/lead-score-pill';
 import type { LeadScorePayload } from '@/components/crm/lead-score-pill';
-import PageHeader from '@/components/page-header';
+import {
+    AssociationCard,
+    RecordBack,
+    RecordShell,
+    RelatedRecordLink,
+} from '@/components/crm/record-chrome';
+import {
+    RecordFact,
+    RecordFactList,
+    RecordIdentity,
+    RecordPageFrame,
+    RecordSection,
+    RecordStatusBadge,
+} from '@/components/crm/record-hub';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+
+type Lead = {
+    id: number;
+    title: string;
+    status?: string | null;
+    source?: string | null;
+    qualified_at?: string | null;
+    contact_id?: number | null;
+    score?: number | null;
+    contact?: { first_name?: string; last_name?: string | null } | null;
+    latest_score?: { reason?: string | null } | null;
+};
 
 export default function LeadShow({
     lead,
@@ -21,10 +48,16 @@ export default function LeadShow({
     enrichmentRuns = [],
     enrichAction,
 }: {
-    lead: any;
+    lead: Lead;
     leadScore?: LeadScorePayload | null;
     askEvo?: AskEvoPayload | null;
-    associations?: any;
+    associations?: {
+        contact?: { id: number; first_name?: string; last_name?: string | null } | null;
+        company?: { id: number; name: string } | null;
+        deal?: { id: number; title: string } | null;
+        threads?: { id: number; subject?: string | null }[];
+        enrollments?: { id: number; sequence?: { name?: string | null } | null }[];
+    };
     pipelines?: {
         id: number;
         name: string;
@@ -36,93 +69,242 @@ export default function LeadShow({
     enrichmentRuns?: EnrichmentRunRow[];
     enrichAction?: string;
 }) {
+    const loading = useInertiaLoading();
+    const askAction = `/crm/leads/${lead.id}/ask`;
+    const contact = associations?.contact ?? lead.contact ?? null;
+    const company = associations?.company ?? null;
+    const deal = associations?.deal ?? null;
+    const threads = associations?.threads ?? [];
+    const enrollments = associations?.enrollments ?? [];
+    const contactName = [contact?.first_name, contact?.last_name]
+        .filter(Boolean)
+        .join(' ');
+
     return (
         <>
             <Head title={lead.title} />
-            <div className="flex-1 space-y-6 p-6">
-                <PageHeader title={lead.title} description={`Status: ${lead.status}`}>
-                    <Link href="/inbox" className="rounded bg-brand px-3 py-1 text-sm text-canvas">
-                        Open in Inbox
-                    </Link>
-                    {lead.status !== 'qualified' ? (
-                        <LeadConversionDialog
-                            leadId={lead.id}
-                            pipelines={pipelines}
-                            members={members}
-                            contactDeals={contactDeals}
-                        />
-                    ) : null}
-                </PageHeader>
-                <Card className="space-y-2 p-4 text-sm">
-                    <p>
-                        Contact:{' '}
-                        <Link href={`/crm/contacts/${lead.contact_id}`} className="text-brand">
-                            {lead.contact?.first_name} {lead.contact?.last_name}
-                        </Link>
-                    </p>
-                    <p>Source: {lead.source ?? '—'}</p>
-                    <p>Qualified at: {lead.qualified_at ?? '—'}</p>
-                    <LeadScorePill score={leadScore ?? (lead.score !== undefined ? { score: lead.score, reason: lead.latest_score?.reason } : null)} />
-                </Card>
-                <AskEvoPanel action={`/crm/leads/${lead.id}/ask`} insight={askEvo} />
-                <Card className="p-4">
-                    <Form action={`/crm/leads/${lead.id}`} method="put" className="grid gap-3 md:grid-cols-3">
-                        {({ processing }) => (
-                            <>
-                                <div>
-                                    <label className="text-sm font-medium">Title</label>
-                                    <input
-                                        name="title"
-                                        defaultValue={lead.title}
-                                        required
-                                        className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+            {loading ? (
+                <SkeletonRecord />
+            ) : (
+                <RecordPageFrame
+                    header={
+                        <>
+                            <RecordBack href="/crm/leads" label="Back to Leads" />
+                            <RecordIdentity
+                                title={lead.title}
+                                kind="Lead"
+                                subtitle={
+                                    <>
+                                        {contactName || 'No contact'}
+                                        {lead.source ? ` · ${lead.source}` : ''}
+                                    </>
+                                }
+                                badge={
+                                    lead.status ? (
+                                        <RecordStatusBadge>
+                                            {lead.status}
+                                        </RecordStatusBadge>
+                                    ) : null
+                                }
+                                meta={
+                                    <LeadScorePill
+                                        compact
+                                        score={
+                                            leadScore ??
+                                            (typeof lead.score === 'number'
+                                                ? {
+                                                      score: lead.score,
+                                                      reason: lead.latest_score
+                                                          ?.reason,
+                                                  }
+                                                : null)
+                                        }
                                     />
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium">Source</label>
-                                    <input
-                                        name="source"
-                                        defaultValue={lead.source ?? ''}
-                                        className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+                                }
+                                actions={
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {lead.status !== 'qualified' ? (
+                                            <LeadConversionDialog
+                                                leadId={lead.id}
+                                                pipelines={pipelines}
+                                                members={members}
+                                                contactDeals={contactDeals}
+                                            />
+                                        ) : null}
+                                        <Button variant="outline" size="sm" asChild>
+                                            <Link href="/inbox">Open in Inbox</Link>
+                                        </Button>
+                                        <div className="md:hidden">
+                                            <AskEvoTrigger
+                                                action={askAction}
+                                                insight={askEvo}
+                                            />
+                                        </div>
+                                    </div>
+                                }
+                            />
+                        </>
+                    }
+                >
+                    <RecordShell
+                        left={
+                            <div className="space-y-3">
+                                <RecordSection title="Lead information">
+                                    <RecordFactList>
+                                        <RecordFact
+                                            label="Contact"
+                                            value={contactName || null}
+                                        />
+                                        <RecordFact
+                                            label="Source"
+                                            value={lead.source}
+                                        />
+                                        <RecordFact
+                                            label="Status"
+                                            value={lead.status}
+                                        />
+                                        <RecordFact
+                                            label="Qualified"
+                                            value={
+                                                lead.qualified_at
+                                                    ? String(lead.qualified_at).slice(
+                                                          0,
+                                                          10,
+                                                      )
+                                                    : null
+                                            }
+                                        />
+                                    </RecordFactList>
+                                </RecordSection>
+                                {enrichAction ? (
+                                    <EnrichmentPanel
+                                        action={enrichAction}
+                                        runs={enrichmentRuns}
                                     />
-                                </div>
-                                <div className="flex items-end">
-                                    <Button disabled={processing}>Save lead</Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </Card>
-                <Card className="space-y-2 p-4 text-sm">
-                    <h2 className="font-medium">Associations</h2>
-                    {associations?.contact ? (
-                        <Link href={`/crm/contacts/${associations.contact.id}`} className="block text-brand">
-                            Contact · {associations.contact.first_name} {associations.contact.last_name}
-                        </Link>
-                    ) : null}
-                    {associations?.company ? (
-                        <Link href={`/crm/companies/${associations.company.id}`} className="block text-brand">
-                            Company · {associations.company.name}
-                        </Link>
-                    ) : null}
-                    {associations?.deal ? (
-                        <Link href={`/crm/deals/${associations.deal.id}`} className="block text-brand">
-                            Deal · {associations.deal.title}
-                        </Link>
-                    ) : null}
-                    {(associations?.threads ?? []).map((thread: any) => (
-                        <Link key={thread.id} href={`/conversations?thread=${thread.id}`} className="block text-brand">
-                            Desk history · {thread.subject ?? thread.id}
-                        </Link>
-                    ))}
-                    {(associations?.enrollments ?? []).map((enrollment: any) => (
-                        <p key={enrollment.id}>Enrollment · {enrollment.sequence?.name ?? enrollment.id}</p>
-                    ))}
-                </Card>
-                {enrichAction ? (
-                    <EnrichmentPanel action={enrichAction} runs={enrichmentRuns} />
-                ) : null}
-            </div>
+                                ) : null}
+                            </div>
+                        }
+                        center={
+                            <RecordSection title="Edit lead">
+                                <Form
+                                    action={`/crm/leads/${lead.id}`}
+                                    method="put"
+                                    className="grid gap-2 sm:grid-cols-2"
+                                >
+                                    {({ processing }) => (
+                                        <>
+                                            <div>
+                                                <label className="mb-1 block text-[11px] text-mute">
+                                                    Title
+                                                </label>
+                                                <Input
+                                                    name="title"
+                                                    defaultValue={lead.title}
+                                                    required
+                                                    className="h-8"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="mb-1 block text-[11px] text-mute">
+                                                    Source
+                                                </label>
+                                                <Input
+                                                    name="source"
+                                                    defaultValue={lead.source ?? ''}
+                                                    className="h-8"
+                                                />
+                                            </div>
+                                            <div className="sm:col-span-2">
+                                                <Button
+                                                    size="sm"
+                                                    className="h-8"
+                                                    disabled={processing}
+                                                >
+                                                    Save lead
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+                                </Form>
+                            </RecordSection>
+                        }
+                        right={
+                            <div className="space-y-3">
+                                <AssociationCard
+                                    title="Contact"
+                                    addHref={
+                                        lead.contact_id
+                                            ? `/crm/contacts/${lead.contact_id}`
+                                            : '/crm/contacts?create=1'
+                                    }
+                                    addLabel={lead.contact_id ? 'View' : 'Add'}
+                                >
+                                    {contact && lead.contact_id ? (
+                                        <RelatedRecordLink
+                                            href={`/crm/contacts/${lead.contact_id}`}
+                                        >
+                                            {contactName || 'Contact'}
+                                        </RelatedRecordLink>
+                                    ) : (
+                                        <p className="text-mute">No contact</p>
+                                    )}
+                                </AssociationCard>
+                                <AssociationCard title="Company">
+                                    {company ? (
+                                        <RelatedRecordLink
+                                            href={`/crm/companies/${company.id}`}
+                                        >
+                                            {company.name}
+                                        </RelatedRecordLink>
+                                    ) : (
+                                        <p className="text-mute">No company</p>
+                                    )}
+                                </AssociationCard>
+                                <AssociationCard title="Deal">
+                                    {deal ? (
+                                        <RelatedRecordLink
+                                            href={`/crm/deals/${deal.id}`}
+                                        >
+                                            {deal.title}
+                                        </RelatedRecordLink>
+                                    ) : (
+                                        <p className="text-mute">No deal</p>
+                                    )}
+                                </AssociationCard>
+                                {threads.length > 0 ? (
+                                    <AssociationCard title="Desk">
+                                        {threads.map((thread) => (
+                                            <RelatedRecordLink
+                                                key={thread.id}
+                                                href={`/conversations?thread=${thread.id}`}
+                                            >
+                                                {thread.subject ?? `Thread ${thread.id}`}
+                                            </RelatedRecordLink>
+                                        ))}
+                                    </AssociationCard>
+                                ) : null}
+                                {enrollments.length > 0 ? (
+                                    <AssociationCard title="Enrollments">
+                                        {enrollments.map((enrollment) => (
+                                            <p
+                                                key={enrollment.id}
+                                                className="text-[13px] text-ink"
+                                            >
+                                                {enrollment.sequence?.name ??
+                                                    `Enrollment ${enrollment.id}`}
+                                            </p>
+                                        ))}
+                                    </AssociationCard>
+                                ) : null}
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
+                            </div>
+                        }
+                    />
+                </RecordPageFrame>
+            )}
         </>
     );
 }

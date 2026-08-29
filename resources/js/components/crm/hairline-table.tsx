@@ -30,7 +30,7 @@ export function HairlineTable({
 }) {
     return (
         <div className="@container/hairline">
-            <div className="hidden overflow-hidden rounded-xl border border-hairline bg-canvas @[480px]/hairline:block">
+            <div className="hidden border-y border-hairline bg-canvas @[480px]/hairline:block">
                 <div className="overflow-x-auto">
                     <table
                         className="aurora-text-table w-full border-collapse"
@@ -100,15 +100,15 @@ export function HairlineTable({
 
             <div className="@[480px]/hairline:hidden">
                 {rows.length === 0 ? (
-                    <div className="aurora-text-body-sm rounded-xl border border-hairline bg-canvas px-4 py-8 text-center text-mute">
+                    <div className="aurora-text-body-sm border-y border-hairline bg-canvas px-4 py-8 text-center text-mute">
                         {empty ?? 'Nothing here yet.'}
                     </div>
                 ) : (
-                    <ul className="space-y-2">
+                    <ul className="divide-y divide-hairline border-y border-hairline bg-canvas">
                         {rows.map((row) => (
                             <li
                                 key={row.id}
-                                className="rounded-xl border border-hairline bg-canvas p-3"
+                                className="bg-canvas px-4 py-3"
                             >
                                 <div className="font-medium text-ink">
                                     {row.mobileTitle}
@@ -155,9 +155,9 @@ export function HairlinePanel({
     padded?: boolean;
 }) {
     return (
-        <section className="overflow-hidden rounded-xl border border-hairline bg-canvas shadow-none">
+        <section className="border-t border-hairline bg-canvas shadow-none">
             {title ? (
-                <header className="flex flex-wrap items-end justify-between gap-3 border-b border-hairline px-4 py-3">
+                <header className="flex flex-wrap items-end justify-between gap-3 border-b border-hairline px-4 py-2.5">
                     <div>
                         <h3 className="aurora-text-section text-ink">
                             {title}
@@ -171,7 +171,7 @@ export function HairlinePanel({
                     {action}
                 </header>
             ) : null}
-            <div className={padded ? 'p-4' : undefined}>{children}</div>
+            <div className={padded ? 'px-4 py-3' : undefined}>{children}</div>
         </section>
     );
 }

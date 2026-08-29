@@ -341,7 +341,7 @@ function FrontDesk({
                             </div>
                             <Link
                                 href={`/crm/contacts/${selected.contact.id}`}
-                                className="aurora-text-ui shrink-0 font-medium text-brand"
+                                className="aurora-text-ui shrink-0 font-medium text-ink hover:underline"
                             >
                                 Open contact
                             </Link>
@@ -359,7 +359,7 @@ function FrontDesk({
                                     }`}
                                 >
                                     {message.type === 'note' ? (
-                                        <p className="aurora-text-caption mb-1 font-medium text-brand">
+                                        <p className="aurora-text-caption mb-1 font-medium text-mute">
                                             Private note, only visible to agents
                                         </p>
                                     ) : null}

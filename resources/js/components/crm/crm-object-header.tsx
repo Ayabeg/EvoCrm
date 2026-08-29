@@ -12,8 +12,8 @@ export function CrmObjectHeader({
 }: {
     title: string;
     description?: string;
-    primaryLabel: string;
-    onPrimary: () => void;
+    primaryLabel?: string;
+    onPrimary?: () => void;
     secondary?: ReactNode;
 }) {
     return (
@@ -31,17 +31,21 @@ export function CrmObjectHeader({
                     </p>
                 ) : null}
             </div>
-            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                {secondary}
-                <Button
-                    type="button"
-                    size="sm"
-                    onClick={onPrimary}
-                    className={cn('h-8 shrink-0')}
-                >
-                    {primaryLabel}
-                </Button>
-            </div>
+            {secondary || (primaryLabel && onPrimary) ? (
+                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                    {secondary}
+                    {primaryLabel && onPrimary ? (
+                        <Button
+                            type="button"
+                            size="sm"
+                            onClick={onPrimary}
+                            className={cn('h-8 shrink-0')}
+                        >
+                            {primaryLabel}
+                        </Button>
+                    ) : null}
+                </div>
+            ) : null}
         </header>
     );
 }

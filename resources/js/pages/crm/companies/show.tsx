@@ -198,7 +198,7 @@ export default function CompanyShow({
                                                 defaultValue={
                                                     company.city ?? ''
                                                 }
-                                                className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
+                                                className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                                             >
                                                 <option value="">City</option>
                                                 {cities.map((city) => (
@@ -215,7 +215,7 @@ export default function CompanyShow({
                                                 defaultValue={
                                                     company.wilaya ?? ''
                                                 }
-                                                className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
+                                                className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                                             >
                                                 <option value="">Wilaya</option>
                                                 {wilayas.map((wilaya) => (
@@ -232,7 +232,7 @@ export default function CompanyShow({
                                                 defaultValue={
                                                     company.owner_id ?? ''
                                                 }
-                                                className="h-8 w-full rounded-xl border border-hairline bg-background px-2 text-sm"
+                                                className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                                             >
                                                 <option value="">
                                                     Unassigned
