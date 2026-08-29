@@ -112,3 +112,60 @@ Settings → Qualify is Lead OS adjacent and still a bordered card under `Headin
 2. Known leftovers (Reports, Warmup, Lead show, Segments, Capture)
 3. Orange / control radius on already-open surfaces
 4. Composition tests + browser verify
+
+---
+
+## Implemented (this branch)
+
+All P1 and the listed P2 items were fixed. No new components.
+
+| Finding | Fix |
+|---|---|
+| P1.1 Reports dual title | Room owns “Reports”. Inner title only when it is a saved dashboard name, at 13px. |
+| P1.2 Lead show admin stack | Record grammar: `RecordPageFrame` / facts / Enrichment / Edit / associations / Ask Evo. Qualify stays the only orange primary. Save lead is outline. |
+| P1.3 Segments PageHeader + cards | `CrmShell chrome="workspace"` + `CrmObjectHeader` + destacked table + CreateDrawer. Filter chips canvas-soft. |
+| P1.4 Capture SurfaceHeader | Same list grammar. Ingest tools stay grouped work. Accept is the only orange primary. |
+| P1.5 Warmup StatCard | `CrmKpiStrip`. “hold at ceiling” is a hairline pill. |
+| P2.1 Hairline frames | `border-y` / `border-t`. No `rounded-xl`. Mobile rows divide, not cards. |
+| P2.2 Accidental orange | Desk / board / outbound / capture / segment row links → ink. Enrichment icon no longer brand. |
+| P2.3 Company selects | `rounded-md` hairline. |
+| P2.4 Qualify settings | Card removed; `border-t` group. |
+
+---
+
+## Browser verification (2026-08-29)
+
+Headless Chrome against `php artisan serve` after `npm run build`. Login `owner@evosales.local`.
+
+| Width | Light | Dark | Overflow | Reports h1 | Brand row-links | StatCard |
+|---|---|---|---|---|---|---|
+| 320 | Home, Contacts, Desk, Reports, Capture | same | 0 | 1 | 0 | 0 |
+| 375 | Home, Contacts, Companies, Deals, Leads, Lead board, Pipeline, Desk, Outbound, Warmup, Reports, Capture, Segments | same | 0 | 1 | 0 | 0 |
+| 390 | Home, Contacts, Desk, Reports, Capture | same | 0 | 1 | 0 | 0 |
+| 430 | Home, Contacts, Desk, Reports, Capture | same | 0 | 1 | 0 | 0 |
+| 768 | Home, Contacts, Desk, Reports, Capture | same · black rail | 0 | 1 | 0 | 0 |
+| 1024 | Home, Contacts, Desk, Reports, Capture | same · black rail | 0 | 1 | 0 | 0 |
+| 1280 | Home, Contacts, Desk, Reports, Capture | same · black rail | 0 | 1 | 0 | 0 |
+| 1440 | Home, Contacts, Pipeline, Desk, Warmup, Reports, Capture, Segments + records | Home, Reports, Warmup, Capture, Lead record · black canvas `#000` | 0 | 1 | 0 | 0 |
+| 1920 | Home, Contacts, Desk, Reports, Capture | same · black rail | 0 | 1 | 0 | 0 |
+
+Records (numeric IDs, not import/duplicates shortcuts): contact, company (`Agri Blida`), deal, lead (`Clinic website intake`) at 1440. Lead also 375 light + dark.
+
+One 375 Pipeline request returned ViteManifestNotFound while `npm run build` rewrote the manifest. Retry after the build: 200, title Pipeline, overflow 0.
+
+Mobile drawer trigger exists at 375. Architecture not changed (240px black Aurora Sheet from #114). This probe’s click did not mount `[data-mobile="true"]` — same flake as the prior pass, not a chrome rewrite.
+
+Dark mode: `html.dark`, canvas `rgb(0,0,0)`, rail `rgb(0,0,0)`, mark `#EC6025` on the single primary. Not an inverted light theme.
+
+---
+
+## Remaining weaknesses (honest)
+
+- Capture ingest remains three tools (CSV / URL / Maps). Outline, not orange. Workflow is not a CRM list.
+- Lead / contact / deal right-rail `AssociationCard` headers are still heavier than left `RecordSection`. Existing record chrome — not rewritten.
+- Ads and Workflows still use `SurfaceHeader`. Out of this pass.
+- Settings connectors / people / attributes still use orange on codes and some links.
+- Report-builder, activities, conversations, sequence show still have `text-brand` row links.
+- Reports charts use orange as data ink (correct).
+- Login can still show “Log in to your account” twice (auth chrome).
+- Mobile drawer click is flaky in headless Chrome; architecture left alone.

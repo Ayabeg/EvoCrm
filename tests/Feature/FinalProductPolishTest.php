@@ -50,6 +50,13 @@ it('brings Segments and Capture inbox onto CRM list grammar', function () {
         ->and($captures)->not->toContain('text-brand');
 });
 
+it('keeps Enrichment as an outline control without a brand icon', function () {
+    $panel = file_get_contents(resource_path('js/components/crm/enrichment-panel.tsx'));
+
+    expect($panel)->toContain('variant="outline"')
+        ->and($panel)->not->toContain('text-brand');
+});
+
 it('destacks shared hairline tables instead of framing them as cards', function () {
     $table = file_get_contents(resource_path('js/components/crm/hairline-table.tsx'));
 
