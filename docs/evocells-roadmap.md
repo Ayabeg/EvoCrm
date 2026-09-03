@@ -1,6 +1,6 @@
 # EvoCells HubSpot Depth Scorecard
 
-**Production baseline:** commit `0304154` (pre-EvoCells) → **`3c271d8`** on `main` (EvoCells 1–6 + HubSpot chrome, 2026-08-24) → **`d139f6e`** on `cursor/hubspot-gap-remaining-waves-fd45` (Waves 1–5, 2026-08-25).
+**Production baseline:** commit `0304154` (pre-EvoCells) → **`3c271d8`** on `main` (EvoCells 1–6 + HubSpot chrome, 2026-08-24) → **`714d21a`** on `main` (Waves 1–6 merged, 2026-08-26). Scores below stay at the 2026-08-25 redo (`d139f6e`, **~85**); Wave 6 evidence is in the side-by-side, not re-scored.
 
 **Full side-by-side audit:** [hubspot-side-by-side.md](./hubspot-side-by-side.md) · [scores](./hubspot-parity-comparison.md)
 

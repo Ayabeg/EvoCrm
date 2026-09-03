@@ -1,5 +1,11 @@
 # Changelog
 
+## HubSpot side-by-side on main (2026-08-26)
+
+Re-pointed the HubSpot vs EvoSales matrix to `main` @ `714d21a` after Waves 1–6 merged. Composite stays **~85** (Wave 6 not re-scored). Visual HTML now matches shipped playbooks, calculated list columns, association filters, segment history, and audit trail. See [`docs/hubspot-side-by-side.md`](docs/hubspot-side-by-side.md).
+
+---
+
 ## Wave 6 seller trust (2026-08-25)
 
 ### Added

@@ -1,8 +1,9 @@
-# HubSpot Parity Comparison — EvoSales vs HubSpot (2026-08-25)
+# HubSpot Parity Comparison — EvoSales vs HubSpot (2026-08-26)
 
-**Audit date:** 2026-08-25  
-**Codebase:** `cursor/hubspot-gap-remaining-waves-fd45` @ `d139f6e` ([PR #92](https://github.com/Mohamedbeghanem/EvoSales/pull/92))  
-**Previous audits:** `3c271d8` on `main` (2026-08-24, composite **~81**) → `9a17fd0` via [PR #51](https://github.com/Mohamedbeghanem/EvoSales/pull/51)  
+**Audit date:** 2026-08-26  
+**Codebase:** `main` @ `714d21a` (Waves 1–6 on `main`; [#88](https://github.com/Mohamedbeghanem/EvoSales/pull/88)–[#92](https://github.com/Mohamedbeghanem/EvoSales/pull/92) merged, #93/#94 commits included)  
+**Previous audits:** `3c271d8` on `main` (2026-08-24, composite **~81**) → `d139f6e` (2026-08-25, Waves 1–5, composite **~85**)  
+**Scores:** M1–M11 stay at the 2026-08-25 redo (**~85**). Wave 6 (audit, calculated list columns, playbooks, segment history) is evidenced below but **not re-scored**.  
 **Methodology:** Evidence from routes, controllers/services, Inertia pages, and Pest feature tests. A capability scores only when it has a route, a user-visible surface, and a service/test — not a backend-only stub.
 
 **Product target (not feature-count parity):** a 5–20 seat Algeria-first sales OS that a team can migrate into, use as system of record, and carry lead → quote. Explicitly deferred: custom objects, tickets, CMS, SAML, marketplace, visual workflow canvas, full CPQ/payments/e-sign, Breeze-scale RAG, Laravel live chat.
@@ -16,16 +17,16 @@
 | Area | HubSpot (Sales + Service + Marketing, 2026) | EvoSales | Score | Evidence |
 |------|---------------------------------------------|----------|-------|----------|
 | **CRM core** | Contacts, companies, deals, tickets, custom objects, Commerce Hub quotes/e-sign/payments | Contacts, companies, deals, leads, quotes with PDF/email/accept, line items, splits, import/merge | **96** | 191 authenticated `web.php` names; `LeadConverter`, `QuoteDocument`, `ContactMerger`; `LeadConversionTest`, `QuoteDeliveryTest`, `QuoteAcceptanceTest` |
-| **Lists & views** | Saved views, advanced filters, calculated columns, bulk actions | Chrome lists with FilterBuilder, column chooser, save-view, bulk, CSV import/export | **90** | `CrmListShell` → `list-toolbar.tsx`; `CrmBulkActionsTest`, `ContactImportTest`, `DealImportTest` |
+| **Lists & views** | Saved views, advanced filters, calculated columns, bulk actions | Chrome lists with FilterBuilder, column chooser (incl. custom/calc attrs), save-view, bulk, CSV import/export, contact deal-stage / has-open-deal filters | **90** | `CrmListShell` → `list-toolbar.tsx`; `CrmBulkActionsTest`, `ListColumnsAndAssociationFiltersTest` |
 | **Pipelines & forecast** | Multi-pipeline, required-property gating, AI/Smart Deal Progression, revenue workspace | Multi-pipeline list+board, weighted forecast, deterministic deal-health band | **90** | `PipelineSwitcher`, `DealBoardForecast`, `RecordInsight::dealHealth`; `DealListPipelineTest`, `DealGuidanceTest`, `DealBoardTest` |
-| **Record UX** | Configurable layouts, playbooks, side panels, Breeze on-record | 3-column chrome, timeline, associations, Ask Evo, custom props, health, commerce editors | **90** | `contacts/show`, `deals/show`, `companies/show`; `settings/record-layouts`; `RecordInsightTest` |
-| **Segments** | Active lists, enter/exit events, ads sync | FilterBuilder segments, enter/exit workflows, Meta audience sync | **88** | `SegmentMatcher`, `segment.exited`; `SegmentExitWorkflowTest`, `CrmSegmentsTest` |
+| **Record UX** | Configurable layouts, playbooks, side panels, Breeze on-record | 3-column chrome, timeline, associations, Ask Evo, custom props, health, commerce editors, playbook cards | **90** | `contacts/show`, `deals/show`; `settings/playbooks`; `RecordPlaybookTest` |
+| **Segments** | Active lists, enter/exit events, ads sync | FilterBuilder segments, enter/exit workflows + membership history, Meta audience sync | **88** | `SegmentMatcher`, `segment.exited`; `SegmentMembershipHistoryTest` |
 | **Workflows** | Visual canvas, branches, 100+ actions, Operations Hub | 7 triggers, 8 actions, delays, if/else, form UI | **80** | `Workflow::triggers()`, `WorkflowRunner`; `CrmWorkflowsTest` (21), `SegmentExitWorkflowTest` |
 | **Sequences (Sales Hub)** | Email sequences, AI personalization, task/LinkedIn steps, reporting | Email + WA sequences, A/B subjects, call/meeting steps, reply pause, warmup, bounce suppress | **93** ⭐ | `SequenceController`, `BounceProcessor`; `OutboundWarmupTest`, `OutboundBounceTest` |
 | **Desk / Inbox** | Unified inbox, live chat, SMS, SLA, bots | EvoDesk embed, native WA/email threads, channel cards | **76** | `InboxController`, `DeskComposer`; SMS still `Twilio SMS dispatch pending` |
 | **Marketing** | Campaigns, ads, attribution, forms, SEO, AEO | Meta Ads center, lead webhooks, outbound campaigns, segment → audience | **88** ⭐ | `AdsCenterController`, `MetaAudienceSyncService`, `AdsHubTest` |
 | **Reporting** | Custom explorer, dashboards, attribution, scheduled send | Category rooms + EvoViz, saved reports, dashboards, real scheduled HTML email | **85** | `ScheduledReportRenderer`, `CrmReportDashboardsTest`, `ScheduledReportDeliveryTest` |
-| **Settings / admin** | Teams, RBAC, SSO, audit log | Owner/admin/member, permission matrix UI, people, layouts, system health | **80** | `settings/permissions.tsx`, `EnforceProductPermissions`, `CrmPermissionsTest`, `ScheduledCommandHealthTest` |
+| **Settings / admin** | Teams, RBAC, SSO, audit log | Owner/admin/member, permission matrix UI, people, layouts, system health, workspace audit trail | **80** | `settings/audit`, `AuditLogger`, `AuditTrailTest`; SAML still deferred |
 | **Integrations / OAuth** | 1,000+ marketplace apps | Google OAuth + Gmail/Calendar sync, Meta OAuth, Evolution WA, tenant webhooks | **96** ⭐ | `GoogleMailSync`, `GoogleCalendarSync`, `WebhookEndpointManager`; `GoogleMailSyncTest`, `WebhookTenantIsolationTest` |
 | **Visual chrome** | One Smart CRM shell | HubSpot-style sidebar, list/record chrome, home command center; hub split-panel retired | **84** | No `hub.tsx`; `CrmListShell` on contacts/deals/companies; `record-chrome.tsx` |
 | **AI layer** | Breeze Copilot, agents, Smart Deal Progression, vector RAG | Ask Evo on records, engagement score, deterministic health/forecast — keyword RAG, not agents | **72** | `AskEvoPanel` on contact/deal/company; `DealGuidanceTest`, `RecordInsightTest` |
@@ -37,11 +38,11 @@
 
 ## Composite score
 
-| Metric | `9a17fd0` | `3c271d8` (2026-08-24) | `d139f6e` (2026-08-25) | Δ vs last |
-|--------|-----------|------------------------|------------------------|-----------|
-| **M1–M11 average** | **~81** | **~81** | **~85** | **+4** |
-| **Visual chrome (M14)** | ~62 | **~79** | **~84** | **+5** |
-| **Omega gate (≥95 on M1–M11)** | Not met | Not met | **Not met** | — |
+| Metric | `9a17fd0` | `3c271d8` (2026-08-24) | `d139f6e` (2026-08-25) | `714d21a` (2026-08-26) |
+|--------|-----------|------------------------|------------------------|------------------------|
+| **M1–M11 average** | **~81** | **~81** | **~85** | **~85** (Wave 6 not re-scored) |
+| **Visual chrome (M14)** | ~62 | **~79** | **~84** | **~84** |
+| **Omega gate (≥95 on M1–M11)** | Not met | Not met | **Not met** | **Not met** |
 
 ### Scoring methodology
 
@@ -75,6 +76,8 @@ Waves 1–5 on this branch. The 2026-08-24 scorecard stayed flat because chrome 
 | Deals-list pipeline selection | 21 | M2, M3 | List/create/views/export honor `?pipeline=` |
 | Chrome lists/records unified | prior + this branch | M2, M4, M10, M14 | `FilterBuilder` / `ColumnChooser` / Ask Evo / `RecordProperties` on primary routes; no `hub.tsx` |
 
+Wave 6 on `714d21a` (not scored): audit trail, calculated/custom list columns, contact `deal_stage` / `has_open_deal` filters, record playbooks, segment enter/exit stints.
+
 ---
 
 ## What did not move (still the honest gaps)
@@ -84,13 +87,11 @@ Waves 1–5 on this branch. The 2026-08-24 scorecard stayed flat because chrome 
 | No tickets / custom objects | HubSpot Smart CRM + Service Hub; Enterprise custom objects |
 | No visual workflow canvas | Operations Hub canvas vs EvoSales form UI |
 | No SMS send path or Laravel live chat | Service Hub inbox / bots; EvoDesk remains the chat boundary |
-| No SAML, audit log, or HubSpot-style teams | Enterprise admin |
+| No SAML or HubSpot-style teams | Enterprise admin; workspace audit trail shipped (login, import, merge, quotes, permissions) |
 | No Breeze agents / vector RAG / Smart Deal Progression | Spring 2026 HubSpot AI; EvoSales health/forecast are deterministic heuristics |
 | No forecast backtest | Professional/Enterprise revenue intelligence |
 | No e-sign, payments, subscriptions | Commerce Hub |
 | No marketplace / CMS / forms / SEO | Marketing Hub + App Marketplace |
-| No calculated columns on lists | Custom report explorer / calculated properties in list views |
-| Segment membership is current-state only | Exit deletes the membership row; history is the workflow execution, not a list audit |
 
 ---
 
@@ -121,8 +122,10 @@ Waves 1–5 on this branch. The 2026-08-24 scorecard stayed flat because chrome 
 | Bulk actions | ✅ | Assign, enroll, move, delete — `CrmBulkActionsTest` |
 | Import / export | ✅ | Contact + deal CSV; export honors pipeline |
 | Pipeline context | ✅ | Deals list switcher + `?pipeline=` on create/views/export |
+| Calculated / custom columns | ✅ | `custom:{key}` via `CrmHub::listViewMeta` + `ListColumnsAndAssociationFiltersTest` |
+| Association filters | Partial | Contact `deal_stage` / `has_open_deal`; company `has_open_deal` |
 | Tests | ✅ | `CrmSavedViewTest` asserts `crm/*/index` (no hub drift) |
-| Gaps | | Calculated list columns; HubSpot-depth association filters |
+| Gaps | | HubSpot-depth cross-object filters |
 
 ### Pipelines & forecast (90)
 
@@ -144,8 +147,9 @@ Waves 1–5 on this branch. The 2026-08-24 scorecard stayed flat because chrome 
 | Custom properties | ✅ | `RecordProperties` on those show pages |
 | Layout admin | ✅ | `/settings/record-layouts` workspace default |
 | Deal commerce | ✅ | Health, line items, quotes, splits on `deals/show` |
+| Playbooks | ✅ | Settings CRUD + `PlaybookCard` on contact/deal show (`RecordPlaybookTest`) |
 | Timeline | ✅ | Activities + Google mail/calendar events when synced |
-| Gaps | | Playbooks; company/lead density still thinner than deal/contact |
+| Gaps | | Company/lead density still thinner than deal/contact |
 
 ### Segments (88)
 
@@ -215,7 +219,8 @@ Waves 1–5 on this branch. The 2026-08-24 scorecard stayed flat because chrome 
 | Permission matrix | ✅ | Role defaults + owner member grants; server enforced |
 | System health | ✅ | Scheduled-command freshness |
 | Pipelines / attributes / layouts | ✅ | Dedicated settings pages |
-| Gaps | | SAML/SSO, audit log, HubSpot-style teams |
+| Audit trail | ✅ | `/settings/audit` — login, import, merge, quote send/accept, permissions (`AuditTrailTest`) |
+| Gaps | | SAML/SSO, HubSpot-style teams, full object-change history |
 
 ### Integrations (96 moat)
 
@@ -264,20 +269,18 @@ Waves 1–5 on this branch. The 2026-08-24 scorecard stayed flat because chrome 
 
 ## Top remaining gaps toward Omega (≥95 composite)
 
-These replace the 2026-08-24 list. Items 7–8 from that list (`segment.exited`, scheduled reports) are **done**.
+These replace the 2026-08-24 list. Items that shipped in Waves 3–6 (`segment.exited`, scheduled reports, calculated columns, playbooks, audit trail, segment history) are **done**.
 
 | # | Gap | Dimensions | Effort | Notes |
 |---|-----|------------|--------|-------|
 | 1 | **Forecast backtest** — validate the band within 15% on historical deals | M3, M10 | Large | Still the honest AI/forecast ceiling |
 | 2 | **SMS send path** (Twilio or DZ provider) | M8 | Medium | Composer already stubs the failure |
 | 3 | **Visual workflow canvas** (read-only v1 → editable) | M6 | Large | Explicitly deferred; largest remaining automation gap |
-| 4 | **Calculated columns + association filters on lists** | M2 | Medium | Shipped: custom/calc columns + deal_stage / has_open_deal |
-| 5 | **Playbooks on records** | M4 | Medium | Shipped: settings CRUD + contact/deal cards |
-| 6 | **SSO + audit log** | M11 | Medium | Audit trail shipped; SAML still deferred |
-| 7 | **Segment membership history** | M5 | Small | Shipped: enter/exit stints on `/crm/segments/{id}` |
-| 8 | **Breeze-comparable RAG** (optional) | M10 | Large | Explicitly deferred; do not fake agent claims |
-| 9 | **Tickets or a Service Hub boundary** | M1, M8 | Large | Empty ticket card on deals is UI only |
-| 10 | **E-sign / payments** | M1 | Large | Quotes accept; they do not collect money or a legal signature |
+| 4 | **SAML / SSO** | M11 | Medium | Audit trail shipped; SAML still deferred |
+| 5 | **Breeze-comparable RAG** (optional) | M10 | Large | Explicitly deferred; do not fake agent claims |
+| 6 | **Tickets or a Service Hub boundary** | M1, M8 | Large | Empty ticket card on deals is UI only |
+| 7 | **E-sign / payments** | M1 | Large | Quotes accept; they do not collect money or a legal signature |
+| 8 | **Deeper association filters** | M2 | Medium | `deal_stage` / `has_open_deal` shipped; HubSpot-depth cross-object filters remain |
 
 ---
 
@@ -321,6 +324,10 @@ Use [production](https://crm.evotechly.com) after merge, or local with the seede
 
 ### Settings
 - [ ] Permissions matrix + member override
+- [ ] `/settings/audit` shows login, import, merge, quote, permission events
+- [ ] `/settings/playbooks` CRUD; card on a contact and a deal
+- [ ] Contact list: custom/calc column + deal-stage / has-open-deal filter
+- [ ] `/crm/segments/{id}` enter/exit history
 - [ ] System health freshness for the eight scheduled commands
 - [ ] Record layouts workspace default
 - [ ] Connectors: Gmail/Calendar start and pause

@@ -103,9 +103,9 @@
 </head>
 <body>
   <header>
-    <p class="kicker">Evotechly · 25 Aug 2026 · d139f6e</p>
+    <p class="kicker">Evotechly · 26 Aug 2026 · main @ 714d21a</p>
     <h1>HubSpot vs EvoSales</h1>
-    <p class="lede">Capability-by-capability for a 5–20 seat Algeria-first sales team. HubSpot is Sales + Service + Marketing Hub 2026. EvoSales is this branch, scored only when a route, UI, and test exist.</p>
+    <p class="lede">Capability-by-capability for a 5–20 seat Algeria-first sales team. HubSpot is Sales + Service + Marketing Hub 2026. EvoSales is <code>main</code> after Waves 1–6. A capability counts only when a route, UI, and test exist. Composite ~85 is unchanged (Wave 6 is in the matrix; scores not re-rolled).</p>
     <div class="score">
       <div><b>~85</b><span>EvoSales M1–M11</span></div>
       <div><b>100</b><span>HubSpot reference</span></div>
@@ -130,17 +130,18 @@
         <tr><th>Capability</th><th>HubSpot</th><th>EvoSales</th><th>Verdict</th></tr>
         <tr><td>Saved views + AND/OR</td><td>Yes</td><td>FilterBuilder + save-view on chrome lists</td><td class="v Match">Match</td></tr>
         <tr><td>Bulk + import + pipeline</td><td>Yes</td><td>Assign/enroll/move/delete; CSV; list switcher</td><td class="v Match">Match</td></tr>
-        <tr><td>Calculated columns</td><td>List formulas</td><td>Record formulas only</td><td class="v Partial">Partial</td></tr>
+        <tr><td>Calculated columns</td><td>List formulas</td><td>Custom and calculated attributes as list columns</td><td class="v Match">Match</td></tr>
+        <tr><td>Association filters</td><td>Cross-object filters</td><td>Contact deal_stage / has_open_deal</td><td class="v Partial">Partial</td></tr>
         <tr><td>Kanban + forecast</td><td>AI / revenue workspace</td><td>Board + weighted band + deal health</td><td class="v Partial">Partial</td></tr>
         <tr><td>Record chrome</td><td>Highlights / timeline / Breeze</td><td>3-column, Ask Evo, properties, commerce</td><td class="v Match">Match</td></tr>
-        <tr><td>Playbooks</td><td>Professional</td><td>None</td><td class="v Gap">Gap</td></tr>
+        <tr><td>Playbooks</td><td>Professional</td><td>Settings CRUD + contact/deal cards</td><td class="v Match">Match</td></tr>
       </table>
     </section>
     <section>
       <h2>Automation, sequences, desk</h2>
       <table>
         <tr><th>Capability</th><th>HubSpot</th><th>EvoSales</th><th>Verdict</th></tr>
-        <tr><td>Segment enter / exit</td><td>Active lists</td><td>Both triggers + Meta audience</td><td class="v Match">Match</td></tr>
+        <tr><td>Segment enter / exit</td><td>Active lists</td><td>Both triggers + Meta audience + membership history</td><td class="v Match">Match</td></tr>
         <tr><td>Workflow builder</td><td>Visual canvas, 100+ actions</td><td>Form UI, 7 triggers, 8 actions</td><td class="v Deferred">Deferred</td></tr>
         <tr><td>Email sequences</td><td>Native, send caps</td><td>Owned SMTP, warmup, bounce suppress</td><td class="v Ahead">Ahead</td></tr>
         <tr><td>WhatsApp</td><td>Channel / app</td><td>Evolution Cloud native</td><td class="v Ahead">Ahead</td></tr>
@@ -153,6 +154,7 @@
         <tr><th>Capability</th><th>HubSpot</th><th>EvoSales</th><th>Verdict</th></tr>
         <tr><td>Reports + schedule</td><td>Explorer + email</td><td>EvoViz rooms + real HTML cron</td><td class="v Match">Match</td></tr>
         <tr><td>Permissions</td><td>Fine RBAC + SSO</td><td>Matrix UI, no SAML</td><td class="v Partial">Partial</td></tr>
+        <tr><td>Audit log</td><td>Enterprise activity</td><td>/settings/audit for login, import, merge, quotes, permissions</td><td class="v Partial">Partial</td></tr>
         <tr><td>Google / Meta</td><td>Native + marketplace</td><td>Gmail/Calendar sync, workspace Meta</td><td class="v Match">Match</td></tr>
         <tr><td>AI</td><td>Breeze agents, Smart Deal Progression</td><td>Ask Evo + deterministic health</td><td class="v Partial">Partial</td></tr>
         <tr><td>Algeria / hosting</td><td>Generic i18n, HubSpot cloud</td><td>Wilaya, DZD, Algiers TZ, self-host</td><td class="v Ahead">Ahead</td></tr>

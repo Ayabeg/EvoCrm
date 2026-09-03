@@ -1,10 +1,10 @@
 # HubSpot vs EvoSales — side by side
 
-**Audit:** 2026-08-25 · `d139f6e` / [PR #92](https://github.com/Mohamedbeghanem/EvoSales/pull/92)  
-**Scores:** [hubspot-parity-comparison.md](./hubspot-parity-comparison.md) · composite **~85** (Omega ≥95 not met)  
+**Audit:** 2026-08-26 · `main` @ `714d21a` (Waves 1–6 merged via [#88](https://github.com/Mohamedbeghanem/EvoSales/pull/88)–[#92](https://github.com/Mohamedbeghanem/EvoSales/pull/92); #93/#94 commits included)  
+**Scores:** [hubspot-parity-comparison.md](./hubspot-parity-comparison.md) · composite **~85** (Omega ≥95 not met; Wave 6 evidence is in the matrix, scores not re-rolled)  
 **Visual:** [hubspot-side-by-side.html](./hubspot-side-by-side.html)
 
-HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of 2026, including Breeze and Commerce Hub quotes. EvoSales column is what ships on this branch (route + UI + tests). Verdict is for a **5–20 seat Algeria-first sales team**, not feature-count parity.
+HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of 2026, including Breeze and Commerce Hub quotes. EvoSales column is what ships on `main` (route + UI + tests). Verdict is for a **5–20 seat Algeria-first sales team**, not feature-count parity.
 
 | Verdict | Meaning |
 |---------|---------|
@@ -192,8 +192,8 @@ HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of
 |--|---------|----------|
 | **M1–M11 composite** | 100 (reference) | **~85** |
 | **Won outright** | Canvas, Breeze agents, tickets/custom objects, Commerce e-sign/pay, SMS/live chat, marketplace, SSO | Owned mail + warmup, WhatsApp native, Meta funnel, wilaya/DZD, self-host, scheduler health |
-| **Now matched** | Lists/filters/bulk, lead→deal, quotes send/accept (without pay), segment exit, Gmail/Calendar, scheduled reports, permission UI | — |
-| **Still the ceiling** | Omega ≥95 needs forecast backtest, SMS, canvas, playbooks, calculated list columns, audit trail | Explicitly not cloning HubSpot Enterprise |
+| **Now matched** | Lists/filters/bulk/calc columns, lead→deal, quotes send/accept (without pay), segment enter/exit + history, Gmail/Calendar, scheduled reports, permission UI, playbooks, audit trail | — |
+| **Still the ceiling** | Omega ≥95 needs forecast backtest, SMS, canvas, SAML, tickets/custom objects, Commerce e-sign/pay, Breeze agents | Explicitly not cloning HubSpot Enterprise |
 
 ---
 
