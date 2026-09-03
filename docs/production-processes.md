@@ -76,6 +76,7 @@ The queue worker exits after one hour through `--max-time=3600`; Docker restarts
 | `outbound:sync-mailboxes` | Every fifteen minutes | mailboxes |
 | `google:sync-mail` | Every fifteen minutes | Gmail tokens, `google_sync_states`, activities |
 | `google:sync-calendar` | Every fifteen minutes | Calendar tokens, `google_sync_states`, activities |
+| `meta:sync` | Every fifteen minutes | `ad_*` hierarchy, `meta_sync_runs` |
 | `reports:deliver` | Daily at 08:00 Africa/Algiers | scheduled reports, last window/status |
 | `outbound:warmup` | Daily at 08:05 Africa/Algiers | mailbox warmup state |
 

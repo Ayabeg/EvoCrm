@@ -35,6 +35,14 @@ class Integration extends Model
 {
     use BelongsToWorkspace;
 
+    /**
+     * @var list<string>
+     */
+    protected $hidden = [
+        'access_token',
+        'refresh_token',
+    ];
+
     public const PROVIDER_META = 'meta';
 
     public const PROVIDER_GMAIL = 'gmail';

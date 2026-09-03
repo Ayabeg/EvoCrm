@@ -106,7 +106,7 @@ class FunnelEventRecorder
     {
         $lead->loadMissing('contact');
 
-        if (! filled($lead->ad_campaign_id)) {
+        if (! filled($lead->ad_campaign_id) && ! $this->isMetaSource($lead->source)) {
             return null;
         }
 
@@ -118,8 +118,31 @@ class FunnelEventRecorder
             'ad_campaign_id' => $lead->ad_campaign_id,
             'source' => $lead->source ?? 'facebook',
             'occurred_at' => $lead->created_at ?? now(),
-            'meta' => ['via' => 'ad_lead'],
+            'meta' => ['via' => 'ad_lead', 'event' => 'lead.created'],
         ]);
+    }
+
+    public function recordLeadQualified(Lead $lead): ?FunnelEvent
+    {
+        $lead->loadMissing('contact');
+
+        return $this->record($lead->workspace, 'lead_qualified', [
+            'subject_type' => Lead::class,
+            'subject_id' => $lead->id,
+            'contact_id' => $lead->contact_id,
+            'lead_id' => $lead->id,
+            'ad_campaign_id' => $lead->ad_campaign_id,
+            'source' => $lead->source ?? $lead->contact?->source,
+            'occurred_at' => $lead->qualified_at ?? now(),
+            'meta' => ['event' => 'lead.qualified'],
+        ]);
+    }
+
+    public function isMetaSource(?string $source): bool
+    {
+        $value = strtolower((string) $source);
+
+        return $value !== '' && (str_contains($value, 'meta') || str_contains($value, 'facebook') || str_contains($value, 'instagram'));
     }
 
     private function defaultFunnel(Workspace $workspace): ?ConversionFunnel

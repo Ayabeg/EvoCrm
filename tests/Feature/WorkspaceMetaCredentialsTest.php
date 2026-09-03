@@ -35,6 +35,13 @@ it('uses each workspace Meta token and selected ad account for campaign sync', f
 
     Http::fake([
         'graph.facebook.com/*/act_*/campaigns*' => Http::response(['data' => []]),
+        'graph.facebook.com/*' => Http::response([
+            'data' => [],
+            'id' => 'act',
+            'name' => 'Workspace account',
+            'currency' => 'DZD',
+            'account_status' => 1,
+        ]),
     ]);
 
     expect(app(MetaAdsService::class)->sync($first)['ok'])->toBeTrue()

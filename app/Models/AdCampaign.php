@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'objective',
     'status',
     'daily_budget_cents',
+    'lifetime_budget_cents',
+    'starts_at',
+    'ends_at',
     'click_to_whatsapp',
     'lead_form',
 ])]
@@ -29,6 +32,9 @@ class AdCampaign extends Model
             'click_to_whatsapp' => 'boolean',
             'lead_form' => 'boolean',
             'daily_budget_cents' => 'integer',
+            'lifetime_budget_cents' => 'integer',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
         ];
     }
 

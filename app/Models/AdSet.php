@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'name',
     'status',
     'daily_budget_cents',
+    'lifetime_budget_cents',
+    'optimization_goal',
+    'targeting_summary',
 ])]
 class AdSet extends Model
 {
@@ -24,6 +27,7 @@ class AdSet extends Model
     {
         return [
             'daily_budget_cents' => 'integer',
+            'lifetime_budget_cents' => 'integer',
         ];
     }
 

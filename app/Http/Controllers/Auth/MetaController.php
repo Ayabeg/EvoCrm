@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Integration;
+use App\Services\Operations\AuditLogger;
 use App\Support\MetaAuth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -93,8 +94,9 @@ class MetaController extends Controller
         }
 
         $scopes = $this->grantedScopes($token) ?? MetaAuth::scopes();
-        $pages = $this->discover($token, '/me/accounts', in_array('pages_show_list', $scopes, true));
-        $adAccounts = $this->discover($token, '/me/adaccounts', in_array('ads_management', $scopes, true));
+        $pages = $this->discoverPages($token, in_array('pages_show_list', $scopes, true));
+        $adAccounts = $this->discover($token, '/me/adaccounts', in_array('ads_management', $scopes, true) || in_array('ads_read', $scopes, true));
+        $instagram = $this->discoverInstagram($pages);
 
         $workspace = $request->user()->workspace;
         $existing = $workspace->integration(Integration::PROVIDER_META);
@@ -110,6 +112,7 @@ class MetaController extends Controller
             [
                 'status' => 'connected',
                 'access_token' => $token,
+                'refresh_token' => $this->encryptedPageSecrets($pages, $existing?->refresh_token),
                 'expires_at' => $expiresIn ? now()->addSeconds($expiresIn) : null,
                 'scopes' => $scopes,
                 'meta' => [
@@ -117,12 +120,22 @@ class MetaController extends Controller
                     'name' => $metaUser->getName(),
                     'email' => $metaUser->getEmail(),
                     'long_lived' => $longLived,
-                    'pages' => $pages,
+                    'pages' => $this->publicPages($pages),
+                    'instagram_accounts' => $instagram,
                     'ad_accounts' => $adAccounts,
                     'selected_ad_account_id' => $selectedAccount !== '' ? $selectedAccount : null,
                 ],
                 'connected_at' => now(),
             ],
+        );
+
+        app(AuditLogger::class)->record(
+            $workspace,
+            'meta.connected',
+            'Meta connected for this workspace',
+            $request->user(),
+            $integration,
+            ['long_lived' => $longLived, 'pages' => count($pages), 'ad_accounts' => count($adAccounts)],
         );
 
         Inertia::flash('toast', [
@@ -166,8 +179,9 @@ class MetaController extends Controller
 
     /**
      * Best-effort asset discovery (pages, ad accounts). Never fatal.
+     * Page access tokens are stored server-side only and never sent to the UI.
      *
-     * @return array<int, array{id: string, name: string}>
+     * @return array<int, array{id: string, name: string, access_token?: string, instagram_business_account?: array<string, mixed>}>
      */
     private function discover(string $token, string $path, bool $allowed): array
     {
@@ -178,7 +192,7 @@ class MetaController extends Controller
         try {
             $response = Http::timeout(15)->get($this->graphUrl($path), [
                 'access_token' => $token,
-                'fields' => 'id,name',
+                'fields' => 'id,name,account_id,currency,timezone_name',
                 'limit' => 50,
             ]);
 
@@ -187,13 +201,126 @@ class MetaController extends Controller
             }
 
             return collect($response->json('data') ?? [])
-                ->map(fn ($row) => ['id' => (string) ($row['id'] ?? ''), 'name' => (string) ($row['name'] ?? '')])
+                ->map(fn ($row) => [
+                    'id' => (string) ($row['id'] ?? $row['account_id'] ?? ''),
+                    'name' => (string) ($row['name'] ?? ''),
+                    'currency' => $row['currency'] ?? null,
+                    'timezone' => $row['timezone_name'] ?? null,
+                ])
                 ->filter(fn ($row) => $row['id'] !== '')
                 ->values()
                 ->all();
         } catch (Throwable) {
             return [];
         }
+    }
+
+    /**
+     * @return array<int, array{id: string, name: string, access_token?: string}>
+     */
+    private function discoverPages(string $token, bool $allowed): array
+    {
+        if (! $allowed) {
+            return [];
+        }
+
+        try {
+            $response = Http::timeout(15)->get($this->graphUrl('/me/accounts'), [
+                'access_token' => $token,
+                'fields' => 'id,name,access_token,instagram_business_account{id,username}',
+                'limit' => 50,
+            ]);
+
+            if (! $response->successful()) {
+                return [];
+            }
+
+            return collect($response->json('data') ?? [])
+                ->map(fn ($row) => array_filter([
+                    'id' => (string) ($row['id'] ?? ''),
+                    'name' => (string) ($row['name'] ?? ''),
+                    'access_token' => filled($row['access_token'] ?? null) ? (string) $row['access_token'] : null,
+                    'instagram_business_account' => $row['instagram_business_account'] ?? null,
+                ], fn ($value) => $value !== null && $value !== ''))
+                ->filter(fn ($row) => ($row['id'] ?? '') !== '')
+                ->values()
+                ->all();
+        } catch (Throwable) {
+            return [];
+        }
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $pages
+     * @return array<int, array{id: string, name: string, page_id: string}>
+     */
+    private function discoverInstagram(array $pages): array
+    {
+        $accounts = [];
+
+        foreach ($pages as $page) {
+            $ig = $page['instagram_business_account'] ?? null;
+            if (! is_array($ig) || ! filled($ig['id'] ?? null)) {
+                continue;
+            }
+
+            $accounts[] = [
+                'id' => (string) $ig['id'],
+                'name' => (string) ($ig['username'] ?? $ig['id']),
+                'page_id' => (string) ($page['id'] ?? ''),
+            ];
+        }
+
+        return $accounts;
+    }
+
+    /**
+     * Persist page identity only. Page tokens stay in the encrypted
+     * refresh_token column, never in the public meta JSON.
+     *
+     * @param  array<int, array<string, mixed>>  $pages
+     * @return array<int, array{id: string, name: string}>
+     */
+    private function publicPages(array $pages): array
+    {
+        return collect($pages)
+            ->map(fn ($page) => [
+                'id' => (string) ($page['id'] ?? ''),
+                'name' => (string) ($page['name'] ?? ''),
+            ])
+            ->filter(fn ($page) => $page['id'] !== '')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $pages
+     */
+    private function encryptedPageSecrets(array $pages, ?string $existing): ?string
+    {
+        $secrets = is_string($existing) && $existing !== ''
+            ? (json_decode($existing, true) ?: [])
+            : [];
+
+        if (! is_array($secrets)) {
+            $secrets = [];
+        }
+
+        $pageTokens = [];
+
+        foreach ($pages as $page) {
+            if (! filled($page['id'] ?? null) || ! filled($page['access_token'] ?? null)) {
+                continue;
+            }
+
+            $pageTokens[(string) $page['id']] = (string) $page['access_token'];
+        }
+
+        if ($pageTokens !== []) {
+            $secrets['page_tokens'] = $pageTokens;
+        }
+
+        return $secrets === [] ? null : json_encode($secrets, JSON_THROW_ON_ERROR);
     }
 
     private function graphUrl(string $path): string

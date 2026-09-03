@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
     'date',
     'impressions',
     'clicks',
+    'reach',
     'spend_cents',
 ])]
 class AdCampaignStat extends Model
@@ -34,6 +35,7 @@ class AdCampaignStat extends Model
             'date' => 'date',
             'impressions' => 'integer',
             'clicks' => 'integer',
+            'reach' => 'integer',
             'spend_cents' => 'integer',
         ];
     }

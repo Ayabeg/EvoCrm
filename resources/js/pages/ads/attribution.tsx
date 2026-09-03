@@ -57,15 +57,18 @@ export default function AdsAttribution({ campaigns, funnels, totals, meta }: Pro
 
                 <KpiMeter
                     items={[
-                        { label: 'Spend', value: formatDzd(totals.spend_cents) },
-                        { label: 'Impressions', value: totals.impressions.toLocaleString() },
-                        { label: 'Clicks', value: totals.clicks.toLocaleString() },
+                        { label: 'Spend (Meta)', value: formatDzd(totals.spend_cents) },
+                        { label: 'Impressions (Meta)', value: totals.impressions.toLocaleString() },
+                        { label: 'Clicks (Meta)', value: totals.clicks.toLocaleString() },
                         {
-                            label: 'Conv. / Leads',
+                            label: 'Leads (CRM)',
                             value: String(totals.conversations + totals.form_leads),
                         },
-                        { label: 'Deals', value: String(totals.deals) },
-                        { label: 'Won', value: String(totals.won) },
+                        { label: 'Won (CRM)', value: String(totals.won) },
+                        {
+                            label: 'ROAS (calc)',
+                            value: totals.roas == null ? 'Not enough data' : `${totals.roas}x`,
+                        },
                     ]}
                 />
 
@@ -87,7 +90,10 @@ export default function AdsAttribution({ campaigns, funnels, totals, meta }: Pro
                     </HairlinePanel>
                 ) : (
                     <div className="grid gap-3 xl:grid-cols-2">
-                        {campaigns.map((campaign) => (
+                        {campaigns.map((campaign) => {
+                            const funnel = funnels[campaign.id] ?? EMPTY_FUNNEL;
+
+                            return (
                             <HairlinePanel key={campaign.id} className="space-y-3 p-4">
                                 <div className="flex flex-wrap items-center gap-2">
                                     <Link
@@ -104,16 +110,22 @@ export default function AdsAttribution({ campaigns, funnels, totals, meta }: Pro
                                         {campaign.account?.name ?? '-'}
                                     </span>
                                 </div>
-                                <FunnelBoard funnel={funnels[campaign.id] ?? EMPTY_FUNNEL} compact />
+                                <FunnelBoard funnel={funnel} compact />
                                 <p className="aurora-text-caption text-mute">
-                                    Spend {formatDzd((funnels[campaign.id] ?? EMPTY_FUNNEL).spend_cents)} ·{' '}
+                                    Spend {formatDzd(funnel.spend_cents)} ·{' '}
+                                    {funnel.cpl_cents == null
+                                        ? 'CPL unavailable'
+                                        : `CPL ${formatDzd(funnel.cpl_cents)}`}{' '}
+                                    ·{' '}
+                                    {funnel.roas == null ? 'ROAS unavailable' : `ROAS ${funnel.roas}x`} ·{' '}
                                     {campaign.ad_sets_count} ad sets
                                     {campaign.daily_budget_cents > 0
                                         ? ` · budget ${formatDzd(campaign.daily_budget_cents)}/day`
                                         : ''}
                                 </p>
                             </HairlinePanel>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

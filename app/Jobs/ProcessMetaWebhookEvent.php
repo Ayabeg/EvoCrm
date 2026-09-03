@@ -1,0 +1,87 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\MetaWebhookEvent;
+use App\Models\Workspace;
+use App\Services\Ads\LeadFormIngestor;
+use App\Services\Meta\MetaLeadAdsService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
+use Throwable;
+
+class ProcessMetaWebhookEvent implements ShouldQueue
+{
+    use Queueable;
+
+    public int $tries = 5;
+
+    public int $timeout = 60;
+
+    /**
+     * @return list<int>
+     */
+    public function backoff(): array
+    {
+        return [10, 30, 60, 120];
+    }
+
+    public function __construct(public int $eventId) {}
+
+    public function handle(LeadFormIngestor $ingestor, MetaLeadAdsService $leads): void
+    {
+        $event = MetaWebhookEvent::query()->with('workspace')->find($this->eventId);
+
+        if (! $event || $event->isProcessed()) {
+            return;
+        }
+
+        $event->forceFill([
+            'status' => MetaWebhookEvent::STATUS_PROCESSING,
+            'attempts' => $event->attempts + 1,
+        ])->save();
+
+        try {
+            $payload = is_array($event->payload) ? $event->payload : [];
+            $workspace = $event->workspace;
+
+            if (! $workspace instanceof Workspace) {
+                throw new RuntimeException('Webhook event has no workspace.');
+            }
+
+            if (! isset($payload['fields']) && ! isset($payload['field_data']) && filled($payload['leadgen_id'] ?? null)) {
+                $retrieved = $leads->retrieveLead($workspace, (string) $payload['leadgen_id']);
+                $payload = array_merge($payload, $leads->normalizeLeadRow($retrieved));
+            }
+
+            $ingestor->ingest($workspace, $payload);
+
+            $event->forceFill([
+                'status' => MetaWebhookEvent::STATUS_PROCESSED,
+                'processed_at' => now(),
+                'failed_at' => null,
+                'error' => null,
+            ])->save();
+
+            Log::info('meta.webhook.processed', [
+                'workspace_id' => $event->workspace_id,
+                'provider_event_id' => $event->provider_event_id,
+            ]);
+        } catch (Throwable $exception) {
+            $event->forceFill([
+                'status' => MetaWebhookEvent::STATUS_FAILED,
+                'failed_at' => now(),
+                'error' => mb_substr($exception->getMessage(), 0, 500),
+            ])->save();
+
+            Log::warning('meta.webhook.failed', [
+                'workspace_id' => $event->workspace_id,
+                'provider_event_id' => $event->provider_event_id,
+            ]);
+
+            throw $exception;
+        }
+    }
+}

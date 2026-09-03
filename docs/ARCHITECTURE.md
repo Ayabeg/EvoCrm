@@ -38,10 +38,10 @@ flowchart LR
 | **Identity** | Workspace, User, RBAC (`owner` / `admin` / `member`) |
 | **CRM** | Sales Hub: Company, Contact, Lead, Deal, Activity timeline, custom attributes, saved lists, quotes, local Product catalog + deal line items (DZD; Evostock later), reports. Operational density is the product — not a contact list. |
 | **Desk** | Sold product: EvoDesk / Chatwoot Community, embedded at `/inbox`. In EvoSales: Channel, Thread, Message as conversation history synced for CRM context + optional composer |
-| **Ads** | AdAccount, AdCampaign, AdSet, Ad, AdCampaignStat (daily insights), AdLead. Funnel: Impressions → Clicks → Conversations/Leads → Qualified → Deals → Won, attributed via `threads.ad_campaign_id` / `leads.ad_campaign_id`. `MetaAdsService` syncs the official Marketing API when `META_*` is set; demo seed data otherwise |
+| **Ads** | AdAccount, AdCampaign, AdSet, Ad, AdCampaignStat (daily insights), AdLead. Funnel: Impressions → Clicks → Conversations/Leads → Qualified → Deals → Won, attributed via `threads.ad_campaign_id` / `leads.ad_campaign_id` / `leads.ad_set_id` / `leads.ad_id`. Workspace Meta OAuth (encrypted `Integration`) drives Graph sync, Lead Ads webhooks, and Conversions API feedback. See [meta-integration.md](./meta-integration.md). |
 | **Outbound** | Mailbox (SMTP + IMAP, warmup status, daily limit), OutboundTemplate (`{{variables}}`), Sequence, SequenceStep, Enrollment (active/paused/finished/cancelled), OutboundMessage (out + in, open pixel, replied_at), Suppression, QuietHours. `outbound:run` sends due steps every minute; `outbound:poll-replies` reads IMAP replies |
 | **Evolution** | Cloud-only instance lifecycle, session text, template send, webhook ingest |
-| **Integrations** | Env-driven Meta + embedded EvoDesk URL; later Embedded Signup |
+| **Integrations** | Workspace Meta OAuth (encrypted tokens), env app credentials, embedded EvoDesk URL; later Embedded Signup |
 
 ## Canonical objects
 
@@ -89,7 +89,7 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 ## Security
 
 - Mailbox SMTP passwords use Laravel’s `encrypted` cast (APP_KEY).
-- Meta and Evolution tokens live in environment variables only — never committed.
+- Meta app credentials (`META_APP_ID`, `META_APP_SECRET`) live in the environment. Workspace user/page tokens are encrypted on `integrations` (`APP_KEY`) and never sent to the frontend.
 - Workspace RBAC: `owner` and `admin` manage settings; members work the rooms.
 - Quiet hours default 21:00–08:00 `Africa/Algiers`.
 - Public `/unsubscribe` writes Suppression.
@@ -100,7 +100,6 @@ Quiet hours (Africa/Algiers) and the suppression list run **before** automated O
 
 - Meta Tech Provider / Embedded Signup
 - Evoleads scraper
-- Live Meta OAuth
 - Bounce tracking via ESP webhooks (reports page is honest about this)
 - Telegram channel (status `later`)
 

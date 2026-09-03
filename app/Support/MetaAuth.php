@@ -66,7 +66,13 @@ class MetaAuth
                 'key' => 'ads',
                 'label' => 'Ads',
                 'scope' => 'ads_management',
-                'granted' => $granted(['ads_management']),
+                'granted' => $granted(['ads_management', 'ads_read']),
+            ],
+            [
+                'key' => 'lead_ads',
+                'label' => 'Lead Ads',
+                'scope' => 'leads_retrieval',
+                'granted' => $granted(['leads_retrieval']),
             ],
         ];
     }

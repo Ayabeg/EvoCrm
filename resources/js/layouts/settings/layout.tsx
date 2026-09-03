@@ -142,7 +142,9 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         page.component === 'settings/connectors' ||
         page.component === 'settings/system-health' ||
         page.component === 'settings/audit' ||
-        page.component === 'settings/playbooks';
+        page.component === 'settings/playbooks' ||
+        page.component === 'settings/meta' ||
+        page.component === 'settings/apps/meta';
 
     return (
         <div className="px-4 py-6">

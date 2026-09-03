@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['workspace_id', 'external_id', 'name', 'status', 'currency'])]
+#[Fillable(['workspace_id', 'external_id', 'name', 'status', 'currency', 'timezone'])]
 class AdAccount extends Model
 {
     use BelongsToWorkspace;

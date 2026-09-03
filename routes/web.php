@@ -99,6 +99,9 @@ Route::post('/webhooks/outbound/bounces/{webhookKey}', [OutboundBounceWebhookCon
     ->whereAlphaNumeric('webhookKey')
     ->middleware('throttle:120,1')
     ->name('webhooks.outbound.bounces');
+Route::get('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::class, 'verify'])
+    ->whereAlphaNumeric('webhookKey')
+    ->name('webhooks.meta.leads.verify');
 Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::class, 'handle'])
     ->whereAlphaNumeric('webhookKey')
     ->middleware('throttle:60,1')
@@ -332,6 +335,9 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::put('/settings/permissions/{user}', [PermissionsController::class, 'update'])->name('settings.permissions.update');
     Route::middleware('can-manage-settings')->group(function () {
         Route::put('/settings/meta/ad-account', [MetaSettingsController::class, 'updateAdAccount'])->name('settings.meta.ad-account');
+        Route::put('/settings/meta/mappings', [MetaSettingsController::class, 'updateMappings'])->name('settings.meta.mappings');
+        Route::put('/settings/meta/conversions', [MetaSettingsController::class, 'updateConversions'])->name('settings.meta.conversions');
+        Route::post('/settings/meta/sync', [MetaSettingsController::class, 'sync'])->name('settings.meta.sync');
         Route::get('/settings/record-layouts', [RecordLayoutSettingsController::class, 'index'])->name('settings.record-layouts');
         Route::post('/settings/pipelines', [PipelineController::class, 'store'])->name('settings.pipelines.store');
         Route::patch('/settings/pipelines/{pipeline}', [PipelineController::class, 'update'])->name('settings.pipelines.update');

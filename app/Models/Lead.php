@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'contact_id',
     'company_id',
     'ad_campaign_id',
+    'ad_set_id',
+    'ad_id',
     'title',
     'status',
     'source',
@@ -50,6 +52,16 @@ class Lead extends Model
     public function adCampaign(): BelongsTo
     {
         return $this->belongsTo(AdCampaign::class);
+    }
+
+    public function adSet(): BelongsTo
+    {
+        return $this->belongsTo(AdSet::class);
+    }
+
+    public function ad(): BelongsTo
+    {
+        return $this->belongsTo(Ad::class);
     }
 
     public function deal(): HasOne

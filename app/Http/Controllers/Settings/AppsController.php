@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Models\Integration;
 use App\Models\Mailbox;
+use App\Services\Operations\AuditLogger;
 use App\Support\GoogleAuth;
 use App\Support\MetaAuth;
 use Illuminate\Http\RedirectResponse;
@@ -86,8 +87,9 @@ class AppsController extends Controller
                 'account_name' => $integration->meta['name'] ?? null,
                 'account_email' => $integration->meta['email'] ?? null,
                 'long_lived' => (bool) ($integration->meta['long_lived'] ?? false),
-                'pages' => $integration->meta['pages'] ?? [],
-                'ad_accounts' => $integration->meta['ad_accounts'] ?? [],
+                'pages' => $this->publicAssets($integration->meta['pages'] ?? []),
+                'instagram_accounts' => $this->publicAssets($integration->meta['instagram_accounts'] ?? []),
+                'ad_accounts' => $this->publicAssets($integration->meta['ad_accounts'] ?? []),
             ],
             'unlocks' => MetaAuth::unlocks($integration),
             'graph_version' => MetaAuth::graphVersion(),
@@ -96,9 +98,17 @@ class AppsController extends Controller
 
     public function destroyMeta(Request $request): RedirectResponse
     {
-        $integration = $request->user()->workspace->integration(Integration::PROVIDER_META);
+        $workspace = $request->user()->workspace;
+        $integration = $workspace->integration(Integration::PROVIDER_META);
 
         $integration?->delete();
+
+        app(AuditLogger::class)->record(
+            $workspace,
+            'meta.disconnected',
+            'Meta disconnected for this workspace',
+            $request->user(),
+        );
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -106,5 +116,30 @@ class AppsController extends Controller
         ]);
 
         return redirect()->route('settings.apps');
+    }
+
+    /**
+     * @return list<array{id: string, name: string}>
+     */
+    private function publicAssets(mixed $assets): array
+    {
+        if (! is_array($assets)) {
+            return [];
+        }
+
+        $public = [];
+
+        foreach ($assets as $asset) {
+            if (! is_array($asset) || ! filled($asset['id'] ?? null)) {
+                continue;
+            }
+
+            $public[] = [
+                'id' => (string) $asset['id'],
+                'name' => (string) ($asset['name'] ?? $asset['id']),
+            ];
+        }
+
+        return $public;
     }
 }

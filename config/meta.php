@@ -27,16 +27,21 @@ return [
 
     'graph_version' => env('META_GRAPH_VERSION', 'v21.0'),
 
+    'webhook_verify_token' => env('META_WEBHOOK_VERIFY_TOKEN'),
+
     'scopes' => [
         'public_profile',
         'email',
         'pages_show_list',
         'pages_manage_metadata',
+        'pages_read_engagement',
+        'leads_retrieval',
         'instagram_basic',
         'instagram_manage_messages',
         'whatsapp_business_management',
         'whatsapp_business_messaging',
         'ads_management',
+        'ads_read',
         'business_management',
     ],
 

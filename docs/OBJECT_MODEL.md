@@ -59,9 +59,17 @@ All domain rows are scoped by `workspace_id` unless noted.
 
 | Object | Notes |
 | --- | --- |
-| **AdAccount** | Meta ad account listing (env connection, no invented IDs). |
-| **AdCampaign** | Campaign / ads “Campaign” object. Flags: `click_to_whatsapp`, `lead_form`. |
-| **AdLead** | Raw lead-form payload linked to Contact + Lead. |
+| **AdAccount** | Workspace Meta ad account (external id, currency, timezone, status). |
+| **AdCampaign** | Campaign object. Flags: `click_to_whatsapp`, `lead_form`. Budget + start/end when Meta sends them. |
+| **AdSet** | Ad set under a campaign (optimization goal, targeting summary). |
+| **Ad** | Ad + creative reference under an ad set. |
+| **AdLead** | Raw lead-form payload linked to Contact + Lead, with campaign/ad set/ad/page attribution. |
+| **MetaLeadForm** | Synced Instant Form catalog. |
+| **MetaFieldMapping** | Tenant map of Meta form fields → CRM properties. |
+| **MetaWebhookEvent** | Durable Lead Ads webhook envelope (idempotent, queue-backed). |
+| **MetaConversionConfig** | CRM lifecycle → Meta standard event mapping (disabled until a pixel is set). |
+| **MetaConversionEvent** | Outbound Conversions API attempt log (hashed user data only). |
+| **MetaSyncRun** | Ads / forms / historical lead sync run. |
 
 ## Evolution
 
