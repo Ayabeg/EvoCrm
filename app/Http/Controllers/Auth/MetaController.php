@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Integration;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Operations\AuditLogger;
 use App\Support\MetaAuth;
 use Illuminate\Http\RedirectResponse;
@@ -137,6 +138,12 @@ class MetaController extends Controller
             $integration,
             ['long_lived' => $longLived, 'pages' => count($pages), 'ad_accounts' => count($adAccounts)],
         );
+
+        app(ProductAnalytics::class)->capture(ProductAnalytics::INTEGRATION_CONNECTED, [
+            'provider' => Integration::PROVIDER_META,
+            'pages' => count($pages),
+            'ad_accounts' => count($adAccounts),
+        ], $request->user(), $workspace);
 
         Inertia::flash('toast', [
             'type' => 'success',

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\MetaWebhookEvent;
 use App\Models\Workspace;
 use App\Services\Ads\LeadFormIngestor;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Meta\MetaLeadAdsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -30,7 +31,7 @@ class ProcessMetaWebhookEvent implements ShouldQueue
 
     public function __construct(public int $eventId) {}
 
-    public function handle(LeadFormIngestor $ingestor, MetaLeadAdsService $leads): void
+    public function handle(LeadFormIngestor $ingestor, MetaLeadAdsService $leads, ProductAnalytics $analytics): void
     {
         $event = MetaWebhookEvent::query()->with('workspace')->find($this->eventId);
 
@@ -57,6 +58,12 @@ class ProcessMetaWebhookEvent implements ShouldQueue
             }
 
             $ingestor->ingest($workspace, $payload);
+
+            $analytics->capture(ProductAnalytics::META_LEAD_RECEIVED, [
+                'provider_event_id' => $event->provider_event_id,
+                'leadgen_id' => $payload['leadgen_id'] ?? null,
+                'form_id' => $payload['form_id'] ?? null,
+            ], null, $workspace);
 
             $event->forceFill([
                 'status' => MetaWebhookEvent::STATUS_PROCESSED,

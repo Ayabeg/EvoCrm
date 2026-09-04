@@ -13,6 +13,7 @@ use App\Models\Stage;
 use App\Models\Workflow;
 use App\Models\WorkflowExecution;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Outbound\QuietHoursGuard;
 use App\Services\Outbound\SequenceEnrollment;
 use Illuminate\Support\Facades\Http;
@@ -26,6 +27,7 @@ class WorkflowRunner
         private SequenceEnrollment $enrollment,
         private CustomAttributes $attributes,
         private QuietHoursGuard $quietHours,
+        private ProductAnalytics $analytics,
     ) {}
 
     public function handleContactCreated(Contact $contact): void
@@ -244,6 +246,15 @@ class WorkflowRunner
             Workflow::ACTION_NOTIFY_USER => $this->notifyUser($workspace, $config, $contact, $deal),
             default => null,
         };
+
+        $this->analytics->capture(ProductAnalytics::WORKFLOW_EXECUTED, [
+            'workflow_id' => $workflow->id,
+            'workflow_name' => $workflow->name,
+            'trigger' => $workflow->trigger,
+            'action' => $action,
+            'contact_id' => $contact?->id,
+            'deal_id' => $deal?->id,
+        ], null, $workspace);
     }
 
     private function conditionPasses(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): bool

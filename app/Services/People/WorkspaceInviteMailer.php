@@ -4,6 +4,7 @@ namespace App\Services\People;
 
 use App\Mail\WorkspaceInviteMail;
 use App\Models\User;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Outbound\MailerFactory;
 use App\Services\Outbound\SmtpMailboxMailer;
 use Illuminate\Support\Facades\Mail;
@@ -17,7 +18,10 @@ use Illuminate\Support\Facades\Password;
  */
 class WorkspaceInviteMailer
 {
-    public function __construct(private MailerFactory $mailers) {}
+    public function __construct(
+        private MailerFactory $mailers,
+        private ProductAnalytics $analytics,
+    ) {}
 
     public function send(User $invitee, User $inviter): InviteSendResult
     {
@@ -44,6 +48,7 @@ class WorkspaceInviteMailer
         // mailable goes through the Laravel mailer so Mail::fake() asserts it.
         if (app()->environment('testing') || config('mail.default') === 'array') {
             Mail::to($invitee->email)->send($mailable);
+            $this->recordInvite($invitee, $inviter);
 
             return InviteSendResult::sent();
         }
@@ -67,7 +72,17 @@ class WorkspaceInviteMailer
             return InviteSendResult::failed($e->getMessage());
         }
 
+        $this->recordInvite($invitee, $inviter);
+
         return InviteSendResult::sent();
+    }
+
+    private function recordInvite(User $invitee, User $inviter): void
+    {
+        $this->analytics->capture(ProductAnalytics::USER_INVITED, [
+            'invitee_id' => $invitee->id,
+            'role' => $invitee->role->value,
+        ], $inviter, $invitee->workspace);
     }
 
     /**

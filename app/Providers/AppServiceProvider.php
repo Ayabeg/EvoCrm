@@ -2,13 +2,18 @@
 
 namespace App\Providers;
 
+use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\User;
+use App\Models\Workspace;
+use App\Observers\CompanyObserver;
 use App\Observers\ContactObserver;
 use App\Observers\DealObserver;
 use App\Observers\LeadObserver;
+use App\Observers\WorkspaceObserver;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Connectors\FakeGoogleApiClient;
 use App\Services\Connectors\GoogleApiClient;
 use App\Services\Connectors\HttpGoogleApiClient;
@@ -41,15 +46,20 @@ class AppServiceProvider extends ServiceProvider
                 : $app->make(HttpGoogleApiClient::class);
         });
         $this->app->singleton(FakeGoogleApiClient::class);
+        $this->app->singleton(ProductAnalytics::class);
     }
 
     public function boot(): void
     {
         $this->configureDefaults();
 
+        Company::observe(CompanyObserver::class);
         Contact::observe(ContactObserver::class);
         Deal::observe(DealObserver::class);
         Lead::observe(LeadObserver::class);
+        Workspace::observe(WorkspaceObserver::class);
+
+        app()->terminating(fn () => app(ProductAnalytics::class)->flush());
 
         // Meta workspace OAuth rides Socialite's official Facebook provider
         // under the "meta" driver name, configured from META_* env vars.
@@ -70,6 +80,11 @@ class AppServiceProvider extends ServiceProvider
             $user = $event->user;
             if ($user instanceof User) {
                 $user->forceFill(['last_login_at' => now()])->save();
+                $analytics = app(ProductAnalytics::class);
+                $analytics->identify($user, $user->workspace);
+                $analytics->capture(ProductAnalytics::USER_LOGGED_IN, [
+                    'email' => $user->email,
+                ], $user, $user->workspace);
                 if ($user->workspace) {
                     app(AuditLogger::class)->record(
                         $user->workspace,

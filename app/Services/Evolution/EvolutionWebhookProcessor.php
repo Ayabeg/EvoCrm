@@ -8,13 +8,17 @@ use App\Models\EvolutionEvent;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\ContactIdentity;
 use App\Support\AlgerianPhone;
 use Illuminate\Support\Arr;
 
 class EvolutionWebhookProcessor
 {
-    public function __construct(private ContactIdentity $contacts) {}
+    public function __construct(
+        private ContactIdentity $contacts,
+        private ProductAnalytics $analytics,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $payload
@@ -92,6 +96,14 @@ class EvolutionWebhookProcessor
         ]);
 
         $thread->forceFill(['last_message_at' => now()])->save();
+
+        if (! $fromMe) {
+            $this->analytics->capture(ProductAnalytics::WHATSAPP_MESSAGE_RECEIVED, [
+                'message_id' => $message->id,
+                'contact_id' => $contact->id,
+                'thread_id' => $thread->id,
+            ], null, $workspace);
+        }
 
         return $message;
     }

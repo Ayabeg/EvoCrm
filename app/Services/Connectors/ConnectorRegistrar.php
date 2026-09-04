@@ -9,6 +9,7 @@ use App\Models\Connector;
 use App\Models\GoogleSyncState;
 use App\Models\Integration;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Evolution\EvolutionCloudService;
 use App\Support\GoogleAuth;
 use App\Support\MetaAuth;
@@ -33,7 +34,7 @@ class ConnectorRegistrar
             ['reason' => $this->reason($status, $provider)],
         );
 
-        return Connector::query()->updateOrCreate(
+        $connector = Connector::query()->updateOrCreate(
             [
                 'workspace_id' => $workspace->id,
                 'provider' => $provider,
@@ -49,6 +50,12 @@ class ConnectorRegistrar
                     : null,
             ]
         );
+
+        if ($status === ConnectorStatus::Connected && ! $existing?->connected_at) {
+            $this->recordConnection($workspace, $provider->value);
+        }
+
+        return $connector;
     }
 
     /**
@@ -62,7 +69,7 @@ class ConnectorRegistrar
 
         $this->persistGoogleTokens($workspace, $provider, $config);
 
-        return Connector::query()->updateOrCreate(
+        $connector = Connector::query()->updateOrCreate(
             [
                 'workspace_id' => $workspace->id,
                 'provider' => $provider,
@@ -74,6 +81,17 @@ class ConnectorRegistrar
                 'connected_at' => now(),
             ]
         );
+
+        $this->recordConnection($workspace, $provider->value);
+
+        return $connector;
+    }
+
+    private function recordConnection(Workspace $workspace, string $provider): void
+    {
+        app(ProductAnalytics::class)->capture(ProductAnalytics::INTEGRATION_CONNECTED, [
+            'provider' => $provider,
+        ], null, $workspace);
     }
 
     /**

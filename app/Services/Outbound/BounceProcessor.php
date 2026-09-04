@@ -4,10 +4,14 @@ namespace App\Services\Outbound;
 
 use App\Models\OutboundMessage;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 
 class BounceProcessor
 {
-    public function __construct(private SuppressionService $suppressions) {}
+    public function __construct(
+        private SuppressionService $suppressions,
+        private ProductAnalytics $analytics,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $payload
@@ -41,6 +45,12 @@ class BounceProcessor
         if ($type === 'hard' && filled($message->to_address)) {
             $this->suppressions->suppress($workspace, 'email', (string) $message->to_address, 'hard_bounce', 'webhook');
         }
+
+        $this->analytics->capture(ProductAnalytics::EMAIL_BOUNCED, [
+            'message_id' => $message->id,
+            'bounce_type' => $type,
+            'contact_id' => $message->contact_id,
+        ], null, $workspace);
 
         return $message->fresh() ?? $message;
     }

@@ -97,4 +97,13 @@ return [
         'timeout' => 8,
     ],
 
+    /*
+    | PostHog product analytics + data hub. The project token is safe to
+    | expose to the browser. Leave empty to disable capture in local/CI.
+    */
+    'posthog' => [
+        'api_key' => env('POSTHOG_API_KEY', env('VITE_POSTHOG_KEY')),
+        'host' => env('POSTHOG_HOST', env('VITE_POSTHOG_HOST', 'https://us.i.posthog.com')),
+    ],
+
 ];

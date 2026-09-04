@@ -6,6 +6,7 @@ use App\Mail\WorkspaceHtmlMail;
 use App\Models\Mailbox;
 use App\Models\Quote;
 use App\Models\User;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Operations\AuditLogger;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -16,6 +17,7 @@ class QuoteMailer
         private QuoteDocument $documents,
         private ActivityRecorder $activities,
         private AuditLogger $audit,
+        private ProductAnalytics $analytics,
     ) {}
 
     public function send(Quote $quote, User $actor, string $to): Quote
@@ -74,6 +76,12 @@ class QuoteMailer
                 ['to' => $to],
             );
         }
+
+        $this->analytics->capture(ProductAnalytics::QUOTE_SENT, [
+            'quote_id' => $quote->id,
+            'deal_id' => $quote->deal_id,
+            'amount_cents' => $quote->total_cents,
+        ], $actor, $quote->workspace);
 
         return $quote->fresh() ?? $quote;
     }

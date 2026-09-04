@@ -1,4 +1,4 @@
-import type { Auth } from '@/types/auth';
+import type { Auth, PosthogShared, Workspace } from '@/types/auth';
 import type { SharedIntegrations } from '@/types/integrations';
 
 declare module 'react' {
@@ -13,6 +13,8 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
+            workspace: Workspace | null;
+            posthog: PosthogShared;
             integrations: SharedIntegrations;
             sidebarOpen: boolean;
             [key: string]: unknown;
