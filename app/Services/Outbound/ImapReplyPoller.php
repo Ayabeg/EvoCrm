@@ -7,6 +7,7 @@ use App\Models\Enrollment;
 use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\WorkflowRunner;
 use RuntimeException;
 
@@ -19,7 +20,10 @@ use RuntimeException;
  */
 class ImapReplyPoller
 {
-    public function __construct(private WorkflowRunner $workflows) {}
+    public function __construct(
+        private WorkflowRunner $workflows,
+        private ProductAnalytics $analytics,
+    ) {}
 
     /**
      * @return array{mailbox: string, replies: int, error: string|null}
@@ -133,6 +137,12 @@ class ImapReplyPoller
 
         if ($lastOutbound && ! $lastOutbound->replied_at) {
             $lastOutbound->forceFill(['replied_at' => now()])->save();
+            $this->analytics->capture(ProductAnalytics::EMAIL_REPLIED, [
+                'contact_id' => $contact->id,
+                'message_id' => $lastOutbound->id,
+                'sequence_id' => $lastOutbound->sequence_id,
+                'mailbox_id' => $mailbox->id,
+            ], null, $contact->workspace ?? $mailbox->workspace);
             $this->branchEnrollmentOnReply($contact, $lastOutbound);
             $this->pauseEnrollmentOnReply($contact, $lastOutbound);
         }

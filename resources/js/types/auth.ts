@@ -13,6 +13,21 @@ export type User = {
     [key: string]: unknown;
 };
 
+export type Workspace = {
+    id: number;
+    name: string;
+    slug: string;
+    timezone?: string;
+    [key: string]: unknown;
+};
+
+export type PosthogShared = {
+    enabled: boolean;
+    key: string | null;
+    host: string;
+    distinct_id: string | null;
+};
+
 export type Auth = {
     user: User;
     capabilities: string[];

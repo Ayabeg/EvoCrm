@@ -5,11 +5,16 @@ namespace App\Services\Crm;
 use App\Models\Contact;
 use App\Models\SavedFilter;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use Illuminate\Support\Facades\DB;
 
 class SegmentMatcher
 {
-    public function __construct(private CrmFilter $filter, private WorkflowRunner $workflows) {}
+    public function __construct(
+        private CrmFilter $filter,
+        private WorkflowRunner $workflows,
+        private ProductAnalytics $analytics,
+    ) {}
 
     public function syncContact(Contact $contact): void
     {
@@ -47,6 +52,11 @@ class SegmentMatcher
                     'updated_at' => now(),
                 ]);
 
+                $this->analytics->capture(ProductAnalytics::SEGMENT_ENTERED, [
+                    'contact_id' => $contact->id,
+                    'segment_id' => $segment->id,
+                    'segment_name' => $segment->name,
+                ], null, $workspace);
                 $this->workflows->handleSegmentEntered($contact, $segment);
             }
 
@@ -58,6 +68,11 @@ class SegmentMatcher
                         'updated_at' => now(),
                     ]);
 
+                $this->analytics->capture(ProductAnalytics::SEGMENT_EXITED, [
+                    'contact_id' => $contact->id,
+                    'segment_id' => $segment->id,
+                    'segment_name' => $segment->name,
+                ], null, $workspace);
                 $this->workflows->handleSegmentExited($contact, $segment);
             }
         }

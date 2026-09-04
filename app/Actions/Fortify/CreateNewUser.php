@@ -5,6 +5,7 @@ namespace App\Actions\Fortify;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\User;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Identity\WorkspaceProvisioner;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -36,6 +37,13 @@ class CreateNewUser implements CreatesNewUsers
             $user,
         );
 
-        return $user->fresh();
+        $user = $user->fresh() ?? $user;
+        $analytics = app(ProductAnalytics::class);
+        $analytics->identify($user, $user->workspace);
+        $analytics->capture(ProductAnalytics::USER_SIGNED_UP, [
+            'email' => $user->email,
+        ], $user, $user->workspace);
+
+        return $user;
     }
 }

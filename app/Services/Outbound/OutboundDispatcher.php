@@ -7,6 +7,7 @@ use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Models\Sequence;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Evolution\EvolutionCloudService;
 
 class OutboundDispatcher
@@ -17,6 +18,7 @@ class OutboundDispatcher
         private QuietHoursGuard $quietHours,
         private EvolutionCloudService $evolution,
         private TemplateRenderer $templates,
+        private ProductAnalytics $analytics,
     ) {}
 
     /**
@@ -77,7 +79,10 @@ class OutboundDispatcher
             $message->forceFill(['mailbox_id' => $mailbox->id])->save();
         }
 
-        return $this->mailers->for($workspace, $mailbox)->send($message);
+        $sent = $this->mailers->for($workspace, $mailbox)->send($message);
+        $this->recordOutbound($workspace, $sent);
+
+        return $sent;
     }
 
     /**
@@ -128,6 +133,27 @@ class OutboundDispatcher
             'sent_at' => $result['ok'] ? now() : null,
         ])->save();
 
+        $this->recordOutbound($contact->workspace ?? $message->workspace, $message);
+
         return $message;
+    }
+
+    private function recordOutbound(?Workspace $workspace, OutboundMessage $message): void
+    {
+        if ($message->status !== 'sent' || ! $workspace instanceof Workspace) {
+            return;
+        }
+
+        $event = $message->channel === 'whatsapp_cloud'
+            ? ProductAnalytics::WHATSAPP_MESSAGE_SENT
+            : ProductAnalytics::EMAIL_SENT;
+
+        $this->analytics->capture($event, [
+            'message_id' => $message->id,
+            'channel' => $message->channel,
+            'contact_id' => $message->contact_id,
+            'sequence_id' => $message->sequence_id,
+            'campaign_id' => $message->campaign_id,
+        ], null, $workspace);
     }
 }

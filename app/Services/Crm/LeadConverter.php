@@ -6,6 +6,7 @@ use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\Stage;
 use App\Models\User;
+use App\Services\Analytics\ProductAnalytics;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -14,6 +15,7 @@ class LeadConverter
     public function __construct(
         private ActivityRecorder $activities,
         private PipelineManager $pipelines,
+        private ProductAnalytics $analytics,
     ) {}
 
     /**
@@ -60,6 +62,13 @@ class LeadConverter
                     'source' => $lead->source,
                 ],
             ], $actor);
+
+            $this->analytics->capture(ProductAnalytics::LEAD_CONVERTED, [
+                'lead_id' => $lead->id,
+                'deal_id' => $deal->id,
+                'mode' => $mode,
+                'source' => $lead->source,
+            ], $actor, $workspace);
 
             return $deal->fresh() ?? $deal;
         });

@@ -51,6 +51,12 @@ class HandleInertiaRequests extends Middleware
                     : [],
             ],
             'workspace' => $user?->workspace,
+            'posthog' => [
+                'enabled' => filled(config('services.posthog.api_key')),
+                'key' => config('services.posthog.api_key'),
+                'host' => config('services.posthog.host', 'https://us.i.posthog.com'),
+                'distinct_id' => $user ? (string) $user->id : null,
+            ],
             'integrations' => fn () => Integrations::forWorkspace($user?->workspace),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

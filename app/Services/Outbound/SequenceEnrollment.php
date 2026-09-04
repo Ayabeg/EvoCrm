@@ -6,6 +6,7 @@ use App\Models\Contact;
 use App\Models\Enrollment;
 use App\Models\Sequence;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\ActivityRecorder;
 use Illuminate\Validation\ValidationException;
 
@@ -14,6 +15,7 @@ class SequenceEnrollment
     public function __construct(
         private SuppressionService $suppressions,
         private ActivityRecorder $activities,
+        private ProductAnalytics $analytics,
     ) {}
 
     public function enroll(Workspace $workspace, Sequence $sequence, Contact $contact): Enrollment
@@ -60,6 +62,14 @@ class SequenceEnrollment
             'company_id' => $contact->company_id,
             'meta' => ['sequence_id' => $sequence->id, 'enrollment_id' => $enrollment->id],
         ]);
+
+        $this->analytics->capture(ProductAnalytics::SEQUENCE_ENROLLED, [
+            'sequence_id' => $sequence->id,
+            'sequence_name' => $sequence->name,
+            'channel' => $sequence->channel,
+            'contact_id' => $contact->id,
+            'enrollment_id' => $enrollment->id,
+        ], null, $workspace);
 
         return $enrollment;
     }
