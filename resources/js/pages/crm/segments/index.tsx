@@ -1,39 +1,343 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import { CreateDrawer } from '@/components/crm/create-drawer';
+import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
+import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import SegmentFilterForm from '@/components/crm/segment-filter-form';
-import type {SegmentFilters} from '@/components/crm/segment-filter-form';
-import PageHeader from '@/components/page-header';
+import type { SegmentFilters } from '@/components/crm/segment-filter-form';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import type { ListFieldDef } from '@/lib/list-view-config';
+import { cn } from '@/lib/utils';
 
-type Segment = { id: number; name: string; entity: string; filters: SegmentFilters; count: number; campaigns: Array<{ id: number; name: string; status: string }> };
+type Segment = {
+    id: number;
+    name: string;
+    entity: string;
+    filters: SegmentFilters;
+    count: number;
+    campaigns: Array<{ id: number; name: string; status: string }>;
+};
 
-export default function SegmentsIndex({ segments, members, cities, wilayas, stages, contactFilterFields, dealFilterFields, canSyncMeta }: { segments: Segment[]; tab: string; members: { id: number; name: string }[]; cities: string[]; wilayas: string[]; stages: { id: number; name: string; slug: string }[]; contactFilterFields: ListFieldDef[]; dealFilterFields: ListFieldDef[]; canSyncMeta: boolean }) {
-    const [entityFilter, setEntityFilter] = useState<'all'|'contact'|'deal'>('all');
+export default function SegmentsIndex({
+    segments,
+    members,
+    cities,
+    wilayas,
+    stages,
+    contactFilterFields,
+    dealFilterFields,
+    canSyncMeta,
+}: {
+    segments: Segment[];
+    tab: string;
+    members: { id: number; name: string }[];
+    cities: string[];
+    wilayas: string[];
+    stages: { id: number; name: string; slug: string }[];
+    contactFilterFields: ListFieldDef[];
+    dealFilterFields: ListFieldDef[];
+    canSyncMeta: boolean;
+}) {
+    const [entityFilter, setEntityFilter] = useState<'all' | 'contact' | 'deal'>(
+        'all',
+    );
     const [search, setSearch] = useState('');
     const [createOpen, setCreateOpen] = useState(false);
     const [editSegment, setEditSegment] = useState<Segment | null>(null);
-    const [createEntity, setCreateEntity] = useState<'contact'|'deal'>('contact');
+    const [createEntity, setCreateEntity] = useState<'contact' | 'deal'>('contact');
     const [draftFilters, setDraftFilters] = useState<SegmentFilters>({});
-    const filtered = useMemo(() => segments.filter(s => (entityFilter==='all'||s.entity===entityFilter) && (!search.trim()||s.name.toLowerCase().includes(search.trim().toLowerCase()))), [entityFilter, search, segments]);
-    const fields = (e:'contact'|'deal') => e==='deal'?dealFilterFields:contactFilterFields;
-    const href = (e:string,id:number)=> e==='deal'?`/crm/deals?filter_id=${id}`:`/crm/contacts?filter_id=${id}`;
+    const filtered = useMemo(
+        () =>
+            segments.filter(
+                (segment) =>
+                    (entityFilter === 'all' || segment.entity === entityFilter) &&
+                    (!search.trim() ||
+                        segment.name
+                            .toLowerCase()
+                            .includes(search.trim().toLowerCase())),
+            ),
+        [entityFilter, search, segments],
+    );
+    const fields = (entity: 'contact' | 'deal') =>
+        entity === 'deal' ? dealFilterFields : contactFilterFields;
+    const href = (entity: string, id: number) =>
+        entity === 'deal'
+            ? `/crm/deals?filter_id=${id}`
+            : `/crm/contacts?filter_id=${id}`;
 
     return (
-        <CrmShell title="Segments"><div className="flex-1 space-y-6 p-6">
-            <PageHeader title="Segments" description="Saved views for contacts and deals."><Button type="button" onClick={()=>setCreateOpen(true)}>New segment</Button></PageHeader>
-            <div className="flex gap-2">{(['all','contact','deal'] as const).map(v=><button key={v} type="button" onClick={()=>setEntityFilter(v)} className={`rounded px-3 py-1 text-[12px] ${entityFilter===v?'bg-brand text-white':'border'}`}>{v}</button>)}<Input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search…" className="h-8 max-w-xs"/></div>
-            <Card className="overflow-hidden"><table className="w-full text-sm"><thead className="bg-muted/50 text-left text-[11px] uppercase text-muted-foreground"><tr><th className="px-4 py-2">Name</th><th className="px-4 py-2">Entity</th><th className="px-4 py-2 text-right">Count</th><th className="px-4 py-2">Campaigns</th><th className="px-4 py-2">Actions</th></tr></thead><tbody>
-                {filtered.map(s=><tr key={s.id} className="border-t border-hairline"><td className="px-4 py-3"><Link href={href(s.entity,s.id)} className="text-brand">{s.name}</Link></td><td className="px-4 py-3 capitalize">{s.entity}</td><td className="px-4 py-3 text-right">{s.count}</td><td className="px-4 py-3">{s.campaigns.map(c=><Link key={c.id} href={`/outbound/campaigns/${c.id}`} className="me-2 text-[12px] text-brand">{c.name}</Link>)}</td><td className="px-4 py-3"><Link href={`/crm/segments/${s.id}`} className="me-2 text-brand">History</Link><button type="button" className="me-2 text-brand" onClick={()=>{
-setEditSegment(s);setDraftFilters(s.filters??{})
-}}>Edit</button>{s.entity==='contact'&&canSyncMeta?<Form action={`/crm/segments/${s.id}/sync-meta`} method="post" className="inline"><Input name="audience_id" placeholder="Audience ID" className="inline h-7 w-28"/><Button type="submit" size="sm">Meta</Button></Form>:null}<button type="button" className="text-muted-foreground" onClick={()=>confirm('Delete?')&&router.delete(`/crm/segments/${s.id}`)}>Delete</button></td></tr>)}
-            </tbody></table></Card>
-            {createOpen?<Card className="p-4"><Form action="/crm/segments" method="post" onSuccess={()=>setCreateOpen(false)}>{({processing})=><><Input name="name" required placeholder="Name"/><select name="entity" value={createEntity} onChange={e=>setCreateEntity(e.target.value as 'contact'|'deal')} className="h-9 w-full rounded border px-2"><option value="contact">Contact</option><option value="deal">Deal</option></select><input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)}/><SegmentFilterForm entity={createEntity} filters={draftFilters} onChange={setDraftFilters} members={members} cities={cities} wilayas={wilayas} stages={stages} filterFields={fields(createEntity)}/><Button type="submit" disabled={processing}>Save</Button></>}</Form></Card>:null}
-            {editSegment?<Card className="p-4"><Form action={`/crm/segments/${editSegment.id}`} method="put" onSuccess={()=>setEditSegment(null)}>{({processing})=><><Input name="name" defaultValue={editSegment.name} required/><input type="hidden" name="entity" value={editSegment.entity}/><input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)}/><SegmentFilterForm entity={editSegment.entity as 'contact'|'deal'} filters={draftFilters} onChange={setDraftFilters} members={members} cities={cities} wilayas={wilayas} stages={stages} filterFields={fields(editSegment.entity as 'contact'|'deal')}/><Button type="submit" disabled={processing}>Update</Button></>}</Form></Card>:null}
-        </div></CrmShell>
+        <CrmShell title="Segments" chrome="workspace">
+            <div
+                className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink"
+                data-crm="list-workspace"
+            >
+                <CrmObjectHeader
+                    title="Segments"
+                    description="Saved views for contacts and deals."
+                    primaryLabel="New segment"
+                    onPrimary={() => {
+                        setDraftFilters({});
+                        setCreateOpen(true);
+                    }}
+                />
+                <div className="flex flex-wrap items-center gap-2 border-b border-hairline bg-canvas px-4 py-2 sm:px-6">
+                    {(['all', 'contact', 'deal'] as const).map((value) => (
+                        <button
+                            key={value}
+                            type="button"
+                            onClick={() => setEntityFilter(value)}
+                            className={cn(
+                                'h-8 rounded-md border px-3 text-[12px] capitalize',
+                                entityFilter === value
+                                    ? 'border-hairline bg-canvas-soft font-medium text-ink'
+                                    : 'border-hairline text-mute hover:text-ink',
+                            )}
+                        >
+                            {value}
+                        </button>
+                    ))}
+                    <Input
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                        placeholder="Search…"
+                        className="h-8 max-w-xs"
+                    />
+                </div>
+                <div className="flex min-h-0 flex-1 flex-col bg-canvas">
+                    {filtered.length === 0 ? (
+                        <CrmEmptyState
+                            title="No segments yet"
+                            line="Save a contact or deal view to reuse it as a list filter or campaign audience."
+                            actionLabel="New segment"
+                            onAction={() => setCreateOpen(true)}
+                        />
+                    ) : (
+                        <div className="min-h-0 flex-1 overflow-auto">
+                            <table className="w-full min-w-[640px] border-collapse text-[13px]">
+                                <thead>
+                                    <tr className="border-b border-hairline bg-canvas-soft text-left">
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:px-6">
+                                            Name
+                                        </th>
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
+                                            Entity
+                                        </th>
+                                        <th className="px-4 py-1.5 text-right text-[11px] font-medium text-mute">
+                                            Count
+                                        </th>
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
+                                            Campaigns
+                                        </th>
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pr-6">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filtered.map((segment) => (
+                                        <tr
+                                            key={segment.id}
+                                            className="border-b border-hairline hover:bg-canvas-soft"
+                                        >
+                                            <td className="px-4 py-1.5 sm:px-6">
+                                                <Link
+                                                    href={href(
+                                                        segment.entity,
+                                                        segment.id,
+                                                    )}
+                                                    className="font-medium text-ink hover:underline"
+                                                >
+                                                    {segment.name}
+                                                </Link>
+                                            </td>
+                                            <td className="px-4 py-1.5 capitalize text-mute">
+                                                {segment.entity}
+                                            </td>
+                                            <td className="px-4 py-1.5 text-right text-ink">
+                                                {segment.count}
+                                            </td>
+                                            <td className="px-4 py-1.5 text-mute">
+                                                {segment.campaigns.map((campaign) => (
+                                                    <Link
+                                                        key={campaign.id}
+                                                        href={`/outbound/campaigns/${campaign.id}`}
+                                                        className="me-2 text-[12px] text-ink hover:underline"
+                                                    >
+                                                        {campaign.name}
+                                                    </Link>
+                                                ))}
+                                            </td>
+                                            <td className="px-4 py-1.5 sm:pr-6">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <Link
+                                                        href={`/crm/segments/${segment.id}`}
+                                                        className="text-[12px] text-mute hover:text-ink"
+                                                    >
+                                                        History
+                                                    </Link>
+                                                    <button
+                                                        type="button"
+                                                        className="text-[12px] text-mute hover:text-ink"
+                                                        onClick={() => {
+                                                            setEditSegment(segment);
+                                                            setDraftFilters(
+                                                                segment.filters ?? {},
+                                                            );
+                                                        }}
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    {segment.entity === 'contact' &&
+                                                    canSyncMeta ? (
+                                                        <Form
+                                                            action={`/crm/segments/${segment.id}/sync-meta`}
+                                                            method="post"
+                                                            className="inline-flex items-center gap-1"
+                                                        >
+                                                            <Input
+                                                                name="audience_id"
+                                                                placeholder="Audience ID"
+                                                                className="h-7 w-28"
+                                                            />
+                                                            <Button
+                                                                type="submit"
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-7"
+                                                            >
+                                                                Meta
+                                                            </Button>
+                                                        </Form>
+                                                    ) : null}
+                                                    <button
+                                                        type="button"
+                                                        className="text-[12px] text-mute hover:text-ink"
+                                                        onClick={() =>
+                                                            confirm('Delete?') &&
+                                                            router.delete(
+                                                                `/crm/segments/${segment.id}`,
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                    <CrmListFooter count={filtered.length} noun="segments" />
+                </div>
+            </div>
+
+            <CreateDrawer
+                open={createOpen}
+                onOpenChange={setCreateOpen}
+                title="New segment"
+            >
+                <Form
+                    action="/crm/segments"
+                    method="post"
+                    className="space-y-3"
+                    onSuccess={() => setCreateOpen(false)}
+                >
+                    {({ processing }) => (
+                        <>
+                            <div>
+                                <Label className="mb-1 block text-[12px]">Name</Label>
+                                <Input name="name" required placeholder="Name" />
+                            </div>
+                            <select
+                                name="entity"
+                                value={createEntity}
+                                onChange={(event) =>
+                                    setCreateEntity(
+                                        event.target.value as 'contact' | 'deal',
+                                    )
+                                }
+                                className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                            >
+                                <option value="contact">Contact</option>
+                                <option value="deal">Deal</option>
+                            </select>
+                            <input
+                                type="hidden"
+                                name="filters_json"
+                                value={JSON.stringify(draftFilters)}
+                            />
+                            <SegmentFilterForm
+                                entity={createEntity}
+                                filters={draftFilters}
+                                onChange={setDraftFilters}
+                                members={members}
+                                cities={cities}
+                                wilayas={wilayas}
+                                stages={stages}
+                                filterFields={fields(createEntity)}
+                            />
+                            <div className="flex justify-end">
+                                <Button disabled={processing}>Save</Button>
+                            </div>
+                        </>
+                    )}
+                </Form>
+            </CreateDrawer>
+
+            <CreateDrawer
+                open={editSegment !== null}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setEditSegment(null);
+                    }
+                }}
+                title="Edit segment"
+            >
+                {editSegment ? (
+                    <Form
+                        action={`/crm/segments/${editSegment.id}`}
+                        method="put"
+                        className="space-y-3"
+                        onSuccess={() => setEditSegment(null)}
+                    >
+                        {({ processing }) => (
+                            <>
+                                <Input name="name" defaultValue={editSegment.name} required />
+                                <input type="hidden" name="entity" value={editSegment.entity} />
+                                <input
+                                    type="hidden"
+                                    name="filters_json"
+                                    value={JSON.stringify(draftFilters)}
+                                />
+                                <SegmentFilterForm
+                                    entity={editSegment.entity as 'contact' | 'deal'}
+                                    filters={draftFilters}
+                                    onChange={setDraftFilters}
+                                    members={members}
+                                    cities={cities}
+                                    wilayas={wilayas}
+                                    stages={stages}
+                                    filterFields={fields(
+                                        editSegment.entity as 'contact' | 'deal',
+                                    )}
+                                />
+                                <div className="flex justify-end">
+                                    <Button disabled={processing}>Update</Button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                ) : null}
+            </CreateDrawer>
+        </CrmShell>
     );
 }
-SegmentsIndex.layout = { breadcrumbs: [{ title: 'Segments', href: '/crm/segments' }] };
+
+SegmentsIndex.layout = {
+    breadcrumbs: [{ title: 'Segments', href: '/crm/segments' }],
+};

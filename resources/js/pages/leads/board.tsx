@@ -142,7 +142,7 @@ function DealCard({
             <div className="flex items-start justify-between gap-1">
                 <Link
                     href={deal.url}
-                    className="min-w-0 flex-1 truncate font-medium hover:text-brand"
+                    className="min-w-0 flex-1 truncate font-medium text-ink hover:underline"
                 >
                     {deal.title}
                 </Link>

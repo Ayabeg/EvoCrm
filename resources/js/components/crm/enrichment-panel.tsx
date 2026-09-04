@@ -72,10 +72,7 @@ export default function EnrichmentPanel({
                             disabled={processing}
                             className="h-7 gap-1.5"
                         >
-                            <Search
-                                className="size-3.5 text-brand"
-                                aria-hidden
-                            />
+                            <Search className="size-3.5" aria-hidden />
                             Enrich
                         </Button>
                     )}

@@ -99,7 +99,7 @@ export default function SequencesIndex({
                         mobileTitle: (
                             <Link
                                 href={`/outbound/sequences/${sequence.id}`}
-                                className="font-medium text-brand hover:underline"
+                                className="font-medium text-ink hover:underline"
                             >
                                 {sequence.name}
                             </Link>
@@ -142,7 +142,7 @@ export default function SequencesIndex({
                                 <div>
                                     <Link
                                         href={`/outbound/sequences/${sequence.id}`}
-                                        className="font-medium text-brand hover:underline"
+                                        className="font-medium text-ink hover:underline"
                                     >
                                         {sequence.name}
                                     </Link>

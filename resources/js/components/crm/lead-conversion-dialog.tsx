@@ -44,7 +44,7 @@ export default function LeadConversionDialog({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>Qualify</Button>
+                <Button size="sm" className="h-8">Qualify</Button>
             </DialogTrigger>
             <DialogContent size="lg">
                 <DialogHeader>

@@ -179,7 +179,7 @@ export default function Outbox({
                                             ) : null}
                                             {message.failure_reason ? (
                                                 <span
-                                                    className="block max-w-64 truncate text-xs text-brand"
+                                                    className="block max-w-64 truncate text-xs text-ink hover:underline"
                                                     title={
                                                         message.failure_reason
                                                     }

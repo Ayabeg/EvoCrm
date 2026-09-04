@@ -1,7 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -21,12 +20,12 @@ export default function QualifySettings({
     return (
         <>
             <Head title="Qualify" />
-            <div className="space-y-6">
+            <div className="space-y-4">
                 <Heading
                     title="Qualify"
                     description="Formula lead score thresholds. Crossing qualify marks the lead. Crossing convert uses the existing convert path."
                 />
-                <Card className="space-y-3 border-hairline p-4">
+                <div className="space-y-3 border-t border-hairline pt-3">
                     <Form
                         action="/settings/qualify"
                         method="put"
@@ -83,7 +82,7 @@ export default function QualifySettings({
                         Hold moves new leads to working. Qualify sets qualified.
                         Convert creates or links the unique deal.
                     </p>
-                </Card>
+                </div>
             </div>
         </>
     );

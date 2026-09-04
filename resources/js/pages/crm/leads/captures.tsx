@@ -1,12 +1,14 @@
 import { Form, Link, router } from '@inertiajs/react';
-import { Inbox, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import {
+    CrmObjectHeader,
+    CrmObjectSecondaryLink,
+} from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
-import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -83,21 +85,22 @@ export default function LeadCapturesIndex({
     };
 
     return (
-        <CrmShell title="Capture inbox">
-            <div className="h-full overflow-y-auto">
-                <div className="flex-1 space-y-6 p-6">
-                    <SurfaceHeader
-                        as="h1"
-                        title="Capture inbox"
-                        description="Inbound identities from Meta forms, CSV, a public URL, or a maps search you ran. Same phone or email merges onto one Lead."
-                    >
-                        <Link
-                            href="/crm/leads"
-                            className="text-ui font-medium text-brand"
-                        >
+        <CrmShell title="Capture inbox" chrome="workspace">
+            <div
+                className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink"
+                data-crm="list-workspace"
+            >
+                <CrmObjectHeader
+                    title="Capture inbox"
+                    description="Inbound identities from Meta forms, CSV, a public URL, or a maps search you ran. Same phone or email merges onto one Lead."
+                    secondary={
+                        <CrmObjectSecondaryLink href="/crm/leads">
                             Leads list
-                        </Link>
-                    </SurfaceHeader>
+                        </CrmObjectSecondaryLink>
+                    }
+                />
+                <div className="min-h-0 flex-1 overflow-y-auto bg-canvas">
+                    <div className="space-y-4 px-4 py-3 sm:px-6">
 
                     <div className="flex flex-wrap items-center gap-2">
                         <FilterChip
@@ -164,6 +167,7 @@ export default function LeadCapturesIndex({
                                         <Button
                                             type="submit"
                                             size="sm"
+                                            variant="outline"
                                             disabled={processing}
                                         >
                                             Upload CSV
@@ -201,6 +205,7 @@ export default function LeadCapturesIndex({
                                         <Button
                                             type="submit"
                                             size="sm"
+                                            variant="outline"
                                             disabled={processing}
                                         >
                                             Capture URL
@@ -355,6 +360,7 @@ export default function LeadCapturesIndex({
                                             <Button
                                                 type="submit"
                                                 size="sm"
+                                                variant="outline"
                                                 disabled={processing}
                                             >
                                                 Store search
@@ -367,12 +373,15 @@ export default function LeadCapturesIndex({
                     </div>
 
                     {captures.length === 0 ? (
-                        <EmptyState
-                            icon={<Inbox className="size-6" />}
-                            title="No captures in this filter"
-                            description="Upload a CSV, paste a public URL, or store results from a maps search you ran."
-                            as="h2"
-                        />
+                        <div className="border-t border-hairline py-8">
+                            <p className="text-[13px] font-medium text-ink">
+                                No captures in this filter
+                            </p>
+                            <p className="mt-1 text-[12px] text-mute">
+                                Upload a CSV, paste a public URL, or store
+                                results from a maps search you ran.
+                            </p>
+                        </div>
                     ) : (
                         <HairlineTable
                             minWidth={880}
@@ -453,7 +462,7 @@ export default function LeadCapturesIndex({
                                     lead: capture.matched_lead_id ? (
                                         <Link
                                             href={`/crm/leads/${capture.matched_lead_id}`}
-                                            className="font-medium text-brand"
+                                            className="font-medium text-ink hover:underline"
                                         >
                                             {capture.matched_lead_title ||
                                                 `Lead ${capture.matched_lead_id}`}
@@ -499,6 +508,7 @@ export default function LeadCapturesIndex({
                             }))}
                         />
                     )}
+                    </div>
                 </div>
             </div>
         </CrmShell>
@@ -520,7 +530,7 @@ function FilterChip({
             className={cn(
                 'rounded-full border px-3 py-1 text-ui',
                 active
-                    ? 'border-brand bg-brand/10 font-medium text-ink'
+                    ? 'border-hairline bg-canvas-soft font-medium text-ink'
                     : 'border-hairline text-mute hover:text-ink',
             )}
         >

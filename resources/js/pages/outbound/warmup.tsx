@@ -1,7 +1,7 @@
 import { Form, router } from '@inertiajs/react';
+import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
 import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
-import { StatCard, StatGrid } from '@/components/ui/aurora/stat-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,26 +74,24 @@ export default function WarmupIndex({
                 title="Mailbox warmup"
                 description={`A conservative Africa/Algiers ramp (${ramp.join(' → ')}, then holds at your ceiling - default ${defaultCeiling}) raises each warming box's daily cap on the daily outbound:warmup schedule. No third-party warmup network: optional peer pings only ever run between this workspace's own enabled mailboxes, and quiet hours still apply to every send.`}
             >
-                <StatGrid
-                    style={{
-                        gridTemplateColumns:
-                            'repeat(auto-fill, minmax(140px, 1fr))',
-                    }}
-                >
-                    <StatCard compact label="Warming" value={summary.warming} />
-                    <StatCard compact label="Active" value={summary.active} />
-                    <StatCard
-                        compact
-                        label="Sent today"
-                        value={`${summary.sent_today}/${summary.cap_today}`}
-                    />
-                    <StatCard
-                        compact
-                        label="Ramp"
-                        value={`${ramp.length} days`}
-                        sub="then hold at ceiling"
-                    />
-                </StatGrid>
+                <CrmKpiStrip
+                    columns={4}
+                    kpis={[
+                        { key: 'warming', label: 'Warming', value: summary.warming },
+                        { key: 'active', label: 'Active', value: summary.active },
+                        {
+                            key: 'sent',
+                            label: 'Sent today',
+                            value: `${summary.sent_today}/${summary.cap_today}`,
+                        },
+                        {
+                            key: 'ramp',
+                            label: 'Ramp',
+                            value: `${ramp.length} days`,
+                            hint: 'then hold at ceiling',
+                        },
+                    ]}
+                />
 
                 <HairlinePanel
                     title="The ramp"
@@ -118,7 +116,7 @@ export default function WarmupIndex({
                                 </span>
                             </span>
                         ))}
-                        <span className="rounded-lg border border-brand px-2.5 py-1 text-brand">
+                        <span className="rounded-md border border-hairline px-2.5 py-1 text-ink">
                             hold at your ceiling
                         </span>
                     </div>

@@ -73,6 +73,8 @@ export function ReportsShell({
     children: ReactNode;
 }) {
     const pathname = usePage().url.split('?')[0] ?? '/reports';
+    const innerTitle = pageTitle ?? title;
+    const showDashboardName = Boolean(innerTitle && innerTitle !== 'Reports');
 
     return (
         <>
@@ -83,9 +85,11 @@ export function ReportsShell({
                         {hero}
                         <header className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
                             <div className="min-w-0">
-                                <h2 className="text-page-title font-semibold tracking-tight text-ink">
-                                    {pageTitle ?? title}
-                                </h2>
+                                {showDashboardName ? (
+                                    <h2 className="text-[13px] font-semibold tracking-tight text-ink">
+                                        {innerTitle}
+                                    </h2>
+                                ) : null}
                                 {description ? (
                                     <p className="mt-0.5 max-w-2xl text-[11px] leading-4 text-mute">
                                         {description}
