@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Observers\CompanyObserver;
 use App\Observers\ContactObserver;
 use App\Observers\DealObserver;
 use App\Observers\LeadObserver;
@@ -51,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
 
+        Company::observe(CompanyObserver::class);
         Contact::observe(ContactObserver::class);
         Deal::observe(DealObserver::class);
         Lead::observe(LeadObserver::class);

@@ -3,10 +3,17 @@
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
+use App\Models\Mailbox;
+use App\Models\OutboundCampaign;
+use App\Models\OutboundMessage;
+use App\Models\Quote;
 use App\Models\User;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\LeadConverter;
 use App\Services\Identity\WorkspaceProvisioner;
+use App\Services\Outbound\CampaignService;
+use App\Services\Webhooks\WebhookEndpointManager;
+use Illuminate\Support\Facades\Mail;
 
 it('records contact created against the authenticated user and workspace', function () {
     $user = User::factory()->create();
@@ -119,6 +126,101 @@ it('records workspace created when a workspace is provisioned', function () {
     expect($analytics->eventNames())->toContain(ProductAnalytics::WORKSPACE_CREATED)
         ->and($analytics->last(ProductAnalytics::WORKSPACE_CREATED)['properties']['name'])->toBe('Analytics Co')
         ->and($analytics->last('$groupidentify')['groups']['workspace'])->toBe((string) $workspace->id);
+});
+
+it('records company created, quote sent, campaign launched, invite, and bounce', function () {
+    Mail::fake();
+
+    $user = User::factory()->create();
+    app(WorkspaceProvisioner::class)->seedDefaults($user->workspace);
+    Mailbox::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'enabled' => true,
+        'is_default' => true,
+    ]);
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'buyer@clinic.dz',
+    ]);
+    $analytics = app(ProductAnalytics::class);
+    $analytics->flushRecorded();
+
+    $this->actingAs($user)
+        ->post('/crm/companies', ['name' => 'Hub Clinic'])
+        ->assertRedirect();
+
+    expect($analytics->eventNames())->toContain(ProductAnalytics::COMPANY_CREATED);
+
+    $pipeline = $user->workspace->defaultPipeline();
+    $deal = Deal::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stageBySlug('proposal')->id,
+        'title' => 'Quoted clinic deal',
+        'amount_cents' => 1_800_000,
+        'currency' => 'DZD',
+    ]);
+
+    $this->actingAs($user)
+        ->post("/crm/deals/{$deal->id}/quotes", [
+            'notes' => 'Valid 14 days',
+            'items' => [
+                ['name' => 'EvoSales workspace', 'quantity' => 1, 'unit_dzd' => 180000],
+            ],
+        ])
+        ->assertRedirect();
+
+    $quote = Quote::query()->where('deal_id', $deal->id)->sole();
+
+    $this->actingAs($user)
+        ->post("/crm/quotes/{$quote->id}/send")
+        ->assertRedirect();
+
+    expect($analytics->eventNames())->toContain(ProductAnalytics::QUOTE_SENT)
+        ->and($analytics->last(ProductAnalytics::QUOTE_SENT)['properties']['quote_id'])->toBe($quote->id);
+
+    $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
+    app(CampaignService::class)->expand($campaign);
+
+    expect($analytics->eventNames())->toContain(ProductAnalytics::CAMPAIGN_LAUNCHED)
+        ->and($analytics->last(ProductAnalytics::CAMPAIGN_LAUNCHED)['properties']['campaign_id'])->toBe($campaign->id);
+
+    $this->actingAs($user)
+        ->post(route('settings.people.store'), [
+            'name' => 'New Admin',
+            'email' => 'admin.hub@evotechly.com',
+            'role' => 'admin',
+        ])
+        ->assertRedirect();
+
+    expect($analytics->eventNames())->toContain(ProductAnalytics::USER_INVITED);
+
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => 'buyer@clinic.dz',
+        'subject' => 'Follow up',
+        'body' => 'Hello',
+        'status' => 'sent',
+        'sent_at' => now(),
+    ]);
+    $endpoint = app(WebhookEndpointManager::class)->forWorkspace(
+        $user->workspace,
+        WebhookEndpointManager::PROVIDER_OUTBOUND_BOUNCE,
+    );
+
+    $this->postJson("/webhooks/outbound/bounces/{$endpoint->key}", [
+        'event_id' => 'evt-hub-1',
+        'message_id' => $message->id,
+        'type' => 'hard',
+        'email' => 'buyer@clinic.dz',
+    ])->assertOk();
+
+    expect($analytics->eventNames())->toContain(ProductAnalytics::EMAIL_BOUNCED)
+        ->and($analytics->last(ProductAnalytics::EMAIL_BOUNCED)['properties']['bounce_type'])->toBe('hard');
 });
 
 it('shares posthog config on inertia pages', function () {

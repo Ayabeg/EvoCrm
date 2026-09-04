@@ -8,6 +8,7 @@ use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
 use App\Models\SavedFilter;
 use App\Models\Workspace;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\CrmFilter;
 use Illuminate\Support\Collection;
 
@@ -25,6 +26,7 @@ class CampaignService
         private TemplateRenderer $templates,
         private MailerFactory $mailers,
         private CrmFilter $crmFilter,
+        private ProductAnalytics $analytics,
     ) {}
 
     /**
@@ -94,6 +96,13 @@ class CampaignService
             'audience_count' => $audience->count(),
             'suppressed_count' => $suppressed,
         ])->save();
+
+        $this->analytics->capture(ProductAnalytics::CAMPAIGN_LAUNCHED, [
+            'campaign_id' => $campaign->id,
+            'audience_count' => $audience->count(),
+            'queued' => $queued,
+            'suppressed' => $suppressed,
+        ], null, $workspace);
 
         return $campaign;
     }
@@ -196,6 +205,15 @@ class CampaignService
 
             $sent = $this->mailers->for($workspace, $mailbox)->send($message);
             $totals[$sent->status === 'sent' ? 'sent' : 'failed']++;
+
+            if ($sent->status === 'sent') {
+                $this->analytics->capture(ProductAnalytics::EMAIL_SENT, [
+                    'message_id' => $sent->id,
+                    'channel' => $sent->channel,
+                    'contact_id' => $sent->contact_id,
+                    'campaign_id' => $sent->campaign_id,
+                ], null, $workspace);
+            }
         }
 
         $this->completeFinishedCampaigns();

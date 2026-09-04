@@ -19,6 +19,8 @@ class ProductAnalytics
 
     public const CONTACT_CREATED = 'contact created';
 
+    public const COMPANY_CREATED = 'company created';
+
     public const DEAL_CREATED = 'deal created';
 
     public const DEAL_STAGE_CHANGED = 'deal stage changed';
@@ -41,9 +43,17 @@ class ProductAnalytics
 
     public const SEQUENCE_ENROLLED = 'sequence enrolled';
 
+    public const CAMPAIGN_LAUNCHED = 'campaign launched';
+
+    public const QUOTE_SENT = 'quote sent';
+
+    public const USER_INVITED = 'user invited';
+
     public const EMAIL_SENT = 'email sent';
 
     public const EMAIL_REPLIED = 'email replied';
+
+    public const EMAIL_BOUNCED = 'email bounced';
 
     public const WHATSAPP_MESSAGE_RECEIVED = 'whatsapp message received';
 

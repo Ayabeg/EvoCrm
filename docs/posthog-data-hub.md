@@ -10,10 +10,11 @@ Set `POSTHOG_API_KEY` and `POSTHOG_HOST` on the web, queue, and scheduler proces
 |---|---|
 | Auth | `user signed up`, `user logged in`, `$identify` |
 | Workspace | `workspace created`, `$groupidentify` (`workspace`) |
-| CRM | `contact created`, `deal created`, `deal stage changed`, `deal won`, `deal lost` |
+| CRM | `contact created`, `company created`, `deal created`, `deal stage changed`, `deal won`, `deal lost`, `quote sent` |
 | Leads | `lead created`, `lead qualified`, `lead converted` |
-| Automation | `segment entered`, `segment exited`, `workflow executed`, `sequence enrolled` |
-| Outbound | `email sent`, `email replied`, `whatsapp message sent` |
+| People | `user invited` |
+| Automation | `segment entered`, `segment exited`, `workflow executed`, `sequence enrolled`, `campaign launched` |
+| Outbound | `email sent`, `email replied`, `email bounced`, `whatsapp message sent` |
 | WhatsApp Cloud | `whatsapp message received` |
 | Meta | `meta lead received`, `integration connected` |
 | Google / desk connectors | `integration connected` |
