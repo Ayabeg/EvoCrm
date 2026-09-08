@@ -8,7 +8,7 @@
 | **Screen freeze** | [evocrm-mobbin-contract.md](./evocrm-mobbin-contract.md) (P0) |
 | **Date** | 2026-09-08 |
 | **Buyer** | 5–20 seat Algeria-first sales team (DZD, wilaya, WhatsApp, Meta ads). |
-| **Status** | Approved. P0–P8 on `main`; P9–P10 remaining. |
+| **Status** | Approved. P0–P9 on `main`; P10 remaining. |
 
 Engineers implement against the cited Mobbin screenshot, not against this paragraph.
 
@@ -270,7 +270,7 @@ Each PR independently reviewable. Mobbin URL in the PR body. Pest coverage on th
 | **P6** | `feat(activities): composer + log call` | [#136](https://github.com/Mohamedbeghanem/EvoSales/pull/136) | P5 | Icon composer + HubSpot log-call fields |
 | **P7** | `feat(outbound): HubSpot sequence step editor` | [#137](https://github.com/Mohamedbeghanem/EvoSales/pull/137) | P2 | Vertical steps, templates, WA step, enroll empty |
 | **P8** | `feat(deals): workspace columns health + next step` | [#138](https://github.com/Mohamedbeghanem/EvoSales/pull/138) | P3 | Health score + next activity columns |
-| **P9** | `chore(ia): retire duplicate /leads board` | remaining | P3, P4 | One leads list, one deals board |
+| **P9** | `chore(ia): retire duplicate /leads board` | [#139](https://github.com/Mohamedbeghanem/EvoSales/pull/139) | P3, P4 | One leads list, one deals board |
 | **P10** | `test: Mobbin QA checklist Pest + screenshots` | remaining | P1–P9 | Checklist in §9 green |
 
 Do not start P7 until P2 list chrome is the only list pattern (avoid dual UI regression).

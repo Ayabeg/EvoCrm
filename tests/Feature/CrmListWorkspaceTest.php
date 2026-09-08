@@ -65,8 +65,10 @@ it('exposes CRM objects on the expanded rail without replacing AppSidebar', func
         ->and($rail)->toContain("label: 'Contacts'")
         ->and($rail)->toContain("label: 'Companies'")
         ->and($rail)->toContain("label: 'Deals'")
-        ->and($rail)->toContain("label: 'Lead board'")
-        ->and($rail)->toContain("href: '/leads'")
+        ->and($rail)->toContain("label: 'Leads'")
+        ->and($rail)->toContain("href: '/crm/leads'")
+        ->and($rail)->not->toContain("href: '/leads'")
+        ->and($rail)->not->toContain("label: 'Lead board'")
         ->and($rail)->not->toContain('@/components/ui/aurora/sidebar')
         ->and($rail)->toContain("from '@/components/ui/sidebar'");
 
@@ -75,12 +77,12 @@ it('exposes CRM objects on the expanded rail without replacing AppSidebar', func
         ->and(strpos($rail, "label: 'Companies'"))
         ->toBeLessThan(strpos($rail, "label: 'Deals'"))
         ->and(strpos($rail, "label: 'Deals'"))
-        ->toBeLessThan(strpos($rail, "label: 'Lead board'"));
+        ->toBeLessThan(strpos($rail, "label: 'Leads'"));
 });
 
-it('keeps the leads list and lead board on the same workspace chrome', function () {
+it('keeps the leads list on workspace chrome and retires the duplicate board product', function () {
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
-    $board = file_get_contents(resource_path('js/pages/leads/board.tsx'));
+    $routes = file_get_contents(base_path('routes/web.php'));
 
     expect($leads)->toContain('chrome="workspace"')
         ->and($leads)->toContain('CrmObjectHeader')
@@ -89,9 +91,6 @@ it('keeps the leads list and lead board on the same workspace chrome', function 
         ->and($leads)->not->toContain('PageHeader')
         ->and($leads)->not->toContain('name="q"');
 
-    expect($board)->toContain('CrmObjectHeader')
-        ->and($board)->toContain('placeholder="Search leads..."')
-        ->and($board)->toContain('aria-label="Search leads"')
-        ->and($board)->not->toContain('PageHeader')
-        ->and($board)->not->toContain('border-brand bg-brand');
+    expect($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')")
+        ->and($routes)->not->toContain('LeadBoardController');
 });
