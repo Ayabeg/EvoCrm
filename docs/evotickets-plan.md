@@ -8,7 +8,7 @@
 | **Screen freeze** | [evotickets-mobbin-contract.md](./evotickets-mobbin-contract.md) (P0) |
 | **Date** | 2026-09-08 |
 | **Buyer** | 5–20 seat Algeria-first sales team. After-sale lives on WhatsApp. |
-| **Status** | Draft for approval. Docs only until P0 merges. |
+| **Status** | P0 on `main`. P1 in flight. |
 
 This plan **reverses** the 2026-08-29 deferral (“tickets sit unused”) by shrinking the object until it is a status layer on Desk — not a second Service Hub.
 
@@ -145,8 +145,8 @@ Each PR independently reviewable. Mobbin URL in the PR body. Pest on the route.
 
 | PR | Title | Depends | Acceptance |
 |---|---|---|---|
-| **P0** | `docs: EvoTickets Mobbin contract + plan` | — | This file + contract. No product code. |
-| **P1** | `feat(tickets): model, number, permissions` | P0 | Factory, unique `number`, contact required |
+| **P0** | `docs: EvoTickets Mobbin contract + plan` | [#141](https://github.com/Mohamedbeghanem/EvoSales/pull/141) | This file + contract. No product code. |
+| **P1** | `feat(tickets): model, number, permissions` | this PR | Factory, unique `number`, contact required |
 | **P2** | `feat(tickets): list + board chrome` | P1 | CrmListShell + PipelineKanban vs [f9b9fcf1](https://mobbin.com/screens/f9b9fcf1-0767-4ee5-adad-12003a31331e) / [d99d4a6b](https://mobbin.com/screens/d99d4a6b-9634-4cd3-8ae1-39e337ebd2ea) |
 | **P3** | `feat(tickets): record Path + thread pane` | P2 | 3-pane; no empty-conversation product |
 | **P4** | `feat(desk): Open ticket from thread` | P3 | Inbox CTA; reopen on inbound if closed |

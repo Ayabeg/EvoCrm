@@ -41,6 +41,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 | --- | --- |
 | **Channel** | `whatsapp` (Evolution Baileys / phone), `whatsapp_cloud` (Evolution Business), `email`, `telegram` (later stub). |
 | **Thread** | Conversation history synced from EvoDesk for CRM (contact ↔ deal). Not the Chatwoot UI. `unread_count` feeds Home. |
+| **Ticket** | After-sale work item on a Contact. Human `number` (`EVO-000041`) unique per workspace. Status `new` → `waiting_on_contact` → `waiting_on_us` → `closed`. Optional `thread_id` (one ticket per thread), `deal_id`, `owner_id`. Contact is required. |
 | **Message** | Inbound/outbound log. Optional CRM composer uses Evolution Cloud `sendText` or stores `failed` with a reason. |
 
 ## Outbound
