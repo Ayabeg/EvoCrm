@@ -97,18 +97,42 @@ export function PipelineKanbanHeader({
                     {amount}
                 </p>
             ) : null}
-            {weighted ? (
-                <p className="mt-0.5 text-[11px] text-mute">
-                    Weighted <span className="money">{weighted}</span>
-                    {probability != null ? ` · ${probability}%` : ''}
-                </p>
-            ) : null}
             <div
                 className="mt-1.5 h-px w-full"
                 style={{ backgroundColor: accent }}
                 aria-hidden
             />
         </header>
+    );
+}
+
+export function PipelineKanbanFooter({
+    amount,
+    weighted,
+    probability,
+}: {
+    amount?: string;
+    weighted?: string;
+    probability?: number;
+}) {
+    if (!amount && !weighted) {
+        return null;
+    }
+
+    return (
+        <footer className="mt-auto border-t border-hairline px-0.5 pt-2 text-[11px] text-mute">
+            {amount ? (
+                <p>
+                    Total: <span className="money text-ink">{amount}</span>
+                </p>
+            ) : null}
+            {weighted ? (
+                <p className="mt-0.5">
+                    Weighted: <span className="money text-ink">{weighted}</span>
+                    {probability != null ? ` · ${probability}%` : ''}
+                </p>
+            ) : null}
+        </footer>
     );
 }
 
@@ -152,8 +176,14 @@ export function PipelineKanbanCard({
     );
 }
 
-export function PipelineKanbanStack({ children }: { children: ReactNode }) {
-    return <div className="grid min-h-16 gap-1.5">{children}</div>;
+export function PipelineKanbanStack({
+    children,
+    className,
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
+    return <div className={cn('grid min-h-16 flex-1 gap-1.5', className)}>{children}</div>;
 }
 
 export function PipelineKanbanEmpty({

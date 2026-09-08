@@ -224,6 +224,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::post('/crm/deals/bulk', [BulkActionController::class, 'deals'])->name('crm.deals.bulk');
     Route::get('/crm/deals', [DealController::class, 'index'])->name('crm.deals.index');
     Route::get('/crm/deals/board', [DealController::class, 'board'])->name('crm.deals.board');
+    Route::put('/crm/deals/board/options', [DealController::class, 'updateBoardOptions'])->name('crm.deals.board.options');
     Route::post('/crm/deals', [DealController::class, 'store'])->name('crm.deals.store');
     Route::get('/crm/deals/{deal}', [DealController::class, 'show'])->name('crm.deals.show');
     Route::put('/crm/deals/{deal}', [DealController::class, 'update'])->name('crm.deals.update');

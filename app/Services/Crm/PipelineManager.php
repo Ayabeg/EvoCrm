@@ -2,10 +2,14 @@
 
 namespace App\Services\Crm;
 
+use App\Models\Activity;
 use App\Models\Deal;
+use App\Models\OutboundMessage;
 use App\Models\Pipeline;
 use App\Models\Stage;
+use App\Models\Thread;
 use App\Models\Workspace;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -78,25 +82,61 @@ class PipelineManager
     }
 
     /**
+     * @param  array<string, mixed>  $options
      * @return array{
      *     stages: Collection<int, array<string, mixed>>,
      *     deals: Collection<int, array<string, mixed>>,
      *     forecast: array{count: int, amount_cents: int, weighted_cents: int}
      * }
      */
-    public function boardData(Workspace $workspace, Pipeline $pipeline): array
+    public function boardData(Workspace $workspace, Pipeline $pipeline, array $options = []): array
     {
+        $options = array_merge(DealBoardOptions::defaults(), $options);
         $deals = Deal::query()
             ->forWorkspace($workspace)
             ->where('pipeline_id', $pipeline->id)
             ->with(['contact.company', 'company', 'stage', 'owner'])
-            ->orderByDesc('last_activity_at')
-            ->orderByDesc('id')
             ->limit(200)
             ->get();
 
-        $stages = $pipeline->stages->map(function (Stage $stage) use ($deals) {
-            $column = $deals->where('stage_id', $stage->id);
+        $touches = $this->lastTouches($workspace, $deals);
+        $nextByDeal = $this->nextActivityByDeal($workspace, $deals);
+
+        $presented = $deals->map(function (Deal $deal) use ($touches, $nextByDeal, $options) {
+            $lastTouch = $touches[$deal->id] ?? $deal->last_activity_at;
+            $inactiveDays = $lastTouch instanceof CarbonInterface
+                ? (int) $lastTouch->diffInDays(now('Africa/Algiers'))
+                : null;
+            $threshold = (int) $options['inactive_after_days'];
+            $isInactive = $inactiveDays === null || $inactiveDays >= $threshold;
+            $hasNext = ($nextByDeal[$deal->id] ?? null) !== null
+                || $deal->next_activity_at instanceof CarbonInterface;
+
+            return [
+                'id' => $deal->id,
+                'title' => $deal->title,
+                'amount_cents' => (int) $deal->amount_cents,
+                'currency' => $deal->currency ?? 'DZD',
+                'stage_id' => $deal->stage_id,
+                'contact_name' => $deal->contact?->displayName(),
+                'company_name' => $deal->company?->name ?? $deal->contact?->company?->name,
+                'owner_name' => $deal->owner?->name,
+                'close_date' => $deal->close_date?->toDateString(),
+                'priority' => $this->priorityBand($deal->priority),
+                'last_touch_at' => $lastTouch instanceof CarbonInterface
+                    ? $lastTouch->timezone('Africa/Algiers')->toIso8601String()
+                    : null,
+                'inactive_days' => $inactiveDays,
+                'is_inactive' => $isInactive,
+                'has_next_activity' => $hasNext,
+                'url' => "/crm/deals/{$deal->id}",
+            ];
+        });
+
+        $presented = $this->sortBoardDeals($presented, (string) $options['sort']);
+
+        $stages = $pipeline->stages->map(function (Stage $stage) use ($presented) {
+            $column = $presented->where('stage_id', $stage->id);
             $amountCents = (int) $column->sum('amount_cents');
             $probability = $stage->winProbability();
 
@@ -116,24 +156,104 @@ class PipelineManager
 
         return [
             'stages' => $stages,
-            'deals' => $deals->map(fn (Deal $deal) => [
-                'id' => $deal->id,
-                'title' => $deal->title,
-                'amount_cents' => (int) $deal->amount_cents,
-                'currency' => $deal->currency ?? 'DZD',
-                'stage_id' => $deal->stage_id,
-                'contact_name' => $deal->contact?->displayName(),
-                'company_name' => $deal->company?->name ?? $deal->contact?->company?->name,
-                'owner_name' => $deal->owner?->name,
-                'close_date' => $deal->close_date?->toDateString(),
-                'url' => "/crm/deals/{$deal->id}",
-            ])->values(),
+            'deals' => $presented->values(),
             'forecast' => [
-                'count' => $deals->count(),
+                'count' => $presented->count(),
                 'amount_cents' => (int) $stages->sum('amount_cents'),
                 'weighted_cents' => (int) $stages->sum('weighted_cents'),
             ],
         ];
+    }
+
+    /**
+     * @param  Collection<int, Deal>  $deals
+     * @return array<int, CarbonInterface|null>
+     */
+    private function lastTouches(Workspace $workspace, Collection $deals): array
+    {
+        $contactIds = $deals->pluck('contact_id')->filter()->unique()->values();
+
+        $threadLast = Thread::query()
+            ->forWorkspace($workspace)
+            ->whereIn('contact_id', $contactIds)
+            ->get(['contact_id', 'last_message_at'])
+            ->groupBy('contact_id')
+            ->map(fn (Collection $rows) => $rows->max('last_message_at'));
+
+        $outboundLast = OutboundMessage::query()
+            ->forWorkspace($workspace)
+            ->whereIn('contact_id', $contactIds)
+            ->get(['contact_id', 'sent_at', 'replied_at', 'opened_at', 'created_at'])
+            ->groupBy('contact_id')
+            ->map(function (Collection $rows) {
+                return $rows->flatMap(fn (OutboundMessage $row) => [
+                    $row->sent_at,
+                    $row->replied_at,
+                    $row->opened_at,
+                    $row->created_at,
+                ])->filter()->max();
+            });
+
+        $touches = [];
+        foreach ($deals as $deal) {
+            $candidates = collect([
+                $deal->last_activity_at,
+                $deal->contact?->last_activity_at,
+                $threadLast[$deal->contact_id] ?? null,
+                $outboundLast[$deal->contact_id] ?? null,
+            ])->filter(fn ($value) => $value instanceof CarbonInterface);
+
+            $touches[$deal->id] = $candidates->max();
+        }
+
+        return $touches;
+    }
+
+    /**
+     * @param  Collection<int, Deal>  $deals
+     * @return array<int, string>
+     */
+    private function nextActivityByDeal(Workspace $workspace, Collection $deals): array
+    {
+        $ids = $deals->pluck('id');
+
+        return Activity::query()
+            ->forWorkspace($workspace)
+            ->whereIn('deal_id', $ids)
+            ->where('done', false)
+            ->whereNotNull('due_at')
+            ->where('due_at', '>=', now('Africa/Algiers'))
+            ->get(['deal_id', 'due_at'])
+            ->groupBy('deal_id')
+            ->map(fn (Collection $rows) => $rows->min('due_at')?->toIso8601String())
+            ->all();
+    }
+
+    /**
+     * @param  Collection<int, array<string, mixed>>  $deals
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function sortBoardDeals(Collection $deals, string $sort): Collection
+    {
+        return match ($sort) {
+            'amount' => $deals->sortByDesc('amount_cents')->values(),
+            'close_date' => $deals->sortBy(fn (array $deal) => $deal['close_date'] ?? '9999-12-31')->values(),
+            'title' => $deals->sortBy(fn (array $deal) => mb_strtolower((string) $deal['title']))->values(),
+            default => $deals
+                ->sort(fn (array $a, array $b) => [$b['last_touch_at'] ?? '', $b['id']] <=> [$a['last_touch_at'] ?? '', $a['id']])
+                ->values(),
+        };
+    }
+
+    private function priorityBand(?string $priority): ?string
+    {
+        $value = mb_strtolower(trim((string) $priority));
+
+        return match ($value) {
+            'high', 'urgent' => 'high',
+            'low' => 'low',
+            default => null,
+        };
     }
 
     /**

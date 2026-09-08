@@ -16,6 +16,7 @@ use App\Services\LeadOs\DealHealthScorer;
 use App\Services\LeadOs\NextMoveAdvisor;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
+use App\Services\Crm\DealBoardOptions;
 use App\Services\Crm\PipelineManager;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
@@ -107,11 +108,12 @@ class DealController extends Controller
         ]);
     }
 
-    public function board(Request $request, PipelineManager $pipelines): Response
+    public function board(Request $request, PipelineManager $pipelines, DealBoardOptions $boardOptions): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
-        $board = $pipelines->boardData($workspace, $pipeline);
+        $options = $boardOptions->forUser($request->user());
+        $board = $pipelines->boardData($workspace, $pipeline, $options);
 
         return Inertia::render('crm/deals/board', [
             'pipeline' => $pipeline->only(['id', 'name']),
@@ -124,7 +126,27 @@ class DealController extends Controller
             'deals' => $board['deals'],
             'forecast' => $board['forecast'],
             'forecastBand' => app(RecordInsight::class)->pipelineForecastBand($workspace, $pipeline),
+            'boardOptions' => $options,
         ]);
+    }
+
+    public function updateBoardOptions(Request $request, DealBoardOptions $boardOptions): RedirectResponse
+    {
+        $data = $request->validate([
+            'card_style' => ['required', 'in:default,compact'],
+            'inactive_after_days' => ['required', 'integer', 'min:1', 'max:90'],
+            'sort' => ['required', 'in:last_activity,amount,close_date,title'],
+        ]);
+
+        $boardOptions->save($request->user(), [
+            ...$data,
+            'show_priority' => $request->boolean('show_priority'),
+            'show_associations' => $request->boolean('show_associations'),
+            'show_activity' => $request->boolean('show_activity'),
+            'mark_inactive' => $request->boolean('mark_inactive'),
+        ]);
+
+        return back();
     }
 
     public function show(Request $request, Deal $deal, CrmHub $hub, RecordInsight $insight, DealHealthScorer $health, NextMoveAdvisor $moves): Response

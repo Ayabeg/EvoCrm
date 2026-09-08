@@ -1,9 +1,13 @@
 <?php
 
+use App\Enums\ChannelType;
+use App\Models\Channel;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\OutboundMessage;
 use App\Models\Pipeline;
 use App\Models\Stage;
+use App\Models\Thread;
 use App\Models\User;
 use App\Services\Crm\DealBoardForecast;
 
@@ -187,4 +191,88 @@ it('shows a pipeline picker and scopes the board when multiple pipelines exist',
             ->where('stages.3.weighted_cents', 9_000_000)
             ->where('forecast.weighted_cents', 9_000_000)
         );
+});
+
+it('exposes HubSpot card fields and default board options', function () {
+    $user = User::factory()->create();
+    $deal = boardDealFor($user, 'new', 2_500_000, ['title' => 'Landing page']);
+    $deal->forceFill([
+        'priority' => 'high',
+        'last_activity_at' => now('Africa/Algiers')->subDays(2),
+        'close_date' => now()->toDateString(),
+    ])->save();
+
+    $this->actingAs($user)
+        ->get('/crm/deals/board')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('boardOptions.card_style', 'default')
+            ->where('boardOptions.inactive_after_days', 14)
+            ->where('deals.0.id', $deal->id)
+            ->where('deals.0.priority', 'high')
+            ->where('deals.0.inactive_days', 2)
+            ->where('deals.0.has_next_activity', false)
+            ->where('deals.0.is_inactive', false));
+});
+
+it('counts WhatsApp thread and outbound mail as last touch', function () {
+    $user = User::factory()->create();
+    $deal = boardDealFor($user, 'new', 1_000_000, ['title' => 'WA deal']);
+    $deal->forceFill(['last_activity_at' => now('Africa/Algiers')->subDays(20)])->save();
+    $contact = $deal->contact;
+
+    $channel = Channel::query()->firstOrCreate(
+        ['workspace_id' => $user->workspace_id, 'type' => ChannelType::WhatsAppCloud],
+        ['name' => 'WA', 'status' => 'connected'],
+    );
+    Thread::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel_id' => $channel->id,
+        'status' => 'open',
+        'last_message_at' => now('Africa/Algiers')->subDay(),
+        'unread_count' => 0,
+    ]);
+
+    OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'status' => 'sent',
+        'to_address' => 'buyer@example.com',
+        'sent_at' => now('Africa/Algiers')->subHours(3),
+    ]);
+
+    $this->actingAs($user)
+        ->get('/crm/deals/board')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('deals.0.id', $deal->id)
+            ->where('deals.0.inactive_days', 0));
+});
+
+it('persists board card options on the deals_board layout', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->from('/crm/deals/board')
+        ->put('/crm/deals/board/options', [
+            'card_style' => 'compact',
+            'inactive_after_days' => 7,
+            'sort' => 'amount',
+            'show_priority' => '1',
+            'show_activity' => '1',
+            'mark_inactive' => '1',
+        ])
+        ->assertRedirect('/crm/deals/board');
+
+    $this->actingAs($user)
+        ->get('/crm/deals/board')
+        ->assertInertia(fn ($page) => $page
+            ->where('boardOptions.card_style', 'compact')
+            ->where('boardOptions.inactive_after_days', 7)
+            ->where('boardOptions.sort', 'amount')
+            ->where('boardOptions.show_priority', true)
+            ->where('boardOptions.show_associations', false));
 });
