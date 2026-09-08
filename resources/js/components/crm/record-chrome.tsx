@@ -14,6 +14,7 @@ import {
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
+import { LogCallForm } from '@/components/crm/activity-composer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -209,7 +210,14 @@ export function RecordActions({
                 </div>
                 {secondary}
             </div>
-            {active ? (
+            {active === 'call' ? (
+                <LogCallForm
+                    contactId={contactId}
+                    dealId={dealId}
+                    companyId={companyId}
+                    onCancel={() => setActive(null)}
+                />
+            ) : active ? (
                 <Form
                     action="/crm/activities"
                     method="post"

@@ -336,6 +336,9 @@ export default function DealShow({
                                 catchUp={catchUp}
                                 dealNext={dealHealth?.next_action}
                                 insight={askEvo}
+                                contactId={deal.contact_id}
+                                dealId={deal.id}
+                                companyId={deal.company_id}
                             />
                         }
                         right={

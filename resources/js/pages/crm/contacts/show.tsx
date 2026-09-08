@@ -232,6 +232,8 @@ export default function ContactShow({
                                 timeline={timeline}
                                 catchUp={catchUp}
                                 insight={askEvo}
+                                contactId={contact.id}
+                                companyId={contact.company_id}
                                 highlights={[
                                     { label: 'Email', value: contact.email },
                                     { label: 'Phone', value: contact.phone_e164 },
