@@ -6,6 +6,8 @@ It is the product control plane. Evolution API is the native WhatsApp Cloud conn
 
 Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotechly**.
 
+**EvoCRM** is the CRM surface of this OS (not a second repo). The approved build is [evocrm-plan.md](./evocrm-plan.md); Mobbin screens are frozen in [evocrm-mobbin-contract.md](./evocrm-mobbin-contract.md).
+
 ## What this is not
 
 - Not Baileys, WhatsApp Web QR, Linked-devices, OpenWA, or any consumer-WhatsApp takeover.

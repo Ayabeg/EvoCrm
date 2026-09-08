@@ -1,5 +1,11 @@
 # Changelog
 
+## EvoCRM plan published (2026-09-08)
+
+Recorded the approved EvoCRM build in [`docs/evocrm-plan.md`](docs/evocrm-plan.md): HubSpot chrome + Salesforce lead Path, Mobbin as source of truth, P0–P10 PR map. No product routes change in this entry.
+
+---
+
 ## HubSpot side-by-side on main (2026-08-26)
 
 Re-pointed the HubSpot vs EvoSales matrix to `main` @ `714d21a` after Waves 1–6 merged. Composite stays **~85** (Wave 6 not re-scored). Visual HTML now matches shipped playbooks, calculated list columns, association filters, segment history, and audit trail. See [`docs/hubspot-side-by-side.md`](docs/hubspot-side-by-side.md).

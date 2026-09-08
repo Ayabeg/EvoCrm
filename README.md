@@ -133,6 +133,7 @@ See [docs/evolution.md](docs/evolution.md). Create instances only with `WHATSAPP
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/OBJECT_MODEL.md](docs/OBJECT_MODEL.md)
 - [docs/evolution.md](docs/evolution.md)
+- [docs/evocrm-plan.md](docs/evocrm-plan.md) — EvoCRM build (HubSpot chrome + Salesforce Path, Mobbin as source of truth)
 
 ## Secrets
 
