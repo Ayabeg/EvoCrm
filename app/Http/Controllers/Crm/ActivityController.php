@@ -68,6 +68,9 @@ class ActivityController extends Controller
             'subject' => ['nullable', 'string', 'max:180'],
             'body' => ['nullable', 'string'],
             'due_at' => ['nullable', 'date'],
+            'logged_at' => ['nullable', 'date'],
+            'outcome' => ['nullable', 'string', 'max:80'],
+            'direction' => ['nullable', 'in:inbound,outbound'],
             'owner_id' => ['nullable', 'integer'],
             'contact_id' => ['nullable', 'integer'],
             'deal_id' => ['nullable', 'integer'],
@@ -83,6 +86,27 @@ class ActivityController extends Controller
         if (! empty($data['company_id'])) {
             Company::query()->forWorkspace($workspace)->findOrFail($data['company_id']);
         }
+
+        $meta = [];
+        if (! empty($data['outcome'])) {
+            $meta['outcome'] = $data['outcome'];
+        }
+        if (! empty($data['direction'])) {
+            $meta['direction'] = $data['direction'];
+        }
+        if (! empty($data['logged_at'])) {
+            $meta['logged_at'] = $data['logged_at'];
+        }
+
+        if ($data['type'] === 'call' && empty($data['subject'])) {
+            $data['subject'] = trim(($data['direction'] ?? 'outbound').' call'.(! empty($data['outcome']) ? ' · '.$data['outcome'] : ''));
+        }
+
+        if ($meta !== []) {
+            $data['meta'] = $meta;
+        }
+
+        unset($data['outcome'], $data['direction'], $data['logged_at']);
 
         $recorder->record($workspace, $data, $request->user());
 

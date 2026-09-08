@@ -10,6 +10,7 @@ export type RecordActivity = {
     due_at?: string | null;
     owner?: { name?: string | null } | null;
     actor?: { name?: string | null } | null;
+    meta?: { outcome?: string | null; direction?: string | null; logged_at?: string | null } | null;
 };
 
 export const RECORD_ACTIVITY_TABS = [

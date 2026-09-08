@@ -1,6 +1,7 @@
 import { Form, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
+import ActivityComposer from '@/components/crm/activity-composer';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
 import type { RecordActivity } from '@/components/crm/record-activity';
@@ -31,12 +32,18 @@ export default function RecordActivityPanel({
     dealNext,
     insight,
     highlights,
+    contactId,
+    dealId,
+    companyId,
 }: {
     timeline: RecordActivity[];
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     dealNext?: string | null;
     insight?: AskEvoPayload | null;
     highlights?: { label: string; value?: string | null }[];
+    contactId?: number | null;
+    dealId?: number | null;
+    companyId?: number | null;
 }) {
     const [tab, setTab] = useState('overview');
     const [chip, setChip] = useState('all');
@@ -129,7 +136,18 @@ export default function RecordActivityPanel({
                         </dl>
                     ) : null}
                     {tab === 'activities' ? (
-                        <div className="mb-2 flex flex-wrap gap-1">
+                        <div className="mb-3 space-y-2">
+                            <ActivityComposer
+                                contactId={contactId}
+                                dealId={dealId}
+                                companyId={companyId}
+                                emailHref={
+                                    contactId
+                                        ? `/outbound?contact_id=${contactId}`
+                                        : '/outbound'
+                                }
+                            />
+                            <div className="flex flex-wrap gap-1">
                             {ACTIVITY_CHIPS.map((item) => (
                                 <Button
                                     key={item.key}
@@ -144,6 +162,7 @@ export default function RecordActivityPanel({
                                     {item.label}
                                 </Button>
                             ))}
+                            </div>
                         </div>
                     ) : null}
                     {items.length === 0 ? (
@@ -166,6 +185,15 @@ export default function RecordActivityPanel({
                                 {item.body && item.subject ? (
                                     <p className="mt-0.5 text-[13px] text-mute">
                                         {item.body}
+                                    </p>
+                                ) : null}
+                                {item.type === 'call' && item.meta?.outcome ? (
+                                    <p className="mt-0.5 text-[12px] text-mute">
+                                        {item.meta.direction === 'inbound'
+                                            ? 'Inbound'
+                                            : 'Outbound'}
+                                        {' · '}
+                                        {item.meta.outcome}
                                     </p>
                                 ) : null}
                                 {item.type === 'task' && !item.done ? (

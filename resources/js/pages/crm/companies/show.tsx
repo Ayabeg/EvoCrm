@@ -265,6 +265,7 @@ export default function CompanyShow({
                             <RecordActivityPanel
                                 timeline={timeline}
                                 insight={askEvo}
+                                companyId={company.id}
                             />
                         }
                         right={
