@@ -334,12 +334,7 @@ it('surfaces score and reason on lead show and the lead board card', function ()
 
     $this->actingAs($user)
         ->get('/leads')
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('leads/board')
-            ->where('deals.0.lead_score.score', 100)
-            ->where('deals.0.lead_score.reason', fn ($reason) => is_string($reason) && $reason !== '')
-        );
+        ->assertRedirect('/crm/deals/board');
 });
 
 it('stores workspace qualify thresholds from settings', function () {

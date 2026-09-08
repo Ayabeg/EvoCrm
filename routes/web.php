@@ -19,7 +19,6 @@ use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\DealSplitController;
 use App\Http\Controllers\Crm\EnrichmentController;
 use App\Http\Controllers\Crm\FunnelController;
-use App\Http\Controllers\Crm\LeadBoardController;
 use App\Http\Controllers\Crm\LeadCaptureController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\LeadOsController;
@@ -120,7 +119,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/auth/instagram', [InstagramController::class, 'redirect'])->name('auth.instagram');
     Route::get('/auth/instagram/callback', [InstagramController::class, 'callback'])->name('auth.instagram.callback');
 
-    Route::get('/leads', [LeadBoardController::class, 'index'])->name('leads.index');
+    Route::redirect('/leads', '/crm/deals/board')->name('leads.index');
 
     Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');

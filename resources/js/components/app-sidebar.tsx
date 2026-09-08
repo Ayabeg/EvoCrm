@@ -54,7 +54,7 @@ const CRM_RAIL_OBJECTS: NavLeaf[] = [
     { id: 'contacts', label: 'Contacts', href: '/crm/contacts', icon: Contact },
     { id: 'companies', label: 'Companies', href: '/crm/companies', icon: Building2 },
     { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake },
-    { id: 'lead-board', label: 'Lead board', href: '/leads', icon: SquareKanban },
+    { id: 'leads', label: 'Leads', href: '/crm/leads', icon: SquareKanban },
 ];
 
 const PRIMARY: NavLeaf[] = [
@@ -64,7 +64,7 @@ const PRIMARY: NavLeaf[] = [
         label: 'CRM',
         href: '/crm/contacts',
         icon: Contact,
-        activePaths: ['/crm', '/leads'],
+        activePaths: ['/crm'],
     },
     {
         id: 'desk',
@@ -89,8 +89,7 @@ const MORE_ITEMS: MoreItem[] = [
     { id: 'companies', label: 'Companies', href: '/crm/companies', icon: Building2, category: 'CRM' },
     { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake, category: 'CRM' },
     { id: 'activities', label: 'Activities', href: '/crm/activities', icon: SquareKanban, category: 'CRM' },
-    { id: 'lead-board', label: 'Lead board', href: '/leads', icon: SquareKanban, category: 'CRM' },
-    { id: 'leads', label: 'Leads list', href: '/crm/leads', icon: SquareKanban, category: 'CRM' },
+    { id: 'leads', label: 'Leads', href: '/crm/leads', icon: SquareKanban, category: 'CRM' },
     { id: 'lead-captures', label: 'Captures', href: '/crm/leads/captures', icon: Inbox, category: 'CRM' },
     { id: 'pipelines', label: 'Pipeline', href: '/crm/deals/board', icon: SquareKanban, category: 'CRM' },
     { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users, category: 'CRM' },

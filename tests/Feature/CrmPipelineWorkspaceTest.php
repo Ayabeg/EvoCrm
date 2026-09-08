@@ -34,9 +34,9 @@ it('keeps one forecast strip on real board data and leaves weighted unbranded', 
         ->and($strip)->not->toContain('CrmKpiStrip');
 });
 
-it('keeps the shared kanban operable for deals and leads without a new board library', function () {
+it('keeps the shared kanban operable for deals without a second leads board product', function () {
     $kanban = file_get_contents(resource_path('js/components/crm/pipeline-kanban.tsx'));
-    $leads = file_get_contents(resource_path('js/pages/leads/board.tsx'));
+    $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
 
     expect($kanban)->toContain('cursor-grab')
         ->and($kanban)->toContain('aria-grabbed')
@@ -46,7 +46,7 @@ it('keeps the shared kanban operable for deals and leads without a new board lib
         ->and($kanban)->toContain('Total:')
         ->and($kanban)->not->toContain('dnd-kit')
         ->and($kanban)->not->toContain('@hello-pangea/dnd')
-        ->and($leads)->toContain('PipelineKanban')
-        ->and($leads)->toContain('CrmObjectHeader')
-        ->and($leads)->not->toContain('PageHeader');
+        ->and($board)->toContain('PipelineKanban')
+        ->and($board)->toContain('CrmObjectHeader')
+        ->and($board)->not->toContain('PageHeader');
 });
