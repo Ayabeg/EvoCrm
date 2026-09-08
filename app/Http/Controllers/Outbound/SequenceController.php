@@ -44,20 +44,33 @@ class SequenceController extends Controller
             'name' => ['required', 'string', 'max:160'],
             'channel' => ['required', 'in:email,whatsapp_cloud'],
             'description' => ['nullable', 'string'],
+            'origin' => ['nullable', 'in:scratch,template'],
         ]);
 
         $sequence = Sequence::query()->create([
-            ...$data,
+            'name' => $data['name'],
+            'channel' => $data['channel'],
+            'description' => $data['description'] ?? null,
             'workspace_id' => $request->user()->workspace_id,
             'active' => false,
         ]);
+
+        $template = null;
+        if (($data['origin'] ?? 'scratch') === 'template' && $data['channel'] === 'email') {
+            $template = OutboundTemplate::query()
+                ->forWorkspace($request->user()->workspace)
+                ->orderBy('name')
+                ->first();
+        }
 
         $sequence->steps()->create([
             'position' => 1,
             'delay_hours' => 0,
             'channel' => $data['channel'],
-            'subject' => $data['channel'] === 'email' ? 'Hello {{first_name}}' : null,
-            'body' => $data['channel'] === 'email' ? 'Thanks for your interest, {{first_name}}.' : null,
+            'step_type' => $data['channel'] === 'whatsapp_cloud' ? 'whatsapp_cloud' : 'email',
+            'subject' => $template?->subject ?? ($data['channel'] === 'email' ? 'Hello {{first_name}}' : null),
+            'body' => $template?->body ?? ($data['channel'] === 'email' ? 'Thanks for your interest, {{first_name}}.' : null),
+            'template_id' => $template?->id,
             'wa_template_name' => $data['channel'] === 'whatsapp_cloud' ? 'hello_world' : null,
             'wa_template_language' => $data['channel'] === 'whatsapp_cloud' ? 'fr' : null,
         ]);
@@ -97,6 +110,9 @@ class SequenceController extends Controller
             ->values()
             ->all();
 
+        $hours = $workspace->activeQuietHours() ?? $workspace->quietHours()->first();
+        $boxes = Mailbox::query()->forWorkspace($workspace)->get();
+
         return Inertia::render('outbound/sequences/show', [
             'sequence' => $sequence->load(['steps.mailbox:id,name', 'enrollments.contact']),
             'stepAnalytics' => $stepAnalytics,
@@ -118,6 +134,16 @@ class SequenceController extends Controller
                 ->where('entity', 'contact')
                 ->orderBy('name')
                 ->get(['id', 'name']),
+            'quietHours' => [
+                'starts_at' => substr((string) ($hours?->starts_at ?? config('evosales.quiet_hours.starts_at')), 0, 5),
+                'ends_at' => substr((string) ($hours?->ends_at ?? config('evosales.quiet_hours.ends_at')), 0, 5),
+                'timezone' => $hours?->timezone ?? 'Africa/Algiers',
+                'enabled' => (bool) ($hours?->enabled ?? true),
+            ],
+            'warmup' => [
+                'warming' => $boxes->filter(fn ($box) => $box->warming())->count(),
+                'total' => $boxes->count(),
+            ],
         ]);
     }
 
@@ -154,6 +180,7 @@ class SequenceController extends Controller
             'channel' => ['required', 'in:email,whatsapp_cloud'],
             'mailbox_id' => ['nullable', 'integer'],
             'subject' => ['nullable', 'string', 'max:180'],
+            'subject_b' => ['nullable', 'string', 'max:180'],
             'body' => ['nullable', 'string'],
             'meeting_url' => ['nullable', 'url', 'max:500'],
             'on_reply_step' => ['nullable', 'integer', 'min:1'],
@@ -198,10 +225,13 @@ class SequenceController extends Controller
 
         $data = $request->validate([
             'delay_hours' => ['required', 'integer', 'min:0'],
+            'step_type' => ['nullable', 'in:email,call,meeting,whatsapp_cloud'],
             'channel' => ['required', 'in:email,whatsapp_cloud'],
             'mailbox_id' => ['nullable', 'integer'],
             'subject' => ['nullable', 'string', 'max:180'],
+            'subject_b' => ['nullable', 'string', 'max:180'],
             'body' => ['nullable', 'string'],
+            'meeting_url' => ['nullable', 'url', 'max:500'],
             'wa_template_name' => ['nullable', 'string', 'max:120'],
             'wa_template_language' => ['nullable', 'string', 'max:12'],
         ]);

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'channel',
     'mailbox_id',
     'subject',
+    'subject_b',
     'body',
     'meeting_url',
     'on_reply_step',
