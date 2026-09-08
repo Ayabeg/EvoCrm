@@ -86,9 +86,13 @@ class Lead extends Model
 
     public function qualify(): void
     {
+        $payload = is_array($this->payload) ? $this->payload : [];
+        $payload['path_step'] = 'converted';
+
         $this->forceFill([
             'status' => 'qualified',
             'qualified_at' => now(),
+            'payload' => $payload,
         ])->save();
     }
 }

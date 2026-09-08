@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Crm;
 
+use App\Enums\ChannelType;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\EnrichmentRun;
 use App\Models\Lead;
+use App\Models\User;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\LeadConverter;
 use App\Services\Crm\LeadScorer;
 use App\Services\Crm\PipelineManager;
 use App\Services\Enrichment\EnrichmentService;
 use App\Support\CrmHub;
+use App\Support\LeadPath;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -58,20 +61,43 @@ class LeadController extends Controller
         abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
-        $lead->load(['contact.company', 'contact.threads', 'contact.enrollments.sequence', 'contact.deals.stage', 'company', 'deal.stage', 'latestScore']);
+        $lead->load([
+            'contact.company',
+            'contact.owner',
+            'contact.threads.channel',
+            'contact.enrollments.sequence',
+            'contact.deals.stage',
+            'company',
+            'deal.stage',
+            'latestScore',
+        ]);
+
+        $threads = $lead->contact?->threads ?? collect();
+        $whatsappThread = $threads->first(
+            fn ($thread) => $thread->channel?->type === ChannelType::WhatsAppCloud,
+        );
+        $lastWhatsapp = $whatsappThread?->messages()->latest('id')->first();
 
         return Inertia::render('crm/leads/show', [
             'lead' => $lead,
             'leadScore' => $lead->latestScore?->present(),
+            'path' => LeadPath::present($lead),
             'askEvo' => $insight->forLead($lead),
             'associations' => [
                 'contact' => $lead->contact,
                 'company' => $lead->company,
                 'deal' => $lead->deal,
-                'threads' => $lead->contact?->threads ?? [],
+                'threads' => $threads,
                 'enrollments' => $lead->contact?->enrollments ?? [],
                 'deals' => $lead->contact?->deals ?? [],
             ],
+            'whatsapp' => $whatsappThread ? [
+                'thread_id' => $whatsappThread->id,
+                'subject' => $whatsappThread->subject,
+                'last_message' => $lastWhatsapp?->body,
+                'last_message_at' => ($lastWhatsapp?->created_at ?? $whatsappThread->last_message_at)?->toIso8601String(),
+                'direction' => $lastWhatsapp?->direction,
+            ] : null,
             'contacts' => Contact::query()
                 ->forWorkspace($workspace)
                 ->orderBy('first_name')
@@ -97,13 +123,45 @@ class LeadController extends Controller
     {
         abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
 
+        if ($request->exists('owner_id') && $request->input('owner_id') === '') {
+            $request->merge(['owner_id' => null]);
+        }
+
         $data = $request->validate([
-            'title' => ['required', 'string', 'max:180'],
-            'source' => ['nullable', 'string', 'max:80'],
-            'status' => ['nullable', 'in:new,working,qualified,disqualified'],
+            'title' => ['sometimes', 'required', 'string', 'max:180'],
+            'source' => ['sometimes', 'nullable', 'string', 'max:80'],
+            'status' => ['sometimes', 'nullable', 'in:new,working,disqualified'],
+            'path_step' => ['sometimes', 'nullable', 'in:new,contacted,nurturing,unqualified'],
+            'owner_id' => ['sometimes', 'nullable', 'integer'],
         ]);
 
-        $lead->update($data);
+        if (isset($data['path_step'])) {
+            LeadPath::apply($lead, (string) $data['path_step']);
+            unset($data['path_step'], $data['status']);
+        }
+
+        if (array_key_exists('owner_id', $data)) {
+            $ownerId = $data['owner_id'];
+            unset($data['owner_id']);
+
+            if ($ownerId) {
+                $owner = User::query()
+                    ->where('workspace_id', $lead->workspace_id)
+                    ->findOrFail($ownerId);
+                $lead->contact?->forceFill(['owner_id' => $owner->id])->save();
+                $recordName = $lead->contact?->display_name ?: $lead->title;
+                Inertia::flash('toast', [
+                    'type' => 'success',
+                    'message' => "{$owner->name} now owns the record for {$recordName}.",
+                ]);
+            } else {
+                $lead->contact?->forceFill(['owner_id' => null])->save();
+            }
+        }
+
+        if ($data !== []) {
+            $lead->update($data);
+        }
 
         return back();
     }

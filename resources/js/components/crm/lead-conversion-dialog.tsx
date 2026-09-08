@@ -26,14 +26,20 @@ export default function LeadConversionDialog({
     pipelines,
     members,
     contactDeals,
+    open: openProp,
+    onOpenChange,
 }: {
     leadId: number;
     pipelines: PipelineOption[];
     members: Member[];
     contactDeals: ContactDeal[];
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }) {
     const defaultPipeline = pipelines.find((row) => row.is_default) ?? pipelines[0];
-    const [open, setOpen] = useState(false);
+    const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+    const open = openProp ?? uncontrolledOpen;
+    const setOpen = onOpenChange ?? setUncontrolledOpen;
     const [mode, setMode] = useState<'create' | 'link'>('create');
     const [pipelineId, setPipelineId] = useState(String(defaultPipeline?.id ?? ''));
     const stages = useMemo(
@@ -44,7 +50,9 @@ export default function LeadConversionDialog({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="sm" className="h-8">Qualify</Button>
+                <Button variant="outline" size="sm" className="h-8">
+                    Convert
+                </Button>
             </DialogTrigger>
             <DialogContent size="lg">
                 <DialogHeader>

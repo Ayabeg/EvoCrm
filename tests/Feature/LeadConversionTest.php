@@ -46,6 +46,7 @@ it('creates a linked deal when a lead is qualified', function () {
 
     expect($lead->status)->toBe('qualified')
         ->and($lead->qualified_at)->not->toBeNull()
+        ->and($lead->payload['path_step'] ?? null)->toBe('converted')
         ->and($deal)->not->toBeNull()
         ->and($deal->lead_id)->toBe($lead->id)
         ->and($deal->contact_id)->toBe($lead->contact_id)
@@ -163,6 +164,8 @@ it('exposes conversion fields on the lead record page', function () {
             ->has('pipelines')
             ->has('members')
             ->has('contactDeals', 1)
+            ->has('path.steps', 5)
+            ->where('path.current', 'contacted')
             ->where('pipelines.0.id', $pipeline->id)
         );
 });

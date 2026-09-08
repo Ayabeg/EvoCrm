@@ -150,6 +150,7 @@ export function RecordIdentity({
     meta,
     badge,
     actions,
+    actionsClassName,
 }: {
     title: string;
     initials?: string;
@@ -158,6 +159,7 @@ export function RecordIdentity({
     meta?: ReactNode;
     badge?: ReactNode;
     actions?: ReactNode;
+    actionsClassName?: string;
 }) {
     return (
         <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -187,7 +189,12 @@ export function RecordIdentity({
                 </div>
             </div>
             {actions ? (
-                <div className="min-w-0 shrink-0 sm:max-w-[22rem] sm:pt-0.5">
+                <div
+                    className={cn(
+                        'min-w-0 shrink-0 sm:max-w-[22rem] sm:pt-0.5',
+                        actionsClassName,
+                    )}
+                >
                     {actions}
                 </div>
             ) : null}
