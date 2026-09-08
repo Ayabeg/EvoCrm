@@ -267,20 +267,31 @@ Wave 6 on `714d21a` (not scored): audit trail, calculated/custom list columns, c
 
 ---
 
+## What to add next (2026-08-29)
+
+Wave 6 closed playbooks, calculated list columns, association filters, audit trail, and segment membership history. Those are no longer the next build.
+
+**Build next: a public meeting scheduler.** HubSpot Sales Hub's most-used primitive that EvoSales still has none of. See [`docs/ideas/next-hubspot-feature.md`](./ideas/next-hubspot-feature.md).
+
+Do not start tickets, canvas, Breeze agents, marketplace, or SAML unless a named customer is blocked by them.
+
 ## Top remaining gaps toward Omega (≥95 composite)
 
 These replace the 2026-08-24 list. Items that shipped in Waves 3–6 (`segment.exited`, scheduled reports, calculated columns, playbooks, audit trail, segment history) are **done**.
 
 | # | Gap | Dimensions | Effort | Notes |
 |---|-----|------------|--------|-------|
-| 1 | **Forecast backtest** — validate the band within 15% on historical deals | M3, M10 | Large | Still the honest AI/forecast ceiling |
-| 2 | **SMS send path** (Twilio or DZ provider) | M8 | Medium | Composer already stubs the failure |
-| 3 | **Visual workflow canvas** (read-only v1 → editable) | M6 | Large | Explicitly deferred; largest remaining automation gap |
-| 4 | **SAML / SSO** | M11 | Medium | Audit trail shipped; SAML still deferred |
-| 5 | **Breeze-comparable RAG** (optional) | M10 | Large | Explicitly deferred; do not fake agent claims |
-| 6 | **Tickets or a Service Hub boundary** | M1, M8 | Large | Empty ticket card on deals is UI only |
-| 7 | **E-sign / payments** | M1 | Large | Quotes accept; they do not collect money or a legal signature |
-| 8 | **Deeper association filters** | M2 | Medium | `deal_stage` / `has_open_deal` shipped; HubSpot-depth cross-object filters remain |
+| 1 | **Public meeting scheduler** — `/book/{user}` writes a Meeting + Calendar event | M4, M8, M12 | Medium | **Recommended next feature.** Google Calendar sync and `meeting` activities already exist |
+| 2 | **Required-property stage gating** | M3 | Medium | HubSpot Professional pipeline honesty; unblocks a trustworthy forecast |
+| 3 | **Sales quotas on Home** | M3, M9 | Medium | Monthly DZD target vs won; the sales-performance table is already there |
+| 4 | **Forecast backtest** — validate the band within 15% on historical deals | M3, M10 | Large | Engineering quality, not a seller-facing feature |
+| 5 | **SMS send path** (Twilio or DZ provider) | M8 | Medium | Composer already stubs the failure; WA-first ICP, ship on demand |
+| 6 | **Visual workflow canvas** (read-only v1 → editable) | M6 | Large | Explicitly deferred; form UI already runs the 7×8 set |
+| 7 | **SAML / SSO** | M11 | Medium | Audit trail shipped; SAML still deferred |
+| 8 | **Breeze-comparable RAG** (optional) | M10 | Large | Explicitly deferred; do not fake agent claims |
+| 9 | **Tickets or a Service Hub boundary** | M1, M8 | Large | After-sale work in this market is WhatsApp, not a ticket queue |
+| 10 | **E-sign / payments** | M1 | Large | Quotes accept; they do not collect money or a legal signature |
+| 11 | **Deeper association filters** | M2 | Medium | `deal_stage` / `has_open_deal` shipped; HubSpot-depth cross-object filters remain |
 
 ---
 
@@ -337,6 +348,7 @@ Use [production](https://crm.evotechly.com) after merge, or local with the seede
 
 ## Related docs
 
+- [Next feature to add (meeting scheduler)](./ideas/next-hubspot-feature.md)
 - [Side-by-side capability matrix](./hubspot-side-by-side.md)
 - [EvoCells roadmap & dimension scorecard](./evocells-roadmap.md)
 - [Production processes](./production-processes.md)

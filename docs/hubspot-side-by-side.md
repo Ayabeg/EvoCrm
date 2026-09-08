@@ -193,7 +193,7 @@ HubSpot column is **Sales Hub Professional + Service Hub + Marketing Hub** as of
 | **M1–M11 composite** | 100 (reference) | **~85** |
 | **Won outright** | Canvas, Breeze agents, tickets/custom objects, Commerce e-sign/pay, SMS/live chat, marketplace, SSO | Owned mail + warmup, WhatsApp native, Meta funnel, wilaya/DZD, self-host, scheduler health |
 | **Now matched** | Lists/filters/bulk/calc columns, lead→deal, quotes send/accept (without pay), segment enter/exit + history, Gmail/Calendar, scheduled reports, permission UI, playbooks, audit trail | — |
-| **Still the ceiling** | Omega ≥95 needs forecast backtest, SMS, canvas, SAML, tickets/custom objects, Commerce e-sign/pay, Breeze agents | Explicitly not cloning HubSpot Enterprise |
+| **Still the ceiling** | Omega ≥95 needs a meeting scheduler, stage-required fields, quotas, then forecast backtest | Explicitly not cloning HubSpot Enterprise. Next feature: [meeting scheduler](./ideas/next-hubspot-feature.md) |
 
 ---
 

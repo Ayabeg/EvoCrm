@@ -146,12 +146,14 @@ curl -sf https://crm.evotechly.com/up
 
 ## Next work toward Omega
 
-1. **M3 + M10** — Forecast band backtest within 15% on historical deals
-2. **M8** — Twilio/DZ SMS send path (live chat stays EvoDesk)
-3. **M6** — Optional read-only workflow canvas v1
-4. **M2** — Calculated list columns and deal-stage filters shipped; remaining list depth is association math beyond open-deal/stage
-5. **M4** — Record playbooks shipped; remaining record gap is richer playbook branching
-6. **M11** — Audit trail shipped; SAML remains deferred
-7. **M5** — Segment membership history is shipped
+**Product decision (2026-08-29):** the next seller-facing feature is a **public meeting scheduler**, not forecast backtest or tickets. Write-up: [next-hubspot-feature.md](./ideas/next-hubspot-feature.md).
+
+1. **M4 + M12** — Public `/book/{user}` page: working hours − Google busy times → Meeting activity + confirmation email
+2. **M3** — Required-property stage gating (pipeline honesty)
+3. **M3 + M9** — Monthly DZD quotas on Home
+4. **M3 + M10** — Forecast band backtest within 15% on historical deals (quality, not a seller feature)
+5. **M8** — Twilio/DZ SMS send path only if a customer asks (live chat stays EvoDesk)
+6. **M6** — Optional read-only workflow canvas v1 — still deferred
+7. **M11** — SAML remains deferred; audit trail shipped
 
 See [Top remaining gaps](./hubspot-parity-comparison.md#top-remaining-gaps-toward-omega-95-composite) for the full list.
