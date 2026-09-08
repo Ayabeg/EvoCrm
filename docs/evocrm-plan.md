@@ -8,7 +8,7 @@
 | **Screen freeze** | [evocrm-mobbin-contract.md](./evocrm-mobbin-contract.md) (P0) |
 | **Date** | 2026-09-08 |
 | **Buyer** | 5–20 seat Algeria-first sales team (DZD, wilaya, WhatsApp, Meta ads). |
-| **Status** | Approved. P0–P4 opened as PRs; P5–P10 remaining. |
+| **Status** | Approved. P0–P5 on `main` or in flight; P6–P10 remaining. |
 
 Engineers implement against the cited Mobbin screenshot, not against this paragraph.
 
@@ -266,7 +266,7 @@ Each PR independently reviewable. Mobbin URL in the PR body. Pest coverage on th
 | **P2** | `feat(crm): list chrome vs HubSpot deals table` | [#131](https://github.com/Mohamedbeghanem/EvoSales/pull/131) | P0 | View tabs, chips, list/board toggle, Create CTA |
 | **P3** | `feat(deals): HubSpot board cards + options` | [#132](https://github.com/Mohamedbeghanem/EvoSales/pull/132) | P2 | Inactivity, High/Low, compact/default persist |
 | **P4** | `feat(leads): Salesforce Path + Convert chrome` | [#133](https://github.com/Mohamedbeghanem/EvoSales/pull/133) | P2 | Path + Convert/Change Owner/Edit |
-| **P5** | `feat(records): 3-pane + Ask Evo rail` | remaining | P4 | 3 columns; AI always on; WA instead of Slack |
+| **P5** | `feat(records): 3-pane + Ask Evo rail` | this PR | P4 | 3 columns; AI always on; WA instead of Slack |
 | **P6** | `feat(activities): composer + log call` | remaining | P5 | Icon composer + HubSpot log-call fields |
 | **P7** | `feat(outbound): HubSpot sequence step editor` | remaining | P2 | Vertical steps, templates, WA step, enroll empty |
 | **P8** | `feat(deals): workspace columns health + next step` | remaining | P3 | Health score + next activity columns |

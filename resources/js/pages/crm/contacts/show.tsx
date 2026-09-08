@@ -3,6 +3,7 @@ import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
 import ContactDealsKanban from '@/components/crm/contact-deals-kanban';
+import DeskThreadCard from '@/components/crm/desk-thread-card';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import EnrichmentPanel from '@/components/crm/enrichment-panel';
 import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
@@ -72,6 +73,12 @@ export default function ContactShow({
     associations: {
         company?: { id: number; name: string } | null;
         deals?: { id: number; title: string; stage?: { name: string } }[];
+        threads?: {
+            id: number;
+            subject?: string | null;
+            last_message?: string | null;
+            last_message_at?: string | null;
+        }[];
     } | null;
     timeline: RecordActivity[];
     attributes?: AttributeBag;
@@ -91,6 +98,8 @@ export default function ContactShow({
     const askAction = `/crm/contacts/${contact.id}/ask`;
     const company = associations?.company ?? contact.company ?? null;
     const deals = associations?.deals ?? [];
+    const thread = associations?.threads?.[0] ?? null;
+    const inbound = catchUp?.inbound?.[0];
 
     return (
         <>
@@ -142,6 +151,11 @@ export default function ContactShow({
                                         entityId={contact.id}
                                         contactId={contact.id}
                                         companyId={contact.company_id}
+                                        whatsappHref={
+                                            thread
+                                                ? `/conversations?thread=${thread.id}`
+                                                : '/inbox'
+                                        }
                                         secondary={
                                             <div className="md:hidden">
                                                 <AskEvoTrigger
@@ -217,10 +231,35 @@ export default function ContactShow({
                             <RecordActivityPanel
                                 timeline={timeline}
                                 catchUp={catchUp}
+                                insight={askEvo}
+                                highlights={[
+                                    { label: 'Email', value: contact.email },
+                                    { label: 'Phone', value: contact.phone_e164 },
+                                    { label: 'Company', value: company?.name },
+                                    {
+                                        label: 'Owner',
+                                        value: contact.owner?.name,
+                                    },
+                                ]}
                             />
                         }
                         right={
                             <div className="space-y-3">
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
+                                <DeskThreadCard
+                                    thread={
+                                        inbound
+                                            ? {
+                                                  id: thread?.id,
+                                                  subject: inbound.label,
+                                                  last_message: inbound.label,
+                                              }
+                                            : thread
+                                    }
+                                />
                                 <AssociationCard
                                     title="Company"
                                     addHref={
@@ -267,10 +306,6 @@ export default function ContactShow({
                                         )}
                                     </AssociationCard>
                                 )}
-                                <AskEvoPanel
-                                    action={askAction}
-                                    insight={askEvo}
-                                />
                             </div>
                         }
                     />

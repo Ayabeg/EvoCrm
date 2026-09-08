@@ -3,6 +3,7 @@ import { useState } from 'react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import { SkeletonRecord } from '@/components/crm/empty-room';
+import DeskThreadCard from '@/components/crm/desk-thread-card';
 import EnrichmentPanel from '@/components/crm/enrichment-panel';
 import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import type { RecordActivity } from '@/components/crm/record-activity';
@@ -260,9 +261,19 @@ export default function CompanyShow({
                                 ) : null}
                             </div>
                         }
-                        center={<RecordActivityPanel timeline={timeline} />}
+                        center={
+                            <RecordActivityPanel
+                                timeline={timeline}
+                                insight={askEvo}
+                            />
+                        }
                         right={
                             <div className="space-y-3">
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
+                                <DeskThreadCard />
                                 <AssociationCard
                                     title="Contacts"
                                     addHref="/crm/contacts?create=1"
@@ -296,10 +307,6 @@ export default function CompanyShow({
                                         ))
                                     )}
                                 </AssociationCard>
-                                <AskEvoPanel
-                                    action={askAction}
-                                    insight={askEvo}
-                                />
                             </div>
                         }
                     />

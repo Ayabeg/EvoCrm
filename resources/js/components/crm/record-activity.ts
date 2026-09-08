@@ -13,21 +13,21 @@ export type RecordActivity = {
 };
 
 export const RECORD_ACTIVITY_TABS = [
-    { key: 'activity', label: 'Activity' },
-    { key: 'tasks', label: 'Tasks' },
-    { key: 'notes', label: 'Notes' },
+    { key: 'overview', label: 'Overview' },
+    { key: 'activities', label: 'Activities' },
+    { key: 'intelligence', label: 'Intelligence' },
 ] as const;
 
 export function filterRecordActivity(
     timeline: RecordActivity[],
     tab: string,
 ): RecordActivity[] {
-    if (tab === 'tasks') {
-        return timeline.filter((item) => item.type === 'task');
+    if (tab === 'overview') {
+        return timeline.slice(0, 5);
     }
 
-    if (tab === 'notes') {
-        return timeline.filter((item) => item.type === 'note');
+    if (tab === 'intelligence') {
+        return [];
     }
 
     return timeline;

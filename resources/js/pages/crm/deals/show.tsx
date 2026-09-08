@@ -11,6 +11,7 @@ import DealQuotes from '@/components/crm/deal-quotes';
 import DealSplits from '@/components/crm/deal-splits';
 import type { DealSuggestionPayload } from '@/components/crm/deal-suggestion-card';
 import DealSuggestionCard from '@/components/crm/deal-suggestion-card';
+import DeskThreadCard from '@/components/crm/desk-thread-card';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import PlaybookCard from '@/components/crm/playbook-card';
 import type { RecordActivity } from '@/components/crm/record-activity';
@@ -184,6 +185,7 @@ export default function DealShow({
                                         dealId={deal.id}
                                         contactId={deal.contact_id}
                                         companyId={deal.company_id}
+                                        whatsappHref="/inbox"
                                         secondary={
                                             <div className="md:hidden">
                                                 <AskEvoTrigger
@@ -333,10 +335,26 @@ export default function DealShow({
                                 timeline={timeline}
                                 catchUp={catchUp}
                                 dealNext={dealHealth?.next_action}
+                                insight={askEvo}
                             />
                         }
                         right={
                             <div className="space-y-3">
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
+                                <DeskThreadCard
+                                    thread={
+                                        catchUp?.inbound?.[0]
+                                            ? {
+                                                  subject: catchUp.inbound[0].label,
+                                                  last_message:
+                                                      catchUp.inbound[0].label,
+                                              }
+                                            : null
+                                    }
+                                />
                                 <AssociationCard
                                     title="Contact"
                                     addHref={
@@ -376,10 +394,6 @@ export default function DealShow({
                                         <p className="text-mute">No company</p>
                                     )}
                                 </AssociationCard>
-                                <AskEvoPanel
-                                    action={askAction}
-                                    insight={askEvo}
-                                />
                             </div>
                         }
                     />

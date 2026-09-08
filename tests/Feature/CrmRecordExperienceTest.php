@@ -30,6 +30,9 @@ it('demotes Ask Evo and keeps a single primary record action', function () {
 
     expect($ask)->not->toContain('fixed end-4 bottom-20')
         ->and($ask)->not->toContain('radial-gradient')
+        ->and($ask)->not->toContain('Breeze')
+        ->and($ask)->toContain('ask-evo-rail')
+        ->and($ask)->toContain('This record')
         ->and($ask)->toContain('variant="outline"')
         ->and($ask)->toContain('variant="ghost"')
         ->and($chrome)->toContain('record-action-group')
@@ -37,12 +40,14 @@ it('demotes Ask Evo and keeps a single primary record action', function () {
         ->and($chrome)->toContain("label: 'Email'")
         ->and($chrome)->toContain("label: 'Call'")
         ->and($chrome)->toContain("label: 'Task'")
-        ->and($chrome)->toContain("label: 'Meeting'")
+        ->and($chrome)->toContain("label: 'Meet'")
+        ->and($chrome)->toContain('WhatsApp')
         ->and($chrome)->toContain('More')
+        ->and($chrome)->toContain('rightLabel = \'Ask Evo\'')
         ->and($chrome)->toContain('defaultPanel="center"')
-        ->and($activity)->toContain("key: 'activity'")
-        ->and($activity)->toContain("key: 'tasks'")
-        ->and($activity)->toContain("key: 'notes'")
+        ->and($activity)->toContain("key: 'overview'")
+        ->and($activity)->toContain("key: 'activities'")
+        ->and($activity)->toContain("key: 'intelligence'")
         ->and($activity)->toContain('taskId');
 });
 
