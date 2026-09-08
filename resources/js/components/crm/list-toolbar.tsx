@@ -1,4 +1,5 @@
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import ColumnChooser from '@/components/crm/column-chooser';
 import ColumnFilterRow from '@/components/crm/column-filter-row';
@@ -9,6 +10,7 @@ import SavedViewTabs from '@/components/crm/saved-view-tabs';
 import { StagePills } from '@/components/crm/stage-pills';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     Sheet,
     SheetContent,
@@ -43,6 +45,9 @@ export default function ListToolbar({
     stagePills = [],
     columns: controlledColumns,
     onColumnsChange,
+    layoutToggle,
+    pipelineSwitcher,
+    extraQuery = {},
 }: {
     entity: 'contact' | 'company' | 'deal';
     basePath: string;
@@ -60,6 +65,9 @@ export default function ListToolbar({
     exportHref?: string;
     columns?: ListViewColumn[];
     onColumnsChange?: (columns: ListViewColumn[]) => void;
+    layoutToggle?: ReactNode;
+    pipelineSwitcher?: ReactNode;
+    extraQuery?: Record<string, string | number | null | undefined>;
 }) {
     const { auth } = usePage().props as { auth: { user: { role: string } } };
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
@@ -99,6 +107,7 @@ export default function ListToolbar({
             wilayas={wilayas}
             columns={columns}
             filterGroups={filterGroups}
+            extraQuery={extraQuery}
             filterBuilder={
                 listView ? (
                     <FilterBuilder
@@ -116,10 +125,16 @@ export default function ListToolbar({
         />
     );
 
+    const searchPlaceholder =
+        entity === 'deal'
+            ? 'Search name or description'
+            : entity === 'company'
+              ? 'Search companies'
+              : 'Search name, email, or phone';
+
     return (
         <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar">
-            <div className="flex items-center gap-2 px-4 py-1.5 sm:px-6">
-                <div className="min-w-0 flex-1">
+            <div className="px-4 pt-2 sm:px-6">
                 <SavedViewTabs
                     basePath={basePath}
                     entity={entity}
@@ -130,19 +145,53 @@ export default function ListToolbar({
                     recordCount={recordCount}
                     filterGroups={filterGroups}
                     canManageSettings={canManageSettings}
+                    extraQuery={extraQuery}
                 />
-                </div>
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-2.5 text-[12px]"
-                    aria-expanded={filtersOpen}
-                    aria-controls="crm-list-filters"
-                    onClick={() => setFiltersOpen((open) => !open)}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 px-4 py-2 sm:px-6">
+                {layoutToggle}
+                {pipelineSwitcher}
+                {isMobile ? (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-2.5 text-[12px]"
+                        aria-expanded={filtersOpen}
+                        aria-controls="crm-list-filters"
+                        onClick={() => setFiltersOpen((open) => !open)}
+                    >
+                        Advanced filters{activeCount > 0 ? ` ${activeCount}` : ''}
+                    </Button>
+                ) : (
+                    <div id="crm-list-filters" className="min-w-0 flex-1">
+                        {filterPanel}
+                    </div>
+                )}
+                <form
+                    className="ms-auto flex min-w-[12rem] max-w-xs flex-1 items-center"
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        const q = String(new FormData(event.currentTarget).get('q') ?? '');
+                        router.get(
+                            crmListHref(
+                                basePath,
+                                { ...filterFields(activeFilters), ...extraQuery },
+                                { q: q || null },
+                            ),
+                            {},
+                            { preserveState: true },
+                        );
+                    }}
                 >
-                    Filter{activeCount > 0 ? ` ${activeCount}` : ''}
-                </Button>
+                    <Input
+                        name="q"
+                        defaultValue={String(activeFilters.q ?? '')}
+                        placeholder={searchPlaceholder}
+                        className="h-7 rounded-sm text-[12px]"
+                        aria-label="Search list"
+                    />
+                </form>
                 {listView ? (
                     <ColumnChooser
                         columnDefs={listView.columnDefs}
@@ -160,20 +209,11 @@ export default function ListToolbar({
                 <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
                     <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
                         <SheetHeader>
-                            <SheetTitle>
-                                Filter{' '}
-                                {entity === 'deal'
-                                    ? 'deals'
-                                    : entity === 'company'
-                                      ? 'companies'
-                                      : 'contacts'}
-                            </SheetTitle>
+                            <SheetTitle>Advanced filters</SheetTitle>
                         </SheetHeader>
-                        <div id="crm-list-filters">{filterPanel}</div>
+                        <div id="crm-list-filters-mobile">{filterPanel}</div>
                     </SheetContent>
                 </Sheet>
-            ) : filtersOpen ? (
-                <div id="crm-list-filters">{filterPanel}</div>
             ) : null}
             {entity === 'deal' ? (
                 <StagePills

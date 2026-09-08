@@ -48,7 +48,8 @@ class DealController extends Controller
         $filter->applyToDeals($query, $filters);
         $filter->applySort('deal', $query, $filters);
 
-        $deals = $hub->withListAttributes($workspace, 'deal', $query->limit(120)->get());
+        [$dealRows, $paginator] = $filter->paginate($query, $request);
+        $deals = $hub->withListAttributes($workspace, 'deal', $dealRows);
 
         $stageCounts = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filters, $filter) {
             $countQuery = Deal::query()->forWorkspace($workspace);
@@ -91,7 +92,8 @@ class DealController extends Controller
             'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
-            'recordCount' => $filter->count($workspace, 'deal', $filters),
+            'recordCount' => $paginator['total'],
+            'paginator' => $paginator,
             'stagePills' => $stageCounts,
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),

@@ -7,7 +7,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,7 @@ import type {
     SavedView,
 } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
+import { cn } from '@/lib/utils';
 
 const OBJECT_NOUNS: Record<'contact' | 'company' | 'deal', string> = {
     contact: 'contacts',
@@ -32,9 +32,9 @@ export default function SavedViewTabs({
     savedFilters = [],
     columns = [],
     listView,
-    recordCount,
     filterGroups,
     canManageSettings = false,
+    extraQuery = {},
 }: {
     basePath: string;
     entity: 'contact' | 'company' | 'deal';
@@ -45,95 +45,98 @@ export default function SavedViewTabs({
     recordCount?: number;
     filterGroups?: ListViewFilters;
     canManageSettings?: boolean;
+    extraQuery?: Record<string, string | number | null | undefined>;
 }) {
     const { auth } = usePage().props;
     const [naming, setNaming] = useState(false);
-    const [visibility, setVisibility] = useState<
-        'private' | 'team' | 'workspace'
-    >('private');
+    const [visibility, setVisibility] = useState<'private' | 'team' | 'workspace'>('private');
     const view = String(activeFilters.view ?? 'all');
     const filterId = Number(activeFilters.filter_id ?? 0) || null;
     const fields = filterFields(activeFilters);
     const groups = filterGroups ?? filterGroupsFromActive(activeFilters);
     const nouns = OBJECT_NOUNS[entity];
 
-    const allHref = crmListHref(basePath, fields, {
+    const allHref = crmListHref(basePath, { ...fields, ...extraQuery }, {
         view: 'all',
         owner: null,
         filter_id: null,
     });
-    const myHref = crmListHref(basePath, fields, {
+    const myHref = crmListHref(basePath, { ...fields, ...extraQuery }, {
         view: 'my',
         owner: auth.user.id,
         filter_id: null,
     });
 
-    const saved = savedFilters.find((filter) => filter.id === filterId);
-    const currentLabel = saved
-        ? saved.name
-        : view === 'my'
-          ? `My ${nouns}`
-          : `All ${nouns}`;
+    const pinned = savedFilters.slice(0, 3);
+    const overflow = savedFilters.slice(3);
+    const tabClass = (active: boolean) =>
+        cn(
+            'shrink-0 border-b-2 pb-2 text-[13px] whitespace-nowrap',
+            active
+                ? 'border-brand font-medium text-ink'
+                : 'border-transparent text-mute hover:text-ink',
+        );
 
     return (
-        <div className="flex min-w-0 items-center gap-1.5" data-crm="views">
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-8 w-full min-w-0 justify-between gap-1 px-2.5 text-[12px] sm:max-w-[12rem]"
-                        aria-label="Saved view"
+        <div className="flex min-w-0 flex-col gap-2" data-crm="views">
+            <div className="flex min-w-0 items-end gap-4 overflow-x-auto">
+                <Link href={allHref} className={tabClass(view === 'all' && !filterId)}>
+                    All {nouns}
+                </Link>
+                <Link href={myHref} className={tabClass(view === 'my' && !filterId)}>
+                    My {nouns}
+                </Link>
+                {pinned.map((filter) => (
+                    <Link
+                        key={filter.id}
+                        href={crmListHref(basePath, { ...extraQuery, filter_id: filter.id })}
+                        className={tabClass(filter.id === filterId)}
+                        title={
+                            filter.visibility === 'workspace'
+                                ? 'Shared with workspace'
+                                : filter.visibility === 'team'
+                                  ? 'Shared with team'
+                                  : 'Private view'
+                        }
                     >
-                        <span className="truncate">{currentLabel}</span>
-                        <ChevronDown className="size-3 shrink-0 text-mute" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuItem asChild>
-                        <Link href={allHref}>
-                            All {nouns}
-                            {typeof recordCount === 'number' && view === 'all' && !filterId
-                                ? ` · ${recordCount}`
-                                : ''}
-                        </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href={myHref}>My {nouns}</Link>
-                    </DropdownMenuItem>
-                    {savedFilters.length > 0 ? <DropdownMenuSeparator /> : null}
-                    {savedFilters.map((filter) => (
-                        <DropdownMenuItem key={filter.id} asChild>
-                            <Link
-                                href={crmListHref(basePath, { filter_id: filter.id })}
-                                title={
-                                    filter.visibility === 'workspace'
-                                        ? 'Shared with workspace'
-                                        : filter.visibility === 'team'
-                                          ? 'Shared with team'
-                                          : 'Private view'
-                                }
+                        {filter.name}
+                        {filter.is_workspace_default ? ' ★' : ''}
+                    </Link>
+                ))}
+                {overflow.length > 0 ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                type="button"
+                                className={tabClass(overflow.some((filter) => filter.id === filterId))}
                             >
-                                {filter.name}
-                                {filter.is_workspace_default ? ' ★' : ''}
-                                {typeof filter.record_count === 'number'
-                                    ? ` · ${filter.record_count}`
-                                    : ''}
-                            </Link>
-                        </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        onSelect={(event) => {
-                            event.preventDefault();
-                            setNaming(true);
-                        }}
-                    >
-                        Save current view
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                                All views
+                                <ChevronDown className="ms-0.5 inline size-3" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-56">
+                            {overflow.map((filter) => (
+                                <DropdownMenuItem key={filter.id} asChild>
+                                    <Link href={crmListHref(basePath, { filter_id: filter.id })}>
+                                        {filter.name}
+                                        {typeof filter.record_count === 'number'
+                                            ? ` · ${filter.record_count}`
+                                            : ''}
+                                    </Link>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : null}
+                <button
+                    type="button"
+                    onClick={() => setNaming(true)}
+                    className="mb-2 inline-flex shrink-0 items-center gap-1 text-[13px] text-mute hover:text-ink"
+                >
+                    + Add view
+                    {savedFilters.length > 0 ? ` (${savedFilters.length}/5)` : ''}
+                </button>
+            </div>
             {naming ? (
                 <Form
                     action="/crm/filters"
@@ -143,88 +146,35 @@ export default function SavedViewTabs({
                 >
                     <input type="hidden" name="entity" value={entity} />
                     <input type="hidden" name="view" value={view} />
-                    <input
-                        type="hidden"
-                        name="owner"
-                        value={String(fields.owner ?? '')}
-                    />
-                    <input
-                        type="hidden"
-                        name="created"
-                        value={String(fields.created ?? '')}
-                    />
-                    <input
-                        type="hidden"
-                        name="last_activity"
-                        value={String(fields.last_activity ?? '')}
-                    />
-                    <input
-                        type="hidden"
-                        name="status"
-                        value={String(fields.status ?? '')}
-                    />
-                    <input
-                        type="hidden"
-                        name="stage"
-                        value={String(fields.stage ?? '')}
-                    />
-                    <input
-                        type="hidden"
-                        name="city"
-                        value={String(fields.city ?? '')}
-                    />
-                    <input
-                        type="hidden"
-                        name="wilaya"
-                        value={String(fields.wilaya ?? '')}
-                    />
-                    {fields.unanswered ? (
-                        <input type="hidden" name="unanswered" value="1" />
-                    ) : null}
-                    {fields.unassigned ? (
-                        <input type="hidden" name="unassigned" value="1" />
-                    ) : null}
-                    <input
-                        type="hidden"
-                        name="filter_groups"
-                        value={JSON.stringify(groups)}
-                    />
+                    <input type="hidden" name="owner" value={String(fields.owner ?? '')} />
+                    <input type="hidden" name="created" value={String(fields.created ?? '')} />
+                    <input type="hidden" name="last_activity" value={String(fields.last_activity ?? '')} />
+                    <input type="hidden" name="status" value={String(fields.status ?? '')} />
+                    <input type="hidden" name="stage" value={String(fields.stage ?? '')} />
+                    <input type="hidden" name="city" value={String(fields.city ?? '')} />
+                    <input type="hidden" name="wilaya" value={String(fields.wilaya ?? '')} />
+                    {fields.unanswered ? <input type="hidden" name="unanswered" value="1" /> : null}
+                    {fields.unassigned ? <input type="hidden" name="unassigned" value="1" /> : null}
+                    <input type="hidden" name="filter_groups" value={JSON.stringify(groups)} />
                     <input
                         type="hidden"
                         name="columns"
-                        value={JSON.stringify(
-                            columns.length
-                                ? columns
-                                : (listView?.columns ?? []),
-                        )}
+                        value={JSON.stringify(columns.length ? columns : (listView?.columns ?? []))}
                     />
                     <input
                         type="hidden"
                         name="sort"
                         value={JSON.stringify(
-                            listView?.sort ?? {
-                                field: 'created_at',
-                                direction: 'desc',
-                            },
+                            listView?.sort ?? { field: 'created_at', direction: 'desc' },
                         )}
                     />
-                    <Input
-                        name="name"
-                        placeholder="View name"
-                        required
-                        className="h-8 w-32 text-[12px]"
-                    />
+                    <Input name="name" placeholder="View name" required className="h-8 w-32 text-[12px]" />
                     {canManageSettings ? (
                         <select
                             name="visibility"
                             value={visibility}
                             onChange={(event) =>
-                                setVisibility(
-                                    event.target.value as
-                                        | 'private'
-                                        | 'team'
-                                        | 'workspace',
-                                )
+                                setVisibility(event.target.value as 'private' | 'team' | 'workspace')
                             }
                             className="h-8 rounded border border-hairline bg-background px-1 text-[12px]"
                         >
@@ -238,9 +188,7 @@ export default function SavedViewTabs({
                             type="checkbox"
                             name="is_workspace_default"
                             value="1"
-                            disabled={
-                                !canManageSettings || visibility !== 'workspace'
-                            }
+                            disabled={!canManageSettings || visibility !== 'workspace'}
                         />
                         Team default
                     </label>

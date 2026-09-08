@@ -1,4 +1,4 @@
-import { Form, Link } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { filterFields } from '@/components/crm/list-query';
@@ -17,6 +17,7 @@ export default function ColumnFilterRow({
     columns = [],
     filterGroups,
     filterBuilder,
+    extraQuery = {},
 }: {
     action: string;
     entity: 'contact' | 'company' | 'deal';
@@ -28,6 +29,7 @@ export default function ColumnFilterRow({
     columns?: { id: string; visible: boolean; order: number }[];
     filterGroups?: ListViewFilters;
     filterBuilder?: ReactNode;
+    extraQuery?: Record<string, string | number | null | undefined>;
 }) {
     const [advanced, setAdvanced] = useState(false);
     const fields = filterFields(activeFilters);
@@ -45,21 +47,33 @@ export default function ColumnFilterRow({
                   { value: 'disqualified', label: 'Disqualified' },
               ];
 
+    const chip =
+        'inline-flex h-7 max-w-full items-center gap-1 rounded-sm border border-hairline bg-canvas px-2 text-[12px] text-ink';
+    const selectClass = 'max-w-[9rem] bg-transparent text-[12px] text-ink outline-none';
+    const ownerLabel = entity === 'deal' ? 'Deal owner' : entity === 'company' ? 'Company owner' : 'Contact owner';
+
     return (
-        <div className="border-t border-hairline bg-canvas px-4 py-3 sm:px-6">
-            <Form action={action} method="get" className="flex flex-wrap items-end gap-2">
+        <div className="min-w-0 flex-1">
+            <Form action={action} method="get" className="flex flex-wrap items-center gap-2">
+                {Object.entries(extraQuery).map(([key, value]) =>
+                    value === null || value === undefined || value === '' ? null : (
+                        <input key={key} type="hidden" name={key} value={String(value)} />
+                    ),
+                )}
                 <input type="hidden" name="view" value={String(fields.view ?? 'all')} />
                 {fields.filter_id ? <input type="hidden" name="filter_id" value={String(fields.filter_id)} /> : null}
                 {fields.stage ? <input type="hidden" name="stage" value={String(fields.stage)} /> : null}
+                {fields.q ? <input type="hidden" name="q" value={String(fields.q)} /> : null}
                 {filterGroups ? (
                     <input type="hidden" name="filter_groups" value={JSON.stringify(filterGroups)} />
                 ) : null}
-                <label className="grid gap-0.5 text-[11px] text-mute">
-                    Owner
+                <label className={chip}>
+                    {ownerLabel}
                     <select
                         name="owner"
                         defaultValue={String(fields.owner ?? '')}
-                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
+                        className={selectClass}
+                        onChange={(event) => event.currentTarget.form?.requestSubmit()}
                     >
                         <option value="">Anyone</option>
                         <option value="unassigned">Unassigned</option>
@@ -70,12 +84,13 @@ export default function ColumnFilterRow({
                         ))}
                     </select>
                 </label>
-                <label className="grid gap-0.5 text-[11px] text-mute">
+                <label className={chip}>
                     Create date
                     <select
                         name="created"
                         defaultValue={String(fields.created ?? '')}
-                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
+                        className={selectClass}
+                        onChange={(event) => event.currentTarget.form?.requestSubmit()}
                     >
                         <option value="">Any time</option>
                         <option value="today">Today</option>
@@ -84,12 +99,13 @@ export default function ColumnFilterRow({
                         <option value="90d">Last 90 days</option>
                     </select>
                 </label>
-                <label className="grid gap-0.5 text-[11px] text-mute">
-                    Last activity
+                <label className={chip}>
+                    Last activity date
                     <select
                         name="last_activity"
                         defaultValue={String(fields.last_activity ?? '')}
-                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
+                        className={selectClass}
+                        onChange={(event) => event.currentTarget.form?.requestSubmit()}
                     >
                         <option value="">Any</option>
                         <option value="7d">7 days</option>
@@ -97,12 +113,13 @@ export default function ColumnFilterRow({
                         <option value="none">None</option>
                     </select>
                 </label>
-                <label className="grid gap-0.5 text-[11px] text-mute">
-                    {entity === 'contact' ? 'Lead status' : 'Deal status'}
+                <label className={chip}>
+                    {entity === 'contact' ? 'Lead status' : entity === 'deal' ? 'Deal status' : 'Status'}
                     <select
                         name="status"
                         defaultValue={String(fields.status ?? '')}
-                        className="h-8 rounded border border-hairline bg-background px-1.5 text-[12px] text-ink"
+                        className={selectClass}
+                        onChange={(event) => event.currentTarget.form?.requestSubmit()}
                     >
                         <option value="">Any</option>
                         {statusOptions.map((option) => (
@@ -112,18 +129,12 @@ export default function ColumnFilterRow({
                         ))}
                     </select>
                 </label>
-                <Button type="submit" variant="outline" size="sm" className="h-8 px-2.5 text-[12px]">
-                    Apply
-                </Button>
-                <Link href={action} className="text-[12px] text-mute hover:text-ink">
-                    Clear
-                </Link>
                 <button
                     type="button"
                     onClick={() => setAdvanced((open) => !open)}
-                    className="text-[12px] text-ink underline-offset-2 hover:underline"
+                    className={chip + ' text-mute'}
                 >
-                    {advanced ? 'Hide advanced' : 'Advanced'}
+                    {advanced ? 'Hide advanced filters' : 'Advanced filters'}
                 </button>
                 {advanced && filterBuilder ? (
                     <div className="w-full border-t border-hairline pt-2">{filterBuilder}</div>
@@ -174,6 +185,9 @@ export default function ColumnFilterRow({
                             <input type="checkbox" name="unassigned" value="1" defaultChecked={!!fields.unassigned} />
                             Unassigned
                         </label>
+                        <Button type="submit" variant="outline" size="sm" className="h-8 px-2.5 text-[12px]">
+                            Apply
+                        </Button>
                     </div>
                 ) : (
                     <>

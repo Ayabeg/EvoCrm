@@ -45,12 +45,28 @@ type CompanyRow = {
     attributes?: AttributeMap;
 };
 
-function formatDate(value?: string | null): string {
+const ALGIERS = 'Africa/Algiers';
+
+function formatDate(value?: string | null, withTime = false): string {
     if (!value) {
         return '—';
     }
 
-    return new Date(value).toLocaleDateString();
+    const parsed = new Date(value.includes('T') || value.includes(' ') ? value.replace(' ', 'T') : `${value}T00:00:00`);
+
+    if (Number.isNaN(parsed.getTime())) {
+        return value;
+    }
+
+    return new Intl.DateTimeFormat('en-GB', {
+        timeZone: ALGIERS,
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        ...(withTime
+            ? { hour: '2-digit', minute: '2-digit', hour12: false }
+            : {}),
+    }).format(parsed);
 }
 
 function renderContactCell(columnId: string, row: ContactRow): string {
@@ -105,7 +121,7 @@ function renderDealCell(columnId: string, row: DealRow): string {
         case 'owner':
             return row.owner?.name ?? '—';
         case 'close_date':
-            return formatDate(row.close_date);
+            return formatDate(row.close_date, true);
         case 'created_at':
             return formatDate(row.created_at);
         case 'last_activity_at':

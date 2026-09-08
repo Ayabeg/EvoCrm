@@ -15,8 +15,7 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
             ->and($src)->toContain('ListViewTable')
             ->and($src)->toContain('hasActiveListFilters')
             ->and($src)->not->toContain('RecordHubPanel')
-            ->and($src)->not->toContain('aurora/data-table')
-            ->and($src)->not->toContain('name="q"');
+            ->and($src)->not->toContain('aurora/data-table');
     }
 
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
@@ -32,11 +31,12 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
         ->and($shell)->not->toContain('RecordHubHeader');
 
     expect($toolbar)->toContain('SavedViewTabs')
-        ->and($toolbar)->toContain('Filter')
+        ->and($toolbar)->toContain('Advanced filters')
         ->and($toolbar)->toContain('CrmActiveFilters')
         ->and($toolbar)->toContain('Sheet')
-        ->and($toolbar)->not->toContain('Create')
-        ->and($toolbar)->not->toContain('name="q"');
+        ->and($toolbar)->toContain('layoutToggle')
+        ->and($toolbar)->toContain('name="q"')
+        ->and($toolbar)->not->toContain('Create');
 
     expect($header)->toContain('text-page-title')
         ->and($header)->toContain('data-crm="object-header"');
@@ -45,7 +45,13 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
         ->and($table)->not->toContain('font-medium text-brand hover:underline');
 
     expect($empty)->toContain('Showing')
+        ->and($empty)->toContain('25 per page')
         ->and($empty)->not->toContain('size-10 rounded-xl');
+
+    $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
+    expect($deals)->toContain('Create deal')
+        ->and($deals)->toContain('layoutToggle')
+        ->and($deals)->toContain('DealLayoutToggle');
 
     expect($crmShell)->toContain("chrome = 'room'")
         ->and($crmShell)->toContain("chrome === 'workspace'");

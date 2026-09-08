@@ -8,7 +8,7 @@ import { CrmShell } from '@/components/crm/crm-shell';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { hasActiveListFilters } from '@/components/crm/list-query';
+import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
 import ListViewTable from '@/components/crm/list-view-table';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import type { StagePill } from '@/components/crm/stage-pills';
@@ -47,6 +47,7 @@ export default function DealsIndex({
     activeFilters,
     listView,
     recordCount,
+    paginator,
     cities,
     wilayas,
     createOpen,
@@ -64,6 +65,7 @@ export default function DealsIndex({
     activeFilters: Record<string, unknown>;
     listView: ListViewMeta;
     recordCount: number;
+    paginator?: { page: number; per_page: number; total: number; last_page: number };
     cities: string[];
     wilayas: string[];
     createOpen?: boolean;
@@ -84,7 +86,7 @@ export default function DealsIndex({
                 title="Deals"
                 entity="deal"
                 basePath="/crm/deals"
-                primaryLabel="New deal"
+                primaryLabel="Create deal"
                 activeFilters={activeFilters}
                 savedFilters={savedFilters}
                 listView={listView}
@@ -104,14 +106,17 @@ export default function DealsIndex({
                                 Import
                             </CrmObjectSecondaryLink>
                         ) : null}
-                        <PipelineSwitcher
-                            pipelineId={pipeline.id}
-                            pipelines={pipelines}
-                            basePath="/crm/deals"
-                        />
-                        <DealLayoutToggle current="list" pipelineId={pipeline.id} />
                     </>
                 }
+                layoutToggle={<DealLayoutToggle current="list" pipelineId={pipeline.id} />}
+                pipelineSwitcher={
+                    <PipelineSwitcher
+                        pipelineId={pipeline.id}
+                        pipelines={pipelines}
+                        basePath="/crm/deals"
+                    />
+                }
+                extraQuery={{ pipeline: pipeline.id }}
             >
                 {(columns) => (
                     <>
@@ -141,7 +146,7 @@ export default function DealsIndex({
                                 actionLabel={
                                     hasActiveListFilters(activeFilters)
                                         ? undefined
-                                        : 'New deal'
+                                        : 'Create deal'
                                 }
                                 onAction={
                                     hasActiveListFilters(activeFilters)
@@ -184,6 +189,23 @@ export default function DealsIndex({
                             total={recordCount}
                             noun="deals"
                             exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
+                            page={paginator?.page}
+                            lastPage={paginator?.last_page}
+                            perPage={paginator?.per_page}
+                            prevHref={
+                                paginator && paginator.page > 1
+                                    ? listPageHref('/crm/deals', activeFilters, paginator.page - 1, {
+                                          pipeline: pipeline.id,
+                                      })
+                                    : null
+                            }
+                            nextHref={
+                                paginator && paginator.page < paginator.last_page
+                                    ? listPageHref('/crm/deals', activeFilters, paginator.page + 1, {
+                                          pipeline: pipeline.id,
+                                      })
+                                    : null
+                            }
                         />
                     </>
                 )}

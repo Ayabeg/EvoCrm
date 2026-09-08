@@ -5,7 +5,7 @@ import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { hasActiveListFilters } from '@/components/crm/list-query';
+import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
 import ListViewTable from '@/components/crm/list-view-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ export default function CompaniesIndex({
     activeFilters,
     listView,
     recordCount,
+    paginator,
     cities,
     wilayas,
     createOpen,
@@ -39,6 +40,7 @@ export default function CompaniesIndex({
     activeFilters: Record<string, unknown>;
     listView: ListViewMeta;
     recordCount: number;
+    paginator?: { page: number; per_page: number; total: number; last_page: number };
     cities: string[];
     wilayas: string[];
     createOpen?: boolean;
@@ -104,6 +106,19 @@ export default function CompaniesIndex({
                             count={companies.length}
                             total={recordCount}
                             noun="companies"
+                            page={paginator?.page}
+                            lastPage={paginator?.last_page}
+                            perPage={paginator?.per_page}
+                            prevHref={
+                                paginator && paginator.page > 1
+                                    ? listPageHref('/crm/companies', activeFilters, paginator.page - 1)
+                                    : null
+                            }
+                            nextHref={
+                                paginator && paginator.page < paginator.last_page
+                                    ? listPageHref('/crm/companies', activeFilters, paginator.page + 1)
+                                    : null
+                            }
                         />
                     </>
                 )}

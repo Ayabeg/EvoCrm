@@ -33,6 +33,7 @@ export function crmListHref(
 export function filterFields(filters: ListFilters): ListFilters {
     return {
         view: filters.view,
+        q: filters.q,
         owner: filters.owner,
         created: filters.created,
         last_activity: filters.last_activity,
@@ -59,6 +60,17 @@ const ACTIVITY_LABELS: Record<string, string> = {
     '30d': '30 days',
     none: 'None',
 };
+
+export function listPageHref(
+    base: string,
+    filters: ListFilters,
+    page: number,
+    extra: ListFilters = {},
+): string {
+    return crmListHref(base, { ...filterFields(filters), ...extra }, {
+        page: page > 1 ? page : null,
+    });
+}
 
 export function hasActiveListFilters(filters: ListFilters): boolean {
     return listFilterChips(filters).length > 0 || (filters.view != null && filters.view !== 'all');

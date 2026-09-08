@@ -39,6 +39,9 @@ export function CrmListShell({
     createHref,
     banner,
     headerActions,
+    layoutToggle,
+    pipelineSwitcher,
+    extraQuery,
     children,
 }: {
     title: string;
@@ -60,6 +63,9 @@ export function CrmListShell({
     createHref?: string;
     banner?: ReactNode;
     headerActions?: ReactNode;
+    layoutToggle?: ReactNode;
+    pipelineSwitcher?: ReactNode;
+    extraQuery?: Record<string, string | number | null | undefined>;
     children: ReactNode | ((columns: ListViewColumn[]) => ReactNode);
 }) {
     const [columns, setColumns] = useState<ListViewColumn[]>(
@@ -108,6 +114,9 @@ export function CrmListShell({
                 stagePills={stagePills}
                 columns={columns}
                 onColumnsChange={setColumns}
+                layoutToggle={layoutToggle}
+                pipelineSwitcher={pipelineSwitcher}
+                extraQuery={extraQuery}
             />
             <div className="flex min-h-0 flex-1 flex-col bg-canvas">
                 {typeof children === 'function' ? children(columns) : children}

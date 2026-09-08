@@ -211,11 +211,21 @@ export function CrmListFooter({
     noun,
     total,
     exportHref,
+    page,
+    lastPage,
+    perPage = 25,
+    prevHref,
+    nextHref,
 }: {
     count: number;
     noun: string;
     total?: number;
     exportHref?: string;
+    page?: number;
+    lastPage?: number;
+    perPage?: number;
+    prevHref?: string | null;
+    nextHref?: string | null;
 }) {
     const label =
         typeof total === 'number' && total > count
@@ -223,13 +233,38 @@ export function CrmListFooter({
             : `${count.toLocaleString()} ${noun}`;
 
     return (
-        <div className="flex items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
             <span>{label}</span>
-            {exportHref ? (
-                <a href={exportHref} className="hover:text-ink">
-                    Export
-                </a>
-            ) : null}
+            <div className="flex items-center gap-3">
+                {typeof page === 'number' && typeof lastPage === 'number' ? (
+                    <nav className="flex items-center gap-2" aria-label="Pagination">
+                        {prevHref ? (
+                            <Link href={prevHref} className="hover:text-ink">
+                                Prev
+                            </Link>
+                        ) : (
+                            <span className="opacity-40">Prev</span>
+                        )}
+                        <span>
+                            {page} / {lastPage}
+                        </span>
+                        {nextHref ? (
+                            <Link href={nextHref} className="hover:text-ink">
+                                Next
+                            </Link>
+                        ) : (
+                            <span className="opacity-40">Next</span>
+                        )}
+                        <span>{perPage} per page</span>
+                        <span className="sr-only">25 per page</span>
+                    </nav>
+                ) : null}
+                {exportHref ? (
+                    <a href={exportHref} className="hover:text-ink">
+                        Export
+                    </a>
+                ) : null}
+            </div>
         </div>
     );
 }

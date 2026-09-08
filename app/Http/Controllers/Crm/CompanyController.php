@@ -34,13 +34,16 @@ class CompanyController extends Controller
         $filter->apply('company', $query, $filters);
         $filter->applySort('company', $query, $filters);
 
+        [$companyRows, $paginator] = $filter->paginate($query, $request);
+
         return Inertia::render('crm/companies/index', [
-            'companies' => $hub->withListAttributes($workspace, 'company', $query->orderBy('name')->limit(120)->get()),
+            'companies' => $hub->withListAttributes($workspace, 'company', $companyRows),
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'company', $request->user()),
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('company', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
-            'recordCount' => $filter->count($workspace, 'company', $filters),
+            'recordCount' => $paginator['total'],
+            'paginator' => $paginator,
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
             'createOpen' => $request->boolean('create'),

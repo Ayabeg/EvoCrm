@@ -72,6 +72,7 @@ class CrmFilter
 
         return [
             'stage' => $request->input('stage', $fromSaved['stage'] ?? null),
+            'q' => $request->string('q')->toString() ?: ($fromSaved['q'] ?? null),
             'owner' => $owner,
             'city' => $request->input('city', $fromSaved['city'] ?? null),
             'wilaya' => $request->input('wilaya', $fromSaved['wilaya'] ?? null),
@@ -136,6 +137,35 @@ class CrmFilter
     /**
      * @param  array<string, mixed>  $filters
      */
+    /**
+     * HubSpot list pages show 25 rows per page.
+     *
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return array{0: \Illuminate\Database\Eloquent\Collection<int, TModel>, 1: array{page: int, per_page: int, total: int, last_page: int}}
+     */
+    public function paginate(Builder $query, Request $request, int $perPage = 25): array
+    {
+        $page = max(1, $request->integer('page') ?: 1);
+        $total = (clone $query)->count();
+        $lastPage = max(1, (int) ceil($total / max(1, $perPage)));
+
+        if ($page > $lastPage) {
+            $page = $lastPage;
+        }
+
+        return [
+            $query->forPage($page, $perPage)->get(),
+            [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'last_page' => $lastPage,
+            ],
+        ];
+    }
+
     public function count(Workspace $workspace, string $entity, array $filters): int
     {
         $query = match ($entity) {
@@ -490,6 +520,8 @@ class CrmFilter
      */
     public function applyToContacts(Builder $query, array $filters): Builder
     {
+        $this->applySearch($query, 'contact', $filters['q'] ?? null);
+
         if (filled($filters['owner'] ?? null) && ($filters['owner'] ?? '') !== 'unassigned') {
             $query->where('owner_id', $filters['owner']);
         }
@@ -560,6 +592,8 @@ class CrmFilter
      */
     public function applyToDeals(Builder $query, array $filters): Builder
     {
+        $this->applySearch($query, 'deal', $filters['q'] ?? null);
+
         if (filled($filters['stage'] ?? null)) {
             $query->whereHas('stage', fn (Builder $stage) => $stage->where('slug', $filters['stage']));
         }
@@ -603,6 +637,8 @@ class CrmFilter
      */
     public function applyToCompanies(Builder $query, array $filters): Builder
     {
+        $this->applySearch($query, 'company', $filters['q'] ?? null);
+
         if (filled($filters['owner'] ?? null) && ($filters['owner'] ?? '') !== 'unassigned') {
             $query->where('owner_id', $filters['owner']);
         }
@@ -739,6 +775,30 @@ class CrmFilter
         if ($days) {
             $query->where('last_activity_at', '>=', now()->subDays($days));
         }
+    }
+
+    /**
+     * @param  Builder<Model>  $query
+     */
+    protected function applySearch(Builder $query, string $entity, mixed $q): void
+    {
+        $term = is_string($q) ? trim($q) : '';
+
+        if ($term === '') {
+            return;
+        }
+
+        $like = '%'.addcslashes($term, '%_\\').'%';
+
+        match ($entity) {
+            'deal' => $query->where('title', 'like', $like),
+            'company' => $query->where('name', 'like', $like),
+            default => $query->where(function (Builder $inner) use ($like): void {
+                $inner->where('first_name', 'like', $like)
+                    ->orWhere('last_name', 'like', $like)
+                    ->orWhere('email', 'like', $like);
+            }),
+        };
     }
 
     /**
