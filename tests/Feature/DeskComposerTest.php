@@ -37,5 +37,5 @@ it('stores a desk composer reply even when Evolution Cloud is disconnected', fun
         ->and($message->direction)->toBe('outbound')
         ->and($message->body)->toBe('Session reply from CRM history')
         ->and($message->status)->toBe('failed')
-        ->and($message->failure_reason)->toContain('Evolution Cloud is not connected');
+        ->and($message->failure_reason)->toContain('Evolution is not connected');
 });

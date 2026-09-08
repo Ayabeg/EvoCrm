@@ -39,7 +39,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 
 | Object | Notes |
 | --- | --- |
-| **Channel** | `whatsapp_cloud` (Evolution), `email`, `telegram` (later stub). |
+| **Channel** | `whatsapp` (Evolution Baileys / phone), `whatsapp_cloud` (Evolution Business), `email`, `telegram` (later stub). |
 | **Thread** | Conversation history synced from EvoDesk for CRM (contact ↔ deal). Not the Chatwoot UI. `unread_count` feeds Home. |
 | **Message** | Inbound/outbound log. Optional CRM composer uses Evolution Cloud `sendText` or stores `failed` with a reason. |
 

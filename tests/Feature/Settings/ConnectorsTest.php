@@ -41,10 +41,15 @@ class ConnectorsTest extends TestCase
                     ->has('googleConnectors', 2)
                     ->where('googleConnectors.0.provider', 'gmail')
                     ->where('googleConnectors.1.provider', 'google_calendar')
-                    ->where('googleConnectors.0.scopes_on_client', false)
+                    ->where('googleConnectors.0.scopes_on_client', true)
                     ->where('googleConnectors.0.reconnect_url', null)
-                    ->has('deskConnectors', 3)
-            );
+                    ->has('deskConnectors', 4)
+            )
+            ->assertDontSee('GOOGLE_GMAIL_SCOPE')
+            ->assertDontSee('GOOGLE_CALENDAR_SCOPE')
+            ->assertDontSee('GOOGLE_CLIENT_ID')
+            ->assertDontSee('META_APP_ID')
+            ->assertDontSee('Setup required');
     }
 
     public function test_saving_gmail_intent_asks_to_reconnect_when_scopes_are_missing(): void
@@ -65,29 +70,23 @@ class ConnectorsTest extends TestCase
 
         $this->assertSame(ConnectorStatus::NeedsReconnect, $connector->status);
         $this->assertSame('gmail', $connector->intent);
-        $this->assertStringContainsString('Reconnect Google with Calendar/Gmail', $connector->config['reason']);
+        $this->assertStringContainsString('Continue with Google', $connector->config['reason']);
+        $this->assertStringNotContainsString('GOOGLE_', $connector->config['reason']);
     }
 
-    public function test_reconnect_without_scopes_does_not_start_oauth(): void
+    public function test_reconnect_launches_google_oauth_on_the_existing_client(): void
     {
         $this->enableGoogle();
-
-        Socialite::shouldReceive('driver')->never();
-
-        $this->actingAs(User::factory()->create())
-            ->get('/settings/connectors/google/gmail')
-            ->assertRedirect(route('settings.connectors', absolute: false));
-    }
-
-    public function test_reconnect_uses_the_existing_google_client_when_scopes_are_set(): void
-    {
-        $this->enableGoogle();
-        config()->set('services.google.gmail_scope', 'https://www.googleapis.com/auth/gmail.readonly');
 
         $provider = Mockery::mock();
         $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
         $provider->shouldReceive('scopes')->once()->with([
             'https://www.googleapis.com/auth/gmail.readonly',
+        ])->andReturnSelf();
+        $provider->shouldReceive('with')->once()->with([
+            'access_type' => 'offline',
+            'prompt' => 'consent',
+            'include_granted_scopes' => 'true',
         ])->andReturnSelf();
         $provider->shouldReceive('redirect')->once()->andReturn(
             redirect('https://accounts.google.com/o/oauth2/v2/auth?client_id=test-client-id&scope=gmail')
@@ -171,9 +170,9 @@ class ConnectorsTest extends TestCase
             ->assertInertia(
                 fn ($page) => $page
                     ->component('settings/apps/index')
-                    ->has('apps', 3)
-                    ->where('apps.1.key', 'google')
-                    ->where('apps.1.manage_url', '/settings/connectors')
+                    ->has('apps', 5)
+                    ->where('apps.3.key', 'google')
+                    ->where('apps.3.manage_url', '/settings/connectors')
             );
     }
 

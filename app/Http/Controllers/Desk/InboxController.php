@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Desk;
 
 use App\Http\Controllers\Controller;
+use App\Models\Integration;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Services\Connectors\ConnectorRegistrar;
@@ -67,6 +68,8 @@ class InboxController extends Controller
 
         $integrations = Integrations::forWorkspace($workspace);
         $scopes = $integrations['meta']['scopes'] ?? [];
+        $whatsapp = $workspace->integration(Integration::PROVIDER_WHATSAPP);
+        $whatsappBusiness = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
 
         return Inertia::render('desk/inbox', [
             'embedUrl' => $embed['state'] === 'ok' ? $embedUrl : null,
@@ -77,10 +80,17 @@ class InboxController extends Controller
             'selected' => $selected,
             'channels' => [
                 [
+                    'key' => 'whatsapp',
+                    'label' => 'WhatsApp',
+                    'href' => '/settings/whatsapp',
+                    'connected' => $whatsapp?->isConnected() ?? false,
+                ],
+                [
                     'key' => 'whatsapp_cloud',
-                    'label' => 'WhatsApp Cloud',
-                    'href' => '/settings/apps',
-                    'connected' => in_array('whatsapp_business_messaging', $scopes, true)
+                    'label' => 'WhatsApp Business',
+                    'href' => '/settings/whatsapp-business',
+                    'connected' => ($whatsappBusiness?->isConnected() ?? false)
+                        || in_array('whatsapp_business_messaging', $scopes, true)
                         || in_array('whatsapp_business_management', $scopes, true),
                 ],
                 [

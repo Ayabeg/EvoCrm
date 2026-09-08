@@ -372,7 +372,7 @@ it('omits ads and desk categories until real rows exist', function () {
             'Inbound' => 1,
             'Outbound' => 0,
         ]);
-    expect($desk['table']['rows'])->toBe([['WhatsApp Cloud', 1, 3, 1]]);
+    expect($desk['table']['rows'])->toBe([['WhatsApp Business', 1, 3, 1]]);
 });
 
 it('builds the activity category from real tasks and notes', function () {

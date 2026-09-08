@@ -82,11 +82,14 @@ it('links meta connect from apps marketplace to setup wizard', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->where('apps.0.key', 'meta')
-            ->where('apps.0.connect_url', '/settings/setup/meta')
+            ->where('apps.0.connect_url', '/auth/meta?popup=1')
+            ->where('apps.0.popup', true)
+            ->missing('apps.0.instagram_connect_url')
+            ->missing('apps.0.callback_url')
         );
 });
 
-it('requires meta to be configured for connect url in wizard', function () {
+it('offers facebook popup login from the wizard without client credentials', function () {
     config()->set('meta.app_id', null);
     config()->set('meta.app_secret', null);
 
@@ -95,7 +98,10 @@ it('requires meta to be configured for connect url in wizard', function () {
     $this->actingAs($user)
         ->get('/settings/setup/meta?step=connect')
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('connectUrl', null));
+        ->assertInertia(fn ($page) => $page
+            ->where('connectUrl', fn ($url) => str_contains($url, '/auth/meta') && str_contains($url, 'popup=1'))
+            ->missing('instagramConnectUrl')
+        );
 });
 
 it('exposes connect url when meta env is configured', function () {

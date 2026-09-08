@@ -59,8 +59,13 @@ class WorkspaceProvisioner
         }
 
         Channel::query()->firstOrCreate(
+            ['workspace_id' => $workspace->id, 'type' => ChannelType::WhatsApp],
+            ['name' => 'WhatsApp', 'status' => 'not_connected']
+        );
+
+        Channel::query()->firstOrCreate(
             ['workspace_id' => $workspace->id, 'type' => ChannelType::WhatsAppCloud],
-            ['name' => 'WhatsApp Cloud', 'status' => 'not_connected']
+            ['name' => 'WhatsApp Business', 'status' => 'not_connected']
         );
 
         Channel::query()->firstOrCreate(

@@ -5,15 +5,15 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Integration;
 use App\Services\Analytics\ProductAnalytics;
+use App\Services\Evolution\WhatsAppConnector;
 use App\Services\Operations\AuditLogger;
 use App\Support\MetaAuth;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Laravel\Socialite\Facades\Socialite;
-use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
@@ -27,19 +27,39 @@ class MetaController extends Controller
      * Send the signed-in user to Meta's OAuth consent screen asking for the
      * full first-wave scope set (pages, Instagram, WhatsApp Cloud, Ads).
      */
-    public function redirect(Request $request): SymfonyRedirectResponse
+    public function redirect(Request $request): Response
     {
-        abort_unless(MetaAuth::enabled(), 404);
-
         if ($request->query('return') === 'setup') {
             $request->session()->put('auth.meta.return', 'setup');
         }
 
-        return Socialite::driver('meta')
+        if ($request->boolean('popup')) {
+            $request->session()->put('auth.meta.popup', true);
+        }
+
+        if (! MetaAuth::canStartLogin()) {
+            return $this->finish(
+                $request,
+                false,
+                'Facebook login is temporarily unavailable. Evotechly is enabling it — no App ID is needed from you.',
+            );
+        }
+
+        config([
+            'services.meta.client_id' => config('meta.app_id'),
+            'services.meta.redirect' => MetaAuth::redirectUri(),
+        ]);
+
+        $driver = Socialite::driver('meta')
             ->scopes(MetaAuth::scopes())
             ->usingGraphVersion(MetaAuth::graphVersion())
-            ->reRequest()
-            ->redirect();
+            ->reRequest();
+
+        if ($request->boolean('popup') || $request->session()->get('auth.meta.popup')) {
+            $driver = $driver->with(['display' => 'popup']);
+        }
+
+        return $driver->redirect();
     }
 
     /**
@@ -48,9 +68,15 @@ class MetaController extends Controller
      * and ad accounts best-effort, then store the connection encrypted on
      * the workspace.
      */
-    public function callback(Request $request): RedirectResponse
+    public function callback(Request $request): Response
     {
-        abort_unless(MetaAuth::enabled(), 404);
+        if (! MetaAuth::enabled()) {
+            return $this->finish(
+                $request,
+                false,
+                'Facebook login is temporarily unavailable. Evotechly is enabling it — no App ID is needed from you.',
+            );
+        }
 
         try {
             $metaUser = Socialite::driver('meta')
@@ -59,16 +85,11 @@ class MetaController extends Controller
         } catch (Throwable $exception) {
             Log::warning('Meta OAuth callback failed', ['error' => $exception->getMessage()]);
 
-            Inertia::flash('toast', [
-                'type' => 'error',
-                'message' => 'Meta did not complete the connection. No token was stored.',
-            ]);
-
-            if ($request->session()->pull('auth.meta.return') === 'setup') {
-                return redirect()->route('settings.setup.show', ['provider' => 'meta', 'step' => 'connect']);
-            }
-
-            return redirect()->route('settings.apps');
+            return $this->finish(
+                $request,
+                false,
+                'Meta did not complete the connection. No token was stored.',
+            );
         }
 
         $token = (string) $metaUser->token;
@@ -145,16 +166,51 @@ class MetaController extends Controller
             'ad_accounts' => count($adAccounts),
         ], $request->user(), $workspace);
 
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => 'Meta connected. Facebook Page, Instagram, WhatsApp Cloud, and Ads unlock as their scopes are granted.',
-        ]);
-
-        if ($request->session()->pull('auth.meta.return') === 'setup') {
-            return redirect()->route('settings.setup.show', ['provider' => 'meta', 'step' => 'finish']);
+        try {
+            $whatsapp = app(WhatsAppConnector::class)->provisionBusinessIfReady($workspace->fresh());
+            $whatsappConnected = (bool) ($whatsapp['connected'] ?? false);
+        } catch (Throwable $exception) {
+            Log::info('WhatsApp Business auto-provision skipped', ['error' => $exception->getMessage()]);
+            $whatsappConnected = false;
         }
 
-        return redirect()->route('settings.apps.meta');
+        return $this->finish(
+            $request,
+            true,
+            $whatsappConnected
+                ? 'Facebook login connected WhatsApp Business automatically.'
+                : 'Meta connected. Facebook Page, Instagram, WhatsApp, and Ads unlock as their scopes are granted.',
+        );
+    }
+
+    private function finish(Request $request, bool $ok, string $message): Response
+    {
+        $fromFacebook = str_contains((string) $request->headers->get('referer'), 'facebook.com');
+        $popup = (bool) $request->session()->pull('auth.meta.popup', false) || $fromFacebook;
+        $setup = $request->session()->pull('auth.meta.return') === 'setup';
+
+        if ($popup) {
+            return response()->view('oauth.popup-complete', [
+                'provider' => 'meta',
+                'ok' => $ok,
+            ]);
+        }
+
+        Inertia::flash('toast', [
+            'type' => $ok ? 'success' : 'error',
+            'message' => $message,
+        ]);
+
+        if ($setup) {
+            return redirect()->route('settings.setup.show', [
+                'provider' => 'meta',
+                'step' => $ok ? 'finish' : 'connect',
+            ]);
+        }
+
+        return $ok
+            ? redirect()->route('settings.apps.meta')
+            : redirect()->route('settings.apps');
     }
 
     /**

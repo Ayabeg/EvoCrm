@@ -45,9 +45,15 @@ class Integration extends Model
 
     public const PROVIDER_META = 'meta';
 
+    public const PROVIDER_INSTAGRAM = 'instagram';
+
     public const PROVIDER_GMAIL = 'gmail';
 
     public const PROVIDER_GOOGLE_CALENDAR = 'google_calendar';
+
+    public const PROVIDER_WHATSAPP = 'whatsapp';
+
+    public const PROVIDER_WHATSAPP_BUSINESS = 'whatsapp_business';
 
     protected function casts(): array
     {

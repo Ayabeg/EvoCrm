@@ -40,8 +40,8 @@ class OAuthSetupController extends Controller
             'currentStep' => $stepKey,
             'stepIndex' => $stepIndex === false ? 0 : $stepIndex,
             'troubleshooting' => $config['troubleshooting'] ?? [],
-            'connectUrl' => $provider === 'meta' && MetaAuth::enabled()
-                ? route('auth.meta', ['return' => 'setup'])
+            'connectUrl' => $provider === 'meta'
+                ? route('auth.meta', ['return' => 'setup', 'popup' => 1])
                 : null,
             'appsUrl' => route('settings.apps'),
             'metaState' => $provider === 'meta' ? $this->metaState($request) : null,
@@ -88,7 +88,6 @@ class OAuthSetupController extends Controller
             'selected_page_id' => $integration?->meta['selected_page_id'] ?? null,
             'selected_page_name' => $integration?->meta['selected_page_name'] ?? null,
             'unlocks' => MetaAuth::unlocks($integration),
-            'callback_url' => (string) config('services.meta.redirect'),
         ];
     }
 

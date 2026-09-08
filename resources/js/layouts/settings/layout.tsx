@@ -37,7 +37,7 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Evolution / WhatsApp Cloud',
+        title: 'WhatsApp',
         href: '/settings/evolution',
         icon: null,
     },
@@ -97,6 +97,8 @@ const requiredPermissionByHref: Record<string, string> = {
     '/settings/apps': 'settings.integrations',
     '/settings/connectors': 'settings.integrations',
     '/settings/evolution': 'settings.integrations',
+    '/settings/whatsapp': 'settings.integrations',
+    '/settings/whatsapp-business': 'settings.integrations',
     '/settings/meta': 'settings.integrations',
     '/settings/channels': 'settings.integrations',
     '/settings/attributes': 'settings.attributes',

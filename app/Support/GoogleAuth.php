@@ -84,7 +84,15 @@ class GoogleAuth
             default => null,
         };
 
-        return is_string($scope) && $scope !== '' ? $scope : null;
+        if (is_string($scope) && $scope !== '') {
+            return $scope;
+        }
+
+        return match ($provider) {
+            ConnectorProvider::Gmail => 'https://www.googleapis.com/auth/gmail.readonly',
+            ConnectorProvider::GoogleCalendar => 'https://www.googleapis.com/auth/calendar.readonly',
+            default => null,
+        };
     }
 
     /**
@@ -99,11 +107,17 @@ class GoogleAuth
 
     /**
      * Extra-scope consent on the same Google OAuth client used for sign-in.
+     * prompt=consent relaunches Google's permission screen.
      */
     public static function redirectForConnector(ConnectorProvider $provider): SymfonyRedirectResponse
     {
         return self::driver()
             ->scopes(self::connectorScopes($provider))
+            ->with([
+                'access_type' => 'offline',
+                'prompt' => 'consent',
+                'include_granted_scopes' => 'true',
+            ])
             ->redirect();
     }
 

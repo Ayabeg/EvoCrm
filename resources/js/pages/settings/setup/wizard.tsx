@@ -1,6 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Check, ExternalLink, Facebook, Minus } from 'lucide-react';
+import { ArrowLeft, Check, ExternalLink, Minus } from 'lucide-react';
 import { useState } from 'react';
+import { MetaMark } from '@/components/brand/marks';
+import { BrandConnectButtons } from '@/components/connectors/brand-connect';
 import { SetupStepper } from '@/components/setup/stepper';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,7 +31,6 @@ type MetaState = {
     selected_page_id: string | null;
     selected_page_name: string | null;
     unlocks: AppUnlock[];
-    callback_url: string;
 };
 
 type Props = {
@@ -220,7 +221,7 @@ function StepBody({
             <div className="space-y-4">
                 <Card className="flex items-start gap-4 p-4">
                     <div className="grid size-12 place-content-center rounded-xl border bg-background">
-                        <Facebook className="size-6" />
+                        <MetaMark className="size-7" />
                     </div>
                     <div>
                         <h3 className="text-sm font-semibold">Meta</h3>
@@ -270,29 +271,10 @@ function StepBody({
                     ) : (
                         <>
                             <p className="text-sm text-muted-foreground">
-                                Sign in with the Facebook account that manages
-                                your Page, WhatsApp Business account, and ad
-                                accounts.
+                                Log in with Facebook. You do not need an App ID
+                                or token.
                             </p>
-                            {connectUrl ? (
-                                <Button asChild className="w-full sm:w-auto">
-                                    <a href={connectUrl}>
-                                        Continue with Facebook
-                                    </a>
-                                </Button>
-                            ) : (
-                                <Button disabled className="w-full sm:w-auto">
-                                    Continue with Facebook
-                                </Button>
-                            )}
-                            {metaState?.callback_url ? (
-                                <p className="text-xs text-muted-foreground">
-                                    Redirect URI:{' '}
-                                    <code className="break-all font-mono">
-                                        {metaState.callback_url}
-                                    </code>
-                                </p>
-                            ) : null}
+                            <BrandConnectButtons facebookUrl={connectUrl} />
                         </>
                     )}
                 </Card>

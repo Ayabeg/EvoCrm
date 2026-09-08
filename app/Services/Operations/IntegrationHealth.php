@@ -39,7 +39,7 @@ class IntegrationHealth
             $this->googleConnector($workspace, ConnectorProvider::GoogleCalendar),
             [
                 'key' => 'evolution',
-                'label' => 'Evolution / WhatsApp Cloud',
+                'label' => 'Evolution / WhatsApp',
                 'state' => filled(config('evolution.base_url')) && filled(config('evolution.api_key'))
                     ? 'connected'
                     : 'not_configured',

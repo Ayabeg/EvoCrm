@@ -6,6 +6,24 @@ Recorded the approved EvoCRM build in [`docs/evocrm-plan.md`](docs/evocrm-plan.m
 
 ---
 
+## Meta OAuth popup connector (2026-08-26)
+
+### Added
+- Paying clients only click Continue with Facebook in a popup. No App ID, secret, or token fields
+- Facebook Login `display=popup` uses Evotechly's platform Meta app
+- Instagram Business Login remains a server path, not a client setup step
+
+---
+
+## Evolution WhatsApp + WhatsApp Business (2026-08-26)
+
+### Added
+- Native [Evolution API](https://github.com/evolution-foundation/evolution-api) connect for **WhatsApp** and **WhatsApp Business** via Facebook Login
+- Settings → Apps tiles and `/settings/whatsapp` / `/settings/whatsapp-business` — paying clients never type Evolution or Cloud keys
+- Workspace-scoped instances (`evo-ws{id}-wa` / `evo-ws{id}-waba`) and `CONNECTION_UPDATE` → connected
+
+---
+
 ## HubSpot side-by-side on main (2026-08-26)
 
 Re-pointed the HubSpot vs EvoSales matrix to `main` @ `714d21a` after Waves 1–6 merged. Composite stays **~85** (Wave 6 not re-scored). Visual HTML now matches shipped playbooks, calculated list columns, association filters, segment history, and audit trail. See [`docs/hubspot-side-by-side.md`](docs/hubspot-side-by-side.md).

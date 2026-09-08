@@ -42,26 +42,42 @@ class AppsMarketplaceTest extends TestCase
             ->assertInertia(
                 fn ($page) => $page
                     ->component('settings/apps/index')
-                    ->has('apps', 3)
+                    ->has('apps', 5)
                     ->where('apps.0.key', 'meta')
                     ->where('apps.0.connected', false)
-                    ->where('apps.0.configured', false)
-                    ->where('apps.1.key', 'google')
-                    ->where('apps.1.callback_url', GoogleAuth::callbackUrl())
-                    ->where('apps.1.origin_url', GoogleAuth::javascriptOrigin())
-                    ->where('apps.2.key', 'smtp')
-            );
+                    ->where('apps.0.connect_url', '/auth/meta?popup=1')
+                    ->missing('apps.0.callback_url')
+                    ->missing('apps.0.instagram_connect_url')
+                    ->missing('apps.0.instagram_callback_url')
+                    ->where('apps.1.key', 'whatsapp')
+                    ->where('apps.2.key', 'whatsapp_business')
+                    ->where('apps.3.key', 'google')
+                    ->where('apps.3.callback_url', GoogleAuth::callbackUrl())
+                    ->where('apps.3.origin_url', GoogleAuth::javascriptOrigin())
+                    ->where('apps.4.key', 'smtp')
+            )
+            ->assertDontSee('META_APP_ID')
+            ->assertDontSee('META_APP_SECRET')
+            ->assertDontSee('META_ACCESS_TOKEN')
+            ->assertDontSee('.env');
     }
 
-    public function test_meta_routes_404_when_not_configured(): void
+    public function test_meta_popup_stays_client_friendly_when_platform_app_is_missing(): void
     {
         config()->set('meta.app_id', null);
         config()->set('meta.app_secret', null);
 
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get('/auth/meta')->assertNotFound();
-        $this->actingAs($user)->get('/auth/meta/callback')->assertNotFound();
+        $this->actingAs($user)
+            ->get('/auth/meta?popup=1')
+            ->assertOk()
+            ->assertSee('evosales:oauth', false)
+            ->assertSee('ok: false', false);
+
+        $this->actingAs($user)
+            ->get('/auth/meta/callback')
+            ->assertRedirect(route('settings.apps', absolute: false));
     }
 
     public function test_meta_redirect_sends_user_to_facebook_when_configured(): void
@@ -85,6 +101,55 @@ class AppsMarketplaceTest extends TestCase
             'https://www.facebook.com/',
             $response->headers->get('Location'),
         );
+    }
+
+    public function test_facebook_callback_closes_the_popup_instead_of_loading_apps(): void
+    {
+        $this->enableMeta();
+
+        $metaUser = new MetaUser;
+        $metaUser->setRaw(['id' => 'fb-user-popup', 'name' => 'Sara', 'email' => 'sara@evotechly.com'])
+            ->map(['id' => 'fb-user-popup', 'name' => 'Sara', 'email' => 'sara@evotechly.com']);
+        $metaUser->setToken('short-lived-token');
+        $metaUser->setExpiresIn(3600);
+
+        $provider = Mockery::mock();
+        $provider->shouldReceive('usingGraphVersion')->once()->andReturnSelf();
+        $provider->shouldReceive('user')->once()->andReturn($metaUser);
+        Socialite::shouldReceive('driver')->once()->with('meta')->andReturn($provider);
+
+        Http::fake([
+            'graph.facebook.com/*' => Http::response(['data' => []], 200),
+        ]);
+
+        $this->actingAs(User::factory()->create())
+            ->withSession(['auth.meta.popup' => true])
+            ->get('/auth/meta/callback')
+            ->assertOk()
+            ->assertSee('evosales:oauth', false)
+            ->assertSee('window.close', false)
+            ->assertDontSee('settings/apps');
+    }
+
+    public function test_meta_popup_asks_facebook_for_the_authorization_window(): void
+    {
+        $this->enableMeta();
+
+        $provider = Mockery::mock();
+        $provider->shouldReceive('scopes')->once()->andReturnSelf();
+        $provider->shouldReceive('usingGraphVersion')->once()->andReturnSelf();
+        $provider->shouldReceive('reRequest')->once()->andReturnSelf();
+        $provider->shouldReceive('with')->once()->with(['display' => 'popup'])->andReturnSelf();
+        $provider->shouldReceive('redirect')->once()->andReturn(
+            redirect('https://www.facebook.com/v21.0/dialog/oauth?display=popup')
+        );
+
+        Socialite::shouldReceive('driver')->once()->with('meta')->andReturn($provider);
+
+        $response = $this->actingAs(User::factory()->create())->get('/auth/meta?popup=1');
+
+        $response->assertRedirect();
+        $this->assertTrue((bool) session('auth.meta.popup'));
     }
 
     public function test_meta_callback_stores_an_encrypted_workspace_connection(): void

@@ -26,7 +26,7 @@ export type ConnectorStatus =
     | 'connected';
 
 export type OfficialDeskConnector = {
-    provider: 'whatsapp_cloud' | 'instagram' | 'facebook_messenger';
+    provider: 'whatsapp' | 'whatsapp_cloud' | 'instagram' | 'facebook_messenger';
     name: string;
     tagline: string;
     intent: string;
@@ -62,9 +62,15 @@ export type MarketplaceApp = {
     configured: boolean;
     connected_at: string | null;
     connect_url: string | null;
+    instagram_connect_url?: string | null;
+    setup_url?: string | null;
     manage_url: string | null;
     callback_url?: string;
     origin_url?: string;
+    instagram_callback_url?: string;
+    popup?: boolean;
+    instagram_connected?: boolean;
+    facebook_connected?: boolean;
     webmail_url?: string | null;
     mailboxes?: number;
     unlocks: AppUnlock[];

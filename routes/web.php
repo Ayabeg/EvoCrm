@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Ads\AdsCenterController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\InstagramController;
 use App\Http\Controllers\Auth\MetaController;
 use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\AskEvoController;
@@ -60,6 +61,7 @@ use App\Http\Controllers\Settings\OAuthSetupController;
 use App\Http\Controllers\Settings\PermissionsController;
 use App\Http\Controllers\Settings\PipelineController;
 use App\Http\Controllers\Settings\RecordLayoutSettingsController;
+use App\Http\Controllers\Settings\WhatsAppController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
 use App\Http\Controllers\Webhooks\OutboundBounceWebhookController;
@@ -112,9 +114,11 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::post('/lead-os/graph', [LeadOsController::class, 'runGraph'])->name('lead-os.graph');
     Route::post('/crm/lost-reviews/{suggestion}/confirm', [LeadOsController::class, 'confirmLost'])->name('crm.lost-reviews.confirm');
 
-    // Meta workspace OAuth (Facebook Login). 404 unless META_* env is set.
+    // Meta workspace OAuth. 404 unless META_* env is set.
     Route::get('/auth/meta', [MetaController::class, 'redirect'])->name('auth.meta');
     Route::get('/auth/meta/callback', [MetaController::class, 'callback'])->name('auth.meta.callback');
+    Route::get('/auth/instagram', [InstagramController::class, 'redirect'])->name('auth.instagram');
+    Route::get('/auth/instagram/callback', [InstagramController::class, 'callback'])->name('auth.instagram.callback');
 
     Route::get('/leads', [LeadBoardController::class, 'index'])->name('leads.index');
 
@@ -324,6 +328,13 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
 
     Route::get('/settings/evolution', [EvolutionSettingsController::class, 'edit'])->name('settings.evolution');
     Route::post('/settings/evolution/sync', [EvolutionSettingsController::class, 'sync'])->name('settings.evolution.sync');
+    Route::get('/settings/whatsapp', [WhatsAppController::class, 'show'])->name('settings.whatsapp');
+    Route::post('/settings/whatsapp/connect', [WhatsAppController::class, 'connect'])->name('settings.whatsapp.connect');
+    Route::get('/settings/whatsapp/status', [WhatsAppController::class, 'status'])->name('settings.whatsapp.status');
+    Route::delete('/settings/whatsapp', [WhatsAppController::class, 'destroy'])->name('settings.whatsapp.destroy');
+    Route::get('/settings/whatsapp-business', [WhatsAppController::class, 'showBusiness'])->name('settings.whatsapp-business');
+    Route::post('/settings/whatsapp-business/connect', [WhatsAppController::class, 'connectBusiness'])->name('settings.whatsapp-business.connect');
+    Route::delete('/settings/whatsapp-business', [WhatsAppController::class, 'destroyBusiness'])->name('settings.whatsapp-business.destroy');
     Route::get('/settings/meta', [MetaSettingsController::class, 'edit'])->name('settings.meta');
     Route::get('/settings/channels', [ChannelSettingsController::class, 'edit'])->name('settings.channels');
     Route::post('/settings/channels', [ChannelSettingsController::class, 'update'])->name('settings.channels.update');

@@ -1,5 +1,6 @@
 import { Form, Link } from '@inertiajs/react';
 import type { FunnelCounts } from '@/components/ads/funnel';
+import { BrandConnectButtons } from '@/components/connectors/brand-connect';
 import { AdsShell } from '@/components/crm/ads-shell';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
 import {
@@ -54,7 +55,11 @@ type Props = {
     funnels: Record<number, FunnelCounts>;
     totals: FunnelCounts;
     leads: AdLeadRow[];
-    meta: { connected: boolean; reason: string | null };
+    meta: {
+        connected: boolean;
+        reason: string | null;
+        connect_url?: string | null;
+    };
 };
 
 function kindOf(campaign: Campaign): string {
@@ -93,11 +98,14 @@ export default function AdsHub({ accounts, campaigns, totals, leads, meta }: Pro
                     </Form>
                 </SurfaceHeader>
 
-                {meta.reason ? (
-                    <HairlinePanel className="px-4 py-3">
-                        <p className="aurora-text-body-sm text-brand">{meta.reason}</p>
-                        <p className="aurora-text-caption mt-1 text-mute">
-                            Until then this hub runs on local demo data. Lead forms POST to{' '}
+                {meta.reason || !meta.connected ? (
+                    <HairlinePanel className="space-y-3 px-4 py-3">
+                        {meta.reason ? (
+                            <p className="aurora-text-body-sm text-brand">{meta.reason}</p>
+                        ) : null}
+                        <BrandConnectButtons facebookUrl={meta.connect_url ?? '/auth/meta?popup=1'} />
+                        <p className="aurora-text-caption text-mute">
+                            Log in with Facebook in the popup. Lead forms POST to{' '}
                             <code>/webhooks/meta/leads/{'{webhookKey}'}</code> and create Contact +
                             Lead in the resolved workspace.
                         </p>

@@ -5,6 +5,7 @@ namespace App\Services\Evolution;
 use App\Enums\ChannelType;
 use App\Models\Channel;
 use App\Models\EvolutionEvent;
+use App\Models\Integration;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Models\Workspace;
@@ -26,10 +27,11 @@ class EvolutionWebhookProcessor
     public function handle(Workspace $workspace, array $payload): ?Message
     {
         $event = (string) ($payload['event'] ?? $payload['type'] ?? 'MESSAGES_UPSERT');
+        $instance = (string) ($payload['instance'] ?? config('evolution.instance'));
 
         EvolutionEvent::query()->create([
             'workspace_id' => $workspace->id,
-            'instance' => $payload['instance'] ?? config('evolution.instance'),
+            'instance' => $instance,
             'event' => $event,
             'payload' => $payload,
             'received_at' => now(),
@@ -39,6 +41,12 @@ class EvolutionWebhookProcessor
             'evolution_last_webhook_at' => now(),
             'evolution_last_event' => $event,
         ])->save();
+
+        if (in_array($event, ['CONNECTION_UPDATE', 'connection.update'], true)) {
+            $this->applyConnectionUpdate($workspace, $instance, $payload);
+
+            return null;
+        }
 
         if (! in_array($event, ['MESSAGES_UPSERT', 'messages.upsert', 'message', 'click_to_whatsapp'], true)) {
             return null;
@@ -60,16 +68,17 @@ class EvolutionWebhookProcessor
             return null;
         }
 
-        $body = $this->extractBody($data);
+        $kind = $this->kindFor($workspace, $instance);
+        $isPhone = $kind === EvolutionCloudService::KIND_WHATSAPP;
         $pushName = (string) (Arr::get($data, 'pushName') ?? Arr::get($payload, 'pushName') ?? 'WhatsApp');
 
         $contact = $this->contacts->findOrCreate($workspace, [
             'first_name' => $pushName !== '' ? $pushName : 'WhatsApp',
             'phone' => $phone,
-            'source' => 'evolution_cloud',
+            'source' => $isPhone ? 'evolution_whatsapp' : 'evolution_cloud',
         ]);
 
-        $channel = $this->whatsAppChannel($workspace);
+        $channel = $this->whatsAppChannel($workspace, $isPhone);
         $thread = Thread::query()->firstOrCreate(
             [
                 'channel_id' => $channel->id,
@@ -78,7 +87,7 @@ class EvolutionWebhookProcessor
             [
                 'workspace_id' => $workspace->id,
                 'status' => 'open',
-                'subject' => 'WhatsApp Cloud',
+                'subject' => $isPhone ? 'WhatsApp' : 'WhatsApp Business',
             ]
         );
 
@@ -88,9 +97,9 @@ class EvolutionWebhookProcessor
             'contact_id' => $contact->id,
             'direction' => $fromMe ? 'outbound' : 'inbound',
             'type' => 'text',
-            'body' => $body,
+            'body' => $this->extractBody($data),
             'status' => 'received',
-            'provider' => 'evolution_cloud',
+            'provider' => $isPhone ? 'evolution_whatsapp' : 'evolution_cloud',
             'provider_message_id' => Arr::get($data, 'key.id') ?? Arr::get($data, 'id'),
             'payload' => $payload,
         ]);
@@ -109,6 +118,61 @@ class EvolutionWebhookProcessor
     }
 
     /**
+     * @param  array<string, mixed>  $payload
+     */
+    protected function applyConnectionUpdate(Workspace $workspace, string $instance, array $payload): void
+    {
+        $state = (string) (Arr::get($payload, 'data.state')
+            ?? Arr::get($payload, 'data.instance.state')
+            ?? Arr::get($payload, 'state')
+            ?? '');
+
+        $provider = $this->kindFor($workspace, $instance);
+        $integration = $workspace->integration($provider);
+
+        if (! $integration) {
+            return;
+        }
+
+        $meta = $integration->meta ?? [];
+        $meta['state'] = $state !== '' ? $state : ($meta['state'] ?? null);
+
+        if ($state === 'open') {
+            unset($meta['qr']);
+            $integration->forceFill([
+                'status' => 'connected',
+                'access_token' => $integration->access_token ?: 'evolution',
+                'meta' => $meta,
+                'connected_at' => $integration->connected_at ?? now(),
+            ])->save();
+
+            return;
+        }
+
+        $integration->forceFill(['meta' => $meta])->save();
+    }
+
+    protected function kindFor(Workspace $workspace, string $instance): string
+    {
+        $phone = $workspace->integration(Integration::PROVIDER_WHATSAPP);
+        $business = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
+
+        if ($phone && ($phone->meta['instance'] ?? null) === $instance) {
+            return Integration::PROVIDER_WHATSAPP;
+        }
+
+        if ($business && ($business->meta['instance'] ?? null) === $instance) {
+            return Integration::PROVIDER_WHATSAPP_BUSINESS;
+        }
+
+        if (str_ends_with($instance, '-wa')) {
+            return Integration::PROVIDER_WHATSAPP;
+        }
+
+        return Integration::PROVIDER_WHATSAPP_BUSINESS;
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      */
     protected function extractBody(array $data): string
@@ -123,15 +187,17 @@ class EvolutionWebhookProcessor
         );
     }
 
-    protected function whatsAppChannel(Workspace $workspace): Channel
+    protected function whatsAppChannel(Workspace $workspace, bool $phone): Channel
     {
+        $type = $phone ? ChannelType::WhatsApp : ChannelType::WhatsAppCloud;
+
         return Channel::query()->firstOrCreate(
             [
                 'workspace_id' => $workspace->id,
-                'type' => ChannelType::WhatsAppCloud,
+                'type' => $type,
             ],
             [
-                'name' => 'WhatsApp Cloud',
+                'name' => $phone ? 'WhatsApp' : 'WhatsApp Business',
                 'status' => 'connected',
             ]
         );

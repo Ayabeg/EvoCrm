@@ -4,12 +4,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Evolution API — WhatsApp Cloud only
+    | Evolution API — WhatsApp + WhatsApp Business
     |--------------------------------------------------------------------------
     |
-    | EvoSales talks to Evolution API exclusively in Cloud / Business API
-    | mode (integration = WHATSAPP-BUSINESS). Baileys, QR login, Linked
-    | devices, OpenWA, and any consumer-WhatsApp takeover are refused.
+    | Native Evolution instance types:
+    |   WHATSAPP-BAILEYS   — phone WhatsApp (QR)
+    |   WHATSAPP-BUSINESS  — official Cloud API (Facebook Login + Graph WABA)
+    |
+    | Platform keys stay on the server. Clients never type them.
+    | OpenWA and linked-device takeovers stay refused.
     |
     */
 
@@ -21,9 +24,6 @@ return [
 
     'webhook_url' => env('EVOLUTION_WEBHOOK_URL'),
 
-    /*
-    | Hard-coded product constraint. Never change this to WHATSAPP-BAILEYS.
-    */
     'integration' => 'WHATSAPP-BUSINESS',
 
     'qrcode' => false,

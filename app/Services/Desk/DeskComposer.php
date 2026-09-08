@@ -3,6 +3,7 @@
 namespace App\Services\Desk;
 
 use App\Enums\ChannelType;
+use App\Models\Integration;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Models\User;
@@ -15,7 +16,7 @@ class DeskComposer
     public function reply(Thread $thread, User $user, string $body): Message
     {
         $channel = $thread->channel;
-        $isWhatsApp = $channel->type === ChannelType::WhatsAppCloud;
+        $isWhatsApp = in_array($channel->type, [ChannelType::WhatsApp, ChannelType::WhatsAppCloud], true);
         $isSms = $channel->type === ChannelType::Sms;
 
         $message = Message::query()->create([
@@ -27,7 +28,9 @@ class DeskComposer
             'type' => 'text',
             'body' => $body,
             'status' => 'queued',
-            'provider' => $isWhatsApp ? 'evolution_cloud' : ($isSms ? 'sms' : $channel->type->value),
+            'provider' => $isWhatsApp
+                ? ($channel->type === ChannelType::WhatsApp ? 'evolution_whatsapp' : 'evolution_cloud')
+                : ($isSms ? 'sms' : $channel->type->value),
         ]);
 
         if ($isWhatsApp) {
@@ -51,14 +54,22 @@ class DeskComposer
         if (! $this->evolution->configured()) {
             $message->forceFill([
                 'status' => 'failed',
-                'failure_reason' => 'Evolution Cloud is not connected. Outbound stored as failed.',
+                'failure_reason' => 'Evolution is not connected. Outbound stored as failed.',
             ])->save();
 
             return;
         }
 
         $number = (string) $thread->contact->phone_e164;
-        $result = $this->evolution->sendText($number, $body);
+        $kind = $thread->channel->type === ChannelType::WhatsApp
+            ? EvolutionCloudService::KIND_WHATSAPP
+            : EvolutionCloudService::KIND_WHATSAPP_BUSINESS;
+        $instance = $thread->workspace?->integration(
+            $kind === EvolutionCloudService::KIND_WHATSAPP
+                ? Integration::PROVIDER_WHATSAPP
+                : Integration::PROVIDER_WHATSAPP_BUSINESS
+        )?->meta['instance'] ?? $this->evolution->instanceName($thread->workspace, $kind);
+        $result = $this->evolution->sendText($number, $body, $instance);
 
         $message->forceFill([
             'status' => $result['ok'] ? 'sent' : 'failed',

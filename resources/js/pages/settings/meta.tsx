@@ -1,5 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import { BrandConnectButtons } from '@/components/connectors/brand-connect';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -37,13 +38,12 @@ function metric(value: string | number | null | undefined, empty = 'Not enough d
 
 export default function MetaSettings({
     connected,
-    app_id_set,
     ad_account_id_set,
     ad_accounts,
     selected_ad_account_id,
-    graph_version,
     reason,
     can_manage,
+    graph_version,
     expires_at,
     webhook_url,
     pages,
@@ -56,15 +56,15 @@ export default function MetaSettings({
     sync_runs,
     webhook_events,
     conversion_logs,
+    connect_url,
 }: {
     connected: boolean;
-    app_id_set: boolean;
     ad_account_id_set: boolean;
     ad_accounts: { id: string; name: string }[];
     selected_ad_account_id: string | null;
-    graph_version: string;
     reason: string | null;
     can_manage: boolean;
+    graph_version: string;
     expires_at: string | null;
     webhook_url: string;
     pages: { id: string; name: string }[];
@@ -77,6 +77,7 @@ export default function MetaSettings({
     sync_runs: { id: number; kind: string; mode: string; status: string; error: string | null; finished_at: string | null }[];
     webhook_events: LogRow[];
     conversion_logs: LogRow[];
+    connect_url?: string | null;
 }) {
     const initialMappings =
         field_mappings.length > 0
@@ -95,8 +96,8 @@ export default function MetaSettings({
                 <div>
                     <h1 className="text-xl font-semibold">Meta</h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        Connection, lead forms, field mapping, and conversion feedback.
-                        Tokens stay encrypted on the server.
+                        Log in with Facebook. Connection, lead forms, field mapping,
+                        and conversion feedback. Tokens stay encrypted on the server.
                     </p>
                 </div>
 
@@ -111,18 +112,23 @@ export default function MetaSettings({
                             </span>
                         ) : null}
                     </div>
-                    <p>App ID: {app_id_set ? 'set' : 'empty'}</p>
-                    <p>Ad account: {ad_account_id_set ? 'selected' : 'not selected'}</p>
+                    <p>Ad account: {ad_account_id_set ? 'selected' : 'choose after login'}</p>
                     <p>Graph version: {graph_version}</p>
                     {reason ? <p className="text-brand">{reason}</p> : null}
-                    <div className="flex flex-wrap gap-2 pt-1">
-                        <Button asChild size="sm" variant="outline">
-                            <Link href="/settings/apps/meta">Connection details</Link>
-                        </Button>
-                        <Button asChild size="sm" variant="outline">
-                            <Link href="/auth/meta">Reconnect</Link>
-                        </Button>
-                    </div>
+                    {!connected && can_manage ? (
+                        <div className="pt-2">
+                            <BrandConnectButtons facebookUrl={connect_url ?? '/auth/meta?popup=1'} />
+                        </div>
+                    ) : (
+                        <div className="flex flex-wrap gap-2 pt-1">
+                            <Button asChild size="sm" variant="outline">
+                                <Link href="/settings/apps/meta">Connection details</Link>
+                            </Button>
+                            <Button asChild size="sm" variant="outline">
+                                <Link href="/auth/meta">Reconnect</Link>
+                            </Button>
+                        </div>
+                    )}
                 </Card>
 
                 {ad_accounts.length > 0 ? (

@@ -21,7 +21,7 @@ export default function ChannelSettings({
                 <div>
                     <h1 className="text-xl font-semibold">Channels</h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        Sold Desk is EvoDesk (Chatwoot Community). WhatsApp Cloud via Evolution is first-class. Telegram is later.
+                        Sold Desk is EvoDesk (Chatwoot Community). WhatsApp and WhatsApp Business via Evolution are first-class. Telegram is later.
                     </p>
                 </div>
                 <Card className="space-y-3 p-4">

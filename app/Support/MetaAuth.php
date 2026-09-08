@@ -13,8 +13,44 @@ class MetaAuth
      */
     public static function enabled(): bool
     {
-        return filled(config('meta.app_id'))
+        return static::canStartLogin()
             && filled(config('meta.app_secret'));
+    }
+
+    /**
+     * Facebook Login can open with only the Evotechly App ID. The secret is
+     * required later to swap the code for a token.
+     */
+    public static function canStartLogin(): bool
+    {
+        return filled(config('meta.app_id'));
+    }
+
+    public static function redirectUri(): string
+    {
+        $configured = (string) (config('meta.redirect_uri') ?: config('services.meta.redirect') ?: '');
+
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        return url('/auth/meta/callback');
+    }
+
+    /**
+     * Official Facebook Login dialog (display=popup). The popup must open
+     * facebook.com — never the EvoSales Apps page.
+     */
+    public static function authorizeUrl(bool $popup = true): string
+    {
+        return 'https://www.facebook.com/'.static::graphVersion().'/dialog/oauth?'.http_build_query([
+            'client_id' => config('meta.app_id'),
+            'redirect_uri' => static::redirectUri(),
+            'response_type' => 'code',
+            'scope' => implode(',', static::scopes()),
+            'display' => $popup ? 'popup' : 'page',
+            'auth_type' => 'rerequest',
+        ], '', '&', PHP_QUERY_RFC3986);
     }
 
     /**

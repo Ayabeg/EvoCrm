@@ -34,7 +34,7 @@ class MetaSettingsController extends Controller
         $integration = $resolved['integration'] ?? $workspace->integration('meta');
 
         return Inertia::render('settings/meta', [
-            'connected' => $integration?->isConnected() ?? false,
+            'connected' => $integration?->isConnected() ?? $resolved['ok'],
             'app_id_set' => filled(config('meta.app_id')),
             'ad_account_id_set' => filled($resolved['ad_account_id']),
             'ad_accounts' => $credentials->accounts($integration),
@@ -42,6 +42,7 @@ class MetaSettingsController extends Controller
             'graph_version' => config('meta.graph_version'),
             'reason' => $resolved['reason'] ?? ($integration?->isConnected() ? null : 'Meta is not connected for this workspace.'),
             'can_manage' => $request->user()->role->canManageSettings(),
+            'connect_url' => '/auth/meta?popup=1',
             'expires_at' => $integration?->expires_at?->toIso8601String(),
             'webhook_url' => $endpoints->urlFor($workspace, WebhookEndpointManager::PROVIDER_META_LEADS),
             'verify_token_set' => filled(config('meta.webhook_verify_token')),

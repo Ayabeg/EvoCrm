@@ -17,7 +17,7 @@ Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotech
 
 ## What this is not
 
-- **Not Baileys.** Official WhatsApp Cloud API only, via Evolution API in Cloud / Business API mode (`WHATSAPP-BUSINESS`). No QR login, Linked-devices, OpenWA, or consumer-WhatsApp takeover.
+- **WhatsApp is Evolution-native.** Phone WhatsApp uses Evolution `WHATSAPP-BAILEYS` (QR). WhatsApp Business uses Evolution `WHATSAPP-BUSINESS` (Facebook Login + Graph WABA). OpenWA and linked-device takeovers stay refused. Clients never type Evolution or Cloud keys.
 - **Not a Kommo / amoCRM clone.**
 - **Not an Instantly clone.**
 - **Not a Laravel Chatwoot clone.** The sold desk is EvoDesk / Chatwoot Community MIT. The in-app thread list is CRM history only.

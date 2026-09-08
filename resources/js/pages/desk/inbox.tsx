@@ -203,7 +203,9 @@ function FrontDesk({
 
         if (folder === 'whatsapp') {
             return threads.filter(
-                (thread) => thread.channel?.type === 'whatsapp_cloud',
+                (thread) =>
+                    thread.channel?.type === 'whatsapp' ||
+                    thread.channel?.type === 'whatsapp_cloud',
             );
         }
 
@@ -217,8 +219,7 @@ function FrontDesk({
             label: 'Unassigned',
             count: threads.filter((thread) => !thread.contact.owner).length,
         },
-        { key: 'whatsapp', label: 'WhatsApp Cloud', count: null },
-    ];
+        { key: 'whatsapp', label: 'WhatsApp Cloud', count: null },    ];
 
     return (
         <AdaptiveWorkspaceShell
@@ -262,8 +263,7 @@ function FrontDesk({
                             WhatsApp Cloud
                         </p>
                     </div>
-                </div>
-            }
+                </div>            }
             center={
                 <>
                     {filtered.map((thread) => (

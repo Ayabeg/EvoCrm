@@ -23,11 +23,27 @@ return [
 
     'app_secret' => env('META_APP_SECRET'),
 
-    'redirect_uri' => env('META_REDIRECT_URI', 'https://crm.evotechly.com/auth/meta/callback'),
+    'redirect_uri' => env('META_REDIRECT_URI'),
 
     'graph_version' => env('META_GRAPH_VERSION', 'v21.0'),
 
     'webhook_verify_token' => env('META_WEBHOOK_VERIFY_TOKEN'),
+
+    /*
+    | Instagram Business Login (Authorization Window).
+    | Empty values fall back to META_APP_ID / META_APP_SECRET.
+    */
+    'instagram_app_id' => env('META_INSTAGRAM_APP_ID'),
+
+    'instagram_app_secret' => env('META_INSTAGRAM_APP_SECRET'),
+
+    'instagram_redirect_uri' => env('META_INSTAGRAM_REDIRECT_URI', 'https://crm.evotechly.com/auth/instagram/callback'),
+
+    'instagram_scopes' => [
+        'instagram_business_basic',
+        'instagram_business_manage_messages',
+        'instagram_business_manage_comments',
+    ],
 
     'scopes' => [
         'public_profile',

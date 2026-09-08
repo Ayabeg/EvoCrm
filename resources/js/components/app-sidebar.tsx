@@ -311,7 +311,7 @@ function ChannelChips({ collapsed }: { collapsed: boolean }) {
         { key: 'instagram', label: 'Instagram connected', icon: Instagram, scopes: ['instagram_basic'] },
         {
             key: 'whatsapp',
-            label: 'WhatsApp Cloud connected',
+            label: 'WhatsApp Business connected',
             icon: MessageCircle,
             scopes: ['whatsapp_business_messaging', 'whatsapp_business_management'],
         },

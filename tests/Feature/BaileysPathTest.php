@@ -2,39 +2,50 @@
 
 use App\Exceptions\UnofficialWhatsAppRefused;
 use App\Models\Mailbox;
+use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Evolution\EvolutionCloudService;
 use App\Services\Outbound\ImapReplyPoller;
+use Illuminate\Support\Facades\Http;
 
-it('refuses any Baileys or QR Evolution instance payload', function () {
+it('allows native Evolution WhatsApp Baileys and Business instance payloads', function () {
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+
+    Http::fake([
+        'https://evolution.example.test/instance/create' => Http::response([
+            'instance' => ['instanceName' => 'ok', 'status' => 'connecting'],
+        ], 201),
+    ]);
+
+    $workspace = User::factory()->create()->workspace;
     $service = app(EvolutionCloudService::class);
 
-    expect(fn () => $service->createInstance(['integration' => 'WHATSAPP-BAILEYS']))
+    expect($service->createWhatsAppInstance($workspace)['ok'])->toBeTrue();
+    expect($service->createBusinessInstance($workspace, [
+        'token' => 't',
+        'number' => 'n',
+        'businessId' => 'b',
+    ])['ok'])->toBeTrue();
+});
+
+it('still refuses OpenWA and linked-device takeovers', function () {
+    $service = app(EvolutionCloudService::class);
+
+    expect(fn () => $service->createInstance(['integration' => 'OPENWA']))
         ->toThrow(UnofficialWhatsAppRefused::class);
 
-    expect(fn () => $service->createInstance(['qrcode' => true]))
-        ->toThrow(UnofficialWhatsAppRefused::class);
-
-    expect(fn () => $service->refuseUnofficial('QR'))
+    expect(fn () => $service->refuseUnofficial('linked-device'))
         ->toThrow(UnofficialWhatsAppRefused::class);
 });
 
-it('does not expose a Baileys or QR connection method', function () {
+it('exposes Evolution WhatsApp QR helpers', function () {
     $methods = get_class_methods(EvolutionCloudService::class);
 
-    expect($methods)->not->toContain('connectWithQr');
-    expect($methods)->not->toContain('startBaileys');
-    expect($methods)->not->toContain('createBaileysInstance');
-    expect($methods)->not->toContain('requestQrCode');
-});
-
-it('keeps Cloud-only literals in the Evolution service source', function () {
-    $source = file_get_contents(app_path('Services/Evolution/EvolutionCloudService.php'));
-
-    expect($source)->toContain("'integration' => 'WHATSAPP-BUSINESS'");
-    expect($source)->toContain("'qrcode' => false");
-    expect($source)->not->toContain('WHATSAPP-BAILEYS');
-    expect($source)->not->toContain("'qrcode' => true");
+    expect($methods)->toContain('createWhatsAppInstance');
+    expect($methods)->toContain('createBusinessInstance');
+    expect($methods)->toContain('connectInstance');
+    expect($methods)->not->toContain('startOpenWa');
 });
 
 it('polls IMAP replies only for configured mailboxes, and fails loudly without ext-imap', function () {

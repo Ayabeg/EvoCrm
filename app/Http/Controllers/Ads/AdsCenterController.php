@@ -172,7 +172,7 @@ class AdsCenterController extends Controller
     }
 
     /**
-     * @return array{connected: bool, app_id_set: bool, ad_account_id_set: bool, reason: string|null}
+     * @return array{connected: bool, ad_account_id_set: bool, reason: string|null, connect_url: string}
      */
     protected function metaStatus(Workspace $workspace): array
     {
@@ -180,9 +180,9 @@ class AdsCenterController extends Controller
 
         return [
             'connected' => $status['connected'],
-            'app_id_set' => filled(config('meta.app_id')),
             'ad_account_id_set' => $status['ad_account_id_set'],
             'reason' => $status['reason'],
+            'connect_url' => '/auth/meta?popup=1',
         ];
     }
 }

@@ -27,7 +27,7 @@ class EnforceProductPermissions
             return 'crm.export';
         }
 
-        if (str_starts_with($name, 'auth.meta')) {
+        if (str_starts_with($name, 'auth.meta') || str_starts_with($name, 'auth.instagram')) {
             return 'settings.integrations';
         }
 

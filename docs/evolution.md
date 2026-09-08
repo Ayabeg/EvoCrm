@@ -1,37 +1,35 @@
-# Evolution API — Cloud only
+# Evolution API — WhatsApp and WhatsApp Business
 
-EvoSales uses Evolution API as the **native WhatsApp connector**, exclusively in **Cloud / Business API** mode.
+EvoSales uses [Evolution API](https://github.com/evolution-foundation/evolution-api) as the native WhatsApp connector. Both official Evolution instance types are first-class:
 
-`integration` is always `WHATSAPP-BUSINESS`. `qrcode` is always `false`.
+| Client channel | Evolution `integration` | How the client connects |
+| --- | --- | --- |
+| **WhatsApp** | `WHATSAPP-BAILEYS` | Scan a QR (`qrcode: true`). Phone → Settings → Linked devices. |
+| **WhatsApp Business** | `WHATSAPP-BUSINESS` | Facebook Login, then Graph discovers the WABA + phone number. No QR. |
+
+Paying clients never type `EVOLUTION_*` or `WA_BUSINESS_*`. Evotechly hosts Evolution (`EVOLUTION_BASE_URL` + `EVOLUTION_API_KEY` on the server).
 
 ## Forbidden
 
-Do not implement or enable:
+Still refused (not Evolution-native):
 
-- Baileys
-- WhatsApp Web QR
-- Linked-devices
 - OpenWA
-- Any unofficial / consumer-WhatsApp takeover
+- Linked-device takeovers outside Evolution
+- Asking a client for App IDs, Cloud tokens, or phone-number IDs
 
-`EvolutionCloudService` refuses any other integration and any `qrcode=true` payload by throwing `UnofficialWhatsAppRefused`.
+Not implemented: Meta Tech Provider / Embedded Signup.
 
-## Env keys
+## Env keys (platform / Evotechly only)
 
 See `.env.example`:
 
 - `EVOLUTION_BASE_URL`
 - `EVOLUTION_API_KEY`
-- `EVOLUTION_INSTANCE`
-- `EVOLUTION_WEBHOOK_URL` — legacy fallback only; Settings provisions a random workspace-scoped endpoint
-- `WA_BUSINESS_TOKEN` — Meta Cloud permanent token
-- `WA_BUSINESS_PHONE_NUMBER_ID`
-- `WA_BUSINESS_WABA_ID`
-- `WA_BUSINESS_GRAPH_VERSION`
-- `WA_BUSINESS_TOKEN_WEBHOOK` — Meta verify token (also used by Evolution as `WA_BUSINESS_TOKEN_WEBHOOK`)
-- `EVODESK_URL` — optional sibling Chatwoot Community URL (documented target only)
+- `EVOLUTION_INSTANCE` — legacy fallback name; workspaces now get `evo-ws{id}-wa` and `evo-ws{id}-waba`
+- `EVOLUTION_WEBHOOK_URL` — legacy fallback; Settings provisions a workspace-scoped endpoint
+- `WA_BUSINESS_*` — optional single-tenant Cloud fallback. Paid workspaces use the Facebook Login token + Graph WABA instead.
 
-Empty credentials render a **not connected** state in Settings → Evolution. Do not invent Meta app IDs or Tech Provider status.
+Empty Evolution URL/key renders “Evotechly is enabling it” — never those env names on client screens.
 
 ## Instance lifecycle
 
@@ -39,13 +37,16 @@ Implemented in `App\Services\Evolution\EvolutionCloudService`:
 
 | Action | Evolution route | Notes |
 | --- | --- | --- |
-| Create | `POST /instance/create` | Always `WHATSAPP-BUSINESS`, `qrcode: false`, Cloud token + phone number id + WABA id |
+| Create WhatsApp | `POST /instance/create` | `WHATSAPP-BAILEYS`, `qrcode: true` |
+| Create Business | `POST /instance/create` | `WHATSAPP-BUSINESS`, token + phone number id + WABA id |
+| Connect / QR | `GET /instance/connect/{instance}` | Fresh QR (~60s) |
+| State | `GET /instance/connectionState/{instance}` | `open` after scan |
 | Fetch | `GET /instance/fetchInstances` | Health check |
-| Set webhook | `POST /webhook/set/{instance}` | Points at the workspace's `/webhooks/evolution/{webhookKey}` endpoint |
-| Session text | `POST /message/sendText/{instance}` | Desk composer, 24h customer window |
-| Template | `POST /message/sendTemplate/{instance}` | Outbound Center only |
+| Set webhook | `POST /webhook/set/{instance}` | Workspace `/webhooks/evolution/{webhookKey}` |
+| Session text | `POST /message/sendText/{instance}` | Desk composer |
+| Template | `POST /message/sendTemplate/{instance}` | Outbound Center, Business only |
 
-Settings → Evolution can trigger create + webhook sync when Cloud credentials exist.
+Settings → Apps → WhatsApp / WhatsApp Business are the client paths.
 
 ## Chatwoot / EvoDesk bridge
 
@@ -53,24 +54,19 @@ This repo is the control plane. Optional `EVODESK_URL` documents a sibling Chatw
 
 Typical production topology:
 
-1. Meta Cloud webhook → Evolution `/webhook/meta` (verify token = `WA_BUSINESS_TOKEN_WEBHOOK`).
-2. Evolution emits `MESSAGES_UPSERT` to the workspace-scoped EvoSales endpoint.
-3. EvoSales maps the event onto Contact + Thread + Message.
-4. If you also run EvoDesk, configure Evolution’s Chatwoot plugin toward that URL — EvoSales does not vendor Chatwoot.
-
-Click-to-WhatsApp ads land on the same Evolution webhook path and become Desk threads on the resolved Contact.
+1. Evolution emits `MESSAGES_UPSERT` and `CONNECTION_UPDATE` to the workspace-scoped EvoSales endpoint.
+2. EvoSales maps the event onto Contact + Thread + Message on the matching channel (`whatsapp` or `whatsapp_cloud`).
+3. If you also run EvoDesk, configure Evolution’s Chatwoot plugin toward that URL — EvoSales does not vendor Chatwoot.
 
 ## Template send vs session reply
 
 | Path | When | API |
 | --- | --- | --- |
-| Desk composer | Human reply inside the Cloud session window | `sendText` |
-| Outbound sequences / Templates page | Outside the session window, official templates only | `sendTemplate` |
-
-Session replies never go through Baileys. Template sends never use unofficial sessions.
+| Desk composer | Human reply inside the session window | `sendText` on the thread’s instance |
+| Outbound sequences / Templates page | Outside the session window, official templates only | `sendTemplate` on the Business instance |
 
 ## Docker
 
-`docker compose --profile evolution up` starts Evolution API **without** enabling a Baileys default instance. You must still create the instance through EvoSales (Cloud-only payload) or Evolution’s API with `WHATSAPP-BUSINESS`.
+`docker compose --profile evolution up` starts Evolution API. Create instances through EvoSales (WhatsApp QR or WhatsApp Business Facebook login).
 
 Default `docker compose up` runs the app only.

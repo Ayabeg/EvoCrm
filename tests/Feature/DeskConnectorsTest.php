@@ -19,10 +19,11 @@ it('exposes the official desk connect panel on the native inbox empty state', fu
         ->assertInertia(fn ($page) => $page
             ->component('desk/inbox')
             ->where('embedState', 'no-url')
-            ->has('officialConnectors', 3)
-            ->where('officialConnectors.0.provider', 'whatsapp_cloud')
-            ->where('officialConnectors.1.provider', 'instagram')
-            ->where('officialConnectors.2.provider', 'facebook_messenger')
+            ->has('officialConnectors', 4)
+            ->where('officialConnectors.0.provider', 'whatsapp')
+            ->where('officialConnectors.1.provider', 'whatsapp_cloud')
+            ->where('officialConnectors.2.provider', 'instagram')
+            ->where('officialConnectors.3.provider', 'facebook_messenger')
             ->where('officialConnectors.0.status', 'not_connected')
         );
 });
@@ -38,7 +39,7 @@ it('keeps the official connect panel when EvoDesk is framed', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->where('embedUrl', 'https://desk.evotechly.com/')
-            ->has('officialConnectors', 3)
+            ->has('officialConnectors', 4)
         );
 });
 
@@ -61,8 +62,7 @@ it('saves a WhatsApp Cloud row as needs official token without Evolution Cloud e
 
     expect($connector->intent)->toBe('desk_whatsapp_cloud')
         ->and($connector->status)->toBe(ConnectorStatus::NeedsToken)
-        ->and($connector->config['reason'])->toContain('Needs official token')
-        ->and($connector->config['reason'])->toContain('never Baileys');
+        ->and($connector->config['reason'])->toContain('Continue with Facebook');
 });
 
 it('marks WhatsApp Cloud connected only when Evolution Cloud credentials already exist', function () {
@@ -154,7 +154,7 @@ it('refuses unofficial WhatsApp providers on the desk connect path', function ()
     expect(Connector::query()->count())->toBe(0);
 });
 
-it('never offers Baileys or unofficial WhatsApp on the desk page source', function () {
+it('never offers OpenWA or linked-device takeovers on the desk page source', function () {
     $inbox = file_get_contents(resource_path('js/pages/desk/inbox.tsx'));
     $panel = file_get_contents(resource_path('js/components/desk/official-connect-panel.tsx'));
 
@@ -165,5 +165,6 @@ it('never offers Baileys or unofficial WhatsApp on the desk page source', functi
         ->toContain('EmptyState')
         ->not->toContain('WHATSAPP-BAILEYS')
         ->not->toContain('connectWithQr')
-        ->not->toContain('/outbound/replies');
+        ->not->toContain('/outbound/replies')
+        ->not->toContain('OpenWA');
 });

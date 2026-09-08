@@ -46,10 +46,8 @@ return [
         // a blank redirect_uri as Error 400 redirect_uri_mismatch.
         'redirect' => env('GOOGLE_REDIRECT_URI') ?: 'https://crm.evotechly.com/auth/google/callback',
         /*
-        | Extra scopes on the SAME OAuth client as sign-in. Leave empty when
-        | the current client does not have Gmail / Calendar APIs enabled —
-        | Settings → Connectors then shows a reconnect empty state and login
-        | never requests these scopes.
+        | Extra scopes on the SAME OAuth client as sign-in. Login never
+        | requests these — only Settings → Connectors → Reconnect does.
         */
         'gmail_scope' => env('GOOGLE_GMAIL_SCOPE'),
         'calendar_scope' => env('GOOGLE_CALENDAR_SCOPE'),
@@ -69,7 +67,7 @@ return [
     'meta' => [
         'client_id' => env('META_APP_ID'),
         'client_secret' => env('META_APP_SECRET'),
-        'redirect' => env('META_REDIRECT_URI', 'https://crm.evotechly.com/auth/meta/callback'),
+        'redirect' => env('META_REDIRECT_URI'),
     ],
 
     /*

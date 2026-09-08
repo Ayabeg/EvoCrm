@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum ConnectorProvider: string
 {
+    case WhatsApp = 'whatsapp';
     case WhatsAppCloud = 'whatsapp_cloud';
     case Instagram = 'instagram';
     case FacebookMessenger = 'facebook_messenger';
@@ -11,13 +12,15 @@ enum ConnectorProvider: string
     case GoogleCalendar = 'google_calendar';
 
     /**
-     * Official Desk channels only. Never Baileys, QR, or Telegram.
+     * Official Desk channels. WhatsApp + WhatsApp Business go through
+     * Evolution API. Instagram and Messenger stay on Meta.
      *
      * @return list<self>
      */
     public static function desk(): array
     {
         return [
+            self::WhatsApp,
             self::WhatsAppCloud,
             self::Instagram,
             self::FacebookMessenger,
@@ -64,7 +67,8 @@ enum ConnectorProvider: string
     public function label(): string
     {
         return match ($this) {
-            self::WhatsAppCloud => 'WhatsApp Cloud',
+            self::WhatsApp => 'WhatsApp',
+            self::WhatsAppCloud => 'WhatsApp Business',
             self::Instagram => 'Instagram',
             self::FacebookMessenger => 'Messenger',
             self::Gmail => 'Gmail',
@@ -75,17 +79,19 @@ enum ConnectorProvider: string
     public function tagline(): string
     {
         return match ($this) {
-            self::WhatsAppCloud => 'Official WhatsApp Cloud API through Evolution Cloud. Never QR, Baileys, or linked devices.',
+            self::WhatsApp => 'Continue with Facebook. Evolution connects WhatsApp automatically.',
+            self::WhatsAppCloud => 'Continue with Facebook. Evolution creates the WhatsApp Business Cloud instance.',
             self::Instagram => 'Official Instagram messaging. Needs a Meta Business token — no unofficial inbox.',
             self::FacebookMessenger => 'Official Facebook Messenger. Needs a Meta Page token — no unofficial inbox.',
-            self::Gmail => 'Read Gmail on the existing Google OAuth client. EvoSales does not send mail from this connector.',
-            self::GoogleCalendar => 'Calendar on the existing Google OAuth client. Sign-in with Google stays unchanged.',
+            self::Gmail => 'Continue with Google to read Gmail. Same sign-in client — login is unchanged.',
+            self::GoogleCalendar => 'Continue with Google to read Calendar. Same sign-in client — login is unchanged.',
         };
     }
 
     public function intent(): string
     {
         return match ($this) {
+            self::WhatsApp => 'desk_whatsapp',
             self::WhatsAppCloud => 'desk_whatsapp_cloud',
             self::Instagram => 'desk_instagram',
             self::FacebookMessenger => 'desk_messenger',

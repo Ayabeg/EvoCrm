@@ -170,19 +170,41 @@ class ConnectorRegistrar
     private function resolveStatus(Workspace $workspace, ConnectorProvider $provider): ConnectorStatus
     {
         return match ($provider) {
-            ConnectorProvider::WhatsAppCloud => $this->whatsAppStatus(),
-            ConnectorProvider::Instagram => $this->metaChannelStatus($workspace, ['instagram_basic']),
+            ConnectorProvider::WhatsApp => $this->whatsAppPhoneStatus($workspace),
+            ConnectorProvider::WhatsAppCloud => $this->whatsAppBusinessStatus($workspace),
+            ConnectorProvider::Instagram => $this->instagramStatus($workspace),
             ConnectorProvider::FacebookMessenger => $this->metaChannelStatus($workspace, ['pages_show_list', 'pages_messaging']),
             ConnectorProvider::Gmail, ConnectorProvider::GoogleCalendar => $this->googleStatus($workspace, $provider),
         };
     }
 
     /**
-     * Connected only when Evolution Cloud + WhatsApp Cloud credentials
-     * already live in env. No live Evolution / Meta call.
+     * Phone WhatsApp is connected when the workspace Evolution
+     * WHATSAPP-BAILEYS instance is stored as connected.
      */
-    private function whatsAppStatus(): ConnectorStatus
+    private function whatsAppPhoneStatus(Workspace $workspace): ConnectorStatus
     {
+        $integration = $workspace->integration(Integration::PROVIDER_WHATSAPP);
+
+        if ($integration?->isConnected()) {
+            return ConnectorStatus::Connected;
+        }
+
+        return ConnectorStatus::NeedsToken;
+    }
+
+    /**
+     * WhatsApp Business is connected from a workspace Evolution
+     * WHATSAPP-BUSINESS instance, or legacy platform Cloud env.
+     */
+    private function whatsAppBusinessStatus(Workspace $workspace): ConnectorStatus
+    {
+        $integration = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
+
+        if ($integration?->isConnected()) {
+            return ConnectorStatus::Connected;
+        }
+
         $evolution = app(EvolutionCloudService::class);
 
         if ($evolution->configured() && $evolution->cloudCredentialsPresent()) {
@@ -190,6 +212,22 @@ class ConnectorRegistrar
         }
 
         return ConnectorStatus::NeedsToken;
+    }
+
+    /**
+     * Instagram is connected from Instagram Business Login
+     * (instagram_business_basic) or a Facebook Login grant that includes
+     * instagram_basic. No live Graph call. Not Embedded Signup.
+     */
+    private function instagramStatus(Workspace $workspace): ConnectorStatus
+    {
+        $instagram = $workspace->integration(Integration::PROVIDER_INSTAGRAM);
+
+        if ($instagram?->isConnected() && $instagram->grants('instagram_business_basic')) {
+            return ConnectorStatus::Connected;
+        }
+
+        return $this->metaChannelStatus($workspace, ['instagram_basic', 'instagram_business_basic']);
     }
 
     /**
@@ -232,9 +270,10 @@ class ConnectorRegistrar
     {
         return match ($status) {
             ConnectorStatus::Connected => $provider->label().' is connected on official credentials already present.',
-            ConnectorStatus::NeedsReconnect => 'Reconnect Google with Calendar/Gmail. Add those scopes to the existing OAuth client — sign-in is unchanged.',
+            ConnectorStatus::NeedsReconnect => 'Continue with Google to grant Gmail or Calendar. Same sign-in client — login is unchanged.',
             ConnectorStatus::NeedsToken => match ($provider) {
-                ConnectorProvider::WhatsAppCloud => 'Needs official token. Set Evolution Cloud + WA_BUSINESS_* — never Baileys or QR.',
+                ConnectorProvider::WhatsApp => 'Continue with Facebook. Evolution connects WhatsApp automatically.',
+                ConnectorProvider::WhatsAppCloud => 'Continue with Facebook. Evolution creates the WhatsApp Business Cloud instance.',
                 ConnectorProvider::Instagram, ConnectorProvider::FacebookMessenger => 'Needs official token. No live Meta Embedded Signup path is configured.',
                 ConnectorProvider::Gmail, ConnectorProvider::GoogleCalendar => 'Needs the existing Google OAuth client before Gmail or Calendar can reconnect.',
             },
@@ -247,12 +286,13 @@ class ConnectorRegistrar
         $needle = strtolower($provider);
 
         if (
-            str_contains($needle, 'baileys')
-            || str_contains($needle, 'whatsapp_web')
-            || str_contains($needle, 'whatsapp-web')
-            || str_contains($needle, 'openwa')
+            str_contains($needle, 'openwa')
             || str_contains($needle, 'linked-device')
             || str_contains($needle, 'linked_device')
+            || str_contains($needle, 'whatsapp_web')
+            || str_contains($needle, 'whatsapp-web')
+            || $needle === 'whatsapp-baileys'
+            || $needle === 'whatsapp_baileys'
             || $needle === 'qr'
             || str_contains($needle, 'whatsapp_qr')
         ) {

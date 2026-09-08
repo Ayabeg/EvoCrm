@@ -65,17 +65,6 @@ class ConnectorController extends Controller
         $enum = ConnectorProvider::tryFrom($provider);
         abort_unless($enum instanceof ConnectorProvider && $enum->isGoogle(), 404);
 
-        if (! GoogleAuth::hasConnectorScope($enum)) {
-            $registrar->connect($request->user()->workspace, $enum);
-
-            Inertia::flash('toast', [
-                'type' => 'info',
-                'message' => 'Reconnect Google with Calendar/Gmail. Add those scopes to the existing OAuth client first. Sign-in is unchanged.',
-            ]);
-
-            return redirect()->route('settings.connectors');
-        }
-
         $request->session()->put('google_connector_intent', $enum->value);
 
         return GoogleAuth::redirectForConnector($enum);
