@@ -78,6 +78,10 @@ class HomeDashboardBuilder
 
         $primaryChart = $this->wonRevenueChart($wonInWindow, $from, $to);
         $pipelineHealth = $this->pipelineHealth($open, $stages, $pipelineCents);
+        $attention = $this->attention($workspace, $open, $from);
+
+        $tasksDueToday = collect($attention)->contains(fn (array $item) => $item['key'] === 'tasks_due');
+        $overdue = collect($attention)->contains(fn (array $item) => $item['key'] === 'overdue_activities');
 
         return [
             'window' => [
@@ -89,7 +93,9 @@ class HomeDashboardBuilder
             'kpis' => $kpis,
             'primaryChart' => $primaryChart,
             'pipelineHealth' => $pipelineHealth,
-            'attention' => $this->attention($workspace, $open, $from),
+            'attention' => $attention,
+            'guidedActions' => app(GuidedActionBuilder::class)->build($workspace, $open),
+            'caughtUp' => ! $tasksDueToday && ! $overdue,
             'activityFeed' => $this->activityFeed($workspace),
             'salesPerformance' => $this->salesPerformance($wonInWindow),
             'quickActions' => [

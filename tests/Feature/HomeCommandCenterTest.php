@@ -5,6 +5,7 @@ use App\Models\Activity;
 use App\Models\Channel;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Mailbox;
 use App\Models\Thread;
 use App\Models\User;
 
@@ -35,6 +36,8 @@ it('serves the command center dashboard', function () {
             ->has('window')
             ->has('kpis')
             ->has('attention')
+            ->has('guidedActions')
+            ->has('caughtUp')
             ->has('activityFeed')
             ->has('quickActions')
             ->has('owners')
@@ -99,6 +102,53 @@ it('filters dashboard by owner', function () {
         ->assertInertia(fn ($page) => $page
             ->where('filters.owner_id', $user->id)
             ->where('kpis.0.key', 'revenue'));
+});
+
+it('offers real connect actions on an empty workspace', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('caughtUp', true)
+            ->where('guidedActions.0.key', 'connect_mailbox')
+            ->where('guidedActions.0.href', '/outbound/mailboxes')
+            ->where('guidedActions.1.key', 'connect_meta')
+            ->where('guidedActions.1.href', '/settings/apps')
+            ->where('guidedActions.2.key', 'connect_whatsapp')
+            ->where('guidedActions.2.href', '/settings/evolution')
+            ->where('guidedActions.3.key', 'connect_calendar')
+            ->where('guidedActions.3.href', '/settings/connectors'));
+});
+
+it('hides the mailbox action once an enabled mailbox exists', function () {
+    $user = User::factory()->create();
+
+    Mailbox::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'enabled' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertInertia(fn ($page) => $page
+            ->where('guidedActions.0.key', 'connect_meta')
+            ->where('guidedActions.3.key', 'create_sequence')
+            ->has('guidedActions', 4));
+});
+
+it('adds a deal next-step action for open deals without a next action', function () {
+    $user = User::factory()->create();
+    $deal = homeDeal($user, 'new');
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertInertia(fn ($page) => $page
+            ->has('guidedActions')
+            ->where('guidedActions.4.key', 'deal_next_step_'.$deal->id)
+            ->where('guidedActions.4.href', '/crm/deals/'.$deal->id)
+            ->where('guidedActions.4.category', 'deal'));
 });
 
 it('includes recent activity feed rows', function () {

@@ -8,6 +8,8 @@ import { AttentionList } from '@/components/dashboard/attention-list';
 import type { AttentionItem } from '@/components/dashboard/attention-list';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
+import { CaughtUpStrip, GuidedActions } from '@/components/dashboard/guided-actions';
+import type { GuidedAction } from '@/components/dashboard/guided-actions';
 import { HomeKpiStrip } from '@/components/dashboard/home-kpi-strip';
 import type { EvoVizPayload } from '@/evoviz/contract';
 import { EvoVizChart } from '@/evoviz/evo-viz-chart';
@@ -40,6 +42,8 @@ type Props = {
     primaryChart: EvoVizPayload | null;
     pipelineHealth: PipelineHealth | null;
     attention: AttentionItem[];
+    guidedActions?: GuidedAction[];
+    caughtUp?: boolean;
     activityFeed: ActivityFeedItem[];
     salesPerformance: SalesRow[] | null;
     quickActions: { label: string; href: string }[];
@@ -89,6 +93,8 @@ export default function Home({
     primaryChart,
     pipelineHealth,
     attention,
+    guidedActions = [],
+    caughtUp = true,
     activityFeed,
     salesPerformance,
     owners = [],
@@ -118,13 +124,37 @@ export default function Home({
                     </div>
                 ) : null}
 
-                <div className="border-b border-hairline bg-canvas px-4 py-3 md:px-5">
-                    <DashboardSection title="Needs attention">
-                        <AttentionList items={attention} />
-                    </DashboardSection>
+                <div
+                    data-home-guided
+                    className="grid border-b border-hairline bg-canvas lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.9fr)] lg:divide-x lg:divide-hairline"
+                >
+                    <div className="space-y-6 px-4 py-3 md:px-5">
+                        <CaughtUpStrip caughtUp={caughtUp} />
+                        <GuidedActions actions={guidedActions} />
+                        {attention.length > 0 ? (
+                            <DashboardSection title="Needs attention">
+                                <AttentionList items={attention} />
+                            </DashboardSection>
+                        ) : null}
+                    </div>
+                    <div className="border-t border-hairline px-4 py-3 md:px-5 lg:border-t-0">
+                        <DashboardSection
+                            title="Activity"
+                            action={
+                                <Link
+                                    href="/crm/activities"
+                                    className="text-[12px] text-mute transition-colors hover:text-ink"
+                                >
+                                    View all
+                                </Link>
+                            }
+                        >
+                            <ActivityFeed items={activityFeed} />
+                        </DashboardSection>
+                    </div>
                 </div>
 
-                <div className="grid bg-canvas lg:grid-cols-2 lg:divide-x lg:divide-hairline">
+                <div className="grid border-t border-hairline bg-canvas lg:grid-cols-2 lg:divide-x lg:divide-hairline">
                     {pipelineHealth ? (
                         <div className="px-4 py-3 md:px-5">
                             <DashboardSection
@@ -161,29 +191,12 @@ export default function Home({
                     ) : null}
                 </div>
 
-                <div className="grid border-t border-hairline bg-canvas lg:grid-cols-2 lg:divide-x lg:divide-hairline">
-                    <div className="px-4 py-3 md:px-5">
+                {salesPerformance && salesPerformance.length > 0 ? (
+                    <div className="border-t border-hairline bg-canvas px-4 py-3 md:px-5">
                         <DashboardSection
-                            title="Activity"
-                            action={
-                                <Link
-                                    href="/crm/activities"
-                                    className="text-[12px] text-mute transition-colors hover:text-ink"
-                                >
-                                    View all
-                                </Link>
-                            }
+                            title="Won by owner"
+                            description="Closed-won in the selected period"
                         >
-                            <ActivityFeed items={activityFeed} />
-                        </DashboardSection>
-                    </div>
-
-                    {salesPerformance && salesPerformance.length > 0 ? (
-                        <div className="border-t border-hairline px-4 py-3 md:px-5 lg:border-t-0">
-                            <DashboardSection
-                                title="Won by owner"
-                                description="Closed-won in the selected period"
-                            >
                                 <table className="w-full">
                                     <thead>
                                         <tr className="border-b border-hairline text-left">
@@ -218,9 +231,8 @@ export default function Home({
                                     </tbody>
                                 </table>
                             </DashboardSection>
-                        </div>
-                    ) : null}
-                </div>
+                    </div>
+                ) : null}
 
                 <footer className="border-t border-hairline bg-canvas px-4 py-2.5 text-[11px] text-mute md:px-5">
                     {dataAsOf

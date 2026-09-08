@@ -53,6 +53,7 @@ it('keeps Home application chrome on Brand Book tokens rather than raw --aurora-
         'js/components/dashboard/attention-list.tsx',
         'js/components/dashboard/activity-feed.tsx',
         'js/components/dashboard/quick-actions.tsx',
+        'js/components/dashboard/guided-actions.tsx',
         'js/components/dashboard/home-kpi-strip.tsx',
         'js/components/crm/evo-kpi-card.tsx',
         'js/components/crm/crm-kpi-strip.tsx',
