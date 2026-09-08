@@ -44,6 +44,28 @@ export default function SequencesIndex({
                     >
                         {({ processing }) => (
                             <>
+                                <div className="space-y-1.5 md:col-span-3">
+                                    <Label>Start from</Label>
+                                    <div className="flex flex-wrap gap-3 text-[13px]">
+                                        <label className="flex items-center gap-2">
+                                            <input
+                                                type="radio"
+                                                name="origin"
+                                                value="scratch"
+                                                defaultChecked
+                                            />
+                                            From scratch
+                                        </label>
+                                        <label className="flex items-center gap-2">
+                                            <input
+                                                type="radio"
+                                                name="origin"
+                                                value="template"
+                                            />
+                                            From template
+                                        </label>
+                                    </div>
+                                </div>
                                 <div className="space-y-1.5">
                                     <Label htmlFor="sequence-name">Name</Label>
                                     <Input

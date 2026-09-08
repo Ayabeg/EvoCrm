@@ -2,6 +2,7 @@ import { Form, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
+import SequenceStepEditor from '@/components/outbound/sequence-step-editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,9 +15,12 @@ type Step = {
     position: number;
     delay_hours: number;
     channel: string;
+    step_type?: string | null;
     mailbox_id?: number | null;
     subject?: string | null;
+    subject_b?: string | null;
     body?: string | null;
+    meeting_url?: string | null;
     wa_template_name?: string | null;
     wa_template_language?: string | null;
     mailbox?: { id: number; name: string } | null;
@@ -155,6 +159,8 @@ export default function SequenceShow({
     mailboxes,
     filters,
     stepAnalytics = [],
+    quietHours,
+    warmup,
 }: {
     sequence: {
         id: number;
@@ -176,13 +182,17 @@ export default function SequenceShow({
         sent: number;
         step_type: string;
     }>;
+    quietHours?: {
+        starts_at: string;
+        ends_at: string;
+        timezone: string;
+        enabled: boolean;
+    } | null;
+    warmup?: { warming: number; total: number } | null;
 }) {
     const [selected, setSelected] = useState<number[]>([]);
-    const [templateId, setTemplateId] = useState<string>('');
-    const [editingStep, setEditingStep] = useState<number | null>(null);
     const [editingSequence, setEditingSequence] = useState(false);
-
-    const template = templates.find((t) => String(t.id) === templateId);
+    const [tab, setTab] = useState<'steps' | 'enroll' | 'settings'>('steps');
 
     const toggleContact = (id: number) =>
         setSelected((current) =>
@@ -258,7 +268,7 @@ export default function SequenceShow({
                     </HairlinePanel>
                 ) : null}
 
-                {stepAnalytics.length > 0 ? (
+                {stepAnalytics.length > 0 && tab === 'steps' ? (
                     <HairlinePanel title="Step funnel" padded={false}>
                         <ul className="divide-y divide-hairline">
                             {stepAnalytics.map((row) => (
@@ -280,174 +290,61 @@ export default function SequenceShow({
                     </HairlinePanel>
                 ) : null}
 
-                <HairlinePanel title="Steps">
-                    <div className="space-y-2">
-                        {(sequence.steps ?? []).map((step) => (
-                            <div
-                                key={step.id}
-                                className="rounded-xl border border-hairline px-3 py-2.5"
-                            >
-                                <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p className="aurora-text-body-sm font-medium text-ink">
-                                            Step {step.position} · +
-                                            {step.delay_hours}h ·{' '}
-                                            {channelLabel(step.channel)}
-                                            {step.mailbox ? (
-                                                <span className="text-mute">
-                                                    {' '}
-                                                    · via {step.mailbox.name}
-                                                </span>
-                                            ) : null}
-                                        </p>
-                                        {step.subject ? (
-                                            <p className="aurora-text-caption mt-0.5 text-mute">
-                                                Subject: {step.subject}
-                                            </p>
-                                        ) : null}
-                                        {step.body ? (
-                                            <p className="aurora-text-body-sm mt-1 whitespace-pre-wrap text-mute">
-                                                {step.body}
-                                            </p>
-                                        ) : null}
-                                        {step.wa_template_name ? (
-                                            <p className="aurora-text-caption text-mute">
-                                                Template {step.wa_template_name}{' '}
-                                                (
-                                                {step.wa_template_language ??
-                                                    'fr'}
-                                                )
-                                            </p>
-                                        ) : null}
-                                    </div>
-                                    <div className="flex flex-shrink-0 items-center gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() =>
-                                                setEditingStep((current) =>
-                                                    current === step.id
-                                                        ? null
-                                                        : step.id,
-                                                )
-                                            }
-                                        >
-                                            {editingStep === step.id
-                                                ? 'Close'
-                                                : 'Edit'}
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-brand"
-                                            onClick={() =>
-                                                router.delete(
-                                                    `/outbound/sequences/${sequence.id}/steps/${step.id}`,
-                                                )
-                                            }
-                                        >
-                                            Remove
-                                        </Button>
-                                    </div>
-                                </div>
-                                {editingStep === step.id ? (
-                                    <Form
-                                        action={`/outbound/sequences/${sequence.id}/steps/${step.id}`}
-                                        method="put"
-                                        className="mt-3 grid gap-3 border-t border-hairline pt-3 md:grid-cols-3"
-                                    >
-                                        {({ processing }) => (
-                                            <>
-                                                <StepFields
-                                                    step={step}
-                                                    mailboxes={mailboxes}
-                                                    defaultChannel={
-                                                        sequence.channel
-                                                    }
-                                                />
-                                                <div className="flex items-end">
-                                                    <Button
-                                                        size="sm"
-                                                        disabled={processing}
-                                                    >
-                                                        Save step
-                                                    </Button>
-                                                </div>
-                                            </>
-                                        )}
-                                    </Form>
-                                ) : null}
-                            </div>
-                        ))}
-                        {(sequence.steps ?? []).length === 0 ? (
-                            <p className="aurora-text-body-sm text-mute">
-                                No steps - add the first one below.
-                            </p>
-                        ) : null}
-                    </div>
-                </HairlinePanel>
+                <div className="flex gap-1 border-b border-hairline">
+                    {(
+                        [
+                            ['steps', 'Steps'],
+                            ['enroll', 'Enroll'],
+                            ['settings', 'Settings'],
+                        ] as const
+                    ).map(([key, label]) => (
+                        <Button
+                            key={key}
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            aria-pressed={tab === key}
+                            className={
+                                tab === key
+                                    ? 'rounded-none border-b-2 border-brand'
+                                    : 'rounded-none'
+                            }
+                            onClick={() => setTab(key)}
+                        >
+                            {label}
+                        </Button>
+                    ))}
+                </div>
 
-                <HairlinePanel title="Add step">
-                    {templates.length > 0 && sequence.channel === 'email' ? (
-                        <div className="mb-3 space-y-1.5">
-                            <Label>Prefill from template</Label>
-                            <NativeSelect
-                                value={templateId}
-                                onChange={(event) =>
-                                    setTemplateId(event.target.value)
-                                }
-                                className="md:w-72"
+                {tab === 'steps' ? (
+                    <HairlinePanel title="Step editor">
+                        <SequenceStepEditor
+                            sequenceId={sequence.id}
+                            steps={sequence.steps ?? []}
+                            mailboxes={mailboxes}
+                            templates={templates}
+                            defaultChannel={sequence.channel}
+                        />
+                    </HairlinePanel>
+                ) : null}
+
+                {tab === 'enroll' ? (
+                    <>
+                <HairlinePanel title="Enroll contacts">
+                    {(sequence.enrollments ?? []).length === 0 ? (
+                        <div className="mb-4 rounded-[var(--radius-1)] border border-hairline p-3">
+                            <p className="text-[13px] text-ink">
+                                Nobody enrolled yet. Enroll contacts below or
+                                auto-enroll when a segment is entered.
+                            </p>
+                            <Link
+                                href="/crm/workflows"
+                                className="mt-2 inline-flex text-[13px] font-medium text-ink hover:underline"
                             >
-                                <option value="">No template</option>
-                                {templates.map((t) => (
-                                    <option key={t.id} value={t.id}>
-                                        {t.name}
-                                    </option>
-                                ))}
-                            </NativeSelect>
+                                Create workflow
+                            </Link>
                         </div>
                     ) : null}
-                    <Form
-                        action={`/outbound/sequences/${sequence.id}/steps`}
-                        method="post"
-                        className="grid gap-3 md:grid-cols-3"
-                        resetOnSuccess
-                    >
-                        {({ processing }) => (
-                            <>
-                                <input
-                                    type="hidden"
-                                    name="template_id"
-                                    value={templateId}
-                                />
-                                <StepFields
-                                    mailboxes={mailboxes}
-                                    defaultChannel={sequence.channel}
-                                    step={
-                                        template
-                                            ? {
-                                                  id: 0,
-                                                  position: 0,
-                                                  delay_hours: 24,
-                                                  channel: sequence.channel,
-                                                  subject: template.subject,
-                                                  body: template.body,
-                                              }
-                                            : undefined
-                                    }
-                                    key={template?.id ?? 'blank'}
-                                />
-                                <div className="flex items-end">
-                                    <Button disabled={processing}>
-                                        Add step
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </HairlinePanel>
-
-                <HairlinePanel title="Enroll contacts">
                     {filters.length > 0 ? (
                         <Form
                             action={`/outbound/sequences/${sequence.id}/enroll`}
@@ -633,6 +530,38 @@ export default function SequenceShow({
                         };
                     })}
                 />
+                    </>
+                ) : null}
+
+                {tab === 'settings' ? (
+                    <HairlinePanel title="Send settings">
+                        <p className="text-[13px] text-ink">
+                            Warmup:{' '}
+                            {warmup
+                                ? `${warmup.warming} of ${warmup.total} mailboxes warming`
+                                : 'not loaded'}
+                            . Quiet hours:{' '}
+                            {quietHours?.enabled
+                                ? `${quietHours.starts_at}–${quietHours.ends_at} ${quietHours.timezone}`
+                                : 'off'}
+                            .
+                        </p>
+                        <div className="mt-2 flex gap-3 text-[13px]">
+                            <Link
+                                href="/outbound/warmup"
+                                className="font-medium text-ink hover:underline"
+                            >
+                                Warmup
+                            </Link>
+                            <Link
+                                href="/outbound/quiet-hours"
+                                className="font-medium text-ink hover:underline"
+                            >
+                                Quiet hours
+                            </Link>
+                        </div>
+                    </HairlinePanel>
+                ) : null}
             </OutboundPage>
         </OutboundShell>
     );
