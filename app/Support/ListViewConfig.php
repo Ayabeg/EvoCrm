@@ -27,6 +27,8 @@ class ListViewConfig
                 ['id' => 'stage', 'label' => 'Stage', 'defaultVisible' => true],
                 ['id' => 'owner', 'label' => 'Owner', 'defaultVisible' => true],
                 ['id' => 'close_date', 'label' => 'Close date', 'defaultVisible' => true],
+                ['id' => 'health', 'label' => 'Health', 'defaultVisible' => true],
+                ['id' => 'next_step', 'label' => 'Next step', 'defaultVisible' => true],
                 ['id' => 'last_activity_at', 'label' => 'Last activity', 'defaultVisible' => false],
                 ['id' => 'company', 'label' => 'Company', 'defaultVisible' => false],
                 ['id' => 'contact', 'label' => 'Contact', 'defaultVisible' => false],

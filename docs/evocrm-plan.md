@@ -8,7 +8,7 @@
 | **Screen freeze** | [evocrm-mobbin-contract.md](./evocrm-mobbin-contract.md) (P0) |
 | **Date** | 2026-09-08 |
 | **Buyer** | 5–20 seat Algeria-first sales team (DZD, wilaya, WhatsApp, Meta ads). |
-| **Status** | Approved. P0–P4 opened as PRs; P5–P10 remaining. |
+| **Status** | Approved. P0–P8 on `main` or in flight; P9–P10 remaining. |
 
 Engineers implement against the cited Mobbin screenshot, not against this paragraph.
 
@@ -269,7 +269,7 @@ Each PR independently reviewable. Mobbin URL in the PR body. Pest coverage on th
 | **P5** | `feat(records): 3-pane + Ask Evo rail` | remaining | P4 | 3 columns; AI always on; WA instead of Slack |
 | **P6** | `feat(activities): composer + log call` | remaining | P5 | Icon composer + HubSpot log-call fields |
 | **P7** | `feat(outbound): HubSpot sequence step editor` | remaining | P2 | Vertical steps, templates, WA step, enroll empty |
-| **P8** | `feat(deals): workspace columns health + next step` | remaining | P3 | Health score + next activity columns |
+| **P8** | `feat(deals): workspace columns health + next step` | this PR | P3 | Health score + next activity columns |
 | **P9** | `chore(ia): retire duplicate /leads board` | remaining | P3, P4 | One leads list, one deals board |
 | **P10** | `test: Mobbin QA checklist Pest + screenshots` | remaining | P1–P9 | Checklist in §9 green |
 

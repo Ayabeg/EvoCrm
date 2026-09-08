@@ -30,6 +30,8 @@ type Deal = {
     company?: { name: string } | null;
     contact?: { first_name: string; last_name?: string | null } | null;
     stage?: { id: number; name: string; slug: string } | null;
+    health?: { score: number; band?: string; label?: string } | null;
+    next_step?: string | null;
 };
 
 type Stage = { id: number; name: string; slug: string };

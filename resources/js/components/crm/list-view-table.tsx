@@ -33,6 +33,8 @@ type DealRow = {
     contact?: { first_name: string; last_name?: string | null } | null;
     owner?: { name: string } | null;
     attributes?: AttributeMap;
+    health?: { score: number; band?: string; label?: string } | null;
+    next_step?: string | null;
 };
 
 type CompanyRow = {
@@ -126,6 +128,12 @@ function renderDealCell(columnId: string, row: DealRow): string {
             return formatDate(row.created_at);
         case 'last_activity_at':
             return formatDate(row.last_activity_at);
+        case 'health':
+            return row.health
+                ? `${row.health.score} ${row.health.label ?? ''}`.trim()
+                : '—';
+        case 'next_step':
+            return row.next_step ?? '—';
         default:
             return customAttributeValue(row.attributes, columnId);
     }
