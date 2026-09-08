@@ -1,5 +1,6 @@
 import { Form } from '@inertiajs/react';
-import { Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,6 +18,7 @@ export type AskEvoPayload = {
     answer?: string | null;
     source?: string;
     live?: boolean;
+    generated_at?: string | null;
 };
 
 function AskEvoBody({
@@ -28,13 +30,15 @@ function AskEvoBody({
 }) {
     const summary =
         insight?.summary ??
-        'Ask Evo about this record — answers use fields and recent activity on this contact.';
+        'Ask Evo about this record — answers use fields, recent activity, and WhatsApp on this workspace.';
 
     return (
         <>
-            <p className="line-clamp-3 text-[12px] leading-5 text-mute">{summary}</p>
+            <p className="line-clamp-4 text-[12px] leading-5 text-mute">
+                {summary}
+            </p>
             {insight?.answer ? (
-                <p className="border-l-2 border-hairline pl-2 text-[12px] leading-5">
+                <p className="border-l-2 border-brand/40 pl-2 text-[12px] leading-5">
                     {insight.question ? (
                         <span className="text-mute">{insight.question} — </span>
                     ) : null}
@@ -50,12 +54,17 @@ function AskEvoBody({
             >
                 <Input
                     name="question"
-                    placeholder="Ask about this record…"
+                    placeholder="Ask a question…"
                     required
                     size="sm"
                     className="text-ui"
                 />
-                <Button type="submit" variant="outline" size="sm" className="w-full sm:w-auto">
+                <Button
+                    type="submit"
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                >
                     Ask Evo
                 </Button>
             </Form>
@@ -114,18 +123,58 @@ export default function AskEvoPanel({
     action: string;
     insight?: AskEvoPayload | null;
 }) {
+    const [open, setOpen] = useState(true);
+    const generated = insight?.generated_at
+        ? new Date(insight.generated_at).toLocaleString('en-GB', {
+              hour: '2-digit',
+              minute: '2-digit',
+          })
+        : null;
+
     return (
-        <section data-testid="ask-evo" className="space-y-2 border-t border-hairline pt-4">
+        <section
+            data-testid="ask-evo-rail"
+            className="space-y-2 rounded-[var(--radius-1)] border border-hairline bg-canvas p-3"
+        >
             <div className="flex items-center justify-between gap-2">
                 <h3 className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-mute uppercase">
                     <Sparkles className="size-3.5 text-mute" aria-hidden />
                     Ask Evo
                 </h3>
-                <span className="text-[10px] text-mute">
-                    {insight?.live ? 'Evo + model' : 'This record'}
-                </span>
+                <div className="flex items-center gap-1.5">
+                    <span
+                        data-testid="ask-evo-source"
+                        className="rounded-full border border-hairline px-1.5 py-0.5 text-[10px] text-mute"
+                    >
+                        {insight?.live ? 'Evo + model' : 'This record'}
+                    </span>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 px-0"
+                        aria-expanded={open}
+                        aria-label={open ? 'Collapse Ask Evo' : 'Expand Ask Evo'}
+                        onClick={() => setOpen((value) => !value)}
+                    >
+                        {open ? (
+                            <ChevronUp className="size-3.5" />
+                        ) : (
+                            <ChevronDown className="size-3.5" />
+                        )}
+                    </Button>
+                </div>
             </div>
-            <AskEvoBody action={action} insight={insight} />
+            {open ? (
+                <div className="space-y-3">
+                    <AskEvoBody action={action} insight={insight} />
+                    {generated ? (
+                        <p className="text-[10px] text-mute">
+                            Generated {generated}
+                        </p>
+                    ) : null}
+                </div>
+            ) : null}
         </section>
     );
 }

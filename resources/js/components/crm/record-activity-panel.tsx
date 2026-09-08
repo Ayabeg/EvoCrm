@@ -1,5 +1,6 @@
 import { Form, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
 import type { RecordActivity } from '@/components/crm/record-activity';
@@ -16,20 +17,37 @@ import {
 } from '@/components/crm/record-hub';
 import { Button } from '@/components/ui/button';
 
+const ACTIVITY_CHIPS = [
+    { key: 'all', label: 'All' },
+    { key: 'call', label: 'Calls' },
+    { key: 'email', label: 'Emails' },
+    { key: 'task', label: 'Tasks' },
+    { key: 'note', label: 'Notes' },
+];
+
 export default function RecordActivityPanel({
     timeline,
     catchUp,
     dealNext,
+    insight,
+    highlights,
 }: {
     timeline: RecordActivity[];
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     dealNext?: string | null;
+    insight?: AskEvoPayload | null;
+    highlights?: { label: string; value?: string | null }[];
 }) {
-    const [tab, setTab] = useState('activity');
-    const items = useMemo(
-        () => filterRecordActivity(timeline, tab),
-        [tab, timeline],
-    );
+    const [tab, setTab] = useState('overview');
+    const [chip, setChip] = useState('all');
+    const items = useMemo(() => {
+        const filtered = filterRecordActivity(timeline, tab);
+        if (tab !== 'activities' || chip === 'all') {
+            return filtered;
+        }
+
+        return filtered.filter((item) => item.type === chip);
+    }, [tab, timeline, chip]);
     const next = deriveRecordNext({ catchUp, timeline, dealNext });
     const showCatchUp = hasCatchUpItems(catchUp);
 
@@ -65,7 +83,7 @@ export default function RecordActivityPanel({
                     }
                 />
             ) : null}
-            {showCatchUp && catchUp ? (
+            {showCatchUp && catchUp && tab === 'overview' ? (
                 <CatchUpBlock
                     inbound={catchUp.inbound}
                     outbound={catchUp.outbound}
@@ -77,48 +95,99 @@ export default function RecordActivityPanel({
                 active={tab}
                 onChange={setTab}
             />
-            <div>
-                {items.length === 0 ? (
-                    <p className="py-2 text-[13px] text-mute">
-                        {tab === 'activity'
-                            ? 'No activity yet.'
-                            : `No ${tab} yet.`}
+            {tab === 'intelligence' ? (
+                <div className="space-y-2">
+                    <p className="text-[13px] text-ink">
+                        {insight?.summary ??
+                            'Ask Evo in the right rail. Context is this record, not a generic agent.'}
                     </p>
-                ) : (
-                    items.map((item) => (
-                        <RecordTimelineItem
-                            key={item.id}
-                            type={item.type}
-                            title={item.subject ?? item.body}
-                            at={item.created_at}
-                            author={
-                                item.actor?.name ?? item.owner?.name ?? null
-                            }
-                        >
-                            {item.body && item.subject ? (
-                                <p className="mt-0.5 text-[13px] text-mute">
-                                    {item.body}
-                                </p>
-                            ) : null}
-                            {item.type === 'task' && !item.done ? (
-                                <Form
-                                    action={`/crm/activities/${item.id}/complete`}
-                                    method="post"
-                                    options={{ preserveScroll: true }}
+                    {insight?.answer ? (
+                        <p className="text-[13px] text-mute">{insight.answer}</p>
+                    ) : (
+                        <p className="text-[13px] text-mute">
+                            No generated note yet. Use Ask Evo — source chip
+                            stays “This record”.
+                        </p>
+                    )}
+                </div>
+            ) : (
+                <div>
+                    {tab === 'overview' && highlights && highlights.length > 0 ? (
+                        <dl className="mb-3 grid gap-2 sm:grid-cols-2">
+                            {highlights
+                                .filter((item) => item.value)
+                                .map((item) => (
+                                    <div key={item.label}>
+                                        <dt className="text-[11px] text-mute">
+                                            {item.label}
+                                        </dt>
+                                        <dd className="text-[13px] text-ink">
+                                            {item.value}
+                                        </dd>
+                                    </div>
+                                ))}
+                        </dl>
+                    ) : null}
+                    {tab === 'activities' ? (
+                        <div className="mb-2 flex flex-wrap gap-1">
+                            {ACTIVITY_CHIPS.map((item) => (
+                                <Button
+                                    key={item.key}
+                                    type="button"
+                                    size="sm"
+                                    variant={
+                                        chip === item.key ? 'secondary' : 'ghost'
+                                    }
+                                    className="h-7 text-[11px]"
+                                    onClick={() => setChip(item.key)}
                                 >
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="mt-1.5 h-7 text-[11px]"
+                                    {item.label}
+                                </Button>
+                            ))}
+                        </div>
+                    ) : null}
+                    {items.length === 0 ? (
+                        <p className="py-2 text-[13px] text-mute">
+                            {tab === 'overview'
+                                ? 'No recent activity yet.'
+                                : 'No activities yet.'}
+                        </p>
+                    ) : (
+                        items.map((item) => (
+                            <RecordTimelineItem
+                                key={item.id}
+                                type={item.type}
+                                title={item.subject ?? item.body}
+                                at={item.created_at}
+                                author={
+                                    item.actor?.name ?? item.owner?.name ?? null
+                                }
+                            >
+                                {item.body && item.subject ? (
+                                    <p className="mt-0.5 text-[13px] text-mute">
+                                        {item.body}
+                                    </p>
+                                ) : null}
+                                {item.type === 'task' && !item.done ? (
+                                    <Form
+                                        action={`/crm/activities/${item.id}/complete`}
+                                        method="post"
+                                        options={{ preserveScroll: true }}
                                     >
-                                        Mark done
-                                    </Button>
-                                </Form>
-                            ) : null}
-                        </RecordTimelineItem>
-                    ))
-                )}
-            </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="mt-1.5 h-7 text-[11px]"
+                                        >
+                                            Mark done
+                                        </Button>
+                                    </Form>
+                                ) : null}
+                            </RecordTimelineItem>
+                        ))
+                    )}
+                </div>
+            )}
         </div>
     );
 }

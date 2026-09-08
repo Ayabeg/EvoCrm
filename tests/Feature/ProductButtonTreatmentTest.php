@@ -46,11 +46,14 @@ it('keeps record actions as a quiet grouped toolbar instead of floating cards', 
             ->and($src)->toContain("label: 'Email'")
             ->and($src)->toContain("label: 'Call'")
             ->and($src)->toContain("label: 'Task'")
-            ->and($src)->toContain("label: 'Meeting'")
             ->and($src)->not->toContain('shape="pill"')
             ->and($src)->not->toContain('min-h-11')
             ->and($src)->not->toContain('grid-cols-3');
     }
+
+    expect($chrome)->toContain("label: 'Meet'")
+        ->and($chrome)->toContain('WhatsApp')
+        ->and($row)->toContain("label: 'Meeting'");
 
     expect($chrome)->toContain('More actions for record');
 });

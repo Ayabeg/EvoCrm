@@ -383,6 +383,10 @@ export default function LeadShow({
                         }
                         right={
                             <div className="space-y-3">
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
                                 <AssociationCard
                                     title="Desk"
                                     addHref="/inbox"
@@ -511,10 +515,6 @@ export default function LeadShow({
                                         ))}
                                     </AssociationCard>
                                 ) : null}
-                                <AskEvoPanel
-                                    action={askAction}
-                                    insight={askEvo}
-                                />
                             </div>
                         }
                     />

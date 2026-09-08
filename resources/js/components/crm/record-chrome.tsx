@@ -4,6 +4,7 @@ import {
     Handshake,
     Inbox,
     Mail,
+    MessageCircle,
     MoreHorizontal,
     Send,
     SendHorizonal,
@@ -42,7 +43,7 @@ const ACTION_DEFS: { type: ActionType; label: string }[] = [
     { type: 'email', label: 'Email' },
     { type: 'call', label: 'Call' },
     { type: 'task', label: 'Task' },
-    { type: 'meeting', label: 'Meeting' },
+    { type: 'meeting', label: 'Meet' },
 ];
 
 export function RecordActions({
@@ -51,12 +52,14 @@ export function RecordActions({
     dealId,
     companyId,
     secondary,
+    whatsappHref = '/inbox',
 }: {
     entityId: number;
     contactId?: number | null;
     dealId?: number | null;
     companyId?: number | null;
     secondary?: ReactNode;
+    whatsappHref?: string;
 }) {
     const [active, setActive] = useState<ActionType | null>(null);
 
@@ -88,6 +91,19 @@ export function RecordActions({
                             </Button>
                         );
                     })}
+                    <Button
+                        asChild
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        title="WhatsApp"
+                        className="h-8 px-2 text-[12px] font-medium"
+                    >
+                        <Link href={whatsappHref}>
+                            <MessageCircle className="size-3.5" aria-hidden />
+                            WhatsApp
+                        </Link>
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
@@ -263,9 +279,9 @@ export function RecordShell({
     left,
     center,
     right,
-    leftLabel = 'Context',
-    centerLabel = 'Activity',
-    rightLabel = 'Related',
+    leftLabel = 'About',
+    centerLabel = 'Workspace',
+    rightLabel = 'Ask Evo',
 }: {
     left: ReactNode;
     center: ReactNode;
