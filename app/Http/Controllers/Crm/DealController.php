@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Enums\WorkspaceRole;
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Product;
@@ -28,7 +29,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DealController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub, PipelineManager $pipelines): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub, PipelineManager $pipelines, RecordInsight $insight): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
@@ -51,6 +52,40 @@ class DealController extends Controller
 
         [$dealRows, $paginator] = $filter->paginate($query, $request);
         $deals = $hub->withListAttributes($workspace, 'deal', $dealRows);
+
+        $nextByDeal = Activity::query()
+            ->whereIn('deal_id', $dealRows->pluck('id'))
+            ->whereIn('type', ['meeting', 'task'])
+            ->where('done', false)
+            ->whereNotNull('due_at')
+            ->orderBy('due_at')
+            ->get()
+            ->unique('deal_id')
+            ->keyBy('deal_id');
+
+        $deals = collect($deals)->map(function (array $row) use ($insight, $dealRows, $nextByDeal) {
+            $model = $dealRows->firstWhere('id', $row['id']);
+            $health = $model ? $insight->dealHealth($model) : null;
+            $next = $nextByDeal->get($row['id']);
+
+            $nextLabel = null;
+            if ($next) {
+                $when = $next->due_at?->timezone('Africa/Algiers')->format('d M H:i');
+                $nextLabel = trim(($next->subject ?: ucfirst($next->type)).($when ? ' · '.$when : ''));
+            } elseif ($health['next_action'] ?? null) {
+                $nextLabel = $health['next_action'];
+            }
+
+            return [
+                ...$row,
+                'health' => $health ? [
+                    'score' => $health['score'],
+                    'band' => $health['band'],
+                    'label' => $health['label'],
+                ] : null,
+                'next_step' => $nextLabel,
+            ];
+        })->values()->all();
 
         $stageCounts = $pipeline->stages->map(function (Stage $stage) use ($workspace, $filters, $filter) {
             $countQuery = Deal::query()->forWorkspace($workspace);
