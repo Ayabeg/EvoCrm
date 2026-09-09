@@ -57,12 +57,10 @@ it('refuses a ticket without a contact', function () {
 it('allows one ticket per desk thread', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
-    $channel = Channel::query()->create([
-        'workspace_id' => $user->workspace_id,
-        'type' => ChannelType::WhatsAppCloud,
-        'name' => 'WhatsApp Cloud',
-        'status' => 'connected',
-    ]);
+    $channel = Channel::query()->firstOrCreate(
+        ['workspace_id' => $user->workspace_id, 'type' => ChannelType::WhatsAppCloud],
+        ['name' => 'WhatsApp Cloud', 'status' => 'connected'],
+    );
     $thread = Thread::query()->create([
         'workspace_id' => $user->workspace_id,
         'contact_id' => $contact->id,

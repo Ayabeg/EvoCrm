@@ -23,7 +23,7 @@ it('keeps contact, company, and deal records on the EvoCRM 3-pane contract', fun
     $desk = file_get_contents(resource_path('js/components/crm/desk-thread-card.tsx'));
 
     expect($contact)->toContain('DeskThreadCard')
-        ->and($contact)->toContain('WhatsApp')
+        ->and($contact)->toContain('whatsappHref')
         ->and($lead)->toContain('WhatsApp')
         ->and($lead)->toContain('AskEvoPanel')
         ->and($ask)->toContain('ask-evo-rail')
