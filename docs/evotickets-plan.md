@@ -8,7 +8,7 @@
 | **Screen freeze** | [evotickets-mobbin-contract.md](./evotickets-mobbin-contract.md) (P0) |
 | **Date** | 2026-09-08 |
 | **Buyer** | 5–20 seat Algeria-first sales team. After-sale lives on WhatsApp. |
-| **Status** | P0–P5 on `main` ([#146](https://github.com/Mohamedbeghanem/EvoSales/pull/146)). P6 in this PR. |
+| **Status** | P0–P6 on `main`. P7 in this PR. |
 
 This plan **reverses** the 2026-08-29 deferral (“tickets sit unused”) by shrinking the object until it is a status layer on Desk — not a second Service Hub.
 
@@ -152,7 +152,7 @@ Each PR independently reviewable. Mobbin URL in the PR body. Pest on the route.
 | **P4** | `feat(desk): Open ticket from thread` | P3 | Inbox CTA; reopen on inbound if closed |
 | **P5** | `feat(records): Tickets related list` | P3 | Contact + deal cards |
 | **P6** | `feat(tickets): SLA + inactivity` | P2 | 8h/24h Algiers; board inactivity line |
-| **P7** | `test: EvoTickets Mobbin QA Pest` | P1–P6 | Checklist green |
+| **P7** | `test: EvoTickets Mobbin QA Pest` | P1–P6 | Checklist green (`EvoTicketsP7MobbinQaTest`) |
 
 Do not start P2 until P1 refuses a ticket without `contact_id`.
 
