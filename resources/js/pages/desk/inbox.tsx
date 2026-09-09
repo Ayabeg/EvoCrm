@@ -30,6 +30,12 @@ type Thread = {
     subject?: string | null;
     contact: Contact;
     channel?: { name: string; type: string };
+    ticket?: {
+        id: number;
+        number: string;
+        status: string;
+        subject: string;
+    } | null;
     messages?: {
         id: number;
         direction: string;
@@ -339,12 +345,39 @@ function FrontDesk({
                                     </p>
                                 </div>
                             </div>
-                            <Link
-                                href={`/crm/contacts/${selected.contact.id}`}
-                                className="aurora-text-ui shrink-0 font-medium text-ink hover:underline"
-                            >
-                                Open contact
-                            </Link>
+                            <div className="flex shrink-0 flex-wrap items-center gap-2">
+                                <Link
+                                    href={`/crm/contacts/${selected.contact.id}`}
+                                    className="aurora-text-ui font-medium text-ink hover:underline"
+                                >
+                                    Open contact
+                                </Link>
+                                {selected.ticket ? (
+                                    <Link
+                                        href={`/crm/tickets/${selected.ticket.id}`}
+                                        data-testid="desk-ticket-link"
+                                        className="aurora-text-ui font-medium text-ink hover:underline"
+                                    >
+                                        {selected.ticket.number}
+                                    </Link>
+                                ) : null}
+                                <Form
+                                    action={`/desk/threads/${selected.id}/ticket`}
+                                    method="post"
+                                >
+                                    {({ processing }) => (
+                                        <Button
+                                            type="submit"
+                                            size="sm"
+                                            className="h-8"
+                                            disabled={processing}
+                                            data-testid="desk-open-ticket"
+                                        >
+                                            Open ticket
+                                        </Button>
+                                    )}
+                                </Form>
+                            </div>
                         </DeskGlass>
                         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-canvas-soft p-4">
                             {(selected.messages ?? []).map((message) => (

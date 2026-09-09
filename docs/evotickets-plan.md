@@ -8,7 +8,7 @@
 | **Screen freeze** | [evotickets-mobbin-contract.md](./evotickets-mobbin-contract.md) (P0) |
 | **Date** | 2026-09-08 |
 | **Buyer** | 5–20 seat Algeria-first sales team. After-sale lives on WhatsApp. |
-| **Status** | P0–P2 on `main` ([#143](https://github.com/Mohamedbeghanem/EvoSales/pull/143)). P3 in this PR. |
+| **Status** | P0–P2 on `main` ([#143](https://github.com/Mohamedbeghanem/EvoSales/pull/143)). P3 [#144](https://github.com/Mohamedbeghanem/EvoSales/pull/144). P4 in this PR. |
 
 This plan **reverses** the 2026-08-29 deferral (“tickets sit unused”) by shrinking the object until it is a status layer on Desk — not a second Service Hub.
 

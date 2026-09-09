@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ChannelType;
 use App\Models\Concerns\BelongsToWorkspace;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -159,6 +160,132 @@ class Ticket extends Model
     public function isOpen(): bool
     {
         return $this->status !== self::STATUS_CLOSED;
+    }
+
+    /**
+     * Open (or reopen) the Desk thread as a ticket. One row per thread_id.
+     */
+    public static function openFromThread(Thread $thread, User $user): self
+    {
+        if (! $thread->contact_id) {
+            throw new InvalidArgumentException('A ticket requires a contact.');
+        }
+
+        $thread->loadMissing(['contact', 'channel']);
+
+        $existing = self::query()
+            ->forWorkspace($thread->workspace_id)
+            ->where('thread_id', $thread->id)
+            ->first();
+
+        if ($existing) {
+            if (! $existing->isOpen()) {
+                $existing->reopenOnInbound($user);
+            }
+
+            return $existing;
+        }
+
+        $ticket = self::query()->create([
+            'workspace_id' => $thread->workspace_id,
+            'contact_id' => $thread->contact_id,
+            'company_id' => $thread->contact?->company_id,
+            'thread_id' => $thread->id,
+            'owner_id' => $user->id,
+            'subject' => self::subjectFromThread($thread),
+            'channel' => self::channelFromThread($thread),
+        ]);
+
+        $ticket->recordActivity('ticket_opened', 'Opened '.$ticket->number, $user);
+
+        return $ticket;
+    }
+
+    /**
+     * Inbound on a closed ticket reopens in place — never a second row.
+     */
+    public static function receiveInbound(Thread $thread): void
+    {
+        $ticket = self::query()
+            ->forWorkspace($thread->workspace_id)
+            ->where('thread_id', $thread->id)
+            ->first();
+
+        $ticket?->reopenOnInbound();
+    }
+
+    public function reopenOnInbound(?User $actor = null): void
+    {
+        $this->forceFill(['last_activity_at' => now()]);
+
+        if ($this->status === self::STATUS_CLOSED) {
+            $this->moveTo(self::STATUS_WAITING_ON_US);
+            $this->recordActivity(
+                'ticket_status',
+                $this->number.' → '.self::statusLabel(self::STATUS_WAITING_ON_US),
+                $actor,
+            );
+
+            return;
+        }
+
+        $this->save();
+    }
+
+    public function markFirstResponse(): void
+    {
+        if ($this->first_response_at) {
+            return;
+        }
+
+        $this->forceFill([
+            'first_response_at' => now(),
+            'last_activity_at' => now(),
+        ])->save();
+    }
+
+    public function recordActivity(string $type, string $subject, ?User $actor = null): void
+    {
+        Activity::query()->create([
+            'workspace_id' => $this->workspace_id,
+            'contact_id' => $this->contact_id,
+            'deal_id' => $this->deal_id,
+            'company_id' => $this->company_id,
+            'type' => $type,
+            'subject' => $subject,
+            'owner_id' => $actor?->id ?? $this->owner_id,
+            'actor_id' => $actor?->id,
+            'meta' => ['ticket_id' => $this->id],
+        ]);
+    }
+
+    public static function subjectFromThread(Thread $thread): string
+    {
+        $snippet = trim((string) $thread->messages()
+            ->where('direction', 'inbound')
+            ->latest('id')
+            ->value('body'));
+        $snippet = trim(preg_replace('/\s+/', ' ', $snippet) ?? $snippet);
+
+        if ($snippet === '') {
+            $snippet = trim((string) $thread->subject) ?: 'WhatsApp';
+        }
+
+        if (mb_strlen($snippet) > 180) {
+            return rtrim(mb_substr($snippet, 0, 177)).'…';
+        }
+
+        return $snippet;
+    }
+
+    public static function channelFromThread(Thread $thread): string
+    {
+        $type = $thread->channel?->type;
+
+        return match ($type) {
+            ChannelType::Email => self::CHANNEL_EMAIL,
+            default => self::CHANNEL_WHATSAPP_CLOUD,
+        };
     }
 
     public function moveTo(string $status): void

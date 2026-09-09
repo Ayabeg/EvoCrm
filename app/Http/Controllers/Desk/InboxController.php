@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Integration;
 use App\Models\Message;
 use App\Models\Thread;
+use App\Models\Ticket;
 use App\Services\Connectors\ConnectorRegistrar;
 use App\Services\Desk\DeskComposer;
 use App\Services\Desk\DeskEmbedProbe;
@@ -14,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use InvalidArgumentException;
 
 class InboxController extends Controller
 {
@@ -43,6 +45,7 @@ class InboxController extends Controller
                 'contact.company:id,name',
                 'contact.owner:id,name',
                 'channel:id,name,type',
+                'ticket:id,thread_id,number,status,subject',
                 'messages' => fn ($q) => $q->latest()->limit(1),
             ])
             ->orderByDesc('last_message_at')
@@ -53,7 +56,7 @@ class InboxController extends Controller
         if ($threadId = $request->integer('thread')) {
             $selected = Thread::query()
                 ->forWorkspace($workspace)
-                ->with(['contact.company', 'contact.owner', 'channel', 'messages.user'])
+                ->with(['contact.company', 'contact.owner', 'channel', 'messages.user', 'ticket'])
                 ->find($threadId);
         }
 
@@ -141,5 +144,22 @@ class InboxController extends Controller
         }
 
         return back();
+    }
+
+    public function openTicket(Request $request, Thread $thread): RedirectResponse
+    {
+        abort_unless((int) $thread->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        if (! $thread->contact_id) {
+            abort(422, 'A ticket requires a contact.');
+        }
+
+        try {
+            $ticket = Ticket::openFromThread($thread, $request->user());
+        } catch (InvalidArgumentException $e) {
+            abort(422, $e->getMessage());
+        }
+
+        return redirect()->route('crm.tickets.show', $ticket);
     }
 }

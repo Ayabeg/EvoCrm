@@ -6,6 +6,7 @@ use App\Enums\ChannelType;
 use App\Models\Integration;
 use App\Models\Message;
 use App\Models\Thread;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Services\Evolution\EvolutionCloudService;
 
@@ -45,6 +46,12 @@ class DeskComposer
         }
 
         $thread->forceFill(['last_message_at' => now()])->save();
+
+        $linked = Ticket::query()
+            ->forWorkspace($thread->workspace_id)
+            ->where('thread_id', $thread->id)
+            ->first();
+        $linked?->markFirstResponse();
 
         return $message->fresh();
     }

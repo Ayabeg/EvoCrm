@@ -8,6 +8,7 @@ use App\Models\EvolutionEvent;
 use App\Models\Integration;
 use App\Models\Message;
 use App\Models\Thread;
+use App\Models\Ticket;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\ContactIdentity;
@@ -107,6 +108,7 @@ class EvolutionWebhookProcessor
         $thread->forceFill(['last_message_at' => now()])->save();
 
         if (! $fromMe) {
+            Ticket::receiveInbound($thread);
             $this->analytics->capture(ProductAnalytics::WHATSAPP_MESSAGE_RECEIVED, [
                 'message_id' => $message->id,
                 'contact_id' => $contact->id,

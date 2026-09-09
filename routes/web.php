@@ -125,6 +125,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/inbox', [InboxController::class, 'inbox'])->name('desk.inbox');
     Route::get('/desk', [InboxController::class, 'index'])->name('desk.index');
     Route::post('/desk/threads/{thread}/reply', [InboxController::class, 'reply'])->name('desk.reply');
+    Route::post('/desk/threads/{thread}/ticket', [InboxController::class, 'openTicket'])->name('desk.ticket.open');
     Route::post('/desk/connectors', [DeskConnectorController::class, 'store'])->name('desk.connectors.store');
     Route::get('/conversations', [ConversationHistoryController::class, 'index'])->name('crm.conversations');
 
