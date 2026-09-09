@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type {
+    ListObjectType,
     ListViewColumn,
     ListViewFilters,
     ListViewMeta,
@@ -49,7 +50,7 @@ export default function ListToolbar({
     pipelineSwitcher,
     extraQuery = {},
 }: {
-    entity: 'contact' | 'company' | 'deal';
+    entity: ListObjectType;
     basePath: string;
     activeFilters?: Record<string, unknown>;
     savedFilters?: SavedView[];
@@ -130,7 +131,9 @@ export default function ListToolbar({
             ? 'Search name or description'
             : entity === 'company'
               ? 'Search companies'
-              : 'Search name, email, or phone';
+              : entity === 'ticket'
+                ? 'Search number or subject'
+                : 'Search name, email, or phone';
 
     return (
         <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar">
@@ -215,17 +218,21 @@ export default function ListToolbar({
                     </SheetContent>
                 </Sheet>
             ) : null}
-            {entity === 'deal' ? (
+            {entity === 'deal' || entity === 'ticket' ? (
                 <StagePills
                     stages={stagePills}
                     activeSlug={
-                        typeof activeFilters.stage === 'string'
-                            ? activeFilters.stage
-                            : null
+                        entity === 'ticket'
+                            ? typeof activeFilters.status === 'string'
+                                ? activeFilters.status
+                                : null
+                            : typeof activeFilters.stage === 'string'
+                              ? activeFilters.stage
+                              : null
                     }
                     hrefFor={(slug) =>
                         crmListHref(basePath, filterFields(activeFilters), {
-                            stage: slug,
+                            [entity === 'ticket' ? 'status' : 'stage']: slug,
                         })
                     }
                 />

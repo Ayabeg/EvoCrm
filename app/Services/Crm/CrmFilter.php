@@ -8,6 +8,7 @@ use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
 use App\Models\Deal;
 use App\Models\SavedFilter;
+use App\Models\Ticket;
 use App\Models\Workspace;
 use App\Support\ListViewConfig;
 use Illuminate\Database\Eloquent\Builder;
@@ -172,6 +173,7 @@ class CrmFilter
             'contact' => Contact::query()->forWorkspace($workspace),
             'deal' => Deal::query()->forWorkspace($workspace),
             'company' => Company::query()->forWorkspace($workspace),
+            'ticket' => Ticket::query()->forWorkspace($workspace),
             default => null,
         };
 

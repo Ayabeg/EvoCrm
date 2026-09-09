@@ -1,4 +1,4 @@
-export type ListObjectType = 'contact' | 'deal' | 'company';
+export type ListObjectType = 'contact' | 'deal' | 'company' | 'ticket';
 
 export type ListViewColumn = {
     id: string;
@@ -98,6 +98,8 @@ export function filterGroupsFromActive(activeFilters: Record<string, unknown>): 
     pushEq('status', activeFilters.status);
     pushEq('stage', activeFilters.stage);
     pushEq('deal_stage', activeFilters.deal_stage);
+    pushEq('priority', activeFilters.priority);
+    pushEq('channel', activeFilters.channel);
 
     if (activeFilters.has_open_deal) {
         rules.push({ field: 'has_open_deal', operator: 'is_true' });

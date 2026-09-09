@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import type { FilterGroup, FilterRule, ListFieldDef, ListViewFilters } from '@/lib/list-view-config';
+import type { FilterGroup, FilterRule, ListFieldDef, ListObjectType, ListViewFilters } from '@/lib/list-view-config';
 import { defaultFilterGroups } from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };
@@ -14,7 +14,7 @@ export default function FilterBuilder({
     stages = [],
     onChange,
 }: {
-    entity: 'contact' | 'company' | 'deal';
+    entity: ListObjectType;
     fields: ListFieldDef[];
     value?: ListViewFilters | null;
     members?: Member[];

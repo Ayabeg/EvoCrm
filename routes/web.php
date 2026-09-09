@@ -29,6 +29,7 @@ use App\Http\Controllers\Crm\SavedFilterController;
 use App\Http\Controllers\Crm\SavedReportController;
 use App\Http\Controllers\Crm\ScheduledReportController;
 use App\Http\Controllers\Crm\SegmentController;
+use App\Http\Controllers\Crm\TicketController;
 use App\Http\Controllers\Crm\WorkflowController;
 use App\Http\Controllers\Desk\DeskConnectorController;
 use App\Http\Controllers\Desk\InboxController;
@@ -240,6 +241,11 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::post('/crm/deals/{deal}/suggestions/{suggestion}/apply', [LeadOsController::class, 'applySuggestion'])->name('crm.deals.suggestions.apply');
     Route::post('/crm/deals/{deal}/suggestions/{suggestion}/dismiss', [LeadOsController::class, 'dismissSuggestion'])->name('crm.deals.suggestions.dismiss');
     Route::post('/crm/deals/{deal}/draft-email', [AskEvoController::class, 'draftDeal'])->name('crm.deals.draft-email');
+
+    Route::get('/crm/tickets', [TicketController::class, 'index'])->name('crm.tickets.index');
+    Route::get('/crm/tickets/board', [TicketController::class, 'board'])->name('crm.tickets.board');
+    Route::post('/crm/tickets', [TicketController::class, 'store'])->name('crm.tickets.store');
+    Route::post('/crm/tickets/{ticket}/move', [TicketController::class, 'move'])->name('crm.tickets.move');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
     Route::get('/ads/attribution', [AdsCenterController::class, 'attribution'])->name('ads.attribution');

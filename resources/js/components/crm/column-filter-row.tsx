@@ -3,7 +3,7 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
-import type { ListViewFilters } from '@/lib/list-view-config';
+import type { ListObjectType, ListViewFilters } from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };
 
@@ -20,7 +20,7 @@ export default function ColumnFilterRow({
     extraQuery = {},
 }: {
     action: string;
-    entity: 'contact' | 'company' | 'deal';
+    entity: ListObjectType;
     activeFilters: Record<string, unknown>;
     members?: Member[];
     cities?: string[];
@@ -34,23 +34,37 @@ export default function ColumnFilterRow({
     const [advanced, setAdvanced] = useState(false);
     const fields = filterFields(activeFilters);
     const statusOptions =
-        entity === 'deal' || entity === 'company'
+        entity === 'ticket'
             ? [
-                  { value: 'open', label: 'Open' },
-                  { value: 'won', label: 'Won' },
-                  { value: 'lost', label: 'Lost' },
+                  { value: 'new', label: 'New' },
+                  { value: 'waiting_on_contact', label: 'Waiting on contact' },
+                  { value: 'waiting_on_us', label: 'Waiting on us' },
+                  { value: 'closed', label: 'Closed' },
               ]
-            : [
-                  { value: 'new', label: 'New lead' },
-                  { value: 'working', label: 'Working' },
-                  { value: 'qualified', label: 'Qualified' },
-                  { value: 'disqualified', label: 'Disqualified' },
-              ];
+            : entity === 'deal' || entity === 'company'
+              ? [
+                    { value: 'open', label: 'Open' },
+                    { value: 'won', label: 'Won' },
+                    { value: 'lost', label: 'Lost' },
+                ]
+              : [
+                    { value: 'new', label: 'New lead' },
+                    { value: 'working', label: 'Working' },
+                    { value: 'qualified', label: 'Qualified' },
+                    { value: 'disqualified', label: 'Disqualified' },
+                ];
 
     const chip =
         'inline-flex h-7 max-w-full items-center gap-1 rounded-sm border border-hairline bg-canvas px-2 text-[12px] text-ink';
     const selectClass = 'max-w-[9rem] bg-transparent text-[12px] text-ink outline-none';
-    const ownerLabel = entity === 'deal' ? 'Deal owner' : entity === 'company' ? 'Company owner' : 'Contact owner';
+    const ownerLabel =
+        entity === 'ticket'
+            ? 'Ticket owner'
+            : entity === 'deal'
+              ? 'Deal owner'
+              : entity === 'company'
+                ? 'Company owner'
+                : 'Contact owner';
 
     return (
         <div className="min-w-0 flex-1">
@@ -84,37 +98,62 @@ export default function ColumnFilterRow({
                         ))}
                     </select>
                 </label>
+                {entity === 'ticket' ? (
+                    <label className={chip}>
+                        Priority
+                        <select
+                            name="priority"
+                            defaultValue={String(fields.priority ?? '')}
+                            className={selectClass}
+                            onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                        >
+                            <option value="">Any</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </label>
+                ) : (
+                    <>
+                        <label className={chip}>
+                            Create date
+                            <select
+                                name="created"
+                                defaultValue={String(fields.created ?? '')}
+                                className={selectClass}
+                                onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                            >
+                                <option value="">Any time</option>
+                                <option value="today">Today</option>
+                                <option value="7d">Last 7 days</option>
+                                <option value="30d">Last 30 days</option>
+                                <option value="90d">Last 90 days</option>
+                            </select>
+                        </label>
+                        <label className={chip}>
+                            Last activity date
+                            <select
+                                name="last_activity"
+                                defaultValue={String(fields.last_activity ?? '')}
+                                className={selectClass}
+                                onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                            >
+                                <option value="">Any</option>
+                                <option value="7d">7 days</option>
+                                <option value="30d">30 days</option>
+                                <option value="none">None</option>
+                            </select>
+                        </label>
+                    </>
+                )}
                 <label className={chip}>
-                    Create date
-                    <select
-                        name="created"
-                        defaultValue={String(fields.created ?? '')}
-                        className={selectClass}
-                        onChange={(event) => event.currentTarget.form?.requestSubmit()}
-                    >
-                        <option value="">Any time</option>
-                        <option value="today">Today</option>
-                        <option value="7d">Last 7 days</option>
-                        <option value="30d">Last 30 days</option>
-                        <option value="90d">Last 90 days</option>
-                    </select>
-                </label>
-                <label className={chip}>
-                    Last activity date
-                    <select
-                        name="last_activity"
-                        defaultValue={String(fields.last_activity ?? '')}
-                        className={selectClass}
-                        onChange={(event) => event.currentTarget.form?.requestSubmit()}
-                    >
-                        <option value="">Any</option>
-                        <option value="7d">7 days</option>
-                        <option value="30d">30 days</option>
-                        <option value="none">None</option>
-                    </select>
-                </label>
-                <label className={chip}>
-                    {entity === 'contact' ? 'Lead status' : entity === 'deal' ? 'Deal status' : 'Status'}
+                    {entity === 'contact'
+                        ? 'Lead status'
+                        : entity === 'deal'
+                          ? 'Deal status'
+                          : entity === 'ticket'
+                            ? 'Ticket status'
+                            : 'Status'}
                     <select
                         name="status"
                         defaultValue={String(fields.status ?? '')}
@@ -129,6 +168,35 @@ export default function ColumnFilterRow({
                         ))}
                     </select>
                 </label>
+                {entity === 'ticket' ? (
+                    <>
+                        <label className={chip}>
+                            Channel
+                            <select
+                                name="channel"
+                                defaultValue={String(fields.channel ?? '')}
+                                className={selectClass}
+                                onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                            >
+                                <option value="">Any</option>
+                                <option value="whatsapp_cloud">WhatsApp</option>
+                                <option value="email">Email</option>
+                                <option value="manual">Manual</option>
+                            </select>
+                        </label>
+                        <label className={chip}>
+                            <input
+                                type="checkbox"
+                                name="unanswered"
+                                value="1"
+                                defaultChecked={!!fields.unanswered}
+                                className="accent-ink"
+                                onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                            />
+                            Unanswered
+                        </label>
+                    </>
+                ) : null}
                 <button
                     type="button"
                     onClick={() => setAdvanced((open) => !open)}
@@ -175,7 +243,7 @@ export default function ColumnFilterRow({
                                 </select>
                             </label>
                         ) : null}
-                        {entity !== 'company' ? (
+                        {entity !== 'company' && entity !== 'ticket' ? (
                             <label className="flex items-center gap-1 text-[12px] text-ink">
                                 <input type="checkbox" name="unanswered" value="1" defaultChecked={!!fields.unanswered} />
                                 Unanswered
@@ -193,7 +261,7 @@ export default function ColumnFilterRow({
                     <>
                         {fields.city ? <input type="hidden" name="city" value={String(fields.city)} /> : null}
                         {fields.wilaya ? <input type="hidden" name="wilaya" value={String(fields.wilaya)} /> : null}
-                        {fields.unanswered ? <input type="hidden" name="unanswered" value="1" /> : null}
+                        {fields.unanswered && entity !== 'ticket' ? <input type="hidden" name="unanswered" value="1" /> : null}
                         {fields.unassigned ? <input type="hidden" name="unassigned" value="1" /> : null}
                         {columns.length ? <input type="hidden" name="columns" value={JSON.stringify(columns)} /> : null}
                     </>

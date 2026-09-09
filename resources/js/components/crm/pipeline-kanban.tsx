@@ -2,7 +2,7 @@ import type { DragEvent, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Shared kanban chrome for the deals pipeline and the leads board.
+ * Shared kanban chrome for the deals pipeline and the tickets Help Desk board.
  * Callers own drag payloads, move requests, and weighted math.
  */
 
@@ -76,6 +76,7 @@ export function PipelineKanbanHeader({
     weighted,
     probability,
     accent,
+    unit = 'deal',
 }: {
     name: string;
     count: number;
@@ -83,6 +84,7 @@ export function PipelineKanbanHeader({
     weighted?: string;
     probability?: number;
     accent: string;
+    unit?: string;
 }) {
     return (
         <header className="mb-2 px-0.5">
@@ -90,7 +92,7 @@ export function PipelineKanbanHeader({
                 {name}
             </h2>
             <p className="mt-0.5 text-[11px] tabular-nums text-mute">
-                {count} {count === 1 ? 'deal' : 'deals'}
+                {count} {count === 1 ? unit : `${unit}s`}
             </p>
             {amount ? (
                 <p className="money mt-1 break-words text-[13px] font-semibold tabular-nums text-ink">

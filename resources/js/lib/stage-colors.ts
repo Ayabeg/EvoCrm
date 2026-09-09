@@ -25,6 +25,12 @@ export function stageUnderlineColor(slug: string): string {
     switch (slug) {
         case 'new':
             return STAGE_COLOR_VARS.mark;
+        case 'waiting_on_contact':
+            return STAGE_COLOR_VARS.mute;
+        case 'waiting_on_us':
+            return STAGE_COLOR_VARS.mark;
+        case 'closed':
+            return STAGE_COLOR_VARS.hairline;
         case 'qualified':
             return STAGE_COLOR_VARS.mark;
         case 'demo':

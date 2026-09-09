@@ -4,6 +4,7 @@ import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import ListToolbar from '@/components/crm/list-toolbar';
 import type { StagePill } from '@/components/crm/stage-pills';
 import type {
+    ListObjectType,
     ListViewColumn,
     ListViewMeta,
     SavedView,
@@ -14,10 +15,11 @@ type Company = { id: number; name: string };
 type Contact = { id: number; first_name: string; last_name?: string | null };
 type Stage = { id: number; name: string; slug: string };
 
-const OBJECT_NOUNS: Record<'contact' | 'company' | 'deal', string> = {
+const OBJECT_NOUNS: Record<ListObjectType, string> = {
     contact: 'contacts',
     company: 'companies',
     deal: 'deals',
+    ticket: 'tickets',
 };
 
 export function CrmListShell({
@@ -45,7 +47,7 @@ export function CrmListShell({
     children,
 }: {
     title: string;
-    entity: 'contact' | 'company' | 'deal';
+    entity: ListObjectType;
     basePath: string;
     primaryLabel: string;
     activeFilters: Record<string, unknown>;

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
+import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -45,6 +45,22 @@ type CompanyRow = {
     created_at?: string | null;
     owner?: { name: string } | null;
     attributes?: AttributeMap;
+};
+
+type TicketRow = {
+    id: number;
+    number: string;
+    subject: string;
+    status: string;
+    status_label?: string;
+    priority?: string | null;
+    channel?: string | null;
+    channel_label?: string | null;
+    created_at?: string | null;
+    sla_due_at?: string | null;
+    contact?: { first_name: string; last_name?: string | null } | null;
+    company?: { name: string } | null;
+    owner?: { name: string } | null;
 };
 
 const ALGIERS = 'Africa/Algiers';
@@ -156,8 +172,73 @@ function renderCompanyCell(columnId: string, row: CompanyRow): string {
     }
 }
 
-function primaryColumnId(entity: 'contact' | 'deal' | 'company'): string {
-    return entity === 'deal' ? 'title' : 'name';
+function titleCase(value?: string | null): string {
+    if (!value) {
+        return '—';
+    }
+
+    return value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function renderTicketCell(columnId: string, row: TicketRow): string {
+    switch (columnId) {
+        case 'number':
+            return row.number;
+        case 'subject':
+            return row.subject;
+        case 'status':
+            return row.status_label ?? titleCase(row.status);
+        case 'priority':
+            return titleCase(row.priority);
+        case 'channel':
+            return row.channel_label ?? titleCase(row.channel);
+        case 'contact':
+            return row.contact
+                ? `${row.contact.first_name} ${row.contact.last_name ?? ''}`.trim()
+                : '—';
+        case 'company':
+            return row.company?.name ?? '—';
+        case 'owner':
+            return row.owner?.name ?? 'Unassigned';
+        case 'created_at':
+            return formatDate(row.created_at);
+        case 'sla_due_at':
+            return formatDate(row.sla_due_at, true);
+        default:
+            return '—';
+    }
+}
+
+function primaryColumnId(entity: ListObjectType): string {
+    if (entity === 'deal') {
+        return 'title';
+    }
+
+    if (entity === 'ticket') {
+        return 'subject';
+    }
+
+    return 'name';
+}
+
+function renderCell(
+    entity: ListObjectType,
+    columnId: string,
+    row: ContactRow | DealRow | CompanyRow | TicketRow,
+): string {
+    if (entity === 'contact') {
+        return renderContactCell(columnId, row as ContactRow);
+    }
+
+    if (entity === 'deal') {
+        return renderDealCell(columnId, row as DealRow);
+    }
+
+    if (entity === 'ticket') {
+        return renderTicketCell(columnId, row as TicketRow);
+    }
+
+    return renderCompanyCell(columnId, row as CompanyRow);
 }
 
 export default function ListViewTable({
@@ -171,8 +252,8 @@ export default function ListViewTable({
     onToggle,
     onTogglePage,
 }: {
-    entity: 'contact' | 'deal' | 'company';
-    rows: ContactRow[] | DealRow[] | CompanyRow[];
+    entity: ListObjectType;
+    rows: ContactRow[] | DealRow[] | CompanyRow[] | TicketRow[];
     columnDefs: ListColumnDef[];
     columns: ListViewColumn[];
     basePath: string;
@@ -241,15 +322,7 @@ export default function ListViewTable({
                                     </td>
                                 ) : null}
                                 {visible.map((column) => {
-                                    const label =
-                                        entity === 'contact'
-                                            ? renderContactCell(column.id, row as ContactRow)
-                                            : entity === 'deal'
-                                              ? renderDealCell(column.id, row as DealRow)
-                                              : renderCompanyCell(
-                                                    column.id,
-                                                    row as CompanyRow,
-                                                );
+                                    const label = renderCell(entity, column.id, row);
 
                                     return (
                                         <td
@@ -284,12 +357,7 @@ export default function ListViewTable({
             {/* Mobile: prioritized card rows — no page-level horizontal scroll */}
             <ul className="divide-y divide-hairline @[480px]/list:hidden">
                 {rows.map((row) => {
-                    const primaryLabel =
-                        entity === 'contact'
-                            ? renderContactCell(primaryId, row as ContactRow)
-                            : entity === 'deal'
-                              ? renderDealCell(primaryId, row as DealRow)
-                              : renderCompanyCell(primaryId, row as CompanyRow);
+                    const primaryLabel = renderCell(entity, primaryId, row);
 
                     return (
                         <li key={row.id} className="flex items-start gap-2 px-4 py-2">
@@ -312,21 +380,7 @@ export default function ListViewTable({
                                         .filter((column) => column.id !== primaryId)
                                         .slice(0, 3)
                                         .map((column) => {
-                                            const value =
-                                                entity === 'contact'
-                                                    ? renderContactCell(
-                                                          column.id,
-                                                          row as ContactRow,
-                                                      )
-                                                    : entity === 'deal'
-                                                      ? renderDealCell(
-                                                            column.id,
-                                                            row as DealRow,
-                                                        )
-                                                      : renderCompanyCell(
-                                                            column.id,
-                                                            row as CompanyRow,
-                                                        );
+                                            const value = renderCell(entity, column.id, row);
 
                                             return (
                                                 <div

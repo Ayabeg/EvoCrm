@@ -43,6 +43,8 @@ export function filterFields(filters: ListFilters): ListFilters {
         wilaya: filters.wilaya,
         unanswered: filters.unanswered,
         unassigned: filters.unassigned,
+        priority: filters.priority,
+        channel: filters.channel,
         filter_id: filters.filter_id,
         filter_groups: filters.filter_groups,
     };
@@ -118,6 +120,22 @@ export function listFilterChips(
             key: 'status',
             label: 'Status',
             value: String(fields.status).replace(/_/g, ' '),
+        });
+    }
+
+    if (fields.priority) {
+        chips.push({
+            key: 'priority',
+            label: 'Priority',
+            value: String(fields.priority),
+        });
+    }
+
+    if (fields.channel) {
+        chips.push({
+            key: 'channel',
+            label: 'Channel',
+            value: String(fields.channel).replace(/_/g, ' '),
         });
     }
 

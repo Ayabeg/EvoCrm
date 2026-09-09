@@ -28,6 +28,7 @@ import {
     Settings,
     ShieldOff,
     SquareKanban,
+    Ticket,
     Users,
     Workflow,
 } from 'lucide-react';
@@ -55,6 +56,7 @@ const CRM_RAIL_OBJECTS: NavLeaf[] = [
     { id: 'companies', label: 'Companies', href: '/crm/companies', icon: Building2 },
     { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake },
     { id: 'leads', label: 'Leads', href: '/crm/leads', icon: SquareKanban },
+    { id: 'tickets', label: 'Tickets', href: '/crm/tickets', icon: Ticket },
 ];
 
 const PRIMARY: NavLeaf[] = [
@@ -90,6 +92,7 @@ const MORE_ITEMS: MoreItem[] = [
     { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake, category: 'CRM' },
     { id: 'activities', label: 'Activities', href: '/crm/activities', icon: SquareKanban, category: 'CRM' },
     { id: 'leads', label: 'Leads', href: '/crm/leads', icon: SquareKanban, category: 'CRM' },
+    { id: 'tickets', label: 'Tickets', href: '/crm/tickets', icon: Ticket, category: 'CRM' },
     { id: 'lead-captures', label: 'Captures', href: '/crm/leads/captures', icon: Inbox, category: 'CRM' },
     { id: 'pipelines', label: 'Pipeline', href: '/crm/deals/board', icon: SquareKanban, category: 'CRM' },
     { id: 'segments', label: 'Segments', href: '/crm/segments', icon: Users, category: 'CRM' },

@@ -41,6 +41,18 @@ class ListViewConfig
                 ['id' => 'owner', 'label' => 'Owner', 'defaultVisible' => true],
                 ['id' => 'created_at', 'label' => 'Created', 'defaultVisible' => false],
             ],
+            'ticket' => [
+                ['id' => 'number', 'label' => 'Number', 'defaultVisible' => true],
+                ['id' => 'subject', 'label' => 'Ticket name', 'defaultVisible' => true],
+                ['id' => 'status', 'label' => 'Status', 'defaultVisible' => true],
+                ['id' => 'priority', 'label' => 'Priority', 'defaultVisible' => true],
+                ['id' => 'channel', 'label' => 'Channel', 'defaultVisible' => true],
+                ['id' => 'contact', 'label' => 'Contact', 'defaultVisible' => true],
+                ['id' => 'company', 'label' => 'Company', 'defaultVisible' => false],
+                ['id' => 'owner', 'label' => 'Owner', 'defaultVisible' => true],
+                ['id' => 'created_at', 'label' => 'Create date', 'defaultVisible' => true],
+                ['id' => 'sla_due_at', 'label' => 'SLA', 'defaultVisible' => false],
+            ],
             default => [],
         };
     }
@@ -83,6 +95,14 @@ class ListViewConfig
                 ['id' => 'last_activity', 'label' => 'Last activity', 'type' => 'select', 'options' => ['7d', '30d', 'none']],
                 ['id' => 'status', 'label' => 'Deal status', 'type' => 'select', 'options' => ['open', 'won', 'lost']],
                 ['id' => 'unassigned', 'label' => 'Unassigned', 'type' => 'boolean'],
+            ],
+            'ticket' => [
+                ['id' => 'status', 'label' => 'Ticket status', 'type' => 'select', 'options' => ['new', 'waiting_on_contact', 'waiting_on_us', 'closed']],
+                ['id' => 'owner', 'label' => 'Owner', 'type' => 'select'],
+                ['id' => 'priority', 'label' => 'Priority', 'type' => 'select', 'options' => ['low', 'medium', 'high']],
+                ['id' => 'channel', 'label' => 'Channel', 'type' => 'select', 'options' => ['whatsapp_cloud', 'email', 'manual']],
+                ['id' => 'unassigned', 'label' => 'Unassigned', 'type' => 'boolean'],
+                ['id' => 'unanswered', 'label' => 'Unanswered', 'type' => 'boolean'],
             ],
             default => [],
         };

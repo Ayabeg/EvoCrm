@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import type {
+    ListObjectType,
     ListViewColumn,
     ListViewFilters,
     ListViewMeta,
@@ -19,10 +20,11 @@ import type {
 import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 
-const OBJECT_NOUNS: Record<'contact' | 'company' | 'deal', string> = {
+const OBJECT_NOUNS: Record<ListObjectType, string> = {
     contact: 'contacts',
     company: 'companies',
     deal: 'deals',
+    ticket: 'tickets',
 };
 
 export default function SavedViewTabs({
@@ -37,7 +39,7 @@ export default function SavedViewTabs({
     extraQuery = {},
 }: {
     basePath: string;
-    entity: 'contact' | 'company' | 'deal';
+    entity: ListObjectType;
     activeFilters: Record<string, unknown>;
     savedFilters?: SavedView[];
     columns?: ListViewColumn[];
@@ -63,7 +65,18 @@ export default function SavedViewTabs({
     });
     const myHref = crmListHref(basePath, { ...fields, ...extraQuery }, {
         view: 'my',
-        owner: auth.user.id,
+        owner: entity === 'ticket' ? null : auth.user.id,
+        filter_id: null,
+    });
+    const unassignedHref = crmListHref(basePath, { ...fields, ...extraQuery }, {
+        view: 'unassigned',
+        owner: null,
+        filter_id: null,
+    });
+    const closedHref = crmListHref(basePath, { ...fields, ...extraQuery }, {
+        view: 'closed',
+        owner: null,
+        status: null,
         filter_id: null,
     });
 
@@ -80,12 +93,34 @@ export default function SavedViewTabs({
     return (
         <div className="flex min-w-0 flex-col gap-2" data-crm="views">
             <div className="flex min-w-0 items-end gap-4 overflow-x-auto">
-                <Link href={allHref} className={tabClass(view === 'all' && !filterId)}>
-                    All {nouns}
-                </Link>
-                <Link href={myHref} className={tabClass(view === 'my' && !filterId)}>
-                    My {nouns}
-                </Link>
+                {entity === 'ticket' ? (
+                    <>
+                        <Link href={allHref} className={tabClass(view === 'all' && !filterId)}>
+                            All open
+                        </Link>
+                        <Link href={myHref} className={tabClass(view === 'my' && !filterId)}>
+                            Assigned to me
+                        </Link>
+                        <Link
+                            href={unassignedHref}
+                            className={tabClass(view === 'unassigned' && !filterId)}
+                        >
+                            Unassigned
+                        </Link>
+                        <Link href={closedHref} className={tabClass(view === 'closed' && !filterId)}>
+                            Closed
+                        </Link>
+                    </>
+                ) : (
+                    <>
+                        <Link href={allHref} className={tabClass(view === 'all' && !filterId)}>
+                            All {nouns}
+                        </Link>
+                        <Link href={myHref} className={tabClass(view === 'my' && !filterId)}>
+                            My {nouns}
+                        </Link>
+                    </>
+                )}
                 {pinned.map((filter) => (
                     <Link
                         key={filter.id}
@@ -128,6 +163,7 @@ export default function SavedViewTabs({
                         </DropdownMenuContent>
                     </DropdownMenu>
                 ) : null}
+                {entity === 'ticket' ? null : (
                 <button
                     type="button"
                     onClick={() => setNaming(true)}
@@ -136,6 +172,7 @@ export default function SavedViewTabs({
                     + Add view
                     {savedFilters.length > 0 ? ` (${savedFilters.length}/5)` : ''}
                 </button>
+                )}
             </div>
             {naming ? (
                 <Form
