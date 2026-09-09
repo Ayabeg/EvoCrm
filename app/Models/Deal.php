@@ -94,6 +94,11 @@ class Deal extends Model
         return $this->hasMany(Quote::class)->latest();
     }
 
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class)->latest();
+    }
+
     /** @return HasMany<DealLineItem, $this> */
     public function lineItems(): HasMany
     {

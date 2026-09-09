@@ -88,6 +88,11 @@ class Contact extends Model
         return $this->hasMany(Lead::class);
     }
 
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class)->latest();
+    }
+
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
