@@ -116,4 +116,66 @@ class HttpGoogleApiClient implements GoogleApiClient
 
         return true;
     }
+
+    public function busyTimes(Integration $integration, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        if (! $integration->isConnected()) {
+            return [];
+        }
+
+        $response = Http::withToken((string) $integration->access_token)
+            ->acceptJson()
+            ->post('https://www.googleapis.com/calendar/v3/freeBusy', [
+                'timeMin' => \Illuminate\Support\Carbon::parse($from)->toIso8601String(),
+                'timeMax' => \Illuminate\Support\Carbon::parse($to)->toIso8601String(),
+                'timeZone' => 'Africa/Algiers',
+                'items' => [['id' => 'primary']],
+            ]);
+
+        if ($response->status() === 401) {
+            return [];
+        }
+
+        $busy = $response->json('calendars.primary.busy') ?? [];
+
+        return collect($busy)->map(fn (array $row) => [
+            'starts_at' => $row['start'] ?? null,
+            'ends_at' => $row['end'] ?? null,
+        ])->filter(fn (array $row) => filled($row['starts_at']) && filled($row['ends_at']))->values()->all();
+    }
+
+    public function createEvent(Integration $integration, array $event): array
+    {
+        if (! $integration->isConnected()) {
+            return ['id' => null, 'revoked' => true];
+        }
+
+        $timezone = $event['timezone'] ?? 'Africa/Algiers';
+        $response = Http::withToken((string) $integration->access_token)
+            ->acceptJson()
+            ->post('https://www.googleapis.com/calendar/v3/calendars/primary/events', [
+                'summary' => $event['subject'] ?? 'Meeting',
+                'description' => $event['body'] ?? null,
+                'location' => $event['location'] ?? null,
+                'start' => [
+                    'dateTime' => $event['starts_at'],
+                    'timeZone' => $timezone,
+                ],
+                'end' => [
+                    'dateTime' => $event['ends_at'],
+                    'timeZone' => $timezone,
+                ],
+                'attendees' => collect($event['attendees'] ?? [])
+                    ->filter()
+                    ->map(fn (string $email) => ['email' => $email])
+                    ->values()
+                    ->all(),
+            ]);
+
+        if ($response->status() === 401) {
+            return ['id' => null, 'revoked' => true];
+        }
+
+        return ['id' => $response->json('id')];
+    }
 }

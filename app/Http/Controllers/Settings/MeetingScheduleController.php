@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers\Settings;
+
+use App\Http\Controllers\Controller;
+use App\Models\MeetingSchedule;
+use App\Services\Meetings\MeetingSlotFinder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class MeetingScheduleController extends Controller
+{
+    public function edit(Request $request, MeetingSlotFinder $slots): Response
+    {
+        $user = $request->user();
+        $schedule = MeetingSchedule::forUser($user);
+
+        return Inertia::render('settings/meetings', [
+            'schedule' => $this->present($schedule, $slots),
+        ]);
+    }
+
+    public function update(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $schedule = MeetingSchedule::forUser($user);
+
+        $data = $request->validate([
+            'slug' => ['required', 'string', 'max:60', 'alpha_dash'],
+            'enabled' => ['sometimes', 'boolean'],
+            'slot_minutes' => ['required', 'integer', Rule::in(MeetingSchedule::SLOT_MINUTES)],
+            'work_start' => ['required', 'date_format:H:i'],
+            'work_end' => ['required', 'date_format:H:i', 'after:work_start'],
+            'weekdays' => ['required', 'array', 'min:1'],
+            'weekdays.*' => ['integer', 'between:1,7'],
+            'location_note' => ['nullable', 'string', 'max:180'],
+            'intro' => ['nullable', 'string', 'max:180'],
+        ]);
+
+        if (MeetingSchedule::query()->where('slug', $data['slug'])->whereKeyNot($schedule->id)->exists()) {
+            return back()->withErrors(['slug' => 'That booking link is already taken.']);
+        }
+
+        $schedule->forceFill([
+            'slug' => $data['slug'],
+            'enabled' => $request->boolean('enabled'),
+            'slot_minutes' => (int) $data['slot_minutes'],
+            'timezone' => MeetingSchedule::TIMEZONE,
+            'work_start' => $data['work_start'],
+            'work_end' => $data['work_end'],
+            'weekdays' => array_values(array_unique(array_map('intval', $data['weekdays']))),
+            'location_note' => $data['location_note'] ?: null,
+            'intro' => $data['intro'] ?: null,
+        ])->save();
+
+        return back();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function present(MeetingSchedule $schedule, MeetingSlotFinder $slots): array
+    {
+        return [
+            'slug' => $schedule->slug,
+            'url' => $schedule->publicUrl(),
+            'enabled' => $schedule->enabled,
+            'slot_minutes' => $schedule->slot_minutes,
+            'timezone' => $schedule->timezone,
+            'work_start' => $schedule->work_start,
+            'work_end' => $schedule->work_end,
+            'weekdays' => $schedule->weekdayList(),
+            'location_note' => $schedule->location_note,
+            'intro' => $schedule->intro,
+            'calendar_connected' => $slots->calendarConnected($schedule),
+        ];
+    }
+}

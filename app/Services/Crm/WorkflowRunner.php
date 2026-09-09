@@ -2,6 +2,7 @@
 
 namespace App\Services\Crm;
 
+use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Enrollment;
@@ -158,6 +159,24 @@ class WorkflowRunner
         }
 
         $this->run($workspace, Workflow::TRIGGER_ENROLLMENT_REPLIED, $contact, null);
+    }
+
+    public function handleMeetingBooked(Activity $activity): void
+    {
+        $workspace = Workspace::query()->find($activity->workspace_id);
+
+        if (! $workspace instanceof Workspace) {
+            return;
+        }
+
+        $contact = $activity->contact_id
+            ? Contact::query()->find($activity->contact_id)
+            : null;
+        $deal = $activity->deal_id
+            ? Deal::query()->find($activity->deal_id)
+            : null;
+
+        $this->run($workspace, Workflow::TRIGGER_MEETING_BOOKED, $contact, $deal);
     }
 
     /**

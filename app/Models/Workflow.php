@@ -69,6 +69,8 @@ class Workflow extends Model
 
     public const TRIGGER_LEAD_QUALIFIED = 'lead.qualified';
 
+    public const TRIGGER_MEETING_BOOKED = 'meeting.booked';
+
     public const ACTION_CREATE_TASK = 'create_task';
 
     public const ACTION_ENROLL_SEQUENCE = 'enroll_sequence';
@@ -122,6 +124,7 @@ class Workflow extends Model
             self::TRIGGER_ENROLLMENT_REPLIED,
             self::TRIGGER_LEAD_SCORED,
             self::TRIGGER_LEAD_QUALIFIED,
+            self::TRIGGER_MEETING_BOOKED,
         ];
     }
 

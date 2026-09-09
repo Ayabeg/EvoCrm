@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Settings\AuditTrailController;
 use App\Http\Controllers\Settings\LeadScoreSettingsController;
+use App\Http\Controllers\Settings\MeetingScheduleController;
 use App\Http\Controllers\Settings\PeopleController;
 use App\Http\Controllers\Settings\PlaybookController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -30,6 +31,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('user-password.update');
 
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
+
+    Route::get('settings/meetings', [MeetingScheduleController::class, 'edit'])->name('settings.meetings');
+    Route::put('settings/meetings', [MeetingScheduleController::class, 'update'])->name('settings.meetings.update');
 
     Route::middleware(['can-manage-settings', EnforceProductPermissions::class])->group(function () {
         Route::get('settings/system-health', SystemHealthController::class)->name('settings.system-health');

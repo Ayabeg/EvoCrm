@@ -48,6 +48,7 @@ use App\Http\Controllers\Outbound\SuppressionController;
 use App\Http\Controllers\Outbound\TemplateController;
 use App\Http\Controllers\Outbound\WarmupController;
 use App\Http\Controllers\Public\FunnelTrackingController;
+use App\Http\Controllers\Public\MeetingBookController;
 use App\Http\Controllers\Public\QuoteAcceptanceController;
 use App\Http\Controllers\Public\TrackingController;
 use App\Http\Controllers\Public\UnsubscribeController;
@@ -86,6 +87,9 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 Route::get('/q/{token}', [QuoteAcceptanceController::class, 'show'])->name('quotes.public.show');
 Route::post('/q/{token}/accept', [QuoteAcceptanceController::class, 'accept'])->name('quotes.public.accept');
+Route::get('/book/{slug}', [MeetingBookController::class, 'show'])->name('meetings.public.show');
+Route::post('/book/{slug}', [MeetingBookController::class, 'store'])->middleware('throttle:20,1')->name('meetings.public.store');
+Route::get('/book/{slug}/done', [MeetingBookController::class, 'done'])->name('meetings.public.done');
 Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
 Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])->name('outbound.track.click');
 Route::get('/track/{slug}/visit.gif', [FunnelTrackingController::class, 'pixel'])->name('funnel.track.visit');

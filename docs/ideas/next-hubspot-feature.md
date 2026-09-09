@@ -1,7 +1,7 @@
 # Next HubSpot feature: public meeting scheduler
 
 **Decision date:** 2026-08-29  
-**Codebase:** `main` @ `97fdff6`  
+**Shipped:** 2026-09-09 (`feat/meeting-scheduler`) — public `/book/{slug}`, Settings → Meetings, Google busy + event write, `meeting.booked` workflow.  
 **Prior audit:** [`docs/hubspot-parity-comparison.md`](../hubspot-parity-comparison.md) (~85 composite, 2026-08-25)  
 **Buyer:** 5–20 seat Algeria-first sales team, not HubSpot Enterprise feature-count parity
 

@@ -21,7 +21,8 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **Deal** | Sales Hub record: amount (cents, display DZD), currency default DZD, `close_date`, `next_step`, `owner_id`, `source`, `lost_reason`. `moveTo(Stage)` writes a `stage_change` activity. Amount rolls up from `DealLineItem` when items exist; stays manual when the deal has no items. |
 | **Product** | Local catalog stand-in until Evostock sync. Workspace-scoped `sku`, `name`, `unit_cents` (DZD), `active`. SKU is the later Evostock join key. |
 | **DealLineItem** | Product or ad hoc line on a Deal: name/sku snapshot, quantity, unit cents, line total. Deal `amount_cents` is the sum when any items exist. |
-| **Activity** | Timeline spine: `note`, `task`, `call`, `meeting`, `stage_change`, `sequence`. Tasks have `due_at`, `owner_id`, `done`. Home next steps = open tasks. |
+| **Activity** | Timeline spine: `note`, `task`, `call`, `meeting`, `stage_change`, `sequence`. Tasks have `due_at`, `owner_id`, `done`. Home next steps = open tasks. Public `/book/{slug}` writes a `meeting` with `meta.source = booking`. |
+| **MeetingSchedule** | Per-user public booking page. `slug`, slot length 30/45/60, Africa/Algiers hours, weekdays. Optional Google Calendar busy subtract + event write. |
 | **CustomAttributeDefinition** | Workspace-defined field (text / number / list) on contact, company, or deal. |
 | **CustomAttributeValue** | Value for one entity + definition. |
 | **SavedFilter** | Named list: stage, owner, city, wilaya, last activity, unanswered, unassigned. |
@@ -29,7 +30,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **AuditEvent** | Workspace log for login, import, merge, quote send/accept, and permission changes. Owner/admin read `/settings/audit`. |
 | **Playbook** | Named script for contact or deal records. Shown on the matching record page. |
 | **Dashboard** | Saved Reports board on top of the default rooms. `name`, `owner_id`, `widgets` JSON (keys into existing EvoViz charts). Workspace-scoped. |
-| **Workflow** | Automation with triggers including `contact.created`, `deal.stage_changed`, `segment.entered`, and `segment.exited`. Actions include task, sequence, webhook, property, owner, deal, email, and notify. Delayed actions queue. |
+| **Workflow** | Automation with triggers including `contact.created`, `deal.stage_changed`, `segment.entered`, `segment.exited`, and `meeting.booked`. Actions include task, sequence, webhook, property, owner, deal, email, and notify. Delayed actions queue. |
 | **Quote** | Versioned quote on a Deal. Status `draft` / `sent` / `accepted`. Currency DZD. Sending freezes `snapshot`/`snapshot_html` and issues a revocable public token. Sent and accepted quotes are immutable. |
 | **ScheduledReport** | Named cron delivery of a saved report or dashboard. Records `last_status`, `last_error`, and `last_window` so one schedule window is emailed once. |
 | **QuoteItem** | Line: optional `product_id` from the same catalog, name, quantity, unit cents, line total. Quote `total_cents` is the sum. |

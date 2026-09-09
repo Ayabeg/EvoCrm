@@ -27,6 +27,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Meetings',
+        href: '/settings/meetings',
+        icon: null,
+    },
+    {
         title: 'Integrations',
         href: '/settings/apps',
         icon: null,
