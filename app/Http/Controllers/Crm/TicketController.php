@@ -69,6 +69,10 @@ class TicketController extends Controller
             'paginator' => $paginator,
             'stagePills' => $statusPills,
             'createOpen' => $request->boolean('create'),
+            'createDefaults' => [
+                'contact_id' => $request->integer('contact_id') ?: null,
+                'deal_id' => $request->integer('deal_id') ?: null,
+            ],
         ]);
     }
 
@@ -110,16 +114,25 @@ class TicketController extends Controller
         $data = $request->validate([
             'subject' => ['required', 'string', 'max:180'],
             'contact_id' => ['required', 'integer'],
+            'deal_id' => ['nullable', 'integer'],
             'priority' => ['nullable', 'in:low,medium,high'],
             'channel' => ['nullable', 'in:whatsapp_cloud,email,manual'],
         ]);
 
         $contact = Contact::query()->forWorkspace($request->user()->workspace)->findOrFail($data['contact_id']);
 
+        $dealId = null;
+        if (! empty($data['deal_id'])) {
+            $deal = Deal::query()->forWorkspace($request->user()->workspace)->findOrFail($data['deal_id']);
+            abort_unless((int) $deal->contact_id === (int) $contact->id, 422);
+            $dealId = $deal->id;
+        }
+
         $ticket = Ticket::query()->create([
             'workspace_id' => $request->user()->workspace_id,
             'contact_id' => $contact->id,
             'company_id' => $contact->company_id,
+            'deal_id' => $dealId,
             'owner_id' => $request->user()->id,
             'subject' => $data['subject'],
             'priority' => $data['priority'] ?? Ticket::PRIORITY_MEDIUM,

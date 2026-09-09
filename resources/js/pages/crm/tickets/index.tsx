@@ -44,6 +44,7 @@ export default function TicketsIndex({
     recordCount,
     paginator,
     createOpen,
+    createDefaults,
 }: {
     tickets: TicketRow[];
     stagePills: StagePill[];
@@ -55,6 +56,7 @@ export default function TicketsIndex({
     recordCount: number;
     paginator?: { page: number; per_page: number; total: number; last_page: number };
     createOpen?: boolean;
+    createDefaults?: { contact_id?: number | null; deal_id?: number | null };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
     const loading = useInertiaLoading();
@@ -148,6 +150,9 @@ export default function TicketsIndex({
                 >
                     {({ processing }) => (
                         <>
+                            {createDefaults?.deal_id ? (
+                                <input type="hidden" name="deal_id" value={createDefaults.deal_id} />
+                            ) : null}
                             <div>
                                 <Label className="mb-1 block text-[12px]">
                                     Subject <span className="text-brand">*</span>
@@ -162,7 +167,7 @@ export default function TicketsIndex({
                                     name="contact_id"
                                     required
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                    defaultValue=""
+                                    defaultValue={createDefaults?.contact_id ? String(createDefaults.contact_id) : ''}
                                 >
                                     <option value="" disabled>
                                         Select a contact

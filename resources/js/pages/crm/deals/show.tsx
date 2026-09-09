@@ -33,6 +33,8 @@ import {
 } from '@/components/crm/record-hub';
 import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
+import TicketsRelatedCard from '@/components/crm/tickets-related-card';
+import type { TicketsRelated } from '@/components/crm/tickets-related-card';
 import { Button } from '@/components/ui/button';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatDzd } from '@/lib/money';
@@ -98,6 +100,7 @@ export default function DealShow({
         company?: { id: number; name: string } | null;
         quotes?: unknown[];
         line_items?: DealLineItemRow[];
+        tickets?: TicketsRelated;
     } | null;
     timeline: RecordActivity[];
     stages: { id: number; name: string }[];
@@ -397,6 +400,14 @@ export default function DealShow({
                                         <p className="text-mute">No company</p>
                                     )}
                                 </AssociationCard>
+                                <TicketsRelatedCard
+                                    tickets={associations?.tickets}
+                                    addHref={
+                                        contact
+                                            ? `/crm/tickets?create=1&contact_id=${contact.id}&deal_id=${deal.id}`
+                                            : undefined
+                                    }
+                                />
                             </div>
                         }
                     />

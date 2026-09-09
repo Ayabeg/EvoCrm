@@ -338,6 +338,39 @@ class Ticket extends Model
     /**
      * @return array<string, mixed>
      */
+    public function presentRelated(): array
+    {
+        return [
+            'id' => $this->id,
+            'number' => $this->number,
+            'subject' => $this->subject,
+            'status' => $this->status,
+            'status_label' => self::statusLabel((string) $this->status),
+            'priority' => $this->priority,
+            'priority_label' => ucfirst((string) $this->priority),
+            'url' => '/crm/tickets/'.$this->id,
+        ];
+    }
+
+    /**
+     * Salesforce Cases card payload: open count + numbered rows.
+     *
+     * @param  iterable<int, Ticket>  $tickets
+     * @return array{open_count: int, rows: array<int, array<string, mixed>>}
+     */
+    public static function presentRelatedList(iterable $tickets, int $limit = 8): array
+    {
+        $collection = collect($tickets)->sortByDesc('id')->values();
+
+        return [
+            'open_count' => $collection->filter(fn (self $ticket) => $ticket->isOpen())->count(),
+            'rows' => $collection->take($limit)->map->presentRelated()->values()->all(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function presentBoard(): array
     {
         $inactiveDays = $this->last_activity_at

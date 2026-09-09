@@ -27,6 +27,8 @@ import {
 } from '@/components/crm/record-hub';
 import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
+import TicketsRelatedCard from '@/components/crm/tickets-related-card';
+import type { TicketsRelated } from '@/components/crm/tickets-related-card';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
 
@@ -79,6 +81,7 @@ export default function ContactShow({
             last_message?: string | null;
             last_message_at?: string | null;
         }[];
+        tickets?: TicketsRelated;
     } | null;
     timeline: RecordActivity[];
     attributes?: AttributeBag;
@@ -308,6 +311,10 @@ export default function ContactShow({
                                         )}
                                     </AssociationCard>
                                 )}
+                                <TicketsRelatedCard
+                                    tickets={associations?.tickets}
+                                    addHref={`/crm/tickets?create=1&contact_id=${contact.id}`}
+                                />
                             </div>
                         }
                     />

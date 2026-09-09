@@ -10,6 +10,7 @@ use App\Models\Deal;
 use App\Models\Message;
 use App\Models\Playbook;
 use App\Models\SavedFilter;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Crm\CrmFilter;
@@ -165,6 +166,7 @@ class CrmHub
             'deals.quotes',
             'threads.channel',
             'enrollments.sequence',
+            'tickets',
         ]);
 
         return [
@@ -174,6 +176,7 @@ class CrmHub
             'threads' => $contact->threads,
             'enrollments' => $contact->enrollments,
             'quotes' => $contact->deals->flatMap->quotes,
+            'tickets' => Ticket::presentRelatedList($contact->tickets),
         ];
     }
 
@@ -191,6 +194,7 @@ class CrmHub
             'lead',
             'quotes.items',
             'lineItems.product',
+            'tickets',
         ]);
 
         return [
@@ -201,6 +205,7 @@ class CrmHub
             'enrollments' => $deal->contact?->enrollments ?? [],
             'quotes' => $deal->quotes,
             'line_items' => $deal->lineItems,
+            'tickets' => Ticket::presentRelatedList($deal->tickets),
         ];
     }
 
