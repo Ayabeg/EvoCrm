@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
+use App\Models\Ticket;
 use App\Services\Ai\RecordInsight;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -61,6 +62,19 @@ class AskEvoController extends Controller
         ]);
 
         $insight->explainLeadScore($lead, $data['question']);
+
+        return back();
+    }
+
+    public function ticket(Request $request, Ticket $ticket, RecordInsight $insight): RedirectResponse
+    {
+        abort_unless((int) $ticket->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'question' => ['required', 'string', 'max:280'],
+        ]);
+
+        $insight->askTicket($ticket, $data['question']);
 
         return back();
     }

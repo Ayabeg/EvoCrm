@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use App\Models\Contact;
+use App\Models\Deal;
 use App\Models\Ticket;
+use App\Models\Thread;
+use App\Models\User;
+use App\Services\Ai\RecordInsight;
 use App\Services\Crm\CrmFilter;
 use App\Support\CrmHub;
+use App\Support\TicketPath;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -110,7 +116,7 @@ class TicketController extends Controller
 
         $contact = Contact::query()->forWorkspace($request->user()->workspace)->findOrFail($data['contact_id']);
 
-        Ticket::query()->create([
+        $ticket = Ticket::query()->create([
             'workspace_id' => $request->user()->workspace_id,
             'contact_id' => $contact->id,
             'company_id' => $contact->company_id,
@@ -119,6 +125,8 @@ class TicketController extends Controller
             'priority' => $data['priority'] ?? Ticket::PRIORITY_MEDIUM,
             'channel' => $data['channel'] ?? Ticket::CHANNEL_MANUAL,
         ]);
+
+        $this->logActivity($ticket, $request, 'ticket_opened', 'Opened '.$ticket->number);
 
         return $request->boolean('from_board')
             ? redirect()->route('crm.tickets.board')
@@ -133,7 +141,165 @@ class TicketController extends Controller
             'status' => ['required', 'in:'.implode(',', Ticket::STATUSES)],
         ]);
 
+        $from = (string) $ticket->status;
         $ticket->moveTo($data['status']);
+        $this->logStatus($ticket, $request, $from);
+
+        return back();
+    }
+
+    public function show(Request $request, Ticket $ticket, CrmHub $hub, RecordInsight $insight): Response
+    {
+        abort_unless((int) $ticket->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $workspace = $request->user()->workspace;
+        $ticket->load(['contact', 'company', 'deal.quotes', 'owner', 'thread.channel']);
+
+        $messages = $ticket->thread
+            ? $ticket->thread->messages()->orderBy('id')->limit(80)->get()->map(fn ($message) => [
+                'id' => $message->id,
+                'body' => $message->body,
+                'direction' => $message->direction,
+                'type' => $message->type,
+                'created_at' => $message->created_at?->timezone('Africa/Algiers')->toIso8601String(),
+            ])->all()
+            : [];
+
+        $takenThreadIds = Ticket::query()
+            ->forWorkspace($workspace)
+            ->whereNotNull('thread_id')
+            ->whereKeyNot($ticket->id)
+            ->pluck('thread_id');
+
+        $attachable = Thread::query()
+            ->forWorkspace($workspace)
+            ->where('contact_id', $ticket->contact_id)
+            ->when($takenThreadIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $takenThreadIds))
+            ->with('channel')
+            ->latest('last_message_at')
+            ->limit(20)
+            ->get()
+            ->map(fn (Thread $thread) => [
+                'id' => $thread->id,
+                'subject' => $thread->subject,
+                'channel' => $thread->channel?->name,
+            ])
+            ->all();
+
+        $quotes = $ticket->deal?->quotes?->map(fn ($quote) => [
+            'id' => $quote->id,
+            'status' => $quote->status,
+            'total_cents' => $quote->total_cents,
+        ])->values()->all() ?? [];
+
+        return Inertia::render('crm/tickets/show', [
+            'ticket' => $ticket->presentRecord(),
+            'path' => TicketPath::present($ticket),
+            'askEvo' => $insight->forTicket($ticket),
+            'thread' => $ticket->thread ? [
+                'id' => $ticket->thread->id,
+                'subject' => $ticket->thread->subject,
+                'channel' => $ticket->thread->channel?->name,
+            ] : null,
+            'messages' => $messages,
+            'attachableThreads' => $attachable,
+            'members' => $hub->members($workspace),
+            'associations' => [
+                'contact' => $ticket->contact ? [
+                    'id' => $ticket->contact->id,
+                    'first_name' => $ticket->contact->first_name,
+                    'last_name' => $ticket->contact->last_name,
+                    'email' => $ticket->contact->email,
+                    'phone_e164' => $ticket->contact->phone_e164,
+                ] : null,
+                'company' => $ticket->company ? ['id' => $ticket->company->id, 'name' => $ticket->company->name] : null,
+                'deal' => $ticket->deal ? ['id' => $ticket->deal->id, 'title' => $ticket->deal->title] : null,
+                'quotes' => $quotes,
+            ],
+        ]);
+    }
+
+    public function update(Request $request, Ticket $ticket): RedirectResponse
+    {
+        abort_unless((int) $ticket->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        if ($request->exists('owner_id') && $request->input('owner_id') === '') {
+            $request->merge(['owner_id' => null]);
+        }
+
+        if ($request->exists('deal_id') && $request->input('deal_id') === '') {
+            $request->merge(['deal_id' => null]);
+        }
+
+        $data = $request->validate([
+            'subject' => ['sometimes', 'required', 'string', 'max:180'],
+            'priority' => ['sometimes', 'nullable', 'in:low,medium,high'],
+            'status' => ['sometimes', 'nullable', 'in:'.implode(',', Ticket::STATUSES)],
+            'owner_id' => ['sometimes', 'nullable', 'integer'],
+            'deal_id' => ['sometimes', 'nullable', 'integer'],
+        ]);
+
+        if (isset($data['status'])) {
+            $from = (string) $ticket->status;
+            $ticket->moveTo($data['status']);
+            $this->logStatus($ticket, $request, $from);
+            unset($data['status']);
+        }
+
+        if (array_key_exists('owner_id', $data)) {
+            $ownerId = $data['owner_id'];
+            unset($data['owner_id']);
+            if ($ownerId) {
+                $owner = User::query()->where('workspace_id', $ticket->workspace_id)->findOrFail($ownerId);
+                $data['owner_id'] = $owner->id;
+            } else {
+                $data['owner_id'] = null;
+            }
+        }
+
+        if (array_key_exists('deal_id', $data)) {
+            $dealId = $data['deal_id'];
+            if ($dealId) {
+                $deal = Deal::query()->forWorkspace($request->user()->workspace)->findOrFail($dealId);
+                $data['deal_id'] = $deal->id;
+            }
+        }
+
+        if ($data !== []) {
+            $ticket->forceFill($data + ['last_activity_at' => now()])->save();
+        }
+
+        return back();
+    }
+
+    public function attachThread(Request $request, Ticket $ticket): RedirectResponse
+    {
+        abort_unless((int) $ticket->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'thread_id' => ['required', 'integer'],
+        ]);
+
+        $thread = Thread::query()
+            ->forWorkspace($request->user()->workspace)
+            ->where('contact_id', $ticket->contact_id)
+            ->findOrFail($data['thread_id']);
+
+        $taken = Ticket::query()
+            ->forWorkspace($request->user()->workspace)
+            ->where('thread_id', $thread->id)
+            ->whereKeyNot($ticket->id)
+            ->exists();
+
+        abort_if($taken, 422, 'That Desk thread already has a ticket.');
+
+        $ticket->forceFill([
+            'thread_id' => $thread->id,
+            'channel' => $ticket->channel === Ticket::CHANNEL_MANUAL
+                ? Ticket::CHANNEL_WHATSAPP_CLOUD
+                : $ticket->channel,
+            'last_activity_at' => now(),
+        ])->save();
 
         return back();
     }
@@ -182,5 +348,34 @@ class TicketController extends Controller
         if ($request->boolean('unanswered')) {
             $query->whereNull('first_response_at');
         }
+    }
+
+    protected function logStatus(Ticket $ticket, Request $request, string $from): void
+    {
+        if ($from === (string) $ticket->status) {
+            return;
+        }
+
+        $this->logActivity(
+            $ticket,
+            $request,
+            'ticket_status',
+            $ticket->number.' → '.Ticket::statusLabel((string) $ticket->status),
+        );
+    }
+
+    protected function logActivity(Ticket $ticket, Request $request, string $type, string $subject): void
+    {
+        Activity::query()->create([
+            'workspace_id' => $ticket->workspace_id,
+            'contact_id' => $ticket->contact_id,
+            'deal_id' => $ticket->deal_id,
+            'company_id' => $ticket->company_id,
+            'type' => $type,
+            'subject' => $subject,
+            'owner_id' => $request->user()->id,
+            'actor_id' => $request->user()->id,
+            'meta' => ['ticket_id' => $ticket->id],
+        ]);
     }
 }

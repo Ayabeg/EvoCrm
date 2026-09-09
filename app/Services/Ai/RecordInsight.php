@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
+use App\Models\Ticket;
 use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Models\User;
@@ -66,6 +67,50 @@ class RecordInsight
         $lead->loadMissing(['contact', 'latestScore']);
 
         return $this->present('lead', $lead->id, $this->summarizeLead($lead));
+    }
+
+    /**
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     */
+    public function forTicket(Ticket $ticket): array
+    {
+        $ticket->loadMissing(['contact', 'company', 'deal', 'owner']);
+
+        return $this->present('ticket', $ticket->id, $this->summarizeTicket($ticket));
+    }
+
+    /**
+     * @return array{answer: string, source: string, summary: string}
+     */
+    public function askTicket(Ticket $ticket, string $question): array
+    {
+        $ticket->loadMissing(['contact', 'company', 'deal', 'owner']);
+        $summary = $this->summarizeTicket($ticket);
+        $facts = $this->ticketFacts($ticket);
+        $activities = $ticket->contact
+            ? $this->retrieveRelevantActivities($ticket->contact, $question)
+            : collect();
+
+        $stub = $this->stubAnswer($question, $facts, $summary, $activities);
+        $live = $this->llm->complete($this->systemPrompt(), $this->userPrompt('ticket', $facts, $activities, $question, $summary));
+
+        $answer = $live['text'] ?? $stub;
+        $source = $live['source'] ?? 'fields';
+
+        AiInsight::query()->create([
+            'workspace_id' => $ticket->workspace_id,
+            'subject_type' => 'ticket',
+            'subject_id' => $ticket->id,
+            'question' => trim($question),
+            'answer' => $answer,
+            'source' => $source,
+        ]);
+
+        return [
+            'answer' => $answer,
+            'source' => $source,
+            'summary' => $summary,
+        ];
     }
 
     /**
@@ -153,6 +198,41 @@ class RecordInsight
         }
 
         return array_filter($facts);
+    }
+
+    public function summarizeTicket(Ticket $ticket): string
+    {
+        $facts = $this->ticketFacts($ticket);
+
+        return implode(' · ', array_filter([
+            $facts['Number'] ?? 'Ticket',
+            $facts['Subject'] ?? null,
+            isset($facts['Status']) ? 'status '.$facts['Status'] : null,
+            isset($facts['Contact']) ? $facts['Contact'] : null,
+            isset($facts['Channel']) ? $facts['Channel'] : null,
+        ])).'.';
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function ticketFacts(Ticket $ticket): array
+    {
+        $contact = $ticket->contact;
+
+        return array_filter([
+            'Number' => (string) $ticket->number,
+            'Subject' => (string) $ticket->subject,
+            'Status' => Ticket::statusLabel((string) $ticket->status),
+            'Priority' => (string) $ticket->priority,
+            'Channel' => Ticket::CHANNEL_LABELS[$ticket->channel] ?? (string) $ticket->channel,
+            'Contact' => $contact
+                ? trim($contact->first_name.' '.($contact->last_name ?? ''))
+                : '',
+            'Company' => (string) ($ticket->company?->name ?? ''),
+            'Owner' => (string) ($ticket->owner?->name ?? 'Unassigned'),
+            'Deal' => (string) ($ticket->deal?->title ?? ''),
+        ]);
     }
 
     /**
@@ -706,7 +786,7 @@ class RecordInsight
             'City' => ['town'],
             'Wilaya' => ['province', 'region'],
             'Company' => ['account', 'organisation', 'organization'],
-            'Owner' => ['assignee', 'assigned'],
+            'Owner' => ['assignee', 'assigned', 'owns'],
             'Deals' => ['pipeline', 'opportunity'],
             'Title' => ['deal name', 'name'],
             'Stage' => ['status', 'step'],
@@ -718,6 +798,11 @@ class RecordInsight
             'Domain' => ['website', 'url'],
             'Industry' => ['sector', 'vertical'],
             'Contacts' => ['people', 'team'],
+            'Number' => ['case', 'ticket number'],
+            'Subject' => ['about'],
+            'Status' => ['state'],
+            'Priority' => ['urgency'],
+            'Channel' => ['whatsapp'],
             default => [],
         };
     }

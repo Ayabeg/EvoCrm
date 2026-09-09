@@ -14,6 +14,7 @@ export function RecordPath({
     onComplete,
     completeLabel = 'Mark Status as Complete',
     disabled = false,
+    label = 'Lead path',
 }: {
     steps: PathStep[];
     current: string;
@@ -21,6 +22,7 @@ export function RecordPath({
     onComplete?: () => void;
     completeLabel?: string;
     disabled?: boolean;
+    label?: string;
 }) {
     const currentIndex = steps.findIndex((step) => step.key === current);
     const isComplete = currentIndex === steps.length - 1;
@@ -29,7 +31,7 @@ export function RecordPath({
         <div className="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center">
             <ol
                 className="flex min-w-0 flex-1 overflow-x-auto"
-                aria-label="Lead path"
+                aria-label={label}
             >
                 {steps.map((step, index) => {
                     const state =

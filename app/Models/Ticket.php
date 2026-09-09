@@ -233,4 +233,16 @@ class Ticket extends Model
             'url' => '/crm/tickets/'.$this->id,
         ];
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function presentRecord(): array
+    {
+        return array_merge($this->present(), [
+            'thread_id' => $this->thread_id,
+            'deal' => $this->deal ? ['id' => $this->deal->id, 'title' => $this->deal->title] : null,
+            'resolved_at' => $this->resolved_at?->timezone('Africa/Algiers')->toIso8601String(),
+        ]);
+    }
 }

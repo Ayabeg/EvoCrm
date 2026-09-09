@@ -246,6 +246,10 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/tickets/board', [TicketController::class, 'board'])->name('crm.tickets.board');
     Route::post('/crm/tickets', [TicketController::class, 'store'])->name('crm.tickets.store');
     Route::post('/crm/tickets/{ticket}/move', [TicketController::class, 'move'])->name('crm.tickets.move');
+    Route::post('/crm/tickets/{ticket}/ask', [AskEvoController::class, 'ticket'])->name('crm.tickets.ask');
+    Route::post('/crm/tickets/{ticket}/thread', [TicketController::class, 'attachThread'])->name('crm.tickets.thread');
+    Route::get('/crm/tickets/{ticket}', [TicketController::class, 'show'])->name('crm.tickets.show');
+    Route::put('/crm/tickets/{ticket}', [TicketController::class, 'update'])->name('crm.tickets.update');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
     Route::get('/ads/attribution', [AdsCenterController::class, 'attribution'])->name('ads.attribution');
