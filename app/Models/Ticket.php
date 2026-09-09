@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ChannelType;
 use App\Models\Concerns\BelongsToWorkspace;
+use App\Support\TicketSla;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -110,6 +111,10 @@ class Ticket extends Model
 
             if (! $ticket->number) {
                 $ticket->number = self::nextNumber((int) $ticket->workspace_id);
+            }
+
+            if (! $ticket->sla_due_at && $ticket->status !== self::STATUS_CLOSED) {
+                $ticket->sla_due_at = TicketSla::dueAt($ticket->priority);
             }
         });
     }
@@ -294,11 +299,27 @@ class Ticket extends Model
             throw new InvalidArgumentException('Unknown ticket status.');
         }
 
-        $this->forceFill([
+        $from = (string) $this->status;
+        $payload = [
             'status' => $status,
             'last_activity_at' => now(),
             'resolved_at' => $status === self::STATUS_CLOSED ? now() : null,
-        ])->save();
+        ];
+
+        if ($status !== self::STATUS_CLOSED && $from === self::STATUS_CLOSED) {
+            $payload['sla_due_at'] = TicketSla::dueAt($this->priority);
+        }
+
+        $this->forceFill($payload)->save();
+    }
+
+    public function refreshSla(): void
+    {
+        if (! $this->isOpen() || $this->first_response_at) {
+            return;
+        }
+
+        $this->sla_due_at = TicketSla::dueAt($this->priority);
     }
 
     public static function statusLabel(string $status): string
@@ -325,6 +346,8 @@ class Ticket extends Model
             'created_at' => $this->created_at?->timezone('Africa/Algiers')->toIso8601String(),
             'last_activity_at' => $this->last_activity_at?->timezone('Africa/Algiers')->toIso8601String(),
             'sla_due_at' => $this->sla_due_at?->timezone('Africa/Algiers')->toIso8601String(),
+            'sla_label' => TicketSla::label($this),
+            'sla_breached' => TicketSla::state($this) === 'breached',
             'contact' => $contact ? [
                 'id' => $contact->id,
                 'first_name' => $contact->first_name,
@@ -373,9 +396,7 @@ class Ticket extends Model
      */
     public function presentBoard(): array
     {
-        $inactiveDays = $this->last_activity_at
-            ? (int) $this->last_activity_at->diffInDays(now())
-            : null;
+        $inactiveDays = $this->inactiveDays();
 
         return [
             'id' => $this->id,
@@ -390,8 +411,23 @@ class Ticket extends Model
             'owner_name' => $this->owner?->name,
             'inactive_days' => $inactiveDays,
             'is_inactive' => $inactiveDays !== null && $inactiveDays >= 2,
+            'sla_due_at' => $this->sla_due_at?->timezone('Africa/Algiers')->toIso8601String(),
+            'sla_label' => TicketSla::label($this),
+            'sla_breached' => TicketSla::state($this) === 'breached',
             'url' => '/crm/tickets/'.$this->id,
         ];
+    }
+
+    public function inactiveDays(): ?int
+    {
+        if (! $this->last_activity_at) {
+            return null;
+        }
+
+        $from = $this->last_activity_at->timezone('Africa/Algiers')->startOfDay();
+        $to = now('Africa/Algiers')->startOfDay();
+
+        return max(0, (int) $from->diffInDays($to, false));
     }
 
     /**

@@ -36,6 +36,8 @@ type BoardTicket = {
     owner_name: string | null;
     inactive_days?: number | null;
     is_inactive?: boolean;
+    sla_label?: string | null;
+    sla_breached?: boolean;
     url: string;
 };
 
@@ -52,9 +54,10 @@ function TicketCard({
 }) {
     const association = ticket.company_name || ticket.contact_name || 'No company';
     const inactiveLabel =
-        ticket.inactive_days == null
-            ? 'No activity'
-            : `No activity for ${ticket.inactive_days} day${ticket.inactive_days === 1 ? '' : 's'}`;
+        ticket.inactive_days && ticket.inactive_days >= 1
+            ? `Inactive for ${ticket.inactive_days} day${ticket.inactive_days === 1 ? '' : 's'}`
+            : null;
+    const showSla = ticket.status !== 'closed' && Boolean(ticket.sla_label) && ticket.sla_label !== '—';
 
     return (
         <PipelineKanbanCard
@@ -84,7 +87,26 @@ function TicketCard({
             </div>
             <p className="mt-0.5 truncate text-[11px] tabular-nums text-mute">{ticket.number}</p>
             <p className="mt-0.5 truncate text-[11px] text-mute">{association}</p>
-            <p className="mt-1 text-[11px] text-mute">{inactiveLabel}</p>
+            {inactiveLabel ? (
+                <p
+                    className={cn(
+                        'mt-1 text-[11px]',
+                        ticket.is_inactive ? 'font-medium text-ink' : 'text-mute',
+                    )}
+                >
+                    {inactiveLabel}
+                </p>
+            ) : null}
+            {showSla ? (
+                <p
+                    className={cn(
+                        'mt-0.5 text-[11px]',
+                        ticket.sla_breached ? 'font-medium text-ink' : 'text-mute',
+                    )}
+                >
+                    SLA {ticket.sla_label}
+                </p>
+            ) : null}
             <p className="mt-0.5 truncate text-[11px] text-mute">
                 {ticket.owner_name ?? 'Unassigned'}
             </p>

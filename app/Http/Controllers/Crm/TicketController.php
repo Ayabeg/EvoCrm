@@ -13,6 +13,7 @@ use App\Services\Ai\RecordInsight;
 use App\Services\Crm\CrmFilter;
 use App\Support\CrmHub;
 use App\Support\TicketPath;
+use App\Support\TicketSla;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -251,6 +252,13 @@ class TicketController extends Controller
             'owner_id' => ['sometimes', 'nullable', 'integer'],
             'deal_id' => ['sometimes', 'nullable', 'integer'],
         ]);
+
+        if (isset($data['priority'])
+            && (string) $data['priority'] !== (string) $ticket->priority
+            && $ticket->isOpen()
+            && ! $ticket->first_response_at) {
+            $data['sla_due_at'] = TicketSla::dueAt($data['priority']);
+        }
 
         if (isset($data['status'])) {
             $from = (string) $ticket->status;

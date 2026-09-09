@@ -58,6 +58,8 @@ type TicketRow = {
     channel_label?: string | null;
     created_at?: string | null;
     sla_due_at?: string | null;
+    sla_label?: string | null;
+    sla_breached?: boolean;
     contact?: { first_name: string; last_name?: string | null } | null;
     company?: { name: string } | null;
     owner?: { name: string } | null;
@@ -203,7 +205,7 @@ function renderTicketCell(columnId: string, row: TicketRow): string {
         case 'created_at':
             return formatDate(row.created_at);
         case 'sla_due_at':
-            return formatDate(row.sla_due_at, true);
+            return row.sla_label ?? formatDate(row.sla_due_at, true);
         default:
             return '—';
     }

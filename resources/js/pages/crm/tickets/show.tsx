@@ -36,6 +36,8 @@ type TicketRecord = {
     channel_label: string;
     created_at?: string | null;
     sla_due_at?: string | null;
+    sla_label?: string | null;
+    sla_breached?: boolean;
     thread_id?: number | null;
     contact?: { id: number; first_name: string; last_name?: string | null } | null;
     company?: { id: number; name: string } | null;
@@ -184,6 +186,10 @@ export default function TicketShow({
                                         <RecordFact
                                             label="Channel"
                                             value={ticket.channel_label}
+                                        />
+                                        <RecordFact
+                                            label="SLA"
+                                            value={ticket.sla_label ?? '—'}
                                         />
                                     </RecordFactList>
                                     <div className="space-y-3">

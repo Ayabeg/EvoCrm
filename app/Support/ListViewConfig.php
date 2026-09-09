@@ -51,7 +51,7 @@ class ListViewConfig
                 ['id' => 'company', 'label' => 'Company', 'defaultVisible' => false],
                 ['id' => 'owner', 'label' => 'Owner', 'defaultVisible' => true],
                 ['id' => 'created_at', 'label' => 'Create date', 'defaultVisible' => true],
-                ['id' => 'sla_due_at', 'label' => 'SLA', 'defaultVisible' => false],
+                ['id' => 'sla_due_at', 'label' => 'SLA', 'defaultVisible' => true],
             ],
             default => [],
         };
