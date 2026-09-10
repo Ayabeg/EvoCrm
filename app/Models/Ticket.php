@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ChannelType;
 use App\Models\Concerns\BelongsToWorkspace;
 use App\Support\TicketSla;
+use App\Services\Crm\TicketSlaWhatsApp;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -329,6 +330,7 @@ class Ticket extends Model
         }
 
         $this->forceFill(['sla_breached_at' => now()])->save();
+        app(TicketSlaWhatsApp::class)->notify($this);
 
         return true;
     }

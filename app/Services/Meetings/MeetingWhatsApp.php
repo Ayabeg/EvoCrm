@@ -15,6 +15,8 @@ class MeetingWhatsApp
 
     public const TEMPLATE_QUOTE = 'quote_accepted';
 
+    public const TEMPLATE_SLA = 'ticket_sla';
+
     public function __construct(private EvolutionCloudService $evolution) {}
 
     /**
