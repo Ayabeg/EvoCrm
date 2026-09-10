@@ -137,6 +137,11 @@ it('sends the Cloud quote_accepted template when WhatsApp Business is connected'
 
     $user = User::factory()->create();
     connectQuoteWhatsApp($user, Integration::PROVIDER_WHATSAPP_BUSINESS);
+    $user->workspace->forceFill([
+        'meeting_wa_templates' => array_merge($user->workspace->meetingWhatsAppConfig(), [
+            'quote' => 'evotechly_quote_accepted',
+        ]),
+    ])->save();
     publicQuote($user, ['public_token' => 'cloud-accept']);
 
     $this->post('/q/cloud-accept/accept')->assertRedirect();
@@ -144,7 +149,7 @@ it('sends the Cloud quote_accepted template when WhatsApp Business is connected'
     expect(Activity::query()->where('type', 'quote_accepted')->sole()->meta['whatsapp_confirm'] ?? null)->toBe('sent');
 
     Http::assertSent(fn ($request) => str_contains($request->url(), '/message/sendTemplate/')
-        && $request['name'] === 'quote_accepted'
+        && $request['name'] === 'evotechly_quote_accepted'
         && $request['language'] === 'fr'
         && $request['number'] === '213550123456');
     Http::assertNotSent(fn ($request) => str_contains($request->url(), '/message/sendText/'));

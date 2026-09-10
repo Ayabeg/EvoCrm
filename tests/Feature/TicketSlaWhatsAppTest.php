@@ -92,6 +92,11 @@ it('sends the Cloud ticket_sla template when WhatsApp Business is connected', fu
 
     $user = User::factory()->create();
     connectSlaWhatsApp($user, Integration::PROVIDER_WHATSAPP_BUSINESS);
+    $user->workspace->forceFill([
+        'meeting_wa_templates' => array_merge($user->workspace->meetingWhatsAppConfig(), [
+            'sla' => 'evotechly_ticket_sla',
+        ]),
+    ])->save();
     $ticket = slaTicket($user);
 
     $this->travelTo(Carbon::parse('2026-09-08 19:00:00', 'Africa/Algiers'));
@@ -102,7 +107,7 @@ it('sends the Cloud ticket_sla template when WhatsApp Business is connected', fu
     expect($row->meta['whatsapp_sla'] ?? null)->toBe('sent');
 
     Http::assertSent(fn ($request) => str_contains($request->url(), '/message/sendTemplate/')
-        && $request['name'] === 'ticket_sla'
+        && $request['name'] === 'evotechly_ticket_sla'
         && $request['language'] === 'fr'
         && $request['number'] === '213550123456');
     Http::assertNotSent(fn ($request) => str_contains($request->url(), '/message/sendText/'));

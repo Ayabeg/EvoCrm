@@ -17,6 +17,8 @@ it('shows default Cloud template names on the meetings settings page', function 
             ->component('settings/meetings')
             ->where('whatsapp.booked', 'meeting_booked')
             ->where('whatsapp.reminder', 'meeting_reminder')
+            ->where('whatsapp.quote', 'quote_accepted')
+            ->where('whatsapp.sla', 'ticket_sla')
             ->where('whatsapp.language', 'fr')
             ->where('whatsapp_cloud_connected', false)
         );
@@ -36,6 +38,8 @@ it('saves Meta-approved template names on the workspace', function () {
             'weekdays' => [1, 2, 3, 4, 5],
             'whatsapp_booked_template' => 'evotechly_meeting_booked',
             'whatsapp_reminder_template' => 'evotechly_meeting_reminder',
+            'whatsapp_quote_template' => 'evotechly_quote_accepted',
+            'whatsapp_sla_template' => 'evotechly_ticket_sla',
             'whatsapp_template_language' => 'ar',
         ])
         ->assertRedirect();
@@ -44,9 +48,43 @@ it('saves Meta-approved template names on the workspace', function () {
 
     expect($user->workspace->meetingTemplateName('meeting_booked'))->toBe('evotechly_meeting_booked')
         ->and($user->workspace->meetingTemplateName('meeting_reminder'))->toBe('evotechly_meeting_reminder')
-        ->and($user->workspace->meetingTemplateName('quote_accepted'))->toBe('quote_accepted')
-        ->and($user->workspace->meetingTemplateName('ticket_sla'))->toBe('ticket_sla')
+        ->and($user->workspace->meetingTemplateName('quote_accepted'))->toBe('evotechly_quote_accepted')
+        ->and($user->workspace->meetingTemplateName('ticket_sla'))->toBe('evotechly_ticket_sla')
         ->and($user->workspace->meetingTemplateLanguage())->toBe('ar');
+});
+
+it('keeps quote and SLA template names when only booked is posted', function () {
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+
+    $user->workspace->forceFill([
+        'meeting_wa_templates' => [
+            'booked' => 'meeting_booked',
+            'reminder' => 'meeting_reminder',
+            'quote' => 'evotechly_quote_accepted',
+            'sla' => 'evotechly_ticket_sla',
+            'language' => 'fr',
+        ],
+    ])->save();
+
+    $this->actingAs($user)
+        ->put('/settings/meetings', [
+            'slug' => $schedule->slug,
+            'enabled' => '1',
+            'slot_minutes' => 30,
+            'work_start' => '09:00',
+            'work_end' => '17:00',
+            'weekdays' => [1, 2, 3, 4, 5],
+            'whatsapp_booked_template' => 'evotechly_meeting_booked',
+            'whatsapp_template_language' => 'fr',
+        ])
+        ->assertRedirect();
+
+    $user->workspace->refresh();
+
+    expect($user->workspace->meetingTemplateName('meeting_booked'))->toBe('evotechly_meeting_booked')
+        ->and($user->workspace->meetingTemplateName('quote_accepted'))->toBe('evotechly_quote_accepted')
+        ->and($user->workspace->meetingTemplateName('ticket_sla'))->toBe('evotechly_ticket_sla');
 });
 
 it('sends the workspace Cloud template name on booking', function () {

@@ -45,6 +45,8 @@ class MeetingScheduleController extends Controller
             'intro' => ['nullable', 'string', 'max:180'],
             'whatsapp_booked_template' => ['nullable', 'string', 'max:512', 'regex:/^[A-Za-z0-9_]*$/'],
             'whatsapp_reminder_template' => ['nullable', 'string', 'max:512', 'regex:/^[A-Za-z0-9_]*$/'],
+            'whatsapp_quote_template' => ['nullable', 'string', 'max:512', 'regex:/^[A-Za-z0-9_]*$/'],
+            'whatsapp_sla_template' => ['nullable', 'string', 'max:512', 'regex:/^[A-Za-z0-9_]*$/'],
             'whatsapp_template_language' => ['nullable', 'string', Rule::in(['fr', 'ar', 'en'])],
         ]);
 
@@ -66,6 +68,8 @@ class MeetingScheduleController extends Controller
 
         if ($request->exists('whatsapp_booked_template')
             || $request->exists('whatsapp_reminder_template')
+            || $request->exists('whatsapp_quote_template')
+            || $request->exists('whatsapp_sla_template')
             || $request->exists('whatsapp_template_language')) {
             $current = $user->workspace->meetingWhatsAppConfig();
             $user->workspace->forceFill([
@@ -76,8 +80,12 @@ class MeetingScheduleController extends Controller
                     'reminder' => $request->exists('whatsapp_reminder_template')
                         ? strtolower(trim((string) ($data['whatsapp_reminder_template'] ?? '')))
                         : $current['reminder'],
-                    'quote' => $current['quote'],
-                    'sla' => $current['sla'],
+                    'quote' => $request->exists('whatsapp_quote_template')
+                        ? strtolower(trim((string) ($data['whatsapp_quote_template'] ?? '')))
+                        : $current['quote'],
+                    'sla' => $request->exists('whatsapp_sla_template')
+                        ? strtolower(trim((string) ($data['whatsapp_sla_template'] ?? '')))
+                        : $current['sla'],
                     'language' => $data['whatsapp_template_language'] ?? $current['language'],
                 ],
             ])->save();

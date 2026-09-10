@@ -22,6 +22,8 @@ type Schedule = {
 type WhatsAppTemplates = {
     booked: string;
     reminder: string;
+    quote: string;
+    sla: string;
     language: string;
 };
 
@@ -186,6 +188,26 @@ export default function MeetingSettings({
                                 />
                             </div>
                             <div>
+                                <Label htmlFor="wa-quote">Quote accepted template</Label>
+                                <Input
+                                    id="wa-quote"
+                                    name="whatsapp_quote_template"
+                                    defaultValue={whatsapp.quote}
+                                    className="mt-1"
+                                    placeholder="quote_accepted"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="wa-sla">Ticket SLA template</Label>
+                                <Input
+                                    id="wa-sla"
+                                    name="whatsapp_sla_template"
+                                    defaultValue={whatsapp.sla}
+                                    className="mt-1"
+                                    placeholder="ticket_sla"
+                                />
+                            </div>
+                            <div>
                                 <Label htmlFor="wa-lang">Language</Label>
                                 <select
                                     id="wa-lang"
@@ -201,8 +223,14 @@ export default function MeetingSettings({
                             <div className="rounded-md bg-canvas-soft p-3 text-[12px] text-mute">
                                 <p className="font-medium text-ink">Meta body variables</p>
                                 <p className="mt-1">
-                                    {'{{1}}'} guest first name · {'{{2}}'} host name · {'{{3}}'} when
-                                    (Africa/Algiers)
+                                    Booked / reminder: {'{{1}}'} guest first name · {'{{2}}'} host name ·{' '}
+                                    {'{{3}}'} when (Africa/Algiers)
+                                </p>
+                                <p className="mt-1">
+                                    Quote: {'{{1}}'} first name · {'{{2}}'} amount · {'{{3}}'} quote id
+                                </p>
+                                <p className="mt-1">
+                                    SLA: {'{{1}}'} first name · {'{{2}}'} ticket number
                                 </p>
                                 <p className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-ink">
                                     {`Salaam {{1}} — {{2}} confirmed your meeting.\n{{3}}`}
