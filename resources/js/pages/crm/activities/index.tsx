@@ -33,12 +33,15 @@ function relatedHref(activity: Activity): string | null {
     if (activity.deal) {
         return `/crm/deals/${activity.deal.id}`;
     }
+
     if (activity.contact) {
         return `/crm/contacts/${activity.contact.id}`;
     }
+
     if (activity.company) {
         return `/crm/companies/${activity.company.id}`;
     }
+
     return null;
 }
 
@@ -66,8 +69,8 @@ export default function ActivitiesIndex({
     };
 
     return (
-        <CrmShell title="Activities" chrome="workspace">
-            <div className="flex h-full min-h-0 flex-col bg-canvas text-[13px] text-ink">
+        <CrmShell title="Activities">
+            <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
                 <CrmListHeader
                     title="Activities"
                     views={[]}
@@ -162,11 +165,20 @@ export default function ActivitiesIndex({
                                     return (
                                         <tr
                                             key={activity.id}
-                                            className={href ? 'cursor-pointer border-b border-hairline hover:bg-canvas-soft' : 'border-b border-hairline'}
-                                            onClick={() => {
-                                                if (href) {
-                                                    router.visit(href);
+                                            className="border-b border-hairline hover:bg-canvas-soft"
+                                            style={href ? { cursor: 'pointer' } : undefined}
+                                            onClick={(event) => {
+                                                if (!href) {
+                                                    return;
                                                 }
+
+                                                const target = event.target as HTMLElement;
+
+                                                if (target.closest('a, input, button, label, form')) {
+                                                    return;
+                                                }
+
+                                                router.visit(href);
                                             }}
                                         >
                                             <td className="px-4 py-1.5 sm:px-6">
@@ -188,7 +200,6 @@ export default function ActivitiesIndex({
                                                     <Link
                                                         href={`/crm/deals/${activity.deal.id}`}
                                                         className="text-ink hover:underline"
-                                                        onClick={(event) => event.stopPropagation()}
                                                     >
                                                         {activity.deal.title}
                                                     </Link>
@@ -196,7 +207,6 @@ export default function ActivitiesIndex({
                                                     <Link
                                                         href={`/crm/contacts/${activity.contact.id}`}
                                                         className="text-ink hover:underline"
-                                                        onClick={(event) => event.stopPropagation()}
                                                     >
                                                         {contactName(activity.contact)}
                                                     </Link>
@@ -204,7 +214,6 @@ export default function ActivitiesIndex({
                                                     <Link
                                                         href={`/crm/companies/${activity.company.id}`}
                                                         className="text-ink hover:underline"
-                                                        onClick={(event) => event.stopPropagation()}
                                                     >
                                                         {activity.company.name}
                                                     </Link>
@@ -220,10 +229,7 @@ export default function ActivitiesIndex({
                                                     ? (activity.completed_at ?? 'Done')
                                                     : (activity.due_at ?? '—')}
                                             </td>
-                                            <td
-                                                className="px-4 py-1.5 text-right sm:pr-6"
-                                                onClick={(event) => event.stopPropagation()}
-                                            >
+                                            <td className="px-4 py-1.5 text-right sm:pr-6">
                                                 {activity.type === 'meeting' ? (
                                                     <div className="flex justify-end">
                                                         <MeetingAttendanceButtons
@@ -238,7 +244,7 @@ export default function ActivitiesIndex({
                                                     >
                                                         <button
                                                             type="submit"
-                                                            className="text-[13px] text-ink hover:underline"
+                                                            className="text-[12px] text-brand hover:underline"
                                                         >
                                                             Done
                                                         </button>

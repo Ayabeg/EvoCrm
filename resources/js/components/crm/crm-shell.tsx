@@ -6,7 +6,7 @@ import type { RoomTab } from '@/components/crm/room-shell';
 const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
         label: 'Home',
-        href: '/home',
+        href: '/dashboard',
         match: (pathname) =>
             pathname === '/home' || pathname === '/' || pathname === '/dashboard',
     },

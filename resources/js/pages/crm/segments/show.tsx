@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     CrmObjectHeader,
     CrmObjectSecondaryLink,
@@ -80,7 +80,16 @@ export default function SegmentShow({
                                     {history.map((row) => (
                                         <tr
                                             key={row.id}
-                                            className="border-b border-hairline hover:bg-canvas-soft"
+                                            className="cursor-pointer border-b border-hairline hover:bg-canvas-soft"
+                                            onClick={(event) => {
+                                                const target = event.target as HTMLElement;
+
+                                                if (target.closest('a, input, button, label')) {
+                                                    return;
+                                                }
+
+                                                router.visit(`/crm/contacts/${row.contact_id}`);
+                                            }}
                                         >
                                             <td className="px-4 py-1.5 sm:px-6">
                                                 <Link

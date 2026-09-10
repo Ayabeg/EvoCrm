@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { RecordBack } from '@/components/crm/record-chrome';
 
@@ -25,13 +25,13 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
                     <RecordBack href="/crm/contacts" label="Contacts" />
                     <div>
                         <h1 className="text-page-title text-ink">Duplicate contacts</h1>
-                        <p className="mt-1 text-ui text-muted-foreground">
+                        <p className="mt-1 text-[13px] text-mute">
                             Groups share a normalized email, phone, or imported external ID.
                         </p>
                     </div>
 
                     {groups.length === 0 ? (
-                        <p className="rounded-md border border-hairline px-4 py-6 text-ui text-muted-foreground">
+                        <p className="rounded-md border border-hairline px-4 py-6 text-[13px] text-mute">
                             No duplicate groups in this workspace.
                         </p>
                     ) : (
@@ -41,21 +41,33 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
 
                                 return (
                                     <li key={group.key} className="rounded-md border border-hairline">
-                                        <div className="border-b border-hairline bg-canvas-soft px-4 py-2 text-[12px] text-muted-foreground">
+                                        <div className="border-b border-hairline bg-canvas-soft px-4 py-2 text-[12px] text-mute">
                                             Same {group.reasons.join(', ')}
                                         </div>
                                         <ul className="divide-y divide-hairline">
                                             {group.contacts.map((contact) => (
-                                                <li key={contact.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                                                <li
+                                                    key={contact.id}
+                                                    className="flex cursor-pointer flex-wrap items-center justify-between gap-3 px-4 py-3 hover:bg-canvas-soft"
+                                                    onClick={(event) => {
+                                                        const target = event.target as HTMLElement;
+
+                                                        if (target.closest('a, input, button, label')) {
+                                                            return;
+                                                        }
+
+                                                        router.visit(`/crm/contacts/${contact.id}`);
+                                                    }}
+                                                >
                                                     <div>
-                                                        <p className="text-ui font-medium text-ink">{contact.display_name}</p>
-                                                        <p className="text-[12px] text-muted-foreground">
+                                                        <p className="text-[13px] font-medium text-ink">{contact.display_name}</p>
+                                                        <p className="text-[12px] text-mute">
                                                             {[contact.email, contact.phone_e164, contact.company]
                                                                 .filter(Boolean)
                                                                 .join(' · ') || 'No identity details'}
                                                         </p>
                                                     </div>
-                                                    <Link href={`/crm/contacts/${contact.id}`} className="text-[12px] font-medium text-brand">
+                                                    <Link href={`/crm/contacts/${contact.id}`} className="text-[12px] font-medium text-ink hover:underline">
                                                         Open
                                                     </Link>
                                                 </li>
@@ -67,7 +79,7 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
                                                     <Link
                                                         key={absorbed.id}
                                                         href={`/crm/contacts/merge/${survivor.id}/${absorbed.id}`}
-                                                        className="text-ui font-medium text-brand"
+                                                        className="text-[13px] font-medium text-brand"
                                                     >
                                                         Merge {absorbed.display_name} into {survivor.display_name}
                                                     </Link>
