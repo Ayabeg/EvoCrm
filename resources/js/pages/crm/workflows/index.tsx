@@ -20,6 +20,8 @@ type WorkflowRow = {
     name: string;
     trigger: string;
     trigger_stage: string | null;
+    trigger_status: string | null;
+    trigger_status_label: string | null;
     action: string;
     action_config: Record<string, unknown>;
     condition_field: string | null;
@@ -68,6 +70,9 @@ const triggerLabel: Record<string, string> = {
     'lead.scored': 'Lead scored',
     'lead.qualified': 'Lead qualified',
     'meeting.booked': 'Meeting booked',
+    'ticket.created': 'Ticket created',
+    'ticket.status_changed': 'Ticket status changed',
+    'ticket.sla_breached': 'Ticket SLA breached',
 };
 
 const actionLabel: Record<string, string> = {
@@ -391,6 +396,9 @@ export default function WorkflowsIndex({
                                             {workflow.trigger_stage
                                                 ? ` → ${workflow.trigger_stage}`
                                                 : ''}
+                                            {workflow.trigger_status_label
+                                                ? ` → ${workflow.trigger_status_label}`
+                                                : ''}
                                         </HairlineTd>
                                         <HairlineTd>
                                             <div>
@@ -537,6 +545,15 @@ export default function WorkflowsIndex({
                                     <option value="meeting.booked">
                                         Meeting booked
                                     </option>
+                                    <option value="ticket.created">
+                                        Ticket created
+                                    </option>
+                                    <option value="ticket.status_changed">
+                                        Ticket status changed
+                                    </option>
+                                    <option value="ticket.sla_breached">
+                                        Ticket SLA breached
+                                    </option>
                                 </NativeSelect>
                             </div>
                             {trigger === 'deal.stage_changed' ? (
@@ -548,6 +565,21 @@ export default function WorkflowsIndex({
                                                 {stage.name}
                                             </option>
                                         ))}
+                                    </NativeSelect>
+                                </div>
+                            ) : trigger === 'ticket.status_changed' ? (
+                                <div>
+                                    <FieldLabel>To status</FieldLabel>
+                                    <NativeSelect name="trigger_status">
+                                        <option value="">Any status</option>
+                                        <option value="new">New</option>
+                                        <option value="waiting_on_contact">
+                                            Waiting on contact
+                                        </option>
+                                        <option value="waiting_on_us">
+                                            Waiting on us
+                                        </option>
+                                        <option value="closed">Closed</option>
                                     </NativeSelect>
                                 </div>
                             ) : trigger === 'segment.entered' ||

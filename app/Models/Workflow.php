@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $trigger
  * @property int|null $trigger_stage_id
+ * @property string|null $trigger_status
  * @property string $action
  * @property array<string, mixed>|null $action_config
  * @property string|null $condition_field
@@ -35,6 +36,7 @@ use Illuminate\Support\Carbon;
     'trigger',
     'trigger_stage_id',
     'trigger_saved_filter_id',
+    'trigger_status',
     'action',
     'action_config',
     'condition_field',
@@ -71,6 +73,12 @@ class Workflow extends Model
 
     public const TRIGGER_MEETING_BOOKED = 'meeting.booked';
 
+    public const TRIGGER_TICKET_CREATED = 'ticket.created';
+
+    public const TRIGGER_TICKET_STATUS_CHANGED = 'ticket.status_changed';
+
+    public const TRIGGER_TICKET_SLA_BREACHED = 'ticket.sla_breached';
+
     public const ACTION_CREATE_TASK = 'create_task';
 
     public const ACTION_ENROLL_SEQUENCE = 'enroll_sequence';
@@ -90,6 +98,8 @@ class Workflow extends Model
     public const CONDITION_DEAL_AMOUNT = 'deal.amount';
 
     public const CONDITION_DEAL_STAGE = 'deal.stage';
+
+    public const CONDITION_TICKET_STATUS = 'ticket.status';
 
     public const OP_EQ = 'eq';
 
@@ -125,6 +135,9 @@ class Workflow extends Model
             self::TRIGGER_LEAD_SCORED,
             self::TRIGGER_LEAD_QUALIFIED,
             self::TRIGGER_MEETING_BOOKED,
+            self::TRIGGER_TICKET_CREATED,
+            self::TRIGGER_TICKET_STATUS_CHANGED,
+            self::TRIGGER_TICKET_SLA_BREACHED,
         ];
     }
 
@@ -173,6 +186,7 @@ class Workflow extends Model
         return [
             self::CONDITION_DEAL_AMOUNT,
             self::CONDITION_DEAL_STAGE,
+            self::CONDITION_TICKET_STATUS,
             'contact.wilaya',
             'contact.city',
             'contact.source',

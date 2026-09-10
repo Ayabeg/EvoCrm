@@ -6,12 +6,14 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Observers\CompanyObserver;
 use App\Observers\ContactObserver;
 use App\Observers\DealObserver;
 use App\Observers\LeadObserver;
+use App\Observers\TicketObserver;
 use App\Observers\WorkspaceObserver;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Connectors\FakeGoogleApiClient;
@@ -71,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         Contact::observe(ContactObserver::class);
         Deal::observe(DealObserver::class);
         Lead::observe(LeadObserver::class);
+        Ticket::observe(TicketObserver::class);
         Workspace::observe(WorkspaceObserver::class);
 
         app()->terminating(fn () => app(ProductAnalytics::class)->flush());

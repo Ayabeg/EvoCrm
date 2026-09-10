@@ -18,6 +18,7 @@ class WorkflowFactory extends Factory
             'name' => 'New Evotechly contact — first task',
             'trigger' => Workflow::TRIGGER_CONTACT_CREATED,
             'trigger_stage_id' => null,
+            'trigger_status' => null,
             'action' => Workflow::ACTION_CREATE_TASK,
             'action_config' => [
                 'subject' => 'Introduce Evotechly to {{contact}}',

@@ -11,6 +11,7 @@ use App\Models\Mailbox;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\Stage;
+use App\Models\Ticket;
 use App\Models\Workflow;
 use App\Models\WorkflowExecution;
 use App\Models\Workspace;
@@ -179,6 +180,34 @@ class WorkflowRunner
         $this->run($workspace, Workflow::TRIGGER_MEETING_BOOKED, $contact, $deal);
     }
 
+    public function handleTicketCreated(Ticket $ticket): void
+    {
+        $this->runTicketTrigger($ticket, Workflow::TRIGGER_TICKET_CREATED);
+    }
+
+    public function handleTicketStatusChanged(Ticket $ticket): void
+    {
+        $this->runTicketTrigger($ticket, Workflow::TRIGGER_TICKET_STATUS_CHANGED);
+    }
+
+    public function handleTicketSlaBreached(Ticket $ticket): void
+    {
+        $this->runTicketTrigger($ticket, Workflow::TRIGGER_TICKET_SLA_BREACHED);
+    }
+
+    private function runTicketTrigger(Ticket $ticket, string $trigger): void
+    {
+        $ticket->loadMissing(['workspace', 'contact', 'deal']);
+
+        $workspace = $ticket->workspace ?? Workspace::query()->find($ticket->workspace_id);
+
+        if (! $workspace instanceof Workspace) {
+            return;
+        }
+
+        $this->run($workspace, $trigger, $ticket->contact, $ticket->deal, $ticket);
+    }
+
     /**
      * Execute a scheduled workflow action (called by workflow:run).
      */
@@ -193,7 +222,7 @@ class WorkflowRunner
         $this->execute($workspace, $workflow, $contact, $deal);
     }
 
-    private function run(Workspace $workspace, string $trigger, ?Contact $contact, ?Deal $deal): void
+    private function run(Workspace $workspace, string $trigger, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
     {
         $workflows = Workflow::query()
             ->forWorkspace($workspace)
@@ -208,6 +237,12 @@ class WorkflowRunner
                 continue;
             }
 
+            if ($trigger === Workflow::TRIGGER_TICKET_STATUS_CHANGED
+                && filled($workflow->trigger_status)
+                && (string) $workflow->trigger_status !== (string) $ticket?->status) {
+                continue;
+            }
+
             try {
                 if ((int) ($workflow->delay_minutes ?? 0) > 0) {
                     $this->schedule($workspace, $workflow, $contact, $deal);
@@ -215,7 +250,7 @@ class WorkflowRunner
                     continue;
                 }
 
-                $this->execute($workspace, $workflow, $contact, $deal);
+                $this->execute($workspace, $workflow, $contact, $deal, $ticket);
             } catch (Throwable) {
                 // Record writes must not fail because a workflow action could not run.
             }
@@ -244,9 +279,9 @@ class WorkflowRunner
         ]);
     }
 
-    private function execute(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): void
+    private function execute(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
     {
-        $useThen = ! $workflow->hasCondition() || $this->conditionPasses($workspace, $workflow, $contact, $deal);
+        $useThen = ! $workflow->hasCondition() || $this->conditionPasses($workspace, $workflow, $contact, $deal, $ticket);
         $action = $useThen ? $workflow->action : $workflow->else_action;
         $config = $useThen ? $workflow->config() : $workflow->elseConfig();
 
@@ -255,14 +290,14 @@ class WorkflowRunner
         }
 
         match ($action) {
-            Workflow::ACTION_CREATE_TASK => $this->createTask($workspace, $workflow, $contact, $deal, $config),
+            Workflow::ACTION_CREATE_TASK => $this->createTask($workspace, $workflow, $contact, $deal, $config, $ticket),
             Workflow::ACTION_ENROLL_SEQUENCE => $this->enrollSequence($workspace, $config, $contact),
-            Workflow::ACTION_SEND_WEBHOOK => $this->sendWebhook($workflow, $config, $contact, $deal),
+            Workflow::ACTION_SEND_WEBHOOK => $this->sendWebhook($workflow, $config, $contact, $deal, $ticket),
             Workflow::ACTION_SET_PROPERTY => $this->setProperty($workspace, $config, $contact, $deal),
             Workflow::ACTION_ASSIGN_OWNER => $this->assignOwner($config, $contact, $deal),
             Workflow::ACTION_CREATE_DEAL => $this->createDeal($workspace, $config, $contact),
             Workflow::ACTION_SEND_EMAIL => $this->sendEmail($workspace, $config, $contact),
-            Workflow::ACTION_NOTIFY_USER => $this->notifyUser($workspace, $config, $contact, $deal),
+            Workflow::ACTION_NOTIFY_USER => $this->notifyUser($workspace, $config, $contact, $deal, $ticket),
             default => null,
         };
 
@@ -273,15 +308,16 @@ class WorkflowRunner
             'action' => $action,
             'contact_id' => $contact?->id,
             'deal_id' => $deal?->id,
+            'ticket_id' => $ticket?->id,
         ], null, $workspace);
     }
 
-    private function conditionPasses(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): bool
+    private function conditionPasses(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): bool
     {
-        return $workflow->compare($this->leftValue($workspace, $workflow, $contact, $deal));
+        return $workflow->compare($this->leftValue($workspace, $workflow, $contact, $deal, $ticket));
     }
 
-    private function leftValue(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): mixed
+    private function leftValue(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): mixed
     {
         $field = (string) $workflow->condition_field;
 
@@ -291,6 +327,10 @@ class WorkflowRunner
 
         if ($field === Workflow::CONDITION_DEAL_STAGE) {
             return $this->dealStageLeft($deal, (string) ($workflow->condition_value ?? ''));
+        }
+
+        if ($field === Workflow::CONDITION_TICKET_STATUS) {
+            return $ticket?->status;
         }
 
         if (str_starts_with($field, 'contact.attr.')) {
@@ -341,31 +381,34 @@ class WorkflowRunner
     /**
      * @param  array<string, mixed>  $config
      */
-    private function createTask(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, array $config): void
+    private function createTask(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, array $config, ?Ticket $ticket = null): void
     {
         $dueInDays = (int) ($config['due_in_days'] ?? 1);
 
         $this->activities->record($workspace, [
             'type' => 'task',
             'subject' => $this->interpolate(
-                (string) ($config['subject'] ?? $this->defaultTaskSubject($contact, $deal)),
+                (string) ($config['subject'] ?? $this->defaultTaskSubject($contact, $deal, $ticket)),
                 $contact,
                 $deal,
+                $ticket,
             ),
             'body' => $this->interpolate(
                 isset($config['body']) ? (string) $config['body'] : null,
                 $contact,
                 $deal,
+                $ticket,
             ),
             'due_at' => now()->addDays(max($dueInDays, 0)),
-            'owner_id' => $deal !== null ? $deal->owner_id : $contact?->owner_id,
+            'owner_id' => $ticket?->owner_id ?? ($deal !== null ? $deal->owner_id : $contact?->owner_id),
             'contact_id' => $contact?->id,
             'deal_id' => $deal?->id,
-            'company_id' => $deal !== null ? $deal->company_id : $contact?->company_id,
-            'meta' => [
+            'company_id' => $deal !== null ? $deal->company_id : ($ticket?->company_id ?? $contact?->company_id),
+            'meta' => array_filter([
                 'workflow_id' => $workflow->id,
                 'source' => 'workflow',
-            ],
+                'ticket_id' => $ticket?->id,
+            ]),
         ]);
     }
 
@@ -394,7 +437,7 @@ class WorkflowRunner
     /**
      * @param  array<string, mixed>  $config
      */
-    private function sendWebhook(Workflow $workflow, array $config, ?Contact $contact, ?Deal $deal): void
+    private function sendWebhook(Workflow $workflow, array $config, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
     {
         $url = trim((string) ($config['url'] ?? ''));
 
@@ -425,6 +468,13 @@ class WorkflowRunner
                     'currency' => $deal->currency,
                     'stage_id' => $deal->stage_id,
                 ] : null,
+                'ticket' => $ticket ? [
+                    'id' => $ticket->id,
+                    'number' => $ticket->number,
+                    'subject' => $ticket->subject,
+                    'status' => $ticket->status,
+                    'priority' => $ticket->priority,
+                ] : null,
             ]);
     }
 
@@ -439,8 +489,12 @@ class WorkflowRunner
         return in_array($scheme, ['http', 'https'], true);
     }
 
-    private function defaultTaskSubject(?Contact $contact, ?Deal $deal): string
+    private function defaultTaskSubject(?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): string
     {
+        if ($ticket) {
+            return 'Follow up on '.$ticket->number;
+        }
+
         if ($deal) {
             return 'Follow up on Evotechly deal';
         }
@@ -452,7 +506,7 @@ class WorkflowRunner
         return 'Evotechly follow-up';
     }
 
-    private function interpolate(?string $text, ?Contact $contact, ?Deal $deal): ?string
+    private function interpolate(?string $text, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): ?string
     {
         if ($text === null || $text === '') {
             return $text;
@@ -461,6 +515,7 @@ class WorkflowRunner
         return strtr($text, [
             '{{contact}}' => $contact?->displayName() ?: 'contact',
             '{{deal}}' => $deal?->title ?: 'deal',
+            '{{ticket}}' => $ticket?->number ?: 'ticket',
         ]);
     }
 
@@ -583,9 +638,9 @@ class WorkflowRunner
     /**
      * @param  array<string, mixed>  $config
      */
-    private function notifyUser(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal): void
+    private function notifyUser(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
     {
-        $userId = isset($config['user_id']) ? (int) $config['user_id'] : ($deal?->owner_id ?? $contact?->owner_id);
+        $userId = isset($config['user_id']) ? (int) $config['user_id'] : ($ticket?->owner_id ?? $deal?->owner_id ?? $contact?->owner_id);
 
         if (! $userId) {
             return;
@@ -598,8 +653,11 @@ class WorkflowRunner
             'owner_id' => $userId,
             'contact_id' => $contact?->id,
             'deal_id' => $deal?->id,
-            'company_id' => $deal?->company_id ?? $contact?->company_id,
-            'meta' => ['source' => 'workflow'],
+            'company_id' => $deal?->company_id ?? $ticket?->company_id ?? $contact?->company_id,
+            'meta' => array_filter([
+                'source' => 'workflow',
+                'ticket_id' => $ticket?->id,
+            ]),
         ]);
     }
 }
