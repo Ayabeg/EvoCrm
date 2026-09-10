@@ -22,11 +22,11 @@ export function CrmObjectHeader({
             data-crm="object-header"
         >
             <div className="min-w-0">
-                <h1 className="text-page-title font-semibold tracking-tight text-ink">
+                <h1 className="text-[15px] font-semibold tracking-tight text-ink">
                     {title}
                 </h1>
                 {description ? (
-                    <p className="mt-0.5 text-[11px] leading-4 text-mute">
+                    <p className="mt-0.5 text-[12px] leading-4 text-mute">
                         {description}
                     </p>
                 ) : null}
@@ -39,7 +39,9 @@ export function CrmObjectHeader({
                             type="button"
                             size="sm"
                             onClick={onPrimary}
-                            className={cn('h-8 shrink-0')}
+                            className={cn(
+                                'h-8 shrink-0 bg-[var(--evosales-mark)] text-white hover:bg-[var(--evosales-mark)]/90',
+                            )}
                         >
                             {primaryLabel}
                         </Button>
