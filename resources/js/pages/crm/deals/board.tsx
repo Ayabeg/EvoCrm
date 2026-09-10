@@ -375,6 +375,7 @@ export default function DealBoard({
                                         <PipelineKanbanHeader
                                             name={stage.name}
                                             count={stage.count}
+                                            amount={formatDzd(stage.amount_cents)}
                                             accent={stageUnderlineColor(
                                                 stage.slug,
                                             )}
