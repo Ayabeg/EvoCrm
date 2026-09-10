@@ -19,6 +19,12 @@ type Schedule = {
     calendar_connected: boolean;
 };
 
+type WhatsAppTemplates = {
+    booked: string;
+    reminder: string;
+    language: string;
+};
+
 const DAYS: { value: number; label: string }[] = [
     { value: 1, label: 'Mon' },
     { value: 2, label: 'Tue' },
@@ -29,7 +35,15 @@ const DAYS: { value: number; label: string }[] = [
     { value: 7, label: 'Sun' },
 ];
 
-export default function MeetingSettings({ schedule }: { schedule: Schedule }) {
+export default function MeetingSettings({
+    schedule,
+    whatsapp,
+    whatsapp_cloud_connected,
+}: {
+    schedule: Schedule;
+    whatsapp: WhatsAppTemplates;
+    whatsapp_cloud_connected: boolean;
+}) {
     return (
         <>
             <Head title="Meetings" />
@@ -141,6 +155,63 @@ export default function MeetingSettings({ schedule }: { schedule: Schedule }) {
                             />
                         </div>
                         <p className="text-[12px] text-mute">Timezone is always {schedule.timezone}.</p>
+
+                        <div className="grid gap-3 border-t border-hairline pt-3">
+                            <div>
+                                <p className="text-[13px] font-medium text-ink">WhatsApp Cloud templates</p>
+                                <p className="mt-1 text-[12px] text-mute">
+                                    {whatsapp_cloud_connected
+                                        ? 'WhatsApp Business is connected. Names must match templates approved in Meta.'
+                                        : 'Connect WhatsApp Business to send Cloud templates. Phone WhatsApp still sends free text.'}
+                                </p>
+                            </div>
+                            <div>
+                                <Label htmlFor="wa-booked">Booked template</Label>
+                                <Input
+                                    id="wa-booked"
+                                    name="whatsapp_booked_template"
+                                    defaultValue={whatsapp.booked}
+                                    className="mt-1"
+                                    placeholder="meeting_booked"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="wa-reminder">Reminder template</Label>
+                                <Input
+                                    id="wa-reminder"
+                                    name="whatsapp_reminder_template"
+                                    defaultValue={whatsapp.reminder}
+                                    className="mt-1"
+                                    placeholder="meeting_reminder"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="wa-lang">Language</Label>
+                                <select
+                                    id="wa-lang"
+                                    name="whatsapp_template_language"
+                                    defaultValue={whatsapp.language}
+                                    className="mt-1 h-9 w-full rounded-md border border-hairline bg-canvas px-2 text-sm"
+                                >
+                                    <option value="fr">French (fr)</option>
+                                    <option value="ar">Arabic (ar)</option>
+                                    <option value="en">English (en)</option>
+                                </select>
+                            </div>
+                            <div className="rounded-md bg-canvas-soft p-3 text-[12px] text-mute">
+                                <p className="font-medium text-ink">Meta body variables</p>
+                                <p className="mt-1">
+                                    {'{{1}}'} guest first name · {'{{2}}'} host name · {'{{3}}'} when
+                                    (Africa/Algiers)
+                                </p>
+                                <p className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-ink">
+                                    {`Salaam {{1}} — {{2}} confirmed your meeting.\n{{3}}`}
+                                </p>
+                                <p className="mt-2">
+                                    Leave a name empty to skip Cloud and use phone WhatsApp text instead.
+                                </p>
+                            </div>
+                        </div>
                         <Button type="submit">Save</Button>
                     </Form>
                 </Card>

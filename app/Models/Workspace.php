@@ -28,6 +28,7 @@ use Illuminate\Support\Carbon;
     'evolution_last_event',
     'lead_score_settings',
     'monthly_quota_cents',
+    'meeting_wa_templates',
 ])]
 class Workspace extends Model
 {
@@ -40,6 +41,7 @@ class Workspace extends Model
             'evolution_last_webhook_at' => 'datetime',
             'lead_score_settings' => 'array',
             'monthly_quota_cents' => 'integer',
+            'meeting_wa_templates' => 'array',
         ];
     }
 
@@ -67,6 +69,57 @@ class Workspace extends Model
     private function thresholdValue(mixed $value): int
     {
         return max(0, min(100, (int) $value));
+    }
+
+    /**
+     * Meta-approved Cloud template names for meeting confirm + reminder.
+     *
+     * @return array{booked: string, reminder: string, language: string}
+     */
+    public function meetingWhatsAppConfig(): array
+    {
+        $stored = is_array($this->meeting_wa_templates) ? $this->meeting_wa_templates : [];
+        $booked = array_key_exists('booked', $stored) ? $stored['booked'] : 'meeting_booked';
+        $reminder = array_key_exists('reminder', $stored) ? $stored['reminder'] : 'meeting_reminder';
+        $language = array_key_exists('language', $stored) ? $stored['language'] : (string) config('evolution.meta.language', 'fr');
+
+        return [
+            'booked' => $this->sanitizeMeetingTemplateName($booked),
+            'reminder' => $this->sanitizeMeetingTemplateName($reminder),
+            'language' => $this->sanitizeMeetingTemplateLanguage($language),
+        ];
+    }
+
+    public function meetingTemplateName(string $kind): string
+    {
+        $config = $this->meetingWhatsAppConfig();
+
+        return $kind === 'meeting_reminder' || $kind === 'reminder'
+            ? $config['reminder']
+            : $config['booked'];
+    }
+
+    public function meetingTemplateLanguage(): string
+    {
+        return $this->meetingWhatsAppConfig()['language'];
+    }
+
+    private function sanitizeMeetingTemplateName(mixed $name): string
+    {
+        $value = strtolower(trim((string) $name));
+
+        if ($value === '' || ! preg_match('/^[a-z0-9_]{1,512}$/', $value)) {
+            return '';
+        }
+
+        return $value;
+    }
+
+    private function sanitizeMeetingTemplateLanguage(mixed $language): string
+    {
+        $value = strtolower(trim((string) $language));
+
+        return in_array($value, ['fr', 'ar', 'en'], true) ? $value : 'fr';
     }
 
     public function users(): HasMany

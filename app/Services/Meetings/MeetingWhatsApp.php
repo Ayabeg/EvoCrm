@@ -41,28 +41,34 @@ class MeetingWhatsApp
 
         $cloud = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
         $session = $workspace->integration(Integration::PROVIDER_WHATSAPP);
+        $cloudAttempted = false;
 
         if ($cloud?->isConnected()) {
             $instance = $cloud->meta['instance']
                 ?? $this->evolution->instanceName($workspace, EvolutionCloudService::KIND_WHATSAPP_BUSINESS);
-            $result = $this->evolution->sendTemplate(
-                $number,
-                $template,
-                (string) config('evolution.meta.language', 'fr'),
-                [
-                    [
-                        'type' => 'body',
-                        'parameters' => array_map(
-                            fn (string $value) => ['type' => 'text', 'text' => $value],
-                            $bodyParams,
-                        ),
-                    ],
-                ],
-                $instance,
-            );
+            $name = $workspace->meetingTemplateName($template);
 
-            if ($result['ok']) {
-                return 'sent';
+            if ($name !== '') {
+                $cloudAttempted = true;
+                $result = $this->evolution->sendTemplate(
+                    $number,
+                    $name,
+                    $workspace->meetingTemplateLanguage(),
+                    [
+                        [
+                            'type' => 'body',
+                            'parameters' => array_map(
+                                fn (string $value) => ['type' => 'text', 'text' => $value],
+                                $bodyParams,
+                            ),
+                        ],
+                    ],
+                    $instance,
+                );
+
+                if ($result['ok']) {
+                    return 'sent';
+                }
             }
         }
 
@@ -74,6 +80,6 @@ class MeetingWhatsApp
             return $textResult['ok'] ? 'sent' : 'failed';
         }
 
-        return $cloud?->isConnected() ? 'failed' : null;
+        return $cloudAttempted ? 'failed' : null;
     }
 }
