@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Home\HomeDashboardBuilder;
+use App\Services\Home\QuotaTracker;
 use App\Services\LeadOs\GraphRunner;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,6 +26,11 @@ class HomeController extends Controller
 
         $builder = new HomeDashboardBuilder($ownerId);
         $dashboard = $builder->build($workspace, $from, $to);
+        $dashboard['quota'] = app(QuotaTracker::class)->present(
+            $workspace,
+            $ownerId,
+            $request->user()->role->canManageSettings(),
+        );
 
         return Inertia::render('home', [
             ...$dashboard,

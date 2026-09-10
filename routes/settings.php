@@ -6,6 +6,7 @@ use App\Http\Controllers\Settings\MeetingScheduleController;
 use App\Http\Controllers\Settings\PeopleController;
 use App\Http\Controllers\Settings\PlaybookController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\QuotaController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\Settings\SmsSettingsController;
 use App\Http\Controllers\Settings\SystemHealthController;
@@ -53,5 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('settings/sms', [SmsSettingsController::class, 'edit'])->name('settings.sms');
         Route::post('settings/sms', [SmsSettingsController::class, 'update'])->name('settings.sms.update');
         Route::delete('settings/sms', [SmsSettingsController::class, 'destroy'])->name('settings.sms.destroy');
+        Route::get('settings/quotas', [QuotaController::class, 'edit'])->name('settings.quotas');
+        Route::put('settings/quotas', [QuotaController::class, 'update'])->name('settings.quotas.update');
     });
 });
