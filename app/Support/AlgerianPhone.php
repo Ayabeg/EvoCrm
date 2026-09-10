@@ -68,4 +68,30 @@ final class AlgerianPhone
 
         return $digits !== '' ? '+'.$digits : null;
     }
+
+    /**
+     * Algerian mobiles: +213 then 5 (Ooredoo), 6 (Mobilis), or 7 (Djezzy), then 8 digits.
+     */
+    public static function isMobile(?string $raw): bool
+    {
+        $e164 = self::normalize($raw);
+
+        return $e164 !== null && (bool) preg_match('/^\+213[567]\d{8}$/', $e164);
+    }
+
+    public static function operator(?string $raw): ?string
+    {
+        $e164 = self::normalize($raw);
+
+        if ($e164 === null || ! self::isMobile($e164)) {
+            return null;
+        }
+
+        return match ($e164[4] ?? '') {
+            '5' => 'ooredoo',
+            '6' => 'mobilis',
+            '7' => 'djezzy',
+            default => null,
+        };
+    }
 }

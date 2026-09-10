@@ -17,6 +17,10 @@ use App\Services\Analytics\ProductAnalytics;
 use App\Services\Connectors\FakeGoogleApiClient;
 use App\Services\Connectors\GoogleApiClient;
 use App\Services\Connectors\HttpGoogleApiClient;
+use App\Services\Desk\FakeSmsClient;
+use App\Services\Desk\HttpSmsGatewayClient;
+use App\Services\Desk\SmsClient;
+use App\Services\Desk\TwilioSmsClient;
 use App\Services\Identity\WorkspaceProvisioner;
 use App\Services\Operations\AuditLogger;
 use App\Services\Operations\ScheduledTaskMonitor;
@@ -46,6 +50,16 @@ class AppServiceProvider extends ServiceProvider
                 : $app->make(HttpGoogleApiClient::class);
         });
         $this->app->singleton(FakeGoogleApiClient::class);
+        $this->app->singleton(FakeSmsClient::class);
+        $this->app->bind(SmsClient::class, function ($app) {
+            if ($app->environment('testing')) {
+                return $app->make(FakeSmsClient::class);
+            }
+
+            return config('sms.driver') === 'twilio'
+                ? $app->make(TwilioSmsClient::class)
+                : $app->make(HttpSmsGatewayClient::class);
+        });
         $this->app->singleton(ProductAnalytics::class);
     }
 

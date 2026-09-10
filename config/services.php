@@ -96,6 +96,17 @@ return [
     ],
 
     /*
+    | Optional Twilio fallback when SMS_DRIVER=twilio. Algeria-first send uses
+    | config/sms.php (local HTTP aggregator). Empty credentials keep desk
+    | replies as a local stub. Sequences never stub.
+    */
+    'twilio' => [
+        'sid' => env('TWILIO_SID', env('TWILIO_ACCOUNT_SID')),
+        'token' => env('TWILIO_TOKEN', env('TWILIO_AUTH_TOKEN')),
+        'from' => env('TWILIO_FROM'),
+    ],
+
+    /*
     | PostHog product analytics + data hub. The project token is safe to
     | expose to the browser. Leave empty to disable capture in local/CI.
     */

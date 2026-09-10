@@ -57,6 +57,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'SMS',
+        href: '/settings/sms',
+        icon: null,
+    },
+    {
         title: 'Custom attributes',
         href: '/settings/attributes',
         icon: null,
@@ -106,6 +111,7 @@ const requiredPermissionByHref: Record<string, string> = {
     '/settings/whatsapp-business': 'settings.integrations',
     '/settings/meta': 'settings.integrations',
     '/settings/channels': 'settings.integrations',
+    '/settings/sms': 'settings.integrations',
     '/settings/attributes': 'settings.attributes',
     '/settings/pipelines': 'settings.pipelines',
     '/settings/record-layouts': 'settings.attributes',
@@ -151,7 +157,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         page.component === 'settings/audit' ||
         page.component === 'settings/playbooks' ||
         page.component === 'settings/meta' ||
-        page.component === 'settings/apps/meta';
+        page.component === 'settings/apps/meta' ||
+        page.component === 'settings/sms';
 
     return (
         <div className="px-4 py-6">
@@ -159,7 +166,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                 <h1 className="aurora-text-display-2 text-ink">Settings</h1>
                 <p className="aurora-text-lead mt-1 max-w-[65ch] text-mute">
                     Workspace profile, the apps marketplace, official connectors,
-                    Evolution Cloud, Meta, and channels
+                    Evolution Cloud, Meta, SMS, and channels
                 </p>
             </header>
 

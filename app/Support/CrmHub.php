@@ -129,24 +129,34 @@ class CrmHub
      */
     protected function associationFilterFields(Workspace $workspace, string $entity): array
     {
-        if (! in_array($entity, ['contact', 'company'], true)) {
+        if (! in_array($entity, ['contact', 'company', 'deal'], true)) {
             return [];
         }
 
+        if ($entity === 'deal') {
+            return [
+                ['id' => 'has_associated_company', 'label' => 'Has associated company', 'type' => 'boolean'],
+            ];
+        }
+
+        $pipeline = $workspace->defaultPipeline();
+        $pipeline->loadMissing('stages');
+        $stages = $pipeline->stages->pluck('slug')->filter()->values()->all();
+
         $fields = [
             ['id' => 'has_open_deal', 'label' => 'Has open deal', 'type' => 'boolean'],
-        ];
-
-        if ($entity === 'contact') {
-            $pipeline = $workspace->defaultPipeline();
-            $pipeline->loadMissing('stages');
-            $stages = $pipeline->stages->pluck('slug')->filter()->values()->all();
-            $fields[] = [
+            [
                 'id' => 'deal_stage',
                 'label' => 'Deal stage',
                 'type' => 'select',
                 'options' => $stages,
-            ];
+            ],
+        ];
+
+        if ($entity === 'contact') {
+            $fields[] = ['id' => 'has_won_deal', 'label' => 'Has won deal', 'type' => 'boolean'];
+            $fields[] = ['id' => 'has_company', 'label' => 'Has company', 'type' => 'boolean'];
+            $fields[] = ['id' => 'deal_min_amount', 'label' => 'Min deal amount (DZD)', 'type' => 'number'];
         }
 
         return $fields;

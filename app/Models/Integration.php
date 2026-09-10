@@ -55,6 +55,8 @@ class Integration extends Model
 
     public const PROVIDER_WHATSAPP_BUSINESS = 'whatsapp_business';
 
+    public const PROVIDER_SMS = 'sms';
+
     protected function casts(): array
     {
         return [

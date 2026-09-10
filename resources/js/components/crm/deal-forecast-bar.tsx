@@ -15,6 +15,14 @@ type ForecastBand = {
     narrative?: string | null;
 };
 
+type ForecastBacktest = {
+    status: string;
+    label: string;
+    sample_count: number;
+    error_pct: number | null;
+    within_15: boolean;
+};
+
 function ForecastFact({
     label,
     value,
@@ -44,9 +52,11 @@ function ForecastFact({
 export default function DealForecastBar({
     forecast,
     forecastBand,
+    forecastBacktest,
 }: {
     forecast: Forecast;
     forecastBand?: ForecastBand | null;
+    forecastBacktest?: ForecastBacktest | null;
 }) {
     return (
         <div
@@ -85,6 +95,19 @@ export default function DealForecastBar({
                             {forecastBand.narrative}
                         </p>
                     ) : null}
+                </div>
+            ) : null}
+            {forecastBacktest ? (
+                <div
+                    className="min-w-0 shrink-0 border-l border-hairline pl-5"
+                    data-testid="forecast-backtest"
+                >
+                    <p className="text-[10px] leading-3 tracking-wide text-mute">
+                        Backtest · 90d
+                    </p>
+                    <p className="mt-0.5 text-[13px] font-semibold text-ink">
+                        {forecastBacktest.label}
+                    </p>
                 </div>
             ) : null}
         </div>

@@ -161,6 +161,7 @@ class DealController extends Controller
             'deals' => $board['deals'],
             'forecast' => $board['forecast'],
             'forecastBand' => app(RecordInsight::class)->pipelineForecastBand($workspace, $pipeline),
+            'forecastBacktest' => app(RecordInsight::class)->pipelineForecastBacktest($workspace, $pipeline),
             'boardOptions' => $options,
         ]);
     }

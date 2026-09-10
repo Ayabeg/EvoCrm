@@ -463,6 +463,104 @@ class RecordInsight
     }
 
     /**
+     * Compare last-open-stage weighted predictions to actual won amount.
+     *
+     * @return array{
+     *     lookback_days: int,
+     *     sample_count: int,
+     *     predicted_cents: int,
+     *     actual_cents: int,
+     *     error_pct: float|null,
+     *     within_15: bool,
+     *     status: string,
+     *     label: string
+     * }
+     */
+    public function pipelineForecastBacktest(Workspace $workspace, Pipeline $pipeline, int $lookbackDays = 90): array
+    {
+        $pipeline->loadMissing('stages');
+        $stages = $pipeline->stages->keyBy('slug');
+
+        $deals = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->whereNotNull('closed_at')
+            ->where('closed_at', '>=', now()->subDays($lookbackDays))
+            ->whereHas('stage', fn ($stage) => $stage->where(function ($query) {
+                $query->where('is_won', true)->orWhere('is_lost', true);
+            }))
+            ->with(['stage', 'activities' => fn ($query) => $query->where('type', 'stage_change')->orderBy('id')])
+            ->get();
+
+        $predicted = 0;
+        $actual = 0;
+        $counted = 0;
+
+        foreach ($deals as $deal) {
+            $fromSlug = $this->lastOpenStageSlug($deal);
+            $fromStage = $fromSlug ? $stages->get($fromSlug) : null;
+
+            if (! $fromStage instanceof Stage || $fromStage->isTerminal()) {
+                continue;
+            }
+
+            $predicted += DealBoardForecast::weightedCents((int) $deal->amount_cents, DealBoardForecast::probabilityFor($fromStage));
+            $actual += $deal->stage?->is_won ? (int) $deal->amount_cents : 0;
+            $counted++;
+        }
+
+        if ($counted < 3) {
+            return [
+                'lookback_days' => $lookbackDays,
+                'sample_count' => $counted,
+                'predicted_cents' => $predicted,
+                'actual_cents' => $actual,
+                'error_pct' => null,
+                'within_15' => false,
+                'status' => 'insufficient_data',
+                'label' => 'Need 3+ closed deals',
+            ];
+        }
+
+        $denominator = max($predicted, $actual, 1);
+        $error = abs($predicted - $actual) / $denominator * 100;
+        $within = $error <= 15;
+
+        return [
+            'lookback_days' => $lookbackDays,
+            'sample_count' => $counted,
+            'predicted_cents' => $predicted,
+            'actual_cents' => $actual,
+            'error_pct' => round($error, 1),
+            'within_15' => $within,
+            'status' => $within ? 'within_15' : 'outside_15',
+            'label' => $within
+                ? 'Within 15% · '.$counted.' deals'
+                : round($error, 1).'% off · '.$counted.' deals',
+        ];
+    }
+
+    protected function lastOpenStageSlug(Deal $deal): ?string
+    {
+        $activities = $deal->activities
+            ->where('type', 'stage_change')
+            ->values();
+
+        foreach ($activities->reverse() as $activity) {
+            $from = data_get($activity->meta, 'from_stage_slug');
+            if (filled($from)) {
+                return (string) $from;
+            }
+        }
+
+        $previous = $activities->slice(0, -1)->last();
+
+        return filled(data_get($previous?->meta, 'stage_slug'))
+            ? (string) data_get($previous->meta, 'stage_slug')
+            : null;
+    }
+
+    /**
      * RAG-lite: keyword-ranked activities beyond the default recent window.
      *
      * @return Collection<int, Activity>
