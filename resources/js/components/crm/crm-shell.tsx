@@ -5,6 +5,23 @@ import type { RoomTab } from '@/components/crm/room-shell';
 
 const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
+        label: 'Home',
+        href: '/home',
+        match: (pathname) => pathname === '/home' || pathname === '/',
+    },
+    {
+        label: 'Leads',
+        href: '/crm/leads',
+        match: (pathname) =>
+            (pathname === '/crm/leads' || pathname.startsWith('/crm/leads/')) &&
+            !pathname.startsWith('/crm/leads/captures'),
+    },
+    {
+        label: 'Captures',
+        href: '/crm/leads/captures',
+        match: (pathname) => pathname.startsWith('/crm/leads/captures'),
+    },
+    {
         label: 'Contacts',
         href: '/crm/contacts',
         match: (pathname) =>
@@ -17,18 +34,6 @@ const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
             pathname === '/crm/companies' || pathname.startsWith('/crm/companies/'),
     },
     {
-        label: 'Leads list',
-        href: '/crm/leads',
-        match: (pathname) =>
-            (pathname === '/crm/leads' || pathname.startsWith('/crm/leads/')) &&
-            !pathname.startsWith('/crm/leads/captures'),
-    },
-    {
-        label: 'Captures',
-        href: '/crm/leads/captures',
-        match: (pathname) => pathname.startsWith('/crm/leads/captures'),
-    },
-    {
         label: 'Deals',
         href: '/crm/deals',
         match: (pathname) =>
@@ -36,17 +41,16 @@ const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
             !pathname.startsWith('/crm/deals/board'),
     },
     {
-        label: 'Activities',
-        href: '/crm/activities',
-        match: (pathname) =>
-            pathname === '/crm/activities' ||
-            pathname.startsWith('/crm/activities/'),
-    },
-    {
         label: 'Pipeline',
         href: '/crm/deals/board',
         match: (pathname) =>
             pathname === '/crm/deals/board' || pathname.startsWith('/crm/deals/board/'),
+    },
+    {
+        label: 'Activities',
+        href: '/crm/activities',
+        match: (pathname) =>
+            pathname === '/crm/activities' || pathname.startsWith('/crm/activities/'),
     },
     {
         label: 'Automation',
