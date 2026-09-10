@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Workflow;
 use App\Services\Connectors\FakeGoogleApiClient;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
@@ -208,4 +209,115 @@ it('returns 404 when the page is off and fires meeting.booked workflows', functi
     $this->post('/book/'.$schedule->slug, bookPayload())->assertRedirect();
 
     expect(Activity::query()->where('type', 'task')->where('subject', 'Prep the demo')->exists())->toBeTrue();
+});
+
+function connectWhatsApp(User $user, string $provider = Integration::PROVIDER_WHATSAPP): Integration
+{
+    return Integration::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'provider' => $provider,
+        'status' => 'connected',
+        'access_token' => 'wa-token',
+        'connected_at' => now(),
+        'meta' => [
+            'instance' => $provider === Integration::PROVIDER_WHATSAPP_BUSINESS
+                ? 'evo-ws'.$user->workspace_id.'-waba'
+                : 'evo-ws'.$user->workspace_id.'-wa',
+            'state' => 'open',
+        ],
+    ]);
+}
+
+it('sends a WhatsApp confirmation when the phone channel is connected', function () {
+    $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
+    Mail::fake();
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake([
+        'https://evolution.example.test/message/sendText/*' => Http::response(['key' => ['id' => 'wamid-1']], 200),
+        'https://evolution.example.test/message/sendTemplate/*' => Http::response(['key' => ['id' => 'wamid-tpl']], 200),
+    ]);
+
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+    $schedule->forceFill(['location_note' => 'Meet link in the invite'])->save();
+    connectWhatsApp($user);
+
+    $this->post('/book/'.$schedule->slug, bookPayload())->assertRedirect();
+
+    $meeting = Activity::query()->where('type', 'meeting')->sole();
+
+    expect($meeting->meta['whatsapp_confirm'] ?? null)->toBe('sent');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/message/sendText/')
+        && $request['number'] === '213550123456'
+        && str_contains((string) $request['text'], 'Karim')
+        && str_contains((string) $request['text'], 'Amina Bensalem')
+        && str_contains((string) $request['text'], '09:00'));
+});
+
+it('sends the Cloud meeting_booked template when WhatsApp Business is connected', function () {
+    $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
+    Mail::fake();
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake([
+        'https://evolution.example.test/message/sendTemplate/*' => Http::response(['key' => ['id' => 'wamid-tpl']], 200),
+        'https://evolution.example.test/message/sendText/*' => Http::response(['key' => ['id' => 'wamid-1']], 200),
+    ]);
+
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+    connectWhatsApp($user, Integration::PROVIDER_WHATSAPP_BUSINESS);
+
+    $this->post('/book/'.$schedule->slug, bookPayload())->assertRedirect();
+
+    expect(Activity::query()->where('type', 'meeting')->sole()->meta['whatsapp_confirm'] ?? null)->toBe('sent');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/message/sendTemplate/')
+        && $request['name'] === 'meeting_booked'
+        && $request['language'] === 'fr'
+        && $request['number'] === '213550123456');
+    Http::assertNotSent(fn ($request) => str_contains($request->url(), '/message/sendText/'));
+});
+
+it('still books when WhatsApp confirmation fails', function () {
+    $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
+    Mail::fake();
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake([
+        'https://evolution.example.test/message/sendText/*' => Http::response(['message' => 'down'], 500),
+        'https://evolution.example.test/message/sendTemplate/*' => Http::response(['message' => 'down'], 500),
+    ]);
+
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+    connectWhatsApp($user);
+
+    $this->post('/book/'.$schedule->slug, bookPayload())->assertRedirect('/book/'.$schedule->slug.'/done');
+
+    $meeting = Activity::query()->where('type', 'meeting')->sole();
+
+    expect($meeting->meta['whatsapp_confirm'] ?? null)->toBe('failed');
+
+    Mail::assertSent(MeetingBookedMail::class);
+});
+
+it('does not send WhatsApp when the channel is disconnected', function () {
+    $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
+    Mail::fake();
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake();
+
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+
+    $this->post('/book/'.$schedule->slug, bookPayload())->assertRedirect();
+
+    $meeting = Activity::query()->where('type', 'meeting')->sole();
+
+    expect($meeting->meta['whatsapp_confirm'] ?? null)->toBeNull();
+    Http::assertNothingSent();
 });

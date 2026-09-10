@@ -9,15 +9,18 @@ use App\Models\Deal;
 use App\Models\Integration;
 use App\Models\MeetingSchedule;
 use App\Models\User;
+use App\Models\Workspace;
 use App\Services\Connectors\GoogleApiClient;
 use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\WorkflowRunner;
+use App\Services\Evolution\EvolutionCloudService;
 use App\Services\Outbound\MailerFactory;
 use App\Services\Outbound\SmtpMailboxMailer;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class MeetingBooker
 {
@@ -28,6 +31,7 @@ class MeetingBooker
         private WorkflowRunner $workflows,
         private GoogleApiClient $google,
         private MailerFactory $mailers,
+        private EvolutionCloudService $evolution,
     ) {}
 
     /**
@@ -98,6 +102,7 @@ class MeetingBooker
         }
 
         $this->confirm($schedule, $host, $guest, $whenLabel);
+        $this->confirmWhatsApp($schedule, $activity, $contact, $host, $guest, $whenLabel);
         $this->workflows->handleMeetingBooked($activity);
 
         return $activity;
@@ -199,5 +204,119 @@ class MeetingBooker
             view($content->text ?? 'mail.meeting-booked-text', $data)->render(),
             view($content->view ?? 'mail.meeting-booked', $data)->render(),
         );
+    }
+
+    /**
+     * @param  array{first_name: string, phone: string}  $guest
+     */
+    private function confirmWhatsApp(
+        MeetingSchedule $schedule,
+        Activity $activity,
+        Contact $contact,
+        User $host,
+        array $guest,
+        string $whenLabel,
+    ): void {
+        try {
+            $this->sendWhatsAppConfirm($schedule, $activity, $contact, $host, $guest, $whenLabel);
+        } catch (Throwable) {
+            $this->stampWhatsApp($activity, 'failed');
+        }
+    }
+
+    /**
+     * @param  array{first_name: string, phone: string}  $guest
+     */
+    private function sendWhatsAppConfirm(
+        MeetingSchedule $schedule,
+        Activity $activity,
+        Contact $contact,
+        User $host,
+        array $guest,
+        string $whenLabel,
+    ): void {
+        if (! $this->evolution->configured()) {
+            return;
+        }
+
+        $workspace = $schedule->workspace ?? Workspace::query()->find($schedule->workspace_id);
+        $number = $contact->phone_e164 ?: $guest['phone'];
+
+        if (! $workspace instanceof Workspace || ! filled($number)) {
+            return;
+        }
+
+        $cloud = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
+        $phone = $workspace->integration(Integration::PROVIDER_WHATSAPP);
+        $body = $this->whatsAppBody($guest['first_name'], $host->name, $whenLabel, $schedule);
+
+        if ($cloud?->isConnected()) {
+            $instance = $cloud->meta['instance']
+                ?? $this->evolution->instanceName($workspace, EvolutionCloudService::KIND_WHATSAPP_BUSINESS);
+            $template = $this->evolution->sendTemplate(
+                $number,
+                'meeting_booked',
+                (string) config('evolution.meta.language', 'fr'),
+                [
+                    [
+                        'type' => 'body',
+                        'parameters' => [
+                            ['type' => 'text', 'text' => $guest['first_name']],
+                            ['type' => 'text', 'text' => $host->name],
+                            ['type' => 'text', 'text' => $whenLabel],
+                        ],
+                    ],
+                ],
+                $instance,
+            );
+
+            if ($template['ok']) {
+                $this->stampWhatsApp($activity, 'sent');
+
+                return;
+            }
+        }
+
+        if ($phone?->isConnected()) {
+            $instance = $phone->meta['instance']
+                ?? $this->evolution->instanceName($workspace, EvolutionCloudService::KIND_WHATSAPP);
+            $text = $this->evolution->sendText($number, $body, $instance);
+            $this->stampWhatsApp($activity, $text['ok'] ? 'sent' : 'failed', $text['ok'] ? null : ($text['error'] ?? 'Send failed'));
+
+            return;
+        }
+
+        if ($cloud?->isConnected()) {
+            $this->stampWhatsApp($activity, 'failed');
+        }
+    }
+
+    private function whatsAppBody(string $guestName, string $hostName, string $whenLabel, MeetingSchedule $schedule): string
+    {
+        $tz = $schedule->timezone ?: MeetingSchedule::TIMEZONE;
+        $lines = [
+            'Salaam '.$guestName.' — '.$hostName.' confirmed your meeting.',
+            $whenLabel.' ('.$tz.')',
+        ];
+
+        if (filled($schedule->location_note)) {
+            $lines[] = (string) $schedule->location_note;
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function stampWhatsApp(Activity $activity, string $status, ?string $error = null): void
+    {
+        $meta = $activity->meta ?? [];
+        $meta['whatsapp_confirm'] = $status;
+
+        if ($error) {
+            $meta['whatsapp_confirm_error'] = mb_substr($error, 0, 180);
+        } else {
+            unset($meta['whatsapp_confirm_error']);
+        }
+
+        $activity->forceFill(['meta' => $meta])->save();
     }
 }
