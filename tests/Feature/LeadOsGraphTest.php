@@ -64,16 +64,16 @@ it('runs the Lead OS graph end to end now that capture, enrich, and score have l
     expect($nodes['capture-drain']['status'])->toBe(GraphRun::NODE_OK)
         ->and($nodes['enrich']['status'])->toBe(GraphRun::NODE_OK)
         ->and($nodes['score']['status'])->toBe(GraphRun::NODE_OK)
-        ->and($nodes['research']['status'])->toBe(GraphRun::NODE_SKIPPED)
-        ->and($nodes['research']['error'])->toContain('Ask Evo')
+        ->and($nodes['research']['status'])->toBe(GraphRun::NODE_OK)
         ->and($nodes['deal-health']['status'])->toBe(GraphRun::NODE_OK)
         ->and($nodes['next-move']['status'])->toBe(GraphRun::NODE_OK)
-        ->and($run->skipped_count)->toBe(1)
-        ->and($run->ok_count)->toBe(5)
+        ->and($run->skipped_count)->toBe(0)
+        ->and($run->ok_count)->toBe(6)
         ->and($run->failed_count)->toBe(0);
 
     expect(DealHealthSnapshot::query()->where('workspace_id', $workspace->id)->count())->toBe(1)
-        ->and(DealSuggestion::query()->where('kind', DealSuggestion::KIND_NEXT_MOVE)->count())->toBe(1);
+        ->and(DealSuggestion::query()->where('kind', DealSuggestion::KIND_NEXT_MOVE)->count())->toBe(1)
+        ->and(AiInsight::query()->where('question', 'Research brief')->where('source', 'fields')->count())->toBe(1);
 });
 
 it('skips missing sibling commands without failing the graph', function () {

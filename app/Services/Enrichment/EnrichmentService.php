@@ -9,6 +9,7 @@ use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\LeadOs\ResearchBrief;
 
 class EnrichmentService
 {
@@ -33,6 +34,10 @@ class EnrichmentService
 
         $this->website->enrich($workspace, $targetType, $target);
         $this->places->enrich($workspace, $targetType, $target);
+
+        if ($target instanceof Company && $this->placesHit($workspace, $targetType, $targetId)) {
+            app(ResearchBrief::class)->writeIfStale($target);
+        }
     }
 
     public function apply(EnrichmentRun $run, ?User $user = null): EnrichmentRun
@@ -119,6 +124,18 @@ class EnrichmentService
                 'created_at' => $run->created_at?->toIso8601String(),
             ])
             ->all());
+    }
+
+    protected function placesHit(Workspace $workspace, string $targetType, int $targetId): bool
+    {
+        return EnrichmentRun::query()
+            ->forWorkspace($workspace)
+            ->where('target_type', $targetType)
+            ->where('target_id', $targetId)
+            ->where('source', EnrichmentRun::SOURCE_GOOGLE_PLACES)
+            ->whereIn('status', [EnrichmentRun::STATUS_PROPOSED, EnrichmentRun::STATUS_APPLIED])
+            ->where('created_at', '>=', now()->subMinute())
+            ->exists();
     }
 
     public function resolve(Workspace $workspace, string $type, int $id): Company|Contact|Lead|null

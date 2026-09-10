@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\EnrichRecordJob;
+use App\Models\AiInsight;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\EnrichmentRun;
@@ -77,6 +78,25 @@ it('persists website and places runs with confidence and auto-applies empty high
         ->and($runs->firstWhere('field', 'address')?->value)->toContain('Alger')
         ->and($runs->firstWhere('field', 'currency_hint')?->value)->toBe('DZD')
         ->and($company->fresh()->phone)->toBe('+21321000000');
+
+    $brief = AiInsight::query()
+        ->where('subject_type', 'company')
+        ->where('subject_id', $company->id)
+        ->where('question', 'Research brief')
+        ->first();
+
+    expect($brief)->not->toBeNull()
+        ->and($brief->source)->toBe('fields')
+        ->and($brief->answer)->toContain('Clinique Atlas')
+        ->and($brief->answer)->not->toContain('@invented');
+
+    app(EnrichmentService::class)->enrich($user->workspace, EnrichmentRun::TARGET_COMPANY, (int) $company->id);
+
+    expect(AiInsight::query()
+        ->where('subject_type', 'company')
+        ->where('subject_id', $company->id)
+        ->where('question', 'Research brief')
+        ->count())->toBe(1);
 
     Http::assertSent(fn ($request) => $request->url() === 'https://places.googleapis.com/v1/places:searchText'
         && $request->hasHeader('X-Goog-Api-Key', 'test-places-key')
@@ -196,7 +216,8 @@ it('no-ops Google Places when the API key is missing and records the skip', func
 
     expect($skip)->not->toBeNull()
         ->and($skip->error)->toBe('GOOGLE_PLACES_API_KEY missing')
-        ->and(EnrichmentRun::query()->where('source', EnrichmentRun::SOURCE_GOOGLE_PLACES)->where('field', 'place_id')->whereNotNull('value')->count())->toBe(0);
+        ->and(EnrichmentRun::query()->where('source', EnrichmentRun::SOURCE_GOOGLE_PLACES)->where('field', 'place_id')->whereNotNull('value')->count())->toBe(0)
+        ->and(AiInsight::query()->where('question', 'Research brief')->count())->toBe(0);
 
     Http::assertNotSent(fn ($request) => str_contains($request->url(), 'places.googleapis.com'));
 });

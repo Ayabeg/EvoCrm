@@ -29,14 +29,6 @@ class ResearchBrief
      */
     public function run(Workspace $workspace): array
     {
-        if (! $this->configured()) {
-            return [
-                'status' => 'skipped',
-                'counts' => ['briefs' => 0],
-                'error' => 'Ask Evo is unconfigured',
-            ];
-        }
-
         $written = 0;
 
         Company::query()
@@ -72,6 +64,22 @@ class ResearchBrief
         ];
     }
 
+    public function writeIfStale(Company $company): ?AiInsight
+    {
+        $fresh = AiInsight::query()
+            ->where('subject_type', 'company')
+            ->where('subject_id', $company->id)
+            ->where('question', 'Research brief')
+            ->where('created_at', '>=', now()->subDay())
+            ->exists();
+
+        if ($fresh) {
+            return null;
+        }
+
+        return $this->writeCompany($company);
+    }
+
     public function writeCompany(Company $company): AiInsight
     {
         $company->loadMissing(['contacts', 'deals.stage']);
@@ -81,10 +89,10 @@ class ResearchBrief
         $live = $this->llm->complete(
             'You are Evo. Write a two-sentence public-facts brief about this Algerian company or place. Use only the supplied fields. Never invent emails, phone numbers, or people. If a fact is missing, say it is not on the record. Never mention HubSpot or Breeze.',
             "Name: {$company->name}\nDomain: ".($company->domain ?: 'none')."\nIndustry: ".($company->industry ?: 'none')."\nPlace: ".($place !== '' ? $place : 'unknown')."\nRecord: {$summary}",
-        );
+        ) ?? [];
 
         $answer = $this->withoutInventedEmails(
-            (string) ($live['text'] ?? $this->stubCompany($company, $place, $summary)),
+            filled($live['text'] ?? null) ? (string) $live['text'] : $this->stubCompany($company, $place, $summary),
             $company,
         );
 
@@ -109,10 +117,10 @@ class ResearchBrief
         $live = $this->llm->complete(
             'You are Evo. Write a two-sentence public-facts brief about this Algerian place or account. Use only the supplied fields. Never invent emails, phone numbers, or people.',
             "Deal: {$deal->title}\nPlace: ".($place !== '' ? $place : 'unknown')."\nRecord: {$summary}",
-        );
+        ) ?? [];
 
         $answer = $this->withoutInventedEmails(
-            (string) ($live['text'] ?? $this->stubPlace($deal, $place, $summary)),
+            filled($live['text'] ?? null) ? (string) $live['text'] : $this->stubPlace($deal, $place, $summary),
             $deal,
         );
 
