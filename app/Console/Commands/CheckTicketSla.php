@@ -3,15 +3,16 @@
 namespace App\Console\Commands;
 
 use App\Models\Ticket;
+use App\Services\Crm\TicketSlaWhatsApp;
 use Illuminate\Console\Command;
 
 class CheckTicketSla extends Command
 {
     protected $signature = 'tickets:check-sla {--limit=200}';
 
-    protected $description = 'Mark overdue first-response SLAs and fire ticket.sla_breached workflows';
+    protected $description = 'Mark overdue first-response SLAs, fire ticket.sla_breached workflows, and flush deferred WhatsApp pings';
 
-    public function handle(): int
+    public function handle(TicketSlaWhatsApp $whatsapp): int
     {
         $due = Ticket::query()
             ->whereNull('sla_breached_at')
@@ -30,7 +31,9 @@ class CheckTicketSla extends Command
             }
         }
 
-        $this->info("tickets:check-sla — {$marked} breached of {$due->count()} due.");
+        $flushed = $whatsapp->flushDeferred((int) $this->option('limit'));
+
+        $this->info("tickets:check-sla — {$marked} breached of {$due->count()} due, {$flushed} WhatsApp ping".($flushed === 1 ? '' : 's').' flushed.');
 
         return self::SUCCESS;
     }

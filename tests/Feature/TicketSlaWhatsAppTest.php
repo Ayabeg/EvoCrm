@@ -133,3 +133,92 @@ it('defers the SLA WhatsApp ping during Africa/Algiers quiet hours', function ()
 
     Http::assertNothingSent();
 });
+
+it('flushes a deferred SLA WhatsApp ping after quiet hours', function () {
+    $this->travelTo(Carbon::parse('2026-09-08 10:00:00', 'Africa/Algiers'));
+    fakeSlaEvolution();
+
+    $user = User::factory()->create();
+    connectSlaWhatsApp($user);
+    $ticket = slaTicket($user);
+
+    QuietHours::query()->where('workspace_id', $user->workspace_id)->update([
+        'enabled' => true,
+        'timezone' => 'Africa/Algiers',
+        'starts_at' => '21:00',
+        'ends_at' => '08:00',
+    ]);
+
+    $this->travelTo(Carbon::parse('2026-09-08 22:00:00', 'Africa/Algiers'));
+    $this->artisan('tickets:check-sla')->assertSuccessful();
+
+    $row = Activity::query()->where('type', 'notification')->latest('id')->first();
+
+    expect($row->meta['whatsapp_sla'] ?? null)->toBe('deferred');
+    Http::assertNothingSent();
+
+    $this->travelTo(Carbon::parse('2026-09-09 08:05:00', 'Africa/Algiers'));
+    $this->artisan('tickets:check-sla')->assertSuccessful();
+
+    expect($row->fresh()->meta['whatsapp_sla'] ?? null)->toBe('sent')
+        ->and(Activity::query()->where('type', 'notification')->where('contact_id', $ticket->contact_id)->count())->toBe(1);
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/message/sendText/')
+        && $request['number'] === '213550123456'
+        && str_contains((string) $request['text'], (string) $ticket->number));
+});
+
+it('does not flush a deferred SLA ping while quiet hours still apply', function () {
+    $this->travelTo(Carbon::parse('2026-09-08 10:00:00', 'Africa/Algiers'));
+    fakeSlaEvolution();
+
+    $user = User::factory()->create();
+    connectSlaWhatsApp($user);
+    slaTicket($user);
+
+    QuietHours::query()->where('workspace_id', $user->workspace_id)->update([
+        'enabled' => true,
+        'timezone' => 'Africa/Algiers',
+        'starts_at' => '21:00',
+        'ends_at' => '08:00',
+    ]);
+
+    $this->travelTo(Carbon::parse('2026-09-08 22:00:00', 'Africa/Algiers'));
+    $this->artisan('tickets:check-sla')->assertSuccessful();
+    $this->travelTo(Carbon::parse('2026-09-08 22:30:00', 'Africa/Algiers'));
+    $this->artisan('tickets:check-sla')->assertSuccessful();
+
+    $row = Activity::query()->where('type', 'notification')->latest('id')->first();
+
+    expect($row->meta['whatsapp_sla'] ?? null)->toBe('deferred');
+    Http::assertNothingSent();
+});
+
+it('skips a deferred SLA ping once the ticket has a first response', function () {
+    $this->travelTo(Carbon::parse('2026-09-08 10:00:00', 'Africa/Algiers'));
+    fakeSlaEvolution();
+
+    $user = User::factory()->create();
+    connectSlaWhatsApp($user);
+    $ticket = slaTicket($user);
+
+    QuietHours::query()->where('workspace_id', $user->workspace_id)->update([
+        'enabled' => true,
+        'timezone' => 'Africa/Algiers',
+        'starts_at' => '21:00',
+        'ends_at' => '08:00',
+    ]);
+
+    $this->travelTo(Carbon::parse('2026-09-08 22:00:00', 'Africa/Algiers'));
+    $this->artisan('tickets:check-sla')->assertSuccessful();
+
+    $ticket->forceFill(['first_response_at' => now()])->save();
+
+    $this->travelTo(Carbon::parse('2026-09-09 08:05:00', 'Africa/Algiers'));
+    $this->artisan('tickets:check-sla')->assertSuccessful();
+
+    $row = Activity::query()->where('type', 'notification')->latest('id')->first();
+
+    expect($row->meta['whatsapp_sla'] ?? null)->toBe('skipped');
+    Http::assertNothingSent();
+});
