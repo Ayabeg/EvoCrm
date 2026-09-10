@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Services\Crm\ActivityRecorder;
+use App\Services\Crm\QuoteWhatsApp;
 use App\Services\Crm\WorkflowRunner;
 use App\Services\Operations\AuditLogger;
 use Illuminate\Http\RedirectResponse;
@@ -38,7 +39,7 @@ class QuoteAcceptanceController extends Controller
         ]);
     }
 
-    public function accept(Request $request, string $token, ActivityRecorder $activities, WorkflowRunner $workflows, AuditLogger $audit): RedirectResponse
+    public function accept(Request $request, string $token, ActivityRecorder $activities, WorkflowRunner $workflows, AuditLogger $audit, QuoteWhatsApp $whatsapp): RedirectResponse
     {
         $quote = $this->resolve($token);
 
@@ -52,7 +53,7 @@ class QuoteAcceptanceController extends Controller
             'accepted_ip' => $request->ip(),
         ])->save();
 
-        $activities->record($quote->workspace, [
+        $activity = $activities->record($quote->workspace, [
             'type' => 'quote_accepted',
             'subject' => 'Quote accepted',
             'body' => 'Quote #'.$quote->id.' was accepted from the public link.',
@@ -71,6 +72,8 @@ class QuoteAcceptanceController extends Controller
                 ['ip' => $request->ip()],
                 $request->ip(),
             );
+
+            $whatsapp->confirm($quote, $activity);
         }
 
         if ($quote->deal) {

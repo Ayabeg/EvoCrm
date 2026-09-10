@@ -74,18 +74,20 @@ class Workspace extends Model
     /**
      * Meta-approved Cloud template names for meeting confirm + reminder.
      *
-     * @return array{booked: string, reminder: string, language: string}
+     * @return array{booked: string, reminder: string, quote: string, language: string}
      */
     public function meetingWhatsAppConfig(): array
     {
         $stored = is_array($this->meeting_wa_templates) ? $this->meeting_wa_templates : [];
         $booked = array_key_exists('booked', $stored) ? $stored['booked'] : 'meeting_booked';
         $reminder = array_key_exists('reminder', $stored) ? $stored['reminder'] : 'meeting_reminder';
+        $quote = array_key_exists('quote', $stored) ? $stored['quote'] : 'quote_accepted';
         $language = array_key_exists('language', $stored) ? $stored['language'] : (string) config('evolution.meta.language', 'fr');
 
         return [
             'booked' => $this->sanitizeMeetingTemplateName($booked),
             'reminder' => $this->sanitizeMeetingTemplateName($reminder),
+            'quote' => $this->sanitizeMeetingTemplateName($quote),
             'language' => $this->sanitizeMeetingTemplateLanguage($language),
         ];
     }
@@ -94,9 +96,11 @@ class Workspace extends Model
     {
         $config = $this->meetingWhatsAppConfig();
 
-        return $kind === 'meeting_reminder' || $kind === 'reminder'
-            ? $config['reminder']
-            : $config['booked'];
+        return match ($kind) {
+            'meeting_reminder', 'reminder' => $config['reminder'],
+            'quote_accepted', 'quote' => $config['quote'],
+            default => $config['booked'],
+        };
     }
 
     public function meetingTemplateLanguage(): string

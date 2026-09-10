@@ -13,6 +13,8 @@ class MeetingWhatsApp
 
     public const TEMPLATE_REMINDER = 'meeting_reminder';
 
+    public const TEMPLATE_QUOTE = 'quote_accepted';
+
     public function __construct(private EvolutionCloudService $evolution) {}
 
     /**

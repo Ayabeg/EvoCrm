@@ -3,16 +3,25 @@
 use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Integration;
 use App\Models\Quote;
 use App\Models\User;
 use App\Services\Crm\QuoteDocument;
+use Illuminate\Support\Facades\Http;
 
 function publicQuote(User $user, array $overrides = []): Quote
 {
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'first_name' => $overrides['first_name'] ?? 'Karim',
+        'phone' => $overrides['phone'] ?? '0550123456',
+    ]);
+    unset($overrides['first_name'], $overrides['phone']);
+
     $pipeline = $user->workspace->defaultPipeline();
     $deal = Deal::query()->create([
         'workspace_id' => $user->workspace_id,
-        'contact_id' => Contact::factory()->create(['workspace_id' => $user->workspace_id])->id,
+        'contact_id' => $contact->id,
         'pipeline_id' => $pipeline->id,
         'stage_id' => $pipeline->stageBySlug('proposal')->id,
         'title' => 'Acceptable deal',
@@ -35,6 +44,23 @@ function publicQuote(User $user, array $overrides = []): Quote
     app(QuoteDocument::class)->freeze($quote);
 
     return $quote->fresh();
+}
+
+function connectQuoteWhatsApp(User $user, string $provider = Integration::PROVIDER_WHATSAPP): Integration
+{
+    return Integration::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'provider' => $provider,
+        'status' => 'connected',
+        'access_token' => 'wa-token',
+        'connected_at' => now(),
+        'meta' => [
+            'instance' => $provider === Integration::PROVIDER_WHATSAPP_BUSINESS
+                ? 'evo-ws'.$user->workspace_id.'-waba'
+                : 'evo-ws'.$user->workspace_id.'-wa',
+            'state' => 'open',
+        ],
+    ]);
 }
 
 it('lets a customer accept a quote without signing in', function () {
@@ -77,3 +103,87 @@ it('rejects expired revoked and foreign quote tokens', function () {
     $this->post('/q/valid-token/accept')->assertRedirect();
     expect($valid->fresh()->accepted_at)->not->toBeNull();
 });
+
+it('sends a WhatsApp confirmation when the phone channel is connected', function () {
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake([
+        'https://evolution.example.test/message/sendText/*' => Http::response(['key' => ['id' => 'wamid-1']], 200),
+        'https://evolution.example.test/message/sendTemplate/*' => Http::response(['key' => ['id' => 'wamid-tpl']], 200),
+    ]);
+
+    $user = User::factory()->create();
+    connectQuoteWhatsApp($user);
+    $quote = publicQuote($user, ['public_token' => 'wa-accept']);
+
+    $this->post('/q/wa-accept/accept')->assertRedirect();
+
+    expect(Activity::query()->where('type', 'quote_accepted')->sole()->meta['whatsapp_confirm'] ?? null)->toBe('sent');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/message/sendText/')
+        && $request['number'] === '213550123456'
+        && str_contains((string) $request['text'], 'Karim')
+        && str_contains((string) $request['text'], '5 000 DZD'));
+    Http::assertNotSent(fn ($request) => str_contains($request->url(), '/message/sendTemplate/'));
+});
+
+it('sends the Cloud quote_accepted template when WhatsApp Business is connected', function () {
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake([
+        'https://evolution.example.test/message/sendTemplate/*' => Http::response(['key' => ['id' => 'wamid-tpl']], 200),
+        'https://evolution.example.test/message/sendText/*' => Http::response(['key' => ['id' => 'wamid-1']], 200),
+    ]);
+
+    $user = User::factory()->create();
+    connectQuoteWhatsApp($user, Integration::PROVIDER_WHATSAPP_BUSINESS);
+    publicQuote($user, ['public_token' => 'cloud-accept']);
+
+    $this->post('/q/cloud-accept/accept')->assertRedirect();
+
+    expect(Activity::query()->where('type', 'quote_accepted')->sole()->meta['whatsapp_confirm'] ?? null)->toBe('sent');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/message/sendTemplate/')
+        && $request['name'] === 'quote_accepted'
+        && $request['language'] === 'fr'
+        && $request['number'] === '213550123456');
+    Http::assertNotSent(fn ($request) => str_contains($request->url(), '/message/sendText/'));
+});
+
+it('still accepts the quote when WhatsApp confirmation fails', function () {
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake([
+        'https://evolution.example.test/message/sendText/*' => Http::response(['message' => 'down'], 500),
+        'https://evolution.example.test/message/sendTemplate/*' => Http::response(['message' => 'down'], 500),
+    ]);
+
+    $user = User::factory()->create();
+    connectQuoteWhatsApp($user);
+    $quote = publicQuote($user, ['public_token' => 'wa-fail']);
+
+    $this->post('/q/wa-fail/accept')->assertRedirect();
+
+    expect($quote->fresh()->status)->toBe('accepted')
+        ->and(Activity::query()->where('type', 'quote_accepted')->sole()->meta['whatsapp_confirm'] ?? null)->toBe('failed');
+});
+
+it('does not send WhatsApp again on a second accept', function () {
+    config()->set('evolution.base_url', 'https://evolution.example.test');
+    config()->set('evolution.api_key', 'evo-key');
+    Http::fake([
+        'https://evolution.example.test/message/sendText/*' => Http::response(['key' => ['id' => 'wamid-1']], 200),
+    ]);
+
+    $user = User::factory()->create();
+    connectQuoteWhatsApp($user);
+    publicQuote($user, ['public_token' => 'wa-once']);
+
+    $this->post('/q/wa-once/accept')->assertRedirect();
+    Http::assertSentCount(1);
+
+    Http::fake();
+    $this->post('/q/wa-once/accept')->assertRedirect();
+    Http::assertNothingSent();
+});
+

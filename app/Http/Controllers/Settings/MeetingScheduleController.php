@@ -76,6 +76,7 @@ class MeetingScheduleController extends Controller
                     'reminder' => $request->exists('whatsapp_reminder_template')
                         ? strtolower(trim((string) ($data['whatsapp_reminder_template'] ?? '')))
                         : $current['reminder'],
+                    'quote' => $current['quote'],
                     'language' => $data['whatsapp_template_language'] ?? $current['language'],
                 ],
             ])->save();

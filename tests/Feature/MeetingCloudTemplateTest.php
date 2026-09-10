@@ -44,6 +44,7 @@ it('saves Meta-approved template names on the workspace', function () {
 
     expect($user->workspace->meetingTemplateName('meeting_booked'))->toBe('evotechly_meeting_booked')
         ->and($user->workspace->meetingTemplateName('meeting_reminder'))->toBe('evotechly_meeting_reminder')
+        ->and($user->workspace->meetingTemplateName('quote_accepted'))->toBe('quote_accepted')
         ->and($user->workspace->meetingTemplateLanguage())->toBe('ar');
 });
 
