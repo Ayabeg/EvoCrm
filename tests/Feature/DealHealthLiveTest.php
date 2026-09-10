@@ -63,7 +63,56 @@ it('writes a deal health snapshot when the stage changes', function () {
             ->where('deal_id', $deal->id)
             ->where('kind', DealSuggestion::KIND_NEXT_MOVE)
             ->where('status', DealSuggestion::STATUS_PENDING)
+            ->count())->toBe(0)
+        ->and(DealSuggestion::query()
+            ->where('deal_id', $deal->id)
+            ->where('kind', DealSuggestion::KIND_LOST_REASON)
             ->count())->toBe(0);
+});
+
+it('drafts a loss reason when a deal is marked lost', function () {
+    $user = User::factory()->create();
+    $deal = liveHealthDeal($user);
+    $pipeline = $user->workspace->defaultPipeline();
+
+    $deal->moveTo($pipeline->stageBySlug('lost'), $user);
+
+    $row = DealSuggestion::query()
+        ->where('deal_id', $deal->id)
+        ->where('kind', DealSuggestion::KIND_LOST_REASON)
+        ->latest('id')
+        ->first();
+
+    expect($row)->not->toBeNull()
+        ->and($row->status)->toBe(DealSuggestion::STATUS_PENDING)
+        ->and($row->body)->not->toBeEmpty()
+        ->and(DealSuggestion::query()
+            ->where('deal_id', $deal->id)
+            ->where('kind', DealSuggestion::KIND_NEXT_MOVE)
+            ->where('status', DealSuggestion::STATUS_PENDING)
+            ->count())->toBe(0);
+
+    $this->actingAs($user)
+        ->get("/crm/deals/{$deal->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('lostReason.id', $row->id)
+            ->where('lostReason.kind', DealSuggestion::KIND_LOST_REASON)
+            ->where('nextMove', null)
+        );
+});
+
+it('does not draft a loss reason when the seller already wrote one', function () {
+    $user = User::factory()->create();
+    $deal = liveHealthDeal($user);
+    $deal->forceFill(['lost_reason' => 'Budget / timing'])->save();
+
+    $deal->moveTo($user->workspace->defaultPipeline()->stageBySlug('lost'), $user);
+
+    expect(DealSuggestion::query()
+        ->where('deal_id', $deal->id)
+        ->where('kind', DealSuggestion::KIND_LOST_REASON)
+        ->count())->toBe(0);
 });
 
 it('rescores open deals when inbound WhatsApp lands', function () {

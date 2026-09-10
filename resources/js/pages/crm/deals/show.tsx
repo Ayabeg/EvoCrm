@@ -66,6 +66,7 @@ export default function DealShow({
     catchUp,
     nextMove,
     afterTouch,
+    lostReason,
     products,
     members,
     splits,
@@ -117,6 +118,7 @@ export default function DealShow({
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     nextMove?: DealSuggestionPayload | null;
     afterTouch?: DealSuggestionPayload | null;
+    lostReason?: DealSuggestionPayload | null;
     products?: CatalogProduct[];
     members?: { id: number; name: string }[];
     splits?: {
@@ -260,6 +262,13 @@ export default function DealShow({
                                         dealId={deal.id}
                                         suggestion={afterTouch}
                                         title="After-touch draft"
+                                    />
+                                ) : null}
+                                {lostReason ? (
+                                    <DealSuggestionCard
+                                        dealId={deal.id}
+                                        suggestion={lostReason}
+                                        title="Loss reason"
                                     />
                                 ) : null}
                                 {dealHealth?.factors?.length ? (

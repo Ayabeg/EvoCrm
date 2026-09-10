@@ -195,6 +195,7 @@ class DealController extends Controller
         $snapshot = $health->latestFor($deal);
         $nextMove = $moves->latestPending($deal);
         $afterTouch = $moves->latestPending($deal, DealSuggestion::KIND_AFTER_TOUCH);
+        $lostReason = $moves->latestPending($deal, DealSuggestion::KIND_LOST_REASON);
 
         return Inertia::render('crm/deals/show', [
             'deal' => $deal,
@@ -214,6 +215,7 @@ class DealController extends Controller
                 : $insight->dealHealth($deal),
             'nextMove' => $nextMove?->present(),
             'afterTouch' => $afterTouch?->present(),
+            'lostReason' => $lostReason?->present(),
             'askEvo' => $insight->forDeal($deal),
         ]);
     }

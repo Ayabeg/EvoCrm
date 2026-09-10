@@ -138,6 +138,12 @@ class DealHealthScorer
                     'dismissed_at' => now(),
                 ]);
 
+            $workspace = $deal->workspace ?? Workspace::query()->find($deal->workspace_id);
+
+            if ($deal->stage->is_lost && $workspace instanceof Workspace && blank($deal->lost_reason)) {
+                app(LostReview::class)->draft($workspace, $deal);
+            }
+
             return null;
         }
 
