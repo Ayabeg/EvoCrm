@@ -60,8 +60,8 @@ class MeetingScheduleController extends Controller
             'work_start' => $data['work_start'],
             'work_end' => $data['work_end'],
             'weekdays' => array_values(array_unique(array_map('intval', $data['weekdays']))),
-            'location_note' => $data['location_note'] ?: null,
-            'intro' => $data['intro'] ?: null,
+            'location_note' => ($data['location_note'] ?? '') ?: null,
+            'intro' => ($data['intro'] ?? '') ?: null,
         ])->save();
 
         if ($request->exists('whatsapp_booked_template')
