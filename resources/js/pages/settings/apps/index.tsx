@@ -183,12 +183,17 @@ export default function AppsMarketplace({ apps }: { apps: MarketplaceApp[] }) {
         <>
             <Head title="Apps" />
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-xl font-semibold">Apps</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Continue with Facebook. WhatsApp connects automatically.
-                        You never enter an App ID, token, or API key.
-                    </p>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <h1 className="text-xl font-semibold">Apps</h1>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Continue with Facebook. WhatsApp connects automatically.
+                            You never enter an App ID, token, or API key.
+                        </p>
+                    </div>
+                    <Button asChild>
+                        <Link href="/settings/setup">Get started</Link>
+                    </Button>
                 </div>
 
                 <div className="grid gap-3">

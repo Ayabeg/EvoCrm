@@ -67,6 +67,10 @@ class ConnectorController extends Controller
 
         $request->session()->put('google_connector_intent', $enum->value);
 
+        if ($request->query('return') === 'start') {
+            $request->session()->put('google_setup_return', 'start');
+        }
+
         return GoogleAuth::redirectForConnector($enum);
     }
 

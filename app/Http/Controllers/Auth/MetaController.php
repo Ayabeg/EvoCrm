@@ -29,8 +29,10 @@ class MetaController extends Controller
      */
     public function redirect(Request $request): Response
     {
-        if ($request->query('return') === 'setup') {
-            $request->session()->put('auth.meta.return', 'setup');
+        $return = $request->query('return');
+
+        if (in_array($return, ['setup', 'start'], true)) {
+            $request->session()->put('auth.meta.return', $return);
         }
 
         if ($request->boolean('popup')) {
@@ -187,7 +189,7 @@ class MetaController extends Controller
     {
         $fromFacebook = str_contains((string) $request->headers->get('referer'), 'facebook.com');
         $popup = (bool) $request->session()->pull('auth.meta.popup', false) || $fromFacebook;
-        $setup = $request->session()->pull('auth.meta.return') === 'setup';
+        $setup = $request->session()->pull('auth.meta.return');
 
         if ($popup) {
             return response()->view('oauth.popup-complete', [
@@ -201,7 +203,14 @@ class MetaController extends Controller
             'message' => $message,
         ]);
 
-        if ($setup) {
+        if ($setup === 'start') {
+            return redirect()->route('settings.setup.show', [
+                'provider' => 'start',
+                'step' => $ok ? 'sms' : 'whatsapp',
+            ]);
+        }
+
+        if ($setup === 'setup') {
             return redirect()->route('settings.setup.show', [
                 'provider' => 'meta',
                 'step' => $ok ? 'finish' : 'connect',

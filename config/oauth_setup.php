@@ -38,4 +38,41 @@ return [
         ],
     ],
 
+    'start' => [
+        'name' => 'your workspace',
+        'tagline' => 'Google Calendar, WhatsApp, then the Algeria SMS key. Same wizard as Meta.',
+        'steps' => [
+            [
+                'key' => 'google',
+                'label' => 'Google Calendar',
+                'title' => 'Connect Google Calendar',
+            ],
+            [
+                'key' => 'whatsapp',
+                'label' => 'WhatsApp',
+                'title' => 'Connect WhatsApp',
+            ],
+            [
+                'key' => 'sms',
+                'label' => 'SMS',
+                'title' => 'Paste the Algeria SMS key',
+            ],
+            [
+                'key' => 'finish',
+                'label' => 'Finish',
+                'title' => 'You are ready to sell',
+            ],
+        ],
+        'troubleshooting' => [
+            [
+                'label' => 'Google Calendar scopes',
+                'href' => 'https://developers.google.com/calendar/api/guides/overview',
+            ],
+            [
+                'label' => 'WhatsApp Cloud API setup',
+                'href' => 'https://developers.facebook.com/docs/whatsapp/cloud-api/get-started',
+            ],
+        ],
+    ],
+
 ];

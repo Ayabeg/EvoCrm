@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\ConnectorProvider;
 use App\Http\Controllers\Controller;
+use App\Models\Connector;
 use App\Models\Integration;
+use App\Support\GoogleAuth;
 use App\Support\MetaAuth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +21,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class OAuthSetupController extends Controller
 {
+    public function start(): RedirectResponse
+    {
+        return redirect()->route('settings.setup.show', ['provider' => 'start']);
+    }
+
     public function show(Request $request, string $provider): Response
     {
         $config = $this->config($provider);
@@ -45,6 +53,7 @@ class OAuthSetupController extends Controller
                 : null,
             'appsUrl' => route('settings.apps'),
             'metaState' => $provider === 'meta' ? $this->metaState($request) : null,
+            'startState' => $provider === 'start' ? $this->startState($request) : null,
         ]);
     }
 
@@ -88,6 +97,39 @@ class OAuthSetupController extends Controller
             'selected_page_id' => $integration?->meta['selected_page_id'] ?? null,
             'selected_page_name' => $integration?->meta['selected_page_name'] ?? null,
             'unlocks' => MetaAuth::unlocks($integration),
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function startState(Request $request): array
+    {
+        $workspace = $request->user()->workspace;
+        $calendar = Connector::query()
+            ->forWorkspace($workspace)
+            ->where('provider', ConnectorProvider::GoogleCalendar)
+            ->first();
+        $sms = $workspace->integration(Integration::PROVIDER_SMS);
+        $whatsapp = $workspace->integration(Integration::PROVIDER_WHATSAPP);
+        $cloud = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
+
+        return [
+            'google' => [
+                'connected' => $calendar?->isConnected() ?? false,
+                'configured' => GoogleAuth::enabled(),
+                'connect_url' => GoogleAuth::enabled()
+                    ? '/settings/connectors/google/'.ConnectorProvider::GoogleCalendar->value.'?return=start'
+                    : null,
+            ],
+            'whatsapp' => [
+                'connected' => ($whatsapp?->isConnected() ?? false) || ($cloud?->isConnected() ?? false),
+                'connect_url' => '/auth/meta?return=start&popup=1',
+            ],
+            'sms' => [
+                'connected' => $sms?->isConnected() ?? false,
+                'key_set' => filled($sms?->access_token),
+                'url' => $sms?->meta['url'] ?? config('sms.http.url'),
+                'sender' => $sms?->meta['sender'] ?? config('sms.sender', 'EVOTECHLY'),
+            ],
         ];
     }
 

@@ -95,6 +95,13 @@ class SmsSettingsController extends Controller
             'message' => 'SMS gateway saved. The API key is stored encrypted and is never shown again.',
         ]);
 
+        if ($request->input('return') === 'start') {
+            return redirect()->route('settings.setup.show', [
+                'provider' => 'start',
+                'step' => 'finish',
+            ]);
+        }
+
         return redirect()->route('settings.sms');
     }
 

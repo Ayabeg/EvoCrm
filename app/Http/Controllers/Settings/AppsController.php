@@ -64,6 +64,7 @@ class AppsController extends Controller
                     'manage_url' => '/settings/whatsapp-business',
                     'popup' => true,
                     'unlocks' => [],
+                    'setup_url' => '/settings/setup/start?step=whatsapp',
                 ],
                 [
                     'key' => Integration::PROVIDER_WHATSAPP_BUSINESS,
@@ -86,6 +87,7 @@ class AppsController extends Controller
                     'connected_at' => null,
                     'connect_url' => null,
                     'manage_url' => '/settings/connectors',
+                    'setup_url' => '/settings/setup/start?step=google',
                     'callback_url' => GoogleAuth::callbackUrl(),
                     'origin_url' => GoogleAuth::javascriptOrigin(),
                     'unlocks' => [],

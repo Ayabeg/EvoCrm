@@ -152,6 +152,13 @@ class GoogleController extends Controller
             'message' => $provider->label().' connected on the existing Google OAuth client.',
         ]);
 
+        if ($request->session()->pull('google_setup_return') === 'start') {
+            return redirect()->route('settings.setup.show', [
+                'provider' => 'start',
+                'step' => 'whatsapp',
+            ]);
+        }
+
         return redirect()->route('settings.connectors');
     }
 }
