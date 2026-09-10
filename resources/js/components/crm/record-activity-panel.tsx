@@ -4,6 +4,7 @@ import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import ActivityComposer from '@/components/crm/activity-composer';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
+import { MeetingAttendanceButtons } from '@/components/crm/meeting-attendance';
 import type { RecordActivity } from '@/components/crm/record-activity';
 import {
     deriveRecordNext,
@@ -23,6 +24,7 @@ const ACTIVITY_CHIPS = [
     { key: 'call', label: 'Calls' },
     { key: 'email', label: 'Emails' },
     { key: 'task', label: 'Tasks' },
+    { key: 'meeting', label: 'Meetings' },
     { key: 'note', label: 'Notes' },
 ];
 
@@ -210,6 +212,12 @@ export default function RecordActivityPanel({
                                             Mark done
                                         </Button>
                                     </Form>
+                                ) : null}
+                                {item.type === 'meeting' ? (
+                                    <MeetingAttendanceButtons
+                                        activityId={item.id}
+                                        attendance={item.meta?.attendance}
+                                    />
                                 ) : null}
                             </RecordTimelineItem>
                         ))

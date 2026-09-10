@@ -70,6 +70,7 @@ const triggerLabel: Record<string, string> = {
     'lead.scored': 'Lead scored',
     'lead.qualified': 'Lead qualified',
     'meeting.booked': 'Meeting booked',
+    'meeting.no_show': 'Meeting no-show',
     'ticket.created': 'Ticket created',
     'ticket.status_changed': 'Ticket status changed',
     'ticket.sla_breached': 'Ticket SLA breached',
@@ -544,6 +545,9 @@ export default function WorkflowsIndex({
                                     </option>
                                     <option value="meeting.booked">
                                         Meeting booked
+                                    </option>
+                                    <option value="meeting.no_show">
+                                        Meeting no-show
                                     </option>
                                     <option value="ticket.created">
                                         Ticket created

@@ -8,8 +8,10 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Services\Crm\ActivityRecorder;
+use App\Services\Meetings\MeetingLifecycle;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -118,6 +120,20 @@ class ActivityController extends Controller
         abort_unless((int) $activity->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $activity->markDone();
+
+        return back();
+    }
+
+    public function attendance(Request $request, Activity $activity, MeetingLifecycle $lifecycle): RedirectResponse
+    {
+        abort_unless((int) $activity->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($activity->type === 'meeting', 404);
+
+        $data = $request->validate([
+            'attendance' => ['required', 'string', Rule::in(Activity::ATTENDANCES)],
+        ]);
+
+        $lifecycle->markAttendance($activity, $data['attendance']);
 
         return back();
     }

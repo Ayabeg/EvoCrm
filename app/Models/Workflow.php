@@ -73,6 +73,8 @@ class Workflow extends Model
 
     public const TRIGGER_MEETING_BOOKED = 'meeting.booked';
 
+    public const TRIGGER_MEETING_NO_SHOW = 'meeting.no_show';
+
     public const TRIGGER_TICKET_CREATED = 'ticket.created';
 
     public const TRIGGER_TICKET_STATUS_CHANGED = 'ticket.status_changed';
@@ -135,6 +137,7 @@ class Workflow extends Model
             self::TRIGGER_LEAD_SCORED,
             self::TRIGGER_LEAD_QUALIFIED,
             self::TRIGGER_MEETING_BOOKED,
+            self::TRIGGER_MEETING_NO_SHOW,
             self::TRIGGER_TICKET_CREATED,
             self::TRIGGER_TICKET_STATUS_CHANGED,
             self::TRIGGER_TICKET_SLA_BREACHED,

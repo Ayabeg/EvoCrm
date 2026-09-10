@@ -153,6 +153,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::get('/crm/activities', [ActivityController::class, 'index'])->name('crm.activities.index');
     Route::post('/crm/activities', [ActivityController::class, 'store'])->name('crm.activities.store');
     Route::post('/crm/activities/{activity}/complete', [ActivityController::class, 'complete'])->name('crm.activities.complete');
+    Route::post('/crm/activities/{activity}/attendance', [ActivityController::class, 'attendance'])->name('crm.activities.attendance');
     Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');
     Route::patch('/crm/filters/{savedFilter}', [SavedFilterController::class, 'update'])->name('crm.filters.update');
     Route::delete('/crm/filters/{savedFilter}', [SavedFilterController::class, 'destroy'])->name('crm.filters.destroy');

@@ -1,5 +1,6 @@
 import { Form } from '@inertiajs/react';
 import type { ReactNode } from 'react';
+import { MeetingAttendanceButtons } from '@/components/crm/meeting-attendance';
 import TimelineFilter from '@/components/crm/timeline-filter';
 import { Button } from '@/components/ui/button';
 
@@ -33,6 +34,7 @@ type TimelineItem = {
     subject?: string | null;
     body?: string | null;
     done?: boolean;
+    meta?: { attendance?: string | null } | null;
 };
 
 export function RecordTimeline({ timeline = [] }: { timeline?: TimelineItem[] }) {
@@ -56,6 +58,12 @@ export function RecordTimeline({ timeline = [] }: { timeline?: TimelineItem[] })
                                                 Done
                                             </Button>
                                         </Form>
+                                    ) : null}
+                                    {item.type === 'meeting' ? (
+                                        <MeetingAttendanceButtons
+                                            activityId={item.id}
+                                            attendance={item.meta?.attendance}
+                                        />
                                     ) : null}
                                 </div>
                             ))}

@@ -36,7 +36,7 @@ export default function MeetingSettings({ schedule }: { schedule: Schedule }) {
             <div className="space-y-6">
                 <Heading
                     title="Meetings"
-                    description="Public booking link. Guests pick a slot in Africa/Algiers. A meeting lands on the contact timeline."
+                    description="Public booking link. Guests pick a slot in Africa/Algiers. A meeting lands on the contact timeline. We email and WhatsApp a reminder 24 hours before; unmarked slots become no-show after they end."
                 />
                 <Card className="space-y-3 border-hairline p-4">
                     <p className="text-[13px] text-ink">

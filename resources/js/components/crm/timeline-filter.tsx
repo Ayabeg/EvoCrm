@@ -7,6 +7,7 @@ type TimelineItem = {
     subject?: string | null;
     body?: string | null;
     done?: boolean;
+    meta?: { attendance?: string | null } | null;
 };
 
 export default function TimelineFilter({

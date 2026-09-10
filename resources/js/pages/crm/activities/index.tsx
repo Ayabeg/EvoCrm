@@ -1,6 +1,7 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmListFooter, CrmListHeader } from '@/components/crm/list-chrome';
+import { MeetingAttendanceButtons } from '@/components/crm/meeting-attendance';
 import { Badge } from '@/components/ui/badge';
 
 type Activity = {
@@ -15,6 +16,7 @@ type Activity = {
     contact?: { id: number; first_name: string; last_name?: string | null } | null;
     deal?: { id: number; title: string } | null;
     company?: { id: number; name: string } | null;
+    meta?: { attendance?: string | null } | null;
 };
 
 type Filters = {
@@ -182,7 +184,14 @@ export default function ActivitiesIndex({
                                                 : (activity.due_at ?? '—')}
                                         </td>
                                         <td className="px-4 py-2.5 text-right">
-                                            {!activity.done ? (
+                                            {activity.type === 'meeting' ? (
+                                                <div className="flex justify-end">
+                                                    <MeetingAttendanceButtons
+                                                        activityId={activity.id}
+                                                        attendance={activity.meta?.attendance}
+                                                    />
+                                                </div>
+                                            ) : !activity.done ? (
                                                 <Form
                                                     action={`/crm/activities/${activity.id}/complete`}
                                                     method="post"

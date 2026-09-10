@@ -28,6 +28,18 @@ class Activity extends Model
 {
     use BelongsToWorkspace;
 
+    public const ATTENDANCE_SHOW = 'show';
+
+    public const ATTENDANCE_NO_SHOW = 'no_show';
+
+    /**
+     * @var list<string>
+     */
+    public const ATTENDANCES = [
+        self::ATTENDANCE_SHOW,
+        self::ATTENDANCE_NO_SHOW,
+    ];
+
     protected function casts(): array
     {
         return [
@@ -69,5 +81,47 @@ class Activity extends Model
             'done' => true,
             'completed_at' => now(),
         ])->save();
+    }
+
+    public function attendance(): ?string
+    {
+        $value = $this->meta['attendance'] ?? null;
+
+        return in_array($value, self::ATTENDANCES, true) ? $value : null;
+    }
+
+    public function wasReminded(): bool
+    {
+        return filled($this->meta['reminded_at'] ?? null);
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     */
+    public function mergeMeta(array $values): void
+    {
+        $this->forceFill(['meta' => array_merge($this->meta ?? [], $values)])->save();
+    }
+
+    public function markAttendance(string $attendance): bool
+    {
+        if (! in_array($attendance, self::ATTENDANCES, true)) {
+            return false;
+        }
+
+        if ($this->attendance() === $attendance) {
+            return false;
+        }
+
+        $meta = $this->meta ?? [];
+        $meta['attendance'] = $attendance;
+
+        $this->forceFill([
+            'meta' => $meta,
+            'done' => true,
+            'completed_at' => $this->completed_at ?? now(),
+        ])->save();
+
+        return true;
     }
 }

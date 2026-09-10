@@ -52,5 +52,10 @@ return [
             'cadence' => 'Mondays at 07:30 Africa/Algiers',
             'stale_after_seconds' => 700000,
         ],
+        'meetings:nudge' => [
+            'label' => 'Meeting reminders and no-shows',
+            'cadence' => 'Every minute',
+            'stale_after_seconds' => 180,
+        ],
     ],
 ];

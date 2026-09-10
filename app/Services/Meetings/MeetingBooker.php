@@ -14,11 +14,7 @@ use App\Services\Connectors\GoogleApiClient;
 use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\WorkflowRunner;
-use App\Services\Evolution\EvolutionCloudService;
-use App\Services\Outbound\MailerFactory;
-use App\Services\Outbound\SmtpMailboxMailer;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -30,8 +26,8 @@ class MeetingBooker
         private ActivityRecorder $activities,
         private WorkflowRunner $workflows,
         private GoogleApiClient $google,
-        private MailerFactory $mailers,
-        private EvolutionCloudService $evolution,
+        private MeetingMailer $mail,
+        private MeetingWhatsApp $whatsapp,
     ) {}
 
     /**
@@ -86,6 +82,7 @@ class MeetingBooker
                 'location_note' => $schedule->location_note,
                 'guest_email' => $guest['email'],
                 'guest_phone' => $guest['phone'],
+                'guest_name' => $guest['first_name'],
             ],
         ], $host);
 
@@ -165,44 +162,24 @@ class MeetingBooker
      */
     private function confirm(MeetingSchedule $schedule, User $host, array $guest, string $whenLabel): void
     {
-        $mailable = new MeetingBookedMail(
-            guestName: $guest['first_name'],
-            hostName: $host->name,
-            whenLabel: $whenLabel,
-            timezone: $schedule->timezone ?: MeetingSchedule::TIMEZONE,
-            locationNote: $schedule->location_note,
-            note: $guest['note'] ?? null,
-        );
+        $workspace = $schedule->workspace ?? Workspace::query()->find($schedule->workspace_id);
 
-        if (app()->environment('testing') || config('mail.default') === 'array') {
-            Mail::to($guest['email'])->cc($host->email)->send($mailable);
-
+        if (! $workspace instanceof Workspace) {
             return;
         }
 
-        $mailbox = $this->mailers->resolve($schedule->workspace);
-
-        if (! $mailbox) {
-            Mail::to($guest['email'])->cc($host->email)->send($mailable);
-
-            return;
-        }
-
-        $content = $mailable->content();
-        $data = [
-            'guestName' => $mailable->guestName,
-            'hostName' => $mailable->hostName,
-            'whenLabel' => $mailable->whenLabel,
-            'timezone' => $mailable->timezone,
-            'locationNote' => $mailable->locationNote,
-            'note' => $mailable->note,
-        ];
-
-        (new SmtpMailboxMailer($mailbox))->sendAdHoc(
+        $this->mail->send(
+            $workspace,
             $guest['email'],
-            $mailable->envelope()->subject ?? 'Meeting confirmed',
-            view($content->text ?? 'mail.meeting-booked-text', $data)->render(),
-            view($content->view ?? 'mail.meeting-booked', $data)->render(),
+            $host->email,
+            new MeetingBookedMail(
+                guestName: $guest['first_name'],
+                hostName: $host->name,
+                whenLabel: $whenLabel,
+                timezone: $schedule->timezone ?: MeetingSchedule::TIMEZONE,
+                locationNote: $schedule->location_note,
+                note: $guest['note'] ?? null,
+            ),
         );
     }
 
@@ -217,77 +194,27 @@ class MeetingBooker
         array $guest,
         string $whenLabel,
     ): void {
-        try {
-            $this->sendWhatsAppConfirm($schedule, $activity, $contact, $host, $guest, $whenLabel);
-        } catch (Throwable) {
-            $this->stampWhatsApp($activity, 'failed');
-        }
-    }
-
-    /**
-     * @param  array{first_name: string, phone: string}  $guest
-     */
-    private function sendWhatsAppConfirm(
-        MeetingSchedule $schedule,
-        Activity $activity,
-        Contact $contact,
-        User $host,
-        array $guest,
-        string $whenLabel,
-    ): void {
-        if (! $this->evolution->configured()) {
-            return;
-        }
-
         $workspace = $schedule->workspace ?? Workspace::query()->find($schedule->workspace_id);
-        $number = $contact->phone_e164 ?: $guest['phone'];
 
-        if (! $workspace instanceof Workspace || ! filled($number)) {
+        if (! $workspace instanceof Workspace) {
             return;
         }
 
-        $cloud = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
-        $phone = $workspace->integration(Integration::PROVIDER_WHATSAPP);
-        $body = $this->whatsAppBody($guest['first_name'], $host->name, $whenLabel, $schedule);
-
-        if ($cloud?->isConnected()) {
-            $instance = $cloud->meta['instance']
-                ?? $this->evolution->instanceName($workspace, EvolutionCloudService::KIND_WHATSAPP_BUSINESS);
-            $template = $this->evolution->sendTemplate(
-                $number,
-                'meeting_booked',
-                (string) config('evolution.meta.language', 'fr'),
-                [
-                    [
-                        'type' => 'body',
-                        'parameters' => [
-                            ['type' => 'text', 'text' => $guest['first_name']],
-                            ['type' => 'text', 'text' => $host->name],
-                            ['type' => 'text', 'text' => $whenLabel],
-                        ],
-                    ],
-                ],
-                $instance,
+        try {
+            $status = $this->whatsapp->send(
+                $workspace,
+                $contact,
+                $guest['phone'],
+                MeetingWhatsApp::TEMPLATE_BOOKED,
+                $this->whatsAppBody($guest['first_name'], $host->name, $whenLabel, $schedule),
+                [$guest['first_name'], $host->name, $whenLabel],
             );
-
-            if ($template['ok']) {
-                $this->stampWhatsApp($activity, 'sent');
-
-                return;
-            }
+        } catch (Throwable) {
+            $status = 'failed';
         }
 
-        if ($phone?->isConnected()) {
-            $instance = $phone->meta['instance']
-                ?? $this->evolution->instanceName($workspace, EvolutionCloudService::KIND_WHATSAPP);
-            $text = $this->evolution->sendText($number, $body, $instance);
-            $this->stampWhatsApp($activity, $text['ok'] ? 'sent' : 'failed', $text['ok'] ? null : ($text['error'] ?? 'Send failed'));
-
-            return;
-        }
-
-        if ($cloud?->isConnected()) {
-            $this->stampWhatsApp($activity, 'failed');
+        if ($status) {
+            $activity->mergeMeta(['whatsapp_confirm' => $status]);
         }
     }
 
@@ -304,19 +231,5 @@ class MeetingBooker
         }
 
         return implode("\n", $lines);
-    }
-
-    private function stampWhatsApp(Activity $activity, string $status, ?string $error = null): void
-    {
-        $meta = $activity->meta ?? [];
-        $meta['whatsapp_confirm'] = $status;
-
-        if ($error) {
-            $meta['whatsapp_confirm_error'] = mb_substr($error, 0, 180);
-        } else {
-            unset($meta['whatsapp_confirm_error']);
-        }
-
-        $activity->forceFill(['meta' => $meta])->save();
     }
 }
