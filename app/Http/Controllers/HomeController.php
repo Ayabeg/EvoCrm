@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AiInsight;
 use App\Models\EnrichmentRun;
 use App\Services\Home\HomeDashboardBuilder;
 use App\Services\Home\QuotaTracker;
@@ -44,6 +45,7 @@ class HomeController extends Controller
             'dataAsOf' => now('Africa/Algiers')->format('Y-m-d H:i'),
             'leadOsGraph' => app(GraphRunner::class)->latest($workspace)?->present(),
             'placesRun' => EnrichmentRun::presentLatestPlaces($workspace),
+            'researchBrief' => AiInsight::presentLatestBrief($workspace),
         ]);
     }
 }

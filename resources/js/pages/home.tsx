@@ -80,6 +80,16 @@ type PlacesRun = {
     href: string | null;
 };
 
+type ResearchBrief = {
+    id: number;
+    subject_type: string;
+    subject_id: number;
+    answer?: string | null;
+    source: string;
+    created_at?: string | null;
+    href: string | null;
+};
+
 type Props = {
     window: { from: string; to: string; days: number; timezone: string };
     kpis: KpiTile[];
@@ -97,6 +107,7 @@ type Props = {
     dataAsOf?: string;
     leadOsGraph?: LeadOsGraphPayload | null;
     placesRun?: PlacesRun | null;
+    researchBrief?: ResearchBrief | null;
 };
 
 function PipelineSummary({ pipeline }: { pipeline: PipelineHealth }) {
@@ -274,10 +285,17 @@ function MonthlyQuota({ quota }: { quota: Quota }) {
     );
 }
 
-function PlacesRunCard({ run }: { run: PlacesRun | null }) {
+function PlacesRunCard({
+    run,
+    brief,
+}: {
+    run: PlacesRun | null;
+    brief: ResearchBrief | null;
+}) {
     const when = run?.created_at
         ? run.created_at.replace('T', ' ').slice(0, 16)
         : null;
+    const href = brief?.href ?? run?.href ?? null;
 
     return (
         <DashboardSection
@@ -288,9 +306,9 @@ function PlacesRunCard({ run }: { run: PlacesRun | null }) {
                     : 'No Google Places run yet. Enrich a company to pull Algerian address and phone.'
             }
             action={
-                run?.href ? (
+                href ? (
                     <Link
-                        href={run.href}
+                        href={href}
                         className="text-[12px] text-mute transition-colors hover:text-ink"
                     >
                         Open record
@@ -313,6 +331,15 @@ function PlacesRunCard({ run }: { run: PlacesRun | null }) {
                     Waiting on the first Places lookup.
                 </p>
             )}
+            {brief?.answer ? (
+                <p className="mt-2 text-[12px] leading-5 text-ink" data-testid="research-brief">
+                    {brief.answer}
+                </p>
+            ) : (
+                <p className="mt-2 text-[12px] text-mute" data-testid="research-brief">
+                    No research brief yet.
+                </p>
+            )}
         </DashboardSection>
     );
 }
@@ -333,6 +360,7 @@ export default function Home({
     dataAsOf,
     leadOsGraph,
     placesRun = null,
+    researchBrief = null,
 }: Props) {
     const subtitle = `Sales command center · ${window.from} → ${window.to}`;
 
@@ -360,7 +388,7 @@ export default function Home({
                         <LeadOsGraphStatus graph={leadOsGraph} compact />
                     </div>
                     <div className="border-t border-hairline px-4 py-3 md:px-5 lg:border-t-0">
-                        <PlacesRunCard run={placesRun} />
+                        <PlacesRunCard run={placesRun} brief={researchBrief} />
                     </div>
                 </div>
 

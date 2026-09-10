@@ -2,6 +2,7 @@
 
 use App\Enums\ChannelType;
 use App\Models\Activity;
+use App\Models\AiInsight;
 use App\Models\Channel;
 use App\Models\Company;
 use App\Models\Contact;
@@ -223,5 +224,46 @@ it('does not invent a Places run when none exist', function () {
     $this->actingAs($user)
         ->get('/dashboard')
         ->assertInertia(fn ($page) => $page
-            ->where('placesRun', null));
+            ->where('placesRun', null)
+            ->where('researchBrief', null));
+});
+
+it('surfaces the latest research brief on Home next to Places', function () {
+    $user = User::factory()->create();
+    $company = Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Clinique Atlas',
+        'city' => 'Alger',
+        'wilaya' => 'Alger',
+    ]);
+
+    $brief = AiInsight::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'subject_type' => 'company',
+        'subject_id' => $company->id,
+        'question' => 'Research brief',
+        'answer' => 'Clinique Atlas is a clinic in Alger. Domain clinique-atlas.dz is on file.',
+        'source' => 'fields',
+    ]);
+
+    $other = User::factory()->create();
+    AiInsight::query()->create([
+        'workspace_id' => $other->workspace_id,
+        'subject_type' => 'company',
+        'subject_id' => Company::factory()->create(['workspace_id' => $other->workspace_id])->id,
+        'question' => 'Research brief',
+        'answer' => 'Other workspace brief',
+        'source' => 'fields',
+    ]);
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('researchBrief.id', $brief->id)
+            ->where('researchBrief.subject_type', 'company')
+            ->where('researchBrief.source', 'fields')
+            ->where('researchBrief.href', '/crm/companies/'.$company->id)
+            ->where('researchBrief.answer', 'Clinique Atlas is a clinic in Alger. Domain clinique-atlas.dz is on file.')
+        );
 });

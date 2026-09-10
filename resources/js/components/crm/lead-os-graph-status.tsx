@@ -52,7 +52,7 @@ export default function LeadOsGraphStatus({
                     <p className="mt-1 text-[12px] text-mute">
                         {graph
                             ? `Last ${graph.triggered_by} run · ${when(graph.started_at)} · ${graph.ok_count} ok · ${graph.skipped_count} skipped · ${graph.failed_count} failed`
-                            : 'No nightly run yet. Capture-drain, enrich, and score skip until those commands land.'}
+                            : 'No graph run yet. Run now to drain ads, enrich, score, research, health, and next-move.'}
                     </p>
                 </div>
                 <Form action="/lead-os/graph" method="post">
