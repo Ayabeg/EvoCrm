@@ -3,13 +3,17 @@
 namespace App\Services\LeadOs;
 
 use App\Models\Activity;
+use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealSuggestion;
+use App\Models\Message;
 use App\Models\Stage;
+use App\Models\Workspace;
 use App\Services\Ai\LlmClient;
+use App\Services\Crm\ActivityRecorder;
 
 /**
- * After a human logs a note, call, or email, queue one draft.
+ * After a human logs a note, call, email, or inbound WhatsApp, queue one draft.
  * Never auto-advance the deal.
  */
 class AfterTouchDraft
@@ -19,7 +23,41 @@ class AfterTouchDraft
     public function shouldDraft(Activity $activity): bool
     {
         return $activity->deal_id
-            && in_array($activity->type, ['note', 'call', 'email'], true);
+            && in_array($activity->type, ['note', 'call', 'email', 'whatsapp'], true);
+    }
+
+    public function logInboundWhatsApp(Workspace $workspace, Contact $contact, Message $message): void
+    {
+        $deals = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('contact_id', $contact->id)
+            ->with(['stage', 'pipeline.stages', 'contact'])
+            ->whereHas('stage', fn ($query) => $query->where('is_won', false)->where('is_lost', false))
+            ->get();
+
+        $recorder = app(ActivityRecorder::class);
+
+        foreach ($deals as $deal) {
+            if (! $deal instanceof Deal) {
+                continue;
+            }
+
+            $recorder->record($workspace, [
+                'type' => 'whatsapp',
+                'subject' => 'Inbound WhatsApp',
+                'body' => $message->body,
+                'contact_id' => $contact->id,
+                'deal_id' => $deal->id,
+                'company_id' => $deal->company_id,
+                'provider' => $message->provider,
+                'provider_event_id' => (string) ($message->provider_message_id ?: $message->id),
+                'meta' => [
+                    'direction' => 'inbound',
+                    'message_id' => $message->id,
+                    'auto_send' => false,
+                ],
+            ]);
+        }
     }
 
     public function draft(Activity $activity): ?DealSuggestion

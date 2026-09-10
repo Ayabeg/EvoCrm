@@ -131,7 +131,7 @@ class DealHealthScorer
         if ($deal->stage?->isTerminal()) {
             DealSuggestion::query()
                 ->where('deal_id', $deal->id)
-                ->where('kind', DealSuggestion::KIND_NEXT_MOVE)
+                ->whereIn('kind', [DealSuggestion::KIND_NEXT_MOVE, DealSuggestion::KIND_AFTER_TOUCH])
                 ->where('status', DealSuggestion::STATUS_PENDING)
                 ->update([
                     'status' => DealSuggestion::STATUS_DISMISSED,

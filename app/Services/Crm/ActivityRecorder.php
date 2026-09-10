@@ -39,7 +39,7 @@ class ActivityRecorder
 
         $this->touch($activity);
 
-        if ($activity->deal_id && in_array($activity->type, ['note', 'call', 'email'], true)) {
+        if ($activity->deal_id && in_array($activity->type, ['note', 'call', 'email', 'whatsapp'], true)) {
             DraftAfterTouch::dispatch($activity->id);
         }
 

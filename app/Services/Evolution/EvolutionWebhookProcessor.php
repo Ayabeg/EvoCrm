@@ -12,6 +12,7 @@ use App\Models\Ticket;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\ContactIdentity;
+use App\Services\LeadOs\AfterTouchDraft;
 use App\Services\LeadOs\DealHealthScorer;
 use App\Support\AlgerianPhone;
 use Illuminate\Support\Arr;
@@ -22,6 +23,7 @@ class EvolutionWebhookProcessor
         private ContactIdentity $contacts,
         private ProductAnalytics $analytics,
         private DealHealthScorer $health,
+        private AfterTouchDraft $drafts,
     ) {}
 
     /**
@@ -117,6 +119,7 @@ class EvolutionWebhookProcessor
                 'thread_id' => $thread->id,
             ], null, $workspace);
             $this->health->refreshOpenDealsForContact($workspace, $contact);
+            $this->drafts->logInboundWhatsApp($workspace, $contact, $message);
         }
 
         return $message;

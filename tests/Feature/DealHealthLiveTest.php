@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealHealthSnapshot;
@@ -146,6 +147,12 @@ it('rescores open deals when inbound WhatsApp lands', function () {
         ->where('status', DealSuggestion::STATUS_PENDING)
         ->latest('id')
         ->first();
+    $after = DealSuggestion::query()
+        ->where('deal_id', $deal->id)
+        ->where('kind', DealSuggestion::KIND_AFTER_TOUCH)
+        ->where('status', DealSuggestion::STATUS_PENDING)
+        ->latest('id')
+        ->first();
 
     expect($deal->last_activity_at?->gt(now()->subMinute()))->toBeTrue()
         ->and($live)->not->toBeNull()
@@ -153,7 +160,18 @@ it('rescores open deals when inbound WhatsApp lands', function () {
         ->and($live->band)->not->toBe(DealHealthSnapshot::BAND_STALLED)
         ->and($live->graph_run_id)->toBeNull()
         ->and($move)->not->toBeNull()
-        ->and($move->payload['auto_send'] ?? null)->toBeFalse();
+        ->and($move->payload['auto_send'] ?? null)->toBeFalse()
+        ->and($after)->not->toBeNull()
+        ->and(data_get($after->payload, 'auto_advance'))->toBeFalse()
+        ->and(data_get($after->payload, 'source_activity_type'))->toBe('whatsapp');
+
+    $this->actingAs($user)
+        ->get("/crm/deals/{$deal->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('afterTouch.id', $after->id)
+            ->where('afterTouch.kind', DealSuggestion::KIND_AFTER_TOUCH)
+        );
 });
 
 it('does not rescore on outbound WhatsApp', function () {
@@ -176,6 +194,7 @@ it('does not rescore on outbound WhatsApp', function () {
 
     expect(DealHealthSnapshot::query()->where('deal_id', $deal->id)->count())->toBe(0)
         ->and(DealSuggestion::query()->where('deal_id', $deal->id)->count())->toBe(0)
+        ->and(Activity::query()->where('deal_id', $deal->id)->where('type', 'whatsapp')->count())->toBe(0)
         ->and($deal->fresh()->last_activity_at?->lt(now()->subDays(7)))->toBeTrue();
 });
 
@@ -205,6 +224,7 @@ it('does not rescore a foreign contact deal on inbound WhatsApp', function () {
 
     expect(DealHealthSnapshot::query()->where('deal_id', $mine->id)->count())->toBe(1)
         ->and(DealHealthSnapshot::query()->where('deal_id', $other->id)->count())->toBe(0)
-        ->and(DealSuggestion::query()->where('deal_id', $mine->id)->count())->toBe(1)
-        ->and(DealSuggestion::query()->where('deal_id', $other->id)->count())->toBe(0);
+        ->and(DealSuggestion::query()->where('deal_id', $mine->id)->where('kind', DealSuggestion::KIND_NEXT_MOVE)->count())->toBe(1)
+        ->and(DealSuggestion::query()->where('deal_id', $other->id)->count())->toBe(0)
+        ->and(DealSuggestion::query()->where('deal_id', $mine->id)->where('kind', DealSuggestion::KIND_AFTER_TOUCH)->count())->toBe(1);
 });
