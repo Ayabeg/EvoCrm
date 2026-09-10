@@ -36,6 +36,37 @@ type SalesRow = {
     revenue_cents: number;
 };
 
+type QuotaOwner = {
+    user_id: number | null;
+    name: string;
+    target_cents: number | null;
+    won_cents: number;
+    won_count: number;
+    remaining_cents: number | null;
+    attainment_pct: number | null;
+    expected_cents: number | null;
+    status: 'hit' | 'on_track' | 'behind' | 'no_target' | string;
+};
+
+type Quota = {
+    month: string;
+    label: string;
+    timezone: string;
+    day: number;
+    days: number;
+    elapsed_pct: number;
+    target_cents: number | null;
+    won_cents: number;
+    won_count: number;
+    remaining_cents: number | null;
+    attainment_pct: number | null;
+    expected_cents: number | null;
+    status: string;
+    can_manage: boolean;
+    settings_href: string;
+    owners: QuotaOwner[];
+};
+
 type Props = {
     window: { from: string; to: string; days: number; timezone: string };
     kpis: KpiTile[];
@@ -46,6 +77,7 @@ type Props = {
     caughtUp?: boolean;
     activityFeed: ActivityFeedItem[];
     salesPerformance: SalesRow[] | null;
+    quota?: Quota | null;
     quickActions: { label: string; href: string }[];
     owners?: Owner[];
     filters?: Filters;
@@ -87,6 +119,147 @@ function PipelineSummary({ pipeline }: { pipeline: PipelineHealth }) {
     );
 }
 
+function quotaStatusLabel(status: string): string {
+    if (status === 'hit') {
+        return 'Hit';
+    }
+    if (status === 'on_track') {
+        return 'On track';
+    }
+    if (status === 'behind') {
+        return 'Behind pace';
+    }
+
+    return 'No target';
+}
+
+function MonthlyQuota({ quota }: { quota: Quota }) {
+    const hasTarget = quota.target_cents !== null;
+    const barPct = Math.min(100, quota.attainment_pct ?? 0);
+    const showTable = quota.owners.length > 0;
+
+    if (!hasTarget && !showTable && !quota.can_manage) {
+        return null;
+    }
+
+    return (
+        <div
+            className="border-b border-hairline bg-canvas px-4 py-3 md:px-5"
+            data-testid="monthly-quota"
+        >
+            <DashboardSection
+                title={`Quota · ${quota.label}`}
+                description={`Closed-won vs monthly DZD target · day ${quota.day} of ${quota.days} (${quota.elapsed_pct}% elapsed)`}
+                action={
+                    quota.can_manage ? (
+                        <Link
+                            href={quota.settings_href}
+                            className="text-[12px] text-mute transition-colors hover:text-ink"
+                        >
+                            Edit quotas
+                        </Link>
+                    ) : null
+                }
+            >
+                {hasTarget ? (
+                    <div className="mb-3">
+                        <div className="flex flex-wrap items-baseline justify-between gap-2">
+                            <p className="text-[13px] text-ink">
+                                <span className="money font-semibold">
+                                    {formatDzd(quota.won_cents)}
+                                </span>
+                                <span className="text-mute">
+                                    {' '}
+                                    of {formatDzd(quota.target_cents)} ·{' '}
+                                    {quota.attainment_pct}%
+                                </span>
+                            </p>
+                            <p className="text-[12px] text-mute">
+                                {quotaStatusLabel(quota.status)}
+                                {quota.remaining_cents !== null &&
+                                quota.status !== 'hit'
+                                    ? ` · ${formatCompactDzd(quota.remaining_cents)} remaining`
+                                    : ''}
+                            </p>
+                        </div>
+                        <div
+                            className="mt-2 h-1.5 overflow-hidden rounded-full bg-hairline"
+                            aria-hidden
+                        >
+                            <div
+                                className="h-full rounded-full bg-ink"
+                                style={{
+                                    width: `${Math.max(barPct, quota.won_cents > 0 ? 2 : 0)}%`,
+                                }}
+                            />
+                        </div>
+                    </div>
+                ) : quota.can_manage ? (
+                    <p className="mb-3 text-[13px] text-mute">
+                        No workspace target this month.{' '}
+                        <Link
+                            href={quota.settings_href}
+                            className="text-ink underline-offset-2 hover:underline"
+                        >
+                            Set monthly quotas
+                        </Link>
+                        .
+                    </p>
+                ) : null}
+
+                {showTable ? (
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-hairline text-left">
+                                <th className="px-0 py-1.5 text-[11px] font-medium text-mute">
+                                    Owner
+                                </th>
+                                <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
+                                    Won
+                                </th>
+                                <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
+                                    Quota
+                                </th>
+                                <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
+                                    Attainment
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {quota.owners.map((row) => (
+                                <tr
+                                    key={row.user_id ?? 'unassigned'}
+                                    className="border-b border-hairline last:border-0"
+                                >
+                                    <td className="px-0 py-1.5 text-[13px] text-ink">
+                                        {row.name}
+                                    </td>
+                                    <td className="money px-0 py-1.5 text-right text-[13px] text-ink">
+                                        {formatDzd(row.won_cents)}
+                                    </td>
+                                    <td className="money px-0 py-1.5 text-right text-[13px] text-ink">
+                                        {row.target_cents
+                                            ? formatDzd(row.target_cents)
+                                            : '—'}
+                                    </td>
+                                    <td className="px-0 py-1.5 text-right text-[13px] text-ink">
+                                        {row.attainment_pct !== null
+                                            ? `${row.attainment_pct}%`
+                                            : '—'}
+                                        <span className="ml-2 text-[11px] text-mute">
+                                            {quotaStatusLabel(row.status)}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : null}
+            </DashboardSection>
+        </div>
+    );
+}
+
 export default function Home({
     window,
     kpis,
@@ -97,6 +270,7 @@ export default function Home({
     caughtUp = true,
     activityFeed,
     salesPerformance,
+    quota = null,
     owners = [],
     filters = {},
     dataAsOf,
@@ -117,6 +291,8 @@ export default function Home({
                 </div>
 
                 {kpis.length > 0 ? <HomeKpiStrip kpis={kpis} /> : null}
+
+                {quota ? <MonthlyQuota quota={quota} /> : null}
 
                 {leadOsGraph ? (
                     <div className="border-b border-hairline bg-canvas px-4 py-3 md:px-5">

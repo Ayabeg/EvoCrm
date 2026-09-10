@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
     'evolution_last_webhook_at',
     'evolution_last_event',
     'lead_score_settings',
+    'monthly_quota_cents',
 ])]
 class Workspace extends Model
 {
@@ -38,6 +39,7 @@ class Workspace extends Model
         return [
             'evolution_last_webhook_at' => 'datetime',
             'lead_score_settings' => 'array',
+            'monthly_quota_cents' => 'integer',
         ];
     }
 

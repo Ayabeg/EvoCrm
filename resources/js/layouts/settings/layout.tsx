@@ -72,6 +72,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Quotas',
+        href: '/settings/quotas',
+        icon: null,
+    },
+    {
         title: 'Record layouts',
         href: '/settings/record-layouts',
         icon: null,
@@ -121,7 +126,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const visibleItems = sidebarNavItems.filter((item) => {
         if (
-            ['/settings/permissions', '/settings/system-health', '/settings/audit', '/settings/playbooks', '/settings/qualify'].includes(
+            ['/settings/permissions', '/settings/system-health', '/settings/audit', '/settings/playbooks', '/settings/qualify', '/settings/quotas'].includes(
                 toUrl(item.href),
             )
         ) {
@@ -150,6 +155,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         page.component === 'settings/system-health' ||
         page.component === 'settings/audit' ||
         page.component === 'settings/playbooks' ||
+        page.component === 'settings/quotas' ||
         page.component === 'settings/meta' ||
         page.component === 'settings/apps/meta';
 

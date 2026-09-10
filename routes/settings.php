@@ -6,6 +6,7 @@ use App\Http\Controllers\Settings\MeetingScheduleController;
 use App\Http\Controllers\Settings\PeopleController;
 use App\Http\Controllers\Settings\PlaybookController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\QuotaController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\Settings\SystemHealthController;
 use App\Http\Middleware\EnforceProductPermissions;
@@ -49,5 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('settings/people/{user}/resend', [PeopleController::class, 'resend'])->name('settings.people.resend');
         Route::put('settings/people/{user}/role', [PeopleController::class, 'updateRole'])->name('settings.people.role');
         Route::delete('settings/people/{user}', [PeopleController::class, 'destroy'])->name('settings.people.destroy');
+        Route::get('settings/quotas', [QuotaController::class, 'edit'])->name('settings.quotas');
+        Route::put('settings/quotas', [QuotaController::class, 'update'])->name('settings.quotas.update');
     });
 });
