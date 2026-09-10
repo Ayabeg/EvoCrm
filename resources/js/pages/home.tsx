@@ -67,6 +67,19 @@ type Quota = {
     owners: QuotaOwner[];
 };
 
+type PlacesRun = {
+    id: number;
+    target_type: string;
+    target_id: number;
+    field: string;
+    value: string | null;
+    status: string;
+    error: string | null;
+    confidence: number | null;
+    created_at: string | null;
+    href: string | null;
+};
+
 type Props = {
     window: { from: string; to: string; days: number; timezone: string };
     kpis: KpiTile[];
@@ -83,6 +96,7 @@ type Props = {
     filters?: Filters;
     dataAsOf?: string;
     leadOsGraph?: LeadOsGraphPayload | null;
+    placesRun?: PlacesRun | null;
 };
 
 function PipelineSummary({ pipeline }: { pipeline: PipelineHealth }) {
@@ -260,6 +274,49 @@ function MonthlyQuota({ quota }: { quota: Quota }) {
     );
 }
 
+function PlacesRunCard({ run }: { run: PlacesRun | null }) {
+    const when = run?.created_at
+        ? run.created_at.replace('T', ' ').slice(0, 16)
+        : null;
+
+    return (
+        <DashboardSection
+            title="Places"
+            description={
+                run
+                    ? `Last Google Places run · ${run.status}${when ? ` · ${when}` : ''}`
+                    : 'No Google Places run yet. Enrich a company to pull Algerian address and phone.'
+            }
+            action={
+                run?.href ? (
+                    <Link
+                        href={run.href}
+                        className="text-[12px] text-mute transition-colors hover:text-ink"
+                    >
+                        Open record
+                    </Link>
+                ) : null
+            }
+        >
+            {run ? (
+                <div data-testid="places-run">
+                    <p className="truncate text-[13px] text-ink">
+                        {run.target_type} · {run.field}
+                        {run.value ? ` · ${run.value}` : ''}
+                    </p>
+                    {run.error ? (
+                        <p className="mt-1 text-[12px] text-mute">{run.error}</p>
+                    ) : null}
+                </div>
+            ) : (
+                <p className="text-[13px] text-mute" data-testid="places-run">
+                    Waiting on the first Places lookup.
+                </p>
+            )}
+        </DashboardSection>
+    );
+}
+
 export default function Home({
     window,
     kpis,
@@ -275,6 +332,7 @@ export default function Home({
     filters = {},
     dataAsOf,
     leadOsGraph,
+    placesRun = null,
 }: Props) {
     const subtitle = `Sales command center · ${window.from} → ${window.to}`;
 
@@ -294,11 +352,17 @@ export default function Home({
 
                 {quota ? <MonthlyQuota quota={quota} /> : null}
 
-                {leadOsGraph ? (
-                    <div className="border-b border-hairline bg-canvas px-4 py-3 md:px-5">
+                <div
+                    data-testid="home-health"
+                    className="grid border-b border-hairline bg-canvas lg:grid-cols-2 lg:divide-x lg:divide-hairline"
+                >
+                    <div className="px-4 py-3 md:px-5">
                         <LeadOsGraphStatus graph={leadOsGraph} compact />
                     </div>
-                ) : null}
+                    <div className="border-t border-hairline px-4 py-3 md:px-5 lg:border-t-0">
+                        <PlacesRunCard run={placesRun} />
+                    </div>
+                </div>
 
                 <div
                     data-home-guided

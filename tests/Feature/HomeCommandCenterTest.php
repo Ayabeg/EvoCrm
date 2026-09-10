@@ -3,8 +3,10 @@
 use App\Enums\ChannelType;
 use App\Models\Activity;
 use App\Models\Channel;
+use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\EnrichmentRun;
 use App\Models\Mailbox;
 use App\Models\Thread;
 use App\Models\User;
@@ -168,4 +170,58 @@ it('includes recent activity feed rows', function () {
         ->assertInertia(fn ($page) => $page
             ->has('activityFeed', 1)
             ->where('activityFeed.0.subject', 'Called prospect'));
+});
+
+it('surfaces the latest Google Places run next to Lead OS health', function () {
+    $user = User::factory()->create();
+    $company = Company::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    EnrichmentRun::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'target_type' => EnrichmentRun::TARGET_COMPANY,
+        'target_id' => $company->id,
+        'source' => EnrichmentRun::SOURCE_WEBSITE,
+        'field' => 'website_title',
+        'value' => 'Old site',
+        'status' => EnrichmentRun::STATUS_APPLIED,
+    ]);
+    $places = EnrichmentRun::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'target_type' => EnrichmentRun::TARGET_COMPANY,
+        'target_id' => $company->id,
+        'source' => EnrichmentRun::SOURCE_GOOGLE_PLACES,
+        'field' => 'address',
+        'value' => 'Hydra, Alger',
+        'status' => EnrichmentRun::STATUS_APPLIED,
+    ]);
+
+    $other = User::factory()->create();
+    EnrichmentRun::factory()->create([
+        'workspace_id' => $other->workspace_id,
+        'target_type' => EnrichmentRun::TARGET_COMPANY,
+        'target_id' => Company::factory()->create(['workspace_id' => $other->workspace_id])->id,
+        'source' => EnrichmentRun::SOURCE_GOOGLE_PLACES,
+        'field' => 'address',
+        'value' => 'Oran',
+        'status' => EnrichmentRun::STATUS_APPLIED,
+    ]);
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('placesRun.id', $places->id)
+            ->where('placesRun.field', 'address')
+            ->where('placesRun.value', 'Hydra, Alger')
+            ->where('placesRun.status', EnrichmentRun::STATUS_APPLIED)
+            ->where('placesRun.href', '/crm/companies/'.$company->id));
+});
+
+it('does not invent a Places run when none exist', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertInertia(fn ($page) => $page
+            ->where('placesRun', null));
 });

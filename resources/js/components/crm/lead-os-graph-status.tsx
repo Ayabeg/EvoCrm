@@ -42,7 +42,7 @@ export default function LeadOsGraphStatus({
     return (
         <section
             data-testid="lead-os-graph"
-            className="border-t border-hairline bg-canvas py-1"
+            className={compact ? 'py-1' : 'border-t border-hairline bg-canvas py-1'}
         >
             <header className="flex flex-wrap items-end justify-between gap-3">
                 <div>

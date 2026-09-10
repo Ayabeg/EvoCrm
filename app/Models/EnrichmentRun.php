@@ -97,4 +97,42 @@ class EnrichmentRun extends Model
     {
         return $this->status === self::STATUS_PROPOSED;
     }
+
+    /**
+     * Latest Google Places run for Home, same strip as Lead OS health.
+     *
+     * @return array{id: int, target_type: string, target_id: int, field: string, value: string|null, status: string, error: string|null, confidence: float|null, created_at: string|null, href: string|null}|null
+     */
+    public static function presentLatestPlaces(Workspace $workspace): ?array
+    {
+        $run = static::query()
+            ->forWorkspace($workspace)
+            ->where('source', self::SOURCE_GOOGLE_PLACES)
+            ->latest('id')
+            ->first();
+
+        if (! $run instanceof self) {
+            return null;
+        }
+
+        $href = match ($run->target_type) {
+            self::TARGET_COMPANY => '/crm/companies/'.$run->target_id,
+            self::TARGET_CONTACT => '/crm/contacts/'.$run->target_id,
+            self::TARGET_LEAD => '/crm/leads/'.$run->target_id,
+            default => null,
+        };
+
+        return [
+            'id' => $run->id,
+            'target_type' => $run->target_type,
+            'target_id' => $run->target_id,
+            'field' => $run->field,
+            'value' => $run->value,
+            'status' => $run->status,
+            'error' => $run->error,
+            'confidence' => $run->confidence,
+            'created_at' => $run->created_at?->timezone('Africa/Algiers')->toIso8601String(),
+            'href' => $href,
+        ];
+    }
 }
