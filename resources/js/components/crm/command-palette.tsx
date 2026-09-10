@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import {
     Bolt,
     Building2,
@@ -10,6 +10,7 @@ import {
     Megaphone,
     MessageCircle,
     PenLine,
+    Search,
     Send,
     SendHorizonal,
     SquareKanban,
@@ -19,13 +20,20 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import {
-    CommandPalette as AuroraCommandPalette
-    
+    CommandPalette as AuroraCommandPalette,
 } from '@/components/aurora/command-palette';
-import type {CommandItem} from '@/components/aurora/command-palette';
+import type { CommandItem } from '@/components/aurora/command-palette';
+
+type SearchHit = {
+    id: number;
+    type: string;
+    label: string;
+    hint?: string | null;
+    href: string;
+};
 
 const NAV_ITEMS = [
-    { label: 'Home', href: '/dashboard', icon: Home, keywords: 'dashboard command center' },
+    { label: 'Home', href: '/home', icon: Home, keywords: 'dashboard command center' },
     { label: 'Contacts', href: '/crm/contacts', icon: Users, keywords: 'crm people leads' },
     { label: 'Companies', href: '/crm/companies', icon: Building2, keywords: 'accounts organizations' },
     { label: 'Leads', href: '/crm/leads', icon: SquareKanban, keywords: 'pipeline prospects' },
@@ -33,6 +41,7 @@ const NAV_ITEMS = [
     { label: 'Captures', href: '/crm/leads/captures', icon: Inbox, keywords: 'inbox capture csv meta maps url' },
     { label: 'Deals', href: '/crm/deals', icon: Handshake, keywords: 'pipeline opportunities' },
     { label: 'Pipelines', href: '/crm/deals/board', icon: SquareKanban, keywords: 'kanban board stages' },
+    { label: 'Activities', href: '/crm/activities', icon: MessageCircle, keywords: 'tasks calls meetings notes' },
     { label: 'Segments', href: '/crm/segments', icon: Users, keywords: 'saved views audiences filters' },
     { label: 'Automation', href: '/crm/workflows', icon: Workflow, keywords: 'workflows triggers' },
     { label: 'Conversations', href: '/conversations', icon: MessageCircle, keywords: 'crm activities history' },
@@ -59,39 +68,57 @@ export function CommandPalette({
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }) {
-    const items = useMemo<CommandItem[]>(
-        () =>
-            NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
+    const page = usePage();
+    const records = (page.props.evoSearchIndex ?? []) as SearchHit[];
 
-                return {
-                    id: item.href,
-                    label: item.label,
-                    description: item.keywords,
-                    section: 'navigate',
-                    icon: <Icon className="size-3.5" strokeWidth={1.65} aria-hidden />,
-                    onSelect: () => {
-                        onOpenChange(false);
-                        router.visit(item.href);
-                    },
-                };
-            }),
-        [onOpenChange],
-    );
+    const items = useMemo<CommandItem[]>(() => {
+        const nav: CommandItem[] = NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+
+            return {
+                id: item.href,
+                label: item.label,
+                description: item.keywords,
+                section: 'navigate',
+                icon: <Icon className="size-3.5" strokeWidth={1.65} aria-hidden />,
+                onSelect: () => {
+                    onOpenChange(false);
+                    router.visit(item.href);
+                },
+            };
+        });
+
+        const hits: CommandItem[] = records.map((hit) => ({
+            id: `${hit.type}-${hit.id}`,
+            label: hit.label,
+            description: hit.hint ?? hit.type,
+            section: 'records',
+            icon: <Search className="size-3.5" strokeWidth={1.65} aria-hidden />,
+            onSelect: () => {
+                onOpenChange(false);
+                router.visit(hit.href);
+            },
+        }));
+
+        return [...hits, ...nav];
+    }, [onOpenChange, records]);
 
     return (
         <AuroraCommandPalette
             open={open}
             onOpenChange={onOpenChange}
             items={items}
-            sections={[{ id: 'navigate', label: 'Navigate' }]}
-            placeholder="Find a page"
+            sections={[
+                { id: 'records', label: 'Records' },
+                { id: 'navigate', label: 'Navigate' },
+            ]}
+            placeholder="Find a record or page"
             filter={(query, item) => {
                 const needle = query.trim().toLowerCase();
 
                 if (!needle) {
-return 1;
-}
+                    return item.section === 'navigate' ? 1 : 0.4;
+                }
 
                 const hay = `${item.label} ${item.description ?? ''}`.toLowerCase();
 
