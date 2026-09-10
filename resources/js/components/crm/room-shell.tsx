@@ -53,22 +53,22 @@ export function RoomShell({
     actions?: ReactNode;
 }) {
     return (
-        <div className="flex h-app-workspace flex-col bg-canvas text-[13px] text-ink">
-            <div className="border-b border-hairline bg-canvas px-4 pt-3 sm:px-6">
-                <div className="flex items-center justify-between gap-3">
-                    <h1 className="text-page-title font-semibold tracking-tight">{title}</h1>
+        <div className="flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink">
+            <div className="sticky top-0 z-10 border-b border-hairline bg-canvas px-4 pt-3 sm:px-6">
+                <div className="flex items-end justify-between gap-3">
+                    <h1 className="text-[15px] font-semibold tracking-tight text-ink">{title}</h1>
                     {actions}
                 </div>
-                <nav className="mt-2 flex gap-4 overflow-x-auto">
+                <nav className="mt-2 flex gap-0 overflow-x-auto" aria-label={`${title} sections`}>
                     {tabs.map((tab) => (
                         <Link
                             key={tab.href}
                             href={tab.href}
                             className={cn(
-                                'border-b-2 pb-2 text-[13px] whitespace-nowrap',
+                                'border-b-2 px-3 pb-2 text-[13px] whitespace-nowrap transition-colors',
                                 tab.active
-                                    ? 'border-brand font-medium text-ink'
-                                    : 'border-transparent text-muted-foreground hover:text-ink',
+                                    ? 'border-[var(--evosales-mark)] font-medium text-ink'
+                                    : 'border-transparent text-mute hover:text-ink',
                             )}
                         >
                             {tab.label}
@@ -76,16 +76,16 @@ export function RoomShell({
                     ))}
                 </nav>
                 {subTabs && subTabs.length > 0 ? (
-                    <nav className="mt-2 flex gap-3 overflow-x-auto border-t border-hairline/60 pt-2">
+                    <nav className="mt-0 flex gap-1 overflow-x-auto border-t border-hairline pt-2 pb-2">
                         {subTabs.map((tab) => (
                             <Link
                                 key={tab.href}
                                 href={tab.href}
                                 className={cn(
-                                    'rounded-md px-2 py-1 text-[12px] whitespace-nowrap',
+                                    'rounded-full px-2.5 py-1 text-[12px] whitespace-nowrap',
                                     tab.active
-                                        ? 'bg-sidebar-accent font-medium text-ink'
-                                        : 'text-muted-foreground hover:bg-sidebar-hover hover:text-ink',
+                                        ? 'bg-ink font-medium text-canvas'
+                                        : 'text-mute hover:bg-canvas-soft hover:text-ink',
                                 )}
                             >
                                 {tab.label}
@@ -94,7 +94,7 @@ export function RoomShell({
                     </nav>
                 ) : null}
             </div>
-            <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
+            <div className="min-h-0 flex-1 overflow-hidden bg-canvas">{children}</div>
         </div>
     );
 }
