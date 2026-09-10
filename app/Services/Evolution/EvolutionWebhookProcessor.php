@@ -12,6 +12,7 @@ use App\Models\Ticket;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\ContactIdentity;
+use App\Services\LeadOs\DealHealthScorer;
 use App\Support\AlgerianPhone;
 use Illuminate\Support\Arr;
 
@@ -20,6 +21,7 @@ class EvolutionWebhookProcessor
     public function __construct(
         private ContactIdentity $contacts,
         private ProductAnalytics $analytics,
+        private DealHealthScorer $health,
     ) {}
 
     /**
@@ -114,6 +116,7 @@ class EvolutionWebhookProcessor
                 'contact_id' => $contact->id,
                 'thread_id' => $thread->id,
             ], null, $workspace);
+            $this->health->refreshOpenDealsForContact($workspace, $contact);
         }
 
         return $message;

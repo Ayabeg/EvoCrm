@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToWorkspace;
 use App\Services\Crm\StagePropertyGate;
+use App\Services\LeadOs\DealHealthScorer;
 use Database\Factories\DealFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -145,5 +146,7 @@ class Deal extends Model
                 'from_stage_slug' => $fromStage?->slug,
             ],
         ]);
+
+        app(DealHealthScorer::class)->refreshLive($this);
     }
 }

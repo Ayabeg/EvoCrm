@@ -3,6 +3,7 @@
 namespace App\Services\LeadOs;
 
 use App\Models\Activity;
+use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealHealthSnapshot;
 use App\Models\GraphRun;
@@ -116,6 +117,45 @@ class DealHealthScorer
             'reason' => $computed['reason'],
             'factors' => $computed['factors'],
         ]);
+    }
+
+    /**
+     * Formula snapshot now — not the nightly graph. Ask Evo still writes reasons on the 02:15 run.
+     */
+    public function refreshLive(Deal $deal): ?DealHealthSnapshot
+    {
+        $deal->loadMissing(['stage', 'pipeline', 'workspace']);
+
+        if ($deal->stage?->isTerminal()) {
+            return null;
+        }
+
+        $workspace = $deal->workspace ?? Workspace::query()->find($deal->workspace_id);
+
+        if (! $workspace instanceof Workspace) {
+            return null;
+        }
+
+        return $this->persist($workspace, $deal, $this->score($deal));
+    }
+
+    public function refreshOpenDealsForContact(Workspace $workspace, Contact $contact): void
+    {
+        $deals = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('contact_id', $contact->id)
+            ->with(['stage', 'pipeline', 'workspace'])
+            ->whereHas('stage', fn ($query) => $query->where('is_won', false)->where('is_lost', false))
+            ->get();
+
+        foreach ($deals as $deal) {
+            if (! $deal instanceof Deal) {
+                continue;
+            }
+
+            $deal->forceFill(['last_activity_at' => now()])->save();
+            $this->refreshLive($deal);
+        }
     }
 
     public function latestFor(Deal $deal): ?DealHealthSnapshot
