@@ -7,7 +7,8 @@ const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
         label: 'Home',
         href: '/home',
-        match: (pathname) => pathname === '/home' || pathname === '/',
+        match: (pathname) =>
+            pathname === '/home' || pathname === '/' || pathname === '/dashboard',
     },
     {
         label: 'Leads',
@@ -80,22 +81,19 @@ export function CrmShell({
     const { url } = usePage();
     const pathname = url.split('?')[0] ?? '/crm/contacts';
 
-    if (chrome === 'workspace') {
-        return (
-            <>
-                <Head title={title} />
-                <div className="flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink">
-                    {children}
-                </div>
-            </>
-        );
-    }
-
     return (
         <>
             <Head title={title} />
             <RoomShell title="CRM" tabs={crmTabs(pathname)}>
-                <div className="h-full overflow-hidden">{children}</div>
+                <div
+                    className={
+                        chrome === 'workspace'
+                            ? 'flex h-full min-h-0 flex-col overflow-hidden bg-canvas-soft text-[13px] text-ink'
+                            : 'h-full overflow-hidden'
+                    }
+                >
+                    {children}
+                </div>
             </RoomShell>
         </>
     );

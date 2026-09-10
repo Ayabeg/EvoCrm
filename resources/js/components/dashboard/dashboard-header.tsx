@@ -43,7 +43,11 @@ export function DashboardHeader({
                         {subtitle}
                     </p>
                 </div>
-                <Button asChild size="sm" className="h-8 shrink-0">
+                <Button
+                    asChild
+                    size="sm"
+                    className="h-8 shrink-0 bg-[var(--evosales-mark)] text-white hover:bg-[var(--evosales-mark)]/90"
+                >
                     <Link href="/crm/deals?create=1">New deal</Link>
                 </Button>
             </div>
