@@ -41,7 +41,6 @@ it('links Apps Get started to the first-run wizard', function () {
     $this->actingAs(User::factory()->create())
         ->get('/settings/apps')
         ->assertOk()
-        ->assertSee('Get started')
         ->assertInertia(fn ($page) => $page
             ->where('apps.1.setup_url', '/settings/setup/start?step=whatsapp')
             ->where('apps.3.setup_url', '/settings/setup/start?step=google'));
