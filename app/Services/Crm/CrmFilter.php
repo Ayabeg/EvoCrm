@@ -36,6 +36,10 @@ class CrmFilter
             'unassigned' => ($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1',
             'deal_stage' => $fromSaved['deal_stage'] ?? null,
             'has_open_deal' => ($fromSaved['has_open_deal'] ?? null) === true || ($fromSaved['has_open_deal'] ?? null) === '1',
+            'has_won_deal' => ($fromSaved['has_won_deal'] ?? null) === true || ($fromSaved['has_won_deal'] ?? null) === '1',
+            'has_company' => ($fromSaved['has_company'] ?? null) === true || ($fromSaved['has_company'] ?? null) === '1',
+            'has_associated_company' => ($fromSaved['has_associated_company'] ?? null) === true || ($fromSaved['has_associated_company'] ?? null) === '1',
+            'deal_min_amount' => $fromSaved['deal_min_amount'] ?? null,
             'view' => $fromSaved['view'] ?? 'all',
             'filter_id' => $saved->id,
             'filter_groups' => $this->parseFilterGroups(null, $fromSaved['filter_groups'] ?? null),
@@ -87,6 +91,10 @@ class CrmFilter
             'email_opened' => $request->boolean('email_opened') || (($fromSaved['email_opened'] ?? null) === true || ($fromSaved['email_opened'] ?? null) === '1'),
             'deal_stage' => $request->input('deal_stage', $fromSaved['deal_stage'] ?? null),
             'has_open_deal' => $request->boolean('has_open_deal') || (($fromSaved['has_open_deal'] ?? null) === true || ($fromSaved['has_open_deal'] ?? null) === '1'),
+            'has_won_deal' => $request->boolean('has_won_deal') || (($fromSaved['has_won_deal'] ?? null) === true || ($fromSaved['has_won_deal'] ?? null) === '1'),
+            'has_company' => $request->boolean('has_company') || (($fromSaved['has_company'] ?? null) === true || ($fromSaved['has_company'] ?? null) === '1'),
+            'has_associated_company' => $request->boolean('has_associated_company') || (($fromSaved['has_associated_company'] ?? null) === true || ($fromSaved['has_associated_company'] ?? null) === '1'),
+            'deal_min_amount' => $request->input('deal_min_amount', $fromSaved['deal_min_amount'] ?? null),
             'view' => $view,
             'filter_id' => $saved?->id,
             'filter_groups' => $filterGroups,
@@ -568,6 +576,19 @@ class CrmFilter
             $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('is_won', false)->where('is_lost', false));
         }
 
+        if (! empty($filters['has_won_deal'])) {
+            $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('is_won', true));
+        }
+
+        if (! empty($filters['has_company'])) {
+            $query->whereNotNull('company_id');
+        }
+
+        if (filled($filters['deal_min_amount'] ?? null) && is_numeric($filters['deal_min_amount'])) {
+            $cents = (int) round(((float) $filters['deal_min_amount']) * 100);
+            $query->whereHas('deals', fn (Builder $deal) => $deal->where('amount_cents', '>=', $cents));
+        }
+
         if (! empty($filters['unanswered'])) {
             $query->where('unanswered', true);
         }
@@ -630,6 +651,10 @@ class CrmFilter
         $this->applyCreated($query, $filters['created'] ?? null);
         $this->applyDealStatus($query, $filters['status'] ?? null);
 
+        if (! empty($filters['has_associated_company'])) {
+            $query->whereNotNull('company_id');
+        }
+
         return $query;
     }
 
@@ -663,6 +688,10 @@ class CrmFilter
 
         if (! empty($filters['has_open_deal'])) {
             $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('is_won', false)->where('is_lost', false));
+        }
+
+        if (filled($filters['deal_stage'] ?? null)) {
+            $query->whereHas('deals.stage', fn (Builder $stage) => $stage->where('slug', $filters['deal_stage']));
         }
 
         return $query;
@@ -1002,6 +1031,13 @@ class CrmFilter
         if ($entity === 'deal' && $field === 'amount') {
             $cents = is_numeric($value) ? (int) round(((float) $value) * 100) : 0;
             $query->where('amount_cents', $sqlOp, $cents);
+
+            return;
+        }
+
+        if ($entity === 'contact' && $field === 'deal_min_amount' && is_numeric($value)) {
+            $cents = (int) round(((float) $value) * 100);
+            $query->whereHas('deals', fn (Builder $deal) => $deal->where('amount_cents', $sqlOp, $cents));
 
             return;
         }

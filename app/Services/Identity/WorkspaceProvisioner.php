@@ -78,6 +78,11 @@ class WorkspaceProvisioner
             ['name' => 'Email', 'status' => 'not_connected']
         );
 
+        Channel::query()->firstOrCreate(
+            ['workspace_id' => $workspace->id, 'type' => ChannelType::Sms],
+            ['name' => 'SMS', 'status' => 'not_connected']
+        );
+
         app(ConversionFunnelProvisioner::class)->provision($workspace);
 
         QuietHours::query()->firstOrCreate(

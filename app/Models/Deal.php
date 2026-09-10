@@ -120,7 +120,8 @@ class Deal extends Model
 
         app(StagePropertyGate::class)->assertCanEnter($this, $stage);
 
-        $from = $this->stage?->name ?? $this->stage_id;
+        $fromStage = $this->stage;
+        $from = $fromStage?->name ?? $this->stage_id;
 
         $this->stage()->associate($stage);
         $this->closed_at = $stage->isTerminal() ? now() : null;
@@ -137,7 +138,12 @@ class Deal extends Model
             'contact_id' => $this->contact_id,
             'deal_id' => $this->id,
             'company_id' => $this->company_id,
-            'meta' => ['stage_id' => $stage->id, 'stage_slug' => $stage->slug],
+            'meta' => [
+                'stage_id' => $stage->id,
+                'stage_slug' => $stage->slug,
+                'from_stage_id' => $fromStage?->id,
+                'from_stage_slug' => $fromStage?->slug,
+            ],
         ]);
     }
 }

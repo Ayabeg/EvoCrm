@@ -8,6 +8,7 @@ use App\Models\OutboundMessage;
 use App\Models\Sequence;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
+use App\Services\Desk\AlgerianSms;
 use App\Services\Evolution\EvolutionCloudService;
 
 class OutboundDispatcher
@@ -19,6 +20,7 @@ class OutboundDispatcher
         private EvolutionCloudService $evolution,
         private TemplateRenderer $templates,
         private ProductAnalytics $analytics,
+        private AlgerianSms $sms,
     ) {}
 
     /**
@@ -27,9 +29,10 @@ class OutboundDispatcher
     public function dispatch(Workspace $workspace, Contact $contact, array $attributes): OutboundMessage
     {
         $channel = $attributes['channel'] ?? 'email';
-        $to = $channel === 'whatsapp_cloud'
-            ? (string) $contact->phone_e164
-            : (string) ($attributes['to_address'] ?? $contact->email);
+        $to = match ($channel) {
+            'whatsapp_cloud', 'sms' => (string) $contact->phone_e164,
+            default => (string) ($attributes['to_address'] ?? $contact->email),
+        };
 
         $message = OutboundMessage::query()->create([
             'workspace_id' => $workspace->id,
@@ -66,6 +69,10 @@ class OutboundDispatcher
 
         if ($channel === 'whatsapp_cloud') {
             return $this->sendWhatsAppTemplate($message, $contact, $attributes);
+        }
+
+        if ($channel === 'sms') {
+            return $this->sendSms($message, $contact, $workspace);
         }
 
         $mailbox = $this->mailers->resolve(
@@ -134,6 +141,21 @@ class OutboundDispatcher
         ])->save();
 
         $this->recordOutbound($contact->workspace ?? $message->workspace, $message);
+
+        return $message;
+    }
+
+    protected function sendSms(OutboundMessage $message, Contact $contact, Workspace $workspace): OutboundMessage
+    {
+        $result = $this->sms->send($workspace, $contact->phone_e164, (string) $message->body, allowStub: false);
+
+        $message->forceFill([
+            'status' => $result['ok'] ? 'sent' : 'failed',
+            'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'SMS send failed'),
+            'sent_at' => $result['ok'] ? now() : null,
+            'to_address' => $result['e164'] ?: $message->to_address,
+            'provider_event_id' => $result['id'],
+        ])->save();
 
         return $message;
     }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Settings\PeopleController;
 use App\Http\Controllers\Settings\PlaybookController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
+use App\Http\Controllers\Settings\SmsSettingsController;
 use App\Http\Controllers\Settings\SystemHealthController;
 use App\Http\Middleware\EnforceProductPermissions;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -49,5 +50,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('settings/people/{user}/resend', [PeopleController::class, 'resend'])->name('settings.people.resend');
         Route::put('settings/people/{user}/role', [PeopleController::class, 'updateRole'])->name('settings.people.role');
         Route::delete('settings/people/{user}', [PeopleController::class, 'destroy'])->name('settings.people.destroy');
+        Route::get('settings/sms', [SmsSettingsController::class, 'edit'])->name('settings.sms');
+        Route::post('settings/sms', [SmsSettingsController::class, 'update'])->name('settings.sms.update');
+        Route::delete('settings/sms', [SmsSettingsController::class, 'destroy'])->name('settings.sms.destroy');
     });
 });

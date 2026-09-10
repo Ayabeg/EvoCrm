@@ -23,7 +23,7 @@ class RunOutboundSequences extends Command
 {
     protected $signature = 'outbound:run {--limit=100}';
 
-    protected $description = 'Dispatch due sequence steps and campaign messages (email + official WhatsApp Cloud)';
+    protected $description = 'Dispatch due sequence steps and campaign messages (email + Algerian SMS + official WhatsApp Cloud)';
 
     public function handle(
         OutboundDispatcher $dispatcher,

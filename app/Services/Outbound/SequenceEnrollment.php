@@ -8,6 +8,7 @@ use App\Models\Sequence;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\ActivityRecorder;
+use App\Support\AlgerianPhone;
 use Illuminate\Validation\ValidationException;
 
 class SequenceEnrollment
@@ -35,6 +36,12 @@ class SequenceEnrollment
         if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
             throw ValidationException::withMessages([
                 'contact_id' => 'Contact is on the suppression list.',
+            ]);
+        }
+
+        if ($sequence->channel === 'sms' && ! AlgerianPhone::isMobile($contact->phone_e164 ?? $contact->phone)) {
+            throw ValidationException::withMessages([
+                'contact_id' => 'SMS sequences only enroll Algerian mobiles (+213 05 / 06 / 07).',
             ]);
         }
 

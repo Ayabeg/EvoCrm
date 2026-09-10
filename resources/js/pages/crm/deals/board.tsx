@@ -203,6 +203,7 @@ export default function DealBoard({
     deals,
     forecast,
     forecastBand,
+    forecastBacktest,
     boardOptions = defaultBoardOptions,
 }: {
     pipeline: { id: number; name: string };
@@ -215,6 +216,13 @@ export default function DealBoard({
         high_cents: number;
         band_label: string;
         narrative?: string | null;
+    } | null;
+    forecastBacktest?: {
+        status: string;
+        label: string;
+        sample_count: number;
+        error_pct: number | null;
+        within_15: boolean;
     } | null;
     boardOptions?: BoardOptions;
 }) {
@@ -304,6 +312,7 @@ export default function DealBoard({
                 <DealForecastBar
                     forecast={forecast}
                     forecastBand={forecastBand}
+                    forecastBacktest={forecastBacktest}
                 />
 
                 {deals.length === 0 && !loading ? (

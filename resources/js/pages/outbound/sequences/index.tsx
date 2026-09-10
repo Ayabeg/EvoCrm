@@ -21,7 +21,15 @@ type SequenceRow = {
 };
 
 function channelLabel(channel: string): string {
-    return channel === 'whatsapp_cloud' ? 'WhatsApp Cloud' : 'Email SMTP';
+    if (channel === 'whatsapp_cloud') {
+        return 'WhatsApp Cloud';
+    }
+
+    if (channel === 'sms') {
+        return 'SMS (DZ)';
+    }
+
+    return 'Email SMTP';
 }
 
 export default function SequencesIndex({
@@ -33,7 +41,7 @@ export default function SequencesIndex({
         <OutboundShell title="Sequences">
             <OutboundPage
                 title="Sequences"
-                description="Email steps with {{variables}}. Quiet hours (Africa/Algiers) defer sends; suppression cancels enrollment. WhatsApp steps use official Cloud templates only."
+                description="Email and Algerian SMS steps with {{variables}}. Quiet hours (Africa/Algiers) defer sends; suppression cancels enrollment. WhatsApp steps use official Cloud templates only. SMS never stubs — connect a DZ gateway in Settings."
             >
                 <HairlinePanel title="Create sequence">
                     <Form
@@ -86,6 +94,9 @@ export default function SequencesIndex({
                                     >
                                         <option value="email">
                                             Email SMTP
+                                        </option>
+                                        <option value="sms">
+                                            SMS (Algeria 05 / 06 / 07)
                                         </option>
                                         <option value="whatsapp_cloud">
                                             WhatsApp Cloud template

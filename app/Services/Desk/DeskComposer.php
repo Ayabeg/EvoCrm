@@ -12,7 +12,10 @@ use App\Services\Evolution\EvolutionCloudService;
 
 class DeskComposer
 {
-    public function __construct(private EvolutionCloudService $evolution) {}
+    public function __construct(
+        private EvolutionCloudService $evolution,
+        private AlgerianSms $sms,
+    ) {}
 
     public function reply(Thread $thread, User $user, string $body): Message
     {
@@ -88,9 +91,9 @@ class DeskComposer
 
     protected function sendViaSms(Message $message, Thread $thread, string $body): void
     {
-        $number = (string) $thread->contact?->phone_e164;
+        $raw = $thread->contact?->phone_e164 ?? $thread->contact?->phone;
 
-        if (! filled($number)) {
+        if (! filled($raw)) {
             $message->forceFill([
                 'status' => 'failed',
                 'failure_reason' => 'Contact has no phone number for SMS.',
@@ -99,19 +102,19 @@ class DeskComposer
             return;
         }
 
-        if (! filled(config('services.twilio.sid')) && ! filled(config('services.twilio.account_sid'))) {
-            $message->forceFill([
-                'status' => 'sent',
-                'failure_reason' => null,
-                'payload' => ['stub' => true, 'to' => $number],
-            ])->save();
-
-            return;
-        }
+        $workspace = $thread->workspace ?? $message->workspace;
+        $result = $this->sms->send($workspace, $raw, $body, allowStub: true);
 
         $message->forceFill([
-            'status' => 'queued',
-            'failure_reason' => 'Twilio SMS dispatch pending provider wiring.',
+            'status' => $result['ok'] ? 'sent' : 'failed',
+            'provider' => $result['stub'] ? 'sms' : ($result['provider'] ?? 'sms'),
+            'provider_message_id' => $result['id'] ?? null,
+            'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'Send failed'),
+            'payload' => array_filter([
+                ...((array) ($result['body'] ?? [])),
+                'stub' => $result['stub'] ? true : null,
+                'to' => $result['e164'] ?? null,
+            ], fn ($value) => $value !== null),
         ])->save();
     }
 }

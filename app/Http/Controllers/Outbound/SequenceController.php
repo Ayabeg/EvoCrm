@@ -42,7 +42,7 @@ class SequenceController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
-            'channel' => ['required', 'in:email,whatsapp_cloud'],
+            'channel' => ['required', 'in:email,whatsapp_cloud,sms'],
             'description' => ['nullable', 'string'],
             'origin' => ['nullable', 'in:scratch,template'],
         ]);
@@ -67,9 +67,13 @@ class SequenceController extends Controller
             'position' => 1,
             'delay_hours' => 0,
             'channel' => $data['channel'],
-            'step_type' => $data['channel'] === 'whatsapp_cloud' ? 'whatsapp_cloud' : 'email',
+            'step_type' => $data['channel'] === 'whatsapp_cloud' ? 'whatsapp_cloud' : ($data['channel'] === 'sms' ? 'sms' : 'email'),
             'subject' => $template?->subject ?? ($data['channel'] === 'email' ? 'Hello {{first_name}}' : null),
-            'body' => $template?->body ?? ($data['channel'] === 'email' ? 'Thanks for your interest, {{first_name}}.' : null),
+            'body' => $template?->body ?? match ($data['channel']) {
+                'email' => 'Thanks for your interest, {{first_name}}.',
+                'sms' => 'Salaam {{first_name}}, on vous contacte au sujet de votre demande. Répondez STOP pour vous désinscrire.',
+                default => null,
+            },
             'template_id' => $template?->id,
             'wa_template_name' => $data['channel'] === 'whatsapp_cloud' ? 'hello_world' : null,
             'wa_template_language' => $data['channel'] === 'whatsapp_cloud' ? 'fr' : null,
@@ -176,8 +180,8 @@ class SequenceController extends Controller
 
         $data = $request->validate([
             'delay_hours' => ['required', 'integer', 'min:0'],
-            'step_type' => ['nullable', 'in:email,call,meeting,whatsapp_cloud'],
-            'channel' => ['required', 'in:email,whatsapp_cloud'],
+            'step_type' => ['nullable', 'in:email,call,meeting,whatsapp_cloud,sms'],
+            'channel' => ['required', 'in:email,whatsapp_cloud,sms'],
             'mailbox_id' => ['nullable', 'integer'],
             'subject' => ['nullable', 'string', 'max:180'],
             'subject_b' => ['nullable', 'string', 'max:180'],
@@ -210,7 +214,11 @@ class SequenceController extends Controller
 
         $sequence->steps()->create([
             ...$data,
-            'step_type' => $data['step_type'] ?? ($data['channel'] === 'whatsapp_cloud' ? 'whatsapp_cloud' : 'email'),
+            'step_type' => $data['step_type'] ?? match ($data['channel']) {
+                'whatsapp_cloud' => 'whatsapp_cloud',
+                'sms' => 'sms',
+                default => 'email',
+            },
             'template_id' => $template?->id,
             'position' => ($sequence->steps()->max('position') ?? 0) + 1,
         ]);
@@ -225,8 +233,8 @@ class SequenceController extends Controller
 
         $data = $request->validate([
             'delay_hours' => ['required', 'integer', 'min:0'],
-            'step_type' => ['nullable', 'in:email,call,meeting,whatsapp_cloud'],
-            'channel' => ['required', 'in:email,whatsapp_cloud'],
+            'step_type' => ['nullable', 'in:email,call,meeting,whatsapp_cloud,sms'],
+            'channel' => ['required', 'in:email,whatsapp_cloud,sms'],
             'mailbox_id' => ['nullable', 'integer'],
             'subject' => ['nullable', 'string', 'max:180'],
             'subject_b' => ['nullable', 'string', 'max:180'],
