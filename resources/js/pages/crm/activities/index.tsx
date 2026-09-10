@@ -29,6 +29,19 @@ function contactName(c?: { first_name: string; last_name?: string | null } | nul
     return c ? [c.first_name, c.last_name].filter(Boolean).join(' ') : '—';
 }
 
+function relatedHref(activity: Activity): string | null {
+    if (activity.deal) {
+        return `/crm/deals/${activity.deal.id}`;
+    }
+    if (activity.contact) {
+        return `/crm/contacts/${activity.contact.id}`;
+    }
+    if (activity.company) {
+        return `/crm/companies/${activity.company.id}`;
+    }
+    return null;
+}
+
 export default function ActivitiesIndex({
     activities,
     members,
@@ -53,8 +66,8 @@ export default function ActivitiesIndex({
     };
 
     return (
-        <CrmShell title="Activities">
-            <div className="flex h-full min-h-0 flex-col bg-canvas text-ui text-ink">
+        <CrmShell title="Activities" chrome="workspace">
+            <div className="flex h-full min-h-0 flex-col bg-canvas text-[13px] text-ink">
                 <CrmListHeader
                     title="Activities"
                     views={[]}
@@ -64,15 +77,15 @@ export default function ActivitiesIndex({
                         window.location.href = '/crm/activities?create=1';
                     }}
                 />
-                <div className="border-b border-hairline px-6 py-3">
-                    <p className="mb-3 text-muted-foreground">
+                <div className="border-b border-hairline px-4 py-2.5 sm:px-6">
+                    <p className="mb-2 text-[12px] text-mute">
                         Tasks, calls, meetings, and notes across contacts, deals, and companies.
                     </p>
                     <div className="flex flex-wrap items-center gap-2">
                         <select
                             value={filters.type ?? ''}
                             onChange={(e) => apply({ type: e.target.value })}
-                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                             aria-label="Activity type"
                         >
                             <option value="">All types</option>
@@ -89,7 +102,7 @@ export default function ActivitiesIndex({
                                     owner_id: e.target.value ? Number(e.target.value) : null,
                                 })
                             }
-                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                             aria-label="Owner"
                         >
                             <option value="">All owners</option>
@@ -102,7 +115,7 @@ export default function ActivitiesIndex({
                         <select
                             value={filters.date ?? 'all'}
                             onChange={(e) => apply({ date: e.target.value })}
-                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-ui"
+                            className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                             aria-label="Due date"
                         >
                             <option value="all">Any due date</option>
@@ -114,99 +127,127 @@ export default function ActivitiesIndex({
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-auto">
-                    <table className="w-full">
-                        <thead className="sticky top-0 bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2 font-medium">Subject</th>
-                                <th className="px-4 py-2 font-medium">Type</th>
-                                <th className="px-4 py-2 font-medium">Related</th>
-                                <th className="px-4 py-2 font-medium">Owner</th>
-                                <th className="px-4 py-2 font-medium">Due</th>
-                                <th className="px-4 py-2 font-medium" />
+                    <table className="w-full min-w-[640px] border-collapse text-[13px]">
+                        <thead>
+                            <tr className="border-b border-hairline bg-canvas-soft text-left">
+                                <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:px-6">
+                                    Subject
+                                </th>
+                                <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
+                                    Type
+                                </th>
+                                <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
+                                    Related
+                                </th>
+                                <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
+                                    Owner
+                                </th>
+                                <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
+                                    Due
+                                </th>
+                                <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pr-6" />
                             </tr>
                         </thead>
                         <tbody>
                             {activities.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-muted-foreground">
+                                    <td colSpan={6} className="px-4 py-8 text-mute sm:px-6">
                                         No activities match this view.
                                     </td>
                                 </tr>
                             ) : (
-                                activities.map((activity) => (
-                                    <tr key={activity.id} className="border-t border-hairline">
-                                        <td className="px-4 py-2.5">
-                                            <span
-                                                className={
-                                                    activity.done
-                                                        ? 'text-muted-foreground line-through'
-                                                        : 'font-medium'
+                                activities.map((activity) => {
+                                    const href = relatedHref(activity);
+
+                                    return (
+                                        <tr
+                                            key={activity.id}
+                                            className={href ? 'cursor-pointer border-b border-hairline hover:bg-canvas-soft' : 'border-b border-hairline'}
+                                            onClick={() => {
+                                                if (href) {
+                                                    router.visit(href);
                                                 }
-                                            >
-                                                {activity.subject ?? activity.body ?? 'Activity'}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-2.5">
-                                            <Badge variant="outline">{activity.type}</Badge>
-                                        </td>
-                                        <td className="px-4 py-2.5">
-                                            {activity.deal ? (
-                                                <Link
-                                                    href={`/crm/deals/${activity.deal.id}`}
-                                                    className="text-brand hover:underline"
+                                            }}
+                                        >
+                                            <td className="px-4 py-1.5 sm:px-6">
+                                                <span
+                                                    className={
+                                                        activity.done
+                                                            ? 'text-mute line-through'
+                                                            : 'font-medium text-ink'
+                                                    }
                                                 >
-                                                    {activity.deal.title}
-                                                </Link>
-                                            ) : activity.contact ? (
-                                                <Link
-                                                    href={`/crm/contacts/${activity.contact.id}`}
-                                                    className="text-brand hover:underline"
-                                                >
-                                                    {contactName(activity.contact)}
-                                                </Link>
-                                            ) : activity.company ? (
-                                                <Link
-                                                    href={`/crm/companies/${activity.company.id}`}
-                                                    className="text-brand hover:underline"
-                                                >
-                                                    {activity.company.name}
-                                                </Link>
-                                            ) : (
-                                                '—'
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-2.5 text-muted-foreground">
-                                            {activity.owner?.name ?? '—'}
-                                        </td>
-                                        <td className="px-4 py-2.5 text-muted-foreground">
-                                            {activity.done
-                                                ? (activity.completed_at ?? 'Done')
-                                                : (activity.due_at ?? '—')}
-                                        </td>
-                                        <td className="px-4 py-2.5 text-right">
-                                            {activity.type === 'meeting' ? (
-                                                <div className="flex justify-end">
-                                                    <MeetingAttendanceButtons
-                                                        activityId={activity.id}
-                                                        attendance={activity.meta?.attendance}
-                                                    />
-                                                </div>
-                                            ) : !activity.done ? (
-                                                <Form
-                                                    action={`/crm/activities/${activity.id}/complete`}
-                                                    method="post"
-                                                >
-                                                    <button
-                                                        type="submit"
-                                                        className="text-ui text-brand hover:underline"
+                                                    {activity.subject ?? activity.body ?? 'Activity'}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-1.5">
+                                                <Badge variant="outline">{activity.type}</Badge>
+                                            </td>
+                                            <td className="px-4 py-1.5">
+                                                {activity.deal ? (
+                                                    <Link
+                                                        href={`/crm/deals/${activity.deal.id}`}
+                                                        className="text-ink hover:underline"
+                                                        onClick={(event) => event.stopPropagation()}
                                                     >
-                                                        Done
-                                                    </button>
-                                                </Form>
-                                            ) : null}
-                                        </td>
-                                    </tr>
-                                ))
+                                                        {activity.deal.title}
+                                                    </Link>
+                                                ) : activity.contact ? (
+                                                    <Link
+                                                        href={`/crm/contacts/${activity.contact.id}`}
+                                                        className="text-ink hover:underline"
+                                                        onClick={(event) => event.stopPropagation()}
+                                                    >
+                                                        {contactName(activity.contact)}
+                                                    </Link>
+                                                ) : activity.company ? (
+                                                    <Link
+                                                        href={`/crm/companies/${activity.company.id}`}
+                                                        className="text-ink hover:underline"
+                                                        onClick={(event) => event.stopPropagation()}
+                                                    >
+                                                        {activity.company.name}
+                                                    </Link>
+                                                ) : (
+                                                    '—'
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-1.5 text-mute">
+                                                {activity.owner?.name ?? '—'}
+                                            </td>
+                                            <td className="px-4 py-1.5 text-mute">
+                                                {activity.done
+                                                    ? (activity.completed_at ?? 'Done')
+                                                    : (activity.due_at ?? '—')}
+                                            </td>
+                                            <td
+                                                className="px-4 py-1.5 text-right sm:pr-6"
+                                                onClick={(event) => event.stopPropagation()}
+                                            >
+                                                {activity.type === 'meeting' ? (
+                                                    <div className="flex justify-end">
+                                                        <MeetingAttendanceButtons
+                                                            activityId={activity.id}
+                                                            attendance={activity.meta?.attendance}
+                                                        />
+                                                    </div>
+                                                ) : !activity.done ? (
+                                                    <Form
+                                                        action={`/crm/activities/${activity.id}/complete`}
+                                                        method="post"
+                                                    >
+                                                        <button
+                                                            type="submit"
+                                                            className="text-[13px] text-ink hover:underline"
+                                                        >
+                                                            Done
+                                                        </button>
+                                                    </Form>
+                                                ) : null}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>
