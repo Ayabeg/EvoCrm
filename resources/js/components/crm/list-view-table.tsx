@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
@@ -243,6 +243,10 @@ function renderCell(
     return renderCompanyCell(columnId, row as CompanyRow);
 }
 
+function recordHref(basePath: string, id: number): string {
+    return `${basePath}/${id}`;
+}
+
 export default function ListViewTable({
     entity,
     rows,
@@ -304,14 +308,24 @@ export default function ListViewTable({
                     <tbody>
                         {rows.map((row) => {
                             const selected = selectedIds.includes(row.id);
+                            const href = recordHref(basePath, row.id);
 
                             return (
                             <tr
                                 key={row.id}
                                 className={cn(
-                                    'border-b border-hairline transition-colors hover:bg-canvas-soft',
+                                    'cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft',
                                     selected && 'bg-canvas-soft',
                                 )}
+                                onClick={(event) => {
+                                    const target = event.target as HTMLElement;
+
+                                    if (target.closest('a, input, button, label')) {
+                                        return;
+                                    }
+
+                                    router.visit(href);
+                                }}
                             >
                                 {selectable ? (
                                     <td className="px-4 py-1.5 sm:px-6">
@@ -338,7 +352,7 @@ export default function ListViewTable({
                                         >
                                             {column.id === primaryId ? (
                                                 <Link
-                                                    href={`${basePath}/${row.id}`}
+                                                    href={href}
                                                     className="font-medium text-ink hover:underline"
                                                 >
                                                     {label}
@@ -360,6 +374,7 @@ export default function ListViewTable({
             <ul className="divide-y divide-hairline @[480px]/list:hidden">
                 {rows.map((row) => {
                     const primaryLabel = renderCell(entity, primaryId, row);
+                    const href = recordHref(basePath, row.id);
 
                     return (
                         <li key={row.id} className="flex items-start gap-2 px-4 py-2">
@@ -373,7 +388,7 @@ export default function ListViewTable({
                                 />
                             ) : null}
                             <Link
-                                href={`${basePath}/${row.id}`}
+                                href={href}
                                 className="block min-w-0 flex-1 no-underline"
                             >
                                 <p className="font-medium text-ink">{primaryLabel}</p>
