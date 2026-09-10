@@ -33,7 +33,7 @@ export function HairlineTable({
             <div className="hidden border-y border-hairline bg-canvas @[480px]/hairline:block">
                 <div className="overflow-x-auto">
                     <table
-                        className="aurora-text-table w-full border-collapse"
+                        className="aurora-text-table w-full border-collapse text-[13px]"
                         style={{ minWidth }}
                     >
                         <thead>
@@ -42,7 +42,7 @@ export function HairlineTable({
                                     <th
                                         key={column.key}
                                         className={cn(
-                                            'px-4 py-2.5 font-medium text-mute',
+                                            'px-4 py-1.5 text-[11px] font-medium text-mute',
                                             column.align === 'right' &&
                                                 'text-right',
                                         )}
@@ -65,12 +65,12 @@ export function HairlineTable({
                             ) : (
                                 rows.map((row) => (
                                     <Fragment key={row.id}>
-                                        <tr className="border-t border-hairline transition-colors hover:bg-canvas-soft/80">
+                                        <tr className="border-t border-hairline transition-colors hover:bg-canvas-soft">
                                             {columns.map((column) => (
                                                 <td
                                                     key={column.key}
                                                     className={cn(
-                                                        'px-4 py-2.5 align-middle',
+                                                        'px-4 py-1.5 align-middle',
                                                         column.align ===
                                                             'right' &&
                                                             'text-right',
@@ -108,13 +108,13 @@ export function HairlineTable({
                         {rows.map((row) => (
                             <li
                                 key={row.id}
-                                className="bg-canvas px-4 py-3"
+                                className="bg-canvas px-4 py-2.5"
                             >
                                 <div className="font-medium text-ink">
                                     {row.mobileTitle}
                                 </div>
                                 {row.mobileMeta && row.mobileMeta.length > 0 ? (
-                                    <dl className="mt-2 grid gap-1.5 text-[12px]">
+                                    <dl className="mt-1.5 grid gap-1 text-[12px]">
                                         {row.mobileMeta.map((item) => (
                                             <div
                                                 key={item.label}
@@ -152,6 +152,7 @@ export function HairlinePanel({
     description?: ReactNode;
     action?: ReactNode;
     children: ReactNode;
+    padded?: boolean;
     padded?: boolean;
 }) {
     return (
