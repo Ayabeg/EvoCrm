@@ -19,13 +19,13 @@ Not EvoCrm. Do not copy EvoCrm pages blindly. Map IA onto existing EvoSales rout
 - Desk, Ads, Outbound, Home, Settings — same engines
 
 ## Phases
-1. CRM tab order + Home entry (Salesforce object order)
-2. Home as widget grid (today / pipeline / tasks) using live props only
-3. Lists: row click → existing record drawer / show
-4. Deals board: HubSpot column totals + card → drawer (keep move API)
-5. Tasks overlay + command palette wired to live search
-6. Outbound / Desk / Ads chrome only — no engine rewrite
-7. Auth / settings polish
+1. CRM tab order + Home entry — done
+2. Home as widget grid from live props — already on `/home`
+3. Lists: whole-row click → existing show — done (`list-view-table`)
+4. Deals board: column totals + card click, keep `POST /crm/deals/{id}/move` — in this pass
+5. Tasks overlay + command palette live records — in this pass (`POST /crm/activities/{id}/complete`)
+6. Outbound / Desk / Ads chrome only — existing shells, no engine rewrite
+7. Auth / settings polish — existing DS tokens
 
 ## Rules
 - No fake KPIs or client-only invents
