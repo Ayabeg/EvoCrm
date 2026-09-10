@@ -6,6 +6,7 @@ use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealHealthSnapshot;
+use App\Models\DealSuggestion;
 use App\Models\GraphRun;
 use App\Models\Stage;
 use App\Models\Workspace;
@@ -120,13 +121,23 @@ class DealHealthScorer
     }
 
     /**
-     * Formula snapshot now — not the nightly graph. Ask Evo still writes reasons on the 02:15 run.
+     * Formula snapshot + one next-move now — not the nightly graph.
+     * Ask Evo still writes health reasons on the 02:15 run.
      */
     public function refreshLive(Deal $deal): ?DealHealthSnapshot
     {
-        $deal->loadMissing(['stage', 'pipeline', 'workspace']);
+        $deal->loadMissing(['stage', 'pipeline', 'workspace', 'contact']);
 
         if ($deal->stage?->isTerminal()) {
+            DealSuggestion::query()
+                ->where('deal_id', $deal->id)
+                ->where('kind', DealSuggestion::KIND_NEXT_MOVE)
+                ->where('status', DealSuggestion::STATUS_PENDING)
+                ->update([
+                    'status' => DealSuggestion::STATUS_DISMISSED,
+                    'dismissed_at' => now(),
+                ]);
+
             return null;
         }
 
@@ -136,7 +147,10 @@ class DealHealthScorer
             return null;
         }
 
-        return $this->persist($workspace, $deal, $this->score($deal));
+        $snapshot = $this->persist($workspace, $deal, $this->score($deal));
+        app(NextMoveAdvisor::class)->suggest($deal);
+
+        return $snapshot;
     }
 
     public function refreshOpenDealsForContact(Workspace $workspace, Contact $contact): void

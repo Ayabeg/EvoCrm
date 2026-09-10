@@ -3,6 +3,7 @@
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealHealthSnapshot;
+use App\Models\DealSuggestion;
 use App\Models\User;
 use App\Services\Evolution\EvolutionWebhookProcessor;
 use App\Services\LeadOs\DealHealthScorer;
@@ -47,12 +48,22 @@ it('writes a deal health snapshot when the stage changes', function () {
     expect($snapshot)->not->toBeNull()
         ->and($snapshot->graph_run_id)->toBeNull()
         ->and($snapshot->score)->toBeGreaterThanOrEqual(0)
-        ->and($snapshot->band)->not->toBe('');
+        ->and($snapshot->band)->not->toBe('')
+        ->and(DealSuggestion::query()
+            ->where('deal_id', $deal->id)
+            ->where('kind', DealSuggestion::KIND_NEXT_MOVE)
+            ->where('status', DealSuggestion::STATUS_PENDING)
+            ->count())->toBe(1);
 
     $deal->moveTo($pipeline->stageBySlug('won'), $user);
 
     expect(DealHealthSnapshot::query()->where('deal_id', $deal->id)->count())->toBe(1)
-        ->and($deal->fresh()->closed_at)->not->toBeNull();
+        ->and($deal->fresh()->closed_at)->not->toBeNull()
+        ->and(DealSuggestion::query()
+            ->where('deal_id', $deal->id)
+            ->where('kind', DealSuggestion::KIND_NEXT_MOVE)
+            ->where('status', DealSuggestion::STATUS_PENDING)
+            ->count())->toBe(0);
 });
 
 it('rescores open deals when inbound WhatsApp lands', function () {
@@ -80,11 +91,20 @@ it('rescores open deals when inbound WhatsApp lands', function () {
     $deal->refresh();
     $live = DealHealthSnapshot::query()->where('deal_id', $deal->id)->latest('id')->first();
 
+    $move = DealSuggestion::query()
+        ->where('deal_id', $deal->id)
+        ->where('kind', DealSuggestion::KIND_NEXT_MOVE)
+        ->where('status', DealSuggestion::STATUS_PENDING)
+        ->latest('id')
+        ->first();
+
     expect($deal->last_activity_at?->gt(now()->subMinute()))->toBeTrue()
         ->and($live)->not->toBeNull()
         ->and($live->score)->toBeGreaterThan($stalled['score'])
         ->and($live->band)->not->toBe(DealHealthSnapshot::BAND_STALLED)
-        ->and($live->graph_run_id)->toBeNull();
+        ->and($live->graph_run_id)->toBeNull()
+        ->and($move)->not->toBeNull()
+        ->and($move->payload['auto_send'] ?? null)->toBeFalse();
 });
 
 it('does not rescore on outbound WhatsApp', function () {
@@ -106,6 +126,7 @@ it('does not rescore on outbound WhatsApp', function () {
     ]);
 
     expect(DealHealthSnapshot::query()->where('deal_id', $deal->id)->count())->toBe(0)
+        ->and(DealSuggestion::query()->where('deal_id', $deal->id)->count())->toBe(0)
         ->and($deal->fresh()->last_activity_at?->lt(now()->subDays(7)))->toBeTrue();
 });
 
@@ -134,5 +155,7 @@ it('does not rescore a foreign contact deal on inbound WhatsApp', function () {
     ]);
 
     expect(DealHealthSnapshot::query()->where('deal_id', $mine->id)->count())->toBe(1)
-        ->and(DealHealthSnapshot::query()->where('deal_id', $other->id)->count())->toBe(0);
+        ->and(DealHealthSnapshot::query()->where('deal_id', $other->id)->count())->toBe(0)
+        ->and(DealSuggestion::query()->where('deal_id', $mine->id)->count())->toBe(1)
+        ->and(DealSuggestion::query()->where('deal_id', $other->id)->count())->toBe(0);
 });

@@ -156,7 +156,7 @@ class NextMoveAdvisor
      */
     public function apply(DealSuggestion $suggestion, Workspace $workspace): void
     {
-        $suggestion->loadMissing('deal.stage');
+        $suggestion->loadMissing(['deal.stage', 'deal.pipeline.stages']);
         $deal = $suggestion->deal;
 
         if (! $deal instanceof Deal || $suggestion->status !== DealSuggestion::STATUS_PENDING) {
@@ -205,9 +205,12 @@ class NextMoveAdvisor
         if ($suggestion->action === DealSuggestion::ACTION_ADVANCE) {
             $stageId = (int) data_get($suggestion->payload, 'stage_id');
             $stage = $deal->pipeline?->stages?->firstWhere('id', $stageId);
+            $suggestion->apply();
             if ($stage instanceof Stage) {
                 $deal->moveTo($stage);
             }
+
+            return;
         }
 
         $suggestion->apply();
