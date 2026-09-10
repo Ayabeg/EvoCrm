@@ -31,16 +31,13 @@ class MetaConversionsService
      */
     public function configs(Workspace $workspace): array
     {
+        MetaConversionConfig::seedFor($workspace);
+
         $existing = MetaConversionConfig::query()->forWorkspace($workspace)->get()->keyBy('crm_event');
         $configs = [];
 
-        foreach (MetaConversionConfig::defaults() as $crmEvent => $metaEvent) {
-            $configs[] = $existing[$crmEvent] ?? MetaConversionConfig::query()->create([
-                'workspace_id' => $workspace->id,
-                'crm_event' => $crmEvent,
-                'meta_event' => $metaEvent,
-                'enabled' => false,
-            ]);
+        foreach (array_keys(MetaConversionConfig::defaults()) as $crmEvent) {
+            $configs[] = $existing[$crmEvent];
         }
 
         return $configs;

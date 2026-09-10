@@ -55,6 +55,22 @@ class MetaConversionConfig extends Model
         ];
     }
 
+    public static function seedFor(Workspace $workspace): void
+    {
+        foreach (self::defaults() as $crmEvent => $metaEvent) {
+            self::query()->firstOrCreate(
+                [
+                    'workspace_id' => $workspace->id,
+                    'crm_event' => $crmEvent,
+                ],
+                [
+                    'meta_event' => $metaEvent,
+                    'enabled' => true,
+                ],
+            );
+        }
+    }
+
     /**
      * @return list<string>
      */

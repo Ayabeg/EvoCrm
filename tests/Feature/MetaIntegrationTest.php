@@ -362,20 +362,28 @@ it('sends hashed Lead and Purchase conversion events and skips duplicates', func
         'source' => 'meta_lead_form',
     ]);
 
-    MetaConversionConfig::query()->create([
-        'workspace_id' => $workspace->id,
-        'crm_event' => MetaConversionConfig::CRM_LEAD_CREATED,
-        'meta_event' => MetaConversionConfig::META_LEAD,
-        'enabled' => true,
-        'pixel_id' => 'pixel-1',
-    ]);
-    MetaConversionConfig::query()->create([
-        'workspace_id' => $workspace->id,
-        'crm_event' => MetaConversionConfig::CRM_DEAL_WON,
-        'meta_event' => MetaConversionConfig::META_PURCHASE,
-        'enabled' => true,
-        'pixel_id' => 'pixel-1',
-    ]);
+    MetaConversionConfig::query()->updateOrCreate(
+        [
+            'workspace_id' => $workspace->id,
+            'crm_event' => MetaConversionConfig::CRM_LEAD_CREATED,
+        ],
+        [
+            'meta_event' => MetaConversionConfig::META_LEAD,
+            'enabled' => true,
+            'pixel_id' => 'pixel-1',
+        ],
+    );
+    MetaConversionConfig::query()->updateOrCreate(
+        [
+            'workspace_id' => $workspace->id,
+            'crm_event' => MetaConversionConfig::CRM_DEAL_WON,
+        ],
+        [
+            'meta_event' => MetaConversionConfig::META_PURCHASE,
+            'enabled' => true,
+            'pixel_id' => 'pixel-1',
+        ],
+    );
 
     Http::fake(['graph.facebook.com/*/pixel-1/events*' => Http::response(['events_received' => 1])]);
 
@@ -419,13 +427,17 @@ it('retries a failed conversion and records the failure', function () {
         'status' => 'new',
         'source' => 'meta_lead_form',
     ]);
-    MetaConversionConfig::query()->create([
-        'workspace_id' => $workspace->id,
-        'crm_event' => MetaConversionConfig::CRM_LEAD_CREATED,
-        'meta_event' => MetaConversionConfig::META_LEAD,
-        'enabled' => true,
-        'pixel_id' => 'pixel-2',
-    ]);
+    MetaConversionConfig::query()->updateOrCreate(
+        [
+            'workspace_id' => $workspace->id,
+            'crm_event' => MetaConversionConfig::CRM_LEAD_CREATED,
+        ],
+        [
+            'meta_event' => MetaConversionConfig::META_LEAD,
+            'enabled' => true,
+            'pixel_id' => 'pixel-2',
+        ],
+    );
 
     Http::fake(['graph.facebook.com/*' => Http::response(['error' => ['message' => 'down']], 500)]);
 

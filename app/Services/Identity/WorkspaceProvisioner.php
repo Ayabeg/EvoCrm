@@ -5,6 +5,7 @@ namespace App\Services\Identity;
 use App\Enums\ChannelType;
 use App\Enums\WorkspaceRole;
 use App\Models\Channel;
+use App\Models\MetaConversionConfig;
 use App\Models\Pipeline;
 use App\Models\Product;
 use App\Models\QuietHours;
@@ -84,6 +85,8 @@ class WorkspaceProvisioner
         );
 
         app(ConversionFunnelProvisioner::class)->provision($workspace);
+
+        MetaConversionConfig::seedFor($workspace);
 
         QuietHours::query()->firstOrCreate(
             ['workspace_id' => $workspace->id],
