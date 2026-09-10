@@ -41,8 +41,8 @@ class MeetingLifecycle
         $meetings = Activity::query()
             ->where('type', 'meeting')
             ->whereNotNull('due_at')
-            ->where('due_at', '>', $now->copy()->addHours(3))
-            ->where('due_at', '<=', $now->copy()->addHours(24))
+            ->where('due_at', '>', $now->copy()->addHours(2))
+            ->where('due_at', '<=', $now->copy()->addHours(26))
             ->orderBy('id')
             ->limit($limit)
             ->get();
@@ -90,7 +90,9 @@ class MeetingLifecycle
             return false;
         }
 
-        if (! $activity->due_at || $activity->due_at->lte(now()->addHours(3)) || $activity->due_at->gt(now()->addHours(24))) {
+        $starts = $this->startsAt($activity);
+
+        if (! $starts || $starts->lte(now()->addHours(3)) || $starts->gt(now()->addHours(24))) {
             return false;
         }
 
@@ -101,7 +103,7 @@ class MeetingLifecycle
         $contact = $activity->contact;
         $schedule = $this->schedule($activity);
         $tz = $schedule?->timezone ?: MeetingSchedule::TIMEZONE;
-        $whenLabel = $activity->due_at->clone()->timezone($tz)->format('D j M Y · H:i');
+        $whenLabel = $starts->clone()->timezone($tz)->format('D j M Y · H:i');
         $guestName = $contact instanceof Contact
             ? (string) ($contact->first_name ?: 'there')
             : (string) ($activity->meta['guest_name'] ?? 'there');
@@ -164,6 +166,17 @@ class MeetingLifecycle
         }
 
         return $activity->due_at !== null && $activity->due_at->lte(now());
+    }
+
+    private function startsAt(Activity $activity): ?Carbon
+    {
+        $raw = $activity->meta['starts_at'] ?? null;
+
+        if (is_string($raw) && $raw !== '') {
+            return Carbon::parse($raw);
+        }
+
+        return $activity->due_at;
     }
 
     private function schedule(Activity $activity): ?MeetingSchedule
