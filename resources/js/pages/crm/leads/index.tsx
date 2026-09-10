@@ -1,4 +1,4 @@
-import { Form, Link } from '@inertiajs/react';
+import { Form, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import {
@@ -84,7 +84,13 @@ export default function LeadsIndex({
                                     {leads.map((lead) => (
                                         <tr
                                             key={lead.id}
-                                            className="border-b border-hairline hover:bg-canvas-soft"
+                                            className="cursor-pointer border-b border-hairline hover:bg-canvas-soft"
+                                            onClick={(event) => {
+                                                if ((event.target as HTMLElement).closest('a,button,input')) {
+                                                    return;
+                                                }
+                                                router.visit(`/crm/leads/${lead.id}`);
+                                            }}
                                         >
                                             <td className="px-4 py-1.5 sm:px-6">
                                                 <Link
@@ -113,12 +119,8 @@ export default function LeadsIndex({
                                                             ? {
                                                                   score:
                                                                       lead.score ??
-                                                                      lead
-                                                                          .latest_score
-                                                                          .score,
-                                                                  reason: lead
-                                                                      .latest_score
-                                                                      .reason,
+                                                                      lead.latest_score.score,
+                                                                  reason: lead.latest_score.reason,
                                                               }
                                                             : null
                                                     }
@@ -156,8 +158,7 @@ export default function LeadsIndex({
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Contact{' '}
-                                    <span className="text-brand">*</span>
+                                    Contact <span className="text-brand">*</span>
                                 </Label>
                                 <select
                                     name="contact_id"
@@ -166,28 +167,18 @@ export default function LeadsIndex({
                                 >
                                     <option value="">Select</option>
                                     {contacts.map((contact) => (
-                                        <option
-                                            key={contact.id}
-                                            value={contact.id}
-                                        >
-                                            {contact.first_name}{' '}
-                                            {contact.last_name}
+                                        <option key={contact.id} value={contact.id}>
+                                            {contact.first_name} {contact.last_name}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    Source
-                                </Label>
+                                <Label className="mb-1 block text-[12px]">Source</Label>
                                 <Input name="source" placeholder="manual" />
                             </div>
                             <div className="flex justify-end gap-2 pt-2">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => setDrawer(false)}
-                                >
+                                <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
                                     Cancel
                                 </Button>
                                 <Button disabled={processing}>Create</Button>
