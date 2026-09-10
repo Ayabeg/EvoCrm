@@ -7,6 +7,7 @@ use App\Models\CustomAttributeDefinition;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\Stage;
+use App\Models\Ticket;
 use App\Models\Workflow;
 use App\Models\Workspace;
 use App\Services\Crm\EvoWorkflowTemplates;
@@ -33,6 +34,10 @@ class WorkflowController extends Controller
                 'name' => $workflow->name,
                 'trigger' => $workflow->trigger,
                 'trigger_stage' => $workflow->triggerStage?->name,
+                'trigger_status' => $workflow->trigger_status,
+                'trigger_status_label' => $workflow->trigger_status
+                    ? Ticket::statusLabel((string) $workflow->trigger_status)
+                    : null,
                 'action' => $workflow->action,
                 'action_config' => $workflow->config(),
                 'condition_field' => $workflow->condition_field,
@@ -78,6 +83,9 @@ class WorkflowController extends Controller
         $stageId = $data['trigger'] === Workflow::TRIGGER_DEAL_STAGE_CHANGED
             ? $data['trigger_stage_id']
             : null;
+        $triggerStatus = $data['trigger'] === Workflow::TRIGGER_TICKET_STATUS_CHANGED
+            ? $data['trigger_status']
+            : null;
 
         if ($stageId) {
             Stage::query()
@@ -89,6 +97,7 @@ class WorkflowController extends Controller
             'name' => $data['name'],
             'trigger' => $data['trigger'],
             'trigger_stage_id' => $stageId,
+            'trigger_status' => $triggerStatus,
             'trigger_saved_filter_id' => $data['trigger_saved_filter_id'],
             'action' => $data['action'],
             'action_config' => $this->actionConfig($data['action'], $data['then']),
@@ -116,6 +125,9 @@ class WorkflowController extends Controller
         $stageId = $data['trigger'] === Workflow::TRIGGER_DEAL_STAGE_CHANGED
             ? $data['trigger_stage_id']
             : null;
+        $triggerStatus = $data['trigger'] === Workflow::TRIGGER_TICKET_STATUS_CHANGED
+            ? $data['trigger_status']
+            : null;
 
         if ($stageId) {
             Stage::query()
@@ -127,6 +139,7 @@ class WorkflowController extends Controller
             'name' => $data['name'],
             'trigger' => $data['trigger'],
             'trigger_stage_id' => $stageId,
+            'trigger_status' => $triggerStatus,
             'trigger_saved_filter_id' => $data['trigger_saved_filter_id'],
             'action' => $data['action'],
             'action_config' => $this->actionConfig($data['action'], $data['then']),
@@ -200,6 +213,11 @@ class WorkflowController extends Controller
                 'nullable',
                 'integer',
             ],
+            'trigger_status' => [
+                'nullable',
+                'string',
+                Rule::in(Ticket::STATUSES),
+            ],
             'trigger_saved_filter_id' => [
                 Rule::requiredIf(in_array($request->input('trigger'), [
                     Workflow::TRIGGER_SEGMENT_ENTERED,
@@ -257,6 +275,7 @@ class WorkflowController extends Controller
             'name' => $data['name'],
             'trigger' => $data['trigger'],
             'trigger_stage_id' => isset($data['trigger_stage_id']) ? (int) $data['trigger_stage_id'] : null,
+            'trigger_status' => filled($data['trigger_status'] ?? null) ? (string) $data['trigger_status'] : null,
             'trigger_saved_filter_id' => isset($data['trigger_saved_filter_id']) ? (int) $data['trigger_saved_filter_id'] : null,
             'action' => $data['action'],
             'condition_field' => filled($data['condition_field'] ?? null) ? (string) $data['condition_field'] : null,
@@ -353,6 +372,7 @@ class WorkflowController extends Controller
         $options = [
             ['value' => Workflow::CONDITION_DEAL_AMOUNT, 'label' => 'Deal amount (DZD)'],
             ['value' => Workflow::CONDITION_DEAL_STAGE, 'label' => 'Deal stage'],
+            ['value' => Workflow::CONDITION_TICKET_STATUS, 'label' => 'Ticket status'],
             ['value' => 'contact.wilaya', 'label' => 'Contact wilaya'],
             ['value' => 'contact.city', 'label' => 'Contact city'],
             ['value' => 'contact.source', 'label' => 'Contact source'],

@@ -10,6 +10,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('outbound:run')->name('outbound:run')->everyMinute()->withoutOverlapping();
 Schedule::command('workflow:run')->name('workflow:run')->everyMinute()->withoutOverlapping();
+Schedule::command('tickets:check-sla')->name('tickets:check-sla')->everyMinute()->withoutOverlapping();
 Schedule::command('reports:deliver')->name('reports:deliver')->dailyAt('08:00')->timezone('Africa/Algiers')->withoutOverlapping();
 Schedule::command('google:sync-mail')->name('google:sync-mail')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('google:sync-calendar')->name('google:sync-calendar')->everyFifteenMinutes()->withoutOverlapping();

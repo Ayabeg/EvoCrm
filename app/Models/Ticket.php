@@ -27,6 +27,7 @@ use InvalidArgumentException;
     'first_response_at',
     'resolved_at',
     'sla_due_at',
+    'sla_breached_at',
     'last_activity_at',
 ])]
 class Ticket extends Model
@@ -80,6 +81,7 @@ class Ticket extends Model
             'first_response_at' => 'datetime',
             'resolved_at' => 'datetime',
             'sla_due_at' => 'datetime',
+            'sla_breached_at' => 'datetime',
             'last_activity_at' => 'datetime',
         ];
     }
@@ -247,6 +249,8 @@ class Ticket extends Model
             'first_response_at' => now(),
             'last_activity_at' => now(),
         ])->save();
+
+        $this->markSlaBreached();
     }
 
     public function recordActivity(string $type, string $subject, ?User $actor = null): void
@@ -308,9 +312,25 @@ class Ticket extends Model
 
         if ($status !== self::STATUS_CLOSED && $from === self::STATUS_CLOSED) {
             $payload['sla_due_at'] = TicketSla::dueAt($this->priority);
+            $payload['sla_breached_at'] = null;
         }
 
         $this->forceFill($payload)->save();
+    }
+
+    public function markSlaBreached(): bool
+    {
+        if ($this->sla_breached_at) {
+            return false;
+        }
+
+        if (TicketSla::state($this) !== 'breached') {
+            return false;
+        }
+
+        $this->forceFill(['sla_breached_at' => now()])->save();
+
+        return true;
     }
 
     public function refreshSla(): void
