@@ -302,26 +302,35 @@ export default function DealShow({
                                         method="post"
                                         className="flex flex-wrap items-center gap-2"
                                     >
-                                        <select
-                                            name="stage_id"
-                                            defaultValue={deal.stage?.id ?? ''}
-                                            className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
-                                        >
-                                            {stages.map((stage) => (
-                                                <option
-                                                    key={stage.id}
-                                                    value={stage.id}
+                                        {({ errors }) => (
+                                            <>
+                                                <select
+                                                    name="stage_id"
+                                                    defaultValue={deal.stage?.id ?? ''}
+                                                    className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
                                                 >
-                                                    {stage.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <Button
-                                            variant="outline"
-                                            className="h-8 text-[12px]"
-                                        >
-                                            Move
-                                        </Button>
+                                                    {stages.map((stage) => (
+                                                        <option
+                                                            key={stage.id}
+                                                            value={stage.id}
+                                                        >
+                                                            {stage.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <Button
+                                                    variant="outline"
+                                                    className="h-8 text-[12px]"
+                                                >
+                                                    Move
+                                                </Button>
+                                                {errors.stage_id ? (
+                                                    <p className="w-full text-[12px] text-destructive">
+                                                        {errors.stage_id}
+                                                    </p>
+                                                ) : null}
+                                            </>
+                                        )}
                                     </Form>
                                 </RecordSection>
                                 <PlaybookCard playbooks={playbooks} />

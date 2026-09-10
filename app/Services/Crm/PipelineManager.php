@@ -314,6 +314,7 @@ class PipelineManager
                 'is_won' => (bool) $stage->is_won,
                 'is_lost' => (bool) $stage->is_lost,
                 'deals_count' => (int) $stage->deals_count,
+                'required_properties' => $stage->requiredPropertyKeys(),
             ])
             ->values()
             ->all();
@@ -364,6 +365,10 @@ class PipelineManager
             if ($stage->is_lost) {
                 $stage->is_won = false;
             }
+        }
+
+        if (array_key_exists('required_properties', $data)) {
+            $stage->required_properties = array_values(array_unique(array_map('strval', $data['required_properties'] ?? [])));
         }
 
         $stage->save();

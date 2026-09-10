@@ -2,6 +2,7 @@ import { Form, Head, Link, router } from '@inertiajs/react';
 import { CalendarClock, Ellipsis, Plus, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
+import { toast } from 'sonner';
 import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import LeadScorePill from '@/components/crm/lead-score-pill';
 import {
@@ -127,7 +128,12 @@ function DealCard({
         router.post(
             `/crm/deals/${deal.id}/move`,
             { stage_id: stageId },
-            { preserveScroll: true },
+            {
+                preserveScroll: true,
+                onError: (errors) => {
+                    toast.error(errors.stage_id ?? 'Could not move this deal. Fill the required fields and try again.');
+                },
+            },
         );
     };
 
@@ -289,7 +295,12 @@ export default function LeadsBoard({
         router.post(
             `/crm/deals/${deal.id}/move`,
             { stage_id: stage.id },
-            { preserveScroll: true },
+            {
+                preserveScroll: true,
+                onError: (errors) => {
+                    toast.error(errors.stage_id ?? 'Could not move this deal. Fill the required fields and try again.');
+                },
+            },
         );
     };
 

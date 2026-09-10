@@ -19,6 +19,7 @@ use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\DealBoardOptions;
 use App\Services\Crm\PipelineManager;
+use App\Services\Crm\StagePropertyGate;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -256,12 +257,12 @@ class DealController extends Controller
                 'source' => 'deal',
             ]);
 
-        Deal::query()->create([
+        $deal = new Deal([
             'workspace_id' => $workspace->id,
             'contact_id' => $contact->id,
             'company_id' => $contact->company_id,
             'pipeline_id' => $pipeline->id,
-            'stage_id' => $stage->id,
+            'stage_id' => $pipeline->stageBySlug('new')?->id,
             'owner_id' => $data['owner_id'] ?? $request->user()->id,
             'title' => $data['title'],
             'amount_cents' => $this->toCents($data),
@@ -272,6 +273,10 @@ class DealController extends Controller
             'close_date' => $data['close_date'] ?? null,
             'next_step' => $data['next_step'] ?? null,
         ]);
+
+        app(StagePropertyGate::class)->assertCanEnter($deal, $stage);
+        $deal->stage_id = $stage->id;
+        $deal->save();
 
         return $request->boolean('add_another')
             ? redirect()->route('crm.deals.index', ['create' => 1])

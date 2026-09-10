@@ -16,6 +16,13 @@ type StageRow = {
     is_won: boolean;
     is_lost: boolean;
     deals_count: number;
+    required_properties?: string[];
+};
+
+type DealProperty = {
+    key: string;
+    label: string;
+    group: string;
 };
 
 type PipelineRow = {
@@ -27,7 +34,15 @@ type PipelineRow = {
     stages?: StageRow[];
 };
 
-function PipelineStages({ pipeline, canManage }: { pipeline: PipelineRow; canManage: boolean }) {
+function PipelineStages({
+    pipeline,
+    canManage,
+    dealProperties,
+}: {
+    pipeline: PipelineRow;
+    canManage: boolean;
+    dealProperties: DealProperty[];
+}) {
     const [open, setOpen] = useState(false);
     const stages = pipeline.stages ?? [];
 
@@ -66,6 +81,28 @@ function PipelineStages({ pipeline, canManage }: { pipeline: PipelineRow; canMan
                                             className="mt-0.5 h-8 w-20 text-xs"
                                         />
                                     </div>
+                                    <input type="hidden" name="required_properties_present" value="1" />
+                                    <fieldset className="w-full">
+                                        <legend className="text-[10px] text-mute">Required to enter</legend>
+                                        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                                            {dealProperties.map((property) => (
+                                                <label
+                                                    key={property.key}
+                                                    className="flex items-center gap-1 text-[11px] text-ink"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        name="required_properties[]"
+                                                        value={property.key}
+                                                        defaultChecked={(stage.required_properties ?? []).includes(
+                                                            property.key,
+                                                        )}
+                                                    />
+                                                    {property.label}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </fieldset>
                                     <Button type="submit" variant="secondary" size="sm">
                                         Save
                                     </Button>
@@ -118,9 +155,11 @@ function PipelineStages({ pipeline, canManage }: { pipeline: PipelineRow; canMan
 export default function PipelineSettings({
     pipelines,
     canManage,
+    dealProperties = [],
 }: {
     pipelines: PipelineRow[];
     canManage: boolean;
+    dealProperties?: DealProperty[];
 }) {
     return (
         <>
@@ -128,7 +167,7 @@ export default function PipelineSettings({
             <div className="space-y-6">
                 <Heading
                     title="Deal pipelines"
-                    description="Create pipelines, edit stage names and win probabilities, and reorder the board columns your team sees on /crm/deals/board."
+                    description="Create pipelines, edit stage names and win probabilities, and require deal fields before a card can enter a stage."
                 />
 
                 {canManage ? (
@@ -180,7 +219,11 @@ export default function PipelineSettings({
                                     ) : null}
                                 </div>
                             </div>
-                            <PipelineStages pipeline={pipeline} canManage={canManage} />
+                            <PipelineStages
+                                pipeline={pipeline}
+                                canManage={canManage}
+                                dealProperties={dealProperties}
+                            />
                         </Card>
                     ))}
                 </div>

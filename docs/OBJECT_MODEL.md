@@ -17,7 +17,7 @@ All domain rows are scoped by `workspace_id` unless noted.
 | **Contact** | Canonical person. Unique per workspace on `phone_e164` and on `email`. `owner_id`, `city`, `wilaya`, `last_activity_at`, `unanswered`. |
 | **Lead** | Pre-pipeline interest. Qualification can create or link one Deal (`deals.lead_id` unique) and writes a `lead_converted` activity. |
 | **Pipeline** | Default “Sales” pipeline per workspace. |
-| **Stage** | New → Qualified → Demo → Proposal → Won / Lost. Optional `probability` (0–100) for board forecast; if missing: New 10, Qualified 25, Demo 50, Proposal 75, Won 100, Lost 0 (unknown open 20). |
+| **Stage** | New → Qualified → Demo → Proposal → Won / Lost. Optional `probability` (0–100) for board forecast; if missing: New 10, Qualified 25, Demo 50, Proposal 75, Won 100, Lost 0 (unknown open 20). Optional `required_properties` (deal fields + `attr.{key}` custom) — `Deal::moveTo` 422s until they are filled. |
 | **Deal** | Sales Hub record: amount (cents, display DZD), currency default DZD, `close_date`, `next_step`, `owner_id`, `source`, `lost_reason`. `moveTo(Stage)` writes a `stage_change` activity. Amount rolls up from `DealLineItem` when items exist; stays manual when the deal has no items. |
 | **Product** | Local catalog stand-in until Evostock sync. Workspace-scoped `sku`, `name`, `unit_cents` (DZD), `active`. SKU is the later Evostock join key. |
 | **DealLineItem** | Product or ad hoc line on a Deal: name/sku snapshot, quantity, unit cents, line total. Deal `amount_cents` is the sum when any items exist. |

@@ -160,11 +160,15 @@ class BulkActionRunner
             $run->increment('succeeded');
             $run->increment('processed');
         } catch (Throwable $exception) {
+            $message = $exception instanceof ValidationException
+                ? (string) collect($exception->errors())->flatten()->first()
+                : $exception->getMessage();
+
             BulkActionRow::query()->create([
                 'bulk_action_run_id' => $run->id,
                 'record_id' => $id,
                 'status' => BulkActionRow::STATUS_FAILED,
-                'error_message' => mb_substr($exception->getMessage(), 0, 500),
+                'error_message' => mb_substr($message !== '' ? $message : $exception->getMessage(), 0, 500),
             ]);
             $run->increment('failed');
             $run->increment('processed');

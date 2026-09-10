@@ -248,8 +248,8 @@ export default function DealBoard({
             { stage_id: stage.id },
             {
                 preserveScroll: true,
-                onError: () => {
-                    toast.error('Could not move this deal. Try again.');
+                onError: (errors) => {
+                    toast.error(errors.stage_id ?? 'Could not move this deal. Fill the required fields and try again.');
                 },
             },
         );

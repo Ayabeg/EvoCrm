@@ -6,15 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Services\Crm\PipelineManager;
+use App\Services\Crm\StagePropertyGate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PipelineController extends Controller
 {
-    public function index(Request $request, PipelineManager $pipelines): Response
+    public function index(Request $request, PipelineManager $pipelines, StagePropertyGate $gate): Response
     {
         Gate::authorize('viewAny', Pipeline::class);
 
@@ -35,6 +37,7 @@ class PipelineController extends Controller
                 })
                 ->values()
                 ->all(),
+            'dealProperties' => $gate->catalog($workspace),
             'canManage' => $request->user()->role->canManageSettings(),
         ]);
     }
@@ -106,17 +109,25 @@ class PipelineController extends Controller
         return back();
     }
 
-    public function updateStage(Request $request, Pipeline $pipeline, Stage $stage, PipelineManager $pipelines): RedirectResponse
+    public function updateStage(Request $request, Pipeline $pipeline, Stage $stage, PipelineManager $pipelines, StagePropertyGate $gate): RedirectResponse
     {
         Gate::authorize('update', $pipeline);
         abort_unless((int) $stage->pipeline_id === (int) $pipeline->id, 404);
+
+        $allowed = $gate->allowedKeys($request->user()->workspace);
 
         $data = $request->validate([
             'name' => ['sometimes', 'string', 'max:120'],
             'probability' => ['nullable', 'integer', 'min:0', 'max:100'],
             'is_won' => ['sometimes', 'boolean'],
             'is_lost' => ['sometimes', 'boolean'],
+            'required_properties' => ['sometimes', 'array'],
+            'required_properties.*' => ['string', Rule::in($allowed)],
         ]);
+
+        if ($request->boolean('required_properties_present')) {
+            $data['required_properties'] = array_values(array_filter((array) $request->input('required_properties', [])));
+        }
 
         $pipelines->updateStage($stage, $data);
 

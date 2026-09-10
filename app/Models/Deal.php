@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToWorkspace;
+use App\Services\Crm\StagePropertyGate;
 use Database\Factories\DealFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -116,6 +117,8 @@ class Deal extends Model
         if ((int) $stage->pipeline_id !== (int) $this->pipeline_id) {
             throw new InvalidArgumentException('Stage does not belong to this deal pipeline.');
         }
+
+        app(StagePropertyGate::class)->assertCanEnter($this, $stage);
 
         $from = $this->stage?->name ?? $this->stage_id;
 

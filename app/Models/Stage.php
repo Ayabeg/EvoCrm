@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['workspace_id', 'pipeline_id', 'name', 'slug', 'position', 'is_won', 'is_lost', 'probability'])]
+#[Fillable(['workspace_id', 'pipeline_id', 'name', 'slug', 'position', 'is_won', 'is_lost', 'probability', 'required_properties'])]
 class Stage extends Model
 {
     use BelongsToWorkspace;
@@ -20,7 +20,18 @@ class Stage extends Model
             'is_won' => 'boolean',
             'is_lost' => 'boolean',
             'probability' => 'integer',
+            'required_properties' => 'array',
         ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function requiredPropertyKeys(): array
+    {
+        $keys = $this->required_properties ?? [];
+
+        return array_values(array_filter(array_map('strval', $keys)));
     }
 
     /**
