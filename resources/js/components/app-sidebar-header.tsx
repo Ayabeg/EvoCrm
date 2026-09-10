@@ -1,7 +1,8 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, Plus, Search } from 'lucide-react';
-import { useState } from 'react';
+import { Bell, CheckSquare, Plus, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { CommandPalette, useCommandPaletteShortcut } from '@/components/crm/command-palette';
+import { TasksOverlay } from '@/components/crm/tasks-overlay';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -16,13 +17,23 @@ import { useInitials } from '@/hooks/use-initials';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
-    const { auth } = usePage().props;
+    const page = usePage();
+    const { auth } = page.props;
+    const taskCount = Number(page.props.evoOpenTaskCount ?? 0);
     const initials = useInitials();
     const user = auth.user;
     const [paletteOpen, setPaletteOpen] = useState(false);
+    const [tasksOpen, setTasksOpen] = useState(false);
     void breadcrumbs;
 
     useCommandPaletteShortcut(() => setPaletteOpen(true));
+
+    useEffect(() => {
+        const open = () => setTasksOpen(true);
+        window.addEventListener('openEvoTasks', open);
+
+        return () => window.removeEventListener('openEvoTasks', open);
+    }, []);
 
     return (
         <>
@@ -35,8 +46,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         readOnly
                         size="sm"
                         value=""
-                        placeholder="Find a page"
-                        aria-label="Find a page"
+                        placeholder="Find a record or page"
+                        aria-label="Find a record or page"
                         onClick={() => setPaletteOpen(true)}
                         onFocus={() => setPaletteOpen(true)}
                         startAdornment={
@@ -49,6 +60,20 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                     </span>
                 </div>
                 <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        title="Tasks"
+                        aria-label="Open tasks"
+                        className="hidden rounded-full min-[390px]:inline-flex"
+                        onClick={() => setTasksOpen(true)}
+                    >
+                        <CheckSquare className="size-4" aria-hidden />
+                        {taskCount > 0 ? (
+                            <span className="ml-1 tabular-nums text-[11px]">{taskCount}</span>
+                        ) : null}
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
@@ -108,6 +133,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 </div>
             </header>
             <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+            <TasksOverlay open={tasksOpen} onOpenChange={setTasksOpen} />
         </>
     );
 }

@@ -10,7 +10,6 @@ import {
     Megaphone,
     MessageCircle,
     PenLine,
-    Search,
     Send,
     SendHorizonal,
     SquareKanban,
@@ -25,7 +24,6 @@ import {
 import type { CommandItem } from '@/components/aurora/command-palette';
 
 type SearchHit = {
-    id: number;
     type: string;
     label: string;
     hint?: string | null;
@@ -41,7 +39,7 @@ const NAV_ITEMS = [
     { label: 'Captures', href: '/crm/leads/captures', icon: Inbox, keywords: 'inbox capture csv meta maps url' },
     { label: 'Deals', href: '/crm/deals', icon: Handshake, keywords: 'pipeline opportunities' },
     { label: 'Pipelines', href: '/crm/deals/board', icon: SquareKanban, keywords: 'kanban board stages' },
-    { label: 'Activities', href: '/crm/activities', icon: MessageCircle, keywords: 'tasks calls meetings notes' },
+    { label: 'Activities', href: '/crm/activities', icon: MessageCircle, keywords: 'tasks calls meetings' },
     { label: 'Segments', href: '/crm/segments', icon: Users, keywords: 'saved views audiences filters' },
     { label: 'Automation', href: '/crm/workflows', icon: Workflow, keywords: 'workflows triggers' },
     { label: 'Conversations', href: '/conversations', icon: MessageCircle, keywords: 'crm activities history' },
@@ -68,11 +66,10 @@ export function CommandPalette({
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }) {
-    const page = usePage();
-    const records = (page.props.evoSearchIndex ?? []) as SearchHit[];
+    const records = ((usePage().props.evoSearchIndex as SearchHit[] | undefined) ?? []);
 
     const items = useMemo<CommandItem[]>(() => {
-        const nav: CommandItem[] = NAV_ITEMS.map((item) => {
+        const nav = NAV_ITEMS.map((item) => {
             const Icon = item.icon;
 
             return {
@@ -88,12 +85,11 @@ export function CommandPalette({
             };
         });
 
-        const hits: CommandItem[] = records.map((hit) => ({
-            id: `${hit.type}-${hit.id}`,
+        const hits = records.map((hit) => ({
+            id: hit.href,
             label: hit.label,
-            description: hit.hint ?? hit.type,
+            description: [hit.type, hit.hint].filter(Boolean).join(' · '),
             section: 'records',
-            icon: <Search className="size-3.5" strokeWidth={1.65} aria-hidden />,
             onSelect: () => {
                 onOpenChange(false);
                 router.visit(hit.href);
@@ -117,7 +113,7 @@ export function CommandPalette({
                 const needle = query.trim().toLowerCase();
 
                 if (!needle) {
-                    return item.section === 'navigate' ? 1 : 0.4;
+                    return 1;
                 }
 
                 const hay = `${item.label} ${item.description ?? ''}`.toLowerCase();
