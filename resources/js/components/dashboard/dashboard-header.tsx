@@ -22,7 +22,7 @@ export function DashboardHeader({
 }) {
     const apply = (next: Partial<Filters>) => {
         router.get(
-            '/dashboard',
+            '/home',
             {
                 owner_id: next.owner_id ?? filters.owner_id ?? '',
                 from: next.from ?? filters.from ?? '',
