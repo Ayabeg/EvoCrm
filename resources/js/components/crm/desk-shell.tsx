@@ -1,7 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { RoomShell  } from '@/components/crm/room-shell';
-import type {RoomTab} from '@/components/crm/room-shell';
+import { RoomShell } from '@/components/crm/room-shell';
+import type { RoomTab } from '@/components/crm/room-shell';
 
 const DESK_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
@@ -14,6 +14,12 @@ const DESK_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
         href: '/conversations',
         match: (pathname) =>
             pathname === '/conversations' || pathname.startsWith('/conversations/'),
+    },
+    {
+        label: 'Tickets',
+        href: '/crm/tickets',
+        match: (pathname) =>
+            pathname === '/crm/tickets' || pathname.startsWith('/crm/tickets/'),
     },
     {
         label: 'Channels',
