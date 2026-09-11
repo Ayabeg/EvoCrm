@@ -1,4 +1,4 @@
-import type { DragEvent, ReactNode } from 'react';
+import type { DragEvent, MouseEvent, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -144,6 +144,7 @@ export function PipelineKanbanCard({
     testId,
     onDragStart,
     onDragEnd,
+    onClick,
     className,
 }: {
     children: ReactNode;
@@ -151,6 +152,7 @@ export function PipelineKanbanCard({
     testId?: string;
     onDragStart: (event: DragEvent) => void;
     onDragEnd: () => void;
+    onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     className?: string;
 }) {
     return (
@@ -158,6 +160,7 @@ export function PipelineKanbanCard({
             draggable
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            onClick={onClick}
             data-testid={testId}
             aria-grabbed={dragging}
             className={cn(
