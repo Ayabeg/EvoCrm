@@ -37,14 +37,18 @@ export function CreateDrawer({
                     className,
                 )}
             >
-                <SheetHeader className="border-b border-hairline px-5 py-4 text-left">
+                <SheetHeader className="relative border-b border-hairline px-5 py-3 text-left">
+                    <span
+                        className="absolute inset-y-0 left-0 w-[3px] bg-[var(--evosales-mark,#EC6025)]"
+                        aria-hidden
+                    />
                     <div className="flex items-start justify-between gap-3 pr-6">
                         <div>
-                            <SheetTitle className="aurora-text-display-2 text-ink">
+                            <SheetTitle className="text-[15px] font-semibold tracking-tight text-ink">
                                 {title}
                             </SheetTitle>
                             {description ? (
-                                <SheetDescription className="aurora-text-caption mt-1 text-mute">
+                                <SheetDescription className="mt-1 text-[12px] text-mute">
                                     {description}
                                 </SheetDescription>
                             ) : null}
@@ -52,7 +56,7 @@ export function CreateDrawer({
                         {showFormLink ? (
                             <a
                                 href="#edit-form"
-                                className="aurora-text-caption shrink-0 font-medium text-brand"
+                                className="shrink-0 text-[12px] font-medium text-brand"
                             >
                                 Edit this form
                             </a>
