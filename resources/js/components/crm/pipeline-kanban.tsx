@@ -1,4 +1,5 @@
 import type { DragEvent, MouseEvent, ReactNode } from 'react';
+import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -144,7 +145,7 @@ export function PipelineKanbanCard({
     testId,
     onDragStart,
     onDragEnd,
-    onClick,
+    onOpen,
     className,
 }: {
     children: ReactNode;
@@ -152,15 +153,39 @@ export function PipelineKanbanCard({
     testId?: string;
     onDragStart: (event: DragEvent) => void;
     onDragEnd: () => void;
-    onClick?: (event: MouseEvent<HTMLDivElement>) => void;
+    onOpen?: () => void;
     className?: string;
 }) {
+    const dragged = useRef(false);
+
+    const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+        if (dragged.current || !onOpen) {
+            return;
+        }
+
+        const target = event.target as HTMLElement;
+
+        if (target.closest('a, button, input, label')) {
+            return;
+        }
+
+        onOpen();
+    };
+
     return (
         <div
             draggable
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            onClick={onClick}
+            onDragStart={(event) => {
+                dragged.current = true;
+                onDragStart(event);
+            }}
+            onDragEnd={() => {
+                onDragEnd();
+                window.setTimeout(() => {
+                    dragged.current = false;
+                }, 0);
+            }}
+            onClick={handleClick}
             data-testid={testId}
             aria-grabbed={dragging}
             className={cn(

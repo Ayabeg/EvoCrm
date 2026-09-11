@@ -134,7 +134,11 @@ export function RecordPageFrame({
 }) {
     return (
         <div className="h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink">
-            <div className="shrink-0 border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6">
+            <div className="relative shrink-0 border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6">
+                <span
+                    className="absolute inset-y-0 left-0 w-[3px] bg-[var(--evosales-mark,#EC6025)]"
+                    aria-hidden
+                />
                 {header}
             </div>
             {children}

@@ -120,6 +120,7 @@ function DealCard({
             className={compact ? 'px-2 py-1.5' : undefined}
             onDragStart={(event) => onDragStart(event, deal.id)}
             onDragEnd={onDragEnd}
+            onOpen={() => router.visit(deal.url)}
         >
             <div className="flex items-start justify-between gap-2">
                 <Link
