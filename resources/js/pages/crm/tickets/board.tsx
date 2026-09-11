@@ -65,6 +65,7 @@ function TicketCard({
             testId={`ticket-card-${ticket.id}`}
             onDragStart={(event) => onDragStart(event, ticket.id)}
             onDragEnd={onDragEnd}
+            onOpen={() => router.visit(ticket.url)}
         >
             <div className="flex items-start justify-between gap-2">
                 <Link
