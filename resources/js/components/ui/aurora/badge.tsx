@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Slot, Slottable } from "@radix-ui/react-slot"
-import { X } from "lucide-react"
+import { X } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 // Warn-once so repeated renders (and React strict-mode double-invokes) don't

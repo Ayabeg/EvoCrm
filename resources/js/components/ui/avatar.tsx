@@ -58,7 +58,7 @@ function Avatar({
             initials={initials}
             fallback={initials}
             size={props.size ?? 'md'}
-            tone={props.tone ?? 'var(--evosales-ink)'}
+            tone={props.tone ?? 'var(--color-text)'}
             ring={props.ring ?? false}
             className={className}
             style={{ boxShadow: 'none', ...props.style }}

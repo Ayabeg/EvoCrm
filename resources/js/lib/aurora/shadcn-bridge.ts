@@ -1,7 +1,13 @@
 /**
  * shadcn New York → Aurora variant map.
- * Color comes from the P02 semantic tokens in `resources/css/app.css`
- * (`--color-accent`, `--color-bg`, …). Do not add a parallel palette here.
+ *
+ * Public product API is `@/components/ui/*`. Aurora implements the controls;
+ * this file is the only variant translation. Color comes from the P02
+ * semantic tokens in `resources/css/app.css` (`--color-accent`, `--color-bg`, …).
+ * Do not add a parallel palette here.
+ *
+ * Mapped here: Button, Badge. Other primitives re-export Aurora 1:1
+ * (Input, Select, Tabs, Dialog, Sheet/Drawer, …) or Sonner for Toast.
  */
 import type { BadgeFill, BadgeTone } from '@/components/ui/aurora/badge';
 import type { ButtonSize as AuroraButtonSize, ButtonVariant as AuroraButtonVariant } from '@/components/ui/aurora/button';

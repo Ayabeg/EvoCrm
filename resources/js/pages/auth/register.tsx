@@ -2,7 +2,7 @@ import { Form, Head } from '@inertiajs/react';
 import GoogleAuthButton from '@/components/google-auth-button';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
-import { FieldError } from '@/components/ui/aurora/field';
+import { FieldError } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

@@ -450,12 +450,45 @@
  * Unlayered so it wins over @layer aurora-components.
  * Tailwind declares `utilities` before this file can insert aurora-components,
  * so a utilities-layer restyle loses to Aurora's glass shadows at runtime.
- * Heights, padding, and radius stay on Aurora + local className.
+ * P03 locks default control height (36px) and radius (8px) here.
  * Dialogs, popovers, and dropdowns keep Aurora overlay elevation.
  */
 .aurora-btn {
-    border-color: var(--evosales-hairline);
+    height: 36px;
+    border-radius: 8px;
+    border-color: var(--color-border);
     box-shadow: none;
+}
+
+.aurora-btn--sm {
+    height: 32px;
+    border-radius: 8px;
+}
+
+.aurora-btn--lg {
+    height: 40px;
+    border-radius: 8px;
+}
+
+.aurora-btn--icon {
+    width: 36px;
+    height: 36px;
+}
+
+.aurora-btn--sm.aurora-btn--icon {
+    width: 32px;
+    height: 32px;
+}
+
+.aurora-btn--lg.aurora-btn--icon {
+    width: 40px;
+    height: 40px;
+}
+
+.aurora-btn--unstyled {
+    height: auto;
+    width: auto;
+    border-radius: 0;
 }
 
 .aurora-btn:hover,
@@ -465,8 +498,8 @@
 
 .aurora-btn:focus-visible {
     box-shadow:
-        0 0 0 1px color-mix(in srgb, var(--evosales-mark) 45%, transparent),
-        0 0 0 3px color-mix(in srgb, var(--evosales-mark) 22%, transparent);
+        0 0 0 1px color-mix(in srgb, var(--color-focus-ring) 45%, transparent),
+        0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 22%, transparent);
 }
 
 .aurora-btn--neutral,

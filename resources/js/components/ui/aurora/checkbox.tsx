@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, Minus } from "lucide-react"
+import { Check, Minus } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Input } from "./input"
 
@@ -117,11 +117,11 @@ function Checkbox({
     >
       <Check
         className={cn("h-[13px] w-[13px]", indeterminate ? "hidden" : currentChecked ? "block" : "hidden")}
-        strokeWidth="2.4"
+        weight="bold"
       />
       <Minus
         className={cn("h-[13px] w-[13px]", indeterminate ? "block" : "hidden")}
-        strokeWidth="2.4"
+        weight="bold"
       />
     </span>
   )

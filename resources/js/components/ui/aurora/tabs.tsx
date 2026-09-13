@@ -23,7 +23,7 @@ function TabsTrigger({ ref, className, ...props }: React.ComponentProps<typeof T
       ref={ref}
       className={cn(
         // layout (CD: symmetric 9px vertical, 12px horizontal)
-        "relative inline-flex items-center gap-1.5 px-3 py-[9px]",
+        "relative inline-flex h-9 items-center gap-1.5 px-3 py-0",
         "select-none cursor-pointer",
         "transition-colors duration-150 focus-visible:outline-none",
         // resting state
@@ -34,7 +34,6 @@ function TabsTrigger({ ref, className, ...props }: React.ComponentProps<typeof T
         // active state (CD: text goes primary, indicator lights up cyan + glow)
         "data-[state=active]:text-[var(--aurora-text-primary)]",
         "data-[state=active]:after:bg-[var(--aurora-accent-primary)]",
-        "data-[state=active]:after:[box-shadow:0_0_8px_var(--aurora-accent-primary)]",
         className
       )}
       style={{
@@ -108,7 +107,7 @@ function PillTrigger({ ref, className, ...props }: React.ComponentProps<typeof T
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5",
+        "inline-flex h-9 items-center gap-1.5 rounded-[6px] px-4 py-0",
         "select-none cursor-pointer",
         "transition-all duration-150 focus-visible:outline-none",
         // resting

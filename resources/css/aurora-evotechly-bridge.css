@@ -113,8 +113,8 @@
     /* Page shell — canvas wash only. No decorative Aurora radials. */
     --aurora-shell-bg: var(--color-bg);
 
-    /* Radii — Aurora optical scale (visible card roundness) */
-    --aurora-radius-1: 12px;
+    /* Radii — P03 control radius is 8px; overlays keep the larger steps */
+    --aurora-radius-1: 8px;
     --aurora-radius-2: 16px;
     --aurora-radius-3: 20px;
     --radius-1: var(--aurora-radius-1);
@@ -260,7 +260,7 @@
     --aurora-type-table: var(--text-ui);
     --aurora-type-caption: var(--text-section-label);
 
-    --aurora-radius-1: 12px;
+    --aurora-radius-1: 8px;
     --aurora-radius-2: 16px;
     --aurora-radius-3: 20px;
     --aurora-shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.28), 0 8px 20px rgba(0, 0, 0, 0.18);
