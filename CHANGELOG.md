@@ -1,5 +1,16 @@
 # Changelog
 
+## G6 product-ready stop gate (2026-09-13)
+
+### Added
+- [`docs/architecture/EVOCRM_PRODUCT_READY.md`](docs/architecture/EVOCRM_PRODUCT_READY.md) — write workflows, G4 authz, simple mode, Sanctum `/api/v1` (#182)
+- `php artisan evocrm:product-ready` — existence gate (QuoteAcceptor, G4 policies, simple mode, Sanctum `routes/api.php`, critical Pest files on disk). Does not run the suite.
+
+### Changed
+- `docs/ARCHITECTURE.md` “What this is not”: Evolution `WHATSAPP-BAILEYS` is allowed; OpenWA / linked-device stay refused
+
+---
+
 ## Desk iframe + outbound mail truth (2026-09-13)
 
 ### Added
