@@ -25,9 +25,9 @@ import { cn } from "@/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// Apple / Aurora Light Cabinet: 240px labeled rail, 56px icon rail.
-// Mobile stays the existing Aurora Sheet — opaque 240px, not a drawer rewrite.
-const SIDEBAR_WIDTH = "240px"
+// Wave 0: Salesforce-density ink icon rail. Desktop is always 56px.
+// Mobile stays the existing Sheet — opaque 240px labeled list.
+const SIDEBAR_WIDTH = "3.5rem"
 const SIDEBAR_WIDTH_MOBILE = "240px"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"

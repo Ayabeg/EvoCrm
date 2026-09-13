@@ -11,7 +11,7 @@ it('§9.1 home is guided left and activity feed right', function () {
         ->and($home)->toContain('GuidedActions')
         ->and($home)->toContain('CaughtUpStrip')
         ->and($home)->toContain('ActivityFeed')
-        ->and($home)->toContain('lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.9fr)]')
+        ->and($home)->toContain('lg:grid-cols-12')
         ->and($home)->not->toContain('Breeze')
         ->and($home)->not->toContain('Einstein');
 });

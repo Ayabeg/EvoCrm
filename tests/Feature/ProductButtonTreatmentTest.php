@@ -15,12 +15,12 @@ it('keeps Aurora Button as the only product button primitive', function () {
         ->and($aurora)->toContain('asChild');
 });
 
-it('restyles Aurora buttons at the EvoSales layer without rewriting Aurora CSS', function () {
+it('restyles Aurora buttons at the EvoCrm layer without rewriting Aurora CSS', function () {
     $product = file_get_contents(resource_path('css/app.css'));
     $aurora = file_get_contents(resource_path('js/components/aurora-components.css'));
 
     expect($aurora)->toContain('box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.34), 0 2px 6px rgba(0,0,0,0.16)')
-        ->and($product)->toContain('EvoSales button composition')
+        ->and($product)->toContain('EvoCrm button composition')
         ->and($product)->toContain('Unlayered so it wins over @layer aurora-components')
         ->and($product)->toContain('.aurora-btn {')
         ->and($product)->toContain('box-shadow: none')
