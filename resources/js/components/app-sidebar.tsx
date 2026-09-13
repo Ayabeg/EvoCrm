@@ -117,6 +117,7 @@ function RailLink({
             title={item.label}
             onClick={onNavigate}
             aria-current={active ? 'page' : undefined}
+            data-active={active || undefined}
             className={cn(
                 'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                 labeled
@@ -228,6 +229,7 @@ export function AppSidebar() {
                                 title="More"
                                 aria-expanded={moreOpen}
                                 aria-haspopup="menu"
+                                data-active={moreOpen || undefined}
                                 onClick={() => setMoreOpen((open) => !open)}
                                 className={cn(
                                     'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',

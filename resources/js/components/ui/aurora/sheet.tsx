@@ -45,7 +45,7 @@ function SheetContent({ ref, className, children, side = "right", style, hideClo
         ref={ref}
         className={cn(
           "fixed z-50 flex flex-col overflow-hidden border transition ease-in-out focus-visible:outline-none",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300",
           sideClass[side],
           className,
         )}

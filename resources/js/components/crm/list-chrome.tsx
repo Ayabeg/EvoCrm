@@ -2,6 +2,8 @@ import { Link, router } from '@inertiajs/react';
 import { ChevronDown, Plus, Search, SlidersHorizontal } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
+import type { EmptyKind } from '@/components/ui/empty-illustration';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -237,7 +239,10 @@ export function CrmListFooter({
             <span>{label}</span>
             <div className="flex items-center gap-3">
                 {typeof page === 'number' && typeof lastPage === 'number' ? (
-                    <nav className="flex items-center gap-2" aria-label="Pagination">
+                    <nav
+                        className="flex items-center gap-2"
+                        aria-label="Pagination"
+                    >
                         {prevHref ? (
                             <Link href={prevHref} className="hover:text-ink">
                                 Prev
@@ -274,23 +279,34 @@ export function CrmEmptyState({
     line,
     actionLabel,
     onAction,
+    kind,
+    illustration,
 }: {
     title: string;
     line: string;
     actionLabel?: string;
     onAction?: () => void;
+    kind?: EmptyKind;
+    illustration?: ReactNode;
 }) {
     return (
-        <div className="grid flex-1 place-items-center bg-canvas px-4 py-10 sm:px-6">
-            <div className="max-w-sm text-center">
-                <p className="text-[13px] font-medium text-ink">{title}</p>
-                <p className="mt-1 text-[12px] leading-5 text-mute">{line}</p>
-                {actionLabel && onAction ? (
-                    <Button type="button" size="sm" onClick={onAction} className="mt-3">
-                        {actionLabel}
-                    </Button>
-                ) : null}
-            </div>
+        <div className="grid flex-1 place-items-center bg-canvas px-4 py-8 sm:px-6">
+            <EmptyState
+                density="page"
+                kind={kind}
+                illustration={illustration}
+                title={title}
+                description={line}
+                as="h2"
+                className="w-full max-w-md"
+                action={
+                    actionLabel && onAction ? (
+                        <Button type="button" size="sm" onClick={onAction}>
+                            {actionLabel}
+                        </Button>
+                    ) : undefined
+                }
+            />
         </div>
     );
 }

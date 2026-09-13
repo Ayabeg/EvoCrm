@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import type { EmptyKind } from '@/components/ui/empty-illustration';
+import { EmptyState } from '@/components/ui/empty-state';
 
 export function EmptyRoom({
     title,
@@ -6,29 +8,36 @@ export function EmptyRoom({
     actionLabel,
     actionHref,
     children,
+    kind,
 }: {
     title: string;
     line: string;
     actionLabel?: string;
     actionHref?: string;
     children?: ReactNode;
+    kind?: EmptyKind;
 }) {
     return (
         <div className="grid flex-1 place-items-center bg-canvas px-6 py-16">
-            <div className="max-w-md text-center">
-                <div className="mx-auto mb-4 size-12 rounded-full border border-dashed border-hairline bg-canvas-soft" />
-                <h2 className="text-[16px] font-semibold text-ink">{title}</h2>
-                <p className="mt-2 text-[13px] text-muted-foreground">{line}</p>
-                {actionLabel && actionHref ? (
-                    <a
-                        href={actionHref}
-                        className="mt-4 inline-block rounded-sm px-3 py-1.5 text-[13px] font-medium text-brand transition-colors hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                    >
-                        {actionLabel}
-                    </a>
-                ) : null}
-                {children}
-            </div>
+            <EmptyState
+                density="page"
+                kind={kind}
+                title={title}
+                description={line}
+                as="h2"
+                className="w-full max-w-md"
+                action={
+                    actionLabel && actionHref ? (
+                        <a
+                            href={actionHref}
+                            className="inline-block rounded-sm px-3 py-1.5 text-[13px] font-medium text-brand transition-colors hover:bg-canvas-soft focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                        >
+                            {actionLabel}
+                        </a>
+                    ) : undefined
+                }
+            />
+            {children}
         </div>
     );
 }
