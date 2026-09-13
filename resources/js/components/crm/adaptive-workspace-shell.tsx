@@ -95,6 +95,8 @@ export function AdaptiveWorkspaceShell({
     centerClassName,
     rightClassName,
     scrollPanels = { left: true, center: true, right: true },
+    tabletGridClassName,
+    desktopGridClassName,
 }: {
     left: ReactNode;
     center: ReactNode;
@@ -107,6 +109,8 @@ export function AdaptiveWorkspaceShell({
     centerClassName?: string;
     rightClassName?: string;
     scrollPanels?: Partial<Record<WorkspacePanelKey, boolean>>;
+    tabletGridClassName?: string;
+    desktopGridClassName?: string;
 }) {
     const [activePanel, setActivePanel] =
         useState<WorkspacePanelKey>(defaultPanel);
@@ -178,7 +182,13 @@ export function AdaptiveWorkspaceShell({
                         {left}
                     </ScrollPanel>
                 ) : (
-                    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] gap-px overflow-hidden bg-hairline">
+                    <div
+                        className={cn(
+                            'grid min-h-0 flex-1 gap-px overflow-hidden bg-hairline',
+                            tabletGridClassName ??
+                                'grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]',
+                        )}
+                    >
                         <ScrollPanel
                             className={centerRegion}
                             scrollable={centerScroll}
@@ -196,7 +206,13 @@ export function AdaptiveWorkspaceShell({
             </div>
 
             {/* Desktop: intrinsic fluid rails + independent scroll regions */}
-            <div className="hidden min-h-0 flex-1 gap-px overflow-hidden bg-hairline lg:grid lg:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)_minmax(18rem,22rem)]">
+            <div
+                className={cn(
+                    'hidden min-h-0 flex-1 gap-px overflow-hidden bg-hairline lg:grid',
+                    desktopGridClassName ??
+                        'lg:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)_minmax(18rem,22rem)]',
+                )}
+            >
                 <ScrollPanel className={leftRegion} scrollable={leftScroll}>
                     {left}
                 </ScrollPanel>

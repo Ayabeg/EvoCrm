@@ -56,7 +56,7 @@ export function DeskShell({
     return (
         <>
             <Head title={title} />
-            <RoomShell title="Desk" tabs={deskTabs(pathname, simpleMode)}>
+            <RoomShell title="Inbox" tabs={deskTabs(pathname, simpleMode)}>
                 <div className="h-full overflow-hidden">{children}</div>
             </RoomShell>
         </>
