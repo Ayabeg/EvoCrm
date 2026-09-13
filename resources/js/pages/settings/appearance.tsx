@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import AppearanceTabs from '@/components/appearance-tabs';
-import Heading from '@/components/heading';
+import { SettingsCard, SettingsPageHeader } from '@/components/settings/chrome';
 import { edit as editAppearance } from '@/routes/appearance';
 
 export default function Appearance() {
@@ -8,16 +8,17 @@ export default function Appearance() {
         <>
             <Head title="Appearance settings" />
 
-            <h1 className="sr-only">Appearance settings</h1>
+            <SettingsPageHeader
+                title="Appearance"
+                description="Cabinet for this browser. Light Cabinet is the EvoCrm default."
+            />
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Appearance settings"
-                    description="Update the appearance settings for your account"
-                />
+            <SettingsCard
+                title="Display"
+                description="Applies to this device only."
+            >
                 <AppearanceTabs />
-            </div>
+            </SettingsCard>
         </>
     );
 }

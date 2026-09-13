@@ -1,5 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Check, Minus } from 'lucide-react';
+import { ArrowLeft, Check, Minus } from '@phosphor-icons/react';
+import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -43,7 +44,12 @@ export default function MetaApp({
             <div className="space-y-6">
                 <div className="rounded-md border border-hairline bg-canvas p-4">
                     <ol className="flex flex-wrap gap-2 text-[12px]">
-                        {['Connect Meta', 'Pick pages', 'Verify scopes', 'Finish'].map((step, index) => (
+                        {[
+                            'Connect Meta',
+                            'Pick pages',
+                            'Verify scopes',
+                            'Finish',
+                        ].map((step, index) => (
                             <li
                                 key={step}
                                 className={`rounded-full px-3 py-1 ${index === 0 ? 'bg-brand text-primary-foreground' : 'bg-canvas-soft text-muted-foreground'}`}
@@ -61,20 +67,18 @@ export default function MetaApp({
                         <ArrowLeft className="size-3" />
                         Apps
                     </Link>
-                    <div className="flex items-center gap-3">
-                        <h1 className="text-xl font-semibold">Meta</h1>
+                    <SettingsPageHeader
+                        title="Meta"
+                        description="Official Facebook Login OAuth. One connection, four surfaces."
+                    >
                         <Badge>Connected</Badge>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Official Facebook Login OAuth. One connection, four
-                        surfaces.
-                    </p>
+                    </SettingsPageHeader>
                 </div>
 
                 <Card className="space-y-2 border-hairline bg-canvas p-4 text-sm shadow-none">
                     <p>
                         <span className="text-muted-foreground">Account:</span>{' '}
-                        {integration.account_name ?? '—'}
+                        {integration.account_name ?? '-'}
                         {integration.account_email
                             ? ` (${integration.account_email})`
                             : ''}
@@ -140,9 +144,7 @@ export default function MetaApp({
                 </Card>
 
                 <Card className="p-4 text-sm">
-                    <h2 className="text-sm font-semibold">
-                        Discovered assets
-                    </h2>
+                    <h2 className="text-sm font-semibold">Discovered assets</h2>
                     <div className="mt-3 space-y-3">
                         <div>
                             <p className="text-xs font-medium text-muted-foreground uppercase">
@@ -198,8 +200,8 @@ export default function MetaApp({
                     </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                         Deletes the stored tokens from this workspace. The Meta
-                        app keeps its grant on Meta's side — revoke it there
-                        too if needed.
+                        app keeps its grant on Meta's side — revoke it there too
+                        if needed.
                     </p>
                     <Form
                         action="/settings/apps/meta"

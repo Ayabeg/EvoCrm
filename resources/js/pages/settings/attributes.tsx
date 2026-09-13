@@ -1,6 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
+import { SettingsPageHeader } from '@/components/settings/chrome';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
 import {
     HairlineRow,
@@ -8,7 +9,6 @@ import {
     HairlineTd,
     HairlineTh,
 } from '@/components/surface/hairline-table';
-import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,7 +79,10 @@ function TypeFields({
             </div>
             {type === 'list' ? (
                 <div>
-                    <Label htmlFor={`${idPrefix}-options`} className="mb-1 block">
+                    <Label
+                        htmlFor={`${idPrefix}-options`}
+                        className="mb-1 block"
+                    >
                         List options (comma)
                     </Label>
                     <Input
@@ -124,7 +127,10 @@ function DefinitionForm({
                             </Label>
                             <NativeSelect id="entity" name="entity">
                                 {entities.map((entity) => (
-                                    <option key={entity.value} value={entity.value}>
+                                    <option
+                                        key={entity.value}
+                                        value={entity.value}
+                                    >
                                         {entity.label}
                                     </option>
                                 ))}
@@ -137,13 +143,20 @@ function DefinitionForm({
                             <Label htmlFor="key" className="mb-1 block">
                                 Key
                             </Label>
-                            <Input id="key" name="key" required placeholder="beds" />
+                            <Input
+                                id="key"
+                                name="key"
+                                required
+                                placeholder="beds"
+                            />
                         </div>
                     ) : null}
 
                     <div>
                         <Label
-                            htmlFor={isEdit ? `label-${definition!.id}` : 'label'}
+                            htmlFor={
+                                isEdit ? `label-${definition!.id}` : 'label'
+                            }
                             className="mb-1 block"
                         >
                             Label
@@ -159,7 +172,9 @@ function DefinitionForm({
 
                     <div>
                         <Label
-                            htmlFor={isEdit ? `group-${definition!.id}` : 'group'}
+                            htmlFor={
+                                isEdit ? `group-${definition!.id}` : 'group'
+                            }
                             className="mb-1 block"
                         >
                             Group
@@ -178,7 +193,7 @@ function DefinitionForm({
                         defaultOptions={definition?.options}
                     />
 
-                    <label className="flex items-center gap-2 aurora-text-body-sm text-ink">
+                    <label className="aurora-text-body-sm flex items-center gap-2 text-ink">
                         <input
                             type="checkbox"
                             name="required"
@@ -224,15 +239,15 @@ export default function AttributeSettings({
         <>
             <Head title="Custom attributes" />
 
-            <div className="space-y-5">
-                <SurfaceHeader
+            <div className="space-y-3">
+                <SettingsPageHeader
                     title="Custom attributes"
                     description="Workspace-defined fields on Contact, Company, and Deal. Add a date or list, group them, then edit or delete the definition."
                 >
                     <Button size="sm" onClick={() => setCreateOpen(true)}>
                         New attribute
                     </Button>
-                </SurfaceHeader>
+                </SettingsPageHeader>
 
                 {byEntity.length === 0 ? (
                     <HairlinePanel className="px-4 py-8">
@@ -275,7 +290,8 @@ export default function AttributeSettings({
                                                     {definition.key}
                                                 </HairlineTd>
                                                 <HairlineTd className="text-mute">
-                                                    {definition.group || 'General'}
+                                                    {definition.group ||
+                                                        'General'}
                                                 </HairlineTd>
                                                 <HairlineTd>
                                                     <Badge variant="outline">
@@ -285,11 +301,24 @@ export default function AttributeSettings({
                                                 <HairlineTd className="text-mute">
                                                     {definition.fill_rate ? (
                                                         <span className="money tabular-nums">
-                                                            {definition.fill_rate.filled}
+                                                            {
+                                                                definition
+                                                                    .fill_rate
+                                                                    .filled
+                                                            }
                                                             /
-                                                            {definition.fill_rate.total}
+                                                            {
+                                                                definition
+                                                                    .fill_rate
+                                                                    .total
+                                                            }
                                                             {' · '}
-                                                            {definition.fill_rate.percent}%
+                                                            {
+                                                                definition
+                                                                    .fill_rate
+                                                                    .percent
+                                                            }
+                                                            %
                                                         </span>
                                                     ) : (
                                                         '-'
@@ -302,7 +331,9 @@ export default function AttributeSettings({
                                                             size="sm"
                                                             className="text-brand"
                                                             onClick={() =>
-                                                                setEditing(definition)
+                                                                setEditing(
+                                                                    definition,
+                                                                )
                                                             }
                                                         >
                                                             Edit
@@ -338,9 +369,7 @@ export default function AttributeSettings({
                 }}
                 title={editing ? `Edit ${editing.label}` : 'Edit attribute'}
                 description={
-                    editing
-                        ? `${editing.entity} · ${editing.key}`
-                        : undefined
+                    editing ? `${editing.entity} · ${editing.key}` : undefined
                 }
                 showFormLink={false}
             >
@@ -348,10 +377,12 @@ export default function AttributeSettings({
                     <div className="space-y-4">
                         {editing.fill_rate ? (
                             <div className="space-y-1 rounded-lg border border-hairline bg-canvas-soft p-3">
-                                <div className="flex items-center justify-between aurora-text-caption text-mute">
+                                <div className="aurora-text-caption flex items-center justify-between text-mute">
                                     <span>Fill rate</span>
                                     <span className="money tabular-nums">
-                                        {editing.fill_rate.filled} / {editing.fill_rate.total} · {editing.fill_rate.percent}%
+                                        {editing.fill_rate.filled} /{' '}
+                                        {editing.fill_rate.total} ·{' '}
+                                        {editing.fill_rate.percent}%
                                     </span>
                                 </div>
                                 <div className="h-1.5 overflow-hidden rounded-full bg-canvas">

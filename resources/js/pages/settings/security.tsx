@@ -1,13 +1,16 @@
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import type { Props as ManageTwoFactorProps } from '@/components/manage-two-factor';
 import ManageTwoFactor from '@/components/manage-two-factor';
 import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import {
+    SettingsCard,
+    SettingsFormRow,
+    SettingsPageHeader,
+    SettingsSaveBar,
+} from '@/components/settings/chrome';
 import { edit } from '@/routes/security';
 
 type Props = {
@@ -22,15 +25,12 @@ export default function Security(props: Props) {
         <>
             <Head title="Security settings" />
 
-            <h1 className="sr-only">Security settings</h1>
+            <SettingsPageHeader
+                title="Security"
+                description="Password and two-factor settings for this login."
+            />
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
-                />
-
+            <div className="grid gap-3">
                 <Form
                     {...SecurityController.update.form()}
                     options={{
@@ -51,80 +51,77 @@ export default function Security(props: Props) {
                             currentPasswordInput.current?.focus();
                         }
                     }}
-                    className="space-y-6"
                 >
                     {({ errors, processing }) => (
-                        <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
-                                </Label>
-
+                        <SettingsCard
+                            title="Update password"
+                            required
+                            footer={
+                                <SettingsSaveBar
+                                    processing={processing}
+                                    saveTestId="update-password-button"
+                                />
+                            }
+                        >
+                            <SettingsFormRow
+                                label="Current password"
+                                htmlFor="current_password"
+                                required
+                            >
                                 <PasswordInput
                                     id="current_password"
                                     ref={currentPasswordInput}
                                     name="current_password"
-                                    className="mt-1 block w-full"
+                                    className="h-8"
                                     autoComplete="current-password"
-                                    placeholder="Current password"
                                 />
-
                                 <InputError message={errors.current_password} />
-                            </div>
+                            </SettingsFormRow>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
-
+                            <SettingsFormRow
+                                label="New password"
+                                htmlFor="password"
+                                required
+                            >
                                 <PasswordInput
                                     id="password"
                                     ref={passwordInput}
                                     name="password"
-                                    className="mt-1 block w-full"
+                                    className="h-8"
                                     autoComplete="new-password"
-                                    placeholder="New password"
                                     passwordrules={props.passwordRules}
                                 />
-
                                 <InputError message={errors.password} />
-                            </div>
+                            </SettingsFormRow>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-
+                            <SettingsFormRow
+                                label="Confirm password"
+                                htmlFor="password_confirmation"
+                                required
+                            >
                                 <PasswordInput
                                     id="password_confirmation"
                                     name="password_confirmation"
-                                    className="mt-1 block w-full"
+                                    className="h-8"
                                     autoComplete="new-password"
-                                    placeholder="Confirm password"
                                     passwordrules={props.passwordRules}
                                 />
-
                                 <InputError
                                     message={errors.password_confirmation}
                                 />
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <Button
-                                    disabled={processing}
-                                    data-test="update-password-button"
-                                >
-                                    Save
-                                </Button>
-                            </div>
-                        </>
+                            </SettingsFormRow>
+                        </SettingsCard>
                     )}
                 </Form>
-            </div>
 
-            <ManageTwoFactor
-                canManageTwoFactor={props.canManageTwoFactor}
-                requiresConfirmation={props.requiresConfirmation}
-                twoFactorEnabled={props.twoFactorEnabled}
-            />
+                <SettingsCard title="Two-factor authentication">
+                    <ManageTwoFactor
+                        canManageTwoFactor={props.canManageTwoFactor}
+                        requiresConfirmation={props.requiresConfirmation}
+                        twoFactorEnabled={props.twoFactorEnabled}
+                    />
+                </SettingsCard>
+            </div>
         </>
     );
 }

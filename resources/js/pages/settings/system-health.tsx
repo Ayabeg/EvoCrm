@@ -1,6 +1,12 @@
 import { Head } from '@inertiajs/react';
-import { Activity, CircleAlert, CircleCheck, CircleX, Clock3 } from 'lucide-react';
-import Heading from '@/components/heading';
+import {
+    CheckCircle,
+    Clock,
+    Pulse,
+    WarningCircle,
+    XCircle,
+} from '@phosphor-icons/react';
+import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
@@ -46,17 +52,23 @@ function timestamp(value: string | null): string {
 function StateBadge({ state }: { state: CommandHealth['state'] }) {
     const Icon =
         state === 'success'
-            ? CircleCheck
+            ? CheckCircle
             : state === 'failed'
-              ? CircleX
+              ? XCircle
               : state === 'running'
-                ? Activity
+                ? Pulse
                 : state === 'stale'
-                  ? CircleAlert
-                  : Clock3;
+                  ? WarningCircle
+                  : Clock;
 
     return (
-        <Badge variant={state === 'failed' || state === 'stale' ? 'destructive' : 'secondary'}>
+        <Badge
+            variant={
+                state === 'failed' || state === 'stale'
+                    ? 'destructive'
+                    : 'secondary'
+            }
+        >
             <Icon aria-hidden="true" className="mr-1 size-3" />
             {stateLabels[state]}
         </Badge>
@@ -73,19 +85,26 @@ export default function SystemHealthSettings({
     return (
         <>
             <Head title="System health" />
-            <div className="space-y-8">
-                <Heading
+            <div className="space-y-4">
+                <SettingsPageHeader
                     title="System health"
                     description="Scheduler freshness and workspace integration state. Credentials are never shown."
                 />
 
-                <section aria-labelledby="scheduled-commands-heading" className="space-y-3">
+                <section
+                    aria-labelledby="scheduled-commands-heading"
+                    className="space-y-3"
+                >
                     <div>
-                        <h2 id="scheduled-commands-heading" className="text-sm font-semibold">
+                        <h2
+                            id="scheduled-commands-heading"
+                            className="text-sm font-semibold"
+                        >
                             Scheduled commands
                         </h2>
                         <p className="text-xs text-muted-foreground">
-                            Stale means the expected execution window passed without a newer run.
+                            Stale means the expected execution window passed
+                            without a newer run.
                         </p>
                     </div>
 
@@ -93,18 +112,33 @@ export default function SystemHealthSettings({
                         <table className="w-full min-w-[760px] text-left text-[13px]">
                             <thead className="bg-canvas-soft text-xs text-muted-foreground">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium">Process</th>
-                                    <th className="px-4 py-3 font-medium">State</th>
-                                    <th className="px-4 py-3 font-medium">Last success</th>
-                                    <th className="px-4 py-3 font-medium">Last failure</th>
-                                    <th className="px-4 py-3 font-medium">Duration</th>
+                                    <th className="px-4 py-3 font-medium">
+                                        Process
+                                    </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        State
+                                    </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        Last success
+                                    </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        Last failure
+                                    </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        Duration
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {commands.map((command) => (
-                                    <tr key={command.command} className="border-t border-hairline">
+                                    <tr
+                                        key={command.command}
+                                        className="border-t border-hairline"
+                                    >
                                         <td className="px-4 py-3">
-                                            <p className="font-medium">{command.label}</p>
+                                            <p className="font-medium">
+                                                {command.label}
+                                            </p>
                                             <p className="text-xs text-muted-foreground">
                                                 {command.cadence}
                                             </p>
@@ -116,7 +150,11 @@ export default function SystemHealthSettings({
                                             {timestamp(command.last_success_at)}
                                         </td>
                                         <td className="px-4 py-3">
-                                            <p>{timestamp(command.last_failure_at)}</p>
+                                            <p>
+                                                {timestamp(
+                                                    command.last_failure_at,
+                                                )}
+                                            </p>
                                             {command.error_type ? (
                                                 <p className="text-xs text-muted-foreground">
                                                     {command.error_type}
@@ -135,21 +173,33 @@ export default function SystemHealthSettings({
                     </Card>
                 </section>
 
-                <section aria-labelledby="integrations-heading" className="space-y-3">
+                <section
+                    aria-labelledby="integrations-heading"
+                    className="space-y-3"
+                >
                     <div>
-                        <h2 id="integrations-heading" className="text-sm font-semibold">
+                        <h2
+                            id="integrations-heading"
+                            className="text-sm font-semibold"
+                        >
                             Integrations
                         </h2>
                         <p className="text-xs text-muted-foreground">
-                            Configuration and last known workspace activity only.
+                            Configuration and last known workspace activity
+                            only.
                         </p>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2">
                         {integrations.map((integration) => (
-                            <Card key={integration.key} className="space-y-2 p-4 shadow-none">
+                            <Card
+                                key={integration.key}
+                                className="space-y-2 p-4 shadow-none"
+                            >
                                 <div className="flex items-center justify-between gap-3">
-                                    <h3 className="text-sm font-semibold">{integration.label}</h3>
+                                    <h3 className="text-sm font-semibold">
+                                        {integration.label}
+                                    </h3>
                                     <Badge variant="secondary">
                                         {integration.state.replaceAll('_', ' ')}
                                     </Badge>
@@ -158,7 +208,8 @@ export default function SystemHealthSettings({
                                     {integration.detail}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                    Last activity: {timestamp(integration.last_activity_at)}
+                                    Last activity:{' '}
+                                    {timestamp(integration.last_activity_at)}
                                 </p>
                             </Card>
                         ))}

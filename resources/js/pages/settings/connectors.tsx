@@ -1,17 +1,18 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { CalendarDays, Mail, MessageCircle } from 'lucide-react';
+import {
+    CalendarBlank,
+    EnvelopeSimple,
+    ChatCircle,
+} from '@phosphor-icons/react';
 import { connectorStatusLabel } from '@/components/desk/connector-status';
 import { ChannelMark } from '@/components/desk/official-connect-panel';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
 import type { GoogleWorkspaceConnector, OfficialDeskConnector } from '@/types';
 
 function GoogleConnectorCard({
@@ -21,21 +22,16 @@ function GoogleConnectorCard({
     connector: GoogleWorkspaceConnector;
     googleEnabled: boolean;
 }) {
-    const Icon = connector.provider === 'gmail' ? Mail : CalendarDays;
+    const Icon =
+        connector.provider === 'gmail' ? EnvelopeSimple : CalendarBlank;
     const showReconnectEmpty = googleEnabled && !connector.scopes_on_client;
 
     return (
-        <Card className="overflow-hidden p-0">
-            <CardHeader className="flex flex-row items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                    <span className="grid size-10 place-content-center rounded-[12px] border border-hairline bg-canvas-soft">
-                        <Icon className="size-4 text-brand" />
-                    </span>
-                    <div>
-                        <CardTitle as="h2">{connector.name}</CardTitle>
-                        <CardDescription>{connector.tagline}</CardDescription>
-                    </div>
-                </div>
+        <SettingsCard title={connector.name} description={connector.tagline}>
+            <div className="flex items-start justify-between gap-3">
+                <span className="grid size-9 place-content-center rounded-[4px] border border-hairline bg-[#eaeaea]">
+                    <Icon className="size-4 text-[#d9500f]" />
+                </span>
                 <Badge
                     variant={
                         connector.status === 'connected'
@@ -45,17 +41,16 @@ function GoogleConnectorCard({
                 >
                     {connectorStatusLabel(connector.status)}
                 </Badge>
-            </CardHeader>
-            <CardContent className="space-y-3">
+            </div>
+            <div className="space-y-3">
                 {showReconnectEmpty ? (
-                    <EmptyState
-                        as="h3"
+                    <SettingsEmptyState
                         icon={<Icon className="size-6" />}
                         title="Reconnect Google"
                         description="Add Calendar and Gmail scopes on the existing OAuth client."
                         action={
                             connector.reconnect_url ? (
-                                <Button asChild>
+                                <Button asChild size="sm">
                                     <a href={connector.reconnect_url}>
                                         Reconnect Google
                                     </a>
@@ -170,8 +165,8 @@ function GoogleConnectorCard({
                         ) : null}
                     </div>
                 ) : null}
-            </CardContent>
-        </Card>
+            </div>
+        </SettingsCard>
     );
 }
 
@@ -195,14 +190,11 @@ export default function ConnectorsSettings({
     return (
         <>
             <Head title="Connectors" />
-            <div className="space-y-8">
-                <div>
-                    <h1 className="text-page-title">Connectors</h1>
-                    <p className="aurora-text-ui mt-1 max-w-[65ch] text-muted-foreground">
-                        Official Gmail and Calendar on the existing Google OAuth
-                        client. Desk channels stay official Meta Cloud only.
-                    </p>
-                </div>
+            <div className="space-y-4">
+                <SettingsPageHeader
+                    title="Connectors"
+                    description="Official Gmail and Calendar on the existing Google OAuth client. Desk channels stay official Meta Cloud only."
+                />
 
                 <section className="space-y-3">
                     <h2 className="aurora-text-section">Google</h2>
@@ -218,9 +210,8 @@ export default function ConnectorsSettings({
                         . EvoSales does not send mail from these connectors.
                     </p>
                     {!googleEnabled ? (
-                        <EmptyState
-                            as="h3"
-                            icon={<Mail className="size-6" />}
+                        <SettingsEmptyState
+                            icon={<EnvelopeSimple className="size-6" />}
                             title="Google is not configured"
                             description="Set the existing Google OAuth client. Login stays the same."
                             action={
@@ -265,45 +256,46 @@ export default function ConnectorsSettings({
                         <Link href="/inbox" className="font-medium text-brand">
                             My Inbox
                         </Link>
-                        . WhatsApp Cloud is Evolution Cloud API only. No Baileys.
+                        . WhatsApp Cloud is Evolution Cloud API only. No
+                        Baileys.
                     </p>
                     <div className="grid gap-3">
                         {deskConnectors.map((connector) => (
-                            <Card
-                                key={connector.provider}
-                                elevated={false}
-                                className="flex items-center justify-between gap-3 p-4"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <span className="grid size-9 place-content-center rounded-[10px] border border-hairline bg-canvas-soft">
-                                        {connector.provider ===
-                                        'whatsapp_cloud' ? (
-                                            <MessageCircle className="size-4 text-brand" />
-                                        ) : (
-                                            <ChannelMark
-                                                provider={connector.provider}
-                                            />
-                                        )}
-                                    </span>
-                                    <div>
-                                        <p className="aurora-text-ui font-medium">
-                                            {connector.name}
-                                        </p>
-                                        <p className="aurora-text-caption text-muted-foreground">
-                                            {connector.tagline}
-                                        </p>
+                            <SettingsCard key={connector.provider}>
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <span className="grid size-9 place-content-center rounded-[4px] border border-hairline bg-[#eaeaea]">
+                                            {connector.provider ===
+                                            'whatsapp_cloud' ? (
+                                                <ChatCircle className="size-4 text-[#d9500f]" />
+                                            ) : (
+                                                <ChannelMark
+                                                    provider={
+                                                        connector.provider
+                                                    }
+                                                />
+                                            )}
+                                        </span>
+                                        <div>
+                                            <p className="aurora-text-ui font-medium">
+                                                {connector.name}
+                                            </p>
+                                            <p className="aurora-text-caption text-muted-foreground">
+                                                {connector.tagline}
+                                            </p>
+                                        </div>
                                     </div>
+                                    <Badge
+                                        variant={
+                                            connector.status === 'connected'
+                                                ? 'default'
+                                                : 'secondary'
+                                        }
+                                    >
+                                        {connectorStatusLabel(connector.status)}
+                                    </Badge>
                                 </div>
-                                <Badge
-                                    variant={
-                                        connector.status === 'connected'
-                                            ? 'default'
-                                            : 'secondary'
-                                    }
-                                >
-                                    {connectorStatusLabel(connector.status)}
-                                </Badge>
-                            </Card>
+                            </SettingsCard>
                         ))}
                     </div>
                 </section>

@@ -1,5 +1,10 @@
 import { Form, Head } from '@inertiajs/react';
-import Heading from '@/components/heading';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+    SettingsSaveBar,
+} from '@/components/settings/chrome';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,20 +17,34 @@ type Playbook = {
     body: string;
 };
 
-export default function PlaybookSettings({ playbooks }: { playbooks: Playbook[] }) {
+export default function PlaybookSettings({
+    playbooks,
+}: {
+    playbooks: Playbook[];
+}) {
     return (
         <>
             <Head title="Playbooks" />
-            <div className="space-y-6">
-                <Heading
+            <div className="space-y-3">
+                <SettingsPageHeader
                     title="Playbooks"
                     description="Short call and email scripts shown on contact and deal records."
                 />
-                <Card className="space-y-3 border-hairline p-4">
-                    <Form action="/settings/playbooks" method="post" className="grid gap-3">
+                <Form action="/settings/playbooks" method="post">
+                    <SettingsCard
+                        title="New playbook"
+                        required
+                        footer={<SettingsSaveBar saveLabel="Save playbook" />}
+                    >
                         <div>
                             <Label htmlFor="playbook-name">Name</Label>
-                            <Input id="playbook-name" name="name" required className="mt-1" placeholder="First Alger call" />
+                            <Input
+                                id="playbook-name"
+                                name="name"
+                                required
+                                className="mt-1"
+                                placeholder="First Alger call"
+                            />
                         </div>
                         <div>
                             <Label htmlFor="playbook-entity">Record</Label>
@@ -50,18 +69,35 @@ export default function PlaybookSettings({ playbooks }: { playbooks: Playbook[] 
                                 placeholder="Confirm wilaya, then book a site visit."
                             />
                         </div>
-                        <Button type="submit">Save playbook</Button>
-                    </Form>
-                </Card>
+                    </SettingsCard>
+                </Form>
                 <div className="space-y-3">
                     {playbooks.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No playbooks yet.</p>
+                        <SettingsEmptyState
+                            title="No playbooks yet"
+                            description="Save a short call or email script to show it on contact and deal records."
+                        />
                     ) : (
                         playbooks.map((playbook) => (
-                            <Card key={playbook.id} className="space-y-3 border-hairline p-4">
-                                <Form action={`/settings/playbooks/${playbook.id}`} method="put" className="grid gap-3">
-                                    <Input name="name" defaultValue={playbook.name} required />
-                                    <input type="hidden" name="entity" value={playbook.entity} />
+                            <Card
+                                key={playbook.id}
+                                className="space-y-3 border-hairline p-4"
+                            >
+                                <Form
+                                    action={`/settings/playbooks/${playbook.id}`}
+                                    method="put"
+                                    className="grid gap-3"
+                                >
+                                    <Input
+                                        name="name"
+                                        defaultValue={playbook.name}
+                                        required
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="entity"
+                                        value={playbook.entity}
+                                    />
                                     <textarea
                                         name="body"
                                         defaultValue={playbook.body}
@@ -70,11 +106,21 @@ export default function PlaybookSettings({ playbooks }: { playbooks: Playbook[] 
                                         className="w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-sm"
                                     />
                                     <div className="flex gap-2">
-                                        <Button type="submit" size="sm">Update</Button>
+                                        <Button type="submit" size="sm">
+                                            Update
+                                        </Button>
                                     </div>
                                 </Form>
-                                <Form action={`/settings/playbooks/${playbook.id}`} method="delete">
-                                    <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground">
+                                <Form
+                                    action={`/settings/playbooks/${playbook.id}`}
+                                    method="delete"
+                                >
+                                    <Button
+                                        type="submit"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-muted-foreground"
+                                    >
                                         Delete
                                     </Button>
                                 </Form>

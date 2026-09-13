@@ -1,10 +1,14 @@
 import { Form, Head, router } from '@inertiajs/react';
+import { ChatCircle } from '@phosphor-icons/react';
 import { useEffect } from 'react';
-import { WhatsAppMark } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 
 type Channel = {
     available: boolean;
@@ -37,23 +41,27 @@ export default function WhatsAppSettings({
     return (
         <>
             <Head title="WhatsApp" />
-            <div className="space-y-6">
-                <div className="flex items-start gap-3">
-                    <div className="grid size-11 place-content-center rounded-xl border bg-background">
-                        <WhatsAppMark className="size-6" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-semibold">WhatsApp</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Continue with Facebook. Evolution connects WhatsApp
-                            automatically — you never type a key.
-                        </p>
-                    </div>
-                </div>
+            <div className="space-y-3">
+                <SettingsPageHeader
+                    title="WhatsApp"
+                    description="Continue with Facebook. Evolution connects WhatsApp automatically. You never type a key."
+                />
 
-                <Card className="space-y-4 p-4">
+                {!channel.connected ? (
+                    <SettingsEmptyState
+                        icon={<ChatCircle className="size-6" />}
+                        title="WhatsApp is disconnected"
+                        description="Continue with Facebook. Evolution attaches the personal WhatsApp channel."
+                    />
+                ) : null}
+
+                <SettingsCard>
                     <div className="flex items-center gap-2">
-                        <Badge variant={channel.connected ? 'default' : 'secondary'}>
+                        <Badge
+                            variant={
+                                channel.connected ? 'default' : 'secondary'
+                            }
+                        >
                             {channel.connected ? 'Connected' : 'Not connected'}
                         </Badge>
                     </div>
@@ -65,30 +73,32 @@ export default function WhatsAppSettings({
                         ) : (
                             <Form action="/settings/whatsapp" method="delete">
                                 {({ processing }) => (
-                                    <Button variant="outline" disabled={processing}>
+                                    <Button
+                                        variant="outline"
+                                        disabled={processing}
+                                    >
                                         Disconnect
                                     </Button>
                                 )}
                             </Form>
                         )}
                     </div>
-                </Card>
+                </SettingsCard>
 
                 {channel.qr?.base64 ? (
-                    <Card className="space-y-3 p-4">
-                        <p className="text-sm font-medium">Personal phone (optional)</p>
-                        <p className="text-xs text-muted-foreground">
+                    <SettingsCard title="Personal phone (optional)">
+                        <p className="text-[12px] text-mute">
                             Only if you also want to link the WhatsApp app on
                             your phone. Facebook login is the main path.
                         </p>
-                        <div className="grid justify-items-center gap-3 rounded-xl border bg-background p-6">
+                        <div className="grid justify-items-center gap-3 rounded-[4px] border border-hairline bg-white p-6">
                             <img
                                 src={channel.qr.base64}
                                 alt="WhatsApp QR code"
-                                className="size-52 rounded-lg bg-white p-2"
+                                className="size-52 rounded-[4px] bg-white p-2"
                             />
                         </div>
-                    </Card>
+                    </SettingsCard>
                 ) : null}
             </div>
         </>
