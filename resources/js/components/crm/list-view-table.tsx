@@ -169,6 +169,35 @@ function customAttributeValue(attributes: AttributeMap | undefined, columnId: st
     return value == null || value === '' ? '—' : value;
 }
 
+function DealNameCell({
+    row,
+    href,
+    linked = true,
+}: {
+    row: DealRow;
+    href: string;
+    linked?: boolean;
+}) {
+    const body = <span className="truncate">{row.title}</span>;
+
+    if (!linked) {
+        return (
+            <span className="inline-flex min-w-0 items-center font-medium text-ink">
+                {body}
+            </span>
+        );
+    }
+
+    return (
+        <Link
+            href={href}
+            className="inline-flex min-w-0 items-center font-medium text-ink hover:underline"
+        >
+            {body}
+        </Link>
+    );
+}
+
 function renderDealCell(columnId: string, row: DealRow): string {
     switch (columnId) {
         case 'title':
@@ -181,7 +210,7 @@ function renderDealCell(columnId: string, row: DealRow): string {
             return row.company?.name ?? '—';
         case 'contact':
             return row.contact
-                ? `${row.contact.first_name} ${row.contact.last_name ?? ''}`.trim()
+                ? formatContactName(row.contact.first_name, row.contact.last_name)
                 : '—';
         case 'owner':
             return row.owner?.name ?? '—';
@@ -329,7 +358,7 @@ export default function ListViewTable({
             <div
                 className={cn(
                     'hidden overflow-x-auto @[480px]/list:block',
-                    entity === 'contact' ? 'bg-white' : 'bg-canvas',
+                    entity === 'contact' || entity === 'deal' ? 'bg-white' : 'bg-canvas',
                 )}
             >
                 <table className="w-full min-w-[640px] border-collapse text-[13px]">
@@ -392,6 +421,9 @@ export default function ListViewTable({
                                     const isContactName =
                                         entity === 'contact' &&
                                         column.id === 'name';
+                                    const isDealName =
+                                        entity === 'deal' &&
+                                        column.id === 'title';
 
                                     return (
                                         <td
@@ -401,11 +433,18 @@ export default function ListViewTable({
                                                 column.id === primaryId
                                                     ? 'font-medium text-ink'
                                                     : 'text-mute',
+                                                column.id === 'amount' &&
+                                                    'money tabular-nums text-ink',
                                             )}
                                         >
                                             {isContactName ? (
                                                 <ContactNameCell
                                                     row={row as ContactRow}
+                                                    href={href}
+                                                />
+                                            ) : isDealName ? (
+                                                <DealNameCell
+                                                    row={row as DealRow}
                                                     href={href}
                                                 />
                                             ) : column.id === primaryId ? (
@@ -452,6 +491,12 @@ export default function ListViewTable({
                                 {entity === 'contact' ? (
                                     <ContactNameCell
                                         row={row as ContactRow}
+                                        href={href}
+                                        linked={false}
+                                    />
+                                ) : entity === 'deal' ? (
+                                    <DealNameCell
+                                        row={row as DealRow}
                                         href={href}
                                         linked={false}
                                     />

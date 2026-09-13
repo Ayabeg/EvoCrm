@@ -1,10 +1,9 @@
-import { Form, usePage } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
-import { CrmShell } from '@/components/crm/crm-shell';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
@@ -83,136 +82,146 @@ export default function DealsIndex({
 
     return (
         <>
-            <CrmShell title="Deals" chrome="workspace">
-                <CrmListShell
-                title="Deals"
-                entity="deal"
-                basePath="/crm/deals"
-                primaryLabel="Create deal"
-                activeFilters={activeFilters}
-                savedFilters={savedFilters}
-                listView={listView}
-                recordCount={recordCount}
-                members={members}
-                cities={cities}
-                wilayas={wilayas}
-                contacts={contacts}
-                stages={stages}
-                stagePills={stagePills}
-                exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
-                createHref={`/crm/deals?pipeline=${pipeline.id}&create=1`}
-                headerActions={
-                    <>
-                        {canImport ? (
-                            <CrmObjectSecondaryLink href="/crm/deals/import">
-                                Import
-                            </CrmObjectSecondaryLink>
-                        ) : null}
-                    </>
-                }
-                layoutToggle={<DealLayoutToggle current="list" pipelineId={pipeline.id} />}
-                pipelineSwitcher={
-                    <PipelineSwitcher
-                        pipelineId={pipeline.id}
-                        pipelines={pipelines}
-                        basePath="/crm/deals"
-                    />
-                }
-                extraQuery={{ pipeline: pipeline.id }}
+            <Head title="Deals" />
+            <div
+                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                data-crm="deals-workspace"
             >
-                {(columns) => (
-                    <>
-                        {canBulk && selectedIds.length > 0 ? (
-                            <BulkActionBar
-                                entity="deal"
-                                selectedIds={selectedIds}
-                                members={members}
-                                stages={stages}
-                                onClear={() => setSelectedIds([])}
-                            />
-                        ) : null}
-                        {loading ? (
-                            <SkeletonList />
-                        ) : deals.length === 0 ? (
-                            <CrmEmptyState
-                                title={
-                                    hasActiveListFilters(activeFilters)
-                                        ? 'No deals match these filters'
-                                        : 'No deals yet'
-                                }
-                                line={
-                                    hasActiveListFilters(activeFilters)
-                                        ? 'Clear filters or pick another stage to see records.'
-                                        : 'Create a deal to start working your pipeline from this list.'
-                                }
-                                actionLabel={
-                                    hasActiveListFilters(activeFilters)
-                                        ? undefined
-                                        : 'Create deal'
-                                }
-                                onAction={
-                                    hasActiveListFilters(activeFilters)
-                                        ? undefined
-                                        : () => setDrawer(true)
-                                }
-                            />
-                        ) : (
-                            <div className="min-h-0 flex-1 overflow-auto">
-                                <ListViewTable
+                <CrmListShell
+                    title="Deals"
+                    entity="deal"
+                    basePath="/crm/deals"
+                    primaryLabel="Create deal"
+                    onCreate={() => setDrawer(true)}
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    listView={listView}
+                    recordCount={recordCount}
+                    members={members}
+                    cities={cities}
+                    wilayas={wilayas}
+                    contacts={contacts}
+                    stages={stages}
+                    stagePills={stagePills}
+                    exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
+                    className="bg-white"
+                    contentClassName="bg-white"
+                    headerActions={
+                        <>
+                            {canImport ? (
+                                <CrmObjectSecondaryLink href="/crm/deals/import">
+                                    Import
+                                </CrmObjectSecondaryLink>
+                            ) : null}
+                        </>
+                    }
+                    layoutToggle={
+                        <DealLayoutToggle current="list" pipelineId={pipeline.id} />
+                    }
+                    pipelineSwitcher={
+                        <PipelineSwitcher
+                            pipelineId={pipeline.id}
+                            pipelines={pipelines}
+                            basePath="/crm/deals"
+                        />
+                    }
+                    extraQuery={{ pipeline: pipeline.id }}
+                >
+                    {(columns) => (
+                        <>
+                            {canBulk && selectedIds.length > 0 ? (
+                                <BulkActionBar
                                     entity="deal"
-                                    rows={deals}
-                                    columnDefs={listView.columnDefs}
-                                    columns={columns}
-                                    basePath="/crm/deals"
-                                    selectable={canBulk}
                                     selectedIds={selectedIds}
-                                    onToggle={(id) =>
-                                        setSelectedIds((current) =>
-                                            current.includes(id)
-                                                ? current.filter((value) => value !== id)
-                                                : [...current, id],
-                                        )
+                                    members={members}
+                                    stages={stages}
+                                    onClear={() => setSelectedIds([])}
+                                />
+                            ) : null}
+                            {loading ? (
+                                <SkeletonList />
+                            ) : deals.length === 0 ? (
+                                <CrmEmptyState
+                                    title={
+                                        hasActiveListFilters(activeFilters)
+                                            ? 'No deals match these filters'
+                                            : 'No deals yet'
                                     }
-                                    onTogglePage={() =>
-                                        setSelectedIds((current) => {
-                                            const pageIds = deals.map((deal) => deal.id);
-                                            const allSelected = pageIds.every((id) => current.includes(id));
-
-                                            return allSelected
-                                                ? current.filter((id) => !pageIds.includes(id))
-                                                : [...new Set([...current, ...pageIds])];
-                                        })
+                                    line={
+                                        hasActiveListFilters(activeFilters)
+                                            ? 'Clear filters or pick another stage to see records.'
+                                            : 'Create a deal to start working your pipeline from this list.'
+                                    }
+                                    actionLabel={
+                                        hasActiveListFilters(activeFilters)
+                                            ? undefined
+                                            : 'Create deal'
+                                    }
+                                    onAction={
+                                        hasActiveListFilters(activeFilters)
+                                            ? undefined
+                                            : () => setDrawer(true)
                                     }
                                 />
-                            </div>
-                        )}
-                        <CrmListFooter
-                            count={deals.length}
-                            total={recordCount}
-                            noun="deals"
-                            exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
-                            page={paginator?.page}
-                            lastPage={paginator?.last_page}
-                            perPage={paginator?.per_page}
-                            prevHref={
-                                paginator && paginator.page > 1
-                                    ? listPageHref('/crm/deals', activeFilters, paginator.page - 1, {
-                                          pipeline: pipeline.id,
-                                      })
-                                    : null
-                            }
-                            nextHref={
-                                paginator && paginator.page < paginator.last_page
-                                    ? listPageHref('/crm/deals', activeFilters, paginator.page + 1, {
-                                          pipeline: pipeline.id,
-                                      })
-                                    : null
-                            }
-                        />
-                    </>
-                )}
-            </CrmListShell>
-            </CrmShell>
+                            ) : (
+                                <div className="min-h-0 flex-1 overflow-auto bg-white">
+                                    <ListViewTable
+                                        entity="deal"
+                                        rows={deals}
+                                        columnDefs={listView.columnDefs}
+                                        columns={columns}
+                                        basePath="/crm/deals"
+                                        selectable={canBulk}
+                                        selectedIds={selectedIds}
+                                        onToggle={(id) =>
+                                            setSelectedIds((current) =>
+                                                current.includes(id)
+                                                    ? current.filter((value) => value !== id)
+                                                    : [...current, id],
+                                            )
+                                        }
+                                        onTogglePage={() =>
+                                            setSelectedIds((current) => {
+                                                const pageIds = deals.map((deal) => deal.id);
+                                                const allSelected = pageIds.every((id) =>
+                                                    current.includes(id),
+                                                );
+
+                                                return allSelected
+                                                    ? current.filter((id) => !pageIds.includes(id))
+                                                    : [...new Set([...current, ...pageIds])];
+                                            })
+                                        }
+                                    />
+                                </div>
+                            )}
+                            <CrmListFooter
+                                count={deals.length}
+                                total={recordCount}
+                                noun="deals"
+                                exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
+                                page={paginator?.page}
+                                lastPage={paginator?.last_page}
+                                perPage={paginator?.per_page}
+                                prevHref={
+                                    paginator && paginator.page > 1
+                                        ? listPageHref('/crm/deals', activeFilters, paginator.page - 1, {
+                                              pipeline: pipeline.id,
+                                          })
+                                        : null
+                                }
+                                nextHref={
+                                    paginator && paginator.page < paginator.last_page
+                                        ? listPageHref('/crm/deals', activeFilters, paginator.page + 1, {
+                                              pipeline: pipeline.id,
+                                          })
+                                        : null
+                                }
+                            />
+                        </>
+                    )}
+                </CrmListShell>
+            </div>
 
             <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create deal">
                 <Form
@@ -233,6 +242,10 @@ export default function DealsIndex({
                             <div>
                                 <Label className="mb-1 block text-[12px]">Amount (DZD)</Label>
                                 <Input name="amount_dzd" type="number" min="0" step="0.01" />
+                            </div>
+                            <div>
+                                <Label className="mb-1 block text-[12px]">Close date</Label>
+                                <Input name="close_date" type="date" />
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">Contact</Label>
@@ -266,6 +279,15 @@ export default function DealsIndex({
                             <div className="flex justify-end gap-2 pt-2">
                                 <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
                                     Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    name="add_another"
+                                    value="1"
+                                    variant="outline"
+                                    disabled={processing}
+                                >
+                                    Create and add another
                                 </Button>
                                 <Button disabled={processing}>Create</Button>
                             </div>

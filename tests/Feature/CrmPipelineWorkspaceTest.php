@@ -3,13 +3,15 @@
 it('gives the deals board a workspace shell without KPI cards or a second dashboard', function () {
     $src = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
 
-    expect($src)->toContain('chrome="workspace"')
+    expect($src)->toContain('data-crm="deals-board"')
         ->and($src)->toContain('CrmObjectHeader')
         ->and($src)->toContain('Create deal')
         ->and($src)->toContain('Board options')
         ->and($src)->toContain('PipelineKanbanFooter')
-        ->and($src)->toContain('create=1')
+        ->and($src)->toContain("action=\"/crm/deals\"")
         ->and($src)->toContain('DealForecastBar')
+        ->and($src)->not->toContain('CrmShell')
+        ->and($src)->not->toContain('chrome="workspace"')
         ->and($src)->toContain('PipelineKanban')
         ->and($src)->toContain('DealLayoutToggle')
         ->and($src)->toContain('PipelineSwitcher')

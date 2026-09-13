@@ -37,6 +37,7 @@ import TicketsRelatedCard from '@/components/crm/tickets-related-card';
 import type { TicketsRelated } from '@/components/crm/tickets-related-card';
 import { Button } from '@/components/ui/button';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { formatContactName } from '@/lib/contact-name';
 import { formatDzd } from '@/lib/money';
 
 type Deal = {
@@ -53,6 +54,12 @@ type Deal = {
     company_id?: number | null;
     stage?: { id: number; name: string; slug: string } | null;
     pipeline?: { name: string; stages?: { id: number; name: string }[] } | null;
+};
+
+type QuoteRow = {
+    id: number;
+    status: string;
+    total_cents: number;
 };
 
 export default function DealShow({
@@ -99,8 +106,13 @@ export default function DealShow({
             last_name?: string | null;
         } | null;
         company?: { id: number; name: string } | null;
-        quotes?: unknown[];
+        quotes?: QuoteRow[];
         line_items?: DealLineItemRow[];
+        threads?: {
+            id: number;
+            subject?: string | null;
+            last_message?: string | null;
+        }[];
         tickets?: TicketsRelated;
     } | null;
     timeline: RecordActivity[];
@@ -133,6 +145,11 @@ export default function DealShow({
     const askAction = `/crm/deals/${deal.id}/ask`;
     const contact = associations?.contact ?? null;
     const company = associations?.company ?? null;
+    const quotes = deal.quotes ?? associations?.quotes ?? [];
+    const thread = associations?.threads?.[0] ?? null;
+    const contactName = contact
+        ? formatContactName(contact.first_name, contact.last_name)
+        : null;
 
     return (
         <>
@@ -142,73 +159,82 @@ export default function DealShow({
             ) : (
                 <RecordPageFrame
                     header={
-                        <>
+                        <div
+                            className="flex items-center justify-between gap-3"
+                            data-crm="deals-record"
+                        >
                             <RecordBack
                                 href="/crm/deals"
                                 label="Back to Deals"
                             />
-                            <RecordIdentity
-                                title={deal.title}
-                                kind="Deal"
-                                subtitle={
-                                    <>
-                                        <span className="money font-medium text-ink">
-                                            {formatDzd(deal.amount_cents)}
-                                        </span>
-                                        {deal.pipeline?.name
-                                            ? ` · ${deal.pipeline.name}`
-                                            : ''}
-                                        {deal.owner?.name
-                                            ? ` · ${deal.owner.name}`
-                                            : ''}
-                                    </>
-                                }
-                                badge={
-                                    deal.stage?.name ? (
-                                        <RecordStatusBadge>
-                                            {deal.stage.name}
-                                        </RecordStatusBadge>
-                                    ) : null
-                                }
-                                meta={
-                                    dealHealth ? (
-                                        <p className="text-[11px] leading-snug text-mute">
-                                            <span className="font-medium text-ink">
-                                                {dealHealth.label}
-                                            </span>{' '}
-                                            ({dealHealth.score}/100)
-                                            <span className="hidden sm:inline">
-                                                {' '}
-                                                · {dealHealth.reason}
-                                            </span>
-                                        </p>
-                                    ) : null
-                                }
-                                actions={
-                                    <RecordActions
-                                        entityId={deal.id}
-                                        dealId={deal.id}
-                                        contactId={deal.contact_id}
-                                        companyId={deal.company_id}
-                                        whatsappHref="/inbox"
-                                        secondary={
-                                            <div className="md:hidden">
-                                                <AskEvoTrigger
-                                                    action={askAction}
-                                                    insight={askEvo}
-                                                />
-                                            </div>
-                                        }
-                                    />
-                                }
-                            />
-                        </>
+                            <div className="md:hidden">
+                                <AskEvoTrigger
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
+                            </div>
+                        </div>
                     }
                 >
                     <RecordShell
+                        leftLabel="About"
+                        centerLabel="Activity"
+                        rightLabel="Related"
+                        leftClassName="bg-white"
+                        centerClassName="bg-white"
+                        rightClassName="bg-white"
                         left={
-                            <div className="space-y-3">
-                                <RecordSection title="Deal information">
+                            <div className="space-y-4">
+                                <RecordIdentity
+                                    title={deal.title}
+                                    kind="Deal"
+                                    subtitle={
+                                        <>
+                                            <span className="money font-medium text-ink">
+                                                {formatDzd(deal.amount_cents)}
+                                            </span>
+                                            {deal.pipeline?.name
+                                                ? ` · ${deal.pipeline.name}`
+                                                : ''}
+                                            {deal.owner?.name
+                                                ? ` · ${deal.owner.name}`
+                                                : ''}
+                                        </>
+                                    }
+                                    badge={
+                                        deal.stage?.name ? (
+                                            <RecordStatusBadge>
+                                                {deal.stage.name}
+                                            </RecordStatusBadge>
+                                        ) : null
+                                    }
+                                    meta={
+                                        dealHealth ? (
+                                            <p className="text-[11px] leading-snug text-mute">
+                                                <span className="font-medium text-ink">
+                                                    {dealHealth.label}
+                                                </span>{' '}
+                                                ({dealHealth.score}/100)
+                                                <span className="hidden sm:inline">
+                                                    {' '}
+                                                    · {dealHealth.reason}
+                                                </span>
+                                            </p>
+                                        ) : null
+                                    }
+                                />
+                                <RecordActions
+                                    entityId={deal.id}
+                                    dealId={deal.id}
+                                    contactId={deal.contact_id}
+                                    companyId={deal.company_id}
+                                    whatsappHref={
+                                        thread
+                                            ? `/conversations?thread=${thread.id}`
+                                            : '/inbox'
+                                    }
+                                />
+                                <RecordSection title="About this deal">
                                     <RecordFactList>
                                         <RecordFact
                                             label="Amount"
@@ -249,6 +275,43 @@ export default function DealShow({
                                             value={deal.priority}
                                         />
                                     </RecordFactList>
+                                </RecordSection>
+                                <RecordSection title="Stage">
+                                    <Form
+                                        action={`/crm/deals/${deal.id}/move`}
+                                        method="post"
+                                        className="flex flex-wrap items-center gap-2"
+                                    >
+                                        {({ errors }) => (
+                                            <>
+                                                <select
+                                                    name="stage_id"
+                                                    defaultValue={deal.stage?.id ?? ''}
+                                                    className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
+                                                >
+                                                    {stages.map((stage) => (
+                                                        <option
+                                                            key={stage.id}
+                                                            value={stage.id}
+                                                        >
+                                                            {stage.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <Button
+                                                    variant="outline"
+                                                    className="h-8 text-[12px]"
+                                                >
+                                                    Move
+                                                </Button>
+                                                {errors.stage_id ? (
+                                                    <p className="w-full text-[12px] text-destructive">
+                                                        {errors.stage_id}
+                                                    </p>
+                                                ) : null}
+                                            </>
+                                        )}
+                                    </Form>
                                 </RecordSection>
                                 {nextMove ? (
                                     <DealSuggestionCard
@@ -305,43 +368,6 @@ export default function DealShow({
                                     splits={splits ?? []}
                                     canManage={Boolean(canManageSplits)}
                                 />
-                                <RecordSection title="Stage">
-                                    <Form
-                                        action={`/crm/deals/${deal.id}/move`}
-                                        method="post"
-                                        className="flex flex-wrap items-center gap-2"
-                                    >
-                                        {({ errors }) => (
-                                            <>
-                                                <select
-                                                    name="stage_id"
-                                                    defaultValue={deal.stage?.id ?? ''}
-                                                    className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
-                                                >
-                                                    {stages.map((stage) => (
-                                                        <option
-                                                            key={stage.id}
-                                                            value={stage.id}
-                                                        >
-                                                            {stage.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <Button
-                                                    variant="outline"
-                                                    className="h-8 text-[12px]"
-                                                >
-                                                    Move
-                                                </Button>
-                                                {errors.stage_id ? (
-                                                    <p className="w-full text-[12px] text-destructive">
-                                                        {errors.stage_id}
-                                                    </p>
-                                                ) : null}
-                                            </>
-                                        )}
-                                    </Form>
-                                </RecordSection>
                                 <PlaybookCard playbooks={playbooks} />
                                 {attributes ? (
                                     <RecordProperties
@@ -360,10 +386,19 @@ export default function DealShow({
                                 contactId={deal.contact_id}
                                 dealId={deal.id}
                                 companyId={deal.company_id}
+                                highlights={[
+                                    {
+                                        label: 'Amount',
+                                        value: formatDzd(deal.amount_cents),
+                                    },
+                                    { label: 'Stage', value: deal.stage?.name },
+                                    { label: 'Contact', value: contactName },
+                                    { label: 'Company', value: company?.name },
+                                ]}
                             />
                         }
                         right={
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 <AskEvoPanel
                                     action={askAction}
                                     insight={askEvo}
@@ -372,11 +407,12 @@ export default function DealShow({
                                     thread={
                                         catchUp?.inbound?.[0]
                                             ? {
+                                                  id: thread?.id,
                                                   subject: catchUp.inbound[0].label,
                                                   last_message:
                                                       catchUp.inbound[0].label,
                                               }
-                                            : null
+                                            : thread
                                     }
                                 />
                                 <AssociationCard
@@ -388,15 +424,16 @@ export default function DealShow({
                                     }
                                     addLabel={contact ? 'View' : 'Add'}
                                 >
-                                    {contact ? (
+                                    {contact && contactName ? (
                                         <RelatedRecordLink
                                             href={`/crm/contacts/${contact.id}`}
                                         >
-                                            {contact.first_name}{' '}
-                                            {contact.last_name}
+                                            {contactName}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">No contact</p>
+                                        <p className="text-mute">
+                                            No contact linked
+                                        </p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard
@@ -415,7 +452,31 @@ export default function DealShow({
                                             {company.name}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">No company</p>
+                                        <p className="text-mute">
+                                            No company linked
+                                        </p>
+                                    )}
+                                </AssociationCard>
+                                <AssociationCard
+                                    title="Quotes"
+                                    addHref="/crm/quotes"
+                                    addLabel={quotes.length > 0 ? 'View' : 'Add'}
+                                >
+                                    {quotes.length === 0 ? (
+                                        <p className="text-mute">
+                                            No quotes yet
+                                        </p>
+                                    ) : (
+                                        quotes.map((quote) => (
+                                            <RelatedRecordLink
+                                                key={quote.id}
+                                                href={`/crm/quotes/${quote.id}/preview`}
+                                                meta={quote.status}
+                                            >
+                                                Quote #{quote.id} ·{' '}
+                                                {formatDzd(quote.total_cents)}
+                                            </RelatedRecordLink>
+                                        ))
                                     )}
                                 </AssociationCard>
                                 <TicketsRelatedCard

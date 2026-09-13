@@ -1,13 +1,13 @@
-import { Link, router } from '@inertiajs/react';
+import { Form, Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import type { DragEvent } from 'react';
 import { toast } from 'sonner';
-import { CrmObjectHeader } from '@/components/crm/crm-object-header';
-import { CrmShell } from '@/components/crm/crm-shell';
-import DealForecastBar from '@/components/crm/deal-forecast-bar';
-import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { BoardOptionsSheet } from '@/components/crm/board-options-sheet';
 import type { BoardOptions } from '@/components/crm/board-options-sheet';
+import { CreateDrawer } from '@/components/crm/create-drawer';
+import { CrmObjectHeader } from '@/components/crm/crm-object-header';
+import DealForecastBar from '@/components/crm/deal-forecast-bar';
+import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import {
     PipelineKanban,
     PipelineKanbanCard,
@@ -25,6 +25,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatDzd } from '@/lib/money';
 import { stageUnderlineColor } from '@/lib/stage-colors';
@@ -72,10 +74,6 @@ type Forecast = {
     weighted_cents: number;
 };
 
-function createDealHref(pipelineId: number): string {
-    return `/crm/deals?pipeline=${pipelineId}&create=1`;
-}
-
 function formatCloseDate(value: string): string {
     const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
 
@@ -109,9 +107,9 @@ function DealCard({
     const compact = options.card_style === 'compact';
     const association = deal.company_name || deal.contact_name || 'No company';
     const inactiveLabel =
-        deal.inactive_days == null
-            ? 'No activity'
-            : `No activity for ${deal.inactive_days} day${deal.inactive_days === 1 ? '' : 's'}`;
+        deal.inactive_days && deal.inactive_days >= 1
+            ? `No activity for ${deal.inactive_days} day${deal.inactive_days === 1 ? '' : 's'}`
+            : 'No activity';
 
     return (
         <PipelineKanbanCard
@@ -149,7 +147,7 @@ function DealCard({
             </p>
             {deal.close_date ? (
                 <p className="mt-0.5 text-[11px] text-mute">
-                    Close date: {formatCloseDate(deal.close_date)}
+                    {formatCloseDate(deal.close_date)}
                 </p>
             ) : null}
             {options.show_activity ? (
@@ -178,8 +176,8 @@ function PipelineBoardSkeleton({ columns = 6 }: { columns?: number }) {
                         <div className="h-3 w-20 animate-pulse rounded bg-hairline" />
                     </div>
                     <div className="grid gap-1.5">
-                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-canvas" />
-                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-canvas" />
+                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-white" />
+                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-white" />
                     </div>
                 </PipelineKanbanColumn>
             ))}
@@ -230,8 +228,8 @@ export default function DealBoard({
     const [draggingId, setDraggingId] = useState<number | null>(null);
     const [overStage, setOverStage] = useState<number | null>(null);
     const [optionsOpen, setOptionsOpen] = useState(false);
+    const [drawer, setDrawer] = useState(false);
     const loading = useInertiaLoading();
-    const createHref = createDealHref(pipeline.id);
     const exportHref = `/crm/deals/export?pipeline=${pipeline.id}`;
 
     const onDragStart = (event: DragEvent, dealId: number) => {
@@ -265,154 +263,155 @@ export default function DealBoard({
     };
 
     return (
-        <CrmShell title="Pipeline" chrome="workspace">
+        <>
+            <Head title="Deals" />
             <div
-                className="flex h-full min-h-0 flex-col bg-canvas-soft"
-                data-crm="pipeline-workspace"
+                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                data-crm="deals-board"
             >
-                <CrmObjectHeader
-                    title="Pipeline"
-                    description={pipeline.name}
-                    primaryLabel="Create deal"
-                    onPrimary={() => {
-                        window.location.href = createHref;
-                    }}
-                    secondary={
-                        <>
-                            <PipelineSwitcher
-                                pipelineId={pipeline.id}
-                                pipelines={pipelines}
-                                basePath="/crm/deals/board"
-                            />
-                            <DealLayoutToggle
-                                current="board"
-                                pipelineId={pipeline.id}
-                            />
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button type="button" variant="outline" size="sm" className="h-8">
-                                        Board options
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onSelect={() => setOptionsOpen(true)}>
-                                        Edit cards
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/settings/pipelines">Edit stages</Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <a href={exportHref}>Export view</a>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </>
-                    }
-                />
+                <div
+                    className="flex h-full min-h-0 flex-col bg-canvas-soft"
+                    data-crm="pipeline-workspace"
+                >
+                    <CrmObjectHeader
+                        title="Deals"
+                        description={pipeline.name}
+                        primaryLabel="Create deal"
+                        onPrimary={() => setDrawer(true)}
+                        secondary={
+                            <>
+                                <PipelineSwitcher
+                                    pipelineId={pipeline.id}
+                                    pipelines={pipelines}
+                                    basePath="/crm/deals/board"
+                                />
+                                <DealLayoutToggle
+                                    current="board"
+                                    pipelineId={pipeline.id}
+                                />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button type="button" variant="outline" size="sm" className="h-8">
+                                            Board options
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => setOptionsOpen(true)}>
+                                            Edit cards
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/settings/pipelines">Edit stages</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <a href={exportHref}>Export view</a>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </>
+                        }
+                    />
 
-                <DealForecastBar
-                    forecast={forecast}
-                    forecastBand={forecastBand}
-                    forecastBacktest={forecastBacktest}
-                />
+                    <DealForecastBar
+                        forecast={forecast}
+                        forecastBand={forecastBand}
+                        forecastBacktest={forecastBacktest}
+                    />
 
-                {deals.length === 0 && !loading ? (
-                    <div
-                        className="border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6"
-                        data-crm="pipeline-empty"
-                    >
-                        <p className="text-[13px] font-medium text-ink">
-                            No deals in this pipeline
-                        </p>
-                        <p className="mt-0.5 text-[12px] text-mute">
-                            Create your first deal to start tracking
-                            opportunities.
-                        </p>
-                        <Button
-                            type="button"
-                            size="sm"
-                            className="mt-2 h-8"
-                            onClick={() => {
-                                window.location.href = createHref;
-                            }}
+                    {deals.length === 0 && !loading ? (
+                        <div
+                            className="border-b border-hairline bg-white px-4 py-2.5 sm:px-6"
+                            data-crm="pipeline-empty"
                         >
-                            Create deal
-                        </Button>
+                            <p className="text-[13px] font-medium text-ink">
+                                No deals in this pipeline
+                            </p>
+                            <p className="mt-0.5 text-[12px] text-mute">
+                                Create your first deal to start tracking
+                                opportunities.
+                            </p>
+                            <Button
+                                type="button"
+                                size="sm"
+                                className="mt-2 h-8"
+                                onClick={() => setDrawer(true)}
+                            >
+                                Create deal
+                            </Button>
+                        </div>
+                    ) : null}
+
+                    <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-canvas-soft">
+                        {loading ? (
+                            <PipelineBoardSkeleton columns={stages.length || 6} />
+                        ) : (
+                            <PipelineKanban className="h-full min-h-[22rem] px-1 sm:px-2">
+                                {stages.map((stage) => {
+                                    const cards = deals.filter(
+                                        (deal) => deal.stage_id === stage.id,
+                                    );
+
+                                    return (
+                                        <PipelineKanbanColumn
+                                            key={stage.id}
+                                            testId={`stage-column-${stage.slug}`}
+                                            over={overStage === stage.id}
+                                            onDragOver={(event) => {
+                                                event.preventDefault();
+                                                event.dataTransfer.dropEffect =
+                                                    'move';
+                                                setOverStage(stage.id);
+                                            }}
+                                            onDragLeave={() =>
+                                                setOverStage((current) =>
+                                                    current === stage.id
+                                                        ? null
+                                                        : current,
+                                                )
+                                            }
+                                            onDrop={(event) =>
+                                                onDrop(event, stage)
+                                            }
+                                        >
+                                            <PipelineKanbanHeader
+                                                name={stage.name}
+                                                count={stage.count}
+                                                accent={stageUnderlineColor(
+                                                    stage.slug,
+                                                )}
+                                            />
+
+                                            <PipelineKanbanStack>
+                                                {cards.map((deal) => (
+                                                    <DealCard
+                                                        key={deal.id}
+                                                        deal={deal}
+                                                        options={boardOptions}
+                                                        dragging={
+                                                            draggingId === deal.id
+                                                        }
+                                                        onDragStart={onDragStart}
+                                                        onDragEnd={() => {
+                                                            setDraggingId(null);
+                                                            setOverStage(null);
+                                                        }}
+                                                    />
+                                                ))}
+
+                                                {cards.length === 0 ? (
+                                                    <PipelineKanbanEmpty />
+                                                ) : null}
+                                            </PipelineKanbanStack>
+                                            <PipelineKanbanFooter
+                                                amount={formatDzd(stage.amount_cents)}
+                                                weighted={formatDzd(stage.weighted_cents)}
+                                                probability={stage.probability}
+                                            />
+                                        </PipelineKanbanColumn>
+                                    );
+                                })}
+                            </PipelineKanban>
+                        )}
                     </div>
-                ) : null}
-
-                <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-canvas">
-                    {loading ? (
-                        <PipelineBoardSkeleton columns={stages.length || 6} />
-                    ) : (
-                        <PipelineKanban className="h-full min-h-[22rem] px-1 sm:px-2">
-                            {stages.map((stage) => {
-                                const cards = deals.filter(
-                                    (deal) => deal.stage_id === stage.id,
-                                );
-
-                                return (
-                                    <PipelineKanbanColumn
-                                        key={stage.id}
-                                        testId={`stage-column-${stage.slug}`}
-                                        over={overStage === stage.id}
-                                        onDragOver={(event) => {
-                                            event.preventDefault();
-                                            event.dataTransfer.dropEffect =
-                                                'move';
-                                            setOverStage(stage.id);
-                                        }}
-                                        onDragLeave={() =>
-                                            setOverStage((current) =>
-                                                current === stage.id
-                                                    ? null
-                                                    : current,
-                                            )
-                                        }
-                                        onDrop={(event) =>
-                                            onDrop(event, stage)
-                                        }
-                                    >
-                                        <PipelineKanbanHeader
-                                            name={stage.name}
-                                            count={stage.count}
-                                            amount={formatDzd(stage.amount_cents)}
-                                            accent={stageUnderlineColor(
-                                                stage.slug,
-                                            )}
-                                        />
-
-                                        <PipelineKanbanStack>
-                                            {cards.map((deal) => (
-                                                <DealCard
-                                                    key={deal.id}
-                                                    deal={deal}
-                                                    options={boardOptions}
-                                                    dragging={
-                                                        draggingId === deal.id
-                                                    }
-                                                    onDragStart={onDragStart}
-                                                    onDragEnd={() => {
-                                                        setDraggingId(null);
-                                                        setOverStage(null);
-                                                    }}
-                                                />
-                                            ))}
-
-                                            {cards.length === 0 ? (
-                                                <PipelineKanbanEmpty />
-                                            ) : null}
-                                        </PipelineKanbanStack>
-                                        <PipelineKanbanFooter
-                                            amount={formatDzd(stage.amount_cents)}
-                                            weighted={formatDzd(stage.weighted_cents)}
-                                            probability={stage.probability}
-                                        />
-                                    </PipelineKanbanColumn>
-                                );
-                            })}
-                        </PipelineKanban>
-                    )}
                 </div>
             </div>
             <BoardOptionsSheet
@@ -421,7 +420,55 @@ export default function DealBoard({
                 options={boardOptions}
                 exportHref={exportHref}
             />
-        </CrmShell>
+            <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create deal">
+                <Form
+                    action="/crm/deals"
+                    method="post"
+                    className="space-y-3"
+                    resetOnSuccess
+                    onSuccess={() => setDrawer(false)}
+                >
+                    {({ processing }) => (
+                        <>
+                            <div>
+                                <Label className="mb-1 block text-[12px]">
+                                    Deal name <span className="text-brand">*</span>
+                                </Label>
+                                <Input name="title" required />
+                            </div>
+                            <div>
+                                <Label className="mb-1 block text-[12px]">Amount (DZD)</Label>
+                                <Input name="amount_dzd" type="number" min="0" step="0.01" />
+                            </div>
+                            <div>
+                                <Label className="mb-1 block text-[12px]">Close date</Label>
+                                <Input name="close_date" type="date" />
+                            </div>
+                            <div>
+                                <Label className="mb-1 block text-[12px]">Stage</Label>
+                                <select
+                                    name="stage_id"
+                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                >
+                                    {stages.map((stage) => (
+                                        <option key={stage.id} value={stage.id}>
+                                            {stage.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <input type="hidden" name="pipeline_id" value={pipeline.id} />
+                            <div className="flex justify-end gap-2 pt-2">
+                                <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
+                                    Cancel
+                                </Button>
+                                <Button disabled={processing}>Create</Button>
+                            </div>
+                        </>
+                    )}
+                </Form>
+            </CreateDrawer>
+        </>
     );
 }
 
