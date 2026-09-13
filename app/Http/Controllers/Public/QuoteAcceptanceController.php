@@ -26,6 +26,14 @@ class QuoteAcceptanceController extends Controller
                 'expires_at' => $quote->expires_at?->toDateString(),
                 'accepted_at' => $quote->accepted_at?->toIso8601String(),
                 'html' => $quote->snapshot_html,
+                'workspace' => $quote->workspace?->name ?? 'EvoCrm',
+                'accept_url' => "/q/{$token}/accept",
+                'deal' => $quote->deal ? [
+                    'title' => $quote->deal->title,
+                ] : null,
+                'contact' => $quote->deal?->contact ? [
+                    'first_name' => $quote->deal->contact->first_name,
+                ] : null,
                 'items' => $quote->snapshot['items'] ?? $quote->items->map(fn ($item) => [
                     'name' => $item->name,
                     'quantity' => $item->quantity,

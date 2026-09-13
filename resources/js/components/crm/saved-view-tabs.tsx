@@ -25,6 +25,7 @@ const OBJECT_NOUNS: Record<ListObjectType, string> = {
     company: 'companies',
     deal: 'deals',
     ticket: 'tickets',
+    quote: 'quotes',
 };
 
 export default function SavedViewTabs({
@@ -163,7 +164,7 @@ export default function SavedViewTabs({
                         </DropdownMenuContent>
                     </DropdownMenu>
                 ) : null}
-                {entity === 'ticket' ? null : (
+                {entity === 'ticket' || entity === 'quote' ? null : (
                 <button
                     type="button"
                     onClick={() => setNaming(true)}

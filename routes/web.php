@@ -180,6 +180,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/crm/quotes', [QuoteController::class, 'index'])->name('crm.quotes.index');
     Route::post('/crm/deals/{deal}/quotes', [QuoteController::class, 'store'])->name('crm.quotes.store');
     Route::put('/crm/quotes/{quote}', [QuoteController::class, 'update'])->name('crm.quotes.update');
+    Route::get('/crm/quotes/{quote}', [QuoteController::class, 'show'])->name('crm.quotes.show');
     Route::get('/crm/quotes/{quote}/preview', [QuoteController::class, 'preview'])->name('crm.quotes.preview');
     Route::post('/crm/quotes/{quote}/send', [QuoteController::class, 'send'])->name('crm.quotes.send');
     Route::post('/crm/quotes/{quote}/revoke', [QuoteController::class, 'revoke'])->name('crm.quotes.revoke');

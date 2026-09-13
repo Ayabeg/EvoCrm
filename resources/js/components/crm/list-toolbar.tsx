@@ -133,7 +133,9 @@ export default function ListToolbar({
               ? 'Search companies'
               : entity === 'ticket'
                 ? 'Search number or subject'
-                : 'Search name, email, or phone';
+                : entity === 'quote'
+                  ? 'Search quote or deal'
+                  : 'Search name, email, or phone';
 
     return (
         <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar">

@@ -8,12 +8,14 @@ export function CrmObjectHeader({
     description,
     primaryLabel,
     onPrimary,
+    primaryClassName,
     secondary,
 }: {
     title: string;
     description?: string;
     primaryLabel?: string;
     onPrimary?: () => void;
+    primaryClassName?: string;
     secondary?: ReactNode;
 }) {
     return (
@@ -41,6 +43,7 @@ export function CrmObjectHeader({
                             onClick={onPrimary}
                             className={cn(
                                 'h-8 shrink-0 bg-[var(--primary)] text-white hover:bg-[var(--evosales-ink-hover)]',
+                                primaryClassName,
                             )}
                         >
                             {primaryLabel}
