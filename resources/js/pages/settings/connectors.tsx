@@ -256,8 +256,8 @@ export default function ConnectorsSettings({
                         <Link href="/inbox" className="font-medium text-brand">
                             My Inbox
                         </Link>
-                        . WhatsApp Cloud is Evolution Cloud API only. No
-                        Baileys.
+                        . WhatsApp Cloud is Evolution Cloud API only.{' '}
+                        No Baileys.
                     </p>
                     <div className="grid gap-3">
                         {deskConnectors.map((connector) => (
