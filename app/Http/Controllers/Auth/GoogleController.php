@@ -16,6 +16,7 @@ use Inertia\Inertia;
 use Laravel\Fortify\Events\TwoFactorAuthenticationChallenged;
 use Laravel\Fortify\Fortify;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
+use Laravel\Socialite\Two\InvalidStateException;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class GoogleController extends Controller
@@ -23,9 +24,15 @@ class GoogleController extends Controller
     /**
      * Send the user to Google's OAuth consent screen.
      */
-    public function redirect(): SymfonyRedirectResponse
+    public function redirect(Request $request): SymfonyRedirectResponse
     {
         abort_unless(GoogleAuth::enabled(), 404);
+
+        $callbackHost = parse_url(GoogleAuth::callbackUrl(), PHP_URL_HOST);
+
+        if (is_string($callbackHost) && $callbackHost !== $request->getHost()) {
+            return redirect()->away('https://'.$callbackHost.'/auth/google');
+        }
 
         return GoogleAuth::driver()->redirect();
     }
@@ -43,7 +50,14 @@ class GoogleController extends Controller
     {
         abort_unless(GoogleAuth::enabled(), 404);
 
-        $googleUser = GoogleAuth::driver()->user();
+        try {
+            $googleUser = GoogleAuth::driver()->user();
+        } catch (InvalidStateException) {
+            return redirect()->route('login')->with(
+                'status',
+                'Google sign-in could not be completed. Start again from this page and try once more.',
+            );
+        }
 
         if ($request->user()) {
             $completed = $this->completeConnectorIfReconnecting($request, $googleUser);

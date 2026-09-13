@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Socialite\Contracts\User as SocialiteUserContract;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as GoogleUser;
 use Mockery;
 use Tests\TestCase;
@@ -49,6 +50,7 @@ class GoogleAuthenticationTest extends TestCase
             'services.google.redirect',
             'https://crm.evotechly.com/auth/google/callback',
         );
+        config()->set('app.url', 'https://crm.evotechly.com');
     }
 
     public function test_redirect_pins_the_canonical_callback_url_on_socialite()
@@ -68,7 +70,17 @@ class GoogleAuthenticationTest extends TestCase
 
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
 
-        $this->get(route('auth.google'))->assertRedirect();
+        $this->get('https://crm.evotechly.com/auth/google')->assertRedirect();
+    }
+
+    public function test_redirect_hops_to_the_callback_host_when_the_request_host_differs()
+    {
+        $this->enableGoogle();
+
+        Socialite::shouldReceive('driver')->never();
+
+        $this->get('https://evormapp.com/auth/google')
+            ->assertRedirect('https://crm.evotechly.com/auth/google');
     }
 
     public function test_callback_pins_the_same_canonical_url_for_the_token_exchange()
@@ -102,7 +114,7 @@ class GoogleAuthenticationTest extends TestCase
 
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
 
-        $response = $this->get(route('auth.google'));
+        $response = $this->get('https://crm.evotechly.com/auth/google');
 
         $response->assertRedirect();
         $this->assertStringStartsWith(
@@ -215,5 +227,25 @@ class GoogleAuthenticationTest extends TestCase
         $response->assertRedirect(route('login'));
         $this->assertGuest();
         $this->assertSame(0, User::query()->count());
+    }
+
+    public function test_callback_redirects_to_login_when_oauth_state_is_invalid()
+    {
+        $this->enableGoogle();
+
+        $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
+        $provider->shouldReceive('user')->once()->andThrow(new InvalidStateException);
+
+        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
+
+        $response = $this->get(route('auth.google.callback'));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas(
+            'status',
+            'Google sign-in could not be completed. Start again from this page and try once more.',
+        );
+        $this->assertGuest();
     }
 }

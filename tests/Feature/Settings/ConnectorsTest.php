@@ -25,6 +25,7 @@ class ConnectorsTest extends TestCase
             'services.google.redirect',
             'https://crm.evotechly.com/auth/google/callback',
         );
+        config()->set('app.url', 'https://crm.evotechly.com');
     }
 
     public function test_connectors_page_renders_gmail_and_calendar(): void
@@ -159,7 +160,7 @@ class ConnectorsTest extends TestCase
 
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
 
-        $this->get(route('auth.google'))->assertRedirect();
+        $this->get('https://crm.evotechly.com/auth/google')->assertRedirect();
     }
 
     public function test_marketplace_google_card_deepens_to_connectors(): void
