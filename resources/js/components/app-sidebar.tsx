@@ -4,6 +4,7 @@ import {
     AddressBook,
     Buildings,
     ChartLine,
+    CheckSquare,
     DotsThree,
     FileText,
     FlowArrow,
@@ -11,12 +12,15 @@ import {
     Handshake,
     House,
     Megaphone,
+    PaperPlaneTilt,
     Path,
+    SquaresFour,
     Ticket,
     Tray,
     UsersThree,
 } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import {
     Tooltip,
@@ -32,7 +36,14 @@ export type NavLeaf = {
     href: string;
     icon: Icon;
     activePaths?: string[];
+    excludePaths?: string[];
     exact?: boolean;
+};
+
+type NavGroup = {
+    id: string;
+    label: string | null;
+    items: NavLeaf[];
 };
 
 type MoreItem = NavLeaf & { category: string };
@@ -45,11 +56,28 @@ const CRM_RAIL_OBJECTS: NavLeaf[] = [
     { id: 'tickets', label: 'Tickets', href: '/crm/tickets', icon: Ticket },
 ];
 
-const PRIMARY: NavLeaf[] = [
-    { id: 'home', label: 'Home', href: '/dashboard', icon: House, activePaths: ['/'] },
+const HOME: NavLeaf = {
+    id: 'home',
+    label: 'Home',
+    href: '/dashboard',
+    icon: House,
+    activePaths: ['/'],
+};
+
+const CRM_LEAVES: NavLeaf[] = [
     { id: 'contacts', label: 'Contacts', href: '/crm/contacts', icon: AddressBook },
     { id: 'companies', label: 'Companies', href: '/crm/companies', icon: Buildings },
-    { id: 'deals', label: 'Deals', href: '/crm/deals', icon: Handshake },
+    {
+        id: 'deals',
+        label: 'Deals',
+        href: '/crm/deals',
+        icon: Handshake,
+        excludePaths: ['/crm/deals/board'],
+    },
+    { id: 'pipeline', label: 'Pipeline', href: '/crm/deals/board', icon: SquaresFour },
+];
+
+const COMMUNICATION_LEAVES: NavLeaf[] = [
     {
         id: 'inbox',
         label: 'Inbox',
@@ -57,7 +85,29 @@ const PRIMARY: NavLeaf[] = [
         icon: Tray,
         activePaths: ['/desk', '/conversations'],
     },
+    { id: 'activities', label: 'Activities', href: '/crm/activities', icon: CheckSquare },
+];
+
+const SALES_LEAVES: NavLeaf[] = [
     { id: 'quotes', label: 'Quotes', href: '/crm/quotes', icon: FileText },
+];
+
+const AUTOMATION_LEAVES: NavLeaf[] = [
+    {
+        id: 'workflows',
+        label: 'Workflows',
+        href: '/crm/workflows',
+        icon: FlowArrow,
+        activePaths: ['/automation'],
+    },
+];
+
+const NAV_GROUPS: NavGroup[] = [
+    { id: 'home', label: null, items: [HOME] },
+    { id: 'crm', label: 'CRM', items: CRM_LEAVES },
+    { id: 'communication', label: 'Communication', items: COMMUNICATION_LEAVES },
+    { id: 'sales', label: 'Sales', items: SALES_LEAVES },
+    { id: 'automation', label: 'Automation', items: AUTOMATION_LEAVES },
 ];
 
 const SETTINGS: NavLeaf = {
@@ -71,9 +121,9 @@ const MORE_ITEMS: MoreItem[] = [
     { id: 'leads', label: 'Leads', href: '/crm/leads', icon: Path, category: 'CRM' },
     { id: 'tickets', label: 'Tickets', href: '/crm/tickets', icon: Ticket, category: 'CRM' },
     { id: 'segments', label: 'Segments', href: '/crm/segments', icon: UsersThree, category: 'CRM' },
-    { id: 'workflows', label: 'Automation', href: '/crm/workflows', icon: FlowArrow, category: 'CRM' },
     { id: 'ads', label: 'Ads', href: '/ads', icon: Megaphone, category: 'Ads' },
     { id: 'reports', label: 'Reports', href: '/reports', icon: ChartLine, category: 'Reports' },
+    { id: 'outbound', label: 'Outbound', href: '/outbound', icon: PaperPlaneTilt, category: 'Outbound' },
 ];
 
 const NAV_ICONS: Record<string, Icon> = {
@@ -81,20 +131,40 @@ const NAV_ICONS: Record<string, Icon> = {
     contacts: AddressBook,
     companies: Buildings,
     deals: Handshake,
+    pipeline: SquaresFour,
     leads: Path,
     tickets: Ticket,
     inbox: Tray,
+    activities: CheckSquare,
     quotes: FileText,
+    workflows: FlowArrow,
     ads: Megaphone,
+    reports: ChartLine,
+    outbound: PaperPlaneTilt,
+    segments: UsersThree,
     settings: GearSix,
 };
 
-function pathMatches(current: string, href: string, exact?: boolean, extra: string[] = []): boolean {
+function pathMatches(
+    current: string,
+    href: string,
+    exact?: boolean,
+    extra: string[] = [],
+    exclude: string[] = [],
+): boolean {
+    if (exclude.some((path) => current === path || current.startsWith(`${path}/`))) {
+        return false;
+    }
+
     if (exact) {
         return current === href || extra.includes(current);
     }
 
-    return current === href || current.startsWith(`${href}/`) || extra.some((path) => current === path || current.startsWith(`${path}/`));
+    return (
+        current === href ||
+        current.startsWith(`${href}/`) ||
+        extra.some((path) => current === path || current.startsWith(`${path}/`))
+    );
 }
 
 function RailLink({
@@ -109,7 +179,13 @@ function RailLink({
     onNavigate?: () => void;
 }) {
     const Icon = item.icon;
-    const active = pathMatches(currentPath, item.href, item.exact, item.activePaths);
+    const active = pathMatches(
+        currentPath,
+        item.href,
+        item.exact,
+        item.activePaths,
+        item.excludePaths,
+    );
     const row = (
         <Link
             href={item.href}
@@ -121,8 +197,8 @@ function RailLink({
             className={cn(
                 'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                 labeled
-                    ? 'flex h-10 w-full items-center gap-2.5 px-3 text-[13px]'
-                    : 'flex size-10 items-center justify-center',
+                    ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px]'
+                    : 'flex h-12 w-full items-center justify-center',
                 active
                     ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                     : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
@@ -148,18 +224,38 @@ function RailLink({
 }
 
 export function AppSidebar() {
-    const { isMobile, openMobile, toggleSidebar } = useSidebar();
+    const { isMobile, openMobile, toggleSidebar, state } = useSidebar();
     const page = usePage();
     const currentPath = new URL(page.url, 'http://localhost').pathname;
     const [moreOpen, setMoreOpen] = useState(false);
     const moreRef = useRef<HTMLLIElement>(null);
     const { simpleMode, nav } = useSimpleMode();
-    const labeled = isMobile;
-    const launchRail = nav.map((item) => ({
-        ...item,
-        icon: NAV_ICONS[item.id] ?? House,
-    }));
-    const railItems = simpleMode ? launchRail : PRIMARY;
+    const labeled = isMobile || state === 'expanded';
+    const allowedIds = simpleMode ? new Set(nav.map((item) => item.id)) : null;
+    const launchIcons = Object.fromEntries(
+        nav.map((item) => [item.id, NAV_ICONS[item.id] ?? House]),
+    ) as Record<string, Icon>;
+
+    const visibleGroups = NAV_GROUPS.map((group) => ({
+        ...group,
+        items: group.items
+            .filter((item) => !allowedIds || allowedIds.has(item.id))
+            .map((item) => ({
+                ...item,
+                icon: simpleMode ? (launchIcons[item.id] ?? item.icon) : item.icon,
+            })),
+    })).filter((group) => group.items.length > 0);
+
+    const groupedIds = new Set(NAV_GROUPS.flatMap((group) => group.items.map((item) => item.id)));
+    const extraLeaves = simpleMode
+        ? nav
+              .filter((item) => !groupedIds.has(item.id) && item.id !== 'settings')
+              .map((item) => ({
+                  ...item,
+                  icon: launchIcons[item.id] ?? House,
+              }))
+        : [];
+
     const showMore = !simpleMode && MORE_ITEMS.length > 0;
 
     useEffect(() => {
@@ -210,10 +306,59 @@ export function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon" className="bg-sidebar" data-cabinet="rail">
-            <nav className={cn('no-scrollbar min-h-0 flex-grow overflow-y-auto py-3', labeled ? 'px-2' : 'px-1')}>
+            <div
+                className={cn(
+                    'flex h-12 shrink-0 items-center',
+                    labeled ? 'gap-2 px-3' : 'justify-center px-1',
+                )}
+            >
+                <AppLogoIcon className="size-7" />
+                {labeled ? (
+                    <span className="truncate text-[13px] font-medium text-sidebar-ink">
+                        EvoCRM
+                    </span>
+                ) : (
+                    <span className="sr-only">EvoCRM</span>
+                )}
+            </div>
+
+            <nav
+                aria-label="EvoCRM"
+                className={cn(
+                    'no-scrollbar min-h-0 flex-grow overflow-y-auto py-1',
+                    labeled ? 'px-2' : 'px-1',
+                )}
+            >
                 <ul className={cn('m-0 flex list-none flex-col gap-0.5', !labeled && 'items-center')}>
-                    {railItems.map((item) => (
-                        <li key={item.id}>
+                    {visibleGroups.map((group) => (
+                        <li key={group.id} className="w-full">
+                            {group.label && labeled ? (
+                                <p className="px-3 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-sidebar-mute">
+                                    {group.label}
+                                </p>
+                            ) : null}
+                            <ul
+                                className={cn(
+                                    'm-0 flex list-none flex-col gap-0.5',
+                                    !labeled && 'items-center',
+                                )}
+                                data-nav={group.id === 'crm' ? 'crm-objects' : undefined}
+                            >
+                                {group.items.map((item) => (
+                                    <li key={item.id} className="w-full">
+                                        <RailLink
+                                            item={item}
+                                            currentPath={currentPath}
+                                            labeled={labeled}
+                                            onNavigate={closeMobile}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        </li>
+                    ))}
+                    {extraLeaves.map((item) => (
+                        <li key={item.id} className="w-full">
                             <RailLink
                                 item={item}
                                 currentPath={currentPath}
@@ -223,7 +368,12 @@ export function AppSidebar() {
                         </li>
                     ))}
                     {showMore ? (
-                        <li ref={moreRef} className="relative">
+                        <li ref={moreRef} className="relative w-full">
+                            {labeled ? (
+                                <p className="px-3 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-sidebar-mute">
+                                    More
+                                </p>
+                            ) : null}
                             <button
                                 type="button"
                                 title="More"
@@ -234,8 +384,8 @@ export function AppSidebar() {
                                 className={cn(
                                     'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                                     labeled
-                                        ? 'flex h-10 w-full items-center gap-2.5 px-3 text-[13px]'
-                                        : 'flex size-10 items-center justify-center',
+                                        ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px]'
+                                        : 'flex h-12 w-full items-center justify-center',
                                     moreOpen
                                         ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                                         : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
@@ -250,7 +400,9 @@ export function AppSidebar() {
                                     role="menu"
                                     className={cn(
                                         'z-[100] overflow-hidden rounded-md border',
-                                        labeled ? 'relative mt-1 w-full' : 'absolute top-0 left-[calc(100%+8px)] w-56',
+                                        labeled
+                                            ? 'relative mt-1 w-full'
+                                            : 'absolute top-0 left-[calc(100%+8px)] w-56',
                                     )}
                                     style={{
                                         borderColor: 'var(--evosales-hairline)',

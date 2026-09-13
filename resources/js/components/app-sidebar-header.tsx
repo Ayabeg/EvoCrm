@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, CheckSquare, MagnifyingGlass, Plus, Question } from '@phosphor-icons/react';
+import { Bell, CheckSquare, MagnifyingGlass, Plus, Sparkle } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { CommandPalette, useCommandPaletteShortcut } from '@/components/crm/command-palette';
@@ -12,7 +12,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
@@ -20,6 +20,8 @@ import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     const page = usePage();
     const { auth } = page.props;
+    const { isMobile, state } = useSidebar();
+    const collapsed = !isMobile && state === 'collapsed';
     const taskCount = Number(page.props.evoOpenTaskCount ?? 0);
     const initials = useInitials();
     const user = auth.user;
@@ -39,24 +41,26 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     return (
         <>
             <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-1.5 px-2 sm:gap-3 sm:px-4">
-                <div className="md:hidden" data-chrome="menu">
+                <div data-chrome="menu">
                     <SidebarTrigger className="-ml-0.5 shrink-0 text-ink" />
                 </div>
-                <Link
-                    href="/dashboard"
-                    title="EvoCrm"
-                    className="hidden shrink-0 items-center gap-2 md:flex"
-                >
-                    <AppLogoIcon className="size-7" />
-                    <span className="sr-only">EvoCrm</span>
-                </Link>
+                {collapsed ? (
+                    <Link
+                        href="/dashboard"
+                        title="EvoCrm"
+                        className="hidden shrink-0 items-center gap-2 md:flex"
+                    >
+                        <AppLogoIcon className="size-7" />
+                        <span className="sr-only">EvoCrm</span>
+                    </Link>
+                ) : null}
                 <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl" data-chrome="search">
                     <Input
                         readOnly
                         size="sm"
                         value=""
-                        placeholder="Find a record or page"
-                        aria-label="Find a record or page"
+                        placeholder="Search EvoCRM…"
+                        aria-label="Search EvoCRM…"
                         onClick={() => setPaletteOpen(true)}
                         onFocus={() => setPaletteOpen(true)}
                         startAdornment={
@@ -72,26 +76,14 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                     <Button
                         type="button"
                         variant="ghost"
-                        size="sm"
-                        title="Help"
-                        aria-label="Help"
-                        className="hidden rounded-full lg:inline-flex"
+                        size="icon"
+                        title="Ask Evo"
+                        aria-label="AI"
+                        data-chrome="ai"
+                        className="rounded-full"
+                        onClick={() => setPaletteOpen(true)}
                     >
-                        <Question className="size-4" weight="regular" aria-hidden />
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        title="Tasks"
-                        aria-label="Open tasks"
-                        className="hidden rounded-full min-[390px]:inline-flex"
-                        onClick={() => setTasksOpen(true)}
-                    >
-                        <CheckSquare className="size-4" weight="regular" aria-hidden />
-                        {taskCount > 0 ? (
-                            <span className="ml-1 tabular-nums text-[11px]">{taskCount}</span>
-                        ) : null}
+                        <Sparkle className="size-4" weight="regular" aria-hidden />
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -116,18 +108,38 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                             <DropdownMenuItem asChild>
                                 <Link href="/crm/deals?create=1">Deal</Link>
                             </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/crm/quotes?create=1">Quote</Link>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <div className="hidden min-[390px]:block" data-chrome="notify">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            title="Notifications"
-                            aria-label="Notifications"
-                        >
-                            <Bell className="size-4" weight="regular" aria-hidden />
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    title="Notifications"
+                                    aria-label="Notifications"
+                                >
+                                    <Bell className="size-4" weight="regular" aria-hidden />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem
+                                    onSelect={() => setTasksOpen(true)}
+                                >
+                                    <CheckSquare className="size-4" weight="regular" aria-hidden />
+                                    Tasks
+                                    {taskCount > 0 ? (
+                                        <span className="ml-auto tabular-nums text-[11px]">
+                                            {taskCount}
+                                        </span>
+                                    ) : null}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                     {user ? (
                         <DropdownMenu>

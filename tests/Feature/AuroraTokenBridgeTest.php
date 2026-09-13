@@ -130,12 +130,14 @@ it('locks the P02 semantic tokens and retires Slate and antique orange', functio
     expect($bridge)->not->toContain('#2e3a45');
 });
 
-it('keeps the Wave 0 icon rail at 56px on desktop and the existing mobile Sheet', function () {
+it('keeps the P04 rail at 240px expanded, 64px collapsed, and a 240px mobile Sheet', function () {
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
 
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "3.5rem"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "240px"');
     expect($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "240px"');
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "3.5rem"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "64px"');
+    expect($sidebar)->toContain('sidebar_state');
+    expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "3.5rem"');
     expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "220px"');
     expect($sidebar)->toContain('<SheetContent');
     expect($sidebar)->toContain('background: "var(--sidebar)"');
@@ -232,17 +234,19 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
-    expect($header)->toContain('placeholder="Find a record or page"');
-    expect($header)->toContain('aria-label="Find a record or page"');
+    expect($header)->toContain('placeholder="Search EvoCRM…"');
+    expect($header)->toContain('aria-label="Search EvoCRM…"');
     expect($header)->not->toContain('Find or Ask');
+    expect($header)->not->toContain('Find a record or page');
     expect($header)->not->toContain('unread');
     expect($palette)->toContain('placeholder="Find a record or page"');
     expect($palette)->not->toContain('Search contacts, deals');
     expect($rail)->not->toContain('Bell');
     expect($header)->toContain('data-chrome="notify"');
     expect($header)->toContain('data-chrome="menu"');
+    expect($header)->toContain('data-chrome="ai"');
     expect($header)->toContain('hidden min-[390px]:block');
-    expect($header)->toContain('<div className="md:hidden" data-chrome="menu">');
+    expect($header)->toContain('data-chrome="menu"');
     expect($css)->toContain('--app-chrome-height: 44px');
     expect($css)->toContain('--app-chrome-height: 52px');
     expect($css)->toContain(".app-topbar [data-chrome='notify']");

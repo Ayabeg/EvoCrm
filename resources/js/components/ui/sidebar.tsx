@@ -25,11 +25,11 @@ import { cn } from "@/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// Wave 0: Salesforce-density ink icon rail. Desktop is always 56px.
-// Mobile stays the existing Sheet — opaque 240px labeled list.
-const SIDEBAR_WIDTH = "3.5rem"
+// P04: 240px labeled rail, 64px collapsed icon rail. Persist via sidebar_state.
+// Mobile Sheet stays an opaque 240px labeled list.
+const SIDEBAR_WIDTH = "240px"
 const SIDEBAR_WIDTH_MOBILE = "240px"
-const SIDEBAR_WIDTH_ICON = "3.5rem"
+const SIDEBAR_WIDTH_ICON = "64px"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContext = {
