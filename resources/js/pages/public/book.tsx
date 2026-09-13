@@ -57,7 +57,7 @@ export default function PublicBook({
             <Head title={`Book ${host.name ?? 'a meeting'}`} />
             <div className="mx-auto max-w-xl space-y-6 p-6">
                 <div>
-                    <p className="text-[11px] tracking-wide text-mute uppercase">EvoSales</p>
+                    <p className="text-[11px] tracking-wide text-mute uppercase">EvoCrm</p>
                     <h1 className="mt-1 text-xl font-semibold text-ink">
                         Book {host.name ?? 'a meeting'}
                     </h1>

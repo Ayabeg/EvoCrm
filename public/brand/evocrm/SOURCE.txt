@@ -1,0 +1,6 @@
+EvoCrm product mark
+Artwork fill is #d9500f — do not recolor.
+Paths are the locked EvoCrm arcs + center circle (no Adobe XMP).
+
+Live tokens: resources/css/app.css
+Paper #eaeaea · Accent #d9500f · Ink #000000

@@ -54,7 +54,9 @@ it('does not rewrite app.css or the EvoDesk rail in this chrome pass', function 
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
-    expect($app)->toContain('--evosales-mark: #ec6025')
+    expect($app)->toContain('--evosales-mark: #d9500f')
+        ->and($app)->toContain('--evosales-canvas: #eaeaea')
+        ->and($app)->toContain('--evosales-ink: #000000')
         ->and($sidebar)->toContain('SheetContent')
         ->and($rail)->toContain('AppSidebar');
 });

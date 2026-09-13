@@ -18,26 +18,29 @@
 @layer theme, base, components, aurora-components, utilities;
 
 /*
- * EvoSales palette — white + black + orange. Do not invent more.
- * Light Cabinet: canvas #FFFFFF, soft white #F7F7F6 (page wash only),
- * ink #111111, mute #525252, hairline #E5E5E5, Evotechly mark orange #EC6025.
+ * EvoCrm triad — paper + ink + accent. Do not invent more.
+ * Light Cabinet: paper/surface #eaeaea, ink #000000, mark accent #d9500f.
+ * Mute #525252, hairline #d4d4d4 (subtle on paper). Filled primary CTAs
+ * are ink; mark orange is the mark, active rail, focus, and product chrome.
  * Dark Cabinet: TRUE BLACK canvas #000000, elevated surfaces #0A0A0A,
  * hairline #1F1F1F, ink #F5F5F5, mute #A3A3A3 — neutral grays only, never
- * navy/blue/teal. Orange #EC6025 is the only action color in both faces:
- * CTAs, links, and action badges — not rail chrome.
+ * navy/blue/teal. Accent #d9500f stays the only brand chroma in both faces.
  * Single structural exception: the authenticated left rail is the EvoDesk
  * cabinet — true black in both faces, Apple/Aurora Light Cabinet feel
- * (labeled ~240px, soft active pill). Tokens never leak into content.
+ * (labeled ~240px, accent active pill). Tokens never leak into content.
  */
 :root {
     /* Top command bar — 44px on phones so work appears earlier; 52px from sm. */
     --app-chrome-height: 44px;
-    --evosales-canvas: #ffffff;
-    --evosales-canvas-soft: #f7f7f6;
-    --evosales-ink: #111111;
+    --evosales-canvas: #eaeaea;
+    --evosales-canvas-soft: #eaeaea;
+    --evosales-ink: #000000;
     --evosales-mute: #525252;
-    --evosales-hairline: #e5e5e5;
-    --evosales-mark: #ec6025;
+    --evosales-hairline: #d4d4d4;
+    --evosales-mark: #d9500f;
+    --evosales-mark-hover: #bf460d;
+    --evosales-mark-pressed: #a93e0c;
+    --evosales-ink-hover: #1a1a1a;
 }
 
 @media (min-width: 640px) {
@@ -140,8 +143,8 @@
     --card-foreground: var(--evosales-ink);
     --popover: var(--evosales-canvas);
     --popover-foreground: var(--evosales-ink);
-    --primary: var(--evosales-mark);
-    --primary-foreground: var(--evosales-canvas);
+    --primary: var(--evosales-ink);
+    --primary-foreground: #ffffff;
     --secondary: var(--evosales-canvas-soft);
     --secondary-foreground: var(--evosales-ink);
     --muted: var(--evosales-canvas-soft);
@@ -160,15 +163,15 @@
     --chart-4: var(--evosales-hairline);
     --chart-5: var(--evosales-canvas-soft);
     --radius: 0.5rem;
-    /* Apple / Aurora Light Cabinet rail: true black, soft pill. Never navy. */
+    /* Apple / Aurora Light Cabinet rail: true black, accent active pill. */
     --sidebar: #000000;
     --sidebar-foreground: #d4d4d4;
     --sidebar-primary: #f5f5f5;
     --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(255, 255, 255, 0.1);
+    --sidebar-accent: rgba(217, 80, 15, 0.22);
     --sidebar-accent-foreground: #f5f5f5;
     --sidebar-border: #1f1f1f;
-    --sidebar-ring: rgba(255, 255, 255, 0.28);
+    --sidebar-ring: #d9500f;
     --sidebar-ink: #f5f5f5;
     --sidebar-mute: #a3a3a3;
     --sidebar-faint: #737373;
@@ -189,8 +192,8 @@
 /*
  * Dark Cabinet — TRUE BLACK, never navy/charcoal-blue. Canvas #000000,
  * elevated surfaces #0A0A0A, hairline #1F1F1F, ink #F5F5F5, mute #A3A3A3.
- * Every override below is a neutral gray (zero chroma) or the Evotechly
- * orange; no blue, indigo, navy, or teal tint is allowed in dark tokens.
+ * Every override below is a neutral gray (zero chroma) or the EvoCrm
+ * accent; no blue, indigo, navy, or teal tint is allowed in dark tokens.
  * Aurora remapping for .dark lives in aurora-evotechly-bridge.css.
  */
 .dark {
@@ -204,7 +207,8 @@
     --secondary: #171717;
     --muted: #171717;
     --accent: #171717;
-    /* Brand CTA keeps the light-face look: white ink on Evotechly orange. */
+    /* Filled CTAs stay ink black in both cabinets. */
+    --primary: #000000;
     --primary-foreground: #ffffff;
     /* Chart series that would otherwise collapse onto the black canvas. */
     --chart-4: #525252;
@@ -215,10 +219,10 @@
     --sidebar-foreground: #a3a3a3;
     --sidebar-primary: #f5f5f5;
     --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(255, 255, 255, 0.1);
+    --sidebar-accent: rgba(217, 80, 15, 0.22);
     --sidebar-accent-foreground: #f5f5f5;
     --sidebar-border: #1f1f1f;
-    --sidebar-ring: rgba(255, 255, 255, 0.28);
+    --sidebar-ring: #d9500f;
     --sidebar-ink: #f5f5f5;
     --sidebar-mute: #a3a3a3;
     --sidebar-faint: #737373;
@@ -303,13 +307,13 @@
      * Hairline only. No product-shadow on chrome.
      */
     /*
-     * Orange discipline on chrome: the bar itself is canvas/hairline.
-     * The only filled mark-orange control is the Create button in the header.
+     * Accent discipline on chrome: the bar itself is paper/hairline.
+     * Filled primary CTAs are ink; mark orange is focus and product chrome.
      */
     .app-topbar {
         height: var(--app-chrome-height);
         isolation: isolate;
-        background: rgb(255 255 255 / 0.78);
+        background: rgb(234 234 234 / 0.86);
         border-bottom: 1px solid var(--evosales-hairline);
         box-shadow: none;
         -webkit-backdrop-filter: blur(20px) saturate(1.4);
@@ -396,15 +400,22 @@
 }
 
 .aurora-btn--filled.aurora-btn--aurora {
-    background: var(--evosales-mark);
-    border-color: var(--evosales-mark);
+    background: var(--primary);
+    border-color: var(--primary);
     color: #ffffff;
     box-shadow: none;
 }
 
 .aurora-btn--filled.aurora-btn--aurora:hover {
-    background: color-mix(in srgb, var(--evosales-mark) 88%, #111111);
-    border-color: color-mix(in srgb, var(--evosales-mark) 88%, #111111);
+    background: var(--evosales-ink-hover);
+    border-color: var(--evosales-ink-hover);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.aurora-btn--filled.aurora-btn--aurora:active {
+    background: #000000;
+    border-color: #000000;
     color: #ffffff;
     box-shadow: none;
 }

@@ -40,7 +40,7 @@ export function CrmObjectHeader({
                             size="sm"
                             onClick={onPrimary}
                             className={cn(
-                                'h-8 shrink-0 bg-[var(--evosales-mark)] text-white hover:bg-[var(--evosales-mark)]/90',
+                                'h-8 shrink-0 bg-[var(--primary)] text-white hover:bg-[var(--evosales-ink-hover)]',
                             )}
                         >
                             {primaryLabel}

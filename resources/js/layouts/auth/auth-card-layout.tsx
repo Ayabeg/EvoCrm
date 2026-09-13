@@ -27,7 +27,7 @@ export default function AuthCardLayout({
                     className="flex items-center gap-2 self-center font-medium"
                 >
                     <AppLogoIcon className="size-9" />
-                    <span className="text-sm font-semibold">EvoSales</span>
+                    <span className="text-sm font-semibold">EvoCrm</span>
                 </Link>
 
                 <div className="flex flex-col gap-6">

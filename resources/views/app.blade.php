@@ -25,7 +25,7 @@
 
         <style>
             html {
-                background-color: #f7f7f6;
+                background-color: #eaeaea;
             }
 
             html.dark {
@@ -33,9 +33,9 @@
             }
         </style>
 
-        <link rel="icon" href="/brand/evotechly/mark.svg" type="image/svg+xml">
+        <link rel="icon" href="/brand/evocrm/logo.svg" type="image/svg+xml">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
-        <link rel="apple-touch-icon" href="/brand/evotechly/mark.svg">
+        <link rel="apple-touch-icon" href="/brand/evocrm/logo.svg">
 
         @fonts
 

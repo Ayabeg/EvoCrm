@@ -26,7 +26,7 @@ it('restyles Aurora buttons at the EvoSales layer without rewriting Aurora CSS',
         ->and($product)->toContain('box-shadow: none')
         ->and($product)->toContain('.aurora-btn--filled.aurora-btn--aurora')
         ->and($product)->toContain('color: #ffffff')
-        ->and($product)->toContain('background: var(--evosales-mark)')
+        ->and($product)->toContain('background: var(--primary)')
         ->and($product)->toContain('.record-action-group');
 
     $beforeComposition = strstr($product, 'Unlayered so it wins over @layer aurora-components', true);

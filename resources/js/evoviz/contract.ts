@@ -6,7 +6,7 @@
  * EvoSales re-implements the same contract in React/Inertia: the server
  * ships plain JSON payloads keyed by these chart ids, and the renderer in
  * `evo-viz-chart.tsx` draws them as SVG from CSS-variable tokens only —
- * Evotechly orange #EC6025 / ink / hairline, never Aurora teal or Kommo
+ * EvoCrm orange #d9500f / ink / hairline, never Aurora teal or Kommo
  * blue, and always readable on the Dark Cabinet #000 canvas.
  *
  * A payload whose series carries no signal (no labels, or every value

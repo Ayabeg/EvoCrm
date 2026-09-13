@@ -7,7 +7,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import PublicLayout from '@/layouts/public-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = 'EvoSales · Evotechly';
+const appName = 'EvoCrm';
 
 createInertiaApp({
     title: (title) =>
@@ -34,7 +34,7 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#EC6025',
+        color: '#d9500f',
     },
 });
 

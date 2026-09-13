@@ -19,7 +19,7 @@ export default function AuthSimpleLayout({
                         >
                             <AppLogoIcon className="size-10" />
                             <span className="text-sm font-semibold tracking-tight text-ink">
-                                EvoSales
+                                EvoCrm
                             </span>
                             <span className="sr-only">{title}</span>
                         </Link>

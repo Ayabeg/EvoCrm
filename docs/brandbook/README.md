@@ -9,7 +9,7 @@ The external GitHub repo `Mohamedbeghanem/Brandbook` **does not exist** (404 —
 | Priority | Path | Role |
 |----------|------|------|
 | 1 | [`resources/css/app.css`](../../resources/css/app.css) | Live CSS tokens (`--evosales-*`, Tailwind `@theme`, Light/Dark Cabinet) |
-| 2 | [`public/brand/evotechly/mark.svg`](../../public/brand/evotechly/mark.svg) | Company mark artwork — fill `#EC6025`, **do not recolor** |
+| 2 | [`public/brand/evocrm/logo.svg`](../../public/brand/evocrm/logo.svg) | Product mark artwork — fill `#d9500f`, **do not recolor** |
 | 3 | [`README.md`](../../README.md) § Brand | Product brand rules |
 | 4 | [`tests/Feature/BrandingTest.php`](../../tests/Feature/BrandingTest.php) | Automated brand assertions |
 | 5 | [`resources/js/evoviz/contract.ts`](../../resources/js/evoviz/contract.ts) | Chart palette (mark / ink / mute only) |
@@ -18,10 +18,10 @@ The external GitHub repo `Mohamedbeghanem/Brandbook` **does not exist** (404 —
 
 | Context | Hex | Notes |
 |---------|-----|-------|
-| **Product UI (EvoSales, EvoDesk rail, favicon, mark.svg)** | `#EC6025` | **Canonical.** Enforced by `BrandingTest.php`. |
+| **Product UI (EvoCrm, EvoDesk rail, favicon, logo.svg)** | `#d9500f` | **Canonical.** Enforced by `BrandingTest.php`. |
 | Marketing design system (Google Drive *Design system v3.0*, *Web Design System v1.0*) | `#FF6A00` | Landing pages and campaign assets only — **not** for CRM/product CSS. |
 
-When in doubt, use `#EC6025` from `app.css`.
+When in doubt, use `#d9500f` from `app.css`.
 
 ## Contents
 
@@ -34,9 +34,8 @@ When in doubt, use `#EC6025` from `app.css`.
 ## Logos (shipped)
 
 ```
-public/brand/evotechly/
-├── mark.svg       # Sidebar 24px, favicon, auth — fill #EC6025
-├── evotechly.svg  # Full lockup (same artwork family)
+public/brand/evocrm/
+├── logo.svg       # Sidebar, favicon, auth — fill #d9500f
 └── SOURCE.txt     # Provenance note
 ```
 

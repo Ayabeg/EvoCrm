@@ -24,11 +24,11 @@ Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotech
 
 ## Brand
 
-EvoCrm is **white + black + orange**. Do not invent more.
+EvoCrm is **paper + ink + accent**. Do not invent more.
 
-- Company mark: `public/brand/evotechly/mark.svg` (artwork fill `#EC6025`, do not recolor). Favicon is the mark.
-- Tokens in `resources/css/app.css`: canvas `#FFFFFF`, canvas-soft `#F7F7F6` (page wash only), ink `#111111`, mute `#525252`, hairline `#E5E5E5`, mark/brand `#EC6025`, Geist.
-- Orange `#EC6025` is the only action color: CTAs, links, active sidebar pip, Open Desk button, action badges.
+- Product mark: `public/brand/evocrm/logo.svg` (artwork fill `#d9500f`, do not recolor). Favicon is the mark.
+- Tokens in `resources/css/app.css`: paper/surface `#eaeaea`, ink `#000000`, mute `#525252`, hairline `#d4d4d4`, mark/accent `#d9500f`, Geist.
+- Accent `#d9500f` is the mark, active rail, focus, and product chrome. Filled primary CTAs are ink `#000000`.
 - **Two faces, chosen in Settings → Appearance** (persisted via the `appearance` cookie + `localStorage`; `app.blade.php` stamps `class="dark"` on `<html>` only for an explicit Dark choice):
   - **Light Cabinet** (default): white cards + hairlines, Chatwoot dark rail (`#151718`) on the left, ~52px topbar.
   - **Dark Cabinet**: TRUE BLACK — canvas `#000000`, elevated surfaces `#0A0A0A`, hairline `#1F1F1F`, ink `#F5F5F5`, mute `#A3A3A3`. Neutral grays only: no navy, blue, indigo, or teal tints in dark tokens. The rail reads black (`#000000`) with the same Chatwoot structure.

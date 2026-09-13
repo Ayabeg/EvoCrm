@@ -1,22 +1,35 @@
 <?php
 
-it('ships the Evotechly mark with artwork fill #EC6025', function () {
-    $mark = public_path('brand/evotechly/mark.svg');
+it('ships the EvoCrm mark with artwork fill #d9500f', function () {
+    $mark = public_path('brand/evocrm/logo.svg');
 
     expect(file_exists($mark))->toBeTrue();
-    expect(file_get_contents($mark))->toContain('#EC6025');
+    expect(file_get_contents($mark))->toContain('#d9500f');
     expect(file_get_contents($mark))->not->toContain('fill="currentColor"');
+    expect(file_get_contents($mark))->not->toContain('xmp');
+    expect(file_get_contents($mark))->not->toContain('#EC6025');
 });
 
-it('uses the Evotechly mark as the favicon', function () {
+it('uses the EvoCrm mark as the favicon', function () {
     $favicon = public_path('favicon.svg');
 
     expect(file_exists($favicon))->toBeTrue();
-    expect(file_get_contents($favicon))->toContain('#EC6025');
+    expect(file_get_contents($favicon))->toContain('#d9500f');
+    expect(file_get_contents($favicon))->not->toContain('#EC6025');
 });
 
-it('renders login with the Evotechly lockup', function () {
-    $this->get(route('login'))->assertOk()->assertSee('EvoSales', false);
+it('renders login with the EvoCrm lockup', function () {
+    $this->get(route('login'))
+        ->assertOk()
+        ->assertSee('/brand/evocrm/logo.svg', false)
+        ->assertSee('#eaeaea', false);
+
+    expect(file_get_contents(resource_path('js/pages/auth/auth-screen.tsx')))
+        ->toContain('EvoCrm')
+        ->and(file_get_contents(resource_path('js/components/app-logo.tsx')))
+        ->toContain('EvoCrm')
+        ->and(file_get_contents(resource_path('js/components/app-logo-icon.tsx')))
+        ->toContain('/brand/evocrm/logo.svg');
 });
 
 it('names the product EvoSales · Evotechly for auth mail', function () {

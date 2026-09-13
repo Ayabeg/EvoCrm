@@ -103,6 +103,26 @@ it('re-asserts Brand identity after Aurora defaults, including the unused .light
     expect($bridge)->not->toMatch('/--aurora-accent-primary:\s*#0288d1/');
 });
 
+it('locks the EvoCrm paper / ink / accent triad and retires Slate and antique orange', function () {
+    $app = file_get_contents(resource_path('css/app.css'));
+    $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
+
+    expect($app)->toContain('--evosales-canvas: #eaeaea');
+    expect($app)->toContain('--evosales-canvas-soft: #eaeaea');
+    expect($app)->toContain('--evosales-ink: #000000');
+    expect($app)->toContain('--evosales-mark: #d9500f');
+    expect($app)->toContain('--evosales-mark-hover: #bf460d');
+    expect($app)->toContain('--evosales-mark-pressed: #a93e0c');
+    expect($app)->toContain('--primary: var(--evosales-ink)');
+    expect($app)->not->toContain('#ec6025');
+    expect($app)->not->toContain('#2e3a45');
+    expect($app)->not->toContain('#2E3A45');
+    expect($bridge)->toContain('--aurora-accent-strong: var(--evosales-mark-hover)');
+    expect($bridge)->toContain('--primary: #000000');
+    expect($bridge)->not->toContain('#ec6025');
+    expect($bridge)->not->toContain('#2e3a45');
+});
+
 it('keeps the Apple cabinet rail at 240px on desktop and the existing mobile Sheet', function () {
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
 
@@ -152,15 +172,18 @@ it('places Needs attention above Performance on Home', function () {
     expect($home)->not->toContain('CrmKpiStrip');
 });
 
-it('uses a soft rail pill instead of an orange active bar', function () {
+it('uses the EvoCrm accent pill on the active rail', function () {
     $app = file_get_contents(resource_path('css/app.css'));
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
     expect($app)->not->toContain('--sidebar-accent: rgba(236, 96, 37, 0.22)');
     expect($bridge)->not->toContain('--sidebar-accent: rgba(236, 96, 37, 0.22)');
-    expect($app)->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
-    expect($bridge)->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
+    expect($app)->not->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
+    expect($bridge)->not->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
+    expect($app)->toContain('--sidebar-accent: rgba(217, 80, 15, 0.22)');
+    expect($bridge)->toContain('--sidebar-accent: rgba(217, 80, 15, 0.22)');
+    expect($app)->toContain('--sidebar-ring: #d9500f');
     expect($rail)->toContain('app-rail-item');
     expect($rail)->not->toContain('inset_2px_0_0_0');
     expect($rail)->toContain("from '@inertiajs/react'");
@@ -183,7 +206,7 @@ it('paints the topbar as a frosted hairline instead of an Aurora panel gradient'
     expect($header)->not->toContain('linear-gradient(180deg, var(--aurora-panel-strong-top)');
     expect($css)->toContain('.app-topbar');
     expect($css)->toContain('backdrop-filter: blur(20px)');
-    expect($css)->toContain('rgb(255 255 255 / 0.78)');
+    expect($css)->toContain('rgb(234 234 234 / 0.86)');
     expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
 });
 

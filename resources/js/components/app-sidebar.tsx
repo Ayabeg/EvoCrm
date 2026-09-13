@@ -476,12 +476,12 @@ export function AppSidebar() {
         <Sidebar collapsible="icon" className="bg-sidebar" data-cabinet="rail">
             <section className={cn('grid text-sm', collapsed ? 'mt-4 mb-4 gap-3' : 'mt-3 mb-4 gap-2')}>
                 <div className={cn('flex min-w-0 items-center gap-2.5', collapsed ? 'justify-center px-1' : 'px-3')}>
-                    <Link href="/dashboard" title="Evotechly" className="grid place-content-center">
+                    <Link href="/dashboard" title="EvoCrm" className="grid place-content-center">
                         <AppLogoIcon className="size-6" />
                     </Link>
                     {!collapsed ? (
                         <span className="truncate text-sm font-medium tracking-[-0.01em] text-sidebar-ink">
-                            Evotechly
+                            EvoCrm
                         </span>
                     ) : null}
                 </div>

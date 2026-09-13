@@ -30,7 +30,7 @@ export default function AuthScreen({
                 >
                     <AppLogoIcon className="size-9" />
                     <span className="aurora-text-ui tracking-tight">
-                        EvoSales
+                        EvoCrm
                     </span>
                     <span className="sr-only">{title}</span>
                 </Link>

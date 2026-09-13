@@ -24,7 +24,7 @@ export default function PublicBookDone({
         <>
             <Head title="Meeting booked" />
             <div className="mx-auto max-w-md space-y-3 p-6">
-                <p className="text-[11px] tracking-wide text-mute uppercase">EvoSales</p>
+                <p className="text-[11px] tracking-wide text-mute uppercase">EvoCrm</p>
                 <h1 className="text-xl font-semibold text-ink">You’re booked</h1>
                 <p className="text-[13px] text-ink">
                     {host.name ? `Meeting with ${host.name}` : 'Meeting confirmed'}

@@ -18,10 +18,7 @@ export default function AuthSplitLayout({
                     className="relative z-20 flex items-center gap-2 text-lg font-medium"
                 >
                     <AppLogoIcon className="size-8" />
-                    <span>EvoSales</span>
-                    <span className="text-sm font-normal text-mute">
-                        · Evotechly
-                    </span>
+                    <span>EvoCrm</span>
                 </Link>
                 <div className="relative z-20 mt-auto max-w-sm text-sm text-mute">
                     {name} is Evotechly’s sales OS. Desk, CRM, Ads, and
@@ -35,7 +32,7 @@ export default function AuthSplitLayout({
                         className="relative z-20 flex items-center justify-center gap-2 lg:hidden"
                     >
                         <AppLogoIcon className="size-10" />
-                        <span className="text-sm font-semibold">EvoSales</span>
+                        <span className="text-sm font-semibold">EvoCrm</span>
                     </Link>
                     <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">
                         <h1 className="text-xl font-medium">{title}</h1>

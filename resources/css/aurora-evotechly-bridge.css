@@ -32,10 +32,10 @@
     --sidebar-foreground: #d4d4d4;
     --sidebar-primary: #f5f5f5;
     --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(255, 255, 255, 0.1);
+    --sidebar-accent: rgba(217, 80, 15, 0.22);
     --sidebar-accent-foreground: #f5f5f5;
     --sidebar-border: #1f1f1f;
-    --sidebar-ring: rgba(255, 255, 255, 0.28);
+    --sidebar-ring: #d9500f;
     --aurora-panel-medium: var(--evosales-canvas);
     --aurora-panel-medium-top: rgba(255, 255, 255, 0.5);
     --aurora-panel-strong: var(--evosales-canvas);
@@ -45,8 +45,8 @@
     --aurora-hover-bg: color-mix(in srgb, var(--evosales-ink) 4%, var(--evosales-canvas-soft));
     --aurora-surface-raised: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.98),
-        rgba(247, 247, 246, 0.98)
+        rgba(234, 234, 234, 0.98),
+        rgba(234, 234, 234, 0.98)
     );
 
     /* Borders */
@@ -57,11 +57,11 @@
     --aurora-text-primary: var(--evosales-ink);
     --aurora-text-muted: var(--evosales-mute);
 
-    /* Primary accent — EvoTechly mark orange (not Aurora cyan) */
+    /* Primary accent — EvoCrm mark orange (not Aurora cyan) */
     --aurora-accent-primary: var(--evosales-mark);
-    --aurora-accent-strong: #f07340;
-    --aurora-accent-deep: #c44e1a;
-    --aurora-accent-lift: #f28555;
+    --aurora-accent-strong: var(--evosales-mark-hover);
+    --aurora-accent-deep: var(--evosales-mark-pressed);
+    --aurora-accent-lift: #e36a2a;
     --aurora-accent-button: var(--evosales-mark);
     --aurora-accent-foreground: #ffffff;
     --aurora-accent-gradient: linear-gradient(
@@ -93,16 +93,16 @@
     --aurora-accent-pink-button: #b82f60;
     --aurora-accent-pink-foreground: #6f1636;
 
-    /* AI / Ask Evo — Axon orange aligned to EvoTechly mark */
+    /* AI / Ask Evo — Axon orange aligned to EvoCrm mark */
     --axon-orange: var(--evosales-mark);
-    --axon-orange-strong: #f07340;
-    --axon-orange-deep: #c44e1a;
+    --axon-orange-strong: var(--evosales-mark-hover);
+    --axon-orange-deep: var(--evosales-mark-pressed);
     --axon-orange-button: var(--evosales-mark);
     --axon-orange-surface: color-mix(in srgb, var(--evosales-mark) 10%, var(--evosales-canvas));
     --axon-orange-border: color-mix(in srgb, var(--evosales-mark) 28%, transparent);
 
     /* Interaction — orange focus, no cyan glow */
-    --aurora-overlay: rgba(17, 17, 17, 0.18);
+    --aurora-overlay: rgba(0, 0, 0, 0.18);
     --aurora-selected-bg: color-mix(in srgb, var(--evosales-mark) 10%, var(--evosales-canvas));
     --aurora-pressed-bg: color-mix(in srgb, var(--evosales-mark) 16%, var(--evosales-canvas));
     --aurora-focus-ring: color-mix(in srgb, var(--evosales-mark) 30%, transparent);
@@ -121,8 +121,8 @@
     --radius-1: var(--aurora-radius-1);
     --radius-2: var(--aurora-radius-2);
     --radius-3: var(--aurora-radius-3);
-    --aurora-shadow-medium: 0 1px 2px rgba(17, 17, 17, 0.06), 0 4px 12px rgba(17, 17, 17, 0.05);
-    --aurora-shadow-strong: 0 2px 8px rgba(17, 17, 17, 0.08), 0 12px 24px rgba(17, 17, 17, 0.06);
+    --aurora-shadow-medium: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.05);
+    --aurora-shadow-strong: 0 2px 8px rgba(0, 0, 0, 0.08), 0 12px 24px rgba(0, 0, 0, 0.06);
     --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.72);
     --aurora-highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 
@@ -157,7 +157,7 @@
     --card-foreground: var(--evosales-ink);
     --popover: var(--evosales-canvas);
     --popover-foreground: var(--evosales-ink);
-    --primary: var(--evosales-mark);
+    --primary: #000000;
     --primary-foreground: #ffffff;
     --secondary: var(--evosales-canvas-soft);
     --secondary-foreground: var(--evosales-ink);
@@ -180,10 +180,10 @@
     --sidebar-foreground: #a3a3a3;
     --sidebar-primary: #f5f5f5;
     --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(255, 255, 255, 0.1);
+    --sidebar-accent: rgba(217, 80, 15, 0.22);
     --sidebar-accent-foreground: #f5f5f5;
     --sidebar-border: #1f1f1f;
-    --sidebar-ring: rgba(255, 255, 255, 0.28);
+    --sidebar-ring: #d9500f;
     --aurora-panel-medium: var(--evosales-canvas);
     --aurora-panel-medium-top: rgba(10, 10, 10, 0.96);
     --aurora-panel-strong: var(--evosales-canvas);
@@ -204,9 +204,9 @@
     --aurora-text-muted: var(--evosales-mute);
 
     --aurora-accent-primary: var(--evosales-mark);
-    --aurora-accent-strong: #f07340;
-    --aurora-accent-deep: #c44e1a;
-    --aurora-accent-lift: #f28555;
+    --aurora-accent-strong: var(--evosales-mark-hover);
+    --aurora-accent-deep: var(--evosales-mark-pressed);
+    --aurora-accent-lift: #e36a2a;
     --aurora-accent-button: var(--evosales-mark);
     --aurora-accent-foreground: #ffffff;
     --aurora-accent-gradient: linear-gradient(
@@ -231,8 +231,8 @@
     );
 
     --axon-orange: var(--evosales-mark);
-    --axon-orange-strong: #f07340;
-    --axon-orange-deep: #c44e1a;
+    --axon-orange-strong: var(--evosales-mark-hover);
+    --axon-orange-deep: var(--evosales-mark-pressed);
     --axon-orange-button: var(--evosales-mark);
     --axon-orange-surface: color-mix(in srgb, var(--evosales-mark) 14%, #171717);
     --axon-orange-border: color-mix(in srgb, var(--evosales-mark) 36%, transparent);
@@ -275,7 +275,7 @@
     --card-foreground: var(--evosales-ink);
     --popover: var(--evosales-canvas);
     --popover-foreground: var(--evosales-ink);
-    --primary: var(--evosales-mark);
+    --primary: #000000;
     --primary-foreground: #ffffff;
     --secondary: #171717;
     --secondary-foreground: var(--evosales-ink);
