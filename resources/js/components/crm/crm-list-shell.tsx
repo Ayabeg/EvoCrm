@@ -101,7 +101,7 @@ export function CrmListShell({
     void primaryClassName;
 
     return (
-        <DataWorkspace
+        <DataWorkspace<{ id: number }>
             object={entity}
             title={title}
             description={description}
