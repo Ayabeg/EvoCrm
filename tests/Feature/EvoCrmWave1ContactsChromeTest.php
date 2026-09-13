@@ -8,6 +8,7 @@ use App\Models\User;
 it('rebuilds the contacts list as a HubSpot-dense workspace on the Wave 0 shell', function () {
     $index = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $query = file_get_contents(resource_path('js/components/crm/list-query.ts'));
     $config = file_get_contents(app_path('Support/ListViewConfig.php'));
 
     expect($index)->toContain('data-crm="contacts-workspace"')
@@ -28,6 +29,9 @@ it('rebuilds the contacts list as a HubSpot-dense workspace on the Wave 0 shell'
     expect($table)->toContain('ContactNameCell')
         ->and($table)->toContain('lead_status')
         ->and($table)->toContain('contactInitials');
+
+    expect($query)->toContain("filters.q")
+        ->and($query)->toContain('query !== \'\'');
 
     expect($config)->toContain("['id' => 'lead_status', 'label' => 'Lead status', 'defaultVisible' => true]");
 });
