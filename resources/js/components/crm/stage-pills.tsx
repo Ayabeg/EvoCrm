@@ -22,7 +22,7 @@ export function StagePills({
     }
 
     return (
-        <div className="flex flex-wrap gap-1.5 px-4 pb-2 sm:px-6">
+        <div className="flex flex-wrap gap-1.5 px-4 pb-2 md:px-8">
             {stages.map((stage) => (
                 <Link
                     key={stage.id}

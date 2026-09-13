@@ -1,0 +1,324 @@
+import { Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { crmListHref, filterFields, listPageHref } from '@/components/crm/list-query';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PageHeader, PageHeaderAction } from '@/ds/chrome/PageHeader';
+import { AdvancedFilterDrawer } from '@/ds/workspace/AdvancedFilterDrawer';
+import { ListDataTable } from '@/ds/workspace/DataTable';
+import { FilterBar } from '@/ds/workspace/FilterBar';
+import { SavedViews } from '@/ds/workspace/SavedViews';
+import type { DataWorkspaceProps } from '@/ds/workspace/types';
+import { filterGroupsFromActive } from '@/lib/list-view-config';
+import { cn } from '@/lib/utils';
+
+const OBJECT_NOUNS = {
+    contact: 'records',
+    company: 'records',
+    deal: 'records',
+    ticket: 'records',
+    quote: 'records',
+} as const;
+
+export function DataWorkspace<Row extends { id: number }>({
+    object,
+    title,
+    description,
+    primaryAction,
+    views,
+    activeViewId,
+    onViewChange,
+    onViewSave,
+    filters,
+    onFiltersChange,
+    filterFields: fieldDefs,
+    chips = [],
+    columns,
+    columnDefs,
+    rows,
+    rowHref: _rowHref,
+    onColumnsChange,
+    selectable = false,
+    selectedIds,
+    onSelectedIdsChange,
+    bulk,
+    mode = 'list',
+    onModeChange,
+    board,
+    loading = false,
+    empty,
+    paginator,
+    extraQuery = {},
+    basePath,
+    filterContext,
+    secondaryActions,
+    banner,
+    filterExtra,
+    toolbarExtra,
+    children,
+    className,
+    contentClassName,
+}: DataWorkspaceProps<Row>) {
+    void _rowHref;
+    const { auth } = usePage().props as { auth: { user: { role: string } } };
+    const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
+    const [advancedOpen, setAdvancedOpen] = useState(false);
+    const filterRecord = filters as Record<string, unknown>;
+    const hasChildren = children !== undefined;
+    const body =
+        typeof children === 'function' ? children(columns) : children;
+    const selected = selectedIds.length > 0;
+
+    const toggleRow = (id: number) => {
+        onSelectedIdsChange(
+            selectedIds.includes(id)
+                ? selectedIds.filter((value) => value !== id)
+                : [...selectedIds, id],
+        );
+    };
+
+    return (
+        <div
+            className={cn(
+                'flex h-full min-h-0 flex-col bg-canvas text-ui text-ink',
+                className,
+            )}
+            data-crm="list-workspace"
+            data-ds="data-workspace"
+            data-object={object}
+            data-mode={mode}
+        >
+            <PageHeader
+                title={title}
+                description={description}
+                secondaryActions={secondaryActions}
+                primaryAction={
+                    <PageHeaderAction
+                        label={primaryAction.label}
+                        onClick={primaryAction.onClick}
+                    />
+                }
+            />
+            {banner}
+            <SavedViews
+                object={object}
+                basePath={basePath}
+                views={views}
+                activeViewId={activeViewId}
+                onViewChange={onViewChange}
+                onViewSave={onViewSave}
+                filters={filterRecord}
+                columns={columns}
+                extraQuery={extraQuery}
+                canManageSettings={canManageSettings}
+            />
+            <FilterBar
+                basePath={basePath}
+                filters={filterRecord}
+                filterFields={fieldDefs}
+                filterContext={filterContext}
+                extraQuery={extraQuery}
+                chips={chips}
+                columns={columns}
+                columnDefs={columnDefs}
+                onColumnsChange={onColumnsChange}
+                onAdvanced={() => setAdvancedOpen(true)}
+                extra={
+                    <>
+                        {onModeChange ? (
+                            <div className="inline-flex h-9 overflow-hidden rounded-md border border-hairline">
+                                <button
+                                    type="button"
+                                    className={cn(
+                                        'h-9 px-3 text-[13px]',
+                                        mode === 'list'
+                                            ? 'bg-sidebar-accent font-medium text-ink'
+                                            : 'text-mute hover:text-ink',
+                                    )}
+                                    onClick={() => onModeChange('list')}
+                                >
+                                    List
+                                </button>
+                                <button
+                                    type="button"
+                                    className={cn(
+                                        'h-9 px-3 text-[13px]',
+                                        mode === 'board'
+                                            ? 'bg-sidebar-accent font-medium text-ink'
+                                            : 'text-mute hover:text-ink',
+                                    )}
+                                    onClick={() => onModeChange('board')}
+                                >
+                                    Board
+                                </button>
+                            </div>
+                        ) : null}
+                        {filterExtra}
+                    </>
+                }
+            />
+            {toolbarExtra}
+            <AdvancedFilterDrawer
+                open={advancedOpen}
+                onOpenChange={setAdvancedOpen}
+                object={object}
+                basePath={basePath}
+                filters={filterRecord}
+                filterFields={fieldDefs}
+                filterContext={filterContext}
+                extraQuery={extraQuery}
+                onFiltersChange={onFiltersChange}
+            />
+            {selected && bulk ? bulk : null}
+            <div className={cn('flex min-h-0 flex-1 flex-col bg-canvas', contentClassName)}>
+                {hasChildren ? (
+                    body
+                ) : mode === 'board' && board ? (
+                    board
+                ) : loading ? (
+                    <div className="space-y-2 px-4 py-4 md:px-8" aria-busy="true">
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                    </div>
+                ) : rows.length === 0 ? (
+                    <div className="grid flex-1 place-items-center px-4 py-8 md:px-8">
+                        <EmptyState
+                            density="page"
+                            title={empty.title}
+                            description={empty.body}
+                            as="h2"
+                            className="w-full max-w-md"
+                            action={
+                                empty.actionLabel ? (
+                                    <Button
+                                        type="button"
+                                        className="h-9"
+                                        onClick={primaryAction.onClick}
+                                    >
+                                        {empty.actionLabel}
+                                    </Button>
+                                ) : undefined
+                            }
+                        />
+                    </div>
+                ) : (
+                    <ListDataTable
+                        object={object}
+                        rows={rows}
+                        columnDefs={columnDefs}
+                        columns={columns}
+                        basePath={basePath}
+                        selectable={selectable}
+                        selectedIds={selectedIds}
+                        onToggle={toggleRow}
+                        onTogglePage={() => {
+                            const pageIds = rows.map((row) => row.id);
+                            const allSelected = pageIds.every((id) =>
+                                selectedIds.includes(id),
+                            );
+
+                            onSelectedIdsChange(
+                                allSelected
+                                    ? selectedIds.filter((id) => !pageIds.includes(id))
+                                    : [...new Set([...selectedIds, ...pageIds])],
+                            );
+                        }}
+                    />
+                )}
+                {!hasChildren && paginator ? (
+                    <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute md:px-8">
+                        <span>
+                            Showing {rows.length.toLocaleString()} of{' '}
+                            {paginator.total.toLocaleString()} {OBJECT_NOUNS[object]}
+                        </span>
+                        <nav className="flex items-center gap-2" aria-label="Pagination">
+                            {paginator.page > 1 ? (
+                                <Link
+                                    href={listPageHref(
+                                        basePath,
+                                        filterRecord,
+                                        paginator.page - 1,
+                                        extraQuery,
+                                    )}
+                                    className="hover:text-ink"
+                                >
+                                    Prev
+                                </Link>
+                            ) : (
+                                <span className="opacity-40">Prev</span>
+                            )}
+                            <span>
+                                {paginator.page} / {paginator.lastPage}
+                            </span>
+                            {paginator.page < paginator.lastPage ? (
+                                <Link
+                                    href={listPageHref(
+                                        basePath,
+                                        filterRecord,
+                                        paginator.page + 1,
+                                        extraQuery,
+                                    )}
+                                    className="hover:text-ink"
+                                >
+                                    Next
+                                </Link>
+                            ) : (
+                                <span className="opacity-40">Next</span>
+                            )}
+                        </nav>
+                    </footer>
+                ) : null}
+            </div>
+        </div>
+    );
+}
+
+export function workspaceViewId(filters: Record<string, unknown>): string {
+    if (filters.filter_id) {
+        return String(filters.filter_id);
+    }
+
+    return String(filters.view ?? 'all');
+}
+
+export function workspaceFilterRecord(
+    filters: DataWorkspaceProps['filters'],
+): Record<string, unknown> {
+    if ('groups' in (filters as object) && (filters as { groups?: unknown }).groups) {
+        return { filter_groups: filters };
+    }
+
+    return filters as Record<string, unknown>;
+}
+
+export function defaultWorkspaceFilters(
+    filters: DataWorkspaceProps['filters'],
+) {
+    return filterGroupsFromActive(workspaceFilterRecord(filters));
+}
+
+export function viewHref(
+    basePath: string,
+    filters: Record<string, unknown>,
+    id: string | null,
+    extraQuery: Record<string, string | number | null | undefined> = {},
+    ownerId?: number,
+): string {
+    const fields = filterFields(filters);
+
+    if (id && /^\d+$/.test(id)) {
+        return crmListHref(basePath, { ...extraQuery, filter_id: Number(id) });
+    }
+
+    const patch: Record<string, unknown> = {
+        view: id ?? 'all',
+        filter_id: null,
+        owner: id === 'my' && ownerId ? ownerId : null,
+    };
+
+    return crmListHref(basePath, { ...fields, ...extraQuery }, patch);
+}
+
+export type { DataWorkspaceProps } from '@/ds/workspace/types';

@@ -235,7 +235,7 @@ export function CrmListFooter({
             : `${count.toLocaleString()} ${noun}`;
 
     return (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute md:px-8">
             <span>{label}</span>
             <div className="flex items-center gap-3">
                 {typeof page === 'number' && typeof lastPage === 'number' ? (

@@ -26,14 +26,15 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
         ->and($contacts)->not->toContain('aurora/data-table');
 
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
+    $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
     $toolbar = file_get_contents(resource_path('js/components/crm/list-toolbar.tsx'));
     $header = file_get_contents(resource_path('js/components/crm/crm-object-header.tsx'));
     $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
     $empty = file_get_contents(resource_path('js/components/crm/list-chrome.tsx'));
     $crmShell = file_get_contents(resource_path('js/components/crm/crm-shell.tsx'));
 
-    expect($shell)->toContain('CrmObjectHeader')
-        ->and($shell)->toContain('data-crm="list-workspace"')
+    expect($shell)->toContain('DataWorkspace')
+        ->and($workspace)->toContain('data-crm="list-workspace"')
         ->and($shell)->not->toContain('RecordHubPanel')
         ->and($shell)->not->toContain('RecordHubHeader');
 
