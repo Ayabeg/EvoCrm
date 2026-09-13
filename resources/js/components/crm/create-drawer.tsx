@@ -40,7 +40,7 @@ export function CreateDrawer({
             >
                 <SheetHeader className="relative border-b border-hairline px-5 py-3 text-left">
                     <span
-                        className="absolute inset-y-0 left-0 w-[3px] bg-[var(--evosales-mark,#d9500f)]"
+                        className="absolute inset-y-0 left-0 w-[3px] bg-brand"
                         aria-hidden
                     />
                     <div className="flex items-start justify-between gap-3 pr-6">

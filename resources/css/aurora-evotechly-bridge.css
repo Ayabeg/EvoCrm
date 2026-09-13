@@ -1,13 +1,16 @@
 /*
  * EvoTechly × Aurora token bridge
  *
- * Maps Aurora primitives (--aurora-*) to EvoCrm / Brandbook semantic tokens
- * (--evosales-*). Import AFTER aurora.css and BEFORE aurora-components.css.
+ * Maps Aurora primitives (--aurora-*) to the P02 semantic source of truth
+ * (--color-bg, --color-accent, --color-text, …). Import AFTER aurora.css
+ * and BEFORE aurora-components.css.
  *
- * Aurora component CSS reads --aurora-* only; this file keeps EvoTechly orange,
- * true-black dark cabinet, and Geist typography without adopting Aurora navy/cyan.
+ * Aurora component CSS reads --aurora-* only; this file keeps EvoCrm orange,
+ * paper rail, and Geist typography without adopting Aurora navy/cyan.
+ * shadcn New York tokens in this file also alias the same semantic variables
+ * — no parallel hardcoded palette.
  *
- * See docs/visual-system/aurora-adoption.md
+ * See docs/design-system.md and docs/visual-system/aurora-adoption.md
  */
 
 /*
@@ -17,52 +20,52 @@
  */
 :root,
 .light {
-    /* Surfaces — EvoCrm Light Cabinet */
-    --aurora-page-bg: var(--evosales-canvas-soft);
-    --aurora-bg: var(--evosales-canvas-soft);
+    /* Surfaces — P02 semantic tokens */
+    --aurora-page-bg: var(--color-bg);
+    --aurora-bg: var(--color-bg);
     /*
      * EvoDesk rail — literals only.
      * aurora.css sets `--sidebar: var(--aurora-nav-bg)`. Pointing
      * `--aurora-nav-bg` back at `--sidebar` made both invalid at
      * computed-value time (transparent rail / mobile sheet) in light mode.
-     * Brand Book: rail is true black in both cabinets.
+     * Literals must match `--color-sidebar` / `--color-bg` (#F7F7F5).
      */
-    --aurora-nav-bg: #000000;
-    --sidebar: #000000;
-    --sidebar-foreground: #d4d4d4;
-    --sidebar-primary: #f5f5f5;
-    --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(217, 80, 15, 0.22);
-    --sidebar-accent-foreground: #f5f5f5;
-    --sidebar-border: #1f1f1f;
-    --sidebar-ring: #d9500f;
-    --aurora-panel-medium: #ffffff;
-    --aurora-panel-medium-top: #ffffff;
-    --aurora-panel-strong: #ffffff;
-    --aurora-panel-strong-top: #ffffff;
-    --aurora-control-surface: var(--evosales-canvas-soft);
-    --aurora-control-surface-top: var(--evosales-canvas-soft);
-    --aurora-hover-bg: color-mix(in srgb, var(--evosales-ink) 4%, var(--evosales-canvas-soft));
+    --aurora-nav-bg: #f7f7f5;
+    --sidebar: #f7f7f5;
+    --sidebar-foreground: #161616;
+    --sidebar-primary: #161616;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: var(--color-accent-soft);
+    --sidebar-accent-foreground: #161616;
+    --sidebar-border: #e3e3df;
+    --sidebar-ring: #e8530e;
+    --aurora-panel-medium: var(--color-surface);
+    --aurora-panel-medium-top: var(--color-surface);
+    --aurora-panel-strong: var(--color-surface);
+    --aurora-panel-strong-top: var(--color-surface);
+    --aurora-control-surface: var(--color-subtle);
+    --aurora-control-surface-top: var(--color-subtle);
+    --aurora-hover-bg: color-mix(in srgb, var(--color-text) 4%, var(--color-bg));
     --aurora-surface-raised: linear-gradient(
         180deg,
-        rgba(234, 234, 234, 0.98),
-        rgba(234, 234, 234, 0.98)
+        color-mix(in srgb, var(--color-bg) 98%, transparent),
+        color-mix(in srgb, var(--color-bg) 98%, transparent)
     );
 
     /* Borders */
-    --aurora-border-default: var(--evosales-hairline);
-    --aurora-border-strong: color-mix(in srgb, var(--evosales-ink) 18%, var(--evosales-hairline));
+    --aurora-border-default: var(--color-border);
+    --aurora-border-strong: var(--color-border-strong);
 
     /* Text */
-    --aurora-text-primary: var(--evosales-ink);
-    --aurora-text-muted: var(--evosales-mute);
+    --aurora-text-primary: var(--color-text);
+    --aurora-text-muted: var(--color-text-secondary);
 
-    /* Primary accent — EvoCrm mark orange (not Aurora cyan) */
-    --aurora-accent-primary: var(--evosales-mark);
-    --aurora-accent-strong: var(--evosales-mark-hover);
-    --aurora-accent-deep: var(--evosales-mark-pressed);
-    --aurora-accent-lift: #e36a2a;
-    --aurora-accent-button: var(--evosales-mark);
+    /* Primary accent — product orange (not Aurora cyan) */
+    --aurora-accent-primary: var(--color-accent);
+    --aurora-accent-strong: var(--color-accent-hover);
+    --aurora-accent-deep: var(--color-accent-pressed);
+    --aurora-accent-lift: color-mix(in srgb, var(--color-accent) 78%, white);
+    --aurora-accent-button: var(--color-accent);
     --aurora-accent-foreground: #ffffff;
     --aurora-accent-gradient: linear-gradient(
         180deg,
@@ -70,11 +73,7 @@
         var(--aurora-accent-button) 100%
     );
     /* Recompute cyan-named surface tokens from the remapped orange accent. */
-    --aurora-accent-primary-surface: color-mix(
-        in srgb,
-        var(--aurora-accent-primary) 10%,
-        var(--aurora-panel-medium)
-    );
+    --aurora-accent-primary-surface: var(--color-accent-soft);
     --aurora-accent-primary-border: color-mix(
         in srgb,
         var(--aurora-accent-primary) 30%,
@@ -83,7 +82,7 @@
     --aurora-accent-primary-foreground: color-mix(
         in srgb,
         var(--aurora-accent-primary) 45%,
-        var(--evosales-ink)
+        var(--color-text)
     );
 
     /* Rose — outbound / secondary agent affordances (muted, not brand) */
@@ -93,26 +92,26 @@
     --aurora-accent-pink-button: #b82f60;
     --aurora-accent-pink-foreground: #6f1636;
 
-    /* AI / Ask Evo — Axon orange aligned to EvoCrm mark */
-    --axon-orange: var(--evosales-mark);
-    --axon-orange-strong: var(--evosales-mark-hover);
-    --axon-orange-deep: var(--evosales-mark-pressed);
-    --axon-orange-button: var(--evosales-mark);
-    --axon-orange-surface: color-mix(in srgb, var(--evosales-mark) 10%, var(--evosales-canvas));
-    --axon-orange-border: color-mix(in srgb, var(--evosales-mark) 28%, transparent);
+    /* AI / Ask Evo — Axon orange aligned to product accent */
+    --axon-orange: var(--color-accent);
+    --axon-orange-strong: var(--color-accent-hover);
+    --axon-orange-deep: var(--color-accent-pressed);
+    --axon-orange-button: var(--color-accent);
+    --axon-orange-surface: var(--color-accent-soft);
+    --axon-orange-border: color-mix(in srgb, var(--color-accent) 28%, transparent);
 
     /* Interaction — orange focus, no cyan glow */
     --aurora-overlay: rgba(0, 0, 0, 0.18);
-    --aurora-selected-bg: color-mix(in srgb, var(--evosales-mark) 10%, var(--evosales-canvas));
-    --aurora-pressed-bg: color-mix(in srgb, var(--evosales-mark) 16%, var(--evosales-canvas));
-    --aurora-focus-ring: color-mix(in srgb, var(--evosales-mark) 30%, transparent);
-    --aurora-focus-ring-strong: color-mix(in srgb, var(--evosales-mark) 40%, transparent);
+    --aurora-selected-bg: var(--color-accent-soft);
+    --aurora-pressed-bg: color-mix(in srgb, var(--color-accent) 16%, var(--color-bg));
+    --aurora-focus-ring: color-mix(in srgb, var(--color-accent) 30%, transparent);
+    --aurora-focus-ring-strong: color-mix(in srgb, var(--color-accent) 40%, transparent);
     --aurora-active-glow:
-        0 0 0 1px color-mix(in srgb, var(--evosales-mark) 28%, transparent),
-        0 2px 8px color-mix(in srgb, var(--evosales-mark) 18%, transparent);
+        0 0 0 1px color-mix(in srgb, var(--color-accent) 28%, transparent),
+        0 2px 8px color-mix(in srgb, var(--color-accent) 18%, transparent);
 
-    /* Page shell — Brand Book canvas wash only. No decorative Aurora radials. */
-    --aurora-shell-bg: var(--evosales-canvas-soft);
+    /* Page shell — canvas wash only. No decorative Aurora radials. */
+    --aurora-shell-bg: var(--color-bg);
 
     /* Radii — Aurora optical scale (visible card roundness) */
     --aurora-radius-1: 12px;
@@ -150,43 +149,43 @@
     --aurora-type-table: var(--text-ui);
     --aurora-type-caption: var(--text-section-label);
 
-    /* shadcn bridge — EvoCrm triad remains canonical for legacy components */
-    --background: var(--evosales-canvas-soft);
-    --foreground: var(--evosales-ink);
-    --card: #ffffff;
-    --card-foreground: var(--evosales-ink);
-    --popover: #ffffff;
-    --popover-foreground: var(--evosales-ink);
-    --primary: #d9500f;
+    /* shadcn New York — same semantic source as :root in app.css */
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text);
+    --popover: var(--color-surface);
+    --popover-foreground: var(--color-text);
+    --primary: var(--color-accent);
     --primary-foreground: #ffffff;
-    --secondary: var(--evosales-canvas-soft);
-    --secondary-foreground: var(--evosales-ink);
-    --muted: var(--evosales-canvas-soft);
-    --muted-foreground: var(--evosales-mute);
-    --accent: var(--evosales-canvas-soft);
-    --accent-foreground: var(--evosales-ink);
-    --border: var(--evosales-hairline);
-    --input: var(--evosales-hairline);
-    --ring: var(--evosales-mark);
+    --secondary: var(--color-subtle);
+    --secondary-foreground: var(--color-text);
+    --muted: var(--color-subtle);
+    --muted-foreground: var(--color-text-muted);
+    --accent: var(--color-subtle);
+    --accent-foreground: var(--color-text);
+    --border: var(--color-border);
+    --input: var(--color-border);
+    --ring: var(--color-focus-ring);
     --radius: 0.5rem;
 }
 
 .dark {
     /* Surfaces — EvoCrm Dark Cabinet (true black, never navy) */
-    --aurora-page-bg: var(--evosales-canvas-soft);
-    --aurora-bg: var(--evosales-canvas-soft);
+    --aurora-page-bg: var(--color-bg);
+    --aurora-bg: var(--color-bg);
     --aurora-nav-bg: #000000;
     --sidebar: #000000;
     --sidebar-foreground: #a3a3a3;
     --sidebar-primary: #f5f5f5;
     --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(217, 80, 15, 0.22);
+    --sidebar-accent: var(--color-accent-soft);
     --sidebar-accent-foreground: #f5f5f5;
     --sidebar-border: #1f1f1f;
-    --sidebar-ring: #d9500f;
-    --aurora-panel-medium: var(--evosales-canvas);
+    --sidebar-ring: #e8530e;
+    --aurora-panel-medium: var(--color-surface);
     --aurora-panel-medium-top: rgba(10, 10, 10, 0.96);
-    --aurora-panel-strong: var(--evosales-canvas);
+    --aurora-panel-strong: var(--color-surface);
     --aurora-panel-strong-top: #141414;
     --aurora-control-surface: #171717;
     --aurora-control-surface-top: rgba(23, 23, 23, 0.96);
@@ -197,17 +196,17 @@
         rgba(10, 10, 10, 0.98)
     );
 
-    --aurora-border-default: var(--evosales-hairline);
-    --aurora-border-strong: #2a2a2a;
+    --aurora-border-default: var(--color-border);
+    --aurora-border-strong: var(--color-border-strong);
 
-    --aurora-text-primary: var(--evosales-ink);
-    --aurora-text-muted: var(--evosales-mute);
+    --aurora-text-primary: var(--color-text);
+    --aurora-text-muted: var(--color-text-secondary);
 
-    --aurora-accent-primary: var(--evosales-mark);
-    --aurora-accent-strong: var(--evosales-mark-hover);
-    --aurora-accent-deep: var(--evosales-mark-pressed);
-    --aurora-accent-lift: #e36a2a;
-    --aurora-accent-button: var(--evosales-mark);
+    --aurora-accent-primary: var(--color-accent);
+    --aurora-accent-strong: var(--color-accent-hover);
+    --aurora-accent-deep: var(--color-accent-pressed);
+    --aurora-accent-lift: color-mix(in srgb, var(--color-accent) 78%, white);
+    --aurora-accent-button: var(--color-accent);
     --aurora-accent-foreground: #ffffff;
     --aurora-accent-gradient: linear-gradient(
         180deg,
@@ -230,23 +229,23 @@
         white
     );
 
-    --axon-orange: var(--evosales-mark);
-    --axon-orange-strong: var(--evosales-mark-hover);
-    --axon-orange-deep: var(--evosales-mark-pressed);
-    --axon-orange-button: var(--evosales-mark);
-    --axon-orange-surface: color-mix(in srgb, var(--evosales-mark) 14%, #171717);
-    --axon-orange-border: color-mix(in srgb, var(--evosales-mark) 36%, transparent);
+    --axon-orange: var(--color-accent);
+    --axon-orange-strong: var(--color-accent-hover);
+    --axon-orange-deep: var(--color-accent-pressed);
+    --axon-orange-button: var(--color-accent);
+    --axon-orange-surface: color-mix(in srgb, var(--color-accent) 14%, #171717);
+    --axon-orange-border: color-mix(in srgb, var(--color-accent) 36%, transparent);
 
     --aurora-overlay: rgba(0, 0, 0, 0.72);
-    --aurora-selected-bg: color-mix(in srgb, var(--evosales-mark) 14%, transparent);
-    --aurora-pressed-bg: color-mix(in srgb, var(--evosales-mark) 20%, transparent);
-    --aurora-focus-ring: color-mix(in srgb, var(--evosales-mark) 30%, transparent);
-    --aurora-focus-ring-strong: color-mix(in srgb, var(--evosales-mark) 52%, transparent);
+    --aurora-selected-bg: color-mix(in srgb, var(--color-accent) 14%, transparent);
+    --aurora-pressed-bg: color-mix(in srgb, var(--color-accent) 20%, transparent);
+    --aurora-focus-ring: color-mix(in srgb, var(--color-accent) 30%, transparent);
+    --aurora-focus-ring-strong: color-mix(in srgb, var(--color-accent) 52%, transparent);
     --aurora-active-glow:
-        0 0 0 1px color-mix(in srgb, var(--evosales-mark) 28%, transparent),
-        0 2px 8px color-mix(in srgb, var(--evosales-mark) 18%, transparent);
+        0 0 0 1px color-mix(in srgb, var(--color-accent) 28%, transparent),
+        0 2px 8px color-mix(in srgb, var(--color-accent) 18%, transparent);
 
-    --aurora-shell-bg: var(--evosales-canvas-soft);
+    --aurora-shell-bg: var(--color-bg);
 
     --aurora-font-display: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
     --aurora-font-sans: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
@@ -269,21 +268,21 @@
     --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     --aurora-highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
-    --background: var(--evosales-canvas-soft);
-    --foreground: var(--evosales-ink);
-    --card: #0a0a0a;
-    --card-foreground: var(--evosales-ink);
-    --popover: #0a0a0a;
-    --popover-foreground: var(--evosales-ink);
-    --primary: #d9500f;
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text);
+    --popover: var(--color-surface);
+    --popover-foreground: var(--color-text);
+    --primary: var(--color-accent);
     --primary-foreground: #ffffff;
     --secondary: #171717;
-    --secondary-foreground: var(--evosales-ink);
+    --secondary-foreground: var(--color-text);
     --muted: #171717;
-    --muted-foreground: var(--evosales-mute);
+    --muted-foreground: var(--color-text-muted);
     --accent: #171717;
-    --accent-foreground: var(--evosales-ink);
-    --border: var(--evosales-hairline);
-    --input: var(--evosales-hairline);
-    --ring: var(--evosales-mark);
+    --accent-foreground: var(--color-text);
+    --border: var(--color-border);
+    --input: var(--color-border);
+    --ring: var(--color-focus-ring);
 }

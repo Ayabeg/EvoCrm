@@ -49,9 +49,43 @@ Map these onto CSS variables in P02. Do not invent extra brand hues.
 | Muted | `#929292` | `--color-text-muted` | Metadata, placeholders, table headers |
 | Border | `#E3E3DF` | `--color-border` | Hairlines, input border, row rules |
 
-Destructive stays a **semantic red** (existing `--destructive`), never orange. Online/presence may stay green `#22C55E` for status only.
+Destructive stays a **semantic red** (existing `--destructive` / `--color-danger`), never orange. Online/presence may stay green `#22C55E` for status only.
 
 Dark cabinet is **out of scope for P02–P15** unless a later brief reopens it. `use-appearance.tsx` currently forces Light Cabinet; keep that until a dedicated dark pass.
+
+### Token mapping (P02 lock)
+
+Stable names → hex / CSS variables / Tailwind. P03 primitives should consume these names; do not introduce another palette.
+
+| Stable name | Hex | CSS variable | Legacy alias | Tailwind |
+|---|---|---|---|---|
+| Background / canvas | `#F7F7F5` | `--color-bg` | `--evosales-canvas`, `--evosales-canvas-soft`, `--background` | `bg-canvas`, `bg-canvas-soft`, `bg-background` |
+| Surface | `#FFFFFF` | `--color-surface` | `--card`, `--popover` | `bg-surface`, `bg-card` |
+| Subtle surface | `#F1F1EF` | `--color-subtle` | `--secondary`, `--muted`, `--accent` (shadcn hover) | `bg-subtle`, `bg-secondary`, `bg-muted`, `bg-accent` |
+| Primary text | `#161616` | `--color-text` | `--evosales-ink`, `--foreground` | `text-ink`, `text-foreground` |
+| Secondary text | `#666666` | `--color-text-secondary` | `--evosales-mute` | `text-mute` |
+| Muted text | `#929292` | `--color-text-muted` | `--muted-foreground` | `text-muted-foreground` |
+| Border default | `#E3E3DF` | `--color-border` | `--evosales-hairline`, `--border`, `--input` | `border-hairline`, `border-border` |
+| Border strong | mix of text on border | `--color-border-strong` | `--aurora-border-strong` | `border-border-strong` |
+| Accent | `#E8530E` | `--color-accent` | `--evosales-mark`, `--primary` | `bg-brand`, `bg-primary`, `text-brand` |
+| Accent hover | `#CF4A0C` | `--color-accent-hover` | `--evosales-mark-hover` | `bg-brand-hover` |
+| Accent pressed | `#B8410B` | `--color-accent-pressed` | `--evosales-mark-pressed` | — |
+| Accent soft / wash | `rgba(232, 83, 14, 0.10)` | `--color-accent-soft`, `--color-accent-wash` | — | `bg-accent-soft` |
+| Success | `#16A34A` | `--color-success` | — | `text-success`, `bg-success` |
+| Warning | `#D97706` | `--color-warning` | — | `text-warning`, `bg-warning` |
+| Danger | destructive oklch | `--color-danger` | `--destructive` | `text-danger`, `text-destructive` |
+| Focus ring | accent | `--color-focus-ring` | `--ring` | `ring-ring`, `ring-focus-ring` |
+| Sidebar surface | `#F7F7F5` | `--color-sidebar` | `--sidebar` (literal in Aurora bridge) | `bg-sidebar` |
+| Sidebar text | `#161616` | `--color-sidebar-text` | `--sidebar-ink`, `--sidebar-foreground` | `text-sidebar-ink` |
+| Sidebar mute | `#666666` | `--color-sidebar-text-mute` | `--sidebar-mute` | `text-sidebar-mute` |
+| Sidebar hover | text 6% on paper | `--color-sidebar-hover` | `--sidebar-hover` | `bg-sidebar-hover` |
+| Sidebar active | accent soft | `--color-sidebar-active` | `--sidebar-accent` | `bg-sidebar-accent` |
+| Sidebar well | `#FFFFFF` | `--color-sidebar-well` | `--sidebar-well` | `bg-sidebar-well` |
+| Sidebar border | `#E3E3DF` | `--color-sidebar-border` | `--sidebar-border` | `border-sidebar-border` |
+
+**Collision note:** `--color-accent` in `:root` is brand orange. Tailwind `bg-accent` maps to shadcn `--accent` (`--color-subtle`) via `@theme inline` so hover surfaces stay paper, not orange. Use `bg-brand` / `bg-primary` / `var(--color-accent)` for the product accent.
+
+**Source of truth:** `resources/css/app.css`. Aurora (`aurora-evotechly-bridge.css`) and shadcn New York alias the same variables — no third theme file.
 
 ### Typography
 

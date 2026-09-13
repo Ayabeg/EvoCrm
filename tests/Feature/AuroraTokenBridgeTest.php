@@ -11,8 +11,8 @@ it('re-asserts the EvoDesk rail as a literal after Aurora remaps --sidebar', fun
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
 
     expect($bridge)->toBeString();
-    expect($bridge)->toMatch('/--aurora-nav-bg:\s*#000000/');
-    expect($bridge)->toMatch('/--sidebar:\s*#000000/');
+    expect($bridge)->toMatch('/--aurora-nav-bg:\s*#f7f7f5/');
+    expect($bridge)->toMatch('/--sidebar:\s*#f7f7f5/');
     expect($bridge)->not->toMatch('/--aurora-nav-bg:\s*var\(--sidebar\)/');
 });
 
@@ -97,28 +97,35 @@ it('re-asserts Brand identity after Aurora defaults, including the unused .light
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
 
     expect($bridge)->toMatch('/:root,\s*\.light\s*\{/');
-    expect($bridge)->toContain('--aurora-accent-primary: var(--evosales-mark)');
+    expect($bridge)->toContain('--aurora-accent-primary: var(--color-accent)');
     expect($bridge)->toContain('--aurora-accent-primary-surface:');
     expect($bridge)->not->toMatch('/--aurora-accent-primary:\s*#29b6f6/');
     expect($bridge)->not->toMatch('/--aurora-accent-primary:\s*#0288d1/');
 });
 
-it('locks the EvoCrm paper / ink / accent triad and retires Slate and antique orange', function () {
+it('locks the P02 semantic tokens and retires Slate and antique orange', function () {
     $app = file_get_contents(resource_path('css/app.css'));
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
 
-    expect($app)->toContain('--evosales-canvas: #eaeaea');
-    expect($app)->toContain('--evosales-canvas-soft: #eaeaea');
-    expect($app)->toContain('--evosales-ink: #000000');
-    expect($app)->toContain('--evosales-mark: #d9500f');
-    expect($app)->toContain('--evosales-mark-hover: #bf460d');
-    expect($app)->toContain('--evosales-mark-pressed: #a93e0c');
-    expect($app)->toContain('--primary: var(--evosales-mark)');
+    expect($app)->toContain('--color-bg: #f7f7f5');
+    expect($app)->toContain('--color-text: #161616');
+    expect($app)->toContain('--color-accent: #e8530e');
+    expect($app)->toContain('--color-accent-hover: #cf4a0c');
+    expect($app)->toContain('--color-accent-pressed: #b8410b');
+    expect($app)->toContain('--evosales-canvas: var(--color-bg)');
+    expect($app)->toContain('--evosales-canvas-soft: var(--color-bg)');
+    expect($app)->toContain('--evosales-ink: var(--color-text)');
+    expect($app)->toContain('--evosales-mark: var(--color-accent)');
+    expect($app)->toContain('--evosales-mark-hover: var(--color-accent-hover)');
+    expect($app)->toContain('--evosales-mark-pressed: var(--color-accent-pressed)');
+    expect($app)->toContain('--primary: var(--color-accent)');
     expect($app)->not->toContain('#ec6025');
     expect($app)->not->toContain('#2e3a45');
     expect($app)->not->toContain('#2E3A45');
-    expect($bridge)->toContain('--aurora-accent-strong: var(--evosales-mark-hover)');
-    expect($bridge)->toContain('--primary: #d9500f');
+    expect($app)->not->toContain('#eaeaea');
+    expect($app)->not->toContain('#d9500f');
+    expect($bridge)->toContain('--aurora-accent-strong: var(--color-accent-hover)');
+    expect($bridge)->toContain('--primary: var(--color-accent)');
     expect($bridge)->not->toContain('#ec6025');
     expect($bridge)->not->toContain('#2e3a45');
 });
@@ -182,9 +189,9 @@ it('uses the EvoCrm accent pill on the active rail', function () {
     expect($bridge)->not->toContain('--sidebar-accent: rgba(236, 96, 37, 0.22)');
     expect($app)->not->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
     expect($bridge)->not->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
-    expect($app)->toContain('--sidebar-accent: rgba(217, 80, 15, 0.22)');
-    expect($bridge)->toContain('--sidebar-accent: rgba(217, 80, 15, 0.22)');
-    expect($app)->toContain('--sidebar-ring: #d9500f');
+    expect($app)->toContain('--sidebar-accent: var(--color-accent-soft)');
+    expect($bridge)->toContain('--sidebar-accent: var(--color-accent-soft)');
+    expect($app)->toContain('--sidebar-ring: #e8530e');
     expect($rail)->toContain('app-rail-item');
     expect($rail)->not->toContain('inset_2px_0_0_0');
     expect($rail)->toContain("from '@inertiajs/react'");
@@ -194,7 +201,7 @@ it('keeps the page shell as a flat Brand canvas with no mesh radials', function 
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
     $shell = file_get_contents(resource_path('js/components/app-shell.tsx'));
 
-    expect($bridge)->toContain('--aurora-shell-bg: var(--evosales-canvas-soft)');
+    expect($bridge)->toContain('--aurora-shell-bg: var(--color-bg)');
     expect($bridge)->not->toMatch('/--aurora-shell-bg:[^;]*radial-gradient/');
     expect($shell)->toContain('bg-[var(--aurora-shell-bg)]');
 });
@@ -207,7 +214,7 @@ it('paints the topbar as a frosted hairline instead of an Aurora panel gradient'
     expect($header)->not->toContain('linear-gradient(180deg, var(--aurora-panel-strong-top)');
     expect($css)->toContain('.app-topbar');
     expect($css)->toContain('backdrop-filter: blur(20px)');
-    expect($css)->toContain('rgb(234 234 234 / 0.86)');
+    expect($css)->toContain('rgb(247 247 245 / 0.86)');
     expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
 });
 

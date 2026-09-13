@@ -18,29 +18,70 @@
 @layer theme, base, components, aurora-components, utilities;
 
 /*
- * EvoCrm triad — paper + ink + accent. Do not invent more.
- * Light Cabinet: paper/canvas #eaeaea, ink #000000, accent #d9500f.
- * Mute #525252, hairline #d4d4d4 (subtle on paper). White cards sit on
- * paper for elevation. Primary actions, focus rings, active rail, and
- * links use #d9500f. Ink is text and the icon rail — never a full-bleed
- * canvas. Dark Cabinet: TRUE BLACK canvas #000000, elevated #0A0A0A,
- * hairline #1F1F1F, ink #F5F5F5, mute #A3A3A3 — no navy/blue/teal.
- * Authenticated rail is a narrow ink icon strip (Salesforce density),
- * accent wash on the active item. Tokens never leak Salesforce blue
- * or HubSpot teal into product chrome.
+ * P02 semantic tokens — one source of truth for product UI.
+ * shadcn New York (`--background`, `--primary`, `--accent`, …) and Aurora
+ * (`--aurora-*`) consume these variables. Do not invent a third palette.
+ *
+ * Light: canvas #F7F7F5, surface #FFFFFF, text #161616, accent #E8530E.
+ * Orange is selective (CTA / active / focus / selected / charts) — never a page wash.
+ * Dark cabinet remains true-black and is out of scope for a visual redesign.
+ * Authenticated rail is paper (not a global black wash). Width stays 56px until P04.
  */
 :root {
     /* Top command bar — 44px on phones so work appears earlier; 52px from sm. */
     --app-chrome-height: 44px;
-    --evosales-canvas: #eaeaea;
-    --evosales-canvas-soft: #eaeaea;
-    --evosales-ink: #000000;
-    --evosales-mute: #525252;
-    --evosales-hairline: #d4d4d4;
-    --evosales-mark: #d9500f;
-    --evosales-mark-hover: #bf460d;
-    --evosales-mark-pressed: #a93e0c;
-    --evosales-ink-hover: #1a1a1a;
+
+    /* Surfaces */
+    --color-bg: #f7f7f5;
+    --color-surface: #ffffff;
+    --color-subtle: #f1f1ef;
+
+    /* Text */
+    --color-text: #161616;
+    --color-text-secondary: #666666;
+    --color-text-muted: #929292;
+
+    /* Borders */
+    --color-border: #e3e3df;
+    --color-border-strong: color-mix(in srgb, var(--color-text) 18%, var(--color-border));
+
+    /* Accent — selective only */
+    --color-accent: #e8530e;
+    --color-accent-hover: #cf4a0c;
+    --color-accent-pressed: #b8410b;
+    --color-accent-soft: rgba(232, 83, 14, 0.1);
+    --color-accent-wash: var(--color-accent-soft);
+
+    /* Status — semantic, not brand hues */
+    --color-success: #16a34a;
+    --color-warning: #d97706;
+    --color-danger: oklch(0.577 0.245 27.325);
+
+    /* Focus */
+    --color-focus-ring: var(--color-accent);
+
+    /* Sidebar surfaces / states — paper rail, not a second black product */
+    --color-sidebar: #f7f7f5;
+    --color-sidebar-text: var(--color-text);
+    --color-sidebar-text-mute: var(--color-text-secondary);
+    --color-sidebar-border: var(--color-border);
+    --color-sidebar-hover: color-mix(in srgb, var(--color-text) 6%, var(--color-sidebar));
+    --color-sidebar-active: var(--color-accent-soft);
+    --color-sidebar-well: var(--color-surface);
+
+    /*
+     * Wave / EvoSales aliases — same source, no parallel hex.
+     * Existing `bg-canvas`, `text-ink`, `border-hairline`, `--evosales-mark` keep working.
+     */
+    --evosales-canvas: var(--color-bg);
+    --evosales-canvas-soft: var(--color-bg);
+    --evosales-ink: var(--color-text);
+    --evosales-mute: var(--color-text-secondary);
+    --evosales-hairline: var(--color-border);
+    --evosales-mark: var(--color-accent);
+    --evosales-mark-hover: var(--color-accent-hover);
+    --evosales-mark-pressed: var(--color-accent-pressed);
+    --evosales-ink-hover: color-mix(in srgb, var(--color-text) 8%, var(--color-surface));
 }
 
 @media (min-width: 640px) {
@@ -59,40 +100,66 @@
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
+    /* Typography scale — Brandbook § typography + locked P02 roles */
+    --text-page-title: 1.375rem; /* 22px — current headers until P03 PageHeader */
+    --text-record-title: 1.25rem; /* 20px — record name */
+    --text-ui: 0.8125rem; /* 13px — tables, timeline, desk */
+    --text-ui-relaxed: 0.875rem; /* 14px — secondary panels */
+    --text-section-label: 0.6875rem; /* 11px — uppercase section labels */
+    --text-micro: 0.625rem; /* 10px — badges, source chips */
+    --text-kpi: 1.75rem; /* 28px — home tiles, funnel KPIs */
+
+    /* Locked type roles for P03+ (do not swap page-title yet — preserves layout) */
+    --text-page: 1.75rem;
+    --text-page-line: 2.125rem;
+    --text-page-weight: 650;
+    --text-section: 1.125rem;
+    --text-section-line: 1.625rem;
+    --text-card: 0.9375rem;
+    --text-card-line: 1.375rem;
+    --text-body: 0.875rem;
+    --text-body-line: 1.25rem;
+    --text-label: 0.8125rem;
+    --text-label-line: 1.125rem;
+    --text-meta: 0.75rem;
+    --text-meta-line: 1rem;
+
+    /* Existing utilities — source names differ from the :root --color-* lock */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
-
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
-
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
-
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
-
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
-
-    --color-accent: var(--accent);
     --color-accent-foreground: var(--accent-foreground);
-
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
-
-    --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
-
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+    --color-brand: var(--evosales-mark);
+    --color-brand-hover: var(--color-accent-hover);
+    --color-ink: var(--evosales-ink);
+    --color-mute: var(--evosales-mute);
+    --color-canvas: var(--evosales-canvas);
+    --color-canvas-soft: var(--evosales-canvas-soft);
+    --color-hairline: var(--evosales-hairline);
 
+    /*
+     * Sidebar utilities must emit --color-sidebar-* because sidebar.tsx
+     * references var(--color-sidebar-primary). Point at --sidebar-* literals
+     * (not --color-sidebar) so the pair cannot cycle.
+     */
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -101,29 +168,6 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
-
-    --color-brand: var(--evosales-mark);
-    --color-ink: var(--evosales-ink);
-    --color-mute: var(--evosales-mute);
-    --color-canvas: var(--evosales-canvas);
-    --color-canvas-soft: var(--evosales-canvas-soft);
-    --color-hairline: var(--evosales-hairline);
-
-    /* Typography scale — Brandbook § typography (docs/brandbook/design-tokens.md) */
-    --text-page-title: 1.375rem; /* 22px — list room headers */
-    --text-record-title: 1.25rem; /* 20px — record name */
-    --text-ui: 0.8125rem; /* 13px — tables, timeline, desk */
-    --text-ui-relaxed: 0.875rem; /* 14px — secondary panels */
-    --text-section-label: 0.6875rem; /* 11px — uppercase section labels */
-    --text-micro: 0.625rem; /* 10px — badges, source chips */
-    --text-kpi: 1.75rem; /* 28px — home tiles, funnel KPIs */
-
-    /*
-     * EvoDesk (Chatwoot Community) next-sidebar rail tokens.
-     * Sidebar-only: text n-slate-11/12, hover/active n-alpha-2, tree line
-     * n-slate-4, search/compose well n-button-color, online presence dot.
-     * Var-chained so the rail can flip charcoal → true black in Dark Cabinet.
-     */
     --color-sidebar-ink: var(--sidebar-ink);
     --color-sidebar-mute: var(--sidebar-mute);
     --color-sidebar-faint: var(--sidebar-faint);
@@ -136,50 +180,73 @@
     --color-sidebar-online: var(--sidebar-online);
 }
 
+/*
+ * Tailwind v4 aliases that would overwrite :root if emitted.
+ * @theme inline inlines the value into utilities and leaves the :root
+ * semantic token intact (https://tailwindcss.com/docs/theme#referencing-other-variables).
+ *
+ * `--color-accent` in :root is brand orange. The `accent` utility maps to
+ * shadcn `--accent` (subtle hover) so `bg-accent` cannot orange-wash the UI.
+ */
+@theme inline {
+    --color-accent: var(--accent);
+    --color-accent-hover: var(--color-accent-hover);
+    --color-accent-soft: var(--color-accent-soft);
+    --color-border: var(--border);
+    --color-border-strong: var(--color-border-strong);
+    --color-surface: var(--color-surface);
+    --color-subtle: var(--color-subtle);
+    --color-success: var(--color-success);
+    --color-warning: var(--color-warning);
+    --color-danger: var(--color-danger);
+    --color-focus-ring: var(--color-focus-ring);
+}
+
 :root {
-    --background: var(--evosales-canvas-soft);
-    --foreground: var(--evosales-ink);
-    --card: #ffffff;
-    --card-foreground: var(--evosales-ink);
-    --popover: #ffffff;
-    --popover-foreground: var(--evosales-ink);
-    --primary: var(--evosales-mark);
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text);
+    --popover: var(--color-surface);
+    --popover-foreground: var(--color-text);
+    --primary: var(--color-accent);
     --primary-foreground: #ffffff;
-    --secondary: var(--evosales-canvas-soft);
-    --secondary-foreground: var(--evosales-ink);
-    --muted: var(--evosales-canvas-soft);
-    --muted-foreground: var(--evosales-mute);
-    --accent: var(--evosales-canvas-soft);
-    --accent-foreground: var(--evosales-ink);
+    --secondary: var(--color-subtle);
+    --secondary-foreground: var(--color-text);
+    --muted: var(--color-subtle);
+    --muted-foreground: var(--color-text-muted);
+    /* shadcn hover / selected surface — not brand orange */
+    --accent: var(--color-subtle);
+    --accent-foreground: var(--color-text);
     /* Framework semantic, not a brand color — delete/destructive flows only. */
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: var(--evosales-hairline);
-    --input: var(--evosales-hairline);
-    --ring: var(--evosales-mark);
-    --chart-1: var(--evosales-mark);
-    --chart-2: var(--evosales-ink);
-    --chart-3: var(--evosales-mute);
-    --chart-4: var(--evosales-hairline);
-    --chart-5: var(--evosales-canvas-soft);
+    --destructive: var(--color-danger);
+    --destructive-foreground: var(--color-danger);
+    --border: var(--color-border);
+    --input: var(--color-border);
+    --ring: var(--color-focus-ring);
+    --chart-1: var(--color-accent);
+    --chart-2: var(--color-text);
+    --chart-3: var(--color-text-secondary);
+    --chart-4: var(--color-border);
+    --chart-5: var(--color-subtle);
     --radius: 0.5rem;
-    /* Apple / Aurora Light Cabinet rail: true black, accent active pill. */
-    --sidebar: #000000;
-    --sidebar-foreground: #d4d4d4;
-    --sidebar-primary: #f5f5f5;
-    --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(217, 80, 15, 0.22);
-    --sidebar-accent-foreground: #f5f5f5;
-    --sidebar-border: #1f1f1f;
-    --sidebar-ring: #d9500f;
-    --sidebar-ink: #f5f5f5;
-    --sidebar-mute: #a3a3a3;
-    --sidebar-faint: #737373;
-    --sidebar-well: #171717;
-    --sidebar-well-hover: #262626;
-    --sidebar-line: #1f1f1f;
-    --sidebar-strong: #262626;
-    --sidebar-hover: rgba(255, 255, 255, 0.06);
+    /* Paper rail — literals re-asserted in the Aurora bridge to avoid cycles. */
+    --sidebar: #f7f7f5;
+    --sidebar-foreground: #161616;
+    --sidebar-primary: #161616;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: var(--color-accent-soft);
+    --sidebar-accent-foreground: #161616;
+    --sidebar-border: #e3e3df;
+    --sidebar-ring: #e8530e;
+    --sidebar-ink: #161616;
+    --sidebar-mute: #666666;
+    --sidebar-faint: #929292;
+    --sidebar-well: #ffffff;
+    --sidebar-well-hover: #f1f1ef;
+    --sidebar-line: #e3e3df;
+    --sidebar-strong: #e3e3df;
+    --sidebar-hover: color-mix(in srgb, #161616 6%, #f7f7f5);
     --sidebar-overlay: rgba(0, 0, 0, 0.8);
     --sidebar-online: #22c55e;
 }
@@ -191,41 +258,55 @@
 @import './aurora-motion.css';
 
 /*
- * Dark Cabinet — TRUE BLACK, never navy/charcoal-blue. Canvas #000000,
- * elevated surfaces #0A0A0A, hairline #1F1F1F, ink #F5F5F5, mute #A3A3A3.
- * Every override below is a neutral gray (zero chroma) or the EvoCrm
- * accent; no blue, indigo, navy, or teal tint is allowed in dark tokens.
+ * Dark Cabinet — TRUE BLACK, never navy/charcoal-blue. Out of scope for a
+ * visual redesign in P02–P15; accent + aliases still resolve through the
+ * semantic tokens. No blue, indigo, navy, or teal tint.
  * Aurora remapping for .dark lives in aurora-evotechly-bridge.css.
  */
 .dark {
-    --evosales-canvas: #0a0a0a;
-    --evosales-canvas-soft: #000000;
-    --evosales-ink: #f5f5f5;
-    --evosales-mute: #a3a3a3;
-    --evosales-hairline: #1f1f1f;
+    --color-bg: #000000;
+    --color-surface: #0a0a0a;
+    --color-subtle: #171717;
+    --color-text: #f5f5f5;
+    --color-text-secondary: #a3a3a3;
+    --color-text-muted: #a3a3a3;
+    --color-border: #1f1f1f;
+    --color-border-strong: #2a2a2a;
+    --color-sidebar: #000000;
+    --color-sidebar-text: #f5f5f5;
+    --color-sidebar-text-mute: #a3a3a3;
+    --color-sidebar-border: #1f1f1f;
+    --color-sidebar-hover: rgba(255, 255, 255, 0.06);
+    --color-sidebar-well: #171717;
+
+    --evosales-canvas: var(--color-surface);
+    --evosales-canvas-soft: var(--color-bg);
+    --evosales-ink: var(--color-text);
+    --evosales-mute: var(--color-text-secondary);
+    --evosales-hairline: var(--color-border);
 
     /* Muted family sits one step above the card instead of sinking to black. */
     --secondary: #171717;
     --muted: #171717;
     --accent: #171717;
     /* Filled CTAs stay accent in both cabinets. */
-    --primary: var(--evosales-mark);
+    --primary: var(--color-accent);
     --primary-foreground: #ffffff;
-    --card: #0a0a0a;
-    --popover: #0a0a0a;
+    --card: var(--color-surface);
+    --popover: var(--color-surface);
     /* Chart series that would otherwise collapse onto the black canvas. */
     --chart-4: #525252;
     --chart-5: #3a3a3a;
 
-    /* Rail stays true black — same soft pill as Light Cabinet. */
+    /* Rail stays true black in dark — same soft pill as light, paper ink inverted. */
     --sidebar: #000000;
     --sidebar-foreground: #a3a3a3;
     --sidebar-primary: #f5f5f5;
     --sidebar-primary-foreground: #000000;
-    --sidebar-accent: rgba(217, 80, 15, 0.22);
+    --sidebar-accent: var(--color-accent-soft);
     --sidebar-accent-foreground: #f5f5f5;
     --sidebar-border: #1f1f1f;
-    --sidebar-ring: #d9500f;
+    --sidebar-ring: #e8530e;
     --sidebar-ink: #f5f5f5;
     --sidebar-mute: #a3a3a3;
     --sidebar-faint: #737373;
@@ -316,7 +397,7 @@
     .app-topbar {
         height: var(--app-chrome-height);
         isolation: isolate;
-        background: rgb(234 234 234 / 0.86);
+        background: rgb(247 247 245 / 0.86);
         border-bottom: 1px solid var(--evosales-hairline);
         box-shadow: none;
         -webkit-backdrop-filter: blur(20px) saturate(1.4);
@@ -345,7 +426,7 @@
     }
 
     .home-widget {
-        background: #ffffff;
+        background: var(--color-surface);
         border: 1px solid var(--evosales-hairline);
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
     }

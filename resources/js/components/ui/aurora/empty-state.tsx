@@ -70,7 +70,7 @@ export function EmptyState({
             ? {
                 border: `1.5px dashed var(--aurora-border-default)`,
                 borderRadius: 2,
-                background: "var(--evosales-canvas-soft, #eaeaea)",
+                background: "var(--color-bg)",
               }
             : undefined
         }

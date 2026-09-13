@@ -6,10 +6,10 @@
     <title>Unsubscribe · EvoSales · Evotechly</title>
     <link rel="icon" href="/brand/evocrm/logo.svg" type="image/svg+xml">
     <style>
-        body { font-family: Geist, "Geist Sans", ui-sans-serif, system-ui, sans-serif; background: #eaeaea; color: #000000; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+        body { font-family: Geist, "Geist Sans", ui-sans-serif, system-ui, sans-serif; background: #F7F7F5; color: #161616; display: grid; place-items: center; min-height: 100vh; margin: 0; }
         main { max-width: 32rem; padding: 2rem; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 0.5rem; }
         h1 { margin-top: 0; }
-        a { color: #d9500f; }
+        a { color: #E8530E; }
     </style>
 </head>
 <body>

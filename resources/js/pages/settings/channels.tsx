@@ -51,7 +51,7 @@ export default function ChannelSettings({
                                 Embedded inside EvoCrm at{' '}
                                 <Link
                                     href="/inbox"
-                                    className="font-medium text-[#d9500f]"
+                                    className="font-medium text-brand"
                                 >
                                     Inbox
                                 </Link>

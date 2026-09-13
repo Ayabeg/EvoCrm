@@ -139,7 +139,7 @@ export default function PublicQuote({
                                 {({ processing }) => (
                                     <Button
                                         disabled={processing}
-                                        className="h-10 bg-[var(--evosales-mark,#d9500f)] px-5 text-white hover:bg-[var(--evosales-mark-hover,#bf460d)]"
+                                        className="h-10 bg-brand px-5 text-white hover:bg-brand-hover"
                                     >
                                         Accept quote
                                     </Button>

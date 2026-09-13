@@ -73,7 +73,7 @@ export default function QuotesIndex({
                     members={members}
                     className="bg-canvas"
                     contentClassName="bg-canvas"
-                    primaryClassName="bg-[var(--evosales-mark,#d9500f)] text-white hover:bg-[var(--evosales-mark-hover,#bf460d)]"
+                    primaryClassName="bg-brand text-white hover:bg-brand-hover"
                 >
                     {(columns) => (
                         <>
@@ -228,7 +228,7 @@ export default function QuotesIndex({
                                     </Button>
                                     <Button
                                         disabled={processing || !dealId}
-                                        className="bg-[var(--evosales-mark,#d9500f)] text-white hover:bg-[var(--evosales-mark-hover,#bf460d)]"
+                                        className="bg-brand text-white hover:bg-brand-hover"
                                     >
                                         Create quote
                                     </Button>

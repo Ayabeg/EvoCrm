@@ -63,7 +63,7 @@ export default function MeetingSettings({
                         Your link:{' '}
                         <a
                             href={schedule.url}
-                            className="font-medium text-[#d9500f] hover:underline"
+                            className="font-medium text-brand hover:underline"
                         >
                             {schedule.url}
                         </a>
@@ -265,7 +265,7 @@ export default function MeetingSettings({
                                     <option value="en">English (en)</option>
                                 </select>
                             </SettingsFormRow>
-                            <div className="rounded-[4px] bg-[#eaeaea] p-3 text-[12px] text-mute">
+                            <div className="rounded-[4px] bg-canvas p-3 text-[12px] text-mute">
                                 <p className="font-medium text-ink">
                                     Meta body variables
                                 </p>

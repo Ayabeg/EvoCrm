@@ -93,7 +93,7 @@ export default function Profile({
                                     <Link
                                         href={send()}
                                         as="button"
-                                        className="text-[#d9500f] underline decoration-[#d9500f]/30 underline-offset-4 hover:decoration-[#d9500f]"
+                                        className="text-brand underline decoration-brand/30 underline-offset-4 hover:decoration-brand"
                                     >
                                         Re-send the verification email.
                                     </Link>

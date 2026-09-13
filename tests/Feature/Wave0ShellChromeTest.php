@@ -1,19 +1,34 @@
 <?php
 
-it('locks the Wave 0 triad: paper canvas, white cards, accent primaries', function () {
+it('locks the P02 semantic palette: canvas, surface, accent primaries', function () {
     $app = file_get_contents(resource_path('css/app.css'));
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
 
-    expect($app)->toContain('--evosales-canvas: #eaeaea')
-        ->and($app)->toContain('--evosales-ink: #000000')
-        ->and($app)->toContain('--evosales-mark: #d9500f')
-        ->and($app)->toContain('--primary: var(--evosales-mark)')
-        ->and($app)->toContain('--card: #ffffff')
+    expect($app)->toContain('--color-bg: #f7f7f5')
+        ->and($app)->toContain('--color-surface: #ffffff')
+        ->and($app)->toContain('--color-subtle: #f1f1ef')
+        ->and($app)->toContain('--color-text: #161616')
+        ->and($app)->toContain('--color-text-secondary: #666666')
+        ->and($app)->toContain('--color-text-muted: #929292')
+        ->and($app)->toContain('--color-border: #e3e3df')
+        ->and($app)->toContain('--color-accent: #e8530e')
+        ->and($app)->toContain('--color-accent-hover: #cf4a0c')
+        ->and($app)->toContain('--color-accent-soft: rgba(232, 83, 14, 0.1)')
+        ->and($app)->toContain('--color-focus-ring: var(--color-accent)')
+        ->and($app)->toContain('--evosales-canvas: var(--color-bg)')
+        ->and($app)->toContain('--evosales-ink: var(--color-text)')
+        ->and($app)->toContain('--evosales-mark: var(--color-accent)')
+        ->and($app)->toContain('--primary: var(--color-accent)')
+        ->and($app)->toContain('--card: var(--color-surface)')
         ->and($app)->toContain('.home-widget')
         ->and($app)->not->toContain('#0176D3')
         ->and($app)->not->toContain('#00A4BD')
-        ->and($bridge)->toContain('--primary: #d9500f')
-        ->and($bridge)->toContain('--card: #ffffff');
+        ->and($app)->not->toContain('#eaeaea')
+        ->and($app)->not->toContain('#d9500f')
+        ->and($bridge)->toContain('--primary: var(--color-accent)')
+        ->and($bridge)->toContain('--card: var(--color-surface)')
+        ->and($bridge)->not->toContain('#eaeaea')
+        ->and($bridge)->not->toContain('#d9500f');
 });
 
 it('ships a Salesforce-density icon rail in the EvoCrm triad', function () {
