@@ -1,7 +1,7 @@
 /*
  * EvoTechly × Aurora token bridge
  *
- * Maps Aurora primitives (--aurora-*) to EvoSales / Brandbook semantic tokens
+ * Maps Aurora primitives (--aurora-*) to EvoCrm / Brandbook semantic tokens
  * (--evosales-*). Import AFTER aurora.css and BEFORE aurora-components.css.
  *
  * Aurora component CSS reads --aurora-* only; this file keeps EvoTechly orange,
@@ -12,12 +12,12 @@
 
 /*
  * Light cabinet. Include `.light` so Aurora's `.light` navy/cyan block
- * cannot win if that class is ever applied (EvoSales light mode is
+ * cannot win if that class is ever applied (EvoCrm light mode is
  * `:root` without `.dark`; it does not currently set `.light`).
  */
 :root,
 .light {
-    /* Surfaces — EvoSales Light Cabinet */
+    /* Surfaces — EvoCrm Light Cabinet */
     --aurora-page-bg: var(--evosales-canvas-soft);
     --aurora-bg: var(--evosales-canvas-soft);
     /*
@@ -36,10 +36,10 @@
     --sidebar-accent-foreground: #f5f5f5;
     --sidebar-border: #1f1f1f;
     --sidebar-ring: #d9500f;
-    --aurora-panel-medium: var(--evosales-canvas);
-    --aurora-panel-medium-top: rgba(255, 255, 255, 0.5);
-    --aurora-panel-strong: var(--evosales-canvas);
-    --aurora-panel-strong-top: var(--evosales-canvas);
+    --aurora-panel-medium: #ffffff;
+    --aurora-panel-medium-top: #ffffff;
+    --aurora-panel-strong: #ffffff;
+    --aurora-panel-strong-top: #ffffff;
     --aurora-control-surface: var(--evosales-canvas-soft);
     --aurora-control-surface-top: var(--evosales-canvas-soft);
     --aurora-hover-bg: color-mix(in srgb, var(--evosales-ink) 4%, var(--evosales-canvas-soft));
@@ -150,14 +150,14 @@
     --aurora-type-table: var(--text-ui);
     --aurora-type-caption: var(--text-section-label);
 
-    /* shadcn bridge — EvoSales remains canonical for legacy components */
+    /* shadcn bridge — EvoCrm triad remains canonical for legacy components */
     --background: var(--evosales-canvas-soft);
     --foreground: var(--evosales-ink);
-    --card: var(--evosales-canvas);
+    --card: #ffffff;
     --card-foreground: var(--evosales-ink);
-    --popover: var(--evosales-canvas);
+    --popover: #ffffff;
     --popover-foreground: var(--evosales-ink);
-    --primary: #000000;
+    --primary: #d9500f;
     --primary-foreground: #ffffff;
     --secondary: var(--evosales-canvas-soft);
     --secondary-foreground: var(--evosales-ink);
@@ -172,7 +172,7 @@
 }
 
 .dark {
-    /* Surfaces — EvoSales Dark Cabinet (true black, never navy) */
+    /* Surfaces — EvoCrm Dark Cabinet (true black, never navy) */
     --aurora-page-bg: var(--evosales-canvas-soft);
     --aurora-bg: var(--evosales-canvas-soft);
     --aurora-nav-bg: #000000;
@@ -271,11 +271,11 @@
 
     --background: var(--evosales-canvas-soft);
     --foreground: var(--evosales-ink);
-    --card: var(--evosales-canvas);
+    --card: #0a0a0a;
     --card-foreground: var(--evosales-ink);
-    --popover: var(--evosales-canvas);
+    --popover: #0a0a0a;
     --popover-foreground: var(--evosales-ink);
-    --primary: #000000;
+    --primary: #d9500f;
     --primary-foreground: #ffffff;
     --secondary: #171717;
     --secondary-foreground: var(--evosales-ink);

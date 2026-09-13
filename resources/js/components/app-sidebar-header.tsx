@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, CheckSquare, Plus, Search } from 'lucide-react';
+import { Bell, CheckSquare, MagnifyingGlass, Plus, Question } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import { CommandPalette, useCommandPaletteShortcut } from '@/components/crm/command-palette';
 import { TasksOverlay } from '@/components/crm/tasks-overlay';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,14 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 <div className="md:hidden" data-chrome="menu">
                     <SidebarTrigger className="-ml-0.5 shrink-0 text-ink" />
                 </div>
+                <Link
+                    href="/dashboard"
+                    title="EvoCrm"
+                    className="hidden shrink-0 items-center gap-2 md:flex"
+                >
+                    <AppLogoIcon className="size-7" />
+                    <span className="sr-only">EvoCrm</span>
+                </Link>
                 <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl" data-chrome="search">
                     <Input
                         readOnly
@@ -51,7 +60,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         onClick={() => setPaletteOpen(true)}
                         onFocus={() => setPaletteOpen(true)}
                         startAdornment={
-                            <Search className="size-4" aria-hidden />
+                            <MagnifyingGlass className="size-4" weight="regular" aria-hidden />
                         }
                         className="cursor-pointer rounded-full pr-3 sm:pr-16"
                     />
@@ -64,12 +73,22 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         type="button"
                         variant="ghost"
                         size="sm"
+                        title="Help"
+                        aria-label="Help"
+                        className="hidden rounded-full lg:inline-flex"
+                    >
+                        <Question className="size-4" weight="regular" aria-hidden />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
                         title="Tasks"
                         aria-label="Open tasks"
                         className="hidden rounded-full min-[390px]:inline-flex"
                         onClick={() => setTasksOpen(true)}
                     >
-                        <CheckSquare className="size-4" aria-hidden />
+                        <CheckSquare className="size-4" weight="regular" aria-hidden />
                         {taskCount > 0 ? (
                             <span className="ml-1 tabular-nums text-[11px]">{taskCount}</span>
                         ) : null}
@@ -84,7 +103,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                 aria-label="Create"
                                 className="rounded-full"
                             >
-                                <Plus className="size-4" aria-hidden />
+                                <Plus className="size-4" weight="bold" aria-hidden />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44">
@@ -106,9 +125,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                             size="icon"
                             title="Notifications"
                             aria-label="Notifications"
-                            className="rounded-full"
                         >
-                            <Bell className="size-4" aria-hidden />
+                            <Bell className="size-4" weight="regular" aria-hidden />
                         </Button>
                     </div>
                     {user ? (

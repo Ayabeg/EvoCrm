@@ -57,7 +57,7 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
         ->and($crmShell)->toContain("chrome === 'workspace'");
 });
 
-it('exposes CRM objects on the expanded rail without replacing AppSidebar', function () {
+it('exposes CRM objects on the icon rail without replacing AppSidebar', function () {
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
     expect($rail)->toContain('CRM_RAIL_OBJECTS')
@@ -70,7 +70,8 @@ it('exposes CRM objects on the expanded rail without replacing AppSidebar', func
         ->and($rail)->not->toContain("href: '/leads'")
         ->and($rail)->not->toContain("label: 'Lead board'")
         ->and($rail)->not->toContain('@/components/ui/aurora/sidebar')
-        ->and($rail)->toContain("from '@/components/ui/sidebar'");
+        ->and($rail)->toContain("from '@/components/ui/sidebar'")
+        ->and($rail)->toContain("from '@phosphor-icons/react'");
 
     expect(strpos($rail, "label: 'Contacts'"))
         ->toBeLessThan(strpos($rail, "label: 'Companies'"))

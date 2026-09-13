@@ -113,21 +113,22 @@ it('locks the EvoCrm paper / ink / accent triad and retires Slate and antique or
     expect($app)->toContain('--evosales-mark: #d9500f');
     expect($app)->toContain('--evosales-mark-hover: #bf460d');
     expect($app)->toContain('--evosales-mark-pressed: #a93e0c');
-    expect($app)->toContain('--primary: var(--evosales-ink)');
+    expect($app)->toContain('--primary: var(--evosales-mark)');
     expect($app)->not->toContain('#ec6025');
     expect($app)->not->toContain('#2e3a45');
     expect($app)->not->toContain('#2E3A45');
     expect($bridge)->toContain('--aurora-accent-strong: var(--evosales-mark-hover)');
-    expect($bridge)->toContain('--primary: #000000');
+    expect($bridge)->toContain('--primary: #d9500f');
     expect($bridge)->not->toContain('#ec6025');
     expect($bridge)->not->toContain('#2e3a45');
 });
 
-it('keeps the Apple cabinet rail at 240px on desktop and the existing mobile Sheet', function () {
+it('keeps the Wave 0 icon rail at 56px on desktop and the existing mobile Sheet', function () {
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
 
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "240px"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "3.5rem"');
     expect($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "240px"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "3.5rem"');
     expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "220px"');
     expect($sidebar)->toContain('<SheetContent');
     expect($sidebar)->toContain('background: "var(--sidebar)"');
@@ -241,10 +242,12 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     expect($css)->toContain('@media (max-width: 389px)');
 });
 
-it('names More-panel pin controls for assistive tech', function () {
+it('names the More overflow for assistive tech', function () {
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
-    expect($rail)->toContain("aria-label={pinned ? 'Unpin from sidebar' : 'Pin to sidebar'}");
+    expect($rail)->toContain('aria-haspopup="menu"');
+    expect($rail)->toContain('aria-expanded={moreOpen}');
+    expect($rail)->toContain('sidebar-more-panel');
 });
 
 it('keeps remaining application chrome off raw Aurora radius and muted-text tokens', function () {

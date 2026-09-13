@@ -1,19 +1,19 @@
 import { Link } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
+import { home } from '@/routes';
 
 /**
  * Auth chrome for every `auth/*` page.
  * Aurora Card + Brand Book identity. Hairline only — no mesh, no shell wash.
  */
 const hairlineCardStyle = {
-    background: 'var(--evosales-canvas)',
+    background: '#ffffff',
     backgroundImage: 'none',
     borderColor: 'var(--evosales-hairline)',
-    borderRadius: 'var(--radius-2)',
-    boxShadow: 'none',
+    borderRadius: '4px',
+    boxShadow: '0 1px 0 rgba(0, 0, 0, 0.04)',
 } as const;
 
 export default function AuthScreen({
@@ -29,7 +29,7 @@ export default function AuthScreen({
                     className="flex flex-col items-center gap-3 text-ink"
                 >
                     <AppLogoIcon className="size-9" />
-                    <span className="aurora-text-ui tracking-tight">
+                    <span className="text-sm font-semibold tracking-tight text-ink">
                         EvoCrm
                     </span>
                     <span className="sr-only">{title}</span>

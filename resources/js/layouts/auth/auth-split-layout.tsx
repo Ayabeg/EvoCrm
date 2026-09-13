@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
-import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
+import { home } from '@/routes';
 
 export default function AuthSplitLayout({
     children,
@@ -21,8 +21,8 @@ export default function AuthSplitLayout({
                     <span>EvoCrm</span>
                 </Link>
                 <div className="relative z-20 mt-auto max-w-sm text-sm text-mute">
-                    {name} is Evotechly’s sales OS. Desk, CRM, Ads, and
-                    Outbound — one login.
+                    {name} — CRM for Algerian operators. Contacts, deals,
+                    inbox, and quotes. One login.
                 </div>
             </div>
             <div className="w-full bg-canvas lg:p-8">
