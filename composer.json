@@ -1,9 +1,10 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "evotechly/evosales",
+    "name": "evotechly/evocrm",
     "type": "project",
-    "description": "EvoSales — Evotechly all-in-one sales OS: Desk, CRM, Ads Center, Outbound Center. Official WhatsApp Cloud via Evolution API.",
+    "description": "EvoCrm — Evotechly all-in-one sales OS: CRM, Desk, Ads Center, Outbound Center. Official WhatsApp Cloud via Evolution API. Formerly EvoSales.",
     "keywords": [
+        "evocrm",
         "evosales",
         "evotechly",
         "crm",

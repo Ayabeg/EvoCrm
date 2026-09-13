@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Repo** | [Mohamedbeghanem/EvoSales](https://github.com/Mohamedbeghanem/EvoSales) (`main`) |
-| **Product name** | EvoCRM (CRM surface). EvoSales remains the OS (CRM + Desk + Outbound + Ads). |
+| **Repo** | [Mohamedbeghanem/EvoCrm](https://github.com/Mohamedbeghanem/EvoCrm) (`main`) |
+| **Product name** | EvoCrm (sales OS: CRM + Desk + Outbound + Ads). Renamed from EvoSales on 2026-09-13. Evomerde is the retired DS fork, not this trunk. |
 | **Source of truth** | Mobbin web screens of HubSpot and Salesforce. Do not invent chrome from memory. |
 | **Screen freeze** | [evocrm-mobbin-contract.md](./evocrm-mobbin-contract.md) (P0) |
 | **Date** | 2026-09-08 |
@@ -20,13 +20,13 @@ Related: [ARCHITECTURE.md](./ARCHITECTURE.md) · [OBJECT_MODEL.md](./OBJECT_MODE
 
 Do not clone either product. **Outwork** means a seller closes more deals per hour than on HubSpot or Salesforce.
 
-| Steal from HubSpot (Mobbin) | Steal from Salesforce (Mobbin) | Keep / beat with EvoSales |
+| Steal from HubSpot (Mobbin) | Steal from Salesforce (Mobbin) | Keep / beat with EvoCrm |
 |---|---|---|
 | Pin rail + More, list/board toggle, saved views, 3-pane record, Breeze-shaped AI rail, sequence step editor, sales workspace next-actions | Lead **Path**, **Convert**, workspace tabs, inline-edit pencils, activity composer (email/call/task/event), related lists (Opportunities / Files) | Owned SMTP + warmup, WhatsApp Cloud, Meta ads funnel, wilaya/DZD/Algiers TZ, self-host, no per-seat tax |
 
 **Do not build (v1):** CMS/pages/blog, AppExchange, custom objects, Flow canvas, Cases/tickets, Salesforce widget home, Slack-in-CRM, e-sign/payments, SAML.
 
-Existing HubSpot-parity score on `main` is **~85**. EvoCRM is the productization of that chrome **plus** Salesforce lead/opportunity mechanics **plus** moats visible on every surface.
+Existing HubSpot-parity score on `main` is **~85**. EvoCrm is the productization of that chrome **plus** Salesforce lead/opportunity mechanics **plus** moats visible on every surface.
 
 ---
 
@@ -69,7 +69,7 @@ Every EvoCRM surface must cite a Mobbin screen. The freeze lives in [evocrm-mobb
 
 ---
 
-## 3. Current EvoSales vs the contract
+## 3. Current EvoCrm vs the contract
 
 Already on `main` (use, do not rewrite):
 
@@ -82,7 +82,7 @@ Already on `main` (use, do not rewrite):
 
 Gaps vs Mobbin (this is the build):
 
-| Gap | HubSpot SoT | Salesforce SoT | EvoSales today |
+| Gap | HubSpot SoT | Salesforce SoT | EvoCrm today |
 |---|---|---|---|
 | Guided home | Next-actions + feed | (ignore widgets) | KPI dashboard, weak onboarding |
 | Board inactivity + card editor | Board options drawer | — | Drag + totals only (P3 PR) |
@@ -100,7 +100,7 @@ Gaps vs Mobbin (this is the build):
 ```mermaid
 flowchart LR
   Seller --> EvoCRM
-  subgraph OS[EvoSales OS]
+  subgraph OS[EvoCrm OS]
     EvoCRM[EvoCRM]
     Desk[Desk /inbox]
     Out[Outbound]
@@ -261,16 +261,16 @@ Each PR independently reviewable. Mobbin URL in the PR body. Pest coverage on th
 
 | PR | Title | GitHub | Depends | Acceptance (Mobbin) |
 |---|---|---|---|---|
-| **P0** | `docs: EvoCRM Mobbin contract` | [#129](https://github.com/Mohamedbeghanem/EvoSales/pull/129) | — | Linked screens only; no new product claims |
-| **P1** | `feat(home): guided sales home` | [#130](https://github.com/Mohamedbeghanem/EvoSales/pull/130) | P0 | Matches HubSpot home zones; actions hit real settings |
-| **P2** | `feat(crm): list chrome vs HubSpot deals table` | [#131](https://github.com/Mohamedbeghanem/EvoSales/pull/131) | P0 | View tabs, chips, list/board toggle, Create CTA |
-| **P3** | `feat(deals): HubSpot board cards + options` | [#132](https://github.com/Mohamedbeghanem/EvoSales/pull/132) | P2 | Inactivity, High/Low, compact/default persist |
-| **P4** | `feat(leads): Salesforce Path + Convert chrome` | [#133](https://github.com/Mohamedbeghanem/EvoSales/pull/133) | P2 | Path + Convert/Change Owner/Edit |
-| **P5** | `feat(records): 3-pane + Ask Evo rail` | [#135](https://github.com/Mohamedbeghanem/EvoSales/pull/135) | P4 | 3 columns; AI always on; WA instead of Slack |
-| **P6** | `feat(activities): composer + log call` | [#136](https://github.com/Mohamedbeghanem/EvoSales/pull/136) | P5 | Icon composer + HubSpot log-call fields |
-| **P7** | `feat(outbound): HubSpot sequence step editor` | [#137](https://github.com/Mohamedbeghanem/EvoSales/pull/137) | P2 | Vertical steps, templates, WA step, enroll empty |
-| **P8** | `feat(deals): workspace columns health + next step` | [#138](https://github.com/Mohamedbeghanem/EvoSales/pull/138) | P3 | Health score + next activity columns |
-| **P9** | `chore(ia): retire duplicate /leads board` | [#139](https://github.com/Mohamedbeghanem/EvoSales/pull/139) | P3, P4 | One leads list, one deals board |
+| **P0** | `docs: EvoCRM Mobbin contract` | [#129](https://github.com/Mohamedbeghanem/EvoCrm/pull/129) | — | Linked screens only; no new product claims |
+| **P1** | `feat(home): guided sales home` | [#130](https://github.com/Mohamedbeghanem/EvoCrm/pull/130) | P0 | Matches HubSpot home zones; actions hit real settings |
+| **P2** | `feat(crm): list chrome vs HubSpot deals table` | [#131](https://github.com/Mohamedbeghanem/EvoCrm/pull/131) | P0 | View tabs, chips, list/board toggle, Create CTA |
+| **P3** | `feat(deals): HubSpot board cards + options` | [#132](https://github.com/Mohamedbeghanem/EvoCrm/pull/132) | P2 | Inactivity, High/Low, compact/default persist |
+| **P4** | `feat(leads): Salesforce Path + Convert chrome` | [#133](https://github.com/Mohamedbeghanem/EvoCrm/pull/133) | P2 | Path + Convert/Change Owner/Edit |
+| **P5** | `feat(records): 3-pane + Ask Evo rail` | [#135](https://github.com/Mohamedbeghanem/EvoCrm/pull/135) | P4 | 3 columns; AI always on; WA instead of Slack |
+| **P6** | `feat(activities): composer + log call` | [#136](https://github.com/Mohamedbeghanem/EvoCrm/pull/136) | P5 | Icon composer + HubSpot log-call fields |
+| **P7** | `feat(outbound): HubSpot sequence step editor` | [#137](https://github.com/Mohamedbeghanem/EvoCrm/pull/137) | P2 | Vertical steps, templates, WA step, enroll empty |
+| **P8** | `feat(deals): workspace columns health + next step` | [#138](https://github.com/Mohamedbeghanem/EvoCrm/pull/138) | P3 | Health score + next activity columns |
+| **P9** | `chore(ia): retire duplicate /leads board` | [#139](https://github.com/Mohamedbeghanem/EvoCrm/pull/139) | P3, P4 | One leads list, one deals board |
 | **P10** | `test: Mobbin QA checklist Pest + screenshots` | this PR | P1–P9 | Checklist in §9 green (`EvoCrmP10MobbinQaTest`) |
 
 Do not start P7 until P2 list chrome is the only list pattern (avoid dual UI regression).
@@ -291,7 +291,7 @@ Do not start P7 until P2 list chrome is the only list pattern (avoid dual UI reg
 
 ## 10. Key decisions
 
-1. **EvoCRM is a surface on EvoSales**, not a new repo — same Laravel 13 / Inertia / React stack.
+1. **EvoCrm is this repo** (formerly EvoSales), not a second product — same Laravel 13 / Inertia / React stack. Evomerde is the retired DS fork, not this trunk.
 2. **HubSpot is chrome SoT; Salesforce is lead/opportunity SoT.** Mixing the other way (SF widget home + HS Path) is worse for this buyer.
 3. **WhatsApp replaces Slack and LinkedIn** on the record and in sequences.
 4. **No tickets, custom objects, CMS, Flow canvas in this plan.** Those are how HubSpot/Salesforce win enterprise seats, not how we outwork a 5–20 person DZ team.
@@ -325,7 +325,7 @@ Do not start P7 until P2 list chrome is the only list pattern (avoid dual UI reg
 ## 13. Open questions (resolved)
 
 1. **`/leads` Kommo board:** redirect in **P9** to `/crm/deals/board`. Do not keep a second pipeline product.
-2. **Product string:** keep **EvoSales** in the UI. EvoCRM is the docs/surface name only.
+2. **Product string:** **EvoCrm** is the product name. Env keys, `config/evosales.php`, and `--evosales-*` CSS stay as legacy identifiers.
 3. **Lead Path statuses:** Path steps are **configurable**, seeded to the Salesforce five (New → Contacted → Nurturing → Unqualified → Converted) and mapped onto existing `new` / `working` / `disqualified` / `qualified`.
 
 ---

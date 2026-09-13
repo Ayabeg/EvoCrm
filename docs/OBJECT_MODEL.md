@@ -1,6 +1,6 @@
-# EvoSales object model
+# EvoCrm object model
 
-All domain rows are scoped by `workspace_id` unless noted.
+All domain rows are scoped by `workspace_id` unless noted. Product: EvoCrm ([Mohamedbeghanem/EvoCrm](https://github.com/Mohamedbeghanem/EvoCrm)), renamed from EvoSales on 2026-09-13. Evomerde is the retired DS fork, not this trunk.
 
 ## Identity
 
@@ -94,4 +94,4 @@ Product 1─* DealLineItem
 Product 1─* QuoteItem
 ```
 
-Click-to-WA and lead forms resolve through `ContactIdentity::findOrCreate` so Desk and CRM stay on the same person. “Open in Desk” leaves EvoSales for `EVOSALES_INBOX_URL`.
+Click-to-WA and lead forms resolve through `ContactIdentity::findOrCreate` so Desk and CRM stay on the same person. “Open in Desk” leaves EvoCrm for `EVOSALES_INBOX_URL`.

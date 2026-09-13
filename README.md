@@ -1,8 +1,8 @@
-# EvoSales
+# EvoCrm
 
-Evotechly’s **all-in-one sales OS**: one workspace, one login, four rooms.
+EvoCrm is Evotechly’s **all-in-one sales OS** (CRM + Desk + Outbound + Ads): one workspace, one login, four rooms. Renamed from EvoSales on 2026-09-13. GitHub: [Mohamedbeghanem/EvoCrm](https://github.com/Mohamedbeghanem/EvoCrm).
 
-1. **Desk** — **[EvoDesk](https://github.com/Mohamedbeghanem/evodesk)** (Chatwoot Community, MIT) **embedded at `/inbox`**. The iframe source is `EVOSALES_INBOX_URL` (default `https://desk.evotechly.com`) plus optional `EVOSALES_INBOX_EMBED_PATH` (default `/`; Chatwoot serves the agent app at `/app`). Operators never leave the CRM hostname — there is no "Open Desk" eject. If EvoDesk sends `X-Frame-Options`, allow-frame the CRM origin on the desk; clearing the workspace inbox URL makes `/inbox` serve the native CRM conversation desk instead. EvoSales does **not** vendor Chatwoot, does **not** copy Chatwoot CSS/assets, and the Laravel page is **not** a Chatwoot clone. A lightweight **conversation history** list stays in CRM as contact ↔ deal context synced from the desk.
+1. **Desk** — **[EvoDesk](https://github.com/Mohamedbeghanem/evodesk)** (Chatwoot Community, MIT) **embedded at `/inbox`**. The iframe source is `EVOSALES_INBOX_URL` (default `https://desk.evotechly.com`) plus optional `EVOSALES_INBOX_EMBED_PATH` (default `/`; Chatwoot serves the agent app at `/app`). Operators never leave the CRM hostname — there is no "Open Desk" eject. If EvoDesk sends `X-Frame-Options`, allow-frame the CRM origin on the desk; clearing the workspace inbox URL makes `/inbox` serve the native CRM conversation desk instead. EvoCrm does **not** vendor Chatwoot, does **not** copy Chatwoot CSS/assets, and the Laravel page is **not** a Chatwoot clone. A lightweight **conversation history** list stays in CRM as contact ↔ deal context synced from the desk.
 2. **CRM (Sales Hub)** — list + detail + associations sidebar. Activity timeline (notes/tasks/calls/meetings), owners, Algeria city/wilaya lists, custom attributes, light quotes, light reports. **`/reports` is the analytics room**: default per-category rooms (Pipeline, Leads, Outbound, Ads, Desk, Activity) plus saved dashboards (name / owner / EvoViz widgets JSON), an add-widget picker that reuses the existing chart components, and global owner + date-range filters. Contact and deal records include **Ask Evo** (answers from this record's fields + recent activities; live OpenAI/Anthropic only when those env keys are set, otherwise a deterministic field stub) and deals show an Evo **deal health** score 0–100. Not a contact list. Not HubSpot Breeze. **`/crm/deals/board` is the deals Board** next to the existing list hub (`/crm/deals`): same pipeline stages (New → Qualified → Demo → Proposal → Won / Lost), drag a card to persist stage (`POST /crm/deals/{deal}/move`), per-column count + DZD total + weighted forecast, and a pipeline picker when the workspace has more than one pipeline. Weighted amount uses stage win probability (0–100): stored `stages.probability` if set, otherwise **New 10, Qualified 25, Demo 50, Proposal 75, Won 100, Lost 0** (unknown open stages 20) — see `config/evosales.php`. **`/leads` is the Kommo-style pipeline board**: horizontal stages (New → Qualified → Demo → Proposal → Won / Lost) with colored underlines, cards showing contact/company, DZD amount, and next task; quick-add on the first column; a top strip for Active / tasks due today / without tasks / overdue / new today; search. Dragging a card between stages updates the deal (`POST /crm/deals/{deal}/move`). It is the same deal engine as `/crm/deals` — no parallel pipeline.
 3. **Ads Hub** — Meta ad accounts, campaigns, ad sets, ads, and a per-campaign funnel board: Impressions → Clicks → Conversations/Leads → Qualified → Deals → Won. Official Marketing API sync when `META_*` env is set (`POST /ads/sync`); demo seed data otherwise. Click-to-WhatsApp and lead-form campaigns only — lead forms ingest through a workspace-scoped `/webhooks/meta/leads/{webhookKey}` endpoint into CRM contacts/leads/deals.
 4. **Outbound Center** — the full email department at `/outbound`: SMTP + IMAP mailboxes (warmup status, daily limit, test send, full edit), sending domains with an SPF/DKIM/DMARC checklist (records stored for the operator to publish; manual verified mark — no DNS API), HTML+text templates with `{{variables}}` and a rendered preview, email sequences (per-step delay/mailbox/template, enroll contacts or whole CRM lists, pause/resume), **broadcast campaigns** (one-shot newsletter to all contacts with email or a saved contact list, scheduled or send-now, every recipient logged as an OutboundMessage), outbox with deferred states, IMAP replies, honest reports (sent / pixel opens / link clicks / IMAP replies; bounces need ESP webhooks), quiet hours, unsubscribe, suppression. `outbound:run` dispatches due sequence steps and campaign messages every minute; `outbound:poll-replies` reads IMAP. The unsubscribe link and all tracking URLs stay on the CRM hostname.
@@ -24,7 +24,7 @@ Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotech
 
 ## Brand
 
-EvoSales is **white + black + orange**. Do not invent more.
+EvoCrm is **white + black + orange**. Do not invent more.
 
 - Company mark: `public/brand/evotechly/mark.svg` (artwork fill `#EC6025`, do not recolor). Favicon is the mark.
 - Tokens in `resources/css/app.css`: canvas `#FFFFFF`, canvas-soft `#F7F7F6` (page wash only), ink `#111111`, mute `#525252`, hairline `#E5E5E5`, mark/brand `#EC6025`, Geist.
@@ -32,7 +32,7 @@ EvoSales is **white + black + orange**. Do not invent more.
 - **Two faces, chosen in Settings → Appearance** (persisted via the `appearance` cookie + `localStorage`; `app.blade.php` stamps `class="dark"` on `<html>` only for an explicit Dark choice):
   - **Light Cabinet** (default): white cards + hairlines, Chatwoot dark rail (`#151718`) on the left, ~52px topbar.
   - **Dark Cabinet**: TRUE BLACK — canvas `#000000`, elevated surfaces `#0A0A0A`, hairline `#1F1F1F`, ink `#F5F5F5`, mute `#A3A3A3`. Neutral grays only: no navy, blue, indigo, or teal tints in dark tokens. The rail reads black (`#000000`) with the same Chatwoot structure.
-- Titles and auth mail: **EvoSales · Evotechly**.
+- Titles and auth mail: **EvoCrm · Evotechly**.
 
 ## Stack
 
@@ -133,7 +133,7 @@ See [docs/evolution.md](docs/evolution.md). Create instances only with `WHATSAPP
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/OBJECT_MODEL.md](docs/OBJECT_MODEL.md)
 - [docs/evolution.md](docs/evolution.md)
-- [docs/evocrm-plan.md](docs/evocrm-plan.md) — EvoCRM build (HubSpot chrome + Salesforce Path, Mobbin as source of truth)
+- [docs/evocrm-plan.md](docs/evocrm-plan.md) — EvoCrm build (HubSpot chrome + Salesforce Path, Mobbin as source of truth)
 
 ## Secrets
 
