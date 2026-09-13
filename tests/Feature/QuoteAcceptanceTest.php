@@ -1,12 +1,14 @@
 <?php
 
 use App\Models\Activity;
+use App\Models\AuditEvent;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Integration;
 use App\Models\Quote;
 use App\Models\User;
 use App\Services\Crm\QuoteDocument;
+use App\Services\Crm\WorkflowRunner;
 use Illuminate\Support\Facades\Http;
 
 function publicQuote(User $user, array $overrides = []): Quote
@@ -173,6 +175,24 @@ it('still accepts the quote when WhatsApp confirmation fails', function () {
         ->and(Activity::query()->where('type', 'quote_accepted')->sole()->meta['whatsapp_confirm'] ?? null)->toBe('failed');
 });
 
+it('rolls back quote acceptance when the workflow hook fails after the quote save', function () {
+    $user = User::factory()->create();
+    $quote = publicQuote($user, ['public_token' => 'wf-fail']);
+
+    $workflows = Mockery::mock(WorkflowRunner::class);
+    $workflows->shouldReceive('handleDealCreated')->once()->andThrow(new RuntimeException('workflow down'));
+    $this->app->instance(WorkflowRunner::class, $workflows);
+
+    $this->post('/q/wf-fail/accept')->assertServerError();
+
+    $fresh = $quote->fresh();
+
+    expect($fresh->status)->not->toBe('accepted')
+        ->and($fresh->accepted_at)->toBeNull()
+        ->and(Activity::query()->where('type', 'quote_accepted')->where('deal_id', $quote->deal_id)->exists())->toBeFalse()
+        ->and(AuditEvent::query()->where('action', 'quote.accepted')->where('subject_id', $quote->id)->exists())->toBeFalse();
+});
+
 it('does not send WhatsApp again on a second accept', function () {
     config()->set('evolution.base_url', 'https://evolution.example.test');
     config()->set('evolution.api_key', 'evo-key');
@@ -191,4 +211,3 @@ it('does not send WhatsApp again on a second accept', function () {
     $this->post('/q/wa-once/accept')->assertRedirect();
     Http::assertNothingSent();
 });
-

@@ -4,10 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
-use App\Services\Crm\ActivityRecorder;
-use App\Services\Crm\QuoteWhatsApp;
-use App\Services\Crm\WorkflowRunner;
-use App\Services\Operations\AuditLogger;
+use App\Services\Crm\QuoteAcceptor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,46 +36,9 @@ class QuoteAcceptanceController extends Controller
         ]);
     }
 
-    public function accept(Request $request, string $token, ActivityRecorder $activities, WorkflowRunner $workflows, AuditLogger $audit, QuoteWhatsApp $whatsapp): RedirectResponse
+    public function accept(Request $request, string $token, QuoteAcceptor $acceptor): RedirectResponse
     {
-        $quote = $this->resolve($token);
-
-        if ($quote->accepted_at) {
-            return back();
-        }
-
-        $quote->forceFill([
-            'status' => 'accepted',
-            'accepted_at' => now(),
-            'accepted_ip' => $request->ip(),
-        ])->save();
-
-        $activity = $activities->record($quote->workspace, [
-            'type' => 'quote_accepted',
-            'subject' => 'Quote accepted',
-            'body' => 'Quote #'.$quote->id.' was accepted from the public link.',
-            'contact_id' => $quote->deal?->contact_id,
-            'deal_id' => $quote->deal_id,
-            'meta' => ['quote_id' => $quote->id],
-        ]);
-
-        if ($quote->workspace) {
-            $audit->record(
-                $quote->workspace,
-                'quote.accepted',
-                'Quote #'.$quote->id.' was accepted from the public link.',
-                null,
-                $quote,
-                ['ip' => $request->ip()],
-                $request->ip(),
-            );
-
-            $whatsapp->confirm($quote, $activity);
-        }
-
-        if ($quote->deal) {
-            $workflows->handleDealCreated($quote->deal);
-        }
+        $acceptor->accept($this->resolve($token), $request->ip());
 
         return back();
     }
