@@ -21,6 +21,7 @@ const OBJECT_NOUNS: Record<ListObjectType, string> = {
     company: 'companies',
     deal: 'deals',
     ticket: 'tickets',
+    quote: 'quotes',
 };
 
 export function CrmListShell({
@@ -46,6 +47,7 @@ export function CrmListShell({
     layoutToggle,
     pipelineSwitcher,
     extraQuery,
+    primaryClassName,
     className,
     contentClassName,
     children,
@@ -73,6 +75,7 @@ export function CrmListShell({
     layoutToggle?: ReactNode;
     pipelineSwitcher?: ReactNode;
     extraQuery?: Record<string, string | number | null | undefined>;
+    primaryClassName?: string;
     className?: string;
     contentClassName?: string;
     children: ReactNode | ((columns: ListViewColumn[]) => ReactNode);
@@ -113,6 +116,7 @@ export function CrmListShell({
                     window.location.href = createHref ?? `${basePath}?create=1`;
                 }}
                 secondary={headerActions}
+                primaryClassName={primaryClassName}
             />
             {banner}
             <ListToolbar

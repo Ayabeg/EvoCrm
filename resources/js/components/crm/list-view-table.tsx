@@ -67,6 +67,19 @@ type TicketRow = {
     owner?: { name: string } | null;
 };
 
+type QuoteRow = {
+    id: number;
+    title: string;
+    status: string;
+    status_label?: string;
+    total_cents?: number | null;
+    created_at?: string | null;
+    expires_at?: string | null;
+    sent_at?: string | null;
+    owner?: { name: string } | null;
+    deal?: { id: number; title: string } | null;
+};
+
 const ALGIERS = 'Africa/Algiers';
 
 function formatDate(value?: string | null, withTime = false): string {
@@ -256,6 +269,27 @@ function titleCase(value?: string | null): string {
     return value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+function renderQuoteCell(columnId: string, row: QuoteRow): string {
+    switch (columnId) {
+        case 'title':
+            return row.title || `Quote #${row.id}`;
+        case 'amount':
+            return formatDzd(row.total_cents ?? 0);
+        case 'status':
+            return row.status_label ?? titleCase(row.status);
+        case 'owner':
+            return row.owner?.name ?? '—';
+        case 'created_at':
+            return formatDate(row.created_at);
+        case 'expires_at':
+            return row.expires_at ? formatDate(row.expires_at) : 'No expiration';
+        case 'sent_at':
+            return formatDate(row.sent_at);
+        default:
+            return '—';
+    }
+}
+
 function renderTicketCell(columnId: string, row: TicketRow): string {
     switch (columnId) {
         case 'number':
@@ -294,13 +328,17 @@ function primaryColumnId(entity: ListObjectType): string {
         return 'subject';
     }
 
+    if (entity === 'quote') {
+        return 'title';
+    }
+
     return 'name';
 }
 
 function renderCell(
     entity: ListObjectType,
     columnId: string,
-    row: ContactRow | DealRow | CompanyRow | TicketRow,
+    row: ContactRow | DealRow | CompanyRow | TicketRow | QuoteRow,
 ): string {
     if (entity === 'contact') {
         return renderContactCell(columnId, row as ContactRow);
@@ -312,6 +350,10 @@ function renderCell(
 
     if (entity === 'ticket') {
         return renderTicketCell(columnId, row as TicketRow);
+    }
+
+    if (entity === 'quote') {
+        return renderQuoteCell(columnId, row as QuoteRow);
     }
 
     return renderCompanyCell(columnId, row as CompanyRow);
@@ -333,7 +375,7 @@ export default function ListViewTable({
     onTogglePage,
 }: {
     entity: ListObjectType;
-    rows: ContactRow[] | DealRow[] | CompanyRow[] | TicketRow[];
+    rows: ContactRow[] | DealRow[] | CompanyRow[] | TicketRow[] | QuoteRow[];
     columnDefs: ListColumnDef[];
     columns: ListViewColumn[];
     basePath: string;

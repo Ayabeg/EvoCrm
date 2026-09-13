@@ -54,6 +54,15 @@ class ListViewConfig
                 ['id' => 'created_at', 'label' => 'Create date', 'defaultVisible' => true],
                 ['id' => 'sla_due_at', 'label' => 'SLA', 'defaultVisible' => true],
             ],
+            'quote' => [
+                ['id' => 'title', 'label' => 'Quote', 'defaultVisible' => true],
+                ['id' => 'amount', 'label' => 'Amount', 'defaultVisible' => true],
+                ['id' => 'status', 'label' => 'Status', 'defaultVisible' => true],
+                ['id' => 'owner', 'label' => 'Owner', 'defaultVisible' => true],
+                ['id' => 'created_at', 'label' => 'Create date', 'defaultVisible' => true],
+                ['id' => 'expires_at', 'label' => 'Expiration', 'defaultVisible' => true],
+                ['id' => 'sent_at', 'label' => 'Sent', 'defaultVisible' => false],
+            ],
             default => [],
         };
     }
@@ -104,6 +113,11 @@ class ListViewConfig
                 ['id' => 'channel', 'label' => 'Channel', 'type' => 'select', 'options' => ['whatsapp_cloud', 'email', 'manual']],
                 ['id' => 'unassigned', 'label' => 'Unassigned', 'type' => 'boolean'],
                 ['id' => 'unanswered', 'label' => 'Unanswered', 'type' => 'boolean'],
+            ],
+            'quote' => [
+                ['id' => 'status', 'label' => 'Quote status', 'type' => 'select', 'options' => ['draft', 'sent', 'accepted']],
+                ['id' => 'owner', 'label' => 'Owner', 'type' => 'select'],
+                ['id' => 'created', 'label' => 'Create date', 'type' => 'select', 'options' => ['today', '7d', '30d', '90d']],
             ],
             default => [],
         };

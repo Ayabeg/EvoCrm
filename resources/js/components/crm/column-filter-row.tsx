@@ -34,37 +34,45 @@ export default function ColumnFilterRow({
     const [advanced, setAdvanced] = useState(false);
     const fields = filterFields(activeFilters);
     const statusOptions =
-        entity === 'ticket'
+        entity === 'quote'
             ? [
-                  { value: 'new', label: 'New' },
-                  { value: 'waiting_on_contact', label: 'Waiting on contact' },
-                  { value: 'waiting_on_us', label: 'Waiting on us' },
-                  { value: 'closed', label: 'Closed' },
+                  { value: 'draft', label: 'Draft' },
+                  { value: 'sent', label: 'Sent' },
+                  { value: 'accepted', label: 'Accepted' },
               ]
-            : entity === 'deal' || entity === 'company'
+            : entity === 'ticket'
               ? [
-                    { value: 'open', label: 'Open' },
-                    { value: 'won', label: 'Won' },
-                    { value: 'lost', label: 'Lost' },
+                    { value: 'new', label: 'New' },
+                    { value: 'waiting_on_contact', label: 'Waiting on contact' },
+                    { value: 'waiting_on_us', label: 'Waiting on us' },
+                    { value: 'closed', label: 'Closed' },
                 ]
-              : [
-                    { value: 'new', label: 'New lead' },
-                    { value: 'working', label: 'Working' },
-                    { value: 'qualified', label: 'Qualified' },
-                    { value: 'disqualified', label: 'Disqualified' },
-                ];
+              : entity === 'deal' || entity === 'company'
+                ? [
+                      { value: 'open', label: 'Open' },
+                      { value: 'won', label: 'Won' },
+                      { value: 'lost', label: 'Lost' },
+                  ]
+                : [
+                      { value: 'new', label: 'New lead' },
+                      { value: 'working', label: 'Working' },
+                      { value: 'qualified', label: 'Qualified' },
+                      { value: 'disqualified', label: 'Disqualified' },
+                  ];
 
     const chip =
         'inline-flex h-7 max-w-full items-center gap-1 rounded-sm border border-hairline bg-canvas px-2 text-[12px] text-ink';
     const selectClass = 'max-w-[9rem] bg-transparent text-[12px] text-ink outline-none';
     const ownerLabel =
-        entity === 'ticket'
-            ? 'Ticket owner'
-            : entity === 'deal'
-              ? 'Deal owner'
-              : entity === 'company'
-                ? 'Company owner'
-                : 'Contact owner';
+        entity === 'quote'
+            ? 'Quote owner'
+            : entity === 'ticket'
+              ? 'Ticket owner'
+              : entity === 'deal'
+                ? 'Deal owner'
+                : entity === 'company'
+                  ? 'Company owner'
+                  : 'Contact owner';
 
     return (
         <div className="min-w-0 flex-1">
@@ -98,7 +106,23 @@ export default function ColumnFilterRow({
                         ))}
                     </select>
                 </label>
-                {entity === 'ticket' ? (
+                {entity === 'quote' ? (
+                    <label className={chip}>
+                        Create date
+                        <select
+                            name="created"
+                            defaultValue={String(fields.created ?? '')}
+                            className={selectClass}
+                            onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                        >
+                            <option value="">Any time</option>
+                            <option value="today">Today</option>
+                            <option value="7d">Last 7 days</option>
+                            <option value="30d">Last 30 days</option>
+                            <option value="90d">Last 90 days</option>
+                        </select>
+                    </label>
+                ) : entity === 'ticket' ? (
                     <label className={chip}>
                         Priority
                         <select
@@ -153,7 +177,9 @@ export default function ColumnFilterRow({
                           ? 'Deal status'
                           : entity === 'ticket'
                             ? 'Ticket status'
-                            : 'Status'}
+                            : entity === 'quote'
+                              ? 'Quote status'
+                              : 'Status'}
                     <select
                         name="status"
                         defaultValue={String(fields.status ?? '')}
