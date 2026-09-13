@@ -58,7 +58,7 @@ it('applies MOTION 3 press, rail, drawer, and toast without page hijacks', funct
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $docs = file_get_contents(base_path('docs/visual-system/aurora-motion.md'));
 
-    expect($app)->toContain("aurora-motion.css");
+    expect($app)->toContain('aurora-motion.css');
 
     expect($motion)->toContain('scale(0.98)')
         ->and($motion)->toContain('scale(0.97)')

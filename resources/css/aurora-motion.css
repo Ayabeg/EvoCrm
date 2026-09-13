@@ -1,6 +1,6 @@
 /*
  * Aurora MOTION 3 (calm) — EvoCrm product overlay.
- * Transform and opacity only. 200–300ms. No springs, no page fades,
+ * Transform and opacity only. 200–300ms. No bounce, no page fades,
  * no scroll hijacks. Unlayered so press/rail beats @layer aurora-components.
  * See docs/visual-system/aurora-motion.md
  */

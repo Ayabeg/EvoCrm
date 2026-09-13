@@ -11,7 +11,7 @@ Calm product motion for EvoCrm. Tokens live in `resources/js/components/aurora.c
 |------|--------|
 | Properties | `transform` and `opacity` only (color/background may fade with the same timing) |
 | Duration | 200–300ms (`--motion-duration-fast` 160ms / `--motion-duration-medium` 240ms) |
-| Easing | `--motion-ease-out` `cubic-bezier(0.2, 0.8, 0.2, 1)` — no springs |
+| Easing | `--motion-ease-out` `cubic-bezier(0.2, 0.8, 0.2, 1)` — no bounce |
 | CTA press | `scale(0.98)` on `.aurora-btn:active` |
 | Rail press | `scale(0.97)` on `.app-rail-item:active` |
 | Drawer | Sheet open 300ms / close 200ms; `[data-aurora=drawer]` |
@@ -22,7 +22,7 @@ Calm product motion for EvoCrm. Tokens live in `resources/js/components/aurora.c
 
 - Framer page transitions
 - Scroll hijacks
-- Bounce / overshoot / “money” springs
+- Bounce / overshoot / money-style physics
 - Perpetual loops on CRM chrome
 
 ## Surfaces
