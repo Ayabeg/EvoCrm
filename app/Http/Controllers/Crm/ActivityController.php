@@ -63,6 +63,8 @@ class ActivityController extends Controller
 
     public function store(Request $request, ActivityRecorder $recorder): RedirectResponse
     {
+        $this->authorize('create', Activity::class);
+
         $workspace = $request->user()->workspace;
 
         $data = $request->validate([

@@ -107,6 +107,8 @@ class ContactController extends Controller
 
     public function store(Request $request, ContactIdentity $identity): RedirectResponse
     {
+        $this->authorize('create', Contact::class);
+
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:120'],
             'last_name' => ['nullable', 'string', 'max:120'],
@@ -129,7 +131,7 @@ class ContactController extends Controller
 
     public function update(Request $request, Contact $contact, CustomAttributes $attributes): RedirectResponse
     {
-        abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $contact);
 
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:120'],
@@ -171,7 +173,7 @@ class ContactController extends Controller
 
     public function updateAttributes(Request $request, Contact $contact, CustomAttributes $attributes): RedirectResponse
     {
-        abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $contact);
 
         $data = $request->validate([
             'attributes' => ['required', 'array'],

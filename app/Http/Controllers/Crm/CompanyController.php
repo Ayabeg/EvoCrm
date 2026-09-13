@@ -75,6 +75,8 @@ class CompanyController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Company::class);
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:180'],
             'domain' => ['nullable', 'string', 'max:180'],
@@ -99,7 +101,7 @@ class CompanyController extends Controller
 
     public function update(Request $request, Company $company, CustomAttributes $attributes): RedirectResponse
     {
-        abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $company);
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:180'],

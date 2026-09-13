@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Activity;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
+use App\Models\Quote;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workspace;
@@ -15,6 +17,12 @@ use App\Observers\DealObserver;
 use App\Observers\LeadObserver;
 use App\Observers\TicketObserver;
 use App\Observers\WorkspaceObserver;
+use App\Policies\ActivityPolicy;
+use App\Policies\CompanyPolicy;
+use App\Policies\ContactPolicy;
+use App\Policies\DealPolicy;
+use App\Policies\LeadPolicy;
+use App\Policies\QuotePolicy;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Connectors\FakeGoogleApiClient;
 use App\Services\Connectors\GoogleApiClient;
@@ -35,6 +43,7 @@ use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -68,6 +77,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Gate::policy(Contact::class, ContactPolicy::class);
+        Gate::policy(Company::class, CompanyPolicy::class);
+        Gate::policy(Lead::class, LeadPolicy::class);
+        Gate::policy(Deal::class, DealPolicy::class);
+        Gate::policy(Quote::class, QuotePolicy::class);
+        Gate::policy(Activity::class, ActivityPolicy::class);
 
         Company::observe(CompanyObserver::class);
         Contact::observe(ContactObserver::class);

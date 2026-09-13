@@ -16,7 +16,8 @@ class QuoteController extends Controller
 {
     public function store(Request $request, Deal $deal, QuoteTotals $totals): RedirectResponse
     {
-        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $deal);
+        $this->authorize('create', Quote::class);
 
         $data = $request->validate([
             'status' => ['nullable', 'in:draft,sent,accepted'],
@@ -46,7 +47,7 @@ class QuoteController extends Controller
 
     public function update(Request $request, Quote $quote, QuoteTotals $totals): RedirectResponse
     {
-        abort_unless((int) $quote->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $quote);
         abort_if($quote->isImmutable(), 422, 'Sent quotes cannot be edited.');
 
         $data = $request->validate([

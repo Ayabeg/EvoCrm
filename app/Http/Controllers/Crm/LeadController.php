@@ -34,6 +34,8 @@ class LeadController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Lead::class);
+
         $data = $request->validate([
             'contact_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:180'],
@@ -121,7 +123,7 @@ class LeadController extends Controller
 
     public function update(Request $request, Lead $lead): RedirectResponse
     {
-        abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $lead);
 
         if ($request->exists('owner_id') && $request->input('owner_id') === '') {
             $request->merge(['owner_id' => null]);
@@ -168,7 +170,7 @@ class LeadController extends Controller
 
     public function qualify(Request $request, Lead $lead, LeadConverter $converter): RedirectResponse
     {
-        abort_unless((int) $lead->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('qualify', $lead);
 
         $data = $request->validate([
             'mode' => ['nullable', 'in:create,link'],

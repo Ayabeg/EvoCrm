@@ -7,19 +7,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
-use App\Models\Product;
-use App\Models\Stage;
 use App\Models\DealHealthSnapshot;
 use App\Models\DealSuggestion;
+use App\Models\Product;
+use App\Models\Stage;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
-use App\Services\LeadOs\DealHealthScorer;
-use App\Services\LeadOs\NextMoveAdvisor;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Crm\DealBoardOptions;
 use App\Services\Crm\PipelineManager;
 use App\Services\Crm\StagePropertyGate;
+use App\Services\LeadOs\DealHealthScorer;
+use App\Services\LeadOs\NextMoveAdvisor;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -222,6 +222,8 @@ class DealController extends Controller
 
     public function store(Request $request, ContactIdentity $identity): RedirectResponse
     {
+        $this->authorize('create', Deal::class);
+
         $data = $request->validate([
             'contact_id' => ['nullable', 'integer'],
             'contact_name' => ['nullable', 'string', 'max:180'],
@@ -288,7 +290,7 @@ class DealController extends Controller
 
     public function update(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
     {
-        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $deal);
 
         $data = $request->validate([
             'title' => ['required', 'string', 'max:180'],
@@ -368,7 +370,7 @@ class DealController extends Controller
 
     public function updateAttributes(Request $request, Deal $deal, CustomAttributes $attributes): RedirectResponse
     {
-        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('update', $deal);
 
         $data = $request->validate([
             'attributes' => ['required', 'array'],
@@ -387,7 +389,7 @@ class DealController extends Controller
 
     public function move(Request $request, Deal $deal): RedirectResponse
     {
-        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+        $this->authorize('move', $deal);
 
         $data = $request->validate([
             'stage_id' => ['required', 'integer'],
