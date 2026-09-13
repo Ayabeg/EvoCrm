@@ -1,12 +1,17 @@
 <?php
 
 it('keeps Aurora Button as the only product button primitive', function () {
+    $ds = file_get_contents(resource_path('js/ds/components/Button.tsx'));
     $adapter = file_get_contents(resource_path('js/components/ui/button.tsx'));
     $bridge = file_get_contents(resource_path('js/lib/aurora/shadcn-bridge.ts'));
     $aurora = file_get_contents(resource_path('js/components/ui/aurora/button.tsx'));
 
-    expect($adapter)->toContain("from '@/components/ui/aurora/button'")
-        ->and($adapter)->toContain('aurora-btn--aurora aurora-btn--filled')
+    expect($ds)->toContain("from '@/components/ui/aurora/button'")
+        ->and($ds)->toContain('aurora-btn--aurora aurora-btn--filled')
+        ->and($ds)->not->toContain('EvoButton')
+        ->and($ds)->not->toContain('PremiumButton')
+        ->and($ds)->not->toContain('GlassButton')
+        ->and($adapter)->toContain("from '@/ds/components/Button'")
         ->and($adapter)->not->toContain('EvoButton')
         ->and($adapter)->not->toContain('PremiumButton')
         ->and($adapter)->not->toContain('GlassButton')

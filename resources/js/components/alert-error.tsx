@@ -1,5 +1,5 @@
 import { AlertCircleIcon } from 'lucide-react';
-import { Callout } from '@/components/ui/aurora/callout';
+import { Callout } from '@/components/ui/callout';
 
 /**
  * Product form-error surface.

@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import PasswordInput from '@/components/password-input';
-import { FieldError } from '@/components/ui/aurora/field';
+import { FieldError } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';

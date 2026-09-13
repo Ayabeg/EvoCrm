@@ -7,7 +7,7 @@
 
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { Check, ChevronRight, Circle } from "lucide-react"
+import { CaretRight, Check, Circle } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { usePortalContainer } from "@/lib/aurora/portal-container"
 
@@ -92,7 +92,7 @@ function DropdownMenuSubTrigger({ ref, className, inset, children, style, ...pro
       {...props}
     >
       {children}
-      <ChevronRight className="ml-auto size-4 opacity-60" aria-hidden />
+      <CaretRight className="ml-auto size-4 opacity-60" weight="bold" aria-hidden />
     </DropdownMenuPrimitive.SubTrigger>
   )
 }
@@ -205,7 +205,8 @@ function DropdownMenuRadioItem({ ref, className, children, style, ...props }: Re
       <span className="absolute left-2 flex size-3.5 items-center justify-center">
         <DropdownMenuPrimitive.ItemIndicator>
           <Circle
-            className="size-2 fill-current"
+            className="size-2"
+            weight="fill"
             style={{ color: "var(--aurora-accent-primary)" }}
             aria-hidden
           />

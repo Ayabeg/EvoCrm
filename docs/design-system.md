@@ -435,9 +435,44 @@ resources/js/
   components/crm/              # shrinks to domain widgets (Ask Evo, pipeline cards)
 ```
 
-Until P16, `components/ui/button.tsx` may re-export `ds/components/Button` so existing imports keep compiling (strangler). Do not add new Aurora variants.
+Until P16, `components/ui/button.tsx` re-exports `ds/components/Button` so existing imports keep compiling (strangler). Do not add new Aurora variants.
 
 Icon family: **Phosphor** (already on the rail). Remove Lucide from product chrome in P03/P14. `components.json` `iconLibrary` should be updated when the DS owns icons.
+
+### P03 lock — canonical primitives
+
+Implementations live in `resources/js/ds/components/*`. `@/components/ui/*` re-exports them so existing product imports keep working. Aurora is the paint layer, not a second theme.
+
+| Product import (`@/components/ui/…`) | DS module | Implementation | Notes |
+|---|---|---|---|
+| `button` | `ds/components/Button` | Aurora Button via `shadcn-bridge` | Default = filled accent `#E8530E`, white label, **36px** |
+| `input` | `ds/components/Input` | Aurora Input + optional label/hint/error | Label above, error below. `h-9` / 36px |
+| `select` | `ds/components/Select` | Aurora Select + optional label/hint/error | Trigger `h-9`. Label above, error below |
+| `native-select` | — | Aurora NativeSelect | Same 36px / 8px control |
+| `tabs` | `ds/components/Tabs` | Aurora Tabs | Trigger `h-9`. Accent underline on active only |
+| `badge` | `ds/components/Badge` | Aurora Badge via `shadcn-bridge` | `default` → accent solid; `secondary`/`outline` stay paper |
+| `avatar` | `ds/components/Avatar` | Aurora Avatar adapter | Ink fallback, no accent ring by default |
+| `checkbox` | `ds/components/Checkbox` | Aurora Checkbox | Phosphor check / minus |
+| `dropdown-menu` | `ds/components/Dropdown` | Aurora dropdown | |
+| `tooltip` | `ds/components/Tooltip` | Aurora tooltip | |
+| `dialog` | `ds/components/Modal` | Aurora dialog | `Modal*` aliases on the DS export |
+| `sheet` + `drawer` | `ds/components/Drawer` | Aurora sheet | Drawer is the same primitive |
+| `sonner` + `toast` | `ds/components/Toast` | Sonner | Aurora toast stays unused |
+| `skeleton` | `ds/components/Skeleton` | Aurora skeleton | |
+| `label` | — | Aurora label | |
+| `textarea` | — | Aurora textarea | |
+| `switch` | — | Aurora switch | |
+| `separator` | — | Aurora separator | |
+| `popover` | — | Aurora popover | |
+| `field` | — | Aurora Field | `FieldError` for auth forms |
+| `callout` | — | Aurora Callout | Canonical status surface; `alert.tsx` is the shadcn adapter |
+| `empty-state` | `ds/components/EmptyState` | Aurora EmptyState + product illustration | |
+
+**P04 should import `@/components/ui/*` or `@/ds/components/*` — not `ui/aurora/*`.** Command palette is P14; do not add a third command primitive here.
+
+Aurora-only internals (`prompt-input`, unused `combobox` / `data-table` / `pagination` / `toast`) stay under `ui/aurora/` until P16. Do not import them from product pages.
+
+Control metrics in this phase: height **36px**, radius **8px** (`--aurora-radius-1`), focus ring `--color-focus-ring` (accent). Sidebar width stays 56px until P04.
 
 ---
 

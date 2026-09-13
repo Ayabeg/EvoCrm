@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X } from "lucide-react"
+import { X } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 function devWarn(message: string): void {
@@ -254,7 +254,7 @@ function Input({
           }
         }}
       >
-        <X className="h-2.5 w-2.5" strokeWidth={1.8} aria-hidden="true" />
+        <X className="h-2.5 w-2.5" weight="bold" aria-hidden="true" />
       </button>
     ) : endAdornment
 

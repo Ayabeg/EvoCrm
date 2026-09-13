@@ -11,4 +11,4 @@ export {
     DialogTitle,
     DialogTrigger,
     type DialogContentProps,
-} from '@/components/ui/aurora/dialog';
+} from '@/ds/components/Modal';

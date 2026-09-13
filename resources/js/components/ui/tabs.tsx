@@ -5,4 +5,4 @@ export {
     TabsContent,
     TabsList,
     TabsTrigger,
-} from '@/components/ui/aurora/tabs';
+} from '@/ds/components/Tabs';
