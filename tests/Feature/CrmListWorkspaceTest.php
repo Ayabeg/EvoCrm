@@ -32,7 +32,7 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
     $empty = file_get_contents(resource_path('js/components/crm/list-chrome.tsx'));
     $crmShell = file_get_contents(resource_path('js/components/crm/crm-shell.tsx'));
 
-    expect($shell)->toContain('CrmObjectHeader')
+    expect($shell)->toContain('DataWorkspace')
         ->and($shell)->toContain('data-crm="list-workspace"')
         ->and($shell)->not->toContain('RecordHubPanel')
         ->and($shell)->not->toContain('RecordHubHeader');
