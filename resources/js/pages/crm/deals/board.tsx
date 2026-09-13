@@ -107,9 +107,9 @@ function DealCard({
     const compact = options.card_style === 'compact';
     const association = deal.company_name || deal.contact_name || 'No company';
     const inactiveLabel =
-        deal.inactive_days == null
-            ? 'No activity'
-            : `No activity for ${deal.inactive_days} day${deal.inactive_days === 1 ? '' : 's'}`;
+        deal.inactive_days && deal.inactive_days >= 1
+            ? `No activity for ${deal.inactive_days} day${deal.inactive_days === 1 ? '' : 's'}`
+            : 'No activity';
 
     return (
         <PipelineKanbanCard
