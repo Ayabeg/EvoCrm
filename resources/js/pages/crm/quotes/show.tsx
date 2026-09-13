@@ -271,7 +271,7 @@ export default function QuoteShow({ quote }: { quote: QuoteRecord }) {
                                                     <Button
                                                         disabled={processing}
                                                         size="sm"
-                                                        className="h-8 bg-[var(--evosales-mark,#d9500f)] text-white hover:bg-[var(--evosales-mark-hover,#bf460d)]"
+                                                        className="h-8 bg-brand text-white hover:bg-brand-hover"
                                                     >
                                                         <PaperPlaneTilt className="size-3.5" />
                                                         {sent ? 'Resend quote' : 'Email quote'}

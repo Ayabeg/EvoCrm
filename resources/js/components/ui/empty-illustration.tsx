@@ -70,18 +70,18 @@ function Frame({
             style={{
                 width: dim,
                 height: dim,
-                background: 'var(--evosales-canvas-soft, #eaeaea)',
+                background: 'var(--color-bg)',
                 border: '1.5px dashed color-mix(in srgb, var(--evosales-ink, #000) 16%, var(--evosales-hairline, #d4d4d4))',
                 borderRadius: 2,
             }}
         >
             <span
                 className="absolute top-1 left-1 h-2 w-2 border-t border-l"
-                style={{ borderColor: 'var(--evosales-mark, #d9500f)' }}
+                style={{ borderColor: 'var(--color-accent)' }}
             />
             <span
                 className="absolute right-1 bottom-1 h-2 w-2 border-r border-b"
-                style={{ borderColor: 'var(--evosales-mark, #d9500f)' }}
+                style={{ borderColor: 'var(--color-accent)' }}
             />
             {children}
         </span>
@@ -95,7 +95,7 @@ function ContactsMark({ size }: { size: 'sm' | 'md' }) {
         <span className="relative inline-flex">
             <AddressBook size={icon} weight="regular" />
             <span
-                className="absolute -right-2 -bottom-1.5 flex items-center justify-center bg-[var(--evosales-canvas-soft,#eaeaea)]"
+                className="absolute -right-2 -bottom-1.5 flex items-center justify-center bg-canvas"
                 style={{
                     width: size === 'sm' ? 16 : 20,
                     height: size === 'sm' ? 16 : 20,
@@ -104,7 +104,7 @@ function ContactsMark({ size }: { size: 'sm' | 'md' }) {
                 <Tray
                     size={size === 'sm' ? 12 : 16}
                     weight="regular"
-                    className="text-[var(--evosales-mark,#d9500f)]"
+                    className="text-brand"
                 />
             </span>
         </span>
@@ -119,7 +119,7 @@ function DealsMark({ size }: { size: 'sm' | 'md' }) {
             <Handshake size={icon} weight="regular" />
             <span
                 className="mt-1 h-px w-6"
-                style={{ background: 'var(--evosales-mark, #d9500f)' }}
+                style={{ background: 'var(--color-accent)' }}
             />
         </span>
     );
@@ -139,7 +139,7 @@ function PipelineMark({ size }: { size: 'sm' | 'md' }) {
                         height: `${Math.round(h * ratio)}px`,
                         background:
                             index === 1
-                                ? 'color-mix(in srgb, var(--evosales-mark, #d9500f) 18%, transparent)'
+                                ? 'color-mix(in srgb, var(--color-accent) 18%, transparent)'
                                 : 'transparent',
                     }}
                 />
@@ -161,7 +161,7 @@ function FilterMark({ size }: { size: 'sm' | 'md' }) {
             <MagnifyingGlass
                 size={size === 'sm' ? 12 : 16}
                 weight="bold"
-                className="absolute -right-2 -bottom-1 text-[var(--evosales-mark,#d9500f)]"
+                className="absolute -right-2 -bottom-1 text-brand"
             />
         </span>
     );

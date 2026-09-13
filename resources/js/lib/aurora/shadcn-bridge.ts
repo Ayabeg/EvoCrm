@@ -1,3 +1,8 @@
+/**
+ * shadcn New York → Aurora variant map.
+ * Color comes from the P02 semantic tokens in `resources/css/app.css`
+ * (`--color-accent`, `--color-bg`, …). Do not add a parallel palette here.
+ */
 import type { BadgeFill, BadgeTone } from '@/components/ui/aurora/badge';
 import type { ButtonSize as AuroraButtonSize, ButtonVariant as AuroraButtonVariant } from '@/components/ui/aurora/button';
 

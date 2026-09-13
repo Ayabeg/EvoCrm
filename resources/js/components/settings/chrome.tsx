@@ -69,7 +69,7 @@ export function SettingsCard({
                     </div>
                     {required ? (
                         <p className="shrink-0 text-[11px] text-mute">
-                            <span className="text-[#d9500f]">*</span>
+                            <span className="text-brand">*</span>
                             {' Required information'}
                         </p>
                     ) : null}
@@ -104,7 +104,7 @@ export function SettingsFormRow({
             >
                 {label}
                 {required ? (
-                    <span className="ml-0.5 text-[#d9500f]">*</span>
+                    <span className="ml-0.5 text-brand">*</span>
                 ) : null}
             </Label>
             <div className="min-w-0">
@@ -151,7 +151,7 @@ export function SettingsSaveBar({
                 disabled={processing}
                 data-settings="save"
                 data-test={saveTestId}
-                className="bg-[#d9500f] text-white hover:bg-[#bf460d] disabled:opacity-60"
+                className="bg-brand text-white hover:bg-brand-hover disabled:opacity-60"
             >
                 {saveLabel}
             </Button>

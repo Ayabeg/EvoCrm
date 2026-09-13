@@ -98,7 +98,7 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                                     className="flex items-center gap-2 text-[12px]"
                                 >
                                     {unlock.granted ? (
-                                        <Check className="size-3.5 text-[#d9500f]" />
+                                        <Check className="size-3.5 text-brand" />
                                     ) : (
                                         <Minus className="size-3.5 text-mute" />
                                     )}
@@ -117,7 +117,7 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                     )}
 
                     {app.key === 'google' && (
-                        <div className="mt-3 space-y-1 rounded-[4px] border border-dashed border-hairline bg-[#eaeaea] p-3 text-[12px] text-mute">
+                        <div className="mt-3 space-y-1 rounded-[4px] border border-dashed border-hairline bg-canvas p-3 text-[12px] text-mute">
                             <p className="font-medium text-ink">
                                 Google Cloud Console
                             </p>
@@ -126,7 +126,7 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                                 origin must be exactly:
                             </p>
                             {app.origin_url ? (
-                                <p className="font-mono break-all text-[#d9500f]">
+                                <p className="font-mono break-all text-brand">
                                     {app.origin_url}
                                 </p>
                             ) : null}
@@ -136,7 +136,7 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                                 means this URI is missing on the client:
                             </p>
                             {app.callback_url ? (
-                                <p className="font-mono break-all text-[#d9500f]">
+                                <p className="font-mono break-all text-brand">
                                     {app.callback_url}
                                 </p>
                             ) : null}
@@ -211,7 +211,7 @@ export default function AppsMarketplace({ apps }: { apps: MarketplaceApp[] }) {
                 <Button
                     asChild
                     size="sm"
-                    className="bg-[#d9500f] text-white hover:bg-[#bf460d]"
+                    className="bg-brand text-white hover:bg-brand-hover"
                 >
                     <Link href="/settings/setup">Get started</Link>
                 </Button>

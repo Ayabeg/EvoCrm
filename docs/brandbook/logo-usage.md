@@ -9,7 +9,7 @@
 
 ## Mark rules
 
-1. **Fill is `#d9500f` in the SVG artwork** — baked into paths, not `currentColor`
+1. **Fill is `#E8530E` in the SVG artwork** — baked into paths, not `currentColor`
 2. **Do not recolor** the mark for light/dark mode — orange stays orange
 3. **Do not** add gradients, shadows, or outlines to the mark
 4. Minimum clear space: height of mark on all sides
@@ -19,13 +19,13 @@
 
 [`resources/js/components/app-logo-icon.tsx`](../../resources/js/components/app-logo-icon.tsx) renders the mark. [`tests/Feature/BrandingTest.php`](../../tests/Feature/BrandingTest.php) asserts:
 
-- Mark file exists and contains `#d9500f`
+- Mark file exists and contains `#E8530E`
 - Mark does **not** use `fill="currentColor"`
-- Favicon contains `#d9500f`
+- Favicon contains `#E8530E`
 
 ## Forbidden
 
 - White or black monochrome variants of the mark (unless a future brandbook explicitly adds approved alternates)
 - Stretching or rotating the mark
 - Placing mark on busy photography without sufficient contrast
-- Using antique `#EC6025` or marketing `#FF6A00` for the mark — artwork is `#d9500f`
+- Using antique `#EC6025`, Wave 0 `#d9500f`, or marketing `#FF6A00` for the mark — artwork is `#E8530E` (see [`design-system.md`](../design-system.md))

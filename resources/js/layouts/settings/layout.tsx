@@ -148,11 +148,11 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     return (
         <div
             data-settings="workspace"
-            className="flex min-h-full flex-col bg-[#eaeaea] lg:flex-row"
+            className="flex min-h-full flex-col bg-canvas lg:flex-row"
         >
             <aside
                 data-settings="nav"
-                className="shrink-0 border-b border-hairline bg-[#eaeaea] lg:w-[15.5rem] lg:border-r lg:border-b-0"
+                className="shrink-0 border-b border-hairline bg-canvas lg:w-[15.5rem] lg:border-r lg:border-b-0"
             >
                 <div className="px-3 pt-3 pb-1">
                     <p className="text-[11px] font-semibold tracking-wide text-mute uppercase">
@@ -185,7 +185,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                                 className={cn(
                                                     'flex h-7 items-center border-l-2 px-2 text-[13px] leading-none transition-colors',
                                                     active
-                                                        ? 'border-[#d9500f] bg-[rgba(217,80,15,0.1)] font-medium text-ink'
+                                                        ? 'border-brand bg-[var(--color-accent-soft)] font-medium text-ink'
                                                         : 'border-transparent text-mute hover:bg-white/70 hover:text-ink',
                                                 )}
                                             >

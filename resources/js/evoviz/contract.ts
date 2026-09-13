@@ -6,8 +6,8 @@
  * EvoSales re-implements the same contract in React/Inertia: the server
  * ships plain JSON payloads keyed by these chart ids, and the renderer in
  * `evo-viz-chart.tsx` draws them as SVG from CSS-variable tokens only —
- * EvoCrm orange #d9500f / ink / hairline, never Aurora teal or Kommo
- * blue, and always readable on the Dark Cabinet #000 canvas.
+ * EvoCrm orange (`--color-accent`) / text / border, never Aurora teal or Kommo
+ * blue, and always readable on the Dark Cabinet canvas.
  *
  * A payload whose series carries no signal (no labels, or every value
  * zero) is empty: servers omit it and the renderer returns null rather
@@ -64,9 +64,9 @@ export type EvoVizTone = 'mark' | 'ink' | 'mute';
  * single hard-coded hex leaving app.css.
  */
 export const EVOVIZ_TONES: Record<EvoVizTone, string> = {
-    mark: 'var(--evosales-mark)',
-    ink: 'var(--evosales-ink)',
-    mute: 'var(--evosales-mute)',
+    mark: 'var(--color-accent)',
+    ink: 'var(--color-text)',
+    mute: 'var(--color-text-secondary)',
 };
 
 export const EVOVIZ_PALETTE: string[] = [
@@ -76,7 +76,7 @@ export const EVOVIZ_PALETTE: string[] = [
 ];
 
 /** Hairline token for baselines, grid rules, and donut tracks. */
-export const EVOVIZ_HAIRLINE = 'var(--evosales-hairline)';
+export const EVOVIZ_HAIRLINE = 'var(--color-border)';
 
 export function evovizSeriesColor(series: EvoVizSeries, index: number): string {
     if (series.tone) {

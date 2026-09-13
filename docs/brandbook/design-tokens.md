@@ -1,6 +1,8 @@
 # EvoCrm design tokens
 
-Extracted from [`resources/css/app.css`](../../resources/css/app.css) — the live implementation. All hex values below are **actual shipped tokens**, not inferred.
+**Historical Wave 0 shipped tokens.** Product UI for P02+ is locked in [`docs/design-system.md`](../design-system.md) (token mapping table). Values below describe the pre-P02 triad and must not be copied into new work.
+
+Extracted from the pre-P02 [`resources/css/app.css`](../../resources/css/app.css). Hex values below are **historical**, not the live contract.
 
 ## Core palette (`:root` / Light Cabinet)
 

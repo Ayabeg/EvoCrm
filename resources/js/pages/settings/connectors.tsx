@@ -29,8 +29,8 @@ function GoogleConnectorCard({
     return (
         <SettingsCard title={connector.name} description={connector.tagline}>
             <div className="flex items-start justify-between gap-3">
-                <span className="grid size-9 place-content-center rounded-[4px] border border-hairline bg-[#eaeaea]">
-                    <Icon className="size-4 text-[#d9500f]" />
+                <span className="grid size-9 place-content-center rounded-[4px] border border-hairline bg-canvas">
+                    <Icon className="size-4 text-brand" />
                 </span>
                 <Badge
                     variant={
@@ -264,10 +264,10 @@ export default function ConnectorsSettings({
                             <SettingsCard key={connector.provider}>
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-3">
-                                        <span className="grid size-9 place-content-center rounded-[4px] border border-hairline bg-[#eaeaea]">
+                                        <span className="grid size-9 place-content-center rounded-[4px] border border-hairline bg-canvas">
                                             {connector.provider ===
                                             'whatsapp_cloud' ? (
-                                                <ChatCircle className="size-4 text-[#d9500f]" />
+                                                <ChatCircle className="size-4 text-brand" />
                                             ) : (
                                                 <ChannelMark
                                                     provider={

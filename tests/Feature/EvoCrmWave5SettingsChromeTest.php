@@ -2,7 +2,7 @@
 
 use App\Models\User;
 
-it('rebuilds the settings shell as a Salesforce-density workspace on the Wave 0 triad', function () {
+it('rebuilds the settings shell as a Salesforce-density workspace on P02 tokens', function () {
     $layout = file_get_contents(resource_path('js/layouts/settings/layout.tsx'));
     $chrome = file_get_contents(resource_path('js/components/settings/chrome.tsx'));
 
@@ -19,8 +19,8 @@ it('rebuilds the settings shell as a Salesforce-density workspace on the Wave 0 
         ->and($layout)->toContain("href: '/settings/workspace'")
         ->and($layout)->toContain("href: '/settings/apps'")
         ->and($layout)->toContain("href: '/settings/channels'")
-        ->and($layout)->toContain('bg-[#eaeaea]')
-        ->and($layout)->toContain('border-[#d9500f]')
+        ->and($layout)->toContain('bg-canvas')
+        ->and($layout)->toContain('border-brand')
         ->and($layout)->not->toContain('lucide-react')
         ->and($layout)->not->toContain('#0176D3')
         ->and($layout)->not->toContain('#00A4BD')
@@ -30,7 +30,7 @@ it('rebuilds the settings shell as a Salesforce-density workspace on the Wave 0 
         ->and($chrome)->toContain('data-settings="save"')
         ->and($chrome)->toContain('data-settings="empty"')
         ->and($chrome)->toContain('bg-white')
-        ->and($chrome)->toContain('bg-[#d9500f]')
+        ->and($chrome)->toContain('bg-brand')
         ->and($chrome)->toContain('Required information')
         ->and($chrome)->toContain('Cancel')
         ->and($chrome)->not->toContain('#0176D3');
