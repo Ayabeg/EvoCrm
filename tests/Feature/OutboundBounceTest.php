@@ -1,10 +1,13 @@
 <?php
 
 use App\Models\Contact;
+use App\Models\Enrollment;
 use App\Models\OutboundMessage;
+use App\Models\Sequence;
 use App\Models\Suppression;
 use App\Models\User;
 use App\Services\Webhooks\WebhookEndpointManager;
+use Illuminate\Support\Carbon;
 
 it('records a hard bounce once and suppresses the address', function () {
     $user = User::factory()->create();
@@ -82,6 +85,66 @@ it('records a soft bounce without suppressing', function () {
 
     expect($message->fresh()->bounce_type)->toBe('soft')
         ->and(Suppression::query()->forWorkspace($user->workspace)->count())->toBe(0);
+});
+
+it('does not send again to a hard-bounced address', function () {
+    $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
+
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'bounce-again@clinic.dz',
+    ]);
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => 'bounce-again@clinic.dz',
+        'subject' => 'Follow up',
+        'body' => 'Hello',
+        'status' => 'sent',
+        'sent_at' => now()->subDay(),
+    ]);
+    $endpoint = app(WebhookEndpointManager::class)->forWorkspace(
+        $user->workspace,
+        WebhookEndpointManager::PROVIDER_OUTBOUND_BOUNCE,
+    );
+
+    $this->postJson("/webhooks/outbound/bounces/{$endpoint->key}", [
+        'event_id' => 'evt-hard-suppress',
+        'message_id' => $message->id,
+        'type' => 'hard',
+        'email' => 'bounce-again@clinic.dz',
+    ])->assertOk();
+
+    $sequence = Sequence::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'channel' => 'email',
+        'active' => true,
+    ]);
+    $sequence->steps()->create([
+        'position' => 1,
+        'delay_hours' => 0,
+        'channel' => 'email',
+        'subject' => 'Again',
+        'body' => 'Should not send',
+    ]);
+    $enrollment = Enrollment::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'sequence_id' => $sequence->id,
+        'contact_id' => $contact->id,
+        'status' => 'active',
+        'next_step' => 1,
+        'next_run_at' => now()->subMinute(),
+    ]);
+
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    expect($enrollment->refresh()->status)->toBe('cancelled')
+        ->and(OutboundMessage::query()
+            ->where('sequence_id', $sequence->id)
+            ->count())->toBe(0);
 });
 
 it('rejects a bounce webhook from another workspace key', function () {

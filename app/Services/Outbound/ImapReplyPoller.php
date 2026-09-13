@@ -112,6 +112,21 @@ class ImapReplyPoller
         $body = imap_body($stream, $uid, FT_UID | FT_PEEK);
         $messageId = isset($header->message_id) ? trim((string) $header->message_id) : null;
 
+        $this->recordContactReply($mailbox, $contact, [
+            'subject' => $subject,
+            'body' => $body,
+            'message_id' => $messageId,
+        ]);
+    }
+
+    /**
+     * IMAP mailbox path (no new ESP): persist an inbound reply, then either
+     * branch the enrollment or pause it. Used by pollMailbox and tests.
+     *
+     * @param  array{subject?: ?string, body?: ?string, message_id?: ?string}  $mail
+     */
+    public function recordContactReply(Mailbox $mailbox, Contact $contact, array $mail = []): OutboundMessage
+    {
         $lastOutbound = OutboundMessage::query()
             ->forWorkspace($mailbox->workspace_id)
             ->where('contact_id', $contact->id)
@@ -120,7 +135,7 @@ class ImapReplyPoller
             ->latest('sent_at')
             ->first();
 
-        OutboundMessage::query()->create([
+        $inbound = OutboundMessage::query()->create([
             'workspace_id' => $mailbox->workspace_id,
             'contact_id' => $contact->id,
             'mailbox_id' => $mailbox->id,
@@ -128,10 +143,10 @@ class ImapReplyPoller
             'channel' => 'email',
             'direction' => 'in',
             'to_address' => $mailbox->from_address,
-            'message_id' => $messageId,
+            'message_id' => $mail['message_id'] ?? null,
             'in_reply_to' => $lastOutbound?->id,
-            'subject' => $subject,
-            'body' => mb_substr(trim((string) $body), 0, 10000),
+            'subject' => $mail['subject'] ?? null,
+            'body' => mb_substr(trim((string) ($mail['body'] ?? '')), 0, 10000),
             'status' => 'received',
         ]);
 
@@ -143,9 +158,13 @@ class ImapReplyPoller
                 'sequence_id' => $lastOutbound->sequence_id,
                 'mailbox_id' => $mailbox->id,
             ], null, $contact->workspace ?? $mailbox->workspace);
-            $this->branchEnrollmentOnReply($contact, $lastOutbound);
-            $this->pauseEnrollmentOnReply($contact, $lastOutbound);
+
+            if (! $this->branchEnrollmentOnReply($contact, $lastOutbound)) {
+                $this->pauseEnrollmentOnReply($contact, $lastOutbound);
+            }
         }
+
+        return $inbound;
     }
 
     protected function pauseEnrollmentOnReply(Contact $contact, OutboundMessage $outbound): void
@@ -168,10 +187,10 @@ class ImapReplyPoller
         $this->workflows->handleEnrollmentReplied($contact, $enrollment);
     }
 
-    protected function branchEnrollmentOnReply(Contact $contact, OutboundMessage $outbound): void
+    protected function branchEnrollmentOnReply(Contact $contact, OutboundMessage $outbound): bool
     {
         if (! $outbound->sequence_id) {
-            return;
+            return false;
         }
 
         $enrollment = Enrollment::query()
@@ -181,20 +200,22 @@ class ImapReplyPoller
             ->first();
 
         if (! $enrollment) {
-            return;
+            return false;
         }
 
         $step = $enrollment->sequence?->steps->firstWhere('position', $enrollment->next_step - 1)
             ?? $enrollment->sequence?->steps->firstWhere('position', $enrollment->next_step);
 
         if (! $step?->on_reply_step) {
-            return;
+            return false;
         }
 
         $enrollment->forceFill([
             'next_step' => (int) $step->on_reply_step,
             'next_run_at' => now(),
         ])->save();
+
+        return true;
     }
 
     protected function senderAddress(mixed $stream, int $uid): ?string

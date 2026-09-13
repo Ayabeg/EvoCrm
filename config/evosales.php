@@ -26,6 +26,23 @@ return [
     'inbox_embed_path' => env('EVOSALES_INBOX_EMBED_PATH', '/'),
 
     /*
+    | Framing policy Laravel can set on CRM responses. frame-ancestors is the
+    | CRM-host allowlist; frame-src is the desk iframe allowlist. The desk
+    | vhost on Contabo must send the same ancestors — Laravel cannot. See
+    | docs/desk-iframe-headers.md. Extra origins are comma-separated.
+    */
+    'embed' => [
+        'frame_ancestors' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('EVOSALES_FRAME_ANCESTORS', '')),
+        ))),
+        'frame_src' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('EVOSALES_FRAME_SRC', '')),
+        ))),
+    ],
+
+    /*
     | Live mail stack (EvoOutreach) at outbound.evotechly.com. The CRM uses
     | it for three things only: SMTP send, IMAP reply polling, and Roundcube
     | webmail. Mailbox records sync from its HTTP API when api_token is set

@@ -1,5 +1,13 @@
 # Changelog
 
+## Desk iframe + outbound mail truth (2026-09-13)
+
+### Added
+- Laravel `frame-ancestors` / `frame-src` on CRM responses so `/inbox` stays on-host; Contabo nginx snippet in [`docs/desk-iframe-headers.md`](docs/desk-iframe-headers.md)
+- IMAP reply-pause on the existing mailbox path; hard-bounce suppression already blocks the next sequence send; quiet hours 21:00–08:00 Africa/Algiers skip sequence sends
+
+---
+
 ## EvoCRM plan published (2026-09-08)
 
 Recorded the approved EvoCRM build in [`docs/evocrm-plan.md`](docs/evocrm-plan.md): HubSpot chrome + Salesforce lead Path, Mobbin as source of truth, P0–P10 PR map. No product routes change in this entry.

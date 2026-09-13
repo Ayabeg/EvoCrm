@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\UnofficialWhatsAppRefused;
+use App\Http\Middleware\EmbedSecurityHeaders;
 use App\Http\Middleware\EnsureUserCanManageSettings;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PostHogRequestContext;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(append: [
+            EmbedSecurityHeaders::class,
             PostHogRequestContext::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
@@ -41,7 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        $exceptions->report(function (\Throwable $e): void {
+        $exceptions->report(function (Throwable $e): void {
             app(ProductAnalytics::class)->captureException($e);
         });
 
