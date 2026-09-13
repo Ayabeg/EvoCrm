@@ -23,6 +23,7 @@ class WorkspaceFactory extends Factory
             'country_code' => 'DZ',
             'default_dial_code' => '213',
             'inbox_url' => 'https://desk.evotechly.com',
+            'simple_mode' => false,
         ];
     }
 

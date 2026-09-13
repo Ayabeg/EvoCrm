@@ -2,6 +2,7 @@ import {
     AssociationCard,
     RelatedRecordLink,
 } from '@/components/crm/record-chrome';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 
 export type RelatedTicket = {
     id: number;
@@ -26,8 +27,13 @@ export default function TicketsRelatedCard({
     tickets?: TicketsRelated | null;
     addHref?: string;
 }) {
+    const { features } = useSimpleMode();
     const openCount = tickets?.open_count ?? 0;
     const rows = tickets?.rows ?? [];
+
+    if (!features.tickets) {
+        return null;
+    }
 
     return (
         <AssociationCard title="Tickets" addHref={addHref} addLabel="Add">

@@ -2,6 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { RoomShell } from '@/components/crm/room-shell';
 import type { RoomTab } from '@/components/crm/room-shell';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 
 const DESK_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
@@ -29,8 +30,12 @@ const DESK_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     },
 ];
 
-export function deskTabs(pathname: string): RoomTab[] {
-    return DESK_TABS.map(({ label, href, match }) => ({
+export function deskTabs(pathname: string, simpleMode = false): RoomTab[] {
+    const tabs = simpleMode
+        ? DESK_TABS.filter((tab) => tab.href !== '/crm/tickets')
+        : DESK_TABS;
+
+    return tabs.map(({ label, href, match }) => ({
         label,
         href,
         active: match ? match(pathname) : pathname === href || pathname.startsWith(`${href}/`),
@@ -45,12 +50,13 @@ export function DeskShell({
     children: ReactNode;
 }) {
     const { url } = usePage();
+    const { simpleMode } = useSimpleMode();
     const pathname = url.split('?')[0] ?? '/inbox';
 
     return (
         <>
             <Head title={title} />
-            <RoomShell title="Desk" tabs={deskTabs(pathname)}>
+            <RoomShell title="Desk" tabs={deskTabs(pathname, simpleMode)}>
                 <div className="h-full overflow-hidden">{children}</div>
             </RoomShell>
         </>

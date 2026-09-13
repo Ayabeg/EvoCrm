@@ -8,6 +8,7 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Support\Integrations;
+use App\Support\SimpleMode;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -57,6 +58,9 @@ class HandleInertiaRequests extends Middleware
                     : [],
             ],
             'workspace' => $workspace,
+            'simpleMode' => SimpleMode::enabled($workspace),
+            'nav' => SimpleMode::nav($workspace),
+            'features' => SimpleMode::features($workspace),
             'posthog' => [
                 'enabled' => filled(config('services.posthog.api_key')),
                 'key' => config('services.posthog.api_key'),

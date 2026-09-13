@@ -10,6 +10,7 @@ use App\Http\Controllers\Settings\QuotaController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\Settings\SmsSettingsController;
 use App\Http\Controllers\Settings\SystemHealthController;
+use App\Http\Controllers\Settings\WorkspaceSettingsController;
 use App\Http\Middleware\EnforceProductPermissions;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Facades\Route;
@@ -56,5 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('settings/sms', [SmsSettingsController::class, 'destroy'])->name('settings.sms.destroy');
         Route::get('settings/quotas', [QuotaController::class, 'edit'])->name('settings.quotas');
         Route::put('settings/quotas', [QuotaController::class, 'update'])->name('settings.quotas.update');
+        Route::get('settings/workspace', [WorkspaceSettingsController::class, 'edit'])->name('settings.workspace');
+        Route::put('settings/workspace', [WorkspaceSettingsController::class, 'update'])->name('settings.workspace.update');
     });
 });

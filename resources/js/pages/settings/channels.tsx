@@ -1,4 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -14,6 +15,11 @@ export default function ChannelSettings({
     evolution: { connected: boolean };
     inboxUrl: string;
 }) {
+    const { features } = useSimpleMode();
+    const visibleChannels = features.sms
+        ? channels
+        : channels.filter((channel) => channel.type !== 'sms');
+
     return (
         <>
             <Head title="Channels" />
@@ -51,7 +57,7 @@ export default function ChannelSettings({
                     </Form>
                 </Card>
                 <div className="space-y-3">
-                    {channels.map((channel) => (
+                    {visibleChannels.map((channel) => (
                         <Card key={channel.id} className="flex items-center justify-between p-4 text-sm">
                             <div>
                                 <p className="font-medium">{channel.name}</p>

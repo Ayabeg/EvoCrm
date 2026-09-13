@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $slug
  * @property string $timezone
+ * @property bool $simple_mode
  * @property Carbon|null $evolution_last_webhook_at
  * @property string|null $evolution_last_event
  */
@@ -24,6 +25,7 @@ use Illuminate\Support\Carbon;
     'country_code',
     'default_dial_code',
     'inbox_url',
+    'simple_mode',
     'evolution_last_webhook_at',
     'evolution_last_event',
     'lead_score_settings',
@@ -39,6 +41,7 @@ class Workspace extends Model
     {
         return [
             'evolution_last_webhook_at' => 'datetime',
+            'simple_mode' => 'boolean',
             'lead_score_settings' => 'array',
             'monthly_quota_cents' => 'integer',
             'meeting_wa_templates' => 'array',

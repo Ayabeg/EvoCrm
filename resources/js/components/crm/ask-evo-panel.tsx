@@ -1,6 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -81,6 +82,12 @@ export function AskEvoTrigger({
     insight?: AskEvoPayload | null;
     className?: string;
 }) {
+    const { features } = useSimpleMode();
+
+    if (!features.ask_evo) {
+        return null;
+    }
+
     return (
         <Sheet>
             <SheetTrigger asChild>
@@ -123,6 +130,7 @@ export default function AskEvoPanel({
     action: string;
     insight?: AskEvoPayload | null;
 }) {
+    const { features } = useSimpleMode();
     const [open, setOpen] = useState(true);
     const generated = insight?.generated_at
         ? new Date(insight.generated_at).toLocaleString('en-GB', {
@@ -130,6 +138,10 @@ export default function AskEvoPanel({
               minute: '2-digit',
           })
         : null;
+
+    if (!features.ask_evo) {
+        return null;
+    }
 
     return (
         <section

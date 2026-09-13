@@ -7,6 +7,7 @@ import { cn, toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 import type { NavItem } from '@/types';
 import type { Auth } from '@/types/auth';
 
@@ -87,6 +88,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Workspace',
+        href: '/settings/workspace',
+        icon: null,
+    },
+    {
         title: 'Record layouts',
         href: '/settings/record-layouts',
         icon: null,
@@ -131,11 +137,21 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
     const page = usePage<{ auth: Auth }>();
     const { auth } = page.props;
+    const { features } = useSimpleMode();
 
     // People manages workspace members — owner/admin only. The routes 403
     // for members; the nav item simply stays hidden for them.
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
+    const isOwner = auth.user.role === 'owner';
     const visibleItems = sidebarNavItems.filter((item) => {
+        if (toUrl(item.href) === '/settings/sms' && !features.sms) {
+            return false;
+        }
+
+        if (toUrl(item.href) === '/settings/workspace') {
+            return isOwner;
+        }
+
         if (
             ['/settings/permissions', '/settings/system-health', '/settings/audit', '/settings/playbooks', '/settings/qualify', '/settings/quotas'].includes(
                 toUrl(item.href),

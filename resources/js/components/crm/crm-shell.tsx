@@ -2,6 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { RoomShell } from '@/components/crm/room-shell';
 import type { RoomTab } from '@/components/crm/room-shell';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 
 const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
@@ -61,8 +62,12 @@ const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     },
 ];
 
-export function crmTabs(pathname: string): RoomTab[] {
-    return CRM_TABS.map(({ label, href, match }) => ({
+export function crmTabs(pathname: string, simpleMode = false): RoomTab[] {
+    const tabs = simpleMode
+        ? CRM_TABS.filter((tab) => ['Contacts', 'Deals'].includes(tab.label))
+        : CRM_TABS;
+
+    return tabs.map(({ label, href, match }) => ({
         label,
         href,
         active: match ? match(pathname) : pathname === href || pathname.startsWith(`${href}/`),
@@ -79,12 +84,13 @@ export function CrmShell({
     chrome?: 'room' | 'workspace';
 }) {
     const { url } = usePage();
+    const { simpleMode } = useSimpleMode();
     const pathname = url.split('?')[0] ?? '/crm/contacts';
 
     return (
         <>
             <Head title={title} />
-            <RoomShell title="CRM" tabs={crmTabs(pathname)}>
+            <RoomShell title="CRM" tabs={crmTabs(pathname, simpleMode)}>
                 <div
                     className={
                         chrome === 'workspace'

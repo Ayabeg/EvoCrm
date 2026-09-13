@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Textarea } from '@/components/ui/textarea';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 import type { OfficialDeskConnector } from '@/types';
 
 type Contact = {
@@ -201,6 +202,7 @@ function FrontDesk({
 }) {
     const [folder, setFolder] = useState('all');
     const [mode, setMode] = useState<'reply' | 'note'>('reply');
+    const { features } = useSimpleMode();
 
     const filtered = useMemo(() => {
         if (folder === 'unassigned') {
@@ -352,7 +354,7 @@ function FrontDesk({
                                 >
                                     Open contact
                                 </Link>
-                                {selected.ticket ? (
+                                {features.tickets && selected.ticket ? (
                                     <Link
                                         href={`/crm/tickets/${selected.ticket.id}`}
                                         data-testid="desk-ticket-link"
@@ -361,22 +363,24 @@ function FrontDesk({
                                         {selected.ticket.number}
                                     </Link>
                                 ) : null}
-                                <Form
-                                    action={`/desk/threads/${selected.id}/ticket`}
-                                    method="post"
-                                >
-                                    {({ processing }) => (
-                                        <Button
-                                            type="submit"
-                                            size="sm"
-                                            className="h-8"
-                                            disabled={processing}
-                                            data-testid="desk-open-ticket"
-                                        >
-                                            Open ticket
-                                        </Button>
-                                    )}
-                                </Form>
+                                {features.tickets ? (
+                                    <Form
+                                        action={`/desk/threads/${selected.id}/ticket`}
+                                        method="post"
+                                    >
+                                        {({ processing }) => (
+                                            <Button
+                                                type="submit"
+                                                size="sm"
+                                                className="h-8"
+                                                disabled={processing}
+                                                data-testid="desk-open-ticket"
+                                            >
+                                                Open ticket
+                                            </Button>
+                                        )}
+                                    </Form>
+                                ) : null}
                             </div>
                         </DeskGlass>
                         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-canvas-soft p-4">

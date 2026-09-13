@@ -5,6 +5,7 @@ import {
     ChartSpline,
     ChevronLeft,
     Contact,
+    FileText,
     Facebook,
     Flame,
     Globe,
@@ -37,6 +38,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import { PillGroup, PillTrigger, TabsContent } from '@/components/ui/tabs';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { DEFAULT_PINNED, readPins, togglePin } from '@/lib/nav-pins';
 import { cn } from '@/lib/utils';
 
@@ -122,20 +124,38 @@ const MORE_ITEMS: MoreItem[] = [
 
 const CATEGORIES = ['CRM', 'Desk', 'Outbound', 'Ads', 'Reports', 'Settings'];
 
+const NAV_ICONS: Record<string, LucideIcon> = {
+    home: House,
+    contacts: Contact,
+    companies: Building2,
+    deals: Handshake,
+    leads: SquareKanban,
+    tickets: Ticket,
+    inbox: Inbox,
+    quotes: FileText,
+    ads: Megaphone,
+    'outbound-warmup': Flame,
+    'report-builder': PenLine,
+    sms: Mail,
+    settings: Settings,
+};
+
 function MorePanelItems({
     category,
     pins,
     onPinsChange,
     onNavigate,
+    items,
 }: {
     category: string;
     pins: string[];
     onPinsChange: (pins: string[]) => void;
     onNavigate: () => void;
+    items: MoreItem[];
 }) {
     return (
         <>
-            {MORE_ITEMS.filter((item) => item.category === category).map((item) => {
+            {items.filter((item) => item.category === category).map((item) => {
                 const pinned = pins.includes(item.id);
                 const Icon = item.icon;
 
@@ -174,12 +194,16 @@ function MorePanelDesktop({
     pins,
     onPinsChange,
     onNavigate,
+    items,
+    categories,
 }: {
     category: string;
     onCategoryChange: (category: string) => void;
     pins: string[];
     onPinsChange: (pins: string[]) => void;
     onNavigate: () => void;
+    items: MoreItem[];
+    categories: string[];
 }) {
     return (
         <>
@@ -190,7 +214,7 @@ function MorePanelDesktop({
                     background: 'var(--evosales-canvas-soft)',
                 }}
             >
-                {CATEGORIES.map((name) => (
+                {categories.map((name) => (
                     <button
                         key={name}
                         type="button"
@@ -220,6 +244,7 @@ function MorePanelDesktop({
                     pins={pins}
                     onPinsChange={onPinsChange}
                     onNavigate={onNavigate}
+                    items={items}
                 />
             </div>
         </>
@@ -232,12 +257,16 @@ function MorePanelMobile({
     pins,
     onPinsChange,
     onNavigate,
+    items,
+    categories,
 }: {
     category: string;
     onCategoryChange: (category: string) => void;
     pins: string[];
     onPinsChange: (pins: string[]) => void;
     onNavigate: () => void;
+    items: MoreItem[];
+    categories: string[];
 }) {
     return (
         <div className="mx-1 mt-2 rounded-lg border border-sidebar-border bg-sidebar-well">
@@ -247,7 +276,7 @@ function MorePanelMobile({
                 className="mx-2 mt-2 w-[calc(100%-1rem)] border-0 bg-transparent p-0"
                 panels={
                     <>
-                        {CATEGORIES.map((name) => (
+                        {categories.map((name) => (
                             <TabsContent
                                 key={name}
                                 value={name}
@@ -258,7 +287,7 @@ function MorePanelMobile({
                     </>
                 }
             >
-                {CATEGORIES.map((name) => (
+                {categories.map((name) => (
                     <PillTrigger
                         key={name}
                         value={name}
@@ -274,6 +303,7 @@ function MorePanelMobile({
                     pins={pins}
                     onPinsChange={onPinsChange}
                     onNavigate={onNavigate}
+                    items={items}
                 />
             </div>
         </div>
@@ -411,6 +441,12 @@ export function AppSidebar() {
     }, [moreOpen, isMobile]);
     const integrations = page.props.integrations;
     const showSetup = !integrations?.meta?.connected && !integrations?.smtp?.connected;
+    const { simpleMode, nav } = useSimpleMode();
+    const moreItems = simpleMode
+        ? MORE_ITEMS.filter((item) => item.category === 'Settings')
+        : MORE_ITEMS;
+    const moreCategories = simpleMode ? ['Settings'] : CATEGORIES;
+    const moreCategory = moreCategories.includes(category) ? category : moreCategories[0];
 
     const catalog = useMemo(() => {
         const extras = MORE_ITEMS.filter((item) => !PRIMARY.some((row) => row.id === item.id));
@@ -422,9 +458,19 @@ export function AppSidebar() {
         .map((id) => catalog.find((item) => item.id === id))
         .filter((item): item is NavLeaf => Boolean(item));
 
-    const railItems = pinnedItems.length > 0 ? pinnedItems : PRIMARY.filter((item) => DEFAULT_PINNED.includes(item.id as (typeof DEFAULT_PINNED)[number]));
+    const launchRail = nav.map((item) => ({
+        ...item,
+        icon: NAV_ICONS[item.id] ?? House,
+    }));
+    const railItems = simpleMode
+        ? launchRail
+        : pinnedItems.length > 0
+          ? pinnedItems
+          : PRIMARY.filter((item) => DEFAULT_PINNED.includes(item.id as (typeof DEFAULT_PINNED)[number]));
     const pinnedIds = new Set(railItems.map((item) => item.id));
-    const crmChildren = CRM_RAIL_OBJECTS.filter((item) => !pinnedIds.has(item.id));
+    const crmChildren = simpleMode
+        ? []
+        : CRM_RAIL_OBJECTS.filter((item) => !pinnedIds.has(item.id));
 
     return (
         <Sidebar collapsible="icon" className="bg-sidebar" data-cabinet="rail">
@@ -516,10 +562,12 @@ export function AppSidebar() {
                         </button>
                         {isMobile && moreOpen ? (
                             <MorePanelMobile
-                                category={category}
+                                category={moreCategory}
                                 onCategoryChange={setCategory}
                                 pins={pins}
                                 onPinsChange={setPins}
+                                items={moreItems}
+                                categories={moreCategories}
                                 onNavigate={() => {
                                     setMoreOpen(false);
 
@@ -542,10 +590,12 @@ export function AppSidebar() {
                                 }}
                             >
                                 <MorePanelDesktop
-                                    category={category}
+                                    category={moreCategory}
                                     onCategoryChange={setCategory}
                                     pins={pins}
                                     onPinsChange={setPins}
+                                    items={moreItems}
+                                    categories={moreCategories}
                                     onNavigate={() => setMoreOpen(false)}
                                 />
                             </div>

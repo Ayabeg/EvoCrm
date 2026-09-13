@@ -14,6 +14,16 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             workspace: Workspace | null;
+            simpleMode: boolean;
+            nav: Array<{ id: string; label: string; href: string }>;
+            features: {
+                tickets: boolean;
+                sms: boolean;
+                ask_evo: boolean;
+                ads: boolean;
+                warmup: boolean;
+                report_builder: boolean;
+            };
             posthog: PosthogShared;
             integrations: SharedIntegrations;
             sidebarOpen: boolean;

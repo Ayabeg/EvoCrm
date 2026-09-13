@@ -67,6 +67,7 @@ use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
 use App\Http\Controllers\Webhooks\OutboundBounceWebhookController;
 use App\Http\Middleware\EnforceProductPermissions;
+use App\Http\Middleware\EnforceSimpleMode;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -113,7 +114,7 @@ Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::cla
     ->middleware('throttle:60,1')
     ->name('webhooks.meta.leads');
 
-Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group(function () {
+Route::middleware(['auth', 'verified', EnforceProductPermissions::class, EnforceSimpleMode::class])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
     Route::post('/lead-os/graph', [LeadOsController::class, 'runGraph'])->name('lead-os.graph');
     Route::post('/crm/lost-reviews/{suggestion}/confirm', [LeadOsController::class, 'confirmLost'])->name('crm.lost-reviews.confirm');
@@ -176,6 +177,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class])->group
     Route::post('/crm/workflows/templates', [WorkflowController::class, 'storeTemplate'])->name('crm.workflows.templates.store');
     Route::post('/crm/workflows/{workflow}/toggle', [WorkflowController::class, 'toggle'])->name('crm.workflows.toggle');
     Route::delete('/crm/workflows/{workflow}', [WorkflowController::class, 'destroy'])->name('crm.workflows.destroy');
+    Route::get('/crm/quotes', [QuoteController::class, 'index'])->name('crm.quotes.index');
     Route::post('/crm/deals/{deal}/quotes', [QuoteController::class, 'store'])->name('crm.quotes.store');
     Route::put('/crm/quotes/{quote}', [QuoteController::class, 'update'])->name('crm.quotes.update');
     Route::get('/crm/quotes/{quote}/preview', [QuoteController::class, 'preview'])->name('crm.quotes.preview');

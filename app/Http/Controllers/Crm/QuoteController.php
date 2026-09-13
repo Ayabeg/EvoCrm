@@ -11,9 +11,36 @@ use App\Services\Crm\QuoteTotals;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class QuoteController extends Controller
 {
+    public function index(Request $request): InertiaResponse
+    {
+        $workspace = $request->user()->workspace;
+
+        $quotes = Quote::query()
+            ->forWorkspace($workspace)
+            ->with(['deal:id,title'])
+            ->latest('id')
+            ->limit(50)
+            ->get()
+            ->map(fn (Quote $quote): array => [
+                'id' => $quote->id,
+                'status' => $quote->status,
+                'total_cents' => $quote->total_cents,
+                'deal' => $quote->deal ? [
+                    'id' => $quote->deal->id,
+                    'title' => $quote->deal->title,
+                ] : null,
+            ]);
+
+        return Inertia::render('crm/quotes/index', [
+            'quotes' => $quotes,
+        ]);
+    }
+
     public function store(Request $request, Deal $deal, QuoteTotals $totals): RedirectResponse
     {
         $this->authorize('update', $deal);

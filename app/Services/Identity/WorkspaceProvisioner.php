@@ -25,6 +25,7 @@ class WorkspaceProvisioner
             'country_code' => 'DZ',
             'default_dial_code' => '213',
             'inbox_url' => config('evosales.inbox_url'),
+            'simple_mode' => true,
         ]);
 
         $this->seedDefaults($workspace);
