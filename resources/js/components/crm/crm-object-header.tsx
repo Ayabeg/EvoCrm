@@ -22,7 +22,7 @@ export function CrmObjectHeader({
             data-crm="object-header"
         >
             <div className="min-w-0">
-                <h1 className="text-[15px] font-semibold tracking-tight text-ink">
+                <h1 className="text-page-title text-[15px] font-semibold tracking-tight text-ink">
                     {title}
                 </h1>
                 {description ? (

@@ -201,11 +201,11 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
-    expect($header)->toContain('placeholder="Find a page"');
-    expect($header)->toContain('aria-label="Find a page"');
+    expect($header)->toContain('placeholder="Find a record or page"');
+    expect($header)->toContain('aria-label="Find a record or page"');
     expect($header)->not->toContain('Find or Ask');
     expect($header)->not->toContain('unread');
-    expect($palette)->toContain('placeholder="Find a page"');
+    expect($palette)->toContain('placeholder="Find a record or page"');
     expect($palette)->not->toContain('Search contacts, deals');
     expect($rail)->not->toContain('Bell');
     expect($header)->toContain('data-chrome="notify"');
