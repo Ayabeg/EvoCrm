@@ -601,19 +601,19 @@ it('branches on deal stage after a move', function () {
         ->toBe(['Qualified and high amount']);
 });
 
-it('adds Automation last in the CRM nav group without reordering the rest', function () {
+it('keeps Automation as its own rail group without reordering CRM objects', function () {
     $sidebar = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
     expect($sidebar)
         ->toContain("label: 'Automation'")
-        ->toContain("href: '/crm/workflows'");
+        ->toContain("label: 'Workflows'")
+        ->toContain("href: '/crm/workflows'")
+        ->toContain("'/automation'");
 
     expect(strpos($sidebar, "href: '/crm/companies'"))
         ->toBeLessThan(strpos($sidebar, "href: '/crm/deals'"))
         ->and(strpos($sidebar, "href: '/crm/deals'"))
         ->toBeLessThan(strpos($sidebar, "href: '/crm/leads'"))
         ->and(strpos($sidebar, "href: '/crm/leads'"))
-        ->toBeLessThan(strpos($sidebar, "href: '/crm/segments'"))
-        ->and(strpos($sidebar, "href: '/crm/segments'"))
-        ->toBeLessThan(strpos($sidebar, "href: '/crm/workflows'"));
+        ->toBeLessThan(strpos($sidebar, "href: '/crm/segments'"));
 });

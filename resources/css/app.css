@@ -25,7 +25,7 @@
  * Light: canvas #F7F7F5, surface #FFFFFF, text #161616, accent #E8530E.
  * Orange is selective (CTA / active / focus / selected / charts) — never a page wash.
  * Dark cabinet remains true-black and is out of scope for a visual redesign.
- * Authenticated rail is paper (not a global black wash). Width stays 56px until P04.
+ * Authenticated rail is paper (not a global black wash). Desktop 64px / 240px.
  */
 :root {
     /* Top command bar — 44px on phones so work appears earlier; 52px from sm. */
@@ -420,8 +420,6 @@
     }
 
     .app-rail-item {
-        height: 40px;
-        width: 40px;
         border-radius: 6px;
     }
 

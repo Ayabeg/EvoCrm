@@ -9,7 +9,7 @@ type Props = {
 };
 
 export function AppShell({ children, variant = 'sidebar' }: Props) {
-    const isOpen = usePage().props.sidebarOpen;
+    const isOpen = usePage().props.sidebarOpen; // sidebar_state cookie → P04 64/240 persist
 
     if (variant === 'header') {
         return (
