@@ -1,4 +1,5 @@
 import { Link, router } from '@inertiajs/react';
+import { contactInitials, formatContactName } from '@/lib/contact-name';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
@@ -12,6 +13,7 @@ type ContactRow = {
     last_name?: string | null;
     email?: string | null;
     phone_e164?: string | null;
+    lead_status?: string | null;
     city?: string | null;
     wilaya?: string | null;
     created_at?: string | null;
@@ -89,14 +91,57 @@ function formatDate(value?: string | null, withTime = false): string {
     }).format(parsed);
 }
 
+function ContactNameCell({
+    row,
+    href,
+    linked = true,
+}: {
+    row: ContactRow;
+    href: string;
+    linked?: boolean;
+}) {
+    const name = formatContactName(row.first_name, row.last_name);
+    const initials = contactInitials(row.first_name, row.last_name);
+    const body = (
+        <>
+            <span
+                className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-[10px] leading-none font-medium text-white"
+                aria-hidden
+            >
+                {initials || '?'}
+            </span>
+            <span className="truncate">{name}</span>
+        </>
+    );
+
+    if (!linked) {
+        return (
+            <span className="inline-flex min-w-0 items-center gap-2 font-medium text-ink">
+                {body}
+            </span>
+        );
+    }
+
+    return (
+        <Link
+            href={href}
+            className="inline-flex min-w-0 items-center gap-2 font-medium text-ink hover:underline"
+        >
+            {body}
+        </Link>
+    );
+}
+
 function renderContactCell(columnId: string, row: ContactRow): string {
     switch (columnId) {
         case 'name':
-            return `${row.first_name} ${row.last_name ?? ''}`.trim();
+            return formatContactName(row.first_name, row.last_name);
         case 'email':
             return row.email ?? '—';
         case 'phone':
             return row.phone_e164 ?? '—';
+        case 'lead_status':
+            return titleCase(row.lead_status);
         case 'company':
             return row.company?.name ?? '—';
         case 'owner':
@@ -281,7 +326,12 @@ export default function ListViewTable({
     return (
         <div className="@container/list min-h-0 flex-1">
             {/* Desktop / tablet: Aurora-styled table in controlled scroll region */}
-            <div className="hidden overflow-x-auto bg-canvas @[480px]/list:block">
+            <div
+                className={cn(
+                    'hidden overflow-x-auto @[480px]/list:block',
+                    entity === 'contact' ? 'bg-white' : 'bg-canvas',
+                )}
+            >
                 <table className="w-full min-w-[640px] border-collapse text-[13px]">
                     <thead>
                         <tr className="border-b border-hairline bg-canvas-soft text-left">
@@ -339,6 +389,9 @@ export default function ListViewTable({
                                 ) : null}
                                 {visible.map((column) => {
                                     const label = renderCell(entity, column.id, row);
+                                    const isContactName =
+                                        entity === 'contact' &&
+                                        column.id === 'name';
 
                                     return (
                                         <td
@@ -350,7 +403,12 @@ export default function ListViewTable({
                                                     : 'text-mute',
                                             )}
                                         >
-                                            {column.id === primaryId ? (
+                                            {isContactName ? (
+                                                <ContactNameCell
+                                                    row={row as ContactRow}
+                                                    href={href}
+                                                />
+                                            ) : column.id === primaryId ? (
                                                 <Link
                                                     href={href}
                                                     className="font-medium text-ink hover:underline"
@@ -391,7 +449,17 @@ export default function ListViewTable({
                                 href={href}
                                 className="block min-w-0 flex-1 no-underline"
                             >
-                                <p className="font-medium text-ink">{primaryLabel}</p>
+                                {entity === 'contact' ? (
+                                    <ContactNameCell
+                                        row={row as ContactRow}
+                                        href={href}
+                                        linked={false}
+                                    />
+                                ) : (
+                                    <p className="font-medium text-ink">
+                                        {primaryLabel}
+                                    </p>
+                                )}
                                 <dl className="mt-1 grid gap-1 text-[11px]">
                                     {visible
                                         .filter((column) => column.id !== primaryId)

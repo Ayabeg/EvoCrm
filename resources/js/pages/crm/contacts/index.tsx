@@ -1,10 +1,9 @@
-import { Form, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
-import { CrmShell } from '@/components/crm/crm-shell';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
@@ -70,12 +69,17 @@ export default function ContactsIndex({
 
     return (
         <>
-            <CrmShell title="Contacts" chrome="workspace">
+            <Head title="Contacts" />
+            <div
+                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                data-crm="contacts-workspace"
+            >
                 <CrmListShell
                     title="Contacts"
                     entity="contact"
                     basePath="/crm/contacts"
                     primaryLabel="Create contact"
+                    onCreate={() => setDrawer(true)}
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -85,6 +89,8 @@ export default function ContactsIndex({
                     wilayas={wilayas}
                     companies={companies}
                     exportHref="/crm/contacts/export"
+                    className="bg-white"
+                    contentClassName="bg-white"
                     headerActions={
                         <>
                             {canMerge ? (
@@ -101,7 +107,7 @@ export default function ContactsIndex({
                     }
                     banner={
                         !hasMailbox ? (
-                            <div className="border-b border-hairline bg-canvas px-4 py-2 text-[12px] text-mute sm:px-6">
+                            <div className="border-b border-hairline bg-white px-4 py-2 text-[12px] text-mute sm:px-6">
                                 Connect email to log outbound from this list.{' '}
                                 <Link
                                     href="/outbound/mailboxes"
@@ -135,8 +141,8 @@ export default function ContactsIndex({
                                     }
                                     line={
                                         hasActiveListFilters(activeFilters)
-                                            ? 'Clear filters or save a different view to see records.'
-                                            : 'Add your first contact to start building your customer workspace.'
+                                            ? 'Clear filters or open another saved view to see records.'
+                                            : 'Add the first person you sell to. Name, phone, and company are enough to start.'
                                     }
                                     actionLabel={
                                         hasActiveListFilters(activeFilters)
@@ -150,7 +156,7 @@ export default function ContactsIndex({
                                     }
                                 />
                             ) : (
-                                <div className="min-h-0 flex-1 overflow-auto">
+                                <div className="min-h-0 flex-1 overflow-auto bg-white">
                                     <ListViewTable
                                         entity="contact"
                                         rows={contacts}
@@ -219,7 +225,7 @@ export default function ContactsIndex({
                         </>
                     )}
                 </CrmListShell>
-            </CrmShell>
+            </div>
 
             <CreateDrawer
                 open={drawer}
