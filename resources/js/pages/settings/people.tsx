@@ -3,6 +3,7 @@ import { useState } from 'react';
 import PeopleController from '@/actions/App/Http/Controllers/Settings/PeopleController';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import InputError from '@/components/input-error';
+import { SettingsPageHeader } from '@/components/settings/chrome';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
 import {
     HairlineRow,
@@ -10,7 +11,6 @@ import {
     HairlineTd,
     HairlineTh,
 } from '@/components/surface/hairline-table';
-import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -102,10 +102,8 @@ export default function People({
         <>
             <Head title="People" />
 
-            <h1 className="sr-only">People</h1>
-
-            <div className="space-y-5">
-                <SurfaceHeader
+            <div className="space-y-3">
+                <SettingsPageHeader
                     title="People"
                     description="Who can sign in to this Evotechly workspace, their role, and their first-login email."
                 >
@@ -116,7 +114,7 @@ export default function People({
                     >
                         Invite
                     </Button>
-                </SurfaceHeader>
+                </SettingsPageHeader>
 
                 <HairlinePanel>
                     <HairlineTable minWidth="40rem">
@@ -145,7 +143,9 @@ export default function People({
                                         {person.email}
                                     </HairlineTd>
                                     <HairlineTd>
-                                        <Badge variant={roleVariant(person.role)}>
+                                        <Badge
+                                            variant={roleVariant(person.role)}
+                                        >
                                             {person.role}
                                         </Badge>
                                     </HairlineTd>
@@ -156,7 +156,9 @@ export default function People({
                                     </HairlineTd>
                                     <HairlineTd>
                                         {person.status === 'active' ? (
-                                            <Badge variant="default">Active</Badge>
+                                            <Badge variant="default">
+                                                Active
+                                            </Badge>
                                         ) : (
                                             <Badge variant="secondary">
                                                 Invite pending
@@ -210,7 +212,9 @@ export default function People({
                                                         Owner
                                                     </option>
                                                 ) : null}
-                                                <option value="admin">Admin</option>
+                                                <option value="admin">
+                                                    Admin
+                                                </option>
                                                 <option value="member">
                                                     Member
                                                 </option>
@@ -232,7 +236,8 @@ export default function People({
                                                     </DialogTrigger>
                                                     <DialogContent>
                                                         <DialogTitle>
-                                                            Remove {person.name}?
+                                                            Remove {person.name}
+                                                            ?
                                                         </DialogTitle>
                                                         <DialogDescription>
                                                             They lose access to
@@ -244,7 +249,9 @@ export default function People({
                                                             become unassigned.
                                                         </DialogDescription>
                                                         <DialogFooter className="gap-2">
-                                                            <DialogClose asChild>
+                                                            <DialogClose
+                                                                asChild
+                                                            >
                                                                 <Button variant="secondary">
                                                                     Cancel
                                                                 </Button>
@@ -305,7 +312,10 @@ export default function People({
                     {({ processing, errors }) => (
                         <>
                             <div>
-                                <Label htmlFor="invite-name" className="mb-1 block">
+                                <Label
+                                    htmlFor="invite-name"
+                                    className="mb-1 block"
+                                >
                                     Name
                                 </Label>
                                 <Input
@@ -317,7 +327,10 @@ export default function People({
                                 <InputError message={errors.name} />
                             </div>
                             <div>
-                                <Label htmlFor="invite-email" className="mb-1 block">
+                                <Label
+                                    htmlFor="invite-email"
+                                    className="mb-1 block"
+                                >
                                     Email
                                 </Label>
                                 <Input
@@ -330,7 +343,10 @@ export default function People({
                                 <InputError message={errors.email} />
                             </div>
                             <div>
-                                <Label htmlFor="invite-role" className="mb-1 block">
+                                <Label
+                                    htmlFor="invite-role"
+                                    className="mb-1 block"
+                                >
                                     Role
                                 </Label>
                                 <NativeSelect

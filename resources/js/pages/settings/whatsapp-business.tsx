@@ -1,9 +1,13 @@
 import { Form, Head } from '@inertiajs/react';
-import { WhatsAppBusinessMark } from '@/components/brand/marks';
+import { ChatCircle } from '@phosphor-icons/react';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 
 type Channel = {
     available: boolean;
@@ -24,23 +28,27 @@ export default function WhatsAppBusinessSettings({
     return (
         <>
             <Head title="WhatsApp Business" />
-            <div className="space-y-6">
-                <div className="flex items-start gap-3">
-                    <div className="grid size-11 place-content-center rounded-xl border bg-background">
-                        <WhatsAppBusinessMark className="size-6" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-semibold">WhatsApp Business</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Continue with Facebook. Evolution connects WhatsApp
-                            Business automatically — no phone-number ID to type.
-                        </p>
-                    </div>
-                </div>
+            <div className="space-y-3">
+                <SettingsPageHeader
+                    title="WhatsApp Business"
+                    description="Continue with Facebook. Evolution connects WhatsApp Business automatically. No phone-number ID to type."
+                />
 
-                <Card className="space-y-4 p-4">
+                {!channel.connected ? (
+                    <SettingsEmptyState
+                        icon={<ChatCircle className="size-6" />}
+                        title="WhatsApp Business is disconnected"
+                        description="Continue with Facebook. Evolution attaches the Business number without a token."
+                    />
+                ) : null}
+
+                <SettingsCard>
                     <div className="flex items-center gap-2">
-                        <Badge variant={channel.connected ? 'default' : 'secondary'}>
+                        <Badge
+                            variant={
+                                channel.connected ? 'default' : 'secondary'
+                            }
+                        >
                             {channel.connected ? 'Connected' : 'Not connected'}
                         </Badge>
                         {channel.display_phone ? (
@@ -56,16 +64,22 @@ export default function WhatsAppBusinessSettings({
                             <BrandConnectButtons facebookUrl={facebook_url} />
                         ) : null}
                         {channel.connected ? (
-                            <Form action="/settings/whatsapp-business" method="delete">
+                            <Form
+                                action="/settings/whatsapp-business"
+                                method="delete"
+                            >
                                 {({ processing }) => (
-                                    <Button variant="outline" disabled={processing}>
+                                    <Button
+                                        variant="outline"
+                                        disabled={processing}
+                                    >
                                         Disconnect
                                     </Button>
                                 )}
                             </Form>
                         ) : null}
                     </div>
-                </Card>
+                </SettingsCard>
             </div>
         </>
     );

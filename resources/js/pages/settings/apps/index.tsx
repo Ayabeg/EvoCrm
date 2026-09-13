@@ -1,5 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
-import { Check, ExternalLink, Mailbox, Minus } from 'lucide-react';
+import {
+    Check,
+    EnvelopeSimple,
+    Minus,
+    Plugs,
+    ArrowSquareOut,
+} from '@phosphor-icons/react';
 import {
     GoogleMark,
     MetaMark,
@@ -7,15 +13,19 @@ import {
     WhatsAppMark,
 } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import type { MarketplaceApp } from '@/types';
 
 function AppLogo({ appKey }: { appKey: string }) {
     if (appKey === 'google') {
         return (
-            <div className="grid size-11 shrink-0 place-content-center rounded-xl border bg-background">
+            <div className="grid size-9 shrink-0 place-content-center rounded-[4px] border border-hairline bg-white">
                 <GoogleMark className="size-5" />
             </div>
         );
@@ -23,7 +33,7 @@ function AppLogo({ appKey }: { appKey: string }) {
 
     if (appKey === 'meta') {
         return (
-            <div className="grid size-11 shrink-0 place-content-center rounded-xl border bg-background">
+            <div className="grid size-9 shrink-0 place-content-center rounded-[4px] border border-hairline bg-white">
                 <MetaMark className="size-6" />
             </div>
         );
@@ -31,7 +41,7 @@ function AppLogo({ appKey }: { appKey: string }) {
 
     if (appKey === 'whatsapp') {
         return (
-            <div className="grid size-11 shrink-0 place-content-center rounded-xl border bg-background">
+            <div className="grid size-9 shrink-0 place-content-center rounded-[4px] border border-hairline bg-white">
                 <WhatsAppMark className="size-6" />
             </div>
         );
@@ -39,54 +49,64 @@ function AppLogo({ appKey }: { appKey: string }) {
 
     if (appKey === 'whatsapp_business') {
         return (
-            <div className="grid size-11 shrink-0 place-content-center rounded-xl border bg-background">
+            <div className="grid size-9 shrink-0 place-content-center rounded-[4px] border border-hairline bg-white">
                 <WhatsAppBusinessMark className="size-6" />
             </div>
         );
     }
 
     return (
-        <div className="grid size-11 shrink-0 place-content-center rounded-xl border bg-background">
-            <Mailbox className="size-5 text-foreground" />
+        <div className="grid size-9 shrink-0 place-content-center rounded-[4px] border border-hairline bg-white">
+            <EnvelopeSimple className="size-5 text-ink" />
         </div>
     );
 }
 
 function AppCard({ app }: { app: MarketplaceApp }) {
     return (
-        <Card className="p-4">
+        <SettingsCard>
             <div className="flex items-start gap-3">
                 <AppLogo appKey={app.key} />
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-sm font-semibold">{app.name}</h3>
+                        <h3 className="text-[14px] font-semibold text-ink">
+                            {app.name}
+                        </h3>
                         <Badge
                             variant={app.connected ? 'default' : 'secondary'}
                         >
                             {app.connected ? 'Connected' : 'Not connected'}
                         </Badge>
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        {app.tagline}
-                    </p>
+                    <p className="mt-1 text-[13px] text-mute">{app.tagline}</p>
+
+                    {!app.connected ? (
+                        <p
+                            data-settings="disconnected"
+                            className="mt-2 text-[12px] text-mute"
+                        >
+                            Disconnected. Connect to unlock this app on the
+                            workspace.
+                        </p>
+                    ) : null}
 
                     {app.key === 'meta' && app.connected && (
                         <div className="mt-3 grid gap-1.5">
                             {app.unlocks.map((unlock) => (
                                 <div
                                     key={`${unlock.key}-${unlock.scope}`}
-                                    className="flex items-center gap-2 text-xs"
+                                    className="flex items-center gap-2 text-[12px]"
                                 >
                                     {unlock.granted ? (
-                                        <Check className="size-3.5 text-brand" />
+                                        <Check className="size-3.5 text-[#d9500f]" />
                                     ) : (
-                                        <Minus className="size-3.5 text-muted-foreground" />
+                                        <Minus className="size-3.5 text-mute" />
                                     )}
                                     <span
                                         className={
                                             unlock.granted
-                                                ? 'text-foreground'
-                                                : 'text-muted-foreground'
+                                                ? 'text-ink'
+                                                : 'text-mute'
                                         }
                                     >
                                         {unlock.label}
@@ -97,8 +117,8 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                     )}
 
                     {app.key === 'google' && (
-                        <div className="mt-3 space-y-1 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-                            <p className="font-medium text-foreground">
+                        <div className="mt-3 space-y-1 rounded-[4px] border border-dashed border-hairline bg-[#eaeaea] p-3 text-[12px] text-mute">
+                            <p className="font-medium text-ink">
                                 Google Cloud Console
                             </p>
                             <p>
@@ -106,18 +126,17 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                                 origin must be exactly:
                             </p>
                             {app.origin_url ? (
-                                <p className="font-mono break-all text-brand">
+                                <p className="font-mono break-all text-[#d9500f]">
                                     {app.origin_url}
                                 </p>
                             ) : null}
                             <p>
                                 Authorized redirect URI must be exactly (no
-                                trailing slash). Error 400
-                                redirect_uri_mismatch means this URI is missing
-                                on the client:
+                                trailing slash). Error 400 redirect_uri_mismatch
+                                means this URI is missing on the client:
                             </p>
                             {app.callback_url ? (
-                                <p className="font-mono break-all text-brand">
+                                <p className="font-mono break-all text-[#d9500f]">
                                     {app.callback_url}
                                 </p>
                             ) : null}
@@ -125,11 +144,10 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                     )}
 
                     {app.key === 'smtp' && (
-                        <p className="mt-2 text-xs text-muted-foreground">
+                        <p className="mt-2 text-[12px] text-mute">
                             {app.mailboxes ?? 0} mailbox
                             {(app.mailboxes ?? 0) === 1 ? '' : 'es'} on this
-                            workspace. Not OAuth — credentials live per
-                            mailbox.
+                            workspace. Not OAuth - credentials live per mailbox.
                         </p>
                     )}
 
@@ -138,7 +156,9 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                             app.key === 'whatsapp' ||
                             app.key === 'whatsapp_business') &&
                             !app.connected && (
-                                <BrandConnectButtons facebookUrl={app.connect_url} />
+                                <BrandConnectButtons
+                                    facebookUrl={app.connect_url}
+                                />
                             )}
                         {app.connected && app.manage_url && (
                             <Button size="sm" variant="outline" asChild>
@@ -152,7 +172,7 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                                     target="_blank"
                                     rel="noreferrer"
                                 >
-                                    <ExternalLink className="size-3.5" />
+                                    <ArrowSquareOut className="size-3.5" />
                                     Open webmail
                                 </a>
                             </Button>
@@ -160,7 +180,7 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                         {app.key === 'meta' &&
                             app.connected &&
                             app.connected_at && (
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-[12px] text-mute">
                                     since{' '}
                                     {new Date(
                                         app.connected_at,
@@ -174,34 +194,56 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                     </div>
                 </div>
             </div>
-        </Card>
+        </SettingsCard>
     );
 }
 
 export default function AppsMarketplace({ apps }: { apps: MarketplaceApp[] }) {
+    const connectedCount = apps.filter((app) => app.connected).length;
+
     return (
         <>
             <Head title="Apps" />
-            <div className="space-y-6">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                        <h1 className="text-xl font-semibold">Apps</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Continue with Facebook. WhatsApp connects automatically.
-                            You never enter an App ID, token, or API key.
-                        </p>
-                    </div>
-                    <Button asChild>
-                        <Link href="/settings/setup">Get started</Link>
-                    </Button>
-                </div>
+            <SettingsPageHeader
+                title="Apps"
+                description="Continue with Facebook. WhatsApp connects automatically. You never enter an App ID, token, or API key."
+            >
+                <Button
+                    asChild
+                    size="sm"
+                    className="bg-[#d9500f] text-white hover:bg-[#bf460d]"
+                >
+                    <Link href="/settings/setup">Get started</Link>
+                </Button>
+            </SettingsPageHeader>
 
+            {apps.length === 0 ? (
+                <SettingsEmptyState
+                    icon={<Plugs className="size-6" weight="regular" />}
+                    title="No apps on this workspace"
+                    description="Apps appear here once the workspace marketplace is provisioned."
+                />
+            ) : (
                 <div className="grid gap-3">
+                    {connectedCount === 0 ? (
+                        <SettingsEmptyState
+                            icon={<Plugs className="size-6" weight="regular" />}
+                            title="Nothing connected yet"
+                            description="Connect Meta, WhatsApp, Google, or mail to start using this workspace."
+                            action={
+                                <Button size="sm" asChild>
+                                    <Link href="/settings/setup">
+                                        Open setup
+                                    </Link>
+                                </Button>
+                            }
+                        />
+                    ) : null}
                     {apps.map((app) => (
                         <AppCard key={app.key} app={app} />
                     ))}
                 </div>
-            </div>
+            )}
         </>
     );
 }

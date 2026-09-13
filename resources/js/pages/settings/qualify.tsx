@@ -1,8 +1,11 @@
 import { Form, Head } from '@inertiajs/react';
-import Heading from '@/components/heading';
-import { Button } from '@/components/ui/button';
+import {
+    SettingsCard,
+    SettingsFormRow,
+    SettingsPageHeader,
+    SettingsSaveBar,
+} from '@/components/settings/chrome';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 type Thresholds = {
     hold: number;
@@ -20,19 +23,27 @@ export default function QualifySettings({
     return (
         <>
             <Head title="Qualify" />
-            <div className="space-y-4">
-                <Heading
-                    title="Qualify"
-                    description="Formula lead score thresholds. Crossing qualify marks the lead. Crossing convert uses the existing convert path."
-                />
-                <div className="space-y-3 border-t border-hairline pt-3">
-                    <Form
-                        action="/settings/qualify"
-                        method="put"
-                        className="grid gap-3 sm:grid-cols-3"
+
+            <SettingsPageHeader
+                title="Qualify"
+                description="Formula lead score thresholds. Crossing qualify marks the lead. Crossing convert uses the existing convert path."
+            />
+
+            <Form action="/settings/qualify" method="put">
+                {({ processing }) => (
+                    <SettingsCard
+                        title="Score thresholds"
+                        required
+                        footer={
+                            canManage ? (
+                                <SettingsSaveBar
+                                    processing={processing}
+                                    saveLabel="Save thresholds"
+                                />
+                            ) : undefined
+                        }
                     >
-                        <div>
-                            <Label htmlFor="hold">Hold</Label>
+                        <SettingsFormRow label="Hold" htmlFor="hold" required>
                             <Input
                                 id="hold"
                                 name="hold"
@@ -40,12 +51,15 @@ export default function QualifySettings({
                                 min={0}
                                 max={100}
                                 defaultValue={thresholds.hold}
-                                className="mt-1"
+                                className="h-8"
                                 disabled={!canManage}
                             />
-                        </div>
-                        <div>
-                            <Label htmlFor="qualify">Qualify</Label>
+                        </SettingsFormRow>
+                        <SettingsFormRow
+                            label="Qualify"
+                            htmlFor="qualify"
+                            required
+                        >
                             <Input
                                 id="qualify"
                                 name="qualify"
@@ -53,12 +67,15 @@ export default function QualifySettings({
                                 min={0}
                                 max={100}
                                 defaultValue={thresholds.qualify}
-                                className="mt-1"
+                                className="h-8"
                                 disabled={!canManage}
                             />
-                        </div>
-                        <div>
-                            <Label htmlFor="convert">Convert</Label>
+                        </SettingsFormRow>
+                        <SettingsFormRow
+                            label="Convert"
+                            htmlFor="convert"
+                            required
+                        >
                             <Input
                                 id="convert"
                                 name="convert"
@@ -66,24 +83,17 @@ export default function QualifySettings({
                                 min={0}
                                 max={100}
                                 defaultValue={thresholds.convert}
-                                className="mt-1"
+                                className="h-8"
                                 disabled={!canManage}
                             />
-                        </div>
-                        {canManage ? (
-                            <div className="sm:col-span-3">
-                                <Button type="submit" size="sm">
-                                    Save thresholds
-                                </Button>
-                            </div>
-                        ) : null}
-                    </Form>
-                    <p className="text-xs text-mute">
-                        Hold moves new leads to working. Qualify sets qualified.
-                        Convert creates or links the unique deal.
-                    </p>
-                </div>
-            </div>
+                        </SettingsFormRow>
+                        <p className="text-[12px] text-mute">
+                            Hold moves new leads to working. Qualify sets
+                            qualified. Convert creates or links the unique deal.
+                        </p>
+                    </SettingsCard>
+                )}
+            </Form>
         </>
     );
 }

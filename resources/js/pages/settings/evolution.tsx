@@ -1,9 +1,14 @@
 import { Head, Link } from '@inertiajs/react';
+import { ChatCircle } from '@phosphor-icons/react';
 import { WhatsAppBusinessMark, WhatsAppMark } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 
 type Channel = {
     available: boolean;
@@ -28,24 +33,33 @@ export default function EvolutionSettings({
     return (
         <>
             <Head title="WhatsApp" />
-            <div className="space-y-6">
-                <div>
-                    <h1 className="text-xl font-semibold">WhatsApp</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Continue with Facebook. Evolution connects WhatsApp and
-                        WhatsApp Business automatically.
-                    </p>
-                </div>
+            <div className="space-y-3">
+                <SettingsPageHeader
+                    title="WhatsApp"
+                    description="Continue with Facebook. Evolution connects WhatsApp and WhatsApp Business automatically."
+                />
+
+                {!whatsapp.connected && !whatsapp_business.connected ? (
+                    <SettingsEmptyState
+                        icon={<ChatCircle className="size-6" />}
+                        title="WhatsApp is disconnected"
+                        description="Continue with Facebook. Evolution attaches both WhatsApp channels without an API key."
+                    />
+                ) : null}
 
                 <div className="grid gap-3 md:grid-cols-2">
-                    <Card className="space-y-3 p-4">
+                    <SettingsCard>
                         <div className="flex items-center gap-2">
                             <WhatsAppMark className="size-5" />
                             <h2 className="text-sm font-semibold">WhatsApp</h2>
                             <Badge
-                                variant={whatsapp.connected ? 'default' : 'secondary'}
+                                variant={
+                                    whatsapp.connected ? 'default' : 'secondary'
+                                }
                             >
-                                {whatsapp.connected ? 'Connected' : 'Not connected'}
+                                {whatsapp.connected
+                                    ? 'Connected'
+                                    : 'Not connected'}
                             </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -58,8 +72,8 @@ export default function EvolutionSettings({
                         ) : (
                             <BrandConnectButtons facebookUrl={facebook_url} />
                         )}
-                    </Card>
-                    <Card className="space-y-3 p-4">
+                    </SettingsCard>
+                    <SettingsCard>
                         <div className="flex items-center gap-2">
                             <WhatsAppBusinessMark className="size-5" />
                             <h2 className="text-sm font-semibold">
@@ -89,13 +103,13 @@ export default function EvolutionSettings({
                         ) : (
                             <BrandConnectButtons facebookUrl={facebook_url} />
                         )}
-                    </Card>
+                    </SettingsCard>
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                    Last inbox event: {last_event ?? '—'}
+                    Last inbox event: {last_event ?? '-'}
                     {last_webhook_at
-                        ? ` · ${new Date(last_webhook_at).toLocaleString()}`
+                        ? ` / ${new Date(last_webhook_at).toLocaleString()}`
                         : ''}
                 </p>
             </div>

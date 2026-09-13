@@ -1,13 +1,15 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { RecordLayoutProvider, useRecordLayoutContext } from '@/components/crm/record-layout-context';
+import {
+    RecordLayoutProvider,
+    useRecordLayoutContext,
+} from '@/components/crm/record-layout-context';
 import {
     RecordLayoutCustomizeButton,
     RecordLayoutEditor,
 } from '@/components/crm/record-layout-editor';
-import Heading from '@/components/heading';
+import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Button } from '@/components/ui/button';
-import SettingsLayout from '@/layouts/settings/layout';
 import type { RecordLayoutState, RecordObjectType } from '@/lib/record-layout';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +23,11 @@ function SaveWorkspaceDefaultButton() {
     const { saveWorkspaceDefault, savingDefault } = useRecordLayoutContext();
 
     return (
-        <Button type="button" onClick={() => void saveWorkspaceDefault()} disabled={savingDefault}>
+        <Button
+            type="button"
+            onClick={() => void saveWorkspaceDefault()}
+            disabled={savingDefault}
+        >
             {savingDefault ? 'Saving…' : 'Save as workspace default'}
         </Button>
     );
@@ -35,14 +41,19 @@ function EntityLayoutEditor({
     seedLayout: RecordLayoutState | null;
 }) {
     return (
-        <RecordLayoutProvider objectType={entity} mode="workspace" seedLayout={seedLayout}>
+        <RecordLayoutProvider
+            objectType={entity}
+            mode="workspace"
+            seedLayout={seedLayout}
+        >
             <div className="flex flex-wrap items-center gap-2">
                 <RecordLayoutCustomizeButton />
                 <SaveWorkspaceDefaultButton />
             </div>
             <RecordLayoutEditor />
             <p className="text-[12px] text-muted-foreground">
-                Workspace defaults apply to all members who have not saved a personal layout for this record type.
+                Workspace defaults apply to all members who have not saved a
+                personal layout for this record type.
             </p>
         </RecordLayoutProvider>
     );
@@ -56,10 +67,10 @@ export default function RecordLayoutsSettings({
     const [entity, setEntity] = useState<RecordObjectType>('contact');
 
     return (
-        <SettingsLayout>
+        <>
             <Head title="Record layouts" />
-            <div className="space-y-6">
-                <Heading
+            <div className="space-y-3">
+                <SettingsPageHeader
                     title="Record layouts"
                     description="Set the default card order and visibility for contact, company, and deal records across your workspace."
                 />
@@ -80,8 +91,18 @@ export default function RecordLayoutsSettings({
                         </button>
                     ))}
                 </nav>
-                <EntityLayoutEditor key={entity} entity={entity} seedLayout={layouts[entity] ?? null} />
+                <EntityLayoutEditor
+                    key={entity}
+                    entity={entity}
+                    seedLayout={layouts[entity] ?? null}
+                />
             </div>
-        </SettingsLayout>
+        </>
     );
 }
+
+RecordLayoutsSettings.layout = {
+    breadcrumbs: [
+        { title: 'Record layouts', href: '/settings/record-layouts' },
+    ],
+};

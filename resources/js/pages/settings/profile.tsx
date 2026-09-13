@@ -1,12 +1,14 @@
-import { Form, Head, usePage } from '@inertiajs/react';
-import { Link } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
+import {
+    SettingsCard,
+    SettingsFormRow,
+    SettingsPageHeader,
+    SettingsSaveBar,
+} from '@/components/settings/chrome';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { Auth } from '@/types';
@@ -28,102 +30,94 @@ export default function Profile({
         <>
             <Head title="Profile settings" />
 
-            <h1 className="sr-only">Profile settings</h1>
+            <SettingsPageHeader
+                title="Profile"
+                description="Name and email for this EvoCrm login."
+            />
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Profile"
-                    description="Update your name and email address"
-                />
-
+            <div className="grid gap-3">
                 <Form
                     {...ProfileController.update.form()}
                     options={{
                         preserveScroll: true,
                     }}
-                    className="space-y-6"
                 >
                     {({ processing, errors }) => (
-                        <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-
+                        <SettingsCard
+                            title="Personal information"
+                            required
+                            footer={
+                                <SettingsSaveBar
+                                    processing={processing}
+                                    saveTestId="update-profile-button"
+                                />
+                            }
+                        >
+                            <SettingsFormRow
+                                label="Name"
+                                htmlFor="name"
+                                required
+                                error={errors.name}
+                            >
                                 <Input
                                     id="name"
-                                    className="mt-1 block w-full"
+                                    className="h-8"
                                     defaultValue={auth.user.name}
                                     name="name"
                                     required
                                     autoComplete="name"
-                                    placeholder="Full name"
                                 />
+                            </SettingsFormRow>
 
-                                <InputError
-                                    className="mt-2"
-                                    message={errors.name}
-                                />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-
+                            <SettingsFormRow
+                                label="Email address"
+                                htmlFor="email"
+                                required
+                                error={errors.email}
+                            >
                                 <Input
                                     id="email"
                                     type="email"
-                                    className="mt-1 block w-full"
+                                    className="h-8"
                                     defaultValue={auth.user.email}
                                     name="email"
                                     required
                                     autoComplete="username"
-                                    placeholder="Email address"
                                 />
-
-                                <InputError
-                                    className="mt-2"
-                                    message={errors.email}
-                                />
-                            </div>
+                            </SettingsFormRow>
 
                             {mustVerifyEmail &&
-                                auth.user.email_verified_at === null && (
-                                    <div>
-                                        <p className="-mt-4 text-sm text-muted-foreground">
-                                            Your email address is unverified.{' '}
-                                            <Link
-                                                href={send()}
-                                                as="button"
-                                                className="text-brand underline decoration-brand/30 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-brand"
-                                            >
-                                                Click here to re-send the
-                                                verification email.
-                                            </Link>
-                                        </p>
+                            auth.user.email_verified_at === null ? (
+                                <p className="text-[12px] text-mute">
+                                    Your email address is unverified.{' '}
+                                    <Link
+                                        href={send()}
+                                        as="button"
+                                        className="text-[#d9500f] underline decoration-[#d9500f]/30 underline-offset-4 hover:decoration-[#d9500f]"
+                                    >
+                                        Re-send the verification email.
+                                    </Link>
+                                    {status === 'verification-link-sent' ? (
+                                        <span className="mt-1 block font-medium text-ink">
+                                            A new verification link has been
+                                            sent to your email address.
+                                        </span>
+                                    ) : null}
+                                </p>
+                            ) : null}
 
-                                        {status ===
-                                            'verification-link-sent' && (
-                                            <div className="mt-2 text-sm font-medium text-green-600">
-                                                A new verification link has been
-                                                sent to your email address.
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                            <div className="flex items-center gap-4">
-                                <Button
-                                    disabled={processing}
-                                    data-test="update-profile-button"
-                                >
-                                    Save
-                                </Button>
-                            </div>
-                        </>
+                            <InputError
+                                className="sr-only"
+                                message={errors.name}
+                            />
+                        </SettingsCard>
                     )}
                 </Form>
-            </div>
 
-            <DeleteUser />
+                <SettingsCard title="Delete account">
+                    <DeleteUser />
+                </SettingsCard>
+            </div>
         </>
     );
 }

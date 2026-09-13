@@ -1,6 +1,12 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import { Plugs } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -28,7 +34,10 @@ type LogRow = {
     provider_event_id?: string;
 };
 
-function metric(value: string | number | null | undefined, empty = 'Not enough data') {
+function metric(
+    value: string | number | null | undefined,
+    empty = 'Not enough data',
+) {
     if (value === null || value === undefined || value === '') {
         return empty;
     }
@@ -74,7 +83,14 @@ export default function MetaSettings({
     default_mappings: Record<string, string>;
     conversion_configs: ConversionConfig[];
     conversion_events: string[];
-    sync_runs: { id: number; kind: string; mode: string; status: string; error: string | null; finished_at: string | null }[];
+    sync_runs: {
+        id: number;
+        kind: string;
+        mode: string;
+        status: string;
+        error: string | null;
+        finished_at: string | null;
+    }[];
     webhook_events: LogRow[];
     conversion_logs: LogRow[];
     connect_url?: string | null;
@@ -82,54 +98,74 @@ export default function MetaSettings({
     const initialMappings =
         field_mappings.length > 0
             ? field_mappings
-            : Object.entries(default_mappings).map(([meta_field, crm_property]) => ({
-                  meta_field,
-                  crm_property,
-              }));
+            : Object.entries(default_mappings).map(
+                  ([meta_field, crm_property]) => ({
+                      meta_field,
+                      crm_property,
+                  }),
+              );
     const [mappings, setMappings] = useState<Mapping[]>(initialMappings);
-    const pixel = conversion_configs.find((config) => config.pixel_id)?.pixel_id ?? '';
+    const pixel =
+        conversion_configs.find((config) => config.pixel_id)?.pixel_id ?? '';
 
     return (
         <>
             <Head title="Meta" />
-            <div className="space-y-8">
-                <div>
-                    <h1 className="text-xl font-semibold">Meta</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Log in with Facebook. Connection, lead forms, field mapping,
-                        and conversion feedback. Tokens stay encrypted on the server.
-                    </p>
-                </div>
+            <div className="space-y-3">
+                <SettingsPageHeader
+                    title="Meta"
+                    description="Log in with Facebook. Connection, lead forms, field mapping, and conversion feedback. Tokens stay encrypted on the server."
+                />
 
-                <Card className="space-y-2 p-4 text-sm">
+                {!connected ? (
+                    <SettingsEmptyState
+                        icon={<Plugs className="size-6" />}
+                        title="Meta is disconnected"
+                        description="Continue with Facebook to attach the ad account, pages, and lead forms. Tokens stay encrypted on the server."
+                    />
+                ) : null}
+
+                <SettingsCard title="Connection">
                     <div className="flex flex-wrap items-center gap-2">
                         <Badge variant={connected ? 'default' : 'secondary'}>
                             {connected ? 'Connected' : 'Needs setup'}
                         </Badge>
                         {expires_at ? (
                             <span className="text-xs text-muted-foreground">
-                                Token expires {new Date(expires_at).toLocaleDateString('en-GB')}
+                                Token expires{' '}
+                                {new Date(expires_at).toLocaleDateString(
+                                    'en-GB',
+                                )}
                             </span>
                         ) : null}
                     </div>
-                    <p>Ad account: {ad_account_id_set ? 'selected' : 'choose after login'}</p>
+                    <p>
+                        Ad account:{' '}
+                        {ad_account_id_set ? 'selected' : 'choose after login'}
+                    </p>
                     <p>Graph version: {graph_version}</p>
                     {reason ? <p className="text-brand">{reason}</p> : null}
                     {!connected && can_manage ? (
                         <div className="pt-2">
-                            <BrandConnectButtons facebookUrl={connect_url ?? '/auth/meta?popup=1'} />
+                            <BrandConnectButtons
+                                facebookUrl={
+                                    connect_url ?? '/auth/meta?popup=1'
+                                }
+                            />
                         </div>
                     ) : (
                         <div className="flex flex-wrap gap-2 pt-1">
                             <Button asChild size="sm" variant="outline">
-                                <Link href="/settings/apps/meta">Connection details</Link>
+                                <Link href="/settings/apps/meta">
+                                    Connection details
+                                </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
                                 <Link href="/auth/meta">Reconnect</Link>
                             </Button>
                         </div>
                     )}
-                </Card>
+                </SettingsCard>
 
                 {ad_accounts.length > 0 ? (
                     <Card className="space-y-4 p-4">
@@ -137,13 +173,18 @@ export default function MetaSettings({
                         <Form action="/settings/meta/ad-account" method="put">
                             {({ processing, errors }) => (
                                 <div className="space-y-3">
-                                    <label htmlFor="meta-ad-account" className="block text-xs font-medium">
+                                    <label
+                                        htmlFor="meta-ad-account"
+                                        className="block text-xs font-medium"
+                                    >
                                         Marketing ad account
                                     </label>
                                     <select
                                         id="meta-ad-account"
                                         name="ad_account_id"
-                                        defaultValue={selected_ad_account_id ?? ''}
+                                        defaultValue={
+                                            selected_ad_account_id ?? ''
+                                        }
                                         disabled={!can_manage || processing}
                                         className="h-9 w-full rounded-md border border-hairline bg-canvas px-3 text-sm"
                                     >
@@ -151,15 +192,24 @@ export default function MetaSettings({
                                             Select an account
                                         </option>
                                         {ad_accounts.map((account) => (
-                                            <option key={account.id} value={account.id}>
+                                            <option
+                                                key={account.id}
+                                                value={account.id}
+                                            >
                                                 {account.name}
                                             </option>
                                         ))}
                                     </select>
                                     {errors.ad_account_id ? (
-                                        <p className="text-xs text-destructive">{errors.ad_account_id}</p>
+                                        <p className="text-xs text-destructive">
+                                            {errors.ad_account_id}
+                                        </p>
                                     ) : null}
-                                    <Button type="submit" size="sm" disabled={!can_manage || processing}>
+                                    <Button
+                                        type="submit"
+                                        size="sm"
+                                        disabled={!can_manage || processing}
+                                    >
                                         Save account
                                     </Button>
                                 </div>
@@ -167,19 +217,29 @@ export default function MetaSettings({
                         </Form>
                         <div className="grid gap-3 text-sm md:grid-cols-2">
                             <div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase">Pages</p>
+                                <p className="text-xs font-medium text-muted-foreground uppercase">
+                                    Pages
+                                </p>
                                 <ul className="mt-1 list-inside list-disc">
-                                    {pages.length === 0 ? <li className="text-muted-foreground">None</li> : null}
+                                    {pages.length === 0 ? (
+                                        <li className="text-muted-foreground">
+                                            None
+                                        </li>
+                                    ) : null}
                                     {pages.map((page) => (
                                         <li key={page.id}>{page.name}</li>
                                     ))}
                                 </ul>
                             </div>
                             <div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase">Instagram</p>
+                                <p className="text-xs font-medium text-muted-foreground uppercase">
+                                    Instagram
+                                </p>
                                 <ul className="mt-1 list-inside list-disc">
                                     {instagram_accounts.length === 0 ? (
-                                        <li className="text-muted-foreground">None</li>
+                                        <li className="text-muted-foreground">
+                                            None
+                                        </li>
                                     ) : null}
                                     {instagram_accounts.map((account) => (
                                         <li key={account.id}>{account.name}</li>
@@ -191,22 +251,31 @@ export default function MetaSettings({
                 ) : null}
 
                 <Card className="space-y-3 p-4">
-                    <h2 className="text-sm font-semibold">Lead forms & webhook</h2>
+                    <h2 className="text-sm font-semibold">
+                        Lead forms & webhook
+                    </h2>
                     <p className="text-xs text-muted-foreground">
-                        Subscribe the Meta app to <code>leadgen</code> on this callback. The
-                        workspace key is the tenant identity.
+                        Subscribe the Meta app to <code>leadgen</code> on this
+                        callback. The workspace key is the tenant identity.
                     </p>
-                    <code className="block break-all rounded-md bg-canvas-soft px-3 py-2 text-xs">
+                    <code className="block rounded-md bg-canvas-soft px-3 py-2 text-xs break-all">
                         {webhook_url}
                     </code>
                     {forms.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No forms synced yet.</p>
+                        <p className="text-sm text-muted-foreground">
+                            No forms synced yet.
+                        </p>
                     ) : (
                         <ul className="space-y-1 text-sm">
                             {forms.map((form) => (
-                                <li key={form.id} className="flex justify-between gap-2">
+                                <li
+                                    key={form.id}
+                                    className="flex justify-between gap-2"
+                                >
                                     <span>{form.name}</span>
-                                    <Badge variant="secondary">{form.status}</Badge>
+                                    <Badge variant="secondary">
+                                        {form.status}
+                                    </Badge>
                                 </li>
                             ))}
                         </ul>
@@ -216,8 +285,8 @@ export default function MetaSettings({
                 <Card className="space-y-4 p-4">
                     <h2 className="text-sm font-semibold">Field mapping</h2>
                     <p className="text-xs text-muted-foreground">
-                        Map Meta form fields to EvoSales properties. Unmapped custom fields
-                        stay on the lead payload.
+                        Map Meta form fields to EvoSales properties. Unmapped
+                        custom fields stay on the lead payload.
                     </p>
                     <Form
                         action="/settings/meta/mappings"
@@ -227,12 +296,19 @@ export default function MetaSettings({
                         {({ processing }) => (
                             <div className="space-y-3">
                                 {mappings.map((row, index) => (
-                                    <div key={`${row.meta_field}-${index}`} className="grid grid-cols-2 gap-2">
+                                    <div
+                                        key={`${row.meta_field}-${index}`}
+                                        className="grid grid-cols-2 gap-2"
+                                    >
                                         <Input
                                             value={row.meta_field}
                                             onChange={(event) => {
                                                 const next = [...mappings];
-                                                next[index] = { ...row, meta_field: event.target.value };
+                                                next[index] = {
+                                                    ...row,
+                                                    meta_field:
+                                                        event.target.value,
+                                                };
                                                 setMappings(next);
                                             }}
                                             placeholder="Meta field"
@@ -242,7 +318,11 @@ export default function MetaSettings({
                                             value={row.crm_property}
                                             onChange={(event) => {
                                                 const next = [...mappings];
-                                                next[index] = { ...row, crm_property: event.target.value };
+                                                next[index] = {
+                                                    ...row,
+                                                    crm_property:
+                                                        event.target.value,
+                                                };
                                                 setMappings(next);
                                             }}
                                             placeholder="EvoSales property"
@@ -256,11 +336,23 @@ export default function MetaSettings({
                                         size="sm"
                                         variant="outline"
                                         disabled={!can_manage}
-                                        onClick={() => setMappings([...mappings, { meta_field: '', crm_property: '' }])}
+                                        onClick={() =>
+                                            setMappings([
+                                                ...mappings,
+                                                {
+                                                    meta_field: '',
+                                                    crm_property: '',
+                                                },
+                                            ])
+                                        }
                                     >
                                         Add field
                                     </Button>
-                                    <Button type="submit" size="sm" disabled={!can_manage || processing}>
+                                    <Button
+                                        type="submit"
+                                        size="sm"
+                                        disabled={!can_manage || processing}
+                                    >
                                         Save mappings
                                     </Button>
                                 </div>
@@ -272,13 +364,16 @@ export default function MetaSettings({
                 <Card className="space-y-4 p-4">
                     <h2 className="text-sm font-semibold">Conversions API</h2>
                     <p className="text-xs text-muted-foreground">
-                        CRM lifecycle events map to Meta standard events. Email and phone are
-                        hashed before send.
+                        CRM lifecycle events map to Meta standard events. Email
+                        and phone are hashed before send.
                     </p>
                     <Form action="/settings/meta/conversions" method="put">
                         {({ processing }) => (
                             <div className="space-y-3">
-                                <label className="block text-xs font-medium" htmlFor="pixel_id">
+                                <label
+                                    className="block text-xs font-medium"
+                                    htmlFor="pixel_id"
+                                >
                                     Pixel / dataset ID
                                 </label>
                                 <Input
@@ -289,11 +384,22 @@ export default function MetaSettings({
                                     placeholder="1234567890"
                                 />
                                 {conversion_configs.map((config, index) => (
-                                    <div key={config.crm_event} className="grid gap-2 rounded-md border border-hairline p-3 md:grid-cols-4">
-                                        <input type="hidden" name={`configs[${index}][crm_event]`} value={config.crm_event} />
+                                    <div
+                                        key={config.crm_event}
+                                        className="grid gap-2 rounded-md border border-hairline p-3 md:grid-cols-4"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name={`configs[${index}][crm_event]`}
+                                            value={config.crm_event}
+                                        />
                                         <div>
-                                            <p className="text-xs text-muted-foreground">EvoSales</p>
-                                            <p className="text-sm font-medium">{config.crm_event}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                EvoSales
+                                            </p>
+                                            <p className="text-sm font-medium">
+                                                {config.crm_event}
+                                            </p>
                                         </div>
                                         <select
                                             name={`configs[${index}][meta_event]`}
@@ -301,14 +407,23 @@ export default function MetaSettings({
                                             disabled={!can_manage}
                                             className="h-9 rounded-md border border-hairline bg-canvas px-2 text-sm"
                                         >
-                                            {conversion_events.map((eventName) => (
-                                                <option key={eventName} value={eventName}>
-                                                    {eventName}
-                                                </option>
-                                            ))}
+                                            {conversion_events.map(
+                                                (eventName) => (
+                                                    <option
+                                                        key={eventName}
+                                                        value={eventName}
+                                                    >
+                                                        {eventName}
+                                                    </option>
+                                                ),
+                                            )}
                                         </select>
                                         <label className="flex items-center gap-2 text-sm">
-                                            <input type="hidden" name={`configs[${index}][enabled]`} value="0" />
+                                            <input
+                                                type="hidden"
+                                                name={`configs[${index}][enabled]`}
+                                                value="0"
+                                            />
                                             <input
                                                 type="checkbox"
                                                 name={`configs[${index}][enabled]`}
@@ -321,12 +436,34 @@ export default function MetaSettings({
                                         <div className="text-xs text-muted-foreground">
                                             <p>Sent {config.sent_count}</p>
                                             <p>Failed {config.failed_count}</p>
-                                            <p>Last ok {metric(config.last_success_at ? new Date(config.last_success_at).toLocaleString() : null)}</p>
-                                            <p>Last fail {metric(config.last_failure_at ? new Date(config.last_failure_at).toLocaleString() : null)}</p>
+                                            <p>
+                                                Last ok{' '}
+                                                {metric(
+                                                    config.last_success_at
+                                                        ? new Date(
+                                                              config.last_success_at,
+                                                          ).toLocaleString()
+                                                        : null,
+                                                )}
+                                            </p>
+                                            <p>
+                                                Last fail{' '}
+                                                {metric(
+                                                    config.last_failure_at
+                                                        ? new Date(
+                                                              config.last_failure_at,
+                                                          ).toLocaleString()
+                                                        : null,
+                                                )}
+                                            </p>
                                         </div>
                                     </div>
                                 ))}
-                                <Button type="submit" size="sm" disabled={!can_manage || processing}>
+                                <Button
+                                    type="submit"
+                                    size="sm"
+                                    disabled={!can_manage || processing}
+                                >
                                     Save conversions
                                 </Button>
                             </div>
@@ -343,11 +480,24 @@ export default function MetaSettings({
                             { kind: 'leads', label: 'Historical leads' },
                             { kind: 'all', label: 'Full sync' },
                         ].map((action) => (
-                            <Form key={action.kind} action="/settings/meta/sync" method="post">
+                            <Form
+                                key={action.kind}
+                                action="/settings/meta/sync"
+                                method="post"
+                            >
                                 {({ processing }) => (
                                     <>
-                                        <input type="hidden" name="kind" value={action.kind} />
-                                        <Button type="submit" size="sm" variant="outline" disabled={!can_manage || processing}>
+                                        <input
+                                            type="hidden"
+                                            name="kind"
+                                            value={action.kind}
+                                        />
+                                        <Button
+                                            type="submit"
+                                            size="sm"
+                                            variant="outline"
+                                            disabled={!can_manage || processing}
+                                        >
                                             {action.label}
                                         </Button>
                                     </>
@@ -356,7 +506,9 @@ export default function MetaSettings({
                         ))}
                     </div>
                     <ul className="space-y-1 text-xs text-muted-foreground">
-                        {sync_runs.length === 0 ? <li>No sync runs yet.</li> : null}
+                        {sync_runs.length === 0 ? (
+                            <li>No sync runs yet.</li>
+                        ) : null}
                         {sync_runs.map((run) => (
                             <li key={run.id}>
                                 {run.kind} · {run.mode} · {run.status}
@@ -369,13 +521,18 @@ export default function MetaSettings({
                 <Card className="space-y-3 p-4">
                     <h2 className="text-sm font-semibold">Logs</h2>
                     <p className="text-xs text-muted-foreground">
-                        Webhook and conversion outcomes. Payloads are stored without tokens.
+                        Webhook and conversion outcomes. Payloads are stored
+                        without tokens.
                     </p>
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <p className="text-xs font-medium uppercase text-muted-foreground">Webhooks</p>
+                            <p className="text-xs font-medium text-muted-foreground uppercase">
+                                Webhooks
+                            </p>
                             <ul className="mt-1 space-y-1 text-xs">
-                                {webhook_events.length === 0 ? <li>None</li> : null}
+                                {webhook_events.length === 0 ? (
+                                    <li>None</li>
+                                ) : null}
                                 {webhook_events.map((event) => (
                                     <li key={event.id}>
                                         {event.event_type} · {event.status}
@@ -385,12 +542,17 @@ export default function MetaSettings({
                             </ul>
                         </div>
                         <div>
-                            <p className="text-xs font-medium uppercase text-muted-foreground">Conversions</p>
+                            <p className="text-xs font-medium text-muted-foreground uppercase">
+                                Conversions
+                            </p>
                             <ul className="mt-1 space-y-1 text-xs">
-                                {conversion_logs.length === 0 ? <li>None</li> : null}
+                                {conversion_logs.length === 0 ? (
+                                    <li>None</li>
+                                ) : null}
                                 {conversion_logs.map((event) => (
                                     <li key={event.id}>
-                                        {event.crm_event} → {event.meta_event} · {event.status}
+                                        {event.crm_event} → {event.meta_event} ·{' '}
+                                        {event.status}
                                     </li>
                                 ))}
                             </ul>

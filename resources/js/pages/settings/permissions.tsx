@@ -1,5 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
-import Heading from '@/components/heading';
+import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -33,14 +33,14 @@ export default function PermissionsSettings({
         <>
             <Head title="Permissions" />
             <div className="space-y-6">
-                <Heading
+                <SettingsPageHeader
                     title="Permissions"
                     description="Server-enforced role defaults with owner-controlled member grants."
                 />
 
                 <Card className="overflow-hidden border-hairline p-0 shadow-none">
                     <table className="w-full text-left text-[13px]">
-                        <thead className="bg-canvas-soft text-[11px] uppercase tracking-wide text-muted-foreground">
+                        <thead className="bg-canvas-soft text-[11px] tracking-wide text-muted-foreground uppercase">
                             <tr>
                                 <th className="px-4 py-2">Capability</th>
                                 <th className="px-4 py-2">Owner</th>
@@ -50,7 +50,10 @@ export default function PermissionsSettings({
                         </thead>
                         <tbody>
                             {matrix.map((row) => (
-                                <tr key={row.key} className="border-t border-hairline">
+                                <tr
+                                    key={row.key}
+                                    className="border-t border-hairline"
+                                >
                                     <td className="px-4 py-2">{row.label}</td>
                                     <Cell allowed={row.owner} />
                                     <Cell allowed={row.admin} />
@@ -62,7 +65,9 @@ export default function PermissionsSettings({
                 </Card>
 
                 <section>
-                    <h2 className="mb-3 text-[14px] font-semibold">Member overrides</h2>
+                    <h2 className="mb-3 text-[14px] font-semibold">
+                        Member overrides
+                    </h2>
                     <ul className="space-y-2">
                         {members.map((member) => (
                             <li
@@ -71,12 +76,16 @@ export default function PermissionsSettings({
                             >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                     <div>
-                                        <p className="font-medium">{member.name}</p>
+                                        <p className="font-medium">
+                                            {member.name}
+                                        </p>
                                         <p className="text-[12px] text-muted-foreground">
                                             {member.email}
                                         </p>
                                     </div>
-                                    <Badge variant="secondary">{member.role}</Badge>
+                                    <Badge variant="secondary">
+                                        {member.role}
+                                    </Badge>
                                 </div>
 
                                 {member.role === 'member' ? (
@@ -93,33 +102,50 @@ export default function PermissionsSettings({
                                                 <>
                                                     <div className="grid gap-2 sm:grid-cols-2">
                                                         {matrix
-                                                            .filter((row) => !row.member)
+                                                            .filter(
+                                                                (row) =>
+                                                                    !row.member,
+                                                            )
                                                             .map((row) => (
                                                                 <label
-                                                                    key={row.key}
+                                                                    key={
+                                                                        row.key
+                                                                    }
                                                                     className="flex items-start gap-2 text-xs"
                                                                 >
                                                                     <input
                                                                         type="checkbox"
                                                                         name="permissions[]"
-                                                                        value={row.key}
+                                                                        value={
+                                                                            row.key
+                                                                        }
                                                                         defaultChecked={(
-                                                                            member.permissions ?? []
-                                                                        ).includes(row.key)}
+                                                                            member.permissions ??
+                                                                            []
+                                                                        ).includes(
+                                                                            row.key,
+                                                                        )}
                                                                         disabled={
                                                                             !canManage ||
                                                                             processing
                                                                         }
                                                                         className="mt-0.5"
                                                                     />
-                                                                    <span>{row.label}</span>
+                                                                    <span>
+                                                                        {
+                                                                            row.label
+                                                                        }
+                                                                    </span>
                                                                 </label>
                                                             ))}
                                                     </div>
                                                     <Button
                                                         type="submit"
                                                         size="sm"
-                                                        disabled={!canManage || processing}
+                                                        disabled={
+                                                            !canManage ||
+                                                            processing
+                                                        }
                                                     >
                                                         Save grants
                                                     </Button>
@@ -129,7 +155,8 @@ export default function PermissionsSettings({
                                     </details>
                                 ) : (
                                     <p className="mt-2 text-[11px] text-muted-foreground">
-                                        Role defaults apply. Only member grants are editable.
+                                        Role defaults apply. Only member grants
+                                        are editable.
                                     </p>
                                 )}
                             </li>

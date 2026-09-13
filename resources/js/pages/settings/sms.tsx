@@ -1,9 +1,15 @@
 import { Form, Head } from '@inertiajs/react';
+import { ChatText } from '@phosphor-icons/react';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsFormRow,
+    SettingsPageHeader,
+    SettingsSaveBar,
+} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 type SmsSettingsProps = {
     connected: boolean;
@@ -39,157 +45,210 @@ export default function SmsSettings({
     return (
         <>
             <Head title="SMS" />
-            <div className="space-y-6">
-                <div>
-                    <h1 className="text-xl font-semibold">SMS · Algeria</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Sends only to Algerian mobiles (+213 05 Ooredoo, 06 Mobilis, 07
-                        Djezzy). Landlines and foreign numbers are refused. Desk replies
-                        can stub locally; sequences never fake a send.
-                    </p>
-                </div>
-                <Card className="space-y-3 p-4 text-sm">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant={connected ? 'default' : 'secondary'}>
-                            {connected ? 'Workspace gateway' : 'Not connected'}
-                        </Badge>
-                        <span>
-                            Env HTTP {env_http_configured ? 'set' : 'empty'} · Twilio{' '}
-                            {env_twilio_configured ? 'set' : 'empty'}
-                        </span>
-                    </div>
-                    <p className="text-muted-foreground">
-                        Default driver is a local HTTP aggregator (generic POST or
-                        SMSMode-style fields). Twilio is opt-in via{' '}
-                        <code className="font-mono">SMS_DRIVER=twilio</code>. Arabic SMS
-                        uses 70 characters per segment (UCS-2); French GSM-7 is 160. Quiet
-                        hours (Africa/Algiers 21:00–08:00) defer sequence SMS; desk replies
-                        still send.
-                    </p>
-                </Card>
-                <Card className="space-y-4 p-4">
-                    <h2 className="font-medium">Workspace gateway</h2>
-                    <Form action="/settings/sms" method="post" className="grid gap-3">
+
+            <SettingsPageHeader
+                title="SMS"
+                description="Sends only to Algerian mobiles (+213 05 Ooredoo, 06 Mobilis, 07 Djezzy). Landlines and foreign numbers are refused."
+            />
+
+            <div className="grid gap-3">
+                {!connected ? (
+                    <SettingsEmptyState
+                        icon={<ChatText className="size-6" weight="regular" />}
+                        title="SMS gateway is disconnected"
+                        description="Save a workspace gateway below. Sequences never fake a send. Desk replies can stub locally."
+                    />
+                ) : (
+                    <SettingsCard title="Gateway status">
+                        <div className="flex flex-wrap items-center gap-2 text-[13px]">
+                            <Badge variant="default">Workspace gateway</Badge>
+                            <span className="text-mute">
+                                Env HTTP {env_http_configured ? 'set' : 'empty'}{' '}
+                                / Twilio{' '}
+                                {env_twilio_configured ? 'set' : 'empty'}
+                            </span>
+                        </div>
+                    </SettingsCard>
+                )}
+
+                <Form action="/settings/sms" method="post">
+                    {({ processing }) => (
+                        <SettingsCard
+                            title="Workspace gateway"
+                            required
+                            footer={
+                                <SettingsSaveBar
+                                    processing={processing}
+                                    saveLabel="Save SMS gateway"
+                                />
+                            }
+                        >
+                            <p className="text-[12px] text-mute">
+                                Default driver is a local HTTP aggregator.
+                                Twilio is opt-in via{' '}
+                                <code className="font-mono">
+                                    SMS_DRIVER=twilio
+                                </code>
+                                . Quiet hours (Africa/Algiers 21:00-08:00) defer
+                                sequence SMS.
+                            </p>
+                            <SettingsFormRow label="Driver" htmlFor="driver">
+                                <select
+                                    id="driver"
+                                    name="driver"
+                                    defaultValue={driver}
+                                    className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px]"
+                                >
+                                    <option value="http">
+                                        DZ HTTP aggregator
+                                    </option>
+                                    <option value="twilio">
+                                        Twilio (env credentials)
+                                    </option>
+                                </select>
+                            </SettingsFormRow>
+                            <SettingsFormRow label="Gateway URL" htmlFor="url">
+                                <Input
+                                    id="url"
+                                    name="url"
+                                    type="url"
+                                    defaultValue={url ?? ''}
+                                    placeholder="https://sms.example.dz/api/send"
+                                    className="h-8"
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow label="Method" htmlFor="method">
+                                <select
+                                    id="method"
+                                    name="method"
+                                    defaultValue={method}
+                                    className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px]"
+                                >
+                                    <option value="POST">POST</option>
+                                    <option value="GET">GET</option>
+                                </select>
+                            </SettingsFormRow>
+                            <SettingsFormRow label="Auth" htmlFor="auth">
+                                <select
+                                    id="auth"
+                                    name="auth"
+                                    defaultValue={http_auth}
+                                    className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px]"
+                                >
+                                    <option value="form">
+                                        API key in form body
+                                    </option>
+                                    <option value="bearer">Bearer token</option>
+                                </select>
+                            </SettingsFormRow>
+                            <SettingsFormRow
+                                label="Sender"
+                                htmlFor="sender"
+                                required
+                                hint="11 letters or digits at most."
+                            >
+                                <Input
+                                    id="sender"
+                                    name="sender"
+                                    defaultValue={sender}
+                                    maxLength={11}
+                                    required
+                                    className="h-8"
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow
+                                label="API key"
+                                htmlFor="api_key"
+                                hint={
+                                    key_set
+                                        ? 'Leave blank to keep the stored key.'
+                                        : undefined
+                                }
+                            >
+                                <Input
+                                    id="api_key"
+                                    name="api_key"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    placeholder={
+                                        key_set
+                                            ? '••••••••'
+                                            : 'Aggregator token'
+                                    }
+                                    className="h-8"
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow
+                                label="To field"
+                                htmlFor="field_to"
+                            >
+                                <Input
+                                    id="field_to"
+                                    name="field_to"
+                                    defaultValue={field_to}
+                                    className="h-8"
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow
+                                label="Message field"
+                                htmlFor="field_message"
+                            >
+                                <Input
+                                    id="field_message"
+                                    name="field_message"
+                                    defaultValue={field_message}
+                                    className="h-8"
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow
+                                label="Sender field"
+                                htmlFor="field_sender"
+                            >
+                                <Input
+                                    id="field_sender"
+                                    name="field_sender"
+                                    defaultValue={field_sender}
+                                    className="h-8"
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow
+                                label="Key field"
+                                htmlFor="field_api_key"
+                            >
+                                <Input
+                                    id="field_api_key"
+                                    name="field_api_key"
+                                    defaultValue={field_api_key}
+                                    className="h-8"
+                                />
+                            </SettingsFormRow>
+                            <p className="text-[11px] text-mute">
+                                SMSMode-style: set To to{' '}
+                                <code className="font-mono">numero</code>,
+                                sender to{' '}
+                                <code className="font-mono">emetteur</code>,
+                                auth to Bearer.
+                            </p>
+                        </SettingsCard>
+                    )}
+                </Form>
+
+                {connected ? (
+                    <Form action="/settings/sms" method="delete">
                         {({ processing }) => (
-                            <>
-                                <div>
-                                    <Label htmlFor="driver">Driver</Label>
-                                    <select
-                                        id="driver"
-                                        name="driver"
-                                        defaultValue={driver}
-                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                    >
-                                        <option value="http">DZ HTTP aggregator</option>
-                                        <option value="twilio">Twilio (env credentials)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <Label htmlFor="url">Gateway URL</Label>
-                                    <Input
-                                        id="url"
-                                        name="url"
-                                        type="url"
-                                        defaultValue={url ?? ''}
-                                        placeholder="https://sms.example.dz/api/send"
-                                    />
-                                </div>
-                                <div className="grid gap-3 sm:grid-cols-2">
-                                    <div>
-                                        <Label htmlFor="method">Method</Label>
-                                        <select
-                                            id="method"
-                                            name="method"
-                                            defaultValue={method}
-                                            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                        >
-                                            <option value="POST">POST</option>
-                                            <option value="GET">GET</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="auth">Auth</Label>
-                                        <select
-                                        id="auth"
-                                        name="auth"
-                                        defaultValue={http_auth}
-                                            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                        >
-                                            <option value="form">API key in form body</option>
-                                            <option value="bearer">Bearer token</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label htmlFor="sender">Sender (≤11 letters/digits)</Label>
-                                    <Input
-                                        id="sender"
-                                        name="sender"
-                                        defaultValue={sender}
-                                        maxLength={11}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="api_key">
-                                        API key {key_set ? '(leave blank to keep the stored key)' : ''}
-                                    </Label>
-                                    <Input
-                                        id="api_key"
-                                        name="api_key"
-                                        type="password"
-                                        autoComplete="new-password"
-                                        placeholder={key_set ? '••••••••' : 'Aggregator token'}
-                                    />
-                                </div>
-                                <div className="grid gap-3 sm:grid-cols-2">
-                                    <div>
-                                        <Label htmlFor="field_to">To field</Label>
-                                        <Input id="field_to" name="field_to" defaultValue={field_to} />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="field_message">Message field</Label>
-                                        <Input
-                                            id="field_message"
-                                            name="field_message"
-                                            defaultValue={field_message}
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="field_sender">Sender field</Label>
-                                        <Input
-                                            id="field_sender"
-                                            name="field_sender"
-                                            defaultValue={field_sender}
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="field_api_key">Key field</Label>
-                                        <Input
-                                            id="field_api_key"
-                                            name="field_api_key"
-                                            defaultValue={field_api_key}
-                                        />
-                                    </div>
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    SMSMode-style: set To to <code>numero</code>, sender to{' '}
-                                    <code>emetteur</code>, auth to Bearer.
-                                </p>
-                                <Button disabled={processing}>Save SMS gateway</Button>
-                            </>
-                        )}
-                    </Form>
-                    {connected ? (
-                        <Form action="/settings/sms" method="delete">
-                            {({ processing }) => (
-                                <Button type="submit" variant="outline" disabled={processing}>
+                            <SettingsCard title="Disconnect">
+                                <Button
+                                    type="submit"
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={processing}
+                                >
                                     Disconnect
                                 </Button>
-                            )}
-                        </Form>
-                    ) : null}
-                </Card>
+                            </SettingsCard>
+                        )}
+                    </Form>
+                ) : null}
             </div>
         </>
     );
