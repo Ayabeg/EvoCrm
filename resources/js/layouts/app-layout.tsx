@@ -1,3 +1,4 @@
+import { PosthogIdentity } from '@/components/posthog-identity';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -10,6 +11,7 @@ export default function AppLayout({
 }) {
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs}>
+            <PosthogIdentity />
             {children}
         </AppLayoutTemplate>
     );

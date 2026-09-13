@@ -1,3 +1,4 @@
+import { PosthogIdentity } from '@/components/posthog-identity';
 import AuthScreen from '@/pages/auth/auth-screen';
 import type { AuthLayoutProps } from '@/types';
 
@@ -8,6 +9,7 @@ export default function AuthLayout({
 }: AuthLayoutProps) {
     return (
         <AuthScreen title={title} description={description}>
+            <PosthogIdentity />
             {children}
         </AuthScreen>
     );
