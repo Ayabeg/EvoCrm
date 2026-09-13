@@ -23,6 +23,10 @@ class EnforceProductPermissions
     {
         $name = (string) $request->route()?->getName();
 
+        if (str_starts_with($name, 'api.v1.')) {
+            return $this->permissionForApiV1($name, $request);
+        }
+
         if (in_array($name, ['crm.contacts.export', 'crm.deals.export'], true)) {
             return 'crm.export';
         }
@@ -100,5 +104,22 @@ class EnforceProductPermissions
         }
 
         return null;
+    }
+
+    private function permissionForApiV1(string $name, Request $request): ?string
+    {
+        if (in_array($name, [
+            'api.v1.auth.revoke',
+            'api.v1.me.show',
+            'api.v1.devices.store',
+        ], true)) {
+            return null;
+        }
+
+        if (str_starts_with($name, 'api.v1.threads')) {
+            return $request->isMethodSafe() ? null : 'desk.manage';
+        }
+
+        return $request->isMethodSafe() ? null : 'crm.edit';
     }
 }

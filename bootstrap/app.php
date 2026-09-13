@@ -2,6 +2,7 @@
 
 use App\Exceptions\UnofficialWhatsAppRefused;
 use App\Http\Middleware\EmbedSecurityHeaders;
+use App\Http\Middleware\EnsureApiWorkspaceToken;
 use App\Http\Middleware\EnsureUserCanManageSettings;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PostHogRequestContext;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -36,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'can-manage-settings' => EnsureUserCanManageSettings::class,
+            'api-workspace' => EnsureApiWorkspaceToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
