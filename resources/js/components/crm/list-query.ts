@@ -75,7 +75,13 @@ export function listPageHref(
 }
 
 export function hasActiveListFilters(filters: ListFilters): boolean {
-    return listFilterChips(filters).length > 0 || (filters.view != null && filters.view !== 'all');
+    const query = filters.q == null ? '' : String(filters.q).trim();
+
+    return (
+        listFilterChips(filters).length > 0 ||
+        (filters.view != null && filters.view !== 'all') ||
+        query !== ''
+    );
 }
 
 export function listFilterChips(

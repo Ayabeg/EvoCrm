@@ -9,6 +9,7 @@ import type {
     ListViewMeta,
     SavedView,
 } from '@/lib/list-view-config';
+import { cn } from '@/lib/utils';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -39,11 +40,14 @@ export function CrmListShell({
     stages = [],
     stagePills = [],
     createHref,
+    onCreate,
     banner,
     headerActions,
     layoutToggle,
     pipelineSwitcher,
     extraQuery,
+    className,
+    contentClassName,
     children,
 }: {
     title: string;
@@ -63,11 +67,14 @@ export function CrmListShell({
     stagePills?: StagePill[];
     exportHref?: string;
     createHref?: string;
+    onCreate?: () => void;
     banner?: ReactNode;
     headerActions?: ReactNode;
     layoutToggle?: ReactNode;
     pipelineSwitcher?: ReactNode;
     extraQuery?: Record<string, string | number | null | undefined>;
+    className?: string;
+    contentClassName?: string;
     children: ReactNode | ((columns: ListViewColumn[]) => ReactNode);
 }) {
     const [columns, setColumns] = useState<ListViewColumn[]>(
@@ -87,7 +94,10 @@ export function CrmListShell({
 
     return (
         <div
-            className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink"
+            className={cn(
+                'flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink',
+                className,
+            )}
             data-crm="list-workspace"
         >
             <CrmObjectHeader
@@ -95,6 +105,11 @@ export function CrmListShell({
                 description={description}
                 primaryLabel={primaryLabel}
                 onPrimary={() => {
+                    if (onCreate) {
+                        onCreate();
+                        return;
+                    }
+
                     window.location.href = createHref ?? `${basePath}?create=1`;
                 }}
                 secondary={headerActions}
@@ -120,7 +135,12 @@ export function CrmListShell({
                 pipelineSwitcher={pipelineSwitcher}
                 extraQuery={extraQuery}
             />
-            <div className="flex min-h-0 flex-1 flex-col bg-canvas">
+            <div
+                className={cn(
+                    'flex min-h-0 flex-1 flex-col bg-canvas',
+                    contentClassName,
+                )}
+            >
                 {typeof children === 'function' ? children(columns) : children}
             </div>
         </div>

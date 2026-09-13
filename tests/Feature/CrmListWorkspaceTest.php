@@ -2,7 +2,6 @@
 
 it('gives CRM list pages one workspace shell without room tabs or a card stack', function () {
     $hubs = [
-        resource_path('js/pages/crm/contacts/index.tsx'),
         resource_path('js/pages/crm/companies/index.tsx'),
         resource_path('js/pages/crm/deals/index.tsx'),
     ];
@@ -17,6 +16,15 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
             ->and($src)->not->toContain('RecordHubPanel')
             ->and($src)->not->toContain('aurora/data-table');
     }
+
+    $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
+    expect($contacts)->toContain('data-crm="contacts-workspace"')
+        ->and($contacts)->toContain('CrmListShell')
+        ->and($contacts)->toContain('ListViewTable')
+        ->and($contacts)->toContain('hasActiveListFilters')
+        ->and($contacts)->not->toContain('CrmShell')
+        ->and($contacts)->not->toContain('RecordHubPanel')
+        ->and($contacts)->not->toContain('aurora/data-table');
 
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
     $toolbar = file_get_contents(resource_path('js/components/crm/list-toolbar.tsx'));

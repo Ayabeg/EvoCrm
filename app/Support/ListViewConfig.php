@@ -14,6 +14,7 @@ class ListViewConfig
                 ['id' => 'name', 'label' => 'Name', 'defaultVisible' => true],
                 ['id' => 'email', 'label' => 'Email', 'defaultVisible' => true],
                 ['id' => 'phone', 'label' => 'Phone', 'defaultVisible' => true],
+                ['id' => 'lead_status', 'label' => 'Lead status', 'defaultVisible' => true],
                 ['id' => 'company', 'label' => 'Company', 'defaultVisible' => true],
                 ['id' => 'owner', 'label' => 'Owner', 'defaultVisible' => true],
                 ['id' => 'city', 'label' => 'City', 'defaultVisible' => false],

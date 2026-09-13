@@ -16,3 +16,16 @@ export function formatContactName(
 
     return `${first} ${last}`.trim();
 }
+
+export function contactInitials(
+    firstName: string,
+    lastName?: string | null,
+): string {
+    return formatContactName(firstName, lastName)
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0] ?? '')
+        .join('')
+        .toUpperCase();
+}

@@ -2,7 +2,6 @@ import { Head } from '@inertiajs/react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
-import ContactDealsKanban from '@/components/crm/contact-deals-kanban';
 import DeskThreadCard from '@/components/crm/desk-thread-card';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import EnrichmentPanel from '@/components/crm/enrichment-panel';
@@ -46,17 +45,6 @@ type Contact = {
     owner?: { id: number; name: string } | null;
 };
 
-type DealKanban = {
-    pipeline: { id: number; name: string };
-    stages: { id: number; name: string; slug: string }[];
-    deals: {
-        id: number;
-        title: string;
-        amount_cents: number;
-        stage_id: number;
-    }[];
-};
-
 export default function ContactShow({
     contact,
     associations,
@@ -64,9 +52,7 @@ export default function ContactShow({
     attributes,
     askEvo,
     contactEngagement,
-    proactiveSummary,
     catchUp,
-    dealsKanban,
     playbooks,
     enrichmentRuns = [],
     enrichAction,
@@ -89,7 +75,16 @@ export default function ContactShow({
     contactEngagement?: { score: number; label: string; reason: string } | null;
     proactiveSummary?: string | null;
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
-    dealsKanban?: DealKanban | null;
+    dealsKanban?: {
+        pipeline: { id: number; name: string };
+        stages: { id: number; name: string; slug: string }[];
+        deals: {
+            id: number;
+            title: string;
+            amount_cents: number;
+            stage_id: number;
+        }[];
+    } | null;
     playbooks?: Array<{ id: number; name: string; body: string }>;
     enrichmentRuns?: EnrichmentRunRow[];
     enrichAction?: string;
@@ -112,71 +107,76 @@ export default function ContactShow({
             ) : (
                 <RecordPageFrame
                     header={
-                        <>
+                        <div
+                            className="flex items-center justify-between gap-3"
+                            data-crm="contacts-record"
+                        >
                             <RecordBack
                                 href="/crm/contacts"
                                 label="Back to Contacts"
                             />
-                            <RecordIdentity
-                                title={name}
-                                kind="Contact"
-                                subtitle={
-                                    <>
-                                        {company?.name ?? 'No company'}
-                                        {contact.owner?.name
-                                            ? ` · ${contact.owner.name}`
-                                            : ''}
-                                    </>
-                                }
-                                badge={
-                                    contact.lead_status ? (
-                                        <RecordStatusBadge>
-                                            {contact.lead_status}
-                                        </RecordStatusBadge>
-                                    ) : null
-                                }
-                                meta={
-                                    contactEngagement ? (
-                                        <p className="text-[11px] leading-snug text-mute">
-                                            <span className="font-medium text-ink">
-                                                {contactEngagement.label}
-                                            </span>{' '}
-                                            ({contactEngagement.score}/100)
-                                            <span className="hidden sm:inline">
-                                                {' '}
-                                                · {contactEngagement.reason}
-                                            </span>
-                                        </p>
-                                    ) : null
-                                }
-                                actions={
-                                    <RecordActions
-                                        entityId={contact.id}
-                                        contactId={contact.id}
-                                        companyId={contact.company_id}
-                                        whatsappHref={
-                                            thread
-                                                ? `/conversations?thread=${thread.id}`
-                                                : '/inbox'
-                                        }
-                                        secondary={
-                                            <div className="md:hidden">
-                                                <AskEvoTrigger
-                                                    action={askAction}
-                                                    insight={askEvo}
-                                                />
-                                            </div>
-                                        }
-                                    />
-                                }
-                            />
-                        </>
+                            <div className="md:hidden">
+                                <AskEvoTrigger
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
+                            </div>
+                        </div>
                     }
                 >
                     <RecordShell
+                        leftLabel="About"
+                        centerLabel="Activity"
+                        rightLabel="Related"
+                        leftClassName="bg-white"
+                        centerClassName="bg-white"
+                        rightClassName="bg-white"
                         left={
-                            <div className="space-y-3">
-                                <RecordSection title="Contact information">
+                            <div className="space-y-4">
+                                <RecordIdentity
+                                    title={name}
+                                    kind="Contact"
+                                    subtitle={
+                                        <>
+                                            {company?.name ?? 'No company'}
+                                            {contact.owner?.name
+                                                ? ` · ${contact.owner.name}`
+                                                : ''}
+                                        </>
+                                    }
+                                    badge={
+                                        contact.lead_status ? (
+                                            <RecordStatusBadge>
+                                                {contact.lead_status}
+                                            </RecordStatusBadge>
+                                        ) : null
+                                    }
+                                    meta={
+                                        contactEngagement ? (
+                                            <p className="text-[11px] leading-snug text-mute">
+                                                <span className="font-medium text-ink">
+                                                    {contactEngagement.label}
+                                                </span>{' '}
+                                                ({contactEngagement.score}/100)
+                                                <span className="hidden sm:inline">
+                                                    {' '}
+                                                    · {contactEngagement.reason}
+                                                </span>
+                                            </p>
+                                        ) : null
+                                    }
+                                />
+                                <RecordActions
+                                    entityId={contact.id}
+                                    contactId={contact.id}
+                                    companyId={contact.company_id}
+                                    whatsappHref={
+                                        thread
+                                            ? `/conversations?thread=${thread.id}`
+                                            : '/inbox'
+                                    }
+                                />
+                                <RecordSection title="About this contact">
                                     <RecordFactList>
                                         <RecordFact
                                             label="Email"
@@ -216,11 +216,6 @@ export default function ContactShow({
                                         runs={enrichmentRuns}
                                     />
                                 ) : null}
-                                {proactiveSummary ? (
-                                    <p className="text-[12px] leading-relaxed text-mute">
-                                        {proactiveSummary}
-                                    </p>
-                                ) : null}
                                 <PlaybookCard playbooks={playbooks} />
                                 {attributes ? (
                                     <RecordProperties
@@ -239,7 +234,10 @@ export default function ContactShow({
                                 companyId={contact.company_id}
                                 highlights={[
                                     { label: 'Email', value: contact.email },
-                                    { label: 'Phone', value: contact.phone_e164 },
+                                    {
+                                        label: 'Phone',
+                                        value: contact.phone_e164,
+                                    },
                                     { label: 'Company', value: company?.name },
                                     {
                                         label: 'Owner',
@@ -249,7 +247,7 @@ export default function ContactShow({
                             />
                         }
                         right={
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 <AskEvoPanel
                                     action={askAction}
                                     insight={askEvo}
@@ -281,36 +279,31 @@ export default function ContactShow({
                                             {company.name}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">No company</p>
+                                        <p className="text-mute">
+                                            No company linked
+                                        </p>
                                     )}
                                 </AssociationCard>
-                                {dealsKanban ? (
-                                    <ContactDealsKanban
-                                        pipelineName={dealsKanban.pipeline.name}
-                                        stages={dealsKanban.stages}
-                                        deals={dealsKanban.deals}
-                                        contactId={contact.id}
-                                    />
-                                ) : (
-                                    <AssociationCard
-                                        title="Deals"
-                                        addHref={`/crm/deals?create=1&contact_id=${contact.id}`}
-                                    >
-                                        {deals.length === 0 ? (
-                                            <p className="text-mute">No deals</p>
-                                        ) : (
-                                            deals.map((deal) => (
-                                                <RelatedRecordLink
-                                                    key={deal.id}
-                                                    href={`/crm/deals/${deal.id}`}
-                                                    meta={deal.stage?.name}
-                                                >
-                                                    {deal.title}
-                                                </RelatedRecordLink>
-                                            ))
-                                        )}
-                                    </AssociationCard>
-                                )}
+                                <AssociationCard
+                                    title="Deals"
+                                    addHref={`/crm/deals?create=1&contact_id=${contact.id}`}
+                                >
+                                    {deals.length === 0 ? (
+                                        <p className="text-mute">
+                                            No deals yet
+                                        </p>
+                                    ) : (
+                                        deals.map((deal) => (
+                                            <RelatedRecordLink
+                                                key={deal.id}
+                                                href={`/crm/deals/${deal.id}`}
+                                                meta={deal.stage?.name}
+                                            >
+                                                {deal.title}
+                                            </RelatedRecordLink>
+                                        ))
+                                    )}
+                                </AssociationCard>
                                 <TicketsRelatedCard
                                     tickets={associations?.tickets}
                                     addHref={`/crm/tickets?create=1&contact_id=${contact.id}`}

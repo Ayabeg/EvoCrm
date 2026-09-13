@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 export function RecordBack({ href, label }: { href: string; label: string }) {
     return (
@@ -290,6 +291,9 @@ export function RecordShell({
     leftLabel = 'About',
     centerLabel = 'Workspace',
     rightLabel = 'Ask Evo',
+    leftClassName,
+    centerClassName,
+    rightClassName,
 }: {
     left: ReactNode;
     center: ReactNode;
@@ -297,6 +301,9 @@ export function RecordShell({
     leftLabel?: string;
     centerLabel?: string;
     rightLabel?: string;
+    leftClassName?: string;
+    centerClassName?: string;
+    rightClassName?: string;
 }) {
     return (
         <AdaptiveWorkspaceShell
@@ -307,9 +314,9 @@ export function RecordShell({
             centerLabel={centerLabel}
             rightLabel={rightLabel}
             defaultPanel="center"
-            leftClassName="md:px-4 md:py-4"
-            centerClassName="sm:px-5 sm:py-4"
-            rightClassName="md:px-4 md:py-4"
+            leftClassName={cn('md:px-4 md:py-4', leftClassName)}
+            centerClassName={cn('sm:px-5 sm:py-4', centerClassName)}
+            rightClassName={cn('md:px-4 md:py-4', rightClassName)}
         />
     );
 }
