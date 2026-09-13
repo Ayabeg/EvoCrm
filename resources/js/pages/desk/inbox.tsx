@@ -1,27 +1,32 @@
-import { Form, Link, router } from '@inertiajs/react';
-import { MessageCircle } from 'lucide-react';
+import { Form, Link, router, usePage } from '@inertiajs/react';
+import { Tray } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { DeskShell } from '@/components/crm/desk-shell';
+import {
+    InboxCaughtUpMark,
+    InboxContactSidebar,
+    InboxEmbedSkeleton,
+    InboxFolderRail,
+    InboxPersonMark,
+    InboxStatusBanner,
+    formatInboxWhen,
+    inboxContactName,
+    inboxInitials,
+} from '@/components/crm/inbox-chrome';
+import type {
+    InboxContact,
+    InboxEmbedState,
+    InboxFolder,
+} from '@/components/crm/inbox-chrome';
 import { DeskGlass } from '@/components/desk/desk-glass';
 import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
-import { Avatar } from '@/components/ui/aurora/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Textarea } from '@/components/ui/textarea';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
-import type { OfficialDeskConnector } from '@/types';
-
-type Contact = {
-    id: number;
-    first_name: string;
-    last_name?: string | null;
-    email?: string | null;
-    phone_e164?: string | null;
-    company?: { id: number; name: string } | null;
-    owner?: { id: number; name: string } | null;
-};
+import type { Auth, OfficialDeskConnector } from '@/types';
 
 type Thread = {
     id: number;
@@ -29,7 +34,7 @@ type Thread = {
     unread_count?: number;
     last_message_at?: string | null;
     subject?: string | null;
-    contact: Contact;
+    contact: InboxContact;
     channel?: { name: string; type: string };
     ticket?: {
         id: number;
@@ -49,33 +54,26 @@ type Thread = {
     }[];
 };
 
+type ChannelChip = {
+    key: string;
+    label: string;
+    href: string;
+    connected: boolean;
+};
+
 type Props = {
     embedUrl: string | null;
-    embedState: 'ok' | 'blocked' | 'unreachable' | 'no-url';
+    embedState: InboxEmbedState;
     embedReason: string | null;
     configuredUrl: string | null;
     threads: Thread[];
     selected: Thread | null;
+    channels?: ChannelChip[];
     officialConnectors: OfficialDeskConnector[];
 };
 
-function nameOf(contact?: Contact | null) {
-    if (!contact) {
-        return 'Unknown';
-    }
-
-    return `${contact.first_name} ${contact.last_name ?? ''}`.trim();
-}
-
-function initialsOf(contact?: Contact | null) {
-    const name = nameOf(contact);
-
-    return name
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0] ?? '')
-        .join('')
-        .toUpperCase();
+function isClosed(status: string): boolean {
+    return status === 'resolved' || status === 'closed';
 }
 
 function ConnectWhatsAppCta({
@@ -111,36 +109,129 @@ function InboxEmpty({
     configuredUrl,
     officialConnectors,
 }: {
-    embedState: Props['embedState'];
+    embedState: InboxEmbedState;
     embedReason: string | null;
     configuredUrl: string | null;
     officialConnectors: OfficialDeskConnector[];
 }) {
     return (
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-canvas-soft">
-            {embedState !== 'no-url' ? (
-                <p className="aurora-text-caption border-b border-hairline bg-canvas px-4 py-3 text-muted-foreground">
-                    <span className="font-medium text-ink">
-                        EvoDesk at {configuredUrl} is not framed here.
-                    </span>{' '}
-                    {embedReason}
-                </p>
-            ) : null}
+            <InboxStatusBanner
+                embedState={embedState}
+                embedReason={embedReason}
+                configuredUrl={configuredUrl}
+            />
             <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-10">
+                <InboxCaughtUpMark />
                 <EmptyState
                     as="h2"
-                    icon={<MessageCircle className="size-6" />}
+                    icon={<Tray className="size-6" weight="regular" />}
                     title="No conversations"
-                    description="Connect official WhatsApp Cloud to start. No Baileys."
+                    description="You're all caught up. Connect official WhatsApp Cloud to start. No Baileys."
                     action={
                         <ConnectWhatsAppCta connectors={officialConnectors} />
                     }
+                    className="border-0"
                 />
             </div>
             <OfficialConnectPanel
                 connectors={officialConnectors}
                 hidePrimaryCta
             />
+        </div>
+    );
+}
+
+function DeskEmbedWorkspace({
+    embedUrl,
+    officialConnectors,
+    configuredUrl,
+    onUseNative,
+}: {
+    embedUrl: string;
+    officialConnectors: OfficialDeskConnector[];
+    configuredUrl: string | null;
+    onUseNative: () => void;
+}) {
+    const [frameState, setFrameState] = useState<'loading' | 'ready' | 'failed'>(
+        'loading',
+    );
+    const host = (() => {
+        try {
+            return new URL(configuredUrl ?? embedUrl).host;
+        } catch {
+            return 'Desk';
+        }
+    })();
+
+    return (
+        <div
+            className="flex h-full min-h-0 flex-col bg-canvas-soft text-[13px] text-ink"
+            data-crm="inbox-workspace"
+            data-inbox="embed"
+        >
+            <header className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline bg-white px-4 py-2">
+                <div className="min-w-0">
+                    <p className="text-[13px] font-medium text-ink">Inbox</p>
+                    <p className="text-[11px] text-mute">
+                        Desk framed on this host · {host}
+                    </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    <Link
+                        href="/conversations"
+                        className="text-[12px] text-mute underline-offset-2 hover:text-ink hover:underline"
+                    >
+                        Conversation history
+                    </Link>
+                    {officialConnectors.some(
+                        (connector) => connector.status !== 'connected',
+                    ) ? (
+                        <Link
+                            href="/settings/channels"
+                            className="text-[12px] text-mute underline-offset-2 hover:text-ink hover:underline"
+                        >
+                            Channels
+                        </Link>
+                    ) : null}
+                </div>
+            </header>
+            <div className="relative min-h-0 flex-1 bg-white">
+                {frameState === 'loading' ? <InboxEmbedSkeleton /> : null}
+                {frameState === 'failed' ? (
+                    <div
+                        role="alert"
+                        className="absolute inset-0 z-10 grid place-items-center bg-white px-6"
+                    >
+                        <div className="max-w-sm text-center">
+                            <p className="text-[13px] font-medium text-ink">
+                                Desk could not be framed
+                            </p>
+                            <p className="mt-1 text-[12px] leading-5 text-mute">
+                                The embed stayed on this host. Continue in the
+                                CRM inbox, or ask ops to allow this origin on
+                                the desk frame-ancestors list.
+                            </p>
+                            <Button
+                                type="button"
+                                size="sm"
+                                className="mt-3"
+                                onClick={onUseNative}
+                            >
+                                Continue in CRM inbox
+                            </Button>
+                        </div>
+                    </div>
+                ) : null}
+                <iframe
+                    title="EvoDesk inbox"
+                    src={embedUrl}
+                    className="min-h-0 h-full w-full flex-1 border-0 bg-white"
+                    allow="clipboard-write; microphone; camera"
+                    onLoad={() => setFrameState('ready')}
+                    onError={() => setFrameState('failed')}
+                />
+            </div>
         </div>
     );
 }
@@ -152,23 +243,20 @@ export default function DeskInbox({
     configuredUrl,
     threads,
     selected,
+    channels = [],
     officialConnectors = [],
 }: Props) {
-    if (embedUrl) {
+    const [useNative, setUseNative] = useState(false);
+
+    if (embedUrl && !useNative) {
         return (
-            <DeskShell title="Desk">
-                <div className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink">
-                    <OfficialConnectPanel
-                        connectors={officialConnectors}
-                        compact
-                    />
-                    <iframe
-                        title="EvoDesk - EvoSales inbox"
-                        src={embedUrl}
-                        className="min-h-0 w-full flex-1 border-0 bg-canvas"
-                        allow="clipboard-write; microphone; camera"
-                    />
-                </div>
+            <DeskShell title="Inbox">
+                <DeskEmbedWorkspace
+                    embedUrl={embedUrl}
+                    officialConnectors={officialConnectors}
+                    configuredUrl={configuredUrl}
+                    onUseNative={() => setUseNative(true)}
+                />
             </DeskShell>
         );
     }
@@ -176,8 +264,12 @@ export default function DeskInbox({
     const empty = threads.length === 0;
 
     return (
-        <DeskShell title="Desk">
-            <div className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink">
+        <DeskShell title="Inbox">
+            <div
+                className="flex h-full min-h-0 flex-col bg-canvas-soft text-[13px] text-ink"
+                data-crm="inbox-workspace"
+                data-inbox="native"
+            >
                 {empty ? (
                     <InboxEmpty
                         embedState={embedState}
@@ -186,7 +278,18 @@ export default function DeskInbox({
                         officialConnectors={officialConnectors}
                     />
                 ) : (
-                    <FrontDesk threads={threads} selected={selected} />
+                    <>
+                        <InboxStatusBanner
+                            embedState={embedState}
+                            embedReason={embedReason}
+                            configuredUrl={configuredUrl}
+                        />
+                        <FrontDesk
+                            threads={threads}
+                            selected={selected}
+                            channels={channels}
+                        />
+                    </>
                 )}
             </div>
         </DeskShell>
@@ -196,17 +299,71 @@ export default function DeskInbox({
 function FrontDesk({
     threads,
     selected,
+    channels,
 }: {
     threads: Thread[];
     selected: Thread | null;
+    channels: ChannelChip[];
 }) {
     const [folder, setFolder] = useState('all');
     const [mode, setMode] = useState<'reply' | 'note'>('reply');
     const { features } = useSimpleMode();
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const userId = auth.user.id;
+
+    const folders = useMemo<InboxFolder[]>(() => {
+        const channelFolders = channels.map((channel) => ({
+            key: channel.key,
+            label: channel.label,
+            count: threads.filter((thread) => thread.channel?.type === channel.key)
+                .length,
+        }));
+
+        return [
+            { key: 'all', label: 'All', count: threads.length },
+            {
+                key: 'unassigned',
+                label: 'Unassigned',
+                count: threads.filter((thread) => !thread.contact.owner).length,
+            },
+            {
+                key: 'mine',
+                label: 'Assigned to me',
+                count: threads.filter(
+                    (thread) => thread.contact.owner?.id === userId,
+                ).length,
+            },
+            {
+                key: 'open',
+                label: 'All open',
+                count: threads.filter((thread) => !isClosed(thread.status)).length,
+            },
+            ...channelFolders,
+            {
+                key: 'closed',
+                label: 'All closed',
+                count: threads.filter((thread) => isClosed(thread.status)).length,
+            },
+        ];
+    }, [channels, threads, userId]);
 
     const filtered = useMemo(() => {
         if (folder === 'unassigned') {
             return threads.filter((thread) => !thread.contact.owner);
+        }
+
+        if (folder === 'mine') {
+            return threads.filter(
+                (thread) => thread.contact.owner?.id === userId,
+            );
+        }
+
+        if (folder === 'open') {
+            return threads.filter((thread) => !isClosed(thread.status));
+        }
+
+        if (folder === 'closed') {
+            return threads.filter((thread) => isClosed(thread.status));
         }
 
         if (folder === 'whatsapp') {
@@ -217,17 +374,14 @@ function FrontDesk({
             );
         }
 
-        return threads;
-    }, [folder, threads]);
+        if (channels.some((channel) => channel.key === folder)) {
+            return threads.filter(
+                (thread) => thread.channel?.type === folder,
+            );
+        }
 
-    const folders = [
-        { key: 'all', label: 'All', count: threads.length },
-        {
-            key: 'unassigned',
-            label: 'Unassigned',
-            count: threads.filter((thread) => !thread.contact.owner).length,
-        },
-        { key: 'whatsapp', label: 'WhatsApp Cloud', count: null },    ];
+        return threads;
+    }, [channels, folder, threads, userId]);
 
     return (
         <AdaptiveWorkspaceShell
@@ -236,259 +390,264 @@ function FrontDesk({
             rightLabel="Conversation"
             defaultPanel="center"
             left={
-                <div className="space-y-3">
-                    <div>
-                        <p className="aurora-text-label mb-2 text-muted-foreground">
-                            Shared inbox
-                        </p>
-                        <div className="grid gap-1">
-                            {folders.map((item) => (
-                                <button
-                                    key={item.key}
-                                    type="button"
-                                    onClick={() => setFolder(item.key)}
-                                    className={`flex w-full items-center justify-between rounded-[var(--radius-1)] px-3 py-1.5 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-                                        folder === item.key
-                                            ? 'bg-canvas-soft font-medium text-ink'
-                                            : 'text-muted-foreground hover:bg-canvas-soft hover:text-ink'
-                                    }`}
-                                >
-                                    <span>{item.label}</span>
-                                    {item.count !== null ? (
-                                        <span className="aurora-text-caption tabular-nums">
-                                            {item.count}
-                                        </span>
-                                    ) : null}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <p className="aurora-text-label mb-2 text-muted-foreground">
-                            Channels
-                        </p>
-                        <p className="aurora-text-ui px-3 text-ink">
-                            WhatsApp Cloud
-                        </p>
-                    </div>
-                </div>            }
+                <InboxFolderRail
+                    folders={folders}
+                    folder={folder}
+                    onSelect={setFolder}
+                />
+            }
             center={
-                <>
-                    {filtered.map((thread) => (
-                        <button
-                            key={thread.id}
-                            type="button"
-                            onClick={() =>
-                                router.get(
-                                    '/inbox',
-                                    { thread: thread.id },
-                                    { preserveState: true },
-                                )
-                            }
-                            className={`flex w-full items-start gap-3 border-b border-hairline px-4 py-2.5 text-left transition-colors duration-200 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-                                selected?.id === thread.id
-                                    ? 'bg-canvas-soft'
-                                    : 'hover:bg-canvas-soft'
-                            }`}
-                        >
-                            <Avatar
-                                size="md"
-                                shape="square"
-                                initials={initialsOf(thread.contact)}
-                                alt={nameOf(thread.contact)}
-                                className="shrink-0"
-                            />
-                            <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between gap-2">
-                                    <span className="truncate font-medium">
-                                        {nameOf(thread.contact)}
-                                    </span>
-                                    {(thread.unread_count ?? 0) > 0 ? (
-                                        <Badge variant="default">
-                                            {thread.unread_count}
-                                        </Badge>
-                                    ) : null}
-                                </div>
-                                <p className="aurora-text-ui mt-0.5 truncate text-muted-foreground">
-                                    {thread.messages?.[0]?.body ??
-                                        thread.subject ??
-                                        'No preview'}
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <div className="flex items-center justify-between border-b border-hairline px-3 py-1.5">
+                        <p className="text-[12px] font-medium text-ink">
+                            Inbox
+                        </p>
+                        <p className="font-mono text-[11px] tabular-nums text-mute">
+                            {filtered.length}
+                        </p>
+                    </div>
+                    {filtered.length === 0 ? (
+                        <div className="grid flex-1 place-items-center px-4 py-10">
+                            <div className="max-w-xs text-center">
+                                <p className="text-[13px] font-medium text-ink">
+                                    No open conversations here
                                 </p>
-                                <p className="aurora-text-caption mt-1 text-muted-foreground">
-                                    {thread.contact.owner?.name ?? 'Unassigned'}
+                                <p className="mt-1 text-[12px] text-mute">
+                                    You&apos;re all caught up.
                                 </p>
                             </div>
-                        </button>
-                    ))}
-                </>
+                        </div>
+                    ) : (
+                        filtered.map((thread) => (
+                            <button
+                                key={thread.id}
+                                type="button"
+                                onClick={() =>
+                                    router.get(
+                                        '/inbox',
+                                        { thread: thread.id },
+                                        { preserveState: true },
+                                    )
+                                }
+                                className={`flex w-full items-start gap-2.5 border-b border-hairline px-3 py-2 text-left transition-colors duration-150 ${
+                                    selected?.id === thread.id
+                                        ? 'bg-canvas-soft'
+                                        : 'hover:bg-canvas-soft'
+                                }`}
+                            >
+                                <InboxPersonMark
+                                    name={inboxContactName(thread.contact)}
+                                    initials={inboxInitials(thread.contact)}
+                                />
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-baseline justify-between gap-2">
+                                        <span className="truncate text-[13px] font-medium text-ink">
+                                            {inboxContactName(thread.contact)}
+                                        </span>
+                                        <span className="shrink-0 font-mono text-[10px] tabular-nums text-mute">
+                                            {formatInboxWhen(
+                                                thread.last_message_at,
+                                            )}
+                                        </span>
+                                    </div>
+                                    <p className="mt-0.5 truncate text-[12px] text-mute">
+                                        {thread.messages?.[0]?.body ??
+                                            thread.subject ??
+                                            'No preview'}
+                                    </p>
+                                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-mute">
+                                        <span className="truncate">
+                                            {thread.channel?.name ??
+                                                'WhatsApp Cloud'}
+                                        </span>
+                                        {(thread.unread_count ?? 0) > 0 ? (
+                                            <Badge
+                                                variant="default"
+                                                className="h-4 min-w-4 rounded-none px-1 font-mono text-[10px]"
+                                            >
+                                                {thread.unread_count}
+                                            </Badge>
+                                        ) : null}
+                                    </div>
+                                </div>
+                            </button>
+                        ))
+                    )}
+                </div>
             }
             right={
                 selected ? (
-                    <div className="flex min-h-0 flex-1 flex-col bg-canvas">
-                        <DeskGlass
-                            as="header"
-                            className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3"
-                        >
-                            <div className="flex min-w-0 items-center gap-3">
-                                <Avatar
-                                    size="md"
-                                    shape="square"
-                                    initials={initialsOf(selected.contact)}
-                                    alt={nameOf(selected.contact)}
-                                />
-                                <div className="min-w-0">
-                                    <h2 className="truncate font-semibold">
-                                        {nameOf(selected.contact)}
-                                    </h2>
-                                    <p className="aurora-text-caption text-muted-foreground">
-                                        {selected.contact.owner?.name ??
-                                            'Unassigned'}{' '}
-                                        · Official WhatsApp
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex shrink-0 flex-wrap items-center gap-2">
-                                <Link
-                                    href={`/crm/contacts/${selected.contact.id}`}
-                                    className="aurora-text-ui font-medium text-ink hover:underline"
-                                >
-                                    Open contact
-                                </Link>
-                                {features.tickets && selected.ticket ? (
-                                    <Link
-                                        href={`/crm/tickets/${selected.ticket.id}`}
-                                        data-testid="desk-ticket-link"
-                                        className="aurora-text-ui font-medium text-ink hover:underline"
-                                    >
-                                        {selected.ticket.number}
-                                    </Link>
-                                ) : null}
-                                {features.tickets ? (
-                                    <Form
-                                        action={`/desk/threads/${selected.id}/ticket`}
-                                        method="post"
-                                    >
-                                        {({ processing }) => (
-                                            <Button
-                                                type="submit"
-                                                size="sm"
-                                                className="h-8"
-                                                disabled={processing}
-                                                data-testid="desk-open-ticket"
-                                            >
-                                                Open ticket
-                                            </Button>
-                                        )}
-                                    </Form>
-                                ) : null}
-                            </div>
-                        </DeskGlass>
-                        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-canvas-soft p-4">
-                            {(selected.messages ?? []).map((message) => (
-                                <div
-                                    key={message.id}
-                                    className={`max-w-[80%] rounded-[18px] px-3.5 py-2.5 ${
-                                        message.type === 'note'
-                                            ? 'bg-muted text-ink'
-                                            : message.direction === 'outbound'
-                                              ? 'ml-auto border border-hairline bg-canvas text-ink'
-                                              : 'bg-canvas text-ink shadow-[var(--aurora-shadow-medium)]'
-                                    }`}
-                                >
-                                    {message.type === 'note' ? (
-                                        <p className="aurora-text-caption mb-1 font-medium text-mute">
-                                            Private note, only visible to agents
-                                        </p>
-                                    ) : null}
-                                    <p className="aurora-text-body">
-                                        {message.body}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                        <Form
-                            action={`/desk/threads/${selected.id}/reply`}
-                            method="post"
-                            resetOnSuccess={['body']}
-                        >
-                            {({ processing }) => (
-                                <DeskGlass as="footer" className="border-t p-3">
-                                    <div className="mb-2 flex gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => setMode('reply')}
-                                            className={
-                                                mode === 'reply'
-                                                    ? 'border-b-2 border-brand pb-1 font-medium'
-                                                    : 'text-muted-foreground'
-                                            }
-                                        >
-                                            Reply
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setMode('note')}
-                                            className={
-                                                mode === 'note'
-                                                    ? 'border-b-2 border-brand pb-1 font-medium'
-                                                    : 'text-muted-foreground'
-                                            }
-                                        >
-                                            Note
-                                        </button>
-                                    </div>
-                                    {mode === 'note' ? (
-                                        <input
-                                            type="hidden"
-                                            name="as_note"
-                                            value="1"
-                                        />
-                                    ) : null}
-                                    <Textarea
-                                        name="body"
-                                        required
-                                        placeholder={
-                                            mode === 'note'
-                                                ? 'Private note'
-                                                : 'Type your message'
-                                        }
-                                        className="min-h-20"
+                    <div className="flex min-h-0 flex-1 bg-white">
+                        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                            <DeskGlass
+                                as="header"
+                                className="flex flex-wrap items-center justify-between gap-2 border-b bg-white px-3 py-2"
+                            >
+                                <div className="flex min-w-0 items-center gap-2.5">
+                                    <InboxPersonMark
+                                        name={inboxContactName(selected.contact)}
+                                        initials={inboxInitials(selected.contact)}
+                                        size="md"
                                     />
-                                    <div className="mt-2 flex justify-end">
-                                        {mode === 'reply' ? (
-                                            <Button
-                                                name="resolve"
-                                                value="1"
-                                                disabled={processing}
-                                            >
-                                                Send as resolved
-                                            </Button>
-                                        ) : (
-                                            <Button disabled={processing}>
-                                                Add note
-                                            </Button>
-                                        )}
+                                    <div className="min-w-0">
+                                        <h2 className="truncate text-[13px] font-semibold text-ink">
+                                            {inboxContactName(selected.contact)}
+                                        </h2>
+                                        <p className="truncate text-[11px] text-mute">
+                                            {selected.contact.owner?.name ??
+                                                'Unassigned'}{' '}
+                                            · Official WhatsApp
+                                        </p>
                                     </div>
-                                </DeskGlass>
-                            )}
-                        </Form>
+                                </div>
+                                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                                    {features.tickets && selected.ticket ? (
+                                        <Link
+                                            href={`/crm/tickets/${selected.ticket.id}`}
+                                            data-testid="desk-ticket-link"
+                                            className="text-[12px] font-medium text-ink underline-offset-2 hover:underline"
+                                        >
+                                            {selected.ticket.number}
+                                        </Link>
+                                    ) : null}
+                                    {features.tickets ? (
+                                        <Form
+                                            action={`/desk/threads/${selected.id}/ticket`}
+                                            method="post"
+                                        >
+                                            {({ processing }) => (
+                                                <Button
+                                                    type="submit"
+                                                    size="sm"
+                                                    className="h-7"
+                                                    disabled={processing}
+                                                    data-testid="desk-open-ticket"
+                                                >
+                                                    Open ticket
+                                                </Button>
+                                            )}
+                                        </Form>
+                                    ) : null}
+                                </div>
+                            </DeskGlass>
+                            <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-canvas-soft p-3">
+                                {(selected.messages ?? []).map((message) => (
+                                    <div
+                                        key={message.id}
+                                        className={`max-w-[78%] px-3 py-2 text-[13px] leading-5 ${
+                                            message.type === 'note'
+                                                ? 'bg-white text-ink'
+                                                : message.direction ===
+                                                    'outbound'
+                                                  ? 'ml-auto border border-hairline bg-white text-ink'
+                                                  : 'bg-white text-ink'
+                                        }`}
+                                    >
+                                        {message.type === 'note' ? (
+                                            <p className="mb-1 text-[10px] font-medium tracking-[0.04em] text-mute uppercase">
+                                                Private note, only visible to
+                                                agents
+                                            </p>
+                                        ) : null}
+                                        <p>{message.body}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <Form
+                                action={`/desk/threads/${selected.id}/reply`}
+                                method="post"
+                                resetOnSuccess={['body']}
+                            >
+                                {({ processing }) => (
+                                    <DeskGlass
+                                        as="footer"
+                                        className="border-t bg-white p-3"
+                                    >
+                                        <div className="mb-2 flex gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setMode('reply')}
+                                                className={
+                                                    mode === 'reply'
+                                                        ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
+                                                        : 'text-[12px] text-mute'
+                                                }
+                                            >
+                                                Reply
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setMode('note')}
+                                                className={
+                                                    mode === 'note'
+                                                        ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
+                                                        : 'text-[12px] text-mute'
+                                                }
+                                            >
+                                                Note
+                                            </button>
+                                        </div>
+                                        {mode === 'note' ? (
+                                            <input
+                                                type="hidden"
+                                                name="as_note"
+                                                value="1"
+                                            />
+                                        ) : null}
+                                        <Textarea
+                                            name="body"
+                                            required
+                                            placeholder={
+                                                mode === 'note'
+                                                    ? 'Private note'
+                                                    : 'Type your message'
+                                            }
+                                            className="min-h-16 rounded-none"
+                                        />
+                                        <div className="mt-2 flex justify-end">
+                                            {mode === 'reply' ? (
+                                                <Button
+                                                    name="resolve"
+                                                    value="1"
+                                                    disabled={processing}
+                                                >
+                                                    Send as resolved
+                                                </Button>
+                                            ) : (
+                                                <Button disabled={processing}>
+                                                    Add note
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </DeskGlass>
+                                )}
+                            </Form>
+                        </div>
+                        <InboxContactSidebar contact={selected.contact} />
                     </div>
                 ) : (
-                    <div className="flex flex-1 items-start bg-canvas px-5 py-6">
-                        <p className="text-[13px] text-mute">
-                            Select a conversation
-                        </p>
+                    <div className="grid flex-1 place-items-center bg-white px-5 py-8">
+                        <div className="max-w-xs text-center">
+                            <p className="text-[13px] font-medium text-ink">
+                                Select a conversation
+                            </p>
+                            <p className="mt-1 text-[12px] text-mute">
+                                You&apos;re all caught up.
+                            </p>
+                        </div>
                     </div>
                 )
             }
-            leftClassName="p-4"
-            centerClassName="p-0"
-            rightClassName="p-0"
+            leftClassName="bg-white p-0"
+            centerClassName="bg-white p-0"
+            rightClassName="bg-white p-0"
             scrollPanels={{ left: true, center: true, right: false }}
+            tabletGridClassName="grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]"
+            desktopGridClassName="lg:grid-cols-[minmax(11rem,13rem)_minmax(18rem,22rem)_minmax(0,1fr)]"
         />
     );
 }
 
 DeskInbox.layout = {
-    breadcrumbs: [{ title: 'Desk', href: '/inbox' }],
+    breadcrumbs: [{ title: 'Inbox', href: '/inbox' }],
 };

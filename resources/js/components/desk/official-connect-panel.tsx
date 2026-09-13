@@ -1,9 +1,12 @@
 import { Form, Link } from '@inertiajs/react';
-import { Facebook, Instagram, MessageCircle } from 'lucide-react';
+import {
+    ChatCircle,
+    FacebookLogo,
+    InstagramLogo,
+} from '@phosphor-icons/react';
 import { connectorStatusLabel } from '@/components/desk/connector-status';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import type { OfficialDeskConnector } from '@/types';
 
 export function ChannelMark({
@@ -12,14 +15,14 @@ export function ChannelMark({
     provider: OfficialDeskConnector['provider'];
 }) {
     if (provider === 'instagram') {
-        return <Instagram className="size-4 text-brand" />;
+        return <InstagramLogo className="size-4 text-ink" weight="regular" />;
     }
 
     if (provider === 'facebook_messenger') {
-        return <Facebook className="size-4 text-brand" />;
+        return <FacebookLogo className="size-4 text-ink" weight="regular" />;
     }
 
-    return <MessageCircle className="size-4 text-brand" />;
+    return <ChatCircle className="size-4 text-ink" weight="regular" />;
 }
 
 function ConnectAction({
@@ -34,7 +37,7 @@ function ConnectAction({
     }
 
     return (
-        <Form action="/desk/connectors" method="post" className="mt-3">
+        <Form action="/desk/connectors" method="post" className="mt-2">
             {({ processing }) => (
                 <>
                     <input
@@ -46,6 +49,7 @@ function ConnectAction({
                         size="sm"
                         variant={primary ? 'default' : 'ghost'}
                         disabled={processing}
+                        className="h-7"
                     >
                         Connect {connector.name}
                     </Button>
@@ -65,15 +69,18 @@ export function OfficialConnectPanel({
     hidePrimaryCta?: boolean;
 }) {
     return (
-        <Card
-            elevated={false}
-            className={compact ? 'm-3 p-3' : 'm-4 p-4 sm:m-6 sm:p-5'}
+        <section
+            className={
+                compact
+                    ? 'border-b border-hairline bg-white px-4 py-3'
+                    : 'border-t border-hairline bg-white px-4 py-4 sm:px-6'
+            }
         >
-            <div className="space-y-1">
-                <h2 className="aurora-text-section font-semibold">
+            <div className="space-y-0.5">
+                <h2 className="text-[13px] font-semibold text-ink">
                     Connect official channels
                 </h2>
-                <p className="aurora-text-body-sm text-muted-foreground">
+                <p className="text-[12px] leading-5 text-mute">
                     {compact
                         ? 'WhatsApp Cloud, Instagram, and Messenger. Official Meta paths only.'
                         : 'EvoDesk talks on official Meta Cloud paths only: WhatsApp Cloud through Evolution, Instagram, and Messenger. No QR. No Baileys. No linked devices.'}
@@ -82,8 +89,8 @@ export function OfficialConnectPanel({
             <div
                 className={
                     compact
-                        ? 'mt-3 grid gap-2'
-                        : 'mt-4 grid gap-3 md:grid-cols-3'
+                        ? 'mt-2 grid gap-1.5'
+                        : 'mt-3 grid gap-px bg-hairline md:grid-cols-3'
                 }
             >
                 {connectors.map((connector) => {
@@ -94,53 +101,58 @@ export function OfficialConnectPanel({
                     return (
                         <div
                             key={connector.provider}
-                            className="rounded-[var(--radius-1)] border border-hairline bg-canvas p-3"
+                            className={
+                                compact
+                                    ? 'flex items-start justify-between gap-2 border border-hairline bg-white px-2.5 py-2'
+                                    : 'bg-white p-3'
+                            }
                         >
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <span className="grid size-8 place-content-center rounded-[10px] border border-hairline bg-canvas-soft">
+                                    <span className="grid size-7 place-content-center bg-canvas-soft">
                                         <ChannelMark
                                             provider={connector.provider}
                                         />
                                     </span>
-                                    <p className="aurora-text-ui font-medium">
+                                    <p className="text-[12px] font-medium text-ink">
                                         {connector.name}
                                     </p>
+                                    <Badge
+                                        variant={
+                                            connector.status === 'connected'
+                                                ? 'default'
+                                                : 'secondary'
+                                        }
+                                        className="rounded-none"
+                                    >
+                                        {connectorStatusLabel(connector.status)}
+                                    </Badge>
                                 </div>
-                                <Badge
-                                    variant={
-                                        connector.status === 'connected'
-                                            ? 'default'
-                                            : 'secondary'
-                                    }
-                                >
-                                    {connectorStatusLabel(connector.status)}
-                                </Badge>
+                                <p className="mt-1.5 text-[11px] leading-4 text-mute">
+                                    {connector.tagline}
+                                </p>
+                                {hidePrimaryCta &&
+                                connector.provider === 'whatsapp_cloud' ? null : (
+                                    <ConnectAction
+                                        connector={connector}
+                                        primary={primary}
+                                    />
+                                )}
                             </div>
-                            <p className="aurora-text-caption mt-2 text-muted-foreground">
-                                {connector.tagline}
-                            </p>
-                            {hidePrimaryCta &&
-                            connector.provider === 'whatsapp_cloud' ? null : (
-                                <ConnectAction
-                                    connector={connector}
-                                    primary={primary}
-                                />
-                            )}
                         </div>
                     );
                 })}
             </div>
-            <p className="aurora-text-caption mt-3 text-muted-foreground">
+            <p className="mt-3 text-[11px] text-mute">
                 Gmail and Calendar live in{' '}
                 <Link
                     href="/settings/connectors"
-                    className="font-medium text-brand"
+                    className="font-medium text-brand underline-offset-2 hover:underline"
                 >
                     Settings, Connectors
                 </Link>
                 . Same Google sign-in, no second login.
             </p>
-        </Card>
+        </section>
     );
 }

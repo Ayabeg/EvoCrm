@@ -17,8 +17,9 @@ class ConversationHistoryController extends Controller
         $threads = Thread::query()
             ->forWorkspace($workspace)
             ->with([
-                'contact:id,first_name,last_name,phone_e164,email,company_id',
+                'contact:id,first_name,last_name,phone_e164,email,company_id,owner_id',
                 'contact.company:id,name',
+                'contact.owner:id,name',
                 'channel:id,name,type',
                 'messages' => fn ($q) => $q->latest()->limit(1),
             ])
@@ -32,6 +33,7 @@ class ConversationHistoryController extends Controller
                 ->forWorkspace($workspace)
                 ->with([
                     'contact.company',
+                    'contact.owner',
                     'contact.deals.stage',
                     'channel',
                     'messages.user',
