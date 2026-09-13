@@ -3,7 +3,6 @@
 it('gives CRM list pages one workspace shell without room tabs or a card stack', function () {
     $hubs = [
         resource_path('js/pages/crm/companies/index.tsx'),
-        resource_path('js/pages/crm/deals/index.tsx'),
     ];
 
     foreach ($hubs as $path) {
@@ -57,9 +56,17 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
         ->and($empty)->not->toContain('size-10 rounded-xl');
 
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
-    expect($deals)->toContain('Create deal')
+    expect($deals)->toContain('data-crm="deals-workspace"')
+        ->and($deals)->toContain('CrmListShell')
+        ->and($deals)->toContain('ListViewTable')
+        ->and($deals)->toContain('hasActiveListFilters')
+        ->and($deals)->toContain('Create deal')
         ->and($deals)->toContain('layoutToggle')
-        ->and($deals)->toContain('DealLayoutToggle');
+        ->and($deals)->toContain('DealLayoutToggle')
+        ->and($deals)->not->toContain('CrmShell')
+        ->and($deals)->not->toContain('chrome="workspace"')
+        ->and($deals)->not->toContain('RecordHubPanel')
+        ->and($deals)->not->toContain('aurora/data-table');
 
     expect($crmShell)->toContain("chrome = 'room'")
         ->and($crmShell)->toContain("chrome === 'workspace'");

@@ -89,12 +89,18 @@ export function PipelineKanbanHeader({
 }) {
     return (
         <header className="mb-2 px-0.5">
-            <h2 className="truncate text-[13px] font-semibold tracking-tight text-ink">
-                {name}
-            </h2>
-            <p className="mt-0.5 text-[11px] tabular-nums text-mute">
-                {count} {count === 1 ? unit : `${unit}s`}
-            </p>
+            <div className="flex items-baseline justify-between gap-2">
+                <h2 className="truncate text-[11px] font-semibold tracking-wide text-ink uppercase">
+                    {name}
+                </h2>
+                <span className="shrink-0 text-[11px] tabular-nums text-mute">
+                    {count}
+                    <span className="sr-only">
+                        {' '}
+                        {count === 1 ? unit : `${unit}s`}
+                    </span>
+                </span>
+            </div>
             {amount ? (
                 <p className="money mt-1 break-words text-[13px] font-semibold tabular-nums text-ink">
                     {amount}
@@ -190,7 +196,7 @@ export function PipelineKanbanCard({
             aria-grabbed={dragging}
             className={cn(
                 cardRadius,
-                'cursor-grab select-none border border-hairline bg-canvas px-2.5 py-2 text-[13px] shadow-[var(--aurora-shadow-medium)]',
+                'cursor-grab select-none border border-hairline bg-white px-2.5 py-2 text-[13px] shadow-[var(--aurora-shadow-medium)]',
                 'transition-[box-shadow,opacity,border-color]',
                 motion,
                 'hover:border-[color-mix(in_srgb,var(--evosales-ink)_16%,var(--evosales-hairline))] hover:shadow-[var(--aurora-shadow-strong)]',
