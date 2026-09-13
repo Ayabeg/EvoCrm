@@ -1,6 +1,8 @@
 export {
+    PillGroup,
+    PillTrigger,
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from '@/components/ui/tabs';
+} from '@/components/ui/aurora/tabs';

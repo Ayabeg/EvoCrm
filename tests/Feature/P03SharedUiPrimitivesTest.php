@@ -1,17 +1,20 @@
 <?php
 
 /**
- * P03 — one public primitive API at @/components/ui/*, backed by Aurora
- * and painted with P02 semantic tokens. Does not own AppShell / rail width.
+ * P03 — DS primitives live in resources/js/ds/components/*.
+ * @/components/ui/* re-exports so existing product imports keep working.
+ * Does not own AppShell / rail width.
  */
 
 it('keeps product buttons on the Aurora adapter with a 36px default control', function () {
+    $ds = file_get_contents(resource_path('js/ds/components/Button.tsx'));
     $adapter = file_get_contents(resource_path('js/components/ui/button.tsx'));
     $bridge = file_get_contents(resource_path('js/lib/aurora/shadcn-bridge.ts'));
     $product = file_get_contents(resource_path('css/app.css'));
 
-    expect($adapter)->toContain("from '@/components/ui/aurora/button'")
-        ->and($adapter)->toContain('aurora-btn--aurora aurora-btn--filled')
+    expect($ds)->toContain("from '@/components/ui/aurora/button'")
+        ->and($ds)->toContain('aurora-btn--aurora aurora-btn--filled')
+        ->and($adapter)->toContain("from '@/ds/components/Button'")
         ->and($bridge)->toContain("return { variant: 'aurora', filled: true }")
         ->and($product)->toContain('height: 36px')
         ->and($product)->toContain('.aurora-btn {')
@@ -45,48 +48,60 @@ it('exposes the locked primitives on a single @/components/ui import path', func
         'popover',
         'field',
         'callout',
+        'empty-state',
     ];
 
     foreach ($public as $name) {
         expect(resource_path("js/components/ui/{$name}.tsx"))->toBeFile();
     }
 
-    $ds = [
-        'Button',
-        'Input',
-        'Select',
-        'Tabs',
-        'Badge',
-        'Avatar',
-        'Checkbox',
-        'Dropdown',
-        'Tooltip',
-        'Modal',
-        'Drawer',
-        'Toast',
-        'Skeleton',
-        'EmptyState',
+    $dsToUi = [
+        'Button' => 'button',
+        'Input' => 'input',
+        'Select' => 'select',
+        'Tabs' => 'tabs',
+        'Badge' => 'badge',
+        'Avatar' => 'avatar',
+        'Checkbox' => 'checkbox',
+        'Dropdown' => 'dropdown-menu',
+        'Tooltip' => 'tooltip',
+        'Modal' => 'dialog',
+        'Drawer' => 'drawer',
+        'Toast' => 'toast',
+        'Skeleton' => 'skeleton',
+        'EmptyState' => 'empty-state',
     ];
 
-    foreach ($ds as $name) {
-        $path = resource_path("js/ds/components/{$name}.tsx");
-        expect($path)->toBeFile();
-        expect(file_get_contents($path))->toContain('@/components/ui/');
+    foreach ($dsToUi as $ds => $ui) {
+        $dsPath = resource_path("js/ds/components/{$ds}.tsx");
+        $uiPath = resource_path("js/components/ui/{$ui}.tsx");
+        expect($dsPath)->toBeFile();
+        expect(file_get_contents($uiPath))->toContain("@/ds/components/{$ds}");
+        expect(file_get_contents($dsPath))->not->toContain("@/components/ui/{$ui}'");
     }
 });
 
-it('lets Input accept a label above and an error string below', function () {
-    $input = file_get_contents(resource_path('js/components/ui/input.tsx'));
+it('lets Input and Select accept a label above and an error string below', function () {
+    $input = file_get_contents(resource_path('js/ds/components/Input.tsx'));
+    $select = file_get_contents(resource_path('js/ds/components/Select.tsx'));
 
     expect($input)->toContain('label?:')
         ->and($input)->toContain('hint?:')
         ->and($input)->toContain("error?: boolean | string")
         ->and($input)->toContain('FieldError')
-        ->and($input)->toContain("from '@/components/ui/aurora/input'");
+        ->and($input)->toContain("from '@/components/ui/aurora/input'")
+        ->and($select)->toContain('label?:')
+        ->and($select)->toContain('hint?:')
+        ->and($select)->toContain("error?: boolean | string")
+        ->and($select)->toContain('FieldError')
+        ->and($select)->toContain("from '@/components/ui/aurora/select'");
 });
 
 it('does not introduce a third theme or Wave hex in public primitives', function () {
-    $files = glob(resource_path('js/components/ui/*.tsx')) ?: [];
+    $files = array_merge(
+        glob(resource_path('js/components/ui/*.tsx')) ?: [],
+        glob(resource_path('js/ds/components/*.tsx')) ?: [],
+    );
 
     expect($files)->not->toBeEmpty();
 
@@ -127,6 +142,12 @@ it('uses Phosphor inside public-facing primitives that render icons', function (
 
     expect(file_get_contents(resource_path('js/components/ui/breadcrumb.tsx')))
         ->toContain('@phosphor-icons/react');
+    expect(file_get_contents(resource_path('js/ds/components/Button.tsx')))
+        ->not->toContain('lucide-react');
+    expect(file_get_contents(resource_path('js/ds/components/Input.tsx')))
+        ->not->toContain('lucide-react');
+    expect(file_get_contents(resource_path('js/ds/components/Select.tsx')))
+        ->not->toContain('lucide-react');
 });
 
 it('routes product FieldError and Callout through the public ui barrels', function () {

@@ -153,7 +153,6 @@ export function HairlinePanel({
     action?: ReactNode;
     children: ReactNode;
     padded?: boolean;
-    padded?: boolean;
 }) {
     return (
         <section className="border-t border-hairline bg-canvas shadow-none">

@@ -3,4 +3,4 @@ export {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from '@/components/ui/aurora/tooltip';
+} from '@/ds/components/Tooltip';

@@ -9,4 +9,5 @@ export {
     SelectSeparator,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/aurora/select';
+    type SelectProps,
+} from '@/ds/components/Select';

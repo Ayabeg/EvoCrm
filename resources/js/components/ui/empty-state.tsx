@@ -1,10 +1,8 @@
 export {
     EmptyState,
-    type EmptyStateDensity,
-    type EmptyStateProps,
-} from '@/components/ui/aurora/empty-state';
-export {
     EmptyIllustration,
     inferEmptyKind,
+    type EmptyStateDensity,
+    type EmptyStateProps,
     type EmptyKind,
-} from '@/components/ui/empty-illustration';
+} from '@/ds/components/EmptyState';
