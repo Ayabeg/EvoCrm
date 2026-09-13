@@ -25,6 +25,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
@@ -319,24 +320,25 @@ export default function DealBoard({
 
                     {deals.length === 0 && !loading ? (
                         <div
-                            className="border-b border-hairline bg-white px-4 py-2.5 sm:px-6"
+                            className="border-b border-hairline bg-white"
                             data-crm="pipeline-empty"
                         >
-                            <p className="text-[13px] font-medium text-ink">
-                                No deals in this pipeline
-                            </p>
-                            <p className="mt-0.5 text-[12px] text-mute">
-                                Create your first deal to start tracking
-                                opportunities.
-                            </p>
-                            <Button
-                                type="button"
-                                size="sm"
-                                className="mt-2 h-8"
-                                onClick={() => setDrawer(true)}
-                            >
-                                Create deal
-                            </Button>
+                            <EmptyState
+                                density="banner"
+                                kind="pipeline"
+                                title="No deals in this pipeline"
+                                description="Create your first deal to start tracking opportunities."
+                                action={
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        className="h-8"
+                                        onClick={() => setDrawer(true)}
+                                    >
+                                        Create deal
+                                    </Button>
+                                }
+                            />
                         </div>
                     ) : null}
 

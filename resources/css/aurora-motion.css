@@ -1,0 +1,78 @@
+/*
+ * Aurora MOTION 3 (calm) — EvoCrm product overlay.
+ * Transform and opacity only. 200–300ms. No bounce, no page fades,
+ * no scroll hijacks. Unlayered so press/rail beats @layer aurora-components.
+ * See docs/visual-system/aurora-motion.md
+ */
+
+.aurora-btn {
+    transition:
+        transform var(--motion-duration-medium, 240ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        opacity var(--motion-duration-medium, 240ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        background-color var(--motion-duration-fast, 160ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        border-color var(--motion-duration-fast, 160ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        color var(--motion-duration-fast, 160ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+.aurora-btn:active:not(:disabled):not([aria-disabled='true']) {
+    transform: scale(0.98);
+}
+
+.app-rail-item {
+    transition:
+        background-color var(--motion-duration-medium, 240ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        color var(--motion-duration-medium, 240ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        opacity var(--motion-duration-medium, 240ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        transform var(--motion-duration-fast, 160ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+.app-rail-item:active {
+    transform: scale(0.97);
+}
+
+[data-aurora='drawer'] {
+    transition:
+        transform var(--motion-duration-medium, 240ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        opacity var(--motion-duration-medium, 240ms)
+            var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+.toaster [data-sonner-toast],
+.aurora-toast-enter {
+    animation: evocrm-toast-in var(--motion-duration-medium, 240ms)
+        var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+}
+
+@keyframes evocrm-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aurora-btn,
+    .app-rail-item,
+    [data-aurora='drawer'],
+    .toaster [data-sonner-toast],
+    .aurora-toast-enter {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+}

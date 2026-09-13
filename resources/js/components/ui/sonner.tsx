@@ -19,6 +19,12 @@ function Toaster({ ...props }: ToasterProps) {
             theme={appearance}
             className="toaster group"
             position="bottom-right"
+            duration={4000}
+            toastOptions={{
+                classNames: {
+                    toast: 'aurora-toast-enter',
+                },
+            }}
             style={
                 {
                     '--normal-bg': 'var(--popover)',

@@ -232,3 +232,4 @@ Production should pin a git commit per [Aurora versioning docs](https://github.c
 - [`docs/visual-system/responsive-architecture.md`](./responsive-architecture.md)
 - [`docs/visual-system/home-dashboard-patterns.md`](./home-dashboard-patterns.md)
 - [`docs/visual-system/datatable-migration.md`](./datatable-migration.md)
+- [`docs/visual-system/aurora-motion.md`](./aurora-motion.md)

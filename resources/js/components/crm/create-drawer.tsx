@@ -32,6 +32,7 @@ export function CreateDrawer({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="right"
+                data-aurora="drawer"
                 className={cn(
                     'w-full gap-0 border-l border-hairline bg-canvas p-0 sm:max-w-md',
                     className,
