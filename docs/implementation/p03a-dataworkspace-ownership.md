@@ -120,6 +120,20 @@ New lock: `tests/Feature/P03ADataWorkspaceOwnershipTest.php`.
 
 ---
 
+## Tests run
+
+| Command | Result |
+|---|---|
+| `php artisan test --filter='P01\|P02\|P03A\|P05\|Wave1\|Wave2\|Wave4\|CrmListWorkspace\|LeadPath\|LeadConversion\|EvoCrmP9'` | pass (48 tests, 943 assertions) |
+| `php artisan test --filter='LeadPath\|LeadConversion\|LeadQualify\|LeadCapture\|EvoCrmP9\|CrmListWorkspace\|P05\|P03A'` | pass (47 tests, 589 assertions) |
+| `npm run types:check` | pass (after `php artisan wayfinder:generate --with-form`) |
+| `npx eslint` on P03A-touched TS files | pass |
+| `npm run build` | pass |
+
+New lock: `tests/Feature/P03ADataWorkspaceOwnershipTest.php`.
+
+---
+
 ## Risks
 
 | Risk | Mitigation |

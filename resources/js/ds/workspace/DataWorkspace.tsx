@@ -14,8 +14,8 @@ import type {
     DataWorkspaceProps,
     DataWorkspaceSharedTableProps,
 } from '@/ds/workspace/types';
-import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { t } from '@/lib/i18n';
+import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 
 const OBJECT_NOUNS = {

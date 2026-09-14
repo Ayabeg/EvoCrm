@@ -52,6 +52,7 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
+    $tickets = file_get_contents(resource_path('js/pages/crm/tickets/index.tsx'));
 
     expect($contacts)->toContain('CrmListShell')
         ->and($contacts)->toContain('ListViewTable')
@@ -84,6 +85,11 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($leads)->not->toContain('CrmListShell')
         ->and($leads)->not->toContain('DataWorkspace')
         ->and($leads)->not->toContain('ListViewTable');
+
+    expect($tickets)->toContain('CrmListShell')
+        ->and($tickets)->toContain('ListViewTable')
+        ->and($tickets)->toContain('TicketLayoutToggle')
+        ->and($tickets)->not->toContain('resultMode=');
 });
 
 it('leaves selection on the domain pages and does not hoist it', function () {
