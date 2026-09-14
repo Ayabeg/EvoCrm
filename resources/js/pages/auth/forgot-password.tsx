@@ -47,7 +47,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     )}
                 </Form>
 
-                <p className="aurora-text-body-sm text-center text-mute">
+                <p className="text-center text-sm text-mute">
                     Or, return to <TextLink href={login()}>log in</TextLink>
                 </p>
             </div>

@@ -95,7 +95,19 @@ it('keeps auth chrome on paper with the EvoCrm lockup', function () {
     }
 
     expect($screen)->toContain("background: '#ffffff'")
-        ->and($screen)->toContain('bg-canvas-soft');
+        ->and($screen)->toContain('bg-canvas-soft')
+        ->and($screen)->toContain('auth-screen')
+        ->and($screen)->toContain('text-ink')
+        ->and($screen)->not->toContain('aurora-text-display-1')
+        ->and($screen)->not->toContain('aurora-text-body-sm');
+
+    $app = file_get_contents(resource_path('css/app.css'));
+
+    expect($app)->toContain('.auth-screen')
+        ->and($app)->toContain('color-scheme: light')
+        ->and($app)->toContain('--aurora-letter-ui: 0')
+        ->and($app)->toContain('--aurora-text-primary: #161616')
+        ->and($app)->toContain('--aurora-control-surface: #ffffff');
 });
 
 it('lands Home as a CRM widget workspace, not a blank stub', function () {

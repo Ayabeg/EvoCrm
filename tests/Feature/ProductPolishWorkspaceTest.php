@@ -75,7 +75,7 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
         ->and($page)->not->toContain('rounded-2xl')
         ->and($page)->not->toContain('mb-8')
         ->and($page)->toContain('Add widget')
-        ->and($list)->toContain('py-1.5')
+        ->and($list)->toContain('py-2')
         ->and($board)->toContain("toLocaleDateString('en-GB'");
 });
 

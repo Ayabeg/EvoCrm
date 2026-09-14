@@ -63,7 +63,7 @@ export default function Login({
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="aurora-text-caption ml-auto"
+                                            className="ml-auto text-xs"
                                             tabIndex={5}
                                         >
                                             Forgot your password?
@@ -104,7 +104,7 @@ export default function Login({
                             </Button>
                         </div>
 
-                        <p className="aurora-text-body-sm text-center text-mute">
+                        <p className="text-center text-sm text-mute">
                             Don't have an account?{' '}
                             <TextLink href={register()} tabIndex={5}>
                                 Sign up

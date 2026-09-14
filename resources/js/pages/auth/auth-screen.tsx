@@ -22,7 +22,7 @@ export default function AuthScreen({
     children,
 }: AuthLayoutProps) {
     return (
-        <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-canvas-soft px-4 py-12 sm:px-6">
+        <div className="auth-screen flex min-h-[100dvh] flex-col items-center justify-center bg-canvas-soft px-4 py-12 sm:px-6">
             <div className="flex w-full max-w-[400px] flex-col items-center gap-10">
                 <Link
                     href={home()}
@@ -44,14 +44,11 @@ export default function AuthScreen({
                         className="border-0 px-8 pt-8 pb-0 text-center"
                         style={{ borderColor: 'transparent' }}
                     >
-                        <h1 className="aurora-text-display-1 text-balance">
+                        <h1 className="text-xl font-semibold tracking-tight text-balance text-ink">
                             {title}
                         </h1>
                         {description ? (
-                            <p
-                                className="aurora-text-body-sm mt-2 text-pretty"
-                                style={{ color: 'var(--evosales-mute)' }}
-                            >
+                            <p className="mt-2 text-sm text-pretty text-mute">
                                 {description}
                             </p>
                         ) : null}
