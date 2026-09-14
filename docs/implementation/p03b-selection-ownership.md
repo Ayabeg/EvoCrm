@@ -134,7 +134,7 @@ Contacts/Deals **keep** rendering the existing domain `BulkActionBar` inside res
 | Item | Phase |
 |---|---|
 | URL / query authority (`q`, filters, view, sort, page, columns) | **P03C** |
-| Empty / pagination / board helpers without domain surface | **P03D** |
+| Empty / pagination / board helpers without domain surface | **Done in P03D** — see `p03d-empty-pagination-board-helpers.md` |
 | Contacts/Companies/Leads/Deals/Quotes onto `shared-table` | P04–P08 |
 | Leads selection UI | P06 (needs workspace table first) |
 | DS bulk bar visual swap / moving the bar into the chrome slot | later (not P03C in the user phase map) |

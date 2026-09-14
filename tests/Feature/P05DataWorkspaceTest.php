@@ -16,6 +16,9 @@ it('lands DataWorkspace with the sketched props and a thin CrmListShell adapter'
         'js/ds/workspace/AdvancedFilterDrawer.tsx',
         'js/ds/workspace/DataTable.tsx',
         'js/ds/workspace/BulkActionBar.tsx',
+        'js/ds/workspace/WorkspaceEmpty.tsx',
+        'js/ds/workspace/WorkspacePaginator.tsx',
+        'js/ds/workspace/surface.ts',
     ] as $path) {
         expect(resource_path($path))->toBeFile();
     }
@@ -59,7 +62,7 @@ it('opens advanced filters in a right Drawer and keeps list-query plus /crm/filt
     expect($views)->toContain("from '@/components/crm/list-query'")
         ->and($views)->toContain('action="/crm/filters"')
         ->and($bar)->toContain('navigateListQuery')
-        ->and($workspace)->toContain('listPageHref');
+        ->and($workspace)->toContain('WorkspacePaginator');
 });
 
 it('locks row 48, page pad-x 32, and 36px controls without object-specific CSS', function () {
@@ -70,6 +73,9 @@ it('locks row 48, page pad-x 32, and 36px controls without object-specific CSS',
         'js/ds/workspace/AdvancedFilterDrawer.tsx',
         'js/ds/workspace/DataTable.tsx',
         'js/ds/workspace/BulkActionBar.tsx',
+        'js/ds/workspace/WorkspaceEmpty.tsx',
+        'js/ds/workspace/WorkspacePaginator.tsx',
+        'js/ds/workspace/surface.ts',
         'js/ds/chrome/PageHeader.tsx',
     ];
 
@@ -97,6 +103,12 @@ it('locks row 48, page pad-x 32, and 36px controls without object-specific CSS',
         ->and($bar)->toContain('h-9')
         ->and($bulk)->toContain('h-9')
         ->and($bulk)->toContain('md:px-8');
+
+    $paginator = file_get_contents(resource_path('js/ds/workspace/WorkspacePaginator.tsx'));
+    $empty = file_get_contents(resource_path('js/ds/workspace/WorkspaceEmpty.tsx'));
+
+    expect($paginator)->toContain('md:px-8')
+        ->and($empty)->toContain('as="h2"');
 });
 
 it('keeps the contacts index Inertia contract through the CrmListShell adapter', function () {

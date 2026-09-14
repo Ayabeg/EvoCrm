@@ -99,7 +99,7 @@ Thin Inertia → DataWorkspace mapper. Maps title, views, filters, chips, column
 |---|---|
 | Hoist selection + bulk state (not full `rows`) | **Done in P03B** — see `p03b-selection-ownership.md` |
 | URL / query authority | **P03C** (user phase map) |
-| Empty / pagination / board helpers without domain surface | P03D |
+| Empty / pagination / board helpers without domain surface | **Done in P03D** — see `p03d-empty-pagination-board-helpers.md` |
 | Contacts / Companies / Leads / Deals / Quotes onto shared-table | P04–P08 |
 | URL/query authority move | not this wave unless a later AC says so |
 | QuickRecordDrawer, Pipeline board on `mode="board"` | P09 / P11 |

@@ -62,7 +62,7 @@ Footer                Settings
 
 | System | Paths | Verdict | Evidence |
 |---|---|---|---|
-| DataWorkspace suite | `ds/workspace/{DataWorkspace,SavedViews,FilterBar,AdvancedFilterDrawer,DataTable,BulkActionBar,types,index}` | **CANONICAL KEEP** | Owns chrome. Native table/pagination only in `resultMode: 'shared-table'`. Domain mode uses `renderResults` |
+| DataWorkspace suite | `ds/workspace/{DataWorkspace,SavedViews,FilterBar,AdvancedFilterDrawer,DataTable,BulkActionBar,WorkspaceEmpty,WorkspacePaginator,surface,types,index}` | **CANONICAL KEEP** | Owns chrome. Native table/pagination/empty only in `resultMode: 'shared-table'`. Board slot works in both modes when `mode="board"`. Domain mode uses `renderResults` |
 | CrmListShell adapter | `components/crm/crm-list-shell.tsx` | **ADAPTER KEEP TEMPORARILY** | Thin Inertia mapper. `resultMode="domain"` + `renderResults` + workspace `selection` (P03B). Domain children still own the table. No stub `rows` / `selectedIds` |
 | ListViewTable | `components/crm/list-view-table.tsx` | **ADAPTER KEEP TEMPORARILY** | Domain cell renderers. `ListDataTable` already delegates here |
 | Domain BulkActionBar | `components/crm/bulk-action-bar.tsx` | **ADAPTER KEEP TEMPORARILY** | Used by contacts + deals pages. DS `ds/workspace/BulkActionBar.tsx` exists in parallel |

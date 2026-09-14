@@ -74,6 +74,10 @@ export type DataWorkspaceChromeProps = {
 
     mode?: 'list' | 'board';
     onModeChange?: (mode: 'list' | 'board') => void;
+    /**
+     * P11 board slot. Rendered when `mode="board"` in either result mode.
+     * Pass `<PipelineKanban />` later — do not move the deals board here (P03D).
+     */
     board?: ReactNode;
 
     extraQuery?: Record<string, string | number | null | undefined>;
@@ -114,10 +118,14 @@ export type DataWorkspaceSharedTableProps<Row extends { id: RowId } = { id: RowI
     DataWorkspaceChromeProps & {
         resultMode: 'shared-table';
         rows: Row[];
+        /** Consumed by ListDataTable (P03D). Not voided. */
         rowHref: (row: Row) => string;
+        /** Reserved for P09 QuickRecordDrawer. Not wired in P03D. */
         onRowPeek?: (row: Row) => void;
         loading?: boolean;
+        /** WorkspaceEmpty — heading required. Domain pages keep CrmEmptyState. */
         empty: DataWorkspaceEmpty;
+        /** WorkspacePaginator via listPageHref. Domain pages keep CrmListFooter. */
         paginator?: DataWorkspacePaginator;
         renderResults?: never;
         children?: never;

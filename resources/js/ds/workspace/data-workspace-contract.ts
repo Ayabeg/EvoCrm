@@ -79,6 +79,8 @@ acceptWorkspace({
         pageIds: [1, 'uuid-row'],
         selectable: true,
     },
+    mode: 'board',
+    board: 'pipeline-kanban-slot',
 });
 
 acceptWorkspace({
