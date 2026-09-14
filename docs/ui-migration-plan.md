@@ -1,5 +1,12 @@
 # EvoCRM UI migration plan
 
+> **Superseded for new work (2026-09-14).**  
+> Historical P01–P16 below is **partially shipped** on `main` (P02 tokens, P03 `ds/` primitives, P04 64/240 shell, P05 DataWorkspace adapter — PRs #196–#198).  
+> Do not start a second token pass or a second DataWorkspace folder from this file.  
+> **Executable sequence:** [`docs/implementation/MASTER-IMPLEMENTATION-PLAN.md`](./implementation/MASTER-IMPLEMENTATION-PLAN.md) (P00–P29).  
+> System map: [`docs/implementation/current-system-map.md`](./implementation/current-system-map.md).  
+> Note: `docs/ui-audit.md` §2 still says DataWorkspace does not exist; that paragraph is stale.
+
 **Scope:** visual/system rebuild only.  
 **Locks:** [`ui-audit.md`](./ui-audit.md), [`design-system.md`](./design-system.md).  
 **Method:** strangler. One phase per PR. Routes and APIs do not move.
@@ -365,3 +372,23 @@ This docs PR (P01) must not edit those files. Implementers of later phases shoul
 - Replacing Inertia with Next / a SPA
 - Cloning HubSpot or Salesforce visual identity
 - Marketing landing rewrite (different orange allowed there)
+
+---
+
+## 6. Reconciliation with the 2026-09-14 master plan (additive)
+
+This section does **not** rewrite P01–P16 above. It records what already landed and where to go next.
+
+| Historical phase | Status on `main` @ `7d05ca7` | Next owner |
+|---|---|---|
+| P01 Audit (this file + design-system + ui-audit) | Shipped | Keep as history |
+| P02 Tokens | Shipped (do not reopen) | — |
+| P03 Primitives in `ds/` | Shipped | Icon/overlay convergence is **new P01** |
+| P04 AppShell 64/240 | Shipped (`P04AppShellTest`) | Leftovers = **new P02** |
+| P05 DataWorkspace adapter | Shipped (`CrmListShell` stubs rows/selection) | Contract completion = **new P03A–D** |
+| P06–P08 object list swaps | **Not done** as full contract | **new P04–P08** (Contacts → Quotes; Leads added) |
+| P09 RecordDrawer | **Not built** | **new P09–P10** QuickRecordDrawer |
+| P10–P16 Home/Inbox/Quotes/Settings/Command/motion/delete | Partially true as product features; not as the locked DS program | **new P11–P29** |
+
+Absent research originals: [`docs/research/_ABSENT.md`](./research/_ABSENT.md).  
+First implementation PR after the architecture-freeze docs: **P01 Primitive convergence** — see master plan §10.
