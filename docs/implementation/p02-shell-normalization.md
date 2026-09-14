@@ -67,17 +67,12 @@ Sparkle remains an **entry** to the command palette. It does not mount `AskEvoPa
 
 ## Tests run
 
-Recorded after this PR's implementation. See the PR body if a later commit updates counts.
-
-| Command | Intent |
+| Command | Result |
 |---|---|
-| `php artisan test --filter=P02` | New lock + leftover header unused |
-| `php artisan test --filter=P01` | Phosphor / overlay path; `/home` assertion removed |
-| `php artisan test --filter=P04` | 64/240 + topbar labels |
-| `php artisan test --filter=Wave0` | Shell chrome |
-| `php artisan test --filter=SimpleMode` | Simple mode nav / guards |
-| `npm run types:check` | TS |
-| `npm run build` | Production bundle |
+| `php artisan test --filter='P02\|P01\|P04\|Wave0\|SimpleMode\|AuroraToken'` | pass (45 tests, 553 assertions) |
+| `npm run types:check` | pass (after `php artisan wayfinder:generate --with-form`) |
+| `npx eslint` on P02-touched TS files | pass (1 pre-existing `command-palette` hook warning) |
+| `npm run build` | pass |
 
 New lock: `tests/Feature/P02ActiveShellNormalizationTest.php`.
 
