@@ -33,7 +33,12 @@ const OBJECT_NOUNS: Record<ListObjectType, string> = {
     quote: 'quotes',
 };
 
-/** Thin Inertia mapper. Domain result mode; selection is a workspace capability. */
+/**
+ * Thin Inertia mapper. Domain result mode; selection is a workspace capability.
+ * P03D empty / paginator / board helpers live on DataWorkspace shared-table
+ * (and the board slot in both modes). Domain pages keep CrmEmptyState +
+ * CrmListFooter in children until P04–P08. Optional `board` is the P11 slot.
+ */
 export function CrmListShell({
     title,
     entity,
@@ -61,6 +66,9 @@ export function CrmListShell({
     className,
     contentClassName,
     selection,
+    mode,
+    onModeChange,
+    board,
     children,
 }: {
     title: string;
@@ -90,6 +98,9 @@ export function CrmListShell({
     className?: string;
     contentClassName?: string;
     selection?: WorkspaceSelectionInput;
+    mode?: 'list' | 'board';
+    onModeChange?: (mode: 'list' | 'board') => void;
+    board?: ReactNode;
     children:
         | ReactNode
         | ((
@@ -191,7 +202,9 @@ export function CrmListShell({
                     {pipelineSwitcher}
                 </>
             }
-            mode={entity === 'deal' ? 'list' : undefined}
+            mode={mode ?? (entity === 'deal' ? 'list' : undefined)}
+            onModeChange={onModeChange}
+            board={board}
             className={className}
             contentClassName={contentClassName}
             renderResults={({ columns: nextColumns, selection: workspaceSelection }) => (

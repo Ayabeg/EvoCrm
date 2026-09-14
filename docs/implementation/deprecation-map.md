@@ -33,7 +33,7 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 | `components/aurora/command-palette.tsx` | P16 | Either become `ds/chrome/CommandPalette` or a thin re-export |
 | `TasksOverlay` as a second notify surface | P15 (P02 kept overlay as the only topbar tasks entry) | `/crm/activities` work queue |
 | `GuidedActions` as the only activation UI | P23 | Durable checklist **plus** leftover guided deals/prospecting if still useful |
-| `list-chrome` `CrmListFooter` / `CrmEmptyState` | P03 pagination/empty | DataWorkspace footer + `EmptyState` |
+| `list-chrome` `CrmListFooter` / `CrmEmptyState` | P04–P08 (helpers landed in P03D) | `WorkspacePaginator` + `WorkspaceEmpty` on shared-table; domain pages still use list-chrome |
 | `CrmObjectHeader` on boards | P11 | PageHeader inside DataWorkspace |
 
 ---

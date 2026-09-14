@@ -1,9 +1,6 @@
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { listPageHref } from '@/components/crm/list-query';
-import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageHeader, PageHeaderAction } from '@/ds/chrome/PageHeader';
 import { AdvancedFilterDrawer } from '@/ds/workspace/AdvancedFilterDrawer';
@@ -12,10 +9,13 @@ import { FilterBar } from '@/ds/workspace/FilterBar';
 import { SavedViews } from '@/ds/workspace/SavedViews';
 import { useWorkspaceSelection } from '@/ds/workspace/selection';
 import type { RowId, WorkspaceSelection } from '@/ds/workspace/selection';
+import { resolveWorkspaceBoardSlot } from '@/ds/workspace/surface';
 import type {
     DataWorkspaceProps,
     DataWorkspaceSharedTableProps,
 } from '@/ds/workspace/types';
+import { WorkspaceEmpty, workspaceEmptyAction } from '@/ds/workspace/WorkspaceEmpty';
+import { WorkspacePaginator } from '@/ds/workspace/WorkspacePaginator';
 import { t } from '@/lib/i18n';
 import {
     applyBuiltInView,
@@ -27,24 +27,12 @@ import type { ListQueryObject } from '@/lib/list-query';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 
-const OBJECT_NOUNS = {
-    contact: 'records',
-    company: 'records',
-    deal: 'records',
-    ticket: 'records',
-    quote: 'records',
-} as const;
-
 function renderSharedTableSurface<Row extends { id: RowId }>(
     props: DataWorkspaceSharedTableProps<Row>,
     selection: WorkspaceSelection,
 ): ReactNode {
-    void props.rowHref;
+    // onRowPeek is reserved for P09 QuickRecordDrawer. Do not invent peek here.
     void props.onRowPeek;
-
-    if (props.mode === 'board' && props.board) {
-        return props.board;
-    }
 
     if (props.loading) {
         return (
@@ -58,26 +46,13 @@ function renderSharedTableSurface<Row extends { id: RowId }>(
 
     if (props.rows.length === 0) {
         return (
-            <div className="grid flex-1 place-items-center px-4 py-8 md:px-8">
-                <EmptyState
-                    density="page"
-                    title={props.empty.title}
-                    description={props.empty.body}
-                    as="h2"
-                    className="w-full max-w-md"
-                    action={
-                        props.empty.actionLabel ? (
-                            <Button
-                                type="button"
-                                className="h-9"
-                                onClick={props.primaryAction.onClick}
-                            >
-                                {props.empty.actionLabel}
-                            </Button>
-                        ) : undefined
-                    }
-                />
-            </div>
+            <WorkspaceEmpty
+                empty={props.empty}
+                action={workspaceEmptyAction(
+                    props.empty.actionLabel,
+                    props.primaryAction.onClick,
+                )}
+            />
         );
     }
 
@@ -88,6 +63,7 @@ function renderSharedTableSurface<Row extends { id: RowId }>(
             columnDefs={props.columnDefs}
             columns={props.columns}
             basePath={props.basePath}
+            rowHref={props.rowHref}
             selectable={props.selection?.selectable ?? false}
             selectedIds={selection.selectedIds}
             onToggle={selection.toggleOne}
@@ -143,12 +119,17 @@ export function DataWorkspace<Row extends { id: RowId }>(
             selectionInput.pageIds ??
             (sharedRows ? sharedRows.map((row) => row.id) : []),
     });
+    const boardSurface = resolveWorkspaceBoardSlot({
+        mode,
+        board: props.board,
+    });
     const resultSurface =
-        resultMode === 'domain'
+        boardSurface ??
+        (resultMode === 'domain'
             ? typeof props.renderResults === 'function'
                 ? props.renderResults({ columns, selection })
                 : props.renderResults
-            : renderSharedTableSurface(props, selection);
+            : renderSharedTableSurface(props, selection));
 
     return (
         <div
@@ -249,51 +230,15 @@ export function DataWorkspace<Row extends { id: RowId }>(
             {selection.bulkActive && bulk ? bulk : null}
             <div className={cn('flex min-h-0 flex-1 flex-col bg-canvas', contentClassName)}>
                 {resultSurface}
-                {resultMode === 'shared-table' && paginator ? (
-                    <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute md:px-8">
-                        <span>
-                            {t('Showing :count of :total :noun', {
-                                count: (sharedRows?.length ?? 0).toLocaleString(),
-                                total: paginator.total.toLocaleString(),
-                                noun: t(OBJECT_NOUNS[object]),
-                            })}
-                        </span>
-                        <nav className="flex items-center gap-2" aria-label={t('Pagination')}>
-                            {paginator.page > 1 ? (
-                                <Link
-                                    href={listPageHref(
-                                        basePath,
-                                        filterRecord,
-                                        paginator.page - 1,
-                                        extraQuery,
-                                    )}
-                                    className="hover:text-ink"
-                                >
-                                    {t('Prev')}
-                                </Link>
-                            ) : (
-                                <span className="opacity-40">{t('Prev')}</span>
-                            )}
-                            <span>
-                                {paginator.page} / {paginator.lastPage}
-                            </span>
-                            {paginator.page < paginator.lastPage ? (
-                                <Link
-                                    href={listPageHref(
-                                        basePath,
-                                        filterRecord,
-                                        paginator.page + 1,
-                                        extraQuery,
-                                    )}
-                                    className="hover:text-ink"
-                                >
-                                    {t('Next')}
-                                </Link>
-                            ) : (
-                                <span className="opacity-40">{t('Next')}</span>
-                            )}
-                        </nav>
-                    </footer>
+                {resultMode === 'shared-table' && paginator && !boardSurface ? (
+                    <WorkspacePaginator
+                        object={object}
+                        basePath={basePath}
+                        filters={filterRecord}
+                        extraQuery={extraQuery}
+                        pageCount={sharedRows?.length ?? 0}
+                        paginator={paginator}
+                    />
                 ) : null}
             </div>
         </div>

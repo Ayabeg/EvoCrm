@@ -120,7 +120,7 @@ it('preserves list-query URL keys and does not add a second write path', functio
         ->and($shell)->toContain('listQueryHref(')
         ->and($shell)->toContain('preserveState: true')
         ->and($shell)->toContain('AdvancedFilterDrawer applies via GET + list-query')
-        ->and($workspace)->toContain('listPageHref')
+        ->and($workspace)->toContain('WorkspacePaginator')
         ->and($workspace)->not->toContain('searchParams.set')
         ->and($workspace)->not->toContain('history.replaceState');
 });

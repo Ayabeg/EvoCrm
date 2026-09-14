@@ -89,7 +89,7 @@ it('treats URL and Inertia props as the list query source of truth', function ()
         ->and($shell)->not->toContain('router.get(')
         ->and($shell)->not->toContain('filterFields(activeFilters)');
 
-    expect($workspace)->toContain('listPageHref')
+    expect($workspace)->toContain('WorkspacePaginator')
         ->and($workspace)->toContain('fromActiveFilters(')
         ->and($workspace)->not->toContain('searchParams.set')
         ->and($workspace)->not->toContain('history.replaceState');

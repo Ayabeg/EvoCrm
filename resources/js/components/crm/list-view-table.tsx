@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
 import type { RowId } from '@/ds/workspace/selection';
+import { resolveRowHref } from '@/ds/workspace/surface';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
@@ -362,16 +363,13 @@ function renderCell(
     return renderCompanyCell(columnId, row as CompanyRow);
 }
 
-function recordHref(basePath: string, id: number): string {
-    return `${basePath}/${id}`;
-}
-
 export default function ListViewTable({
     entity,
     rows,
     columnDefs,
     columns,
     basePath,
+    rowHref,
     selectable = false,
     selectedIds = [],
     onToggle,
@@ -383,6 +381,7 @@ export default function ListViewTable({
     columnDefs: ListColumnDef[];
     columns: ListViewColumn[];
     basePath: string;
+    rowHref?: (row: { id: RowId }) => string;
     selectable?: boolean;
     selectedIds?: RowId[];
     onToggle?: (id: RowId) => void;
@@ -450,7 +449,7 @@ export default function ListViewTable({
                     <tbody>
                         {rows.map((row) => {
                             const selected = hasRowId(selectedIds, row.id);
-                            const href = recordHref(basePath, row.id);
+                            const href = resolveRowHref(row, rowHref, basePath);
 
                             return (
                             <tr
@@ -537,7 +536,7 @@ export default function ListViewTable({
             <ul className="divide-y divide-hairline @[480px]/list:hidden">
                 {rows.map((row) => {
                     const primaryLabel = renderCell(entity, primaryId, row);
-                    const href = recordHref(basePath, row.id);
+                    const href = resolveRowHref(row, rowHref, basePath);
 
                     return (
                         <li key={row.id} className="flex items-start gap-2 px-4 py-2">

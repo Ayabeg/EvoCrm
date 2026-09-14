@@ -72,6 +72,7 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 - **Result modes (P03A):** `resultMode: 'shared-table'` owns `rows` + shared table chrome. `resultMode: 'domain'` takes `renderResults` and forbids `rows` / `children`. `CrmListShell` is domain mode until P04–P08 migrate objects.
 - **Selection (P03B):** chrome `selection` contract (`RowId = string | number`). Domain consumes `renderResults({ columns, selection })`. Actions stay domain.
 - **Query (P03C):** URL / Inertia `activeFilters` is the durable list-query source of truth. Canonical contract in `lib/list-query`. Domain adapters serialize to existing params (`q`, `view`, `filter_id`, `page`, …). No competing React list-state mirror.
+- **Empty / paginator / board (P03D):** Shared-table uses `WorkspaceEmpty` (h2), `WorkspacePaginator` (`listPageHref`), and `resolveWorkspaceBoardSlot`. `rowHref` is consumed by `ListDataTable`. Domain pages keep `CrmEmptyState` + `CrmListFooter`. Board slot is ready for P11; deals board is not moved.
 
 ### SavedViews / FilterBar / AdvancedFilterDrawer
 
@@ -84,7 +85,7 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 - **Owner:** `ds/workspace/DataTable.tsx`
 - **Owns:** row height 48, selection checkboxes, row click routing
 - **Delegates cells to:** `ListViewTable` renderers / domain `columnDefs`
-- **Domain owns:** `columnDefs`, `rowHref`, object-specific columns (wilaya, amount, stage)
+- **Domain owns:** `columnDefs`, `rowHref` (required on shared-table; `ListDataTable` consumes it), object-specific columns (wilaya, amount, stage)
 
 ### BulkActionBar
 

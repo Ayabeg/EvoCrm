@@ -221,8 +221,13 @@ New lock: `tests/Feature/P03CListQueryOwnershipTest.php`.
 
 ## Deferred to P03D
 
+Done in P03D — see `p03d-empty-pagination-board-helpers.md`:
+
 - Empty / pagination / board helpers without a domain surface
 - Shared-table `listPageHref` footer as the live paginator (pages still use `CrmListFooter`)
+
+Still deferred:
+
 - Putting `sort` or `columns` on the URL (would need a backend read path)
 - Contacts→shared-table migration, BulkActionBar redesign, PipelineBoard on `mode="board"`
 

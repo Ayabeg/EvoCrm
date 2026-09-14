@@ -139,12 +139,13 @@ export function DataTable<Row extends { id: RowId }>({
     );
 }
 
-export function ListDataTable({
+export function ListDataTable<Row extends { id: RowId }>({
     object,
     rows,
     columnDefs,
     columns,
     basePath,
+    rowHref,
     selectable = false,
     selectedIds = [],
     onToggle,
@@ -152,10 +153,11 @@ export function ListDataTable({
     isRowSelectable,
 }: {
     object: ListObjectType;
-    rows: Array<{ id: RowId }>;
+    rows: Row[];
     columnDefs: ListColumnDef[];
     columns: ListViewColumn[];
     basePath: string;
+    rowHref: (row: Row) => string;
     selectable?: boolean;
     selectedIds?: RowId[];
     onToggle?: (id: RowId) => void;
@@ -170,6 +172,7 @@ export function ListDataTable({
                 columnDefs={columnDefs}
                 columns={columns}
                 basePath={basePath}
+                rowHref={rowHref as (row: { id: RowId }) => string}
                 selectable={selectable}
                 selectedIds={selectedIds}
                 onToggle={onToggle}
