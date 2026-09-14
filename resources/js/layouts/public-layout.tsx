@@ -1,3 +1,4 @@
+import { HydrateI18n } from '@/components/i18n-provider';
 import { PosthogIdentity } from '@/components/posthog-identity';
 
 export default function PublicLayout({
@@ -7,6 +8,7 @@ export default function PublicLayout({
 }) {
     return (
         <div className="min-h-screen bg-canvas text-ink">
+            <HydrateI18n />
             <PosthogIdentity />
             {children}
         </div>

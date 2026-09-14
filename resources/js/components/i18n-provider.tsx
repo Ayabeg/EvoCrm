@@ -1,5 +1,4 @@
 import { usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { hydrateI18n } from '@/lib/i18n';
 
 type I18nPageProps = {
@@ -7,9 +6,13 @@ type I18nPageProps = {
     translations?: Record<string, string>;
 };
 
-export function I18nProvider({ children }: { children: ReactNode }) {
+/**
+ * Must mount inside an Inertia page (layouts), never via createInertiaApp({ withApp }).
+ * usePage() outside that context throws and whitescreens the app.
+ */
+export function HydrateI18n() {
     const { locale, translations } = usePage<I18nPageProps>().props;
     hydrateI18n(locale, translations);
 
-    return children;
+    return null;
 }
