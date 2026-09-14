@@ -10,8 +10,8 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 
 | Artifact | Why | Stop importing in | Replacement |
 |---|---|---|---|
-| `components/app-header.tsx` | Laravel starter-kit; Lucide; unused by AppLayout | P02 | `AppSidebarHeader` |
-| `layouts/app/app-header-layout.tsx` | Only consumer of `AppHeader` | P02 | `app-sidebar-layout.tsx` |
+| `components/app-header.tsx` | Laravel starter-kit; Lucide; unused by AppLayout | P02 (marked `@deprecated`; still not imported) | `AppSidebarHeader` |
+| `layouts/app/app-header-layout.tsx` | Only consumer of `AppHeader` | P02 (marked `@deprecated`; still not imported) | `app-sidebar-layout.tsx` |
 | `components/crm/list-toolbar.tsx` | Superseded by `ds/workspace/FilterBar` | already unused | FilterBar |
 | `components/crm/saved-view-tabs.tsx` | Only used by list-toolbar | already unused | SavedViews |
 | `pages/leads/board.tsx` | Orphan UI; `/leads` redirects to deals board | keep unrouted; delete P28 | `/crm/deals/board` |
@@ -31,7 +31,7 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 | `CrmListShell` children-table bypass (`rows={[]}`) | P03B–P08 | Shell only maps Inertia → DataWorkspace props |
 | `CrmShell` on companies / leads / tickets / activities / workflows | Each page’s migrate PR | Remove double chrome; rail is enough |
 | `components/aurora/command-palette.tsx` | P16 | Either become `ds/chrome/CommandPalette` or a thin re-export |
-| `TasksOverlay` as a second notify surface | P02 / P15 | Notifications + `/crm/activities` |
+| `TasksOverlay` as a second notify surface | P15 (P02 kept overlay as the only topbar tasks entry) | `/crm/activities` work queue |
 | `GuidedActions` as the only activation UI | P23 | Durable checklist **plus** leftover guided deals/prospecting if still useful |
 | `list-chrome` `CrmListFooter` / `CrmEmptyState` | P03 pagination/empty | DataWorkspace footer + `EmptyState` |
 | `CrmObjectHeader` on boards | P11 | PageHeader inside DataWorkspace |
@@ -62,7 +62,7 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 | Gap | Classification | Notes |
 |---|---|---|
 | Missing QuickRecordDrawer | **Add** (not replace) | Show pages stay |
-| Command Home → `/home` | **Fix** in P16 (or P01 if cheap) | Not a component replace |
+| Command Home → `/home` | **Fixed** in P02 (`/dashboard`) | Not a component replace |
 | n8n-style canvas | **Do not add** | Structured builder is the replacement for “we should have a canvas” |
 
 No live product screen is classified REPLACE.

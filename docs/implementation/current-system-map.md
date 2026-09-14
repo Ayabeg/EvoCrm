@@ -1,6 +1,6 @@
 # Current system map
 
-**Baseline:** `main` @ `7d05ca7` (inspected 2026-09-14).  
+**Baseline:** `main` @ `1b1c10d` (inspected 2026-09-14; P02 facts below).  
 **Classifications:** `CANONICAL KEEP` · `ADAPTER KEEP TEMPORARILY` · `MIGRATE` · `DEPRECATE` · `REPLACE` (only if fundamentally unsuitable).  
 **Companion:** [canonical-component-map.md](./canonical-component-map.md) · [deprecation-map.md](./deprecation-map.md).
 
@@ -36,8 +36,8 @@ Layout switch (`resources/js/app.tsx`):
 |---|---|---|---|
 | Authenticated shell | `layouts/app-layout.tsx`, `layouts/app/app-sidebar-layout.tsx`, `components/app-shell.tsx` | **CANONICAL KEEP** | Default for all product pages |
 | Sidebar 64/240 | `components/app-sidebar.tsx`, `components/ui/sidebar.tsx` | **CANONICAL KEEP** | Groups Home / CRM / Communication / Sales / Automation + More + Settings. Phosphor. `P04AppShellTest` |
-| Topbar | `components/app-sidebar-header.tsx` | **CANONICAL KEEP** (normalize in P02) | Search → palette, Ask Evo → palette, Create dropdown, Notifications → Tasks overlay, profile |
-| Header layout leftover | `layouts/app/app-header-layout.tsx`, `components/app-header.tsx` | **DEPRECATE** | Lucide starter-kit header. **Not imported by `AppLayout`.** |
+| Topbar | `components/app-sidebar-header.tsx` | **CANONICAL KEEP** (P02 normalized) | Search/⌘K → palette, Ask Evo → same palette, Create dropdown, one Tasks overlay button, profile |
+| Header layout leftover | `layouts/app/app-header-layout.tsx`, `components/app-header.tsx` | **DEPRECATE** | Lucide starter-kit header. **Not imported by `AppLayout`.** Marked `@deprecated` in P02; delete in P28. |
 | Settings chrome | `layouts/settings/layout.tsx`, `components/settings/chrome.tsx` | **CANONICAL KEEP** (IA migrate P21) | Groups You / Workspace / Integrations / CRM / Admin |
 | Auth / public | `layouts/auth-*`, `layouts/public-layout.tsx` | **CANONICAL KEEP** | Out of this UX program except tokens |
 | Page header | `ds/chrome/PageHeader.tsx`, `components/page-header.tsx`, `crm-object-header.tsx` | **MIGRATE** toward `PageHeader` | DataWorkspace already uses `PageHeader`. Deals board / leads still use `CrmObjectHeader` |
@@ -139,15 +139,15 @@ Move contract: `POST /crm/deals/{deal}/move`. No keyboard move, no undo toast.
 
 | System | Paths | Verdict |
 |---|---|---|
-| CRM palette | `components/crm/command-palette.tsx` | **CANONICAL KEEP** (P01: Phosphor icons; sections + `/home` href still P16) |
+| CRM palette | `components/crm/command-palette.tsx` | **CANONICAL KEEP** (P01: Phosphor; P02: Home → `/dashboard`; sections still P16) |
 | Aurora palette primitive | `components/aurora/command-palette.tsx` | **ADAPTER KEEP TEMPORARILY** — presentation layer |
 | Search index | `evoSearchIndex` Inertia share | **CANONICAL KEEP** |
-| Tasks overlay | `components/crm/tasks-overlay.tsx` | **ADAPTER KEEP TEMPORARILY** — fold into notifications / activities (P02/P15) |
+| Tasks overlay | `components/crm/tasks-overlay.tsx` | **ADAPTER KEEP TEMPORARILY** — P02 kept it as the single topbar tasks entry; fold into `/crm/activities` in P15 |
 | DS overlays | `ds/components/{Drawer,Modal,Toast}` | **CANONICAL KEEP** |
 
-Palette today: sections `records` + `navigate` only. Phosphor icons (P01). Home item `href: '/home'` — **`/` is named `home` and redirects; there is no `/home` route.** Dashboard is `/dashboard` (fix in P02/P16).
+Palette today: sections `records` + `navigate` only. Phosphor icons (P01). Home item `href: '/dashboard'` (P02). `/` is named `home` and redirects; there is no `/home` route.
 
-Topbar Ask Evo opens the palette, not `AskEvoPanel`.
+Topbar Ask Evo opens the palette, not `AskEvoPanel`. Topbar Tasks opens `TasksOverlay` (not a second Notifications dropdown).
 
 ---
 
