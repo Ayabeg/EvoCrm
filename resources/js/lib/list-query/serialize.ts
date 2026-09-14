@@ -1,6 +1,5 @@
 import { listQueryAdapter } from '@/lib/list-query/adapters';
 import {
-    emptyCanonicalListQuery,
     emptyToNull,
     isEmptyFilterGroups,
     isListQuerySort,
@@ -68,8 +67,6 @@ export function fromActiveFilters(
     extra?: ListQueryExtraInput,
     page?: number | null,
 ): CanonicalListQuery {
-    const current = emptyCanonicalListQuery();
-
     return {
         search: emptyToNull(filters.q),
         page: normalizePage(page ?? toOptionalNumber(filters.page)),

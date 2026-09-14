@@ -10,9 +10,9 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from '@/components/ui/drawer';
+import type { DataWorkspaceEntity, DataWorkspaceFilterContext } from '@/ds/workspace/types';
 import type { ListFieldDef, ListViewFilters } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
-import type { DataWorkspaceEntity, DataWorkspaceFilterContext } from '@/ds/workspace/types';
 
 export function AdvancedFilterDrawer({
     open,
@@ -43,6 +43,8 @@ export function AdvancedFilterDrawer({
     );
 
     useEffect(() => {
+        // Drawer draft resets from Inertia filters when the URL query changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setGroups(filterGroupsFromActive(filters));
     }, [filters]);
 

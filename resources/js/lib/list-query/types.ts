@@ -86,7 +86,7 @@ export type ListQueryPatch = {
 
 /**
  * Backend / URL param bag after domain serialization.
- * Explicit keys only — not `Record<string, any>`.
+ * Explicit keys only — not an untyped string bag.
  */
 export type DomainListParams = {
     q?: string;

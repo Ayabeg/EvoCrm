@@ -92,7 +92,7 @@ export function toOptionalBoolean(value: unknown): boolean | null {
         return null;
     }
 
-    return Boolean(value) ? true : null;
+    return value ? true : null;
 }
 
 export function normalizePage(page: number | null | undefined): number | null {
