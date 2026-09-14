@@ -17,7 +17,7 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 | `pages/leads/board.tsx` | Orphan UI; `/leads` redirects to deals board | keep unrouted; delete P28 | `/crm/deals/board` |
 | `app/Http/Controllers/Crm/LeadBoardController.php` | Renders orphan page | P28 **only if** no route/tests require the class — see `LeadsBoardTest` / `EvoCrmP9RetireLeadsBoardTest` before delete | Deal board controller |
 | Lucide imports on leftover / unused files | Dual family leftover after P01 | P28 | `@phosphor-icons/react` — P01 already cleared active chrome. Remaining: `app-header.tsx`, `nav-main.tsx`, `ui/icon.tsx`, `types/navigation.ts`, `leads/board.tsx`, `saved-view-tabs.tsx`, `quick-launch-grid.tsx`, unused Aurora skins |
-| Domain `components/crm/bulk-action-bar.tsx` | Parallel to DS bar | P03C–P08 as each object moves | `ds/workspace/BulkActionBar` |
+| Domain `components/crm/bulk-action-bar.tsx` | Thin wrapper over DS bar; still used by contacts + deals | Later bar-visual phase (not P03C URL work) | `ds/workspace/BulkActionBar` |
 | `CrmListHeader` (list-chrome) | Legacy activities header | P15 | PageHeader + queue chrome |
 | Dead Aurora skins unused by DS re-exports | `ui/aurora/{data-table,pagination,toast,combobox}` if still unreferenced | P28 | DS primitives |
 | Hardcoded `#d9500f` / `#eaeaea` leftovers | Pre-token lock | opportunistic through P29 | CSS variables |
@@ -28,7 +28,7 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 
 | Adapter | Keep until | Then |
 |---|---|---|
-| `CrmListShell` domain `renderResults` (pages still own tables) | P03B–P08 | Shared-table `rows` + selection; shell only maps Inertia → DataWorkspace props |
+| `CrmListShell` domain `renderResults` (pages still own tables) | P04–P08 | Shared-table `rows`; shell only maps Inertia → DataWorkspace props. Selection already workspace-owned (P03B). |
 | `CrmShell` on companies / leads / tickets / activities / workflows | Each page’s migrate PR | Remove double chrome; rail is enough |
 | `components/aurora/command-palette.tsx` | P16 | Either become `ds/chrome/CommandPalette` or a thin re-export |
 | `TasksOverlay` as a second notify surface | P15 (P02 kept overlay as the only topbar tasks entry) | `/crm/activities` work queue |

@@ -75,6 +75,12 @@ export default function QuotesIndex({
                     className="bg-canvas"
                     contentClassName="bg-canvas"
                     primaryClassName="bg-brand text-white hover:bg-brand-hover"
+                    selection={{
+                        mode: 'uncontrolled',
+                        // Page does not participate now. Not a permanent bulk ban.
+                        selectable: false,
+                        pageIds: quotes.map((quote) => quote.id),
+                    }}
                 >
                     {(columns) => (
                         <>

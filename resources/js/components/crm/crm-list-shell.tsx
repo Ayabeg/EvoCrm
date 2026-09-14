@@ -5,6 +5,7 @@ import { crmListHref, filterFields, listFilterChips } from '@/components/crm/lis
 import type { StagePill } from '@/components/crm/stage-pills';
 import { StagePills } from '@/components/crm/stage-pills';
 import { DataWorkspace, viewHref } from '@/ds/workspace/DataWorkspace';
+import type { WorkspaceSelection, WorkspaceSelectionInput } from '@/ds/workspace/selection';
 import type {
     ListObjectType,
     ListViewColumn,
@@ -25,7 +26,7 @@ const OBJECT_NOUNS: Record<ListObjectType, string> = {
     quote: 'quotes',
 };
 
-/** Thin Inertia mapper. Domain result mode until P03B–P08 own rows. */
+/** Thin Inertia mapper. Domain result mode; selection is a workspace capability. */
 export function CrmListShell({
     title,
     entity,
@@ -52,6 +53,7 @@ export function CrmListShell({
     primaryClassName,
     className,
     contentClassName,
+    selection,
     children,
 }: {
     title: string;
@@ -80,7 +82,13 @@ export function CrmListShell({
     primaryClassName?: string;
     className?: string;
     contentClassName?: string;
-    children: ReactNode | ((columns: ListViewColumn[]) => ReactNode);
+    selection?: WorkspaceSelectionInput;
+    children:
+        | ReactNode
+        | ((
+              columns: ListViewColumn[],
+              selection: WorkspaceSelection,
+          ) => ReactNode);
 }) {
     const { auth } = usePage().props as { auth: { user: { id: number } } };
     const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
@@ -163,6 +171,7 @@ export function CrmListShell({
             }
             extraQuery={query}
             basePath={basePath}
+            selection={selection}
             filterContext={{ members, cities, wilayas, stages }}
             secondaryActions={headerActions}
             banner={banner}
@@ -175,7 +184,7 @@ export function CrmListShell({
             mode={entity === 'deal' ? 'list' : undefined}
             className={className}
             contentClassName={contentClassName}
-            renderResults={(nextColumns) => (
+            renderResults={({ columns: nextColumns, selection: workspaceSelection }) => (
                 <>
                     {entity === 'deal' || entity === 'ticket' ? (
                         <StagePills
@@ -196,7 +205,9 @@ export function CrmListShell({
                             }
                         />
                     ) : null}
-                    {typeof children === 'function' ? children(nextColumns) : children}
+                    {typeof children === 'function'
+                        ? children(nextColumns, workspaceSelection)
+                        : children}
                 </>
             )}
         />

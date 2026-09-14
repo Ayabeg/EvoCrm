@@ -97,8 +97,8 @@ Thin Inertia → DataWorkspace mapper. Maps title, views, filters, chips, column
 
 | Item | Phase |
 |---|---|
-| Hoist contacts `rows` + `selectedIds` | P03B |
-| DS `BulkActionBar` on contacts | P03C |
+| Hoist selection + bulk state (not full `rows`) | **Done in P03B** — see `p03b-selection-ownership.md` |
+| URL / query authority | **P03C** (user phase map) |
 | Empty / pagination / board helpers without domain surface | P03D |
 | Contacts / Companies / Leads / Deals / Quotes onto shared-table | P04–P08 |
 | URL/query authority move | not this wave unless a later AC says so |

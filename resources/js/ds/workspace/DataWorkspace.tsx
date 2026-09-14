@@ -10,6 +10,8 @@ import { AdvancedFilterDrawer } from '@/ds/workspace/AdvancedFilterDrawer';
 import { ListDataTable } from '@/ds/workspace/DataTable';
 import { FilterBar } from '@/ds/workspace/FilterBar';
 import { SavedViews } from '@/ds/workspace/SavedViews';
+import { useWorkspaceSelection } from '@/ds/workspace/selection';
+import type { RowId, WorkspaceSelection } from '@/ds/workspace/selection';
 import type {
     DataWorkspaceProps,
     DataWorkspaceSharedTableProps,
@@ -26,11 +28,9 @@ const OBJECT_NOUNS = {
     quote: 'records',
 } as const;
 
-function renderSharedTableSurface<Row extends { id: number }>(
+function renderSharedTableSurface<Row extends { id: RowId }>(
     props: DataWorkspaceSharedTableProps<Row>,
-    selectedIds: number[],
-    toggleRow: (id: number) => void,
-    togglePage: () => void,
+    selection: WorkspaceSelection,
 ): ReactNode {
     void props.rowHref;
     void props.onRowPeek;
@@ -81,15 +81,16 @@ function renderSharedTableSurface<Row extends { id: number }>(
             columnDefs={props.columnDefs}
             columns={props.columns}
             basePath={props.basePath}
-            selectable={props.selectable ?? false}
-            selectedIds={selectedIds}
-            onToggle={toggleRow}
-            onTogglePage={togglePage}
+            selectable={props.selection?.selectable ?? false}
+            selectedIds={selection.selectedIds}
+            onToggle={selection.toggleOne}
+            onTogglePage={selection.togglePage}
+            isRowSelectable={props.selection?.isRowSelectable}
         />
     );
 }
 
-export function DataWorkspace<Row extends { id: number }>(
+export function DataWorkspace<Row extends { id: RowId }>(
     props: DataWorkspaceProps<Row>,
 ) {
     const {
@@ -127,48 +128,20 @@ export function DataWorkspace<Row extends { id: number }>(
     const [advancedOpen, setAdvancedOpen] = useState(false);
     const filterRecord = filters as Record<string, unknown>;
     const sharedRows = resultMode === 'shared-table' ? props.rows : undefined;
-    const selectedIds =
-        resultMode === 'shared-table' ? (props.selectedIds ?? []) : [];
-    const onSelectedIdsChange =
-        resultMode === 'shared-table' ? props.onSelectedIdsChange : undefined;
-    const selected = selectedIds.length > 0;
     const paginator = resultMode === 'shared-table' ? props.paginator : undefined;
+    const selectionInput = props.selection ?? { mode: 'uncontrolled' as const };
+    const selection = useWorkspaceSelection({
+        ...selectionInput,
+        pageIds:
+            selectionInput.pageIds ??
+            (sharedRows ? sharedRows.map((row) => row.id) : []),
+    });
     const resultSurface =
         resultMode === 'domain'
             ? typeof props.renderResults === 'function'
-                ? props.renderResults(columns)
+                ? props.renderResults({ columns, selection })
                 : props.renderResults
-            : renderSharedTableSurface(
-                  props,
-                  selectedIds,
-                  (id) => {
-                      if (!onSelectedIdsChange) {
-                          return;
-                      }
-
-                      onSelectedIdsChange(
-                          selectedIds.includes(id)
-                              ? selectedIds.filter((value) => value !== id)
-                              : [...selectedIds, id],
-                      );
-                  },
-                  () => {
-                      if (!onSelectedIdsChange || !sharedRows) {
-                          return;
-                      }
-
-                      const pageIds = sharedRows.map((row) => row.id);
-                      const allSelected = pageIds.every((id) =>
-                          selectedIds.includes(id),
-                      );
-
-                      onSelectedIdsChange(
-                          allSelected
-                              ? selectedIds.filter((id) => !pageIds.includes(id))
-                              : [...new Set([...selectedIds, ...pageIds])],
-                      );
-                  },
-              );
+            : renderSharedTableSurface(props, selection);
 
     return (
         <div
@@ -181,6 +154,8 @@ export function DataWorkspace<Row extends { id: number }>(
             data-object={object}
             data-mode={mode}
             data-result-mode={resultMode}
+            data-bulk-active={selection.bulkActive ? 'true' : 'false'}
+            data-selected-count={selection.selectedCount}
         >
             <PageHeader
                 title={title}
@@ -263,7 +238,7 @@ export function DataWorkspace<Row extends { id: number }>(
                 extraQuery={extraQuery}
                 onFiltersChange={onFiltersChange}
             />
-            {selected && bulk ? bulk : null}
+            {selection.bulkActive && bulk ? bulk : null}
             <div className={cn('flex min-h-0 flex-1 flex-col bg-canvas', contentClassName)}>
                 {resultSurface}
                 {resultMode === 'shared-table' && paginator ? (

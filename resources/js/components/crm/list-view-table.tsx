@@ -1,9 +1,11 @@
 import { Link, router } from '@inertiajs/react';
+import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
+import type { RowId } from '@/ds/workspace/selection';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
+import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
-import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 type AttributeMap = Record<string, string | null>;
@@ -374,6 +376,7 @@ export default function ListViewTable({
     selectedIds = [],
     onToggle,
     onTogglePage,
+    isRowSelectable,
 }: {
     entity: ListObjectType;
     rows: ContactRow[] | DealRow[] | CompanyRow[] | TicketRow[] | QuoteRow[];
@@ -381,9 +384,10 @@ export default function ListViewTable({
     columns: ListViewColumn[];
     basePath: string;
     selectable?: boolean;
-    selectedIds?: number[];
-    onToggle?: (id: number) => void;
+    selectedIds?: RowId[];
+    onToggle?: (id: RowId) => void;
     onTogglePage?: () => void;
+    isRowSelectable?: (id: RowId) => boolean;
 }) {
     const visible = visibleColumns({
         columnDefs,
@@ -393,7 +397,11 @@ export default function ListViewTable({
     });
     const primaryId = primaryColumnId(entity);
     const pageIds = rows.map((row) => row.id);
-    const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
+    const { allPageSelected, somePageSelected } = derivePageSelection(
+        selectedIds,
+        pageIds,
+        { isRowSelectable },
+    );
 
     return (
         <div className="@container/list min-h-0 flex-1">
@@ -411,9 +419,21 @@ export default function ListViewTable({
                                 <th className="w-10 px-4 md:px-8">
                                     <input
                                         type="checkbox"
-                                        checked={allSelected}
+                                        checked={allPageSelected}
+                                        ref={(element) => {
+                                            if (element) {
+                                                element.indeterminate = somePageSelected;
+                                            }
+                                        }}
                                         onChange={onTogglePage}
                                         aria-label="Select page"
+                                        aria-checked={
+                                            somePageSelected
+                                                ? 'mixed'
+                                                : allPageSelected
+                                                  ? 'true'
+                                                  : 'false'
+                                        }
                                     />
                                 </th>
                             ) : null}
@@ -429,7 +449,7 @@ export default function ListViewTable({
                     </thead>
                     <tbody>
                         {rows.map((row) => {
-                            const selected = selectedIds.includes(row.id);
+                            const selected = hasRowId(selectedIds, row.id);
                             const href = recordHref(basePath, row.id);
 
                             return (
@@ -454,6 +474,9 @@ export default function ListViewTable({
                                         <input
                                             type="checkbox"
                                             checked={selected}
+                                            disabled={
+                                                !(isRowSelectable?.(row.id) ?? true)
+                                            }
                                             onChange={() => onToggle?.(row.id)}
                                             aria-label={`Select ${row.id}`}
                                         />
@@ -522,7 +545,8 @@ export default function ListViewTable({
                                 <input
                                     type="checkbox"
                                     className="mt-1"
-                                    checked={selectedIds.includes(row.id)}
+                                    checked={hasRowId(selectedIds, row.id)}
+                                    disabled={!(isRowSelectable?.(row.id) ?? true)}
                                     onChange={() => onToggle?.(row.id)}
                                     aria-label={`Select ${row.id}`}
                                 />

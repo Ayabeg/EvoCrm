@@ -19,7 +19,6 @@ it('lets domain-result mode render without fake rows', function () {
         ->and($types)->toContain("resultMode: 'domain'")
         ->and($types)->toContain('renderResults: DataWorkspaceRenderResults')
         ->and($types)->toContain('rows?: never')
-        ->and($types)->toContain('selectedIds?: never')
         ->and($types)->toContain('children?: never');
 
     expect($workspace)->toContain('resultMode')
@@ -92,20 +91,17 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($tickets)->not->toContain('resultMode=');
 });
 
-it('leaves selection on the domain pages and does not hoist it', function () {
+it('keeps domain pages off the shared-table result mode after selection hoist', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
-    expect($contacts)->toContain('const [selectedIds, setSelectedIds] = useState<number[]>([])')
-        ->and($contacts)->toContain('selectedIds={selectedIds}')
-        ->and($contacts)->toContain("entity=\"contact\"")
-        ->and($deals)->toContain('const [selectedIds, setSelectedIds] = useState<number[]>([])')
-        ->and($deals)->toContain('selectedIds={selectedIds}')
-        ->and($shell)->not->toContain('selectedIds')
-        ->and($shell)->not->toContain('onSelectedIdsChange')
-        ->and($workspace)->toContain("resultMode === 'shared-table' ? (props.selectedIds ?? []) : []");
+    expect($contacts)->toContain("entity=\"contact\"")
+        ->and($contacts)->not->toContain('resultMode=')
+        ->and($deals)->not->toContain('resultMode=')
+        ->and($shell)->toContain('resultMode="domain"')
+        ->and($workspace)->toContain('useWorkspaceSelection');
 });
 
 it('preserves list-query URL keys and does not add a second write path', function () {

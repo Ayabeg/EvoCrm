@@ -1,21 +1,28 @@
 import { router } from '@inertiajs/react';
 import ListViewTable from '@/components/crm/list-view-table';
-import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
-import { t } from '@/lib/i18n';
-import { cn } from '@/lib/utils';
+import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
+import type { RowId } from '@/ds/workspace/selection';
 import type { DataTableProps } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
+import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
+import { cn } from '@/lib/utils';
 
-export function DataTable<Row extends { id: number }>({
+export function DataTable<Row extends { id: RowId }>({
     columns,
     rows,
     rowHeight = 48,
     selectedIds = [],
     onToggle,
+    onTogglePage,
     onRowClick,
+    isRowSelectable,
 }: DataTableProps<Row>) {
     const pageIds = rows.map((row) => row.id);
-    const allSelected =
-        pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
+    const { allPageSelected, somePageSelected } = derivePageSelection(
+        selectedIds,
+        pageIds,
+        { isRowSelectable },
+    );
 
     return (
         <div className="min-h-0 flex-1 overflow-auto" data-ds="data-table">
@@ -26,24 +33,49 @@ export function DataTable<Row extends { id: number }>({
                             <th className="w-10 px-4 md:px-8">
                                 <input
                                     type="checkbox"
-                                    checked={allSelected}
+                                    checked={allPageSelected}
+                                    ref={(element) => {
+                                        if (element) {
+                                            element.indeterminate = somePageSelected;
+                                        }
+                                    }}
                                     onChange={() => {
-                                        if (allSelected) {
+                                        if (onTogglePage) {
+                                            onTogglePage();
+
+                                            return;
+                                        }
+
+                                        if (allPageSelected) {
                                             pageIds.forEach((id) => {
-                                                if (selectedIds.includes(id)) {
-                                                    onToggle(id);
+                                                if (
+                                                    (isRowSelectable?.(id) ?? true) &&
+                                                    hasRowId(selectedIds, id)
+                                                ) {
+                                                    onToggle?.(id);
                                                 }
                                             });
+
                                             return;
                                         }
 
                                         pageIds.forEach((id) => {
-                                            if (!selectedIds.includes(id)) {
-                                                onToggle(id);
+                                            if (
+                                                (isRowSelectable?.(id) ?? true) &&
+                                                !hasRowId(selectedIds, id)
+                                            ) {
+                                                onToggle?.(id);
                                             }
                                         });
                                     }}
                                     aria-label="Select page"
+                                    aria-checked={
+                                        somePageSelected
+                                            ? 'mixed'
+                                            : allPageSelected
+                                              ? 'true'
+                                              : 'false'
+                                    }
                                 />
                             </th>
                         ) : null}
@@ -60,7 +92,9 @@ export function DataTable<Row extends { id: number }>({
                 </thead>
                 <tbody>
                     {rows.map((row) => {
-                        const selected = selectedIds.includes(row.id);
+                        const selected = hasRowId(selectedIds, row.id);
+
+                        const canSelect = isRowSelectable?.(row.id) ?? true;
 
                         return (
                             <tr
@@ -85,6 +119,7 @@ export function DataTable<Row extends { id: number }>({
                                         <input
                                             type="checkbox"
                                             checked={selected}
+                                            disabled={!canSelect}
                                             onChange={() => onToggle(row.id)}
                                             aria-label={`Select ${row.id}`}
                                         />
@@ -114,16 +149,18 @@ export function ListDataTable({
     selectedIds = [],
     onToggle,
     onTogglePage,
+    isRowSelectable,
 }: {
     object: ListObjectType;
-    rows: Array<{ id: number }>;
+    rows: Array<{ id: RowId }>;
     columnDefs: ListColumnDef[];
     columns: ListViewColumn[];
     basePath: string;
     selectable?: boolean;
-    selectedIds?: number[];
-    onToggle?: (id: number) => void;
+    selectedIds?: RowId[];
+    onToggle?: (id: RowId) => void;
     onTogglePage?: () => void;
+    isRowSelectable?: (id: RowId) => boolean;
 }) {
     return (
         <div className="min-h-0 flex-1 overflow-auto" data-ds="data-table">
@@ -137,6 +174,7 @@ export function ListDataTable({
                 selectedIds={selectedIds}
                 onToggle={onToggle}
                 onTogglePage={onTogglePage}
+                isRowSelectable={isRowSelectable}
             />
         </div>
     );

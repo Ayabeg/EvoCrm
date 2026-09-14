@@ -15,8 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
-import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import { t } from '@/lib/i18n';
+import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import type { Auth } from '@/types';
 
 type Deal = {
@@ -75,7 +75,6 @@ export default function DealsIndex({
     bulk?: { enabled: boolean };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const loading = useInertiaLoading();
     const { auth } = usePage<{ auth: Auth }>().props;
     const canImport = auth.capabilities.includes('crm.import');
@@ -127,16 +126,21 @@ export default function DealsIndex({
                         />
                     }
                     extraQuery={{ pipeline: pipeline.id }}
+                    selection={{
+                        mode: 'uncontrolled',
+                        selectable: canBulk,
+                        pageIds: deals.map((deal) => deal.id),
+                    }}
                 >
-                    {(columns) => (
+                    {(columns, selection) => (
                         <>
-                            {canBulk && selectedIds.length > 0 ? (
+                            {canBulk && selection.bulkActive ? (
                                 <BulkActionBar
                                     entity="deal"
-                                    selectedIds={selectedIds}
+                                    selectedIds={selection.selectedIds}
                                     members={members}
                                     stages={stages}
-                                    onClear={() => setSelectedIds([])}
+                                    onClear={selection.clearSelection}
                                 />
                             ) : null}
                             {loading ? (
@@ -173,26 +177,9 @@ export default function DealsIndex({
                                         columns={columns}
                                         basePath="/crm/deals"
                                         selectable={canBulk}
-                                        selectedIds={selectedIds}
-                                        onToggle={(id) =>
-                                            setSelectedIds((current) =>
-                                                current.includes(id)
-                                                    ? current.filter((value) => value !== id)
-                                                    : [...current, id],
-                                            )
-                                        }
-                                        onTogglePage={() =>
-                                            setSelectedIds((current) => {
-                                                const pageIds = deals.map((deal) => deal.id);
-                                                const allSelected = pageIds.every((id) =>
-                                                    current.includes(id),
-                                                );
-
-                                                return allSelected
-                                                    ? current.filter((id) => !pageIds.includes(id))
-                                                    : [...new Set([...current, ...pageIds])];
-                                            })
-                                        }
+                                        selectedIds={selection.selectedIds}
+                                        onToggle={selection.toggleOne}
+                                        onTogglePage={selection.togglePage}
                                     />
                                 </div>
                             )}

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { RowId, WorkspaceSelection, WorkspaceSelectionInput } from '@/ds/workspace/selection';
 import type {
     ListColumnDef,
     ListFieldDef,
@@ -7,6 +8,8 @@ import type {
     ListViewFilters,
     SavedView,
 } from '@/lib/list-view-config';
+
+export type { RowId, WorkspaceSelection, WorkspaceSelectionInput };
 
 export type DataWorkspaceObject = 'contact' | 'company' | 'deal' | 'quote';
 
@@ -37,8 +40,6 @@ export type DataWorkspaceFilterContext = {
     wilayas?: string[];
     stages?: Array<{ id: number; name: string; slug: string }>;
 };
-
-export type DataWorkspaceRenderResults = ReactNode | ((columns: ListViewColumn[]) => ReactNode);
 
 /**
  * Chrome DataWorkspace owns in both result modes.
@@ -78,6 +79,15 @@ export type DataWorkspaceChromeProps = {
     extraQuery?: Record<string, string | number | null | undefined>;
     basePath: string;
 
+    /**
+     * Shared selection + bulk-state contract (P03B).
+     * Domain still owns row identity, page participation (`selectable`),
+     * per-row `isRowSelectable`, actions, and handlers.
+     * `selectable: false` means this page does not participate now —
+     * not that the object can never support bulk.
+     */
+    selection?: WorkspaceSelectionInput;
+
     filterContext?: DataWorkspaceFilterContext;
     secondaryActions?: ReactNode;
     banner?: ReactNode;
@@ -87,19 +97,25 @@ export type DataWorkspaceChromeProps = {
     contentClassName?: string;
 };
 
+export type DataWorkspaceRenderResultsContext<Id extends RowId = RowId> = {
+    columns: ListViewColumn[];
+    selection: WorkspaceSelection<Id>;
+};
+
+export type DataWorkspaceRenderResults =
+    | ReactNode
+    | ((ctx: DataWorkspaceRenderResultsContext) => ReactNode);
+
 /**
  * MODE A — DataWorkspace / DataTable owns rows and shared table chrome.
- * Selection stays optional until P03B; do not invent page selection here.
+ * Selection is the chrome `selection` contract, not a second selectedIds prop.
  */
-export type DataWorkspaceSharedTableProps<Row extends { id: number } = { id: number }> =
+export type DataWorkspaceSharedTableProps<Row extends { id: RowId } = { id: RowId }> =
     DataWorkspaceChromeProps & {
         resultMode: 'shared-table';
         rows: Row[];
         rowHref: (row: Row) => string;
         onRowPeek?: (row: Row) => void;
-        selectable?: boolean;
-        selectedIds?: number[];
-        onSelectedIdsChange?: (ids: number[]) => void;
         loading?: boolean;
         empty: DataWorkspaceEmpty;
         paginator?: DataWorkspacePaginator;
@@ -108,8 +124,9 @@ export type DataWorkspaceSharedTableProps<Row extends { id: number } = { id: num
     };
 
 /**
- * MODE B — Domain renders the result surface (table, empty, pagination, selection).
- * DataWorkspace owns surrounding list chrome only. No sentinel rows.
+ * MODE B — Domain renders the result surface (table, empty, pagination).
+ * DataWorkspace owns surrounding list chrome + shared selection state.
+ * Domain consumes selection via renderResults({ columns, selection }).
  */
 export type DataWorkspaceDomainProps = DataWorkspaceChromeProps & {
     resultMode: 'domain';
@@ -117,16 +134,13 @@ export type DataWorkspaceDomainProps = DataWorkspaceChromeProps & {
     rows?: never;
     rowHref?: never;
     onRowPeek?: never;
-    selectable?: never;
-    selectedIds?: never;
-    onSelectedIdsChange?: never;
     loading?: never;
     empty?: never;
     paginator?: never;
     children?: never;
 };
 
-export type DataWorkspaceProps<Row extends { id: number } = { id: number }> =
+export type DataWorkspaceProps<Row extends { id: RowId } = { id: RowId }> =
     | DataWorkspaceSharedTableProps<Row>
     | DataWorkspaceDomainProps;
 
@@ -137,20 +151,22 @@ export type DataTableColumn<Row> = {
     render: (row: Row) => ReactNode;
 };
 
-export type DataTableProps<Row extends { id: number } = { id: number }> = {
+export type DataTableProps<Row extends { id: RowId } = { id: RowId }> = {
     columns: DataTableColumn<Row>[];
     rows: Row[];
     rowHeight?: 48;
-    selectedIds?: number[];
-    onToggle?: (id: number) => void;
+    selectedIds?: RowId[];
+    onToggle?: (id: RowId) => void;
+    onTogglePage?: () => void;
     onRowClick?: (row: Row) => void;
+    isRowSelectable?: (id: RowId) => boolean;
 };
 
 export type BulkAction = 'assign_owner' | 'enroll_sequence' | 'move_stage' | 'delete' | 'export';
 
 export type BulkActionBarProps = {
     object: DataWorkspaceEntity;
-    selectedIds: number[];
+    selectedIds: RowId[];
     actions: BulkAction[];
     members?: Array<{ id: number; name: string }>;
     sequences?: Array<{ id: number; name: string }>;

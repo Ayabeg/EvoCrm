@@ -67,9 +67,10 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 ### DataWorkspace
 
 - **Owner:** `ds/workspace/DataWorkspace.tsx`
-- **Owns:** orchestration — header, SavedViews, FilterBar, AdvancedFilterDrawer, bulk slot, list|board switch, empty/loading, pagination **when it owns rows**
+- **Owns:** orchestration — header, SavedViews, FilterBar, AdvancedFilterDrawer, **shared selection + bulk-active state**, bulk slot, list|board switch, empty/loading, pagination **when it owns rows**
 - **Must not own:** cell renderers, bulk POST shapes, create forms, kanban cards, Ask Evo
-- **Result modes (P03A):** `resultMode: 'shared-table'` owns `rows` + shared table chrome. `resultMode: 'domain'` takes `renderResults` and forbids `rows` / `selectedIds` / `children`. `CrmListShell` is domain mode until P04–P08 migrate objects. Selection hoist is P03B.
+- **Result modes (P03A):** `resultMode: 'shared-table'` owns `rows` + shared table chrome. `resultMode: 'domain'` takes `renderResults` and forbids `rows` / `children`. `CrmListShell` is domain mode until P04–P08 migrate objects.
+- **Selection (P03B):** chrome `selection` contract (`RowId = string | number`). Domain consumes `renderResults({ columns, selection })`. Actions stay domain.
 
 ### SavedViews / FilterBar / AdvancedFilterDrawer
 
@@ -92,7 +93,7 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 
 ### CrmListShell
 
-- **Role after P03A:** thin page helper that maps Inertia list props → `DataWorkspace` domain mode (`renderResults`). Real `rows` + `selectedIds` wait for P03B–P08.
+- **Role after P03B:** thin page helper that maps Inertia list props → `DataWorkspace` domain mode (`renderResults` + `selection`). Domain tables still render via children. Shared-table `rows` wait for P04–P08.
 - **Deprecate as a visual fork** once all five objects pass through shared-table mode without a domain result surface.
 
 ---

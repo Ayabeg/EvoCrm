@@ -63,6 +63,12 @@ export default function CompaniesIndex({
                 members={members}
                 cities={cities}
                 wilayas={wilayas}
+                selection={{
+                    mode: 'uncontrolled',
+                    // Page does not participate now. Not a permanent bulk ban.
+                    selectable: false,
+                    pageIds: companies.map((company) => company.id),
+                }}
             >
                 {(columns) => (
                     <>

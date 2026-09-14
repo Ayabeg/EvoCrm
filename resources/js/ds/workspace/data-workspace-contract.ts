@@ -1,3 +1,4 @@
+import type { WorkspaceSelectionInput } from '@/ds/workspace/selection';
 import type { DataWorkspaceChromeProps, DataWorkspaceProps } from '@/ds/workspace/types';
 
 /**
@@ -21,6 +22,7 @@ const chrome: DataWorkspaceChromeProps = {
 };
 
 declare function acceptWorkspace(props: DataWorkspaceProps): void;
+declare function acceptSelection(input: WorkspaceSelectionInput): void;
 
 acceptWorkspace({
     ...chrome,
@@ -66,4 +68,61 @@ acceptWorkspace({
     resultMode: 'shared-table',
     rowHref: (row) => `/crm/contacts/${row.id}`,
     empty: { title: 'No contacts yet', body: '' },
+});
+
+acceptWorkspace({
+    ...chrome,
+    resultMode: 'domain',
+    renderResults: ({ selection }) => selection.selectedCount,
+    selection: {
+        mode: 'uncontrolled',
+        pageIds: [1, 'uuid-row'],
+        selectable: true,
+    },
+});
+
+acceptWorkspace({
+    ...chrome,
+    resultMode: 'shared-table',
+    rows: [{ id: 'uuid-1' }],
+    rowHref: (row) => `/crm/contacts/${row.id}`,
+    empty: { title: 'No contacts yet', body: '' },
+    selection: {
+        mode: 'controlled',
+        selectedIds: ['uuid-1'],
+        onSelectedIdsChange: () => undefined,
+    },
+});
+
+acceptSelection({
+    mode: 'uncontrolled',
+    // @ts-expect-error uncontrolled selection cannot pass selectedIds
+    selectedIds: [1],
+    onSelectedIdsChange: () => undefined,
+});
+
+acceptSelection({
+    mode: 'uncontrolled',
+    // @ts-expect-error uncontrolled selection cannot pass onSelectedIdsChange
+    onSelectedIdsChange: () => undefined,
+});
+
+// @ts-expect-error controlled selection requires onSelectedIdsChange
+acceptSelection({
+    mode: 'controlled',
+    selectedIds: [1],
+});
+
+// @ts-expect-error controlled selection requires selectedIds
+acceptSelection({
+    mode: 'controlled',
+    onSelectedIdsChange: () => undefined,
+});
+
+acceptSelection({
+    mode: 'controlled',
+    selectedIds: [1],
+    onSelectedIdsChange: () => undefined,
+    // @ts-expect-error controlled selection cannot take defaultSelectedIds
+    defaultSelectedIds: [1],
 });
