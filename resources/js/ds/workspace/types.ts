@@ -38,7 +38,13 @@ export type DataWorkspaceFilterContext = {
     stages?: Array<{ id: number; name: string; slug: string }>;
 };
 
-export type DataWorkspaceProps<Row extends { id: number } = { id: number }> = {
+export type DataWorkspaceRenderResults = ReactNode | ((columns: ListViewColumn[]) => ReactNode);
+
+/**
+ * Chrome DataWorkspace owns in both result modes.
+ * Domain still supplies copy, filter fields, column defs, and create.
+ */
+export type DataWorkspaceChromeProps = {
     object: DataWorkspaceEntity;
     title: string;
     description?: string;
@@ -60,24 +66,15 @@ export type DataWorkspaceProps<Row extends { id: number } = { id: number }> = {
 
     columns: ListViewColumn[];
     columnDefs: ListColumnDef[];
-    rows: Row[];
-    rowHref: (row: Row) => string;
     onColumnsChange: (columns: ListViewColumn[]) => void;
     sort?: { id: string; dir: 'asc' | 'desc' };
 
-    selectable?: boolean;
-    selectedIds: number[];
-    onSelectedIdsChange: (ids: number[]) => void;
     bulk?: ReactNode;
 
     mode?: 'list' | 'board';
     onModeChange?: (mode: 'list' | 'board') => void;
     board?: ReactNode;
 
-    loading?: boolean;
-    empty: DataWorkspaceEmpty;
-
-    paginator?: DataWorkspacePaginator;
     extraQuery?: Record<string, string | number | null | undefined>;
     basePath: string;
 
@@ -86,10 +83,52 @@ export type DataWorkspaceProps<Row extends { id: number } = { id: number }> = {
     banner?: ReactNode;
     filterExtra?: ReactNode;
     toolbarExtra?: ReactNode;
-    children?: ReactNode | ((columns: ListViewColumn[]) => ReactNode);
     className?: string;
     contentClassName?: string;
 };
+
+/**
+ * MODE A — DataWorkspace / DataTable owns rows and shared table chrome.
+ * Selection stays optional until P03B; do not invent page selection here.
+ */
+export type DataWorkspaceSharedTableProps<Row extends { id: number } = { id: number }> =
+    DataWorkspaceChromeProps & {
+        resultMode: 'shared-table';
+        rows: Row[];
+        rowHref: (row: Row) => string;
+        onRowPeek?: (row: Row) => void;
+        selectable?: boolean;
+        selectedIds?: number[];
+        onSelectedIdsChange?: (ids: number[]) => void;
+        loading?: boolean;
+        empty: DataWorkspaceEmpty;
+        paginator?: DataWorkspacePaginator;
+        renderResults?: never;
+        children?: never;
+    };
+
+/**
+ * MODE B — Domain renders the result surface (table, empty, pagination, selection).
+ * DataWorkspace owns surrounding list chrome only. No sentinel rows.
+ */
+export type DataWorkspaceDomainProps = DataWorkspaceChromeProps & {
+    resultMode: 'domain';
+    renderResults: DataWorkspaceRenderResults;
+    rows?: never;
+    rowHref?: never;
+    onRowPeek?: never;
+    selectable?: never;
+    selectedIds?: never;
+    onSelectedIdsChange?: never;
+    loading?: never;
+    empty?: never;
+    paginator?: never;
+    children?: never;
+};
+
+export type DataWorkspaceProps<Row extends { id: number } = { id: number }> =
+    | DataWorkspaceSharedTableProps<Row>
+    | DataWorkspaceDomainProps;
 
 export type DataTableColumn<Row> = {
     id: string;

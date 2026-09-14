@@ -28,7 +28,7 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 
 | Adapter | Keep until | Then |
 |---|---|---|
-| `CrmListShell` children-table bypass (`rows={[]}`) | P03B–P08 | Shell only maps Inertia → DataWorkspace props |
+| `CrmListShell` domain `renderResults` (pages still own tables) | P03B–P08 | Shared-table `rows` + selection; shell only maps Inertia → DataWorkspace props |
 | `CrmShell` on companies / leads / tickets / activities / workflows | Each page’s migrate PR | Remove double chrome; rail is enough |
 | `components/aurora/command-palette.tsx` | P16 | Either become `ds/chrome/CommandPalette` or a thin re-export |
 | `TasksOverlay` as a second notify surface | P15 (P02 kept overlay as the only topbar tasks entry) | `/crm/activities` work queue |

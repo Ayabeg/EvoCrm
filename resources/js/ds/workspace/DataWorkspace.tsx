@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { crmListHref, filterFields, listPageHref } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -9,9 +10,12 @@ import { AdvancedFilterDrawer } from '@/ds/workspace/AdvancedFilterDrawer';
 import { ListDataTable } from '@/ds/workspace/DataTable';
 import { FilterBar } from '@/ds/workspace/FilterBar';
 import { SavedViews } from '@/ds/workspace/SavedViews';
-import type { DataWorkspaceProps } from '@/ds/workspace/types';
-import { filterGroupsFromActive } from '@/lib/list-view-config';
+import type {
+    DataWorkspaceProps,
+    DataWorkspaceSharedTableProps,
+} from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
+import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 
 const OBJECT_NOUNS = {
@@ -22,62 +26,149 @@ const OBJECT_NOUNS = {
     quote: 'records',
 } as const;
 
-export function DataWorkspace<Row extends { id: number }>({
-    object,
-    title,
-    description,
-    primaryAction,
-    views,
-    activeViewId,
-    onViewChange,
-    onViewSave,
-    filters,
-    onFiltersChange,
-    filterFields: fieldDefs,
-    chips = [],
-    columns,
-    columnDefs,
-    rows,
-    rowHref: _rowHref,
-    onColumnsChange,
-    selectable = false,
-    selectedIds,
-    onSelectedIdsChange,
-    bulk,
-    mode = 'list',
-    onModeChange,
-    board,
-    loading = false,
-    empty,
-    paginator,
-    extraQuery = {},
-    basePath,
-    filterContext,
-    secondaryActions,
-    banner,
-    filterExtra,
-    toolbarExtra,
-    children,
-    className,
-    contentClassName,
-}: DataWorkspaceProps<Row>) {
-    void _rowHref;
+function renderSharedTableSurface<Row extends { id: number }>(
+    props: DataWorkspaceSharedTableProps<Row>,
+    selectedIds: number[],
+    toggleRow: (id: number) => void,
+    togglePage: () => void,
+): ReactNode {
+    void props.rowHref;
+    void props.onRowPeek;
+
+    if (props.mode === 'board' && props.board) {
+        return props.board;
+    }
+
+    if (props.loading) {
+        return (
+            <div className="space-y-2 px-4 py-4 md:px-8" aria-busy="true">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+            </div>
+        );
+    }
+
+    if (props.rows.length === 0) {
+        return (
+            <div className="grid flex-1 place-items-center px-4 py-8 md:px-8">
+                <EmptyState
+                    density="page"
+                    title={props.empty.title}
+                    description={props.empty.body}
+                    as="h2"
+                    className="w-full max-w-md"
+                    action={
+                        props.empty.actionLabel ? (
+                            <Button
+                                type="button"
+                                className="h-9"
+                                onClick={props.primaryAction.onClick}
+                            >
+                                {props.empty.actionLabel}
+                            </Button>
+                        ) : undefined
+                    }
+                />
+            </div>
+        );
+    }
+
+    return (
+        <ListDataTable
+            object={props.object}
+            rows={props.rows}
+            columnDefs={props.columnDefs}
+            columns={props.columns}
+            basePath={props.basePath}
+            selectable={props.selectable ?? false}
+            selectedIds={selectedIds}
+            onToggle={toggleRow}
+            onTogglePage={togglePage}
+        />
+    );
+}
+
+export function DataWorkspace<Row extends { id: number }>(
+    props: DataWorkspaceProps<Row>,
+) {
+    const {
+        object,
+        title,
+        description,
+        primaryAction,
+        views,
+        activeViewId,
+        onViewChange,
+        onViewSave,
+        filters,
+        onFiltersChange,
+        filterFields: fieldDefs,
+        chips = [],
+        columns,
+        columnDefs,
+        onColumnsChange,
+        bulk,
+        mode = 'list',
+        onModeChange,
+        extraQuery = {},
+        basePath,
+        filterContext,
+        secondaryActions,
+        banner,
+        filterExtra,
+        toolbarExtra,
+        className,
+        contentClassName,
+        resultMode,
+    } = props;
     const { auth } = usePage().props as { auth: { user: { role: string } } };
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const [advancedOpen, setAdvancedOpen] = useState(false);
     const filterRecord = filters as Record<string, unknown>;
-    const hasChildren = children !== undefined;
-    const body =
-        typeof children === 'function' ? children(columns) : children;
+    const sharedRows = resultMode === 'shared-table' ? props.rows : undefined;
+    const selectedIds =
+        resultMode === 'shared-table' ? (props.selectedIds ?? []) : [];
+    const onSelectedIdsChange =
+        resultMode === 'shared-table' ? props.onSelectedIdsChange : undefined;
     const selected = selectedIds.length > 0;
+    const paginator = resultMode === 'shared-table' ? props.paginator : undefined;
+    const resultSurface =
+        resultMode === 'domain'
+            ? typeof props.renderResults === 'function'
+                ? props.renderResults(columns)
+                : props.renderResults
+            : renderSharedTableSurface(
+                  props,
+                  selectedIds,
+                  (id) => {
+                      if (!onSelectedIdsChange) {
+                          return;
+                      }
 
-    const toggleRow = (id: number) => {
-        onSelectedIdsChange(
-            selectedIds.includes(id)
-                ? selectedIds.filter((value) => value !== id)
-                : [...selectedIds, id],
-        );
-    };
+                      onSelectedIdsChange(
+                          selectedIds.includes(id)
+                              ? selectedIds.filter((value) => value !== id)
+                              : [...selectedIds, id],
+                      );
+                  },
+                  () => {
+                      if (!onSelectedIdsChange || !sharedRows) {
+                          return;
+                      }
+
+                      const pageIds = sharedRows.map((row) => row.id);
+                      const allSelected = pageIds.every((id) =>
+                          selectedIds.includes(id),
+                      );
+
+                      onSelectedIdsChange(
+                          allSelected
+                              ? selectedIds.filter((id) => !pageIds.includes(id))
+                              : [...new Set([...selectedIds, ...pageIds])],
+                      );
+                  },
+              );
 
     return (
         <div
@@ -89,6 +180,7 @@ export function DataWorkspace<Row extends { id: number }>({
             data-ds="data-workspace"
             data-object={object}
             data-mode={mode}
+            data-result-mode={resultMode}
         >
             <PageHeader
                 title={title}
@@ -173,66 +265,12 @@ export function DataWorkspace<Row extends { id: number }>({
             />
             {selected && bulk ? bulk : null}
             <div className={cn('flex min-h-0 flex-1 flex-col bg-canvas', contentClassName)}>
-                {hasChildren ? (
-                    body
-                ) : mode === 'board' && board ? (
-                    board
-                ) : loading ? (
-                    <div className="space-y-2 px-4 py-4 md:px-8" aria-busy="true">
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                    </div>
-                ) : rows.length === 0 ? (
-                    <div className="grid flex-1 place-items-center px-4 py-8 md:px-8">
-                        <EmptyState
-                            density="page"
-                            title={empty.title}
-                            description={empty.body}
-                            as="h2"
-                            className="w-full max-w-md"
-                            action={
-                                empty.actionLabel ? (
-                                    <Button
-                                        type="button"
-                                        className="h-9"
-                                        onClick={primaryAction.onClick}
-                                    >
-                                        {empty.actionLabel}
-                                    </Button>
-                                ) : undefined
-                            }
-                        />
-                    </div>
-                ) : (
-                    <ListDataTable
-                        object={object}
-                        rows={rows}
-                        columnDefs={columnDefs}
-                        columns={columns}
-                        basePath={basePath}
-                        selectable={selectable}
-                        selectedIds={selectedIds}
-                        onToggle={toggleRow}
-                        onTogglePage={() => {
-                            const pageIds = rows.map((row) => row.id);
-                            const allSelected = pageIds.every((id) =>
-                                selectedIds.includes(id),
-                            );
-
-                            onSelectedIdsChange(
-                                allSelected
-                                    ? selectedIds.filter((id) => !pageIds.includes(id))
-                                    : [...new Set([...selectedIds, ...pageIds])],
-                            );
-                        }}
-                    />
-                )}
-                {!hasChildren && paginator ? (
+                {resultSurface}
+                {resultMode === 'shared-table' && paginator ? (
                     <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute md:px-8">
                         <span>
                             {t('Showing :count of :total :noun', {
-                                count: rows.length.toLocaleString(),
+                                count: (sharedRows?.length ?? 0).toLocaleString(),
                                 total: paginator.total.toLocaleString(),
                                 noun: t(OBJECT_NOUNS[object]),
                             })}
