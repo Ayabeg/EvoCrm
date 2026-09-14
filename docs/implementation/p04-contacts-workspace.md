@@ -95,7 +95,7 @@ Visibility and order stay on `ListViewConfig` + session `CrmListShell` column st
 
 Recommended scan hierarchy (documented, not forced onto saved views): identity → company → communication → owner → lifecycle → activity → metadata.
 
-Identity cell: name + email (or company if no email). Subtle 24px initials. No new backend fields.
+Identity cell: name + company (or no secondary line). Email stays in the Email column and is never repeated under the name. Subtle 24px initials. No new backend fields.
 
 ---
 
@@ -165,7 +165,7 @@ Export link moved onto the shared paginator (`exportHref="/crm/contacts/export"`
 
 ## VISUAL CHANGES (Contacts only)
 
-- Identity cell: two-line name + secondary identifier; contact table headers 13/18
+- Identity cell: two-line name + company (no email under the name); contact table headers 13/18
 - Contact rows `min-h-12` so two-line identity can grow; other objects stay `h-12`
 - Header hierarchy unchanged (28/34 title, secondary Duplicates/Import, one primary Create)
 - Filter / saved-view chrome is the existing DataWorkspace spacing (pad-x 32)
@@ -221,7 +221,6 @@ Not deleted: `list-view-table.tsx`, `list-chrome.tsx`, `CrmListShell` domain pat
 
 ## REMAINING CONTACTS DEBT
 
-- Email can appear in the identity cell and the Email column when both are visible
 - Default column order is still ListViewConfig (company is not immediately after identity)
 - Bulk bar still sits in the chrome slot (not a visual redesign)
 - `CrmListShell` still maps Inertia; page does not import DataWorkspace directly

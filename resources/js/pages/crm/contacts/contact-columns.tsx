@@ -66,13 +66,11 @@ export function applyContactColumnContract(columnDefs: ListColumnDef[]): ListCol
     );
 }
 
+/**
+ * Secondary line is association only. Email stays in the Email column so
+ * the identity cell never duplicates a typically-visible communication field.
+ */
 export function contactIdentitySecondary(row: ContactListRow): string | null {
-    const email = row.email?.trim();
-
-    if (email) {
-        return email;
-    }
-
     const company = row.company?.name?.trim();
 
     return company || null;

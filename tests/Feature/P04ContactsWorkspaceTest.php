@@ -64,7 +64,9 @@ it('keeps Contacts row identity href columns and selection on the shared contrac
         ->and($columns)->toContain('export function ContactIdentityCell')
         ->and($columns)->toContain('export function applyContactColumnContract')
         ->and($columns)->toContain("label: 'Contact'")
-        ->and($columns)->toContain('contactIdentitySecondary');
+        ->and($columns)->toContain('contactIdentitySecondary')
+        ->and($columns)->toContain('Secondary line is association only')
+        ->and($columns)->not->toContain('row.email?.trim()');
 
     expect($table)->toContain('ContactNameCell')
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
@@ -80,7 +82,8 @@ it('keeps Contacts row identity href columns and selection on the shared contrac
 
     expect($contract)->toContain('rowHref is /crm/contacts/:id')
         ->and($contract)->toContain('true empty vs filtered empty')
-        ->and($contract)->toContain('name column relabels to Contact');
+        ->and($contract)->toContain('name column relabels to Contact')
+        ->and($contract)->toContain('identity secondary is company only');
 });
 
 it('preserves Contact bulk actions permissions header and query ownership', function () {

@@ -21,7 +21,7 @@ export const P04_COLUMN_LABELS = applyContactColumnContract([
     { id: 'company', label: 'Company', defaultVisible: true },
 ]);
 
-export const P04_SECONDARY_EMAIL = contactIdentitySecondary({
+export const P04_SECONDARY_WITH_EMAIL = contactIdentitySecondary({
     id: 1,
     first_name: 'Amel',
     last_name: 'Hadj',
@@ -35,6 +35,14 @@ export const P04_SECONDARY_COMPANY = contactIdentitySecondary({
     last_name: 'Hadj',
     email: null,
     company: { name: 'Clinic' },
+});
+
+export const P04_SECONDARY_NO_COMPANY = contactIdentitySecondary({
+    id: 3,
+    first_name: 'Amel',
+    last_name: 'Hadj',
+    email: 'amel@clinic.dz',
+    company: null,
 });
 
 if (P04_ROW_HREF !== '/crm/contacts/42') {
@@ -57,8 +65,12 @@ if (P04_COLUMN_LABELS[0]?.label !== 'Contact' || P04_COLUMN_LABELS[1]?.label !==
     throw new Error('name relabels to Contact without inventing fields');
 }
 
-if (P04_SECONDARY_EMAIL !== 'amel@clinic.dz' || P04_SECONDARY_COMPANY !== 'Clinic') {
-    throw new Error('identity secondary prefers email then company');
+if (
+    P04_SECONDARY_WITH_EMAIL !== 'Clinic' ||
+    P04_SECONDARY_COMPANY !== 'Clinic' ||
+    P04_SECONDARY_NO_COMPANY !== null
+) {
+    throw new Error('identity secondary is company only and never email');
 }
 
 export const P04_CONTACT_COLUMN_CONTRACT = {
@@ -66,5 +78,5 @@ export const P04_CONTACT_COLUMN_CONTRACT = {
     'string row ids stay string': true,
     'true empty vs filtered empty': true,
     'name column relabels to Contact': true,
-    'identity secondary prefers email': true,
+    'identity secondary is company only': true,
 } as const;
