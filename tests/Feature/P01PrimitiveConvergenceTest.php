@@ -42,9 +42,7 @@ it('keeps listed product chrome off lucide-react', function () {
     }
 
     expect(file_get_contents(resource_path('js/components/crm/command-palette.tsx')))
-        ->toContain('@phosphor-icons/react')
-        ->and(file_get_contents(resource_path('js/components/crm/command-palette.tsx')))
-        ->toContain("href: '/home'");
+        ->toContain('@phosphor-icons/react');
 });
 
 it('routes active product overlays through canonical drawer or dialog barrels', function () {

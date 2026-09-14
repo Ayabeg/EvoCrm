@@ -59,7 +59,7 @@ Existing chrome tests are often **source-string locks** (they `file_get_contents
 |---|---|---|---|
 | P00 | n/a (docs) | — | This file |
 | P01 | P03 primitives, Wave0 icons | Any test that asserts `lucide-react` on a migrated file | Phosphor-only on listed chrome files |
-| P02 | P04, Wave0, SimpleModeNav | Header/search assertions | `AppHeader` unused; Home href if fixed here |
+| P02 | P04, Wave0, SimpleModeNav | Header/search / Tasks labels | `P02ActiveShellNormalizationTest`: Home `/dashboard`; leftover header unused |
 | P03A–D | P05, Wave1 | P05 adapter assertions when rows stop being stubbed | Workspace owns `selectedIds` on contacts |
 | P04 Contacts | Wave1, P05 | `data-crm="contacts-workspace"` | Selection + bulk via DS bar |
 | P05 Companies | Wave1-style if present | Remove CrmShell lock if any | — |
@@ -70,7 +70,7 @@ Existing chrome tests are often **source-string locks** (they `file_get_contents
 | P11–P12 Board | MoveDeal, Wave2, StageRequired | Board `data-crm` | Keyboard + undo (feature if you add a hook) |
 | P13–P14 Inbox | Wave3, InboxCsp | Native/embed flags | CSP headers untouched |
 | P15 Activities | Activity composer tests | — | Complete / attendance POSTs |
-| P16 Command | — | `/home` → `/dashboard` | Sections exist |
+| P16 Command | — | Home href already `/dashboard` (P02) | Sections exist |
 | P17 Home | HomeCommandCenter, HomeQuota, Wave0 home | Widget class names | Attention above charts |
 | P18 Quotes builder | QuoteAcceptance, QuoteDelivery, Wave4 | — | Public `/q/{token}` |
 | P19–P20 Workflows | EvoCell2, workflow feature tests | — | Toggle / store / no canvas |

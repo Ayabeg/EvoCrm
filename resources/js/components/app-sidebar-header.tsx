@@ -1,5 +1,15 @@
+/**
+ * Canonical topbar (P02): Search/⌘K → command palette; Sparkle/Ask Evo → same
+ * palette (Ask section waits for P16/P24); Create stays Create; one Tasks
+ * overlay (not a second notify bell, not a competing /crm/activities topbar link).
+ */
+/**
+ * Canonical topbar (P02): Search/⌘K → command palette; Sparkle/Ask Evo → same
+ * palette (Ask section waits for P16/P24); Create stays Create; one Tasks
+ * overlay (not a second notify bell, not a competing /crm/activities topbar link).
+ */
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, CheckSquare, MagnifyingGlass, Plus, Sparkle } from '@phosphor-icons/react';
+import { Bell, MagnifyingGlass, Plus, Sparkle } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { CommandPalette, useCommandPaletteShortcut } from '@/components/crm/command-palette';
@@ -79,7 +89,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         variant="ghost"
                         size="icon"
                         title={t('Ask Evo')}
-                        aria-label={t('AI')}
+                        aria-label={t('Ask Evo')}
                         data-chrome="ai"
                         className="rounded-full"
                         onClick={() => setPaletteOpen(true)}
@@ -115,32 +125,20 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <div className="hidden min-[390px]:block" data-chrome="notify">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    title={t('Notifications')}
-                                    aria-label={t('Notifications')}
-                                >
-                                    <Bell className="size-4" weight="regular" aria-hidden />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem
-                                    onSelect={() => setTasksOpen(true)}
-                                >
-                                    <CheckSquare className="size-4" weight="regular" aria-hidden />
-                                    {t('Tasks')}
-                                    {taskCount > 0 ? (
-                                        <span className="ml-auto tabular-nums text-[11px]">
-                                            {taskCount}
-                                        </span>
-                                    ) : null}
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            title={t('Tasks')}
+                            aria-label={
+                                taskCount > 0
+                                    ? `${t('Tasks')} (${taskCount})`
+                                    : t('Tasks')
+                            }
+                            onClick={() => setTasksOpen(true)}
+                        >
+                            <Bell className="size-4" weight="regular" aria-hidden />
+                        </Button>
                     </div>
                     {user ? (
                         <DropdownMenu>

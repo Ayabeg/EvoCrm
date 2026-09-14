@@ -44,7 +44,7 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 ### Topbar
 
 - **Owner:** `components/app-sidebar-header.tsx`
-- **Owns:** search affordance, global Create, notifications entry, profile, Ask Evo *entry*
+- **Owns:** search affordance, global Create, Tasks overlay entry, profile, Ask Evo *entry* (same palette)
 - **Must not own:** record search implementation (delegates to Command)
 
 ### CommandPalette
@@ -52,7 +52,7 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 - **Owner:** `components/crm/command-palette.tsx` (config) + one presentation primitive
 - **Owns:** sections Navigate · Records · Create · Ask Evo (capability)
 - **Must not own:** record editing, workflow execution
-- **Fix:** Home → `/dashboard` (not `/home`)
+- **Home href:** `/dashboard` (P02; not `/home`)
 
 ### PageHeader
 

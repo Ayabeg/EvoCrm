@@ -1,3 +1,8 @@
+/**
+ * @deprecated P02 — leftover Laravel starter-kit header (Lucide).
+ * Unused by `AppLayout`. Canonical chrome is `AppSidebarHeader`.
+ * Do not import. Delete in P28 after zero imports and tests allow.
+ */
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from '@/components/app-logo';

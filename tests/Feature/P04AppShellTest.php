@@ -47,15 +47,15 @@ it('locks P04 desktop 64/240 widths and the 240px labeled mobile Sheet', functio
         ->and($rail)->toContain('text-[13px]');
 });
 
-it('locks the P04 topbar search, command shortcut, and AI · Create · Notifications · Profile', function () {
+it('locks the P04 topbar search, command shortcut, and Ask Evo · Create · Tasks · Profile', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
 
     expect($header)->toContain("t('Search EvoCRM…')")
         ->and($header)->toContain('⌘K')
         ->and($header)->toContain('useCommandPaletteShortcut')
-        ->and($header)->toContain("t('AI')")
+        ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Create')")
-        ->and($header)->toContain("t('Notifications')")
+        ->and($header)->toContain("t('Tasks')")
         ->and($header)->toContain('account menu')
         ->and($header)->toContain('/crm/quotes?create=1')
         ->and($header)->not->toContain('Find a record or page')

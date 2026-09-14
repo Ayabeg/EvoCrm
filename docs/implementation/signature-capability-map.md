@@ -116,7 +116,7 @@ Capabilities are **module ids**. Later PRs implement slices of a capability, not
 
 - `components/crm/command-palette.tsx`
 - Topbar search + shortcut
-- Missing: Create / Ask sections; `/home` bug; Phosphor
+- Missing: Create / Ask sections (P16). Home href and Phosphor: done (P01/P02).
 
 ---
 

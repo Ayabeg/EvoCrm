@@ -34,7 +34,7 @@ type SearchHit = {
 };
 
 const NAV_ITEMS = [
-    { label: 'Home', href: '/home', icon: House, keywords: 'dashboard command center' },
+    { label: 'Home', href: '/dashboard', icon: House, keywords: 'dashboard command center' },
     { label: 'Contacts', href: '/crm/contacts', icon: AddressBook, keywords: 'crm people leads' },
     { label: 'Companies', href: '/crm/companies', icon: Buildings, keywords: 'accounts organizations' },
     { label: 'Leads', href: '/crm/leads', icon: Path, keywords: 'pipeline prospects' },
