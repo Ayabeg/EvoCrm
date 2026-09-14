@@ -186,6 +186,21 @@ Proofs: `resources/js/lib/list-query/list-query-contract.ts`.
 
 ---
 
+## Tests run
+
+| Command | Result |
+|---|---|
+| `php artisan test --filter='P03C'` | pass (5 tests, 141 assertions) |
+| `php artisan test --filter='P01\|P02\|P03A\|P03B\|P03C\|P05\|Wave1\|Wave2\|Wave4\|CrmListWorkspace\|CrmBulkActions'` | pass (54 tests, 1150 assertions) |
+| `php artisan test --filter='Contact\|Compan\|Lead\|Deal\|Quote\|P03'` | pass (295 tests, 3573 assertions) |
+| `npm run types:check` | pass (after `php artisan wayfinder:generate --with-form`) |
+| `npx eslint` on P03C-touched TS files | pass |
+| `npm run build` | pass |
+
+New lock: `tests/Feature/P03CListQueryOwnershipTest.php`.
+
+---
+
 ## Deferred to P03D
 
 - Empty / pagination / board helpers without a domain surface
