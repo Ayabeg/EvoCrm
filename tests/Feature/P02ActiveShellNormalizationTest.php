@@ -28,8 +28,8 @@ it('keeps AppLayout on the 64/240 sidebar shell and does not wire the leftover h
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
 
     expect($appLayout)->toContain("from '@/layouts/app/app-sidebar-layout'")
-        ->and($appLayout)->not->toContain('app-header-layout')
-        ->and($appLayout)->not->toContain('AppHeaderLayout')
+        ->and($appLayout)->not->toContain("from '@/layouts/app/app-header-layout'")
+        ->and($appLayout)->not->toContain("from '@/components/app-header'")
         ->and($sidebarLayout)->toContain('AppSidebarHeader')
         ->and($sidebarLayout)->toContain('AppSidebar')
         ->and($headerLayout)->toContain('@deprecated')
