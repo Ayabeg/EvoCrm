@@ -13,12 +13,12 @@ import {
     clearQuickFilters,
     patchListQuery,
 } from '@/lib/list-query/patch';
+import type { ActiveFilterBag } from '@/lib/list-query/serialize';
 import {
     domainParamKeys,
     fromActiveFilters,
     listQueryHref,
     toDomainParams,
-    type ActiveFilterBag,
 } from '@/lib/list-query/serialize';
 import type { CanonicalListQuery } from '@/lib/list-query/types';
 

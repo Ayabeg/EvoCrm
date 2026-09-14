@@ -1,5 +1,4 @@
 import { listQueryAdapter, listQueryObjectFromPath } from '@/lib/list-query/adapters';
-import { patchListQuery } from '@/lib/list-query/patch';
 import {
     emptyToNull,
     isEmptyFilterGroups,
@@ -9,6 +8,7 @@ import {
     toOptionalNumber,
 } from '@/lib/list-query/empty';
 import { writeListHref } from '@/lib/list-query/href';
+import { patchListQuery } from '@/lib/list-query/patch';
 import type {
     CanonicalListQuery,
     DomainListParams,
@@ -92,7 +92,7 @@ export function fromActiveFilters(
         filterGroups: parseFilterGroups(filters.filter_groups),
         sort: parseUrlSort(filters.sort, filters.direction),
         extras: extrasFromInput({
-            pipeline: extra?.pipeline ?? filters.pipeline,
+            pipeline: extra?.pipeline ?? toOptionalNumber(filters.pipeline),
         }),
     };
 }

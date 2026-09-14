@@ -208,10 +208,10 @@ URL-owned `sort` + `direction` (`?sort=amount&direction=desc`) reconstruct into 
 
 | Command | Result |
 |---|---|
-| `php artisan test --filter='P03C'` | pass (5 tests, 141 assertions) |
-| `php artisan test --filter='P01\|P02\|P03A\|P03B\|P03C\|P05\|Wave1\|Wave2\|Wave4\|CrmListWorkspace\|CrmBulkActions'` | pass (54 tests, 1150 assertions) |
-| `php artisan test --filter='Contact\|Compan\|Lead\|Deal\|Quote\|P03'` | pass (295 tests, 3573 assertions) |
-| `npm run types:check` | pass (after `php artisan wayfinder:generate --with-form`) |
+| `php artisan test --filter='P03C'` | pass (6 tests, 170 assertions) |
+| `php artisan test --filter='P01\|P02\|P03A\|P03B\|P03C\|CrmListWorkspace\|CrmBulkActions\|Contact\|Compan\|Deal\|Quote\|Lead'` | pass (302 tests, 3523 assertions) |
+| `npx vite-node resources/js/lib/list-query/list-query-contract.ts` | pass (runtime proofs) |
+| `npm run types:check` | pass |
 | `npx eslint` on P03C-touched TS files | pass |
 | `npm run build` | pass |
 
