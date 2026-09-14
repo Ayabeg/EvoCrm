@@ -11,12 +11,12 @@ import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
-import type { Auth } from '@/types';
 import {
     contactEmptyState,
     contactRowHref,
-    type ContactListRow,
 } from '@/pages/crm/contacts/contact-columns';
+import type { ContactListRow } from '@/pages/crm/contacts/contact-columns';
+import type { Auth } from '@/types';
 
 export default function ContactsIndex({
     contacts,

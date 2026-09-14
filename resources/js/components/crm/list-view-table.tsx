@@ -4,14 +4,14 @@ import type { RowId } from '@/ds/workspace/selection';
 import { resolveRowHref } from '@/ds/workspace/surface';
 import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
-import {
-    applyContactColumnContract,
-    ContactIdentityCell as ContactNameCell,
-} from '@/pages/crm/contacts/contact-columns';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
+import {
+    applyContactColumnContract,
+    ContactIdentityCell as ContactNameCell,
+} from '@/pages/crm/contacts/contact-columns';
 
 type AttributeMap = Record<string, string | null>;
 
