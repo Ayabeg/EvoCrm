@@ -1,5 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Check, ExternalLink, Minus } from 'lucide-react';
+import { ArrowLeft, ArrowSquareOut, Check, Minus } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { GoogleMark, MetaMark } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
@@ -117,9 +117,9 @@ function MetaFinishStep({
                             className="flex items-center gap-2 text-sm"
                         >
                             {unlock.granted ? (
-                                <Check className="size-4 text-brand" />
+                                <Check className="size-4 text-brand" aria-hidden />
                             ) : (
-                                <Minus className="size-4 text-muted-foreground" />
+                                <Minus className="size-4 text-muted-foreground" aria-hidden />
                             )}
                             <span
                                 className={
@@ -358,9 +358,9 @@ function StatusRow({
     return (
         <div className="flex items-center gap-2 text-sm">
             {ok ? (
-                <Check className="size-4 text-brand" />
+                <Check className="size-4 text-brand" aria-hidden />
             ) : (
-                <Minus className="size-4 text-muted-foreground" />
+                <Minus className="size-4 text-muted-foreground" aria-hidden />
             )}
             <span className={ok ? '' : 'text-muted-foreground'}>{label}</span>
         </div>
@@ -589,7 +589,7 @@ export default function OAuthSetupWizard({
                         href={appsUrl}
                         className="mb-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                     >
-                        <ArrowLeft className="size-3" />
+                        <ArrowLeft className="size-3" aria-hidden />
                         Apps
                     </Link>
                     <h1 className="text-xl font-semibold">
@@ -634,7 +634,7 @@ export default function OAuthSetupWizard({
                                         className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
                                     >
                                         {link.label}
-                                        <ExternalLink className="size-3.5" />
+                                        <ArrowSquareOut className="size-3.5" aria-hidden />
                                     </a>
                                 </li>
                             ))}

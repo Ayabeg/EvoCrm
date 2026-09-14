@@ -1,5 +1,5 @@
 import { Form, router } from '@inertiajs/react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
 import { Badge } from '@/components/ui/badge';
@@ -44,9 +44,9 @@ function CopyRecord({ value }: { value: string }) {
             }}
         >
             {copied ? (
-                <Check className="size-3" />
+                <Check className="size-3" aria-hidden />
             ) : (
-                <Copy className="size-3" />
+                <Copy className="size-3" aria-hidden />
             )}
             {copied ? 'Copied' : 'Copy'}
         </button>

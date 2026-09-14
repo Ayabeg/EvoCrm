@@ -1,5 +1,6 @@
 import { Form, Link } from '@inertiajs/react';
-import { Calendar, CheckSquare, Mail, Phone, StickyNote } from 'lucide-react';
+import type { Icon } from '@phosphor-icons/react';
+import { Calendar, CheckSquare, Envelope, Note, Phone } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,13 +10,13 @@ export type ComposerType = 'note' | 'email' | 'call' | 'task' | 'meeting';
 const ICONS: {
     type: ComposerType;
     label: string;
-    icon: typeof StickyNote;
+    icon: Icon;
 }[] = [
-    { type: 'email', label: 'Email', icon: Mail },
+    { type: 'email', label: 'Email', icon: Envelope },
     { type: 'call', label: 'Call', icon: Phone },
     { type: 'task', label: 'Task', icon: CheckSquare },
     { type: 'meeting', label: 'Event', icon: Calendar },
-    { type: 'note', label: 'Note', icon: StickyNote },
+    { type: 'note', label: 'Note', icon: Note },
 ];
 
 const CALL_OUTCOMES = [
@@ -185,7 +186,7 @@ export default function ActivityComposer({
                                 title="Email via Outbound"
                             >
                                 <Link href={emailHref}>
-                                    <action.icon className="size-3.5" />
+                                    <action.icon className="size-3.5" aria-hidden />
                                     {action.label}
                                 </Link>
                             </Button>
@@ -207,7 +208,7 @@ export default function ActivityComposer({
                                 setActive(selected ? null : action.type)
                             }
                         >
-                            <action.icon className="size-3.5" />
+                            <action.icon className="size-3.5" aria-hidden />
                             {action.label}
                         </Button>
                     );

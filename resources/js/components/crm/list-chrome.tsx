@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { ChevronDown, Plus, Search, SlidersHorizontal } from 'lucide-react';
+import { CaretDown, MagnifyingGlass, Plus, SlidersHorizontal } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import type { EmptyKind } from '@/components/ui/empty-illustration';
@@ -39,7 +39,7 @@ export function CrmListHeader({
                     className="inline-flex items-center gap-1 text-page-title text-ink"
                 >
                     {t(title)}
-                    <ChevronDown className="size-4 text-muted-foreground" />
+                    <CaretDown className="size-4 text-muted-foreground" aria-hidden />
                 </button>
                 <div className="flex items-center gap-2">
                     {headerActions}
@@ -73,7 +73,7 @@ export function CrmListHeader({
                         onClick={onAddView}
                         className="mb-2 inline-flex items-center gap-1 text-ui text-muted-foreground hover:text-ink"
                     >
-                        <Plus className="size-3.5" />
+                        <Plus className="size-3.5" aria-hidden />
                         {t('add view')}
                     </button>
                 ) : null}
@@ -101,7 +101,7 @@ export function CrmListToolbar({
                 <input type="hidden" name="sort" value={sort ?? ''} />
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="relative min-w-[220px] flex-1">
-                        <Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                        <MagnifyingGlass className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
                         <Input
                             name="q"
                             defaultValue={query ?? ''}
@@ -140,7 +140,7 @@ export function CrmListToolbar({
                         type="button"
                         className="inline-flex h-7 items-center gap-1 rounded-sm border border-hairline px-2 text-[12px] text-muted-foreground"
                     >
-                        <SlidersHorizontal className="size-3" />
+                        <SlidersHorizontal className="size-3" aria-hidden />
                         {t('Advanced filters')}
                     </button>
                 </div>
@@ -191,7 +191,7 @@ export function ColumnFilter({
     return (
         <label className="inline-flex h-7 items-center gap-1 rounded-sm border border-hairline px-2 text-[12px] text-ink">
             {label}
-            <ChevronDown className="size-3 text-muted-foreground" />
+            <CaretDown className="size-3 text-muted-foreground" aria-hidden />
             <select
                 name={name}
                 defaultValue={value ?? ''}

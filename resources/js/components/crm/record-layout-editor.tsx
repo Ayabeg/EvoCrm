@@ -1,7 +1,7 @@
-import { ChevronDown, ChevronUp, Columns3, RotateCcw } from 'lucide-react';
+import { ArrowCounterClockwise, CaretDown, CaretUp, Columns } from '@phosphor-icons/react';
 import { useRecordLayoutContext } from '@/components/crm/record-layout-context';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { cardsForObject  } from '@/lib/record-layout';
 import type {RecordColumn} from '@/lib/record-layout';
 
@@ -15,7 +15,7 @@ export function RecordLayoutCustomizeButton() {
 
     return (
         <Button type="button" variant="secondary" className="h-7 text-[11px]" onClick={() => setEditorOpen(true)}>
-            <Columns3 className="mr-1 size-3.5" />
+            <Columns className="mr-1 size-3.5" aria-hidden />
             Customize layout
         </Button>
     );
@@ -27,17 +27,17 @@ export function RecordLayoutEditor() {
     const defs = cardsForObject(objectType);
 
     return (
-        <Sheet open={editorOpen} onOpenChange={setEditorOpen}>
-            <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
-                <SheetHeader>
-                    <SheetTitle>Customize record layout</SheetTitle>
-                    <SheetDescription>
+        <Drawer open={editorOpen} onOpenChange={setEditorOpen}>
+            <DrawerContent side="right" className="w-full overflow-y-auto sm:max-w-md">
+                <DrawerHeader>
+                    <DrawerTitle>Customize record layout</DrawerTitle>
+                    <DrawerDescription>
                         Show, hide, and reorder cards on {objectType} records.
                         {mode === 'workspace'
                             ? ' Save as workspace default when you are done.'
                             : ' Saved to your account.'}
-                    </SheetDescription>
-                </SheetHeader>
+                    </DrawerDescription>
+                </DrawerHeader>
                 <div className="space-y-5 px-4 pb-6">
                     {(['main', 'side'] as RecordColumn[]).map((column) => (
                         <section key={column} className="space-y-2">
@@ -77,7 +77,7 @@ export function RecordLayoutEditor() {
                                                     aria-label={`Move ${def.label} up`}
                                                     onClick={() => moveCard(def.id, 'up')}
                                                 >
-                                                    <ChevronUp className="size-4" aria-hidden />
+                                                    <CaretUp className="size-4" aria-hidden />
                                                 </Button>
                                                 <Button
                                                     type="button"
@@ -87,7 +87,7 @@ export function RecordLayoutEditor() {
                                                     aria-label={`Move ${def.label} down`}
                                                     onClick={() => moveCard(def.id, 'down')}
                                                 >
-                                                    <ChevronDown className="size-4" aria-hidden />
+                                                    <CaretDown className="size-4" aria-hidden />
                                                 </Button>
                                             </div>
                                         </div>
@@ -97,7 +97,7 @@ export function RecordLayoutEditor() {
                     ))}
                     <div className="flex gap-2">
                         <Button type="button" variant="secondary" onClick={resetLayout}>
-                            <RotateCcw className="mr-1 size-3.5" />
+                            <ArrowCounterClockwise className="mr-1 size-3.5" aria-hidden />
                             Reset
                         </Button>
                         <Button type="button" onClick={() => setEditorOpen(false)}>
@@ -105,7 +105,7 @@ export function RecordLayoutEditor() {
                         </Button>
                     </div>
                 </div>
-            </SheetContent>
-        </Sheet>
+            </DrawerContent>
+        </Drawer>
     );
 }

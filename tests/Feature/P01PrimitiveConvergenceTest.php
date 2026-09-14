@@ -1,0 +1,90 @@
+<?php
+
+/**
+ * P01 — Phosphor-only product chrome; overlays import canonical drawers/dialogs.
+ * Does not own Command OS, /home→/dashboard, or leftover app-header deletion.
+ */
+
+it('keeps listed product chrome off lucide-react', function () {
+    $files = [
+        'js/components/crm/command-palette.tsx',
+        'js/components/crm/record-chrome.tsx',
+        'js/components/crm/ask-evo-panel.tsx',
+        'js/components/crm/activity-composer.tsx',
+        'js/components/crm/list-chrome.tsx',
+        'js/components/crm/record-action-row.tsx',
+        'js/components/crm/record-layout-editor.tsx',
+        'js/components/crm/inline-record-field.tsx',
+        'js/components/crm/enrichment-panel.tsx',
+        'js/components/crm/create-drawer.tsx',
+        'js/components/crm/column-chooser.tsx',
+        'js/components/crm/board-options-sheet.tsx',
+        'js/components/app-sidebar.tsx',
+        'js/components/app-sidebar-header.tsx',
+        'js/components/user-menu-content.tsx',
+        'js/components/appearance-tabs.tsx',
+        'js/components/password-input.tsx',
+        'js/components/alert-error.tsx',
+        'js/components/manage-two-factor.tsx',
+        'js/components/two-factor-recovery-codes.tsx',
+        'js/components/two-factor-setup-modal.tsx',
+        'js/components/ui/sidebar.tsx',
+        'js/pages/settings/setup/wizard.tsx',
+        'js/pages/crm/leads/captures.tsx',
+        'js/pages/outbound/domains/index.tsx',
+        'js/components/aurora/command-palette.tsx',
+    ];
+
+    foreach ($files as $file) {
+        $src = file_get_contents(resource_path($file));
+        expect($src)->not->toContain("from 'lucide-react'")
+            ->and($src)->not->toContain('from "lucide-react"');
+    }
+
+    expect(file_get_contents(resource_path('js/components/crm/command-palette.tsx')))
+        ->toContain('@phosphor-icons/react')
+        ->and(file_get_contents(resource_path('js/components/crm/command-palette.tsx')))
+        ->toContain("href: '/home'");
+});
+
+it('routes active product overlays through canonical drawer or dialog barrels', function () {
+    $drawers = [
+        'js/components/crm/create-drawer.tsx',
+        'js/components/crm/ask-evo-panel.tsx',
+        'js/components/crm/record-layout-editor.tsx',
+        'js/components/crm/column-chooser.tsx',
+        'js/components/crm/board-options-sheet.tsx',
+    ];
+
+    foreach ($drawers as $file) {
+        $src = file_get_contents(resource_path($file));
+        expect($src)->toContain("@/components/ui/drawer")
+            ->and($src)->not->toContain("@/components/ui/sheet")
+            ->and($src)->not->toContain('@/components/ui/aurora/');
+    }
+
+    expect(file_get_contents(resource_path('js/components/ui/drawer.tsx')))
+        ->toContain('@/ds/components/Drawer');
+    expect(file_get_contents(resource_path('js/components/ui/dialog.tsx')))
+        ->toContain('@/ds/components/Modal');
+    expect(file_get_contents(resource_path('js/ds/components/Drawer.tsx')))
+        ->toContain('@/components/ui/aurora/sheet');
+
+    $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
+    expect($sidebar)->toContain('<SheetContent')
+        ->and($sidebar)->toContain("@/components/ui/sheet");
+});
+
+it('does not delete leftover header files or change Inertia contracts', function () {
+    expect(resource_path('js/components/app-header.tsx'))->toBeFile();
+    expect(resource_path('js/layouts/app/app-header-layout.tsx'))->toBeFile();
+
+    $header = file_get_contents(resource_path('js/components/app-header.tsx'));
+    expect($header)->toContain('lucide-react');
+
+    $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
+    expect($palette)->toContain("section: 'navigate'")
+        ->and($palette)->toContain("section: 'records'")
+        ->and($palette)->not->toContain("section: 'create'")
+        ->and($palette)->not->toContain("section: 'ask'");
+});

@@ -1,13 +1,14 @@
-import { Monitor, Moon, Sun } from 'lucide-react';
+import type { Icon } from '@phosphor-icons/react';
+import { Desktop, Moon, Sun } from '@phosphor-icons/react';
 import type { HTMLAttributes } from 'react';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
 
-const tabs: { value: Appearance; icon: typeof Sun; label: string }[] = [
+const tabs: { value: Appearance; icon: Icon; label: string }[] = [
     { value: 'light', icon: Sun, label: 'Light' },
     { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
+    { value: 'system', icon: Desktop, label: 'System' },
 ];
 
 export default function AppearanceToggleTab({
@@ -42,6 +43,8 @@ export default function AppearanceToggleTab({
                                 '-ml-1 h-4 w-4',
                                 appearance === value && 'text-brand',
                             )}
+                            weight="regular"
+                            aria-hidden
                         />
                         <span className="ml-1.5 text-sm">{label}</span>
                     </button>
