@@ -179,7 +179,9 @@ No new cards, gradients, orange surfaces, or app-shell redesign.
 New lock: `tests/Feature/P04ContactsWorkspaceTest.php`  
 Proofs: `resources/js/pages/crm/contacts/contact-columns-contract.ts`
 
-Updated source locks that previously froze Contacts on domain children: P03A, P03B, P03D, Wave1, Wave6, `CrmListWorkspaceTest`, P05.
+Updated source locks that previously froze Contacts on domain children: P03A, P03B, P03D, Wave1, Wave6, `CrmListWorkspaceTest`, P05, `CrmRecordHubVisualTest`.
+
+CI-only fixture pin (not a Home change): `ActivityCreateTest` now uses midday `Africa/Algiers` for `due_at`. `now()->addHour()` already failed on `main` @ `aee49804` after ~22:00 UTC because Home KPIs use Algiers day bounds.
 
 ---
 
