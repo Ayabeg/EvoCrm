@@ -62,8 +62,8 @@ Footer                Settings
 
 | System | Paths | Verdict | Evidence |
 |---|---|---|---|
-| DataWorkspace suite | `ds/workspace/{DataWorkspace,SavedViews,FilterBar,AdvancedFilterDrawer,DataTable,BulkActionBar,types,index}` | **CANONICAL KEEP** | Owns chrome. Native table/pagination only when `children` is omitted |
-| CrmListShell adapter | `components/crm/crm-list-shell.tsx` | **ADAPTER KEEP TEMPORARILY** | Passes `rows={[]}`, `selectedIds={[]}`, `onSelectedIdsChange={() => undefined}`. Children own the table |
+| DataWorkspace suite | `ds/workspace/{DataWorkspace,SavedViews,FilterBar,AdvancedFilterDrawer,DataTable,BulkActionBar,types,index}` | **CANONICAL KEEP** | Owns chrome. Native table/pagination only in `resultMode: 'shared-table'`. Domain mode uses `renderResults` |
+| CrmListShell adapter | `components/crm/crm-list-shell.tsx` | **ADAPTER KEEP TEMPORARILY** | Thin Inertia mapper. `resultMode="domain"` + `renderResults`. Domain children own the table. No stub `rows` / `selectedIds` (P03A) |
 | ListViewTable | `components/crm/list-view-table.tsx` | **ADAPTER KEEP TEMPORARILY** | Domain cell renderers. `ListDataTable` already delegates here |
 | Domain BulkActionBar | `components/crm/bulk-action-bar.tsx` | **ADAPTER KEEP TEMPORARILY** | Used by contacts + deals pages. DS `ds/workspace/BulkActionBar.tsx` exists in parallel |
 | list-query | `components/crm/list-query.ts`, `lib/list-view-config.ts` | **CANONICAL KEEP** | URL filters, chips, `/crm/filters` |

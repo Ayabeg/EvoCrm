@@ -295,7 +295,8 @@ Shared **BACKEND CONTRACT THAT MUST NOT CHANGE:** routes in `web.php` / `setting
 **RISKS:** None.  
 **ROLLBACK:** Revert.  
 **ACCEPTANCE CRITERIA:** Contract comments match canonical map; no page visual change.  
-**OUT OF SCOPE:** Hoisting state.
+**OUT OF SCOPE:** Hoisting state.  
+**LANDED:** Discriminated `shared-table` / `domain` result modes; `CrmListShell` maps to domain `renderResults` with no stub `rows={[]}`. See [p03a-dataworkspace-ownership.md](./p03a-dataworkspace-ownership.md).
 
 ---
 
