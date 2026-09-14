@@ -9,7 +9,11 @@ export type {
     BulkActionBarProps,
     DataTableColumn,
     DataTableProps,
+    DataWorkspaceChromeProps,
+    DataWorkspaceDomainProps,
     DataWorkspaceEntity,
     DataWorkspaceObject,
     DataWorkspaceProps,
+    DataWorkspaceRenderResults,
+    DataWorkspaceSharedTableProps,
 } from '@/ds/workspace/types';
