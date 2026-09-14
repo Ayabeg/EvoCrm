@@ -34,7 +34,7 @@ it('renders login with the EvoCrm lockup', function () {
         ->toContain('/brand/evocrm/logo.svg');
 });
 
-it('names the product EvoSales · Evotechly for auth mail', function () {
-    expect(config('app.name'))->toBe('EvoSales · Evotechly');
-    expect(config('mail.from.name'))->toBe('EvoSales · Evotechly');
+it('names the product EvoCrm · Evotechly for auth mail', function () {
+    expect(config('app.name'))->toBe('EvoCrm · Evotechly');
+    expect(config('mail.from.name'))->toBe('EvoCrm · Evotechly');
 });

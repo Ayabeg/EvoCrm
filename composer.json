@@ -21,7 +21,8 @@
         "laravel/socialite": "^5.30",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
-        "posthog/posthog-php": "^4.13"
+        "posthog/posthog-php": "^4.13",
+        "resend/resend-php": "^1.14"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",

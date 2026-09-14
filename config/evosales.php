@@ -4,7 +4,7 @@ return [
 
     'company' => env('EVOSALES_COMPANY', 'Evotechly'),
 
-    'brand_title' => env('APP_NAME', 'EvoSales · Evotechly'),
+    'brand_title' => env('APP_NAME', 'EvoCrm · Evotechly'),
 
     /*
     | Sold Desk is EvoDesk (Chatwoot Community MIT), not a Laravel inbox clone.

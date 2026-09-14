@@ -1,5 +1,18 @@
 # Changelog
 
+## Transactional mail via Resend (2026-09-14)
+
+### Added
+- `resend/resend-php` so Laravel's built-in Resend transport can send (meetings, quotes, invites, Fortify)
+- `php artisan evocrm:mail-smoke` — readiness check; `--send --to=` delivers a `MeetingBookedMail` through the default mailer
+- Workspace invites fall back to the default mailer (Resend) when the workspace has no enabled SMTP mailbox
+
+### Changed
+- `.env.example` / `.env.production.example` document Resend for transactional mail and keep `outbound.evotechly.com` SMTP for sequences
+- Example `APP_NAME` / mail from name: **EvoCrm · Evotechly**. `RESEND_API_KEY` (Laravel) with `RESEND_KEY` alias
+
+---
+
 ## G6 product-ready stop gate (2026-09-13)
 
 ### Added

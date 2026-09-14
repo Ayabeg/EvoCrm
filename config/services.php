@@ -19,7 +19,9 @@ return [
     ],
 
     'resend' => [
-        'key' => env('RESEND_API_KEY'),
+        // Laravel docs: RESEND_API_KEY. RESEND_KEY is accepted as an alias.
+        // Source: https://laravel.com/docs/13.x/mail#resend-driver
+        'key' => env('RESEND_API_KEY', env('RESEND_KEY')),
     ],
 
     'ses' => [

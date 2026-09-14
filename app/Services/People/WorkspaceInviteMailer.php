@@ -11,13 +11,28 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 
 /**
- * Issues the first-login email for a workspace invite. The mail leaves
- * through the workspace's default enabled mailbox (the SmtpMailboxMailer
- * path) — never MAIL_MAILER=log, never a plaintext standing password. The
- * link is a single-use Fortify password-reset token on the CRM hostname.
+ * Issues the first-login email for a workspace invite. Prefer the
+ * workspace's default enabled mailbox (SmtpMailboxMailer). When none is
+ * enabled, fall back to Laravel's default mailer if it is a real
+ * transactional transport (Resend on Contabo day-1). Never send a
+ * standing password — the link is a single-use Fortify reset token.
  */
 class WorkspaceInviteMailer
 {
+    /**
+     * Default mailers that can deliver without a workspace SMTP mailbox.
+     *
+     * @var list<string>
+     */
+    private const TRANSACTIONAL_DEFAULT_MAILERS = [
+        'resend',
+        'smtp',
+        'ses',
+        'postmark',
+        'mailgun',
+        'failover',
+    ];
+
     public function __construct(
         private MailerFactory $mailers,
         private ProductAnalytics $analytics,
@@ -33,7 +48,7 @@ class WorkspaceInviteMailer
 
         $mailbox = $this->mailers->resolve($workspace);
 
-        if (! $mailbox) {
+        if (! $mailbox && ! $this->canUseDefaultMailer()) {
             return InviteSendResult::noMailbox();
         }
 
@@ -44,9 +59,10 @@ class WorkspaceInviteMailer
             inviteUrl: $this->setPasswordUrl($invitee),
         );
 
-        // Tests and the array mailer never open a real SMTP connection — the
-        // mailable goes through the Laravel mailer so Mail::fake() asserts it.
-        if (app()->environment('testing') || config('mail.default') === 'array') {
+        // Tests, the array mailer, and no-mailbox Resend (or other
+        // transactional default) go through Laravel Mail so Mail::fake()
+        // asserts the same mailable production Resend will send.
+        if (app()->environment('testing') || config('mail.default') === 'array' || ! $mailbox) {
             Mail::to($invitee->email)->send($mailable);
             $this->recordInvite($invitee, $inviter);
 
@@ -64,7 +80,7 @@ class WorkspaceInviteMailer
 
             (new SmtpMailboxMailer($mailbox))->sendAdHoc(
                 $invitee->email,
-                $mailable->envelope()->subject ?? 'EvoSales · Evotechly',
+                $mailable->envelope()->subject ?? config('app.name'),
                 view($content->text ?? 'mail.workspace-invite-text', $data)->render(),
                 view($content->view ?? 'mail.workspace-invite', $data)->render(),
             );
@@ -83,6 +99,11 @@ class WorkspaceInviteMailer
             'invitee_id' => $invitee->id,
             'role' => $invitee->role->value,
         ], $inviter, $invitee->workspace);
+    }
+
+    private function canUseDefaultMailer(): bool
+    {
+        return in_array((string) config('mail.default'), self::TRANSACTIONAL_DEFAULT_MAILERS, true);
     }
 
     /**

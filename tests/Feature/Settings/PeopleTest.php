@@ -123,6 +123,24 @@ it('cannot invite a second owner', function () {
     Mail::assertNothingSent();
 });
 
+it('sends the invite through the default Resend mailer when no mailbox is enabled', function () {
+    config(['mail.default' => 'resend']);
+    Mail::fake();
+
+    $owner = peopleOwner();
+
+    $this->actingAs($owner)
+        ->post(route('settings.people.store'), [
+            'name' => 'Resend Person',
+            'email' => 'resend-invite@evotechly.com',
+            'role' => 'member',
+        ])
+        ->assertRedirect();
+
+    Mail::assertSent(WorkspaceInviteMail::class, fn (WorkspaceInviteMail $mail) => $mail->hasTo('resend-invite@evotechly.com')
+        && $mail->mailer === 'resend');
+});
+
 it('keeps the invite pending and fails honestly when no mailbox is enabled', function () {
     Mail::fake();
 

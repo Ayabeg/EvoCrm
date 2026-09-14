@@ -14,6 +14,9 @@ return [
     |
     */
 
+    // Transactional product mail (meetings, quotes, invites, Fortify).
+    // Production Contabo: MAIL_MAILER=resend. Sequences stay on
+    // outbound.evotechly.com SMTP via EVOSALES_SMTP_* / workspace mailboxes.
     'default' => env('MAIL_MAILER', 'log'),
 
     /*
@@ -112,7 +115,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'EvoSales · Evotechly')),
+        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'EvoCrm · Evotechly')),
     ],
 
 ];

@@ -102,6 +102,23 @@ Required platform values:
 
 Provider values are required only for enabled integrations. The complete non-secret template is `.env.production.example`.
 
+## Transactional mail (Resend) — Contabo flip
+
+Day-1 product mail (meetings, quotes, invites, Fortify) is Laravel's default mailer. Official Evotechly mail is Resend Pro. Sequence/warmup SMTP on `outbound.evotechly.com` stays separate (`EVOSALES_SMTP_*` / workspace mailboxes).
+
+Contabo still ships theater until these env values are set (never commit the key):
+
+1. `MAIL_MAILER=resend`
+2. `RESEND_API_KEY=` (Laravel official; `RESEND_KEY` is accepted as an alias)
+3. `MAIL_FROM_ADDRESS=noreply@evocrmapp.com` (or `support@evocrmapp.com`) on a **verified** Resend domain
+4. `MAIL_FROM_NAME` / `APP_NAME` — `EvoCrm · Evotechly`
+5. `php artisan config:clear` (web, queue, and scheduler share this env)
+6. Send a test: `php artisan evocrm:mail-smoke --send --to=you@evotechly.com`
+
+Rollback: set `MAIL_MAILER=log` and `config:clear`. Mail becomes theater again; sequences are unchanged.
+
+Sources: https://laravel.com/docs/13.x/mail#resend-driver
+
 ## Rollback
 
 Application rollback uses the previous Git revision and image. Migrations must remain backward compatible within a release rollback window. Do not run destructive down migrations against production data.
