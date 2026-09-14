@@ -63,7 +63,7 @@ Footer                Settings
 | System | Paths | Verdict | Evidence |
 |---|---|---|---|
 | DataWorkspace suite | `ds/workspace/{DataWorkspace,SavedViews,FilterBar,AdvancedFilterDrawer,DataTable,BulkActionBar,types,index}` | **CANONICAL KEEP** | Owns chrome. Native table/pagination only in `resultMode: 'shared-table'`. Domain mode uses `renderResults` |
-| CrmListShell adapter | `components/crm/crm-list-shell.tsx` | **ADAPTER KEEP TEMPORARILY** | Thin Inertia mapper. `resultMode="domain"` + `renderResults`. Domain children own the table. No stub `rows` / `selectedIds` (P03A) |
+| CrmListShell adapter | `components/crm/crm-list-shell.tsx` | **ADAPTER KEEP TEMPORARILY** | Thin Inertia mapper. `resultMode="domain"` + `renderResults` + workspace `selection` (P03B). Domain children still own the table. No stub `rows` / `selectedIds` |
 | ListViewTable | `components/crm/list-view-table.tsx` | **ADAPTER KEEP TEMPORARILY** | Domain cell renderers. `ListDataTable` already delegates here |
 | Domain BulkActionBar | `components/crm/bulk-action-bar.tsx` | **ADAPTER KEEP TEMPORARILY** | Used by contacts + deals pages. DS `ds/workspace/BulkActionBar.tsx` exists in parallel |
 | list-query | `components/crm/list-query.ts`, `lib/list-view-config.ts` | **CANONICAL KEEP** | URL filters, chips, `/crm/filters` |
@@ -77,11 +77,11 @@ Footer                Settings
 
 | Object | Page | Shell | Table | Create | Bulk | Saved views |
 |---|---|---|---|---|---|---|
-| Contacts | `pages/crm/contacts/index.tsx` | CrmListShell (no CrmShell) | ListViewTable | CreateDrawer | Domain BulkActionBar | Yes |
-| Companies | `pages/crm/companies/index.tsx` | **CrmShell + CrmListShell** | ListViewTable | CreateDrawer | No | Yes |
-| Deals list | `pages/crm/deals/index.tsx` | CrmListShell | ListViewTable | CreateDrawer | Domain BulkActionBar | Yes + stage pills |
+| Contacts | `pages/crm/contacts/index.tsx` | CrmListShell (no CrmShell) | ListViewTable (workspace selection) | CreateDrawer | Domain BulkActionBar (shared selection) | Yes |
+| Companies | `pages/crm/companies/index.tsx` | **CrmShell + CrmListShell** | ListViewTable (selection wired, not selectable) | CreateDrawer | No | Yes |
+| Deals list | `pages/crm/deals/index.tsx` | CrmListShell | ListViewTable (workspace selection) | CreateDrawer | Domain BulkActionBar (shared selection) | Yes + stage pills |
 | Deals board | `pages/crm/deals/board.tsx` | Custom CrmObjectHeader | PipelineKanban | CreateDrawer | No | Board options, not DataWorkspace views |
-| Quotes | `pages/crm/quotes/index.tsx` | CrmListShell | ListViewTable | CreateDrawer (needs deal id) | No | Yes |
+| Quotes | `pages/crm/quotes/index.tsx` | CrmListShell | ListViewTable (selection wired, not selectable) | CreateDrawer (needs deal id) | No | Yes |
 | Tickets list | `pages/crm/tickets/index.tsx` | CrmShell + CrmListShell | ListViewTable | CreateDrawer | No | Yes |
 | Tickets board | `pages/crm/tickets/board.tsx` | CrmShell + header | PipelineKanban | — | — | Status columns |
 | Leads | `pages/crm/leads/index.tsx` | CrmShell + CrmObjectHeader | **Raw `<table>`** | CreateDrawer | No | **No** |

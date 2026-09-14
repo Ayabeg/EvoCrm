@@ -63,6 +63,11 @@ export default function CompaniesIndex({
                 members={members}
                 cities={cities}
                 wilayas={wilayas}
+                selection={{
+                    mode: 'uncontrolled',
+                    selectable: false,
+                    pageIds: companies.map((company) => company.id),
+                }}
             >
                 {(columns) => (
                     <>

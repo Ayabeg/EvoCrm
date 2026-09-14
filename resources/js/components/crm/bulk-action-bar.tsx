@@ -1,4 +1,5 @@
 import { BulkActionBar as DataWorkspaceBulkActionBar } from '@/ds/workspace/BulkActionBar';
+import type { RowId } from '@/ds/workspace/selection';
 import type { BulkAction } from '@/ds/workspace/types';
 
 type Member = { id: number; name: string };
@@ -14,7 +15,7 @@ export function BulkActionBar({
     onClear,
 }: {
     entity: 'contact' | 'deal';
-    selectedIds: number[];
+    selectedIds: RowId[];
     members: Member[];
     sequences?: Sequence[];
     stages?: Stage[];

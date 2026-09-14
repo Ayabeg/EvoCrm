@@ -67,3 +67,50 @@ acceptWorkspace({
     rowHref: (row) => `/crm/contacts/${row.id}`,
     empty: { title: 'No contacts yet', body: '' },
 });
+
+acceptWorkspace({
+    ...chrome,
+    resultMode: 'domain',
+    renderResults: ({ selection }) => selection.selectedCount,
+    selection: {
+        mode: 'uncontrolled',
+        pageIds: [1, 'uuid-row'],
+        selectable: true,
+    },
+});
+
+acceptWorkspace({
+    ...chrome,
+    resultMode: 'shared-table',
+    rows: [{ id: 'uuid-1' }],
+    rowHref: (row) => `/crm/contacts/${row.id}`,
+    empty: { title: 'No contacts yet', body: '' },
+    selection: {
+        mode: 'controlled',
+        selectedIds: ['uuid-1'],
+        onSelectedIdsChange: () => undefined,
+    },
+});
+
+// @ts-expect-error uncontrolled selection cannot pass selectedIds
+acceptWorkspace({
+    ...chrome,
+    resultMode: 'domain',
+    renderResults: null,
+    selection: {
+        mode: 'uncontrolled',
+        selectedIds: [1],
+        onSelectedIdsChange: () => undefined,
+    },
+});
+
+// @ts-expect-error controlled selection requires onSelectedIdsChange
+acceptWorkspace({
+    ...chrome,
+    resultMode: 'domain',
+    renderResults: null,
+    selection: {
+        mode: 'controlled',
+        selectedIds: [1],
+    },
+});

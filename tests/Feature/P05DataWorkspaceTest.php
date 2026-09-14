@@ -29,7 +29,7 @@ it('lands DataWorkspace with the sketched props and a thin CrmListShell adapter'
         ->and($types)->toContain("resultMode: 'domain'")
         ->and($types)->toContain('rowHref: (row: Row) => string')
         ->and($types)->toContain("mode?: 'list' | 'board'")
-        ->and($types)->toContain('selectedIds?: number[]');
+        ->and($types)->toContain('selection?: WorkspaceSelectionInput');
 
     expect($workspace)->toContain('SavedViews')
         ->and($workspace)->toContain('FilterBar')

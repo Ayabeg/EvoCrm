@@ -61,7 +61,6 @@ export default function ContactsIndex({
     bulk?: { enabled: boolean; sequences: { id: number; name: string }[] };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const loading = useInertiaLoading();
     const { auth } = usePage<{ auth: Auth }>().props;
     const canImport = auth.capabilities.includes('crm.import');
@@ -106,6 +105,11 @@ export default function ContactsIndex({
                             ) : null}
                         </>
                     }
+                    selection={{
+                        mode: 'uncontrolled',
+                        selectable: canBulk,
+                        pageIds: contacts.map((contact) => contact.id),
+                    }}
                     banner={
                         !hasMailbox ? (
                             <div className="border-b border-hairline bg-white px-4 py-2 text-[12px] text-mute sm:px-6">
@@ -120,15 +124,15 @@ export default function ContactsIndex({
                         ) : null
                     }
                 >
-                    {(columns) => (
+                    {(columns, selection) => (
                         <>
-                            {canBulk && selectedIds.length > 0 ? (
+                            {canBulk && selection.bulkActive ? (
                                 <BulkActionBar
                                     entity="contact"
-                                    selectedIds={selectedIds}
+                                    selectedIds={selection.selectedIds}
                                     members={members}
                                     sequences={bulk?.sequences ?? []}
-                                    onClear={() => setSelectedIds([])}
+                                    onClear={selection.clearSelection}
                                 />
                             ) : null}
                             {loading ? (
@@ -165,42 +169,9 @@ export default function ContactsIndex({
                                         columns={columns}
                                         basePath="/crm/contacts"
                                         selectable={canBulk}
-                                        selectedIds={selectedIds}
-                                        onToggle={(id) =>
-                                            setSelectedIds((current) =>
-                                                current.includes(id)
-                                                    ? current.filter(
-                                                          (value) =>
-                                                              value !== id,
-                                                      )
-                                                    : [...current, id],
-                                            )
-                                        }
-                                        onTogglePage={() =>
-                                            setSelectedIds((current) => {
-                                                const pageIds = contacts.map(
-                                                    (contact) => contact.id,
-                                                );
-                                                const allSelected =
-                                                    pageIds.every((id) =>
-                                                        current.includes(id),
-                                                    );
-
-                                                return allSelected
-                                                    ? current.filter(
-                                                          (id) =>
-                                                              !pageIds.includes(
-                                                                  id,
-                                                              ),
-                                                      )
-                                                    : [
-                                                          ...new Set([
-                                                              ...current,
-                                                              ...pageIds,
-                                                          ]),
-                                                      ];
-                                            })
-                                        }
+                                        selectedIds={selection.selectedIds}
+                                        onToggle={selection.toggleOne}
+                                        onTogglePage={selection.togglePage}
                                     />
                                 </div>
                             )}
