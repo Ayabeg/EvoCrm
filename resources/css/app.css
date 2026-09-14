@@ -607,3 +607,65 @@
     background: var(--aurora-hover-bg);
     color: var(--evosales-mark);
 }
+
+/*
+ * Auth chrome is locked to paper. html.dark (system / iOS) would otherwise
+ * paint Aurora titles in light ink and inputs as black pills on the white card.
+ */
+.auth-screen {
+    color-scheme: light;
+    background-color: #f7f7f5;
+    color: #161616;
+    letter-spacing: 0;
+    word-spacing: 0.06em;
+    --color-bg: #f7f7f5;
+    --color-surface: #ffffff;
+    --color-subtle: #f1f1ef;
+    --color-text: #161616;
+    --color-text-secondary: #666666;
+    --color-text-muted: #929292;
+    --color-border: #e3e3df;
+    --color-border-strong: color-mix(in srgb, #161616 18%, #e3e3df);
+    --color-canvas: #f7f7f5;
+    --color-canvas-soft: #f7f7f5;
+    --color-ink: #161616;
+    --color-mute: #666666;
+    --color-hairline: #e3e3df;
+    --evosales-canvas: #f7f7f5;
+    --evosales-canvas-soft: #f7f7f5;
+    --evosales-ink: #161616;
+    --evosales-mute: #666666;
+    --evosales-hairline: #e3e3df;
+    --aurora-page-bg: #f7f7f5;
+    --aurora-bg: #f7f7f5;
+    --aurora-text-primary: #161616;
+    --aurora-text-muted: #666666;
+    --aurora-control-surface: #ffffff;
+    --aurora-control-surface-top: #ffffff;
+    --aurora-hover-bg: color-mix(in srgb, #161616 4%, #f7f7f5);
+    --aurora-border-default: #e3e3df;
+    --aurora-border-strong: color-mix(in srgb, #161616 18%, #e3e3df);
+    --aurora-letter-ui: 0;
+    --aurora-letter-label: 0;
+    --aurora-letter-meta: 0;
+    --background: #f7f7f5;
+    --foreground: #161616;
+    --card: #ffffff;
+    --card-foreground: #161616;
+    --muted-foreground: #929292;
+    --input: #e3e3df;
+    --border: #e3e3df;
+    --primary: #e8530e;
+    --primary-foreground: #ffffff;
+}
+
+.auth-screen h1,
+.auth-screen p,
+.auth-screen label,
+.auth-screen button,
+.auth-screen a,
+.auth-screen span,
+.auth-screen input {
+    letter-spacing: 0;
+    word-spacing: 0.06em;
+}

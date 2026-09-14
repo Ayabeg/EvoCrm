@@ -116,7 +116,7 @@ export default function TwoFactorChallenge() {
                                 Continue
                             </Button>
 
-                            <p className="aurora-text-body-sm text-center text-mute">
+                            <p className="text-center text-sm text-mute">
                                 <span>or you can </span>
                                 <button
                                     type="button"

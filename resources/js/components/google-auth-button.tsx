@@ -57,7 +57,7 @@ export default function GoogleAuthButton({
                     <Separator className="w-full" />
                 </div>
                 <div className="relative flex justify-center">
-                    <span className="aurora-text-caption bg-canvas px-2 text-mute">
+                    <span className="bg-white px-2 text-xs text-mute">
                         {separator}
                     </span>
                 </div>
