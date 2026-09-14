@@ -4,7 +4,8 @@
 **Baseline:** `main` @ `7d05ca7` (research requested against audit SHA `a0b9a85`; neither SHA has `docs/research/`).  
 **Method:** CONSOLIDATE → NORMALIZE → MIGRATE → IMPROVE → POLISH. Not a rewrite.  
 **Locks:** [`docs/design-system.md`](../design-system.md) tokens/paint; [`docs/evocrm-mobbin-contract.md`](../evocrm-mobbin-contract.md) density only; this tree for sequencing.  
-**Companions:** [current-system-map.md](./current-system-map.md) · [canonical-component-map.md](./canonical-component-map.md) · [deprecation-map.md](./deprecation-map.md) · [signature-capability-map.md](./signature-capability-map.md) · [test-strategy.md](./test-strategy.md) · [research/_ABSENT.md](../research/_ABSENT.md)
+**Companions:** [current-system-map.md](./current-system-map.md) · [canonical-component-map.md](./canonical-component-map.md) · [deprecation-map.md](./deprecation-map.md) · [signature-capability-map.md](./signature-capability-map.md) · [test-strategy.md](./test-strategy.md)  
+**Research pack:** [ux](../research/ux-benchmark.md) · [micro-ux](../research/micro-ux-benchmark.md) · [pipeline](../research/pipeline-benchmark.md) · [records](../research/record-workspace-benchmark.md) · [settings](../research/settings-benchmark.md) · [onboarding](../research/onboarding-benchmark.md) · [absent SoT](../research/_ABSENT.md)
 
 Historical P01–P16 in [`docs/ui-migration-plan.md`](../ui-migration-plan.md) is **partially shipped** (tokens, `ds/` primitives, 64/240 shell, DataWorkspace adapter). This file supersedes it for all *new* work. Do not delete that file.
 

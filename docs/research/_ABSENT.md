@@ -1,39 +1,50 @@
-# Absent research sources
+# Absent Source-of-Truth research files
 
 **Searched:** 2026-09-14  
-**Baseline:** `main` @ `7d05ca7` (HEAD at plan time). Research was requested against the audit SHA `a0b9a85` (i18n hydrate, #201) — that SHA also has **no** `docs/research/`.  
-**Method:** `git ls-tree -r` across every local remote branch; `git log --all` for `docs/research/*`, `*benchmark*.md`, `docs/evocrm-ux-blueprint.md`; workspace glob. GitHub code search was unavailable (MCP discovery failed).
+**Baseline:** `main` @ `7d05ca7`. Requested audit SHA `a0b9a8571fed2a1cbe7bd98d58b47d043c4fc7b2` also has **no** `docs/research/` on any reachable ref.  
+**Method:** `git ls-tree -r` on every local remote branch; `git log --all` for `docs/research/*`, `*benchmark*.md`, `docs/evocrm-ux-blueprint.md`; workspace glob. GitHub code search was unavailable (MCP discovery failed).
 
-None of the requested Source-of-Truth research files exist on `main` or on any reachable branch in this clone.
+None of the requested Source-of-Truth files existed on `main` or on any searched branch **before this PR**. This file lists what is **still missing** (not restored) and what this PR restored from the approved user pack.
 
-## Absent on every searched ref
+---
+
+## Still absent (not found on the repo — do not invent)
+
+These Source-of-Truth files were requested and were **not** on any searched ref. This PR does **not** create fake scores, fake Mobbin screenshots, or stub replacements for them.
 
 | Requested path | Status |
 |---|---|
-| `docs/research/ux-benchmark.md` | Absent on git history. **Restored in this PR** from the approved research pack (audited `a0b9a8571fed2a1cbe7bd98d58b47d043c4fc7b2`): Findings 1–12, benchmark matrix, Mobbin user-pack URLs. |
-| `docs/research/dashboard-benchmark.md` | **Absent. Not reconstructed** — no approved body, no branch copy, no scores. |
-| `docs/research/data-workspace-benchmark.md` | **Absent. Not reconstructed** — contract is specified in `docs/design-system.md` and implemented (adapter) in `resources/js/ds/workspace/*`. |
-| `docs/research/record-workspace-benchmark.md` | Absent. **Reconstructed** from the approved summary + `docs/evocrm-mobbin-contract.md` + live `RecordShell`. |
-| `docs/research/pipeline-benchmark.md` | Absent on git history. **Restored in this PR** from the approved pack: one deal engine, `board.tsx`, stages New→Lost, column header, card order, DnD+menu+keyboard+undo, reject Lead Board / drag-only, list↔board parity. |
-| `docs/research/inbox-benchmark.md` | **Absent. Not reconstructed** — live dual-mode inbox documented in the system map. |
-| `docs/research/automation-benchmark.md` | **Absent. Not reconstructed** — live workflows are a structured table, not a canvas. |
-| `docs/research/command-benchmark.md` | **Absent. Not reconstructed** — live palette documented in the system map. |
-| `docs/research/onboarding-benchmark.md` | Absent. **Reconstructed** from the approved summary + setup wizard + Home `GuidedActions`. |
-| `docs/research/settings-benchmark.md` | Absent. **Reconstructed** from the approved summary + `layouts/settings/layout.tsx`. |
-| `docs/research/micro-ux-benchmark.md` | Absent on git history. **Restored in this PR** from the approved pack: full behavior matrix (Button through Keyboard shortcut), ADOPT/REJECT, Lucide/Phosphor principal consistency risk. |
-| `docs/research/major-category-scorecard.md` | **Absent. Not reconstructed** — inventing numeric scores would be false precision. |
-| `docs/research/evocrm-pattern-map.md` | **Absent. Not reconstructed** — superseded by `docs/implementation/canonical-component-map.md`. |
-| `docs/evocrm-ux-blueprint.md` | **Absent.** Closest present locks: `docs/design-system.md`, `docs/evocrm-mobbin-contract.md`. |
+| `docs/research/dashboard-benchmark.md` | **Absent.** Home behavior is covered in `ux-benchmark.md` Finding 12 and `onboarding-benchmark.md`. No standalone dashboard scorecard. |
+| `docs/research/data-workspace-benchmark.md` | **Absent.** Contract lives in `docs/design-system.md` + `ds/workspace/*` + `ux-benchmark.md` Findings 1–2, 4. |
+| `docs/research/inbox-benchmark.md` | **Absent.** Inbox/EvoDesk boundary is `ux-benchmark.md` Finding 6 + `current-system-map.md`. |
+| `docs/research/automation-benchmark.md` | **Absent.** Structured-not-canvas + test-before-activate is `ux-benchmark.md` Finding 9. |
+| `docs/research/command-benchmark.md` | **Absent.** Command/Ask Evo gap is `ux-benchmark.md` Finding 10. |
+| `docs/research/major-category-scorecard.md` | **Absent.** No numeric scores invented. |
+| `docs/research/evocrm-pattern-map.md` | **Absent.** Use `docs/implementation/canonical-component-map.md`. |
+| `docs/evocrm-ux-blueprint.md` | **Absent.** Closest locks: `docs/design-system.md`, `docs/evocrm-mobbin-contract.md`, this research pack. |
 
-## Present docs used instead (do not treat as the missing research)
+---
 
-- `docs/design-system.md` — locked tokens, shell, DataWorkspace contract sketch
-- `docs/ui-audit.md` — historical inventory (stale on DataWorkspace; written before P05 landed)
-- `docs/ui-migration-plan.md` — historical P01–P16 visual strangler (P02–P05 already shipped)
-- `docs/evocrm-mobbin-contract.md` — HubSpot/Salesforce density refs (pattern only, never paint)
-- `docs/visual-system/responsive-architecture.md` — breakpoint behavior
-- `docs/crm-redesign-plan.md` — older redesign narrative (black rail / `#EC6025`; superseded by design-system lock)
+## Restored in this PR (were absent on git; now present from the approved pack)
 
-## Reconstruction rule
+| Path | Pack contents |
+|---|---|
+| `docs/research/ux-benchmark.md` | Audited `a0b9a8571fed2a1cbe7bd98d58b47d043c4fc7b2`; Findings 1–12; benchmark matrix; Mobbin user-pack URLs |
+| `docs/research/micro-ux-benchmark.md` | Behavior matrix Button → Keyboard shortcut; ADOPT/REJECT; Lucide/Phosphor risk |
+| `docs/research/pipeline-benchmark.md` | One deal engine; `board.tsx`; stages; column/card/move; reject Lead Board + drag-only |
+| `docs/research/record-workspace-benchmark.md` | KEEP RecordShell; ADD QuickRecordDrawer; drawer vs full; HubSpot/Attio/Salesforce/Pipedrive ADOPT/ADAPT/REJECT; header/left/center/right; URL-addressable peek |
+| `docs/research/settings-benchmark.md` | Target IA Personal / Workspace / CRM / Communication / Automation / Integrations / Developer; scopes ME/WORKSPACE/CRM/CHANNEL/INTEGRATION/DEVELOPER; Stripe danger; max 2 levels |
+| `docs/research/onboarding-benchmark.md` | Persistent Home 9-step checklist; states; ADOPT Shopify/Linear/Stripe; REJECT wizard-hides-product and auto-connect without consent |
 
-`ux-benchmark.md`, `micro-ux-benchmark.md`, and `pipeline-benchmark.md` are restored from the approved research pack (Findings 1–12, behavior matrix, pipeline contract). Remaining reconstructions (record-workspace, settings, onboarding) await Part 2. They cite Mobbin IDs only from the user pack / `docs/evocrm-mobbin-contract.md` / `docs/design-system.md`. They do **not** invent scores or fake screenshots.
+---
+
+## Present docs that are not the missing research
+
+- `docs/design-system.md`
+- `docs/ui-audit.md` (stale: claims DataWorkspace does not exist)
+- `docs/ui-migration-plan.md` (historical P01–P16; P02–P05 shipped)
+- `docs/evocrm-mobbin-contract.md`
+- `docs/visual-system/responsive-architecture.md`
+- `docs/crm-redesign-plan.md`
+
+**Rule:** Do not invent Mobbin IDs or scores for absent files. Cite only the user pack / `evocrm-mobbin-contract.md` / `design-system.md`.

@@ -1,72 +1,128 @@
-# Onboarding / activation benchmark (reconstructed)
+# EvoCRM onboarding / activation benchmark
 
-**Status:** Reconstructed 2026-09-14. Original file never existed on `main` or any searched branch.  
-**Provenance:** Approved research summary + `/settings/setup` wizard + Home `GuidedActions` + `FirstRunSetupTest` / `OAuthSetupWizardTest`.  
-**Honesty:** No invented completion-rate scores.
-
----
-
-## Reference pattern (behavior only)
-
-Shopify + Linear + Stripe:
-
-- Onboarding is **activation to a first CRM outcome**, not a wizard you dismiss.
-- A persistent checklist survives the first session.
-- Connectors are steps, not the whole product.
-- Empty states point at the next checklist item.
-
-First CRM outcomes (pick the first true one, do not require all):
-
-1. Create a contact (or import)
-2. Create a deal on the default pipeline
-3. Log or complete an activity
-4. Connect a real channel (mailbox / WhatsApp Cloud) **or** skip with an explicit “do this later”
+| | |
+|---|---|
+| **Status** | Approved research |
+| **Audited revision** | `a0b9a8571fed2a1cbe7bd98d58b47d043c4fc7b2` |
+| **Companion** | [`ux-benchmark.md`](./ux-benchmark.md) Finding 12 · [`settings-benchmark.md`](./settings-benchmark.md) |
+| **Reference pattern** | Shopify checklist + Linear first-loop + Stripe milestones — **behavior only** |
+| **Job** | Persistent Home checklist to a **first CRM outcome**. Wizard dismiss is not onboarded. |
 
 ---
 
-## Current implementation (verified)
+## 1. First CRM outcome
 
-| Surface | Path | What it is |
+Activation is complete when the workspace has produced **one** real CRM outcome — not when `/settings/setup` is closed.
+
+Count the first true one (do not require all):
+
+- A **contact** exists (created or imported)
+- A **deal** sits on the default pipeline
+- An **activity** is logged or completed
+- Optionally a **quote** is created from that deal
+
+Connecting WhatsApp / mailbox is a channel step. It is **not** the definition of onboarded. Skip is explicit (“do this later”), never silent auto-connect.
+
+---
+
+## 2. Persistent Home checklist — 9 steps
+
+Lives on Home (`/dashboard`, `pages/home.tsx`), above vanity charts, in the Needs attention / Guided actions region. Survives the first session. Completion is **data-driven**.
+
+| # | Step | Done when | Primary action | Scope |
+|---|---|---|---|---|
+| 1 | Confirm you | Profile has a name the team can see | `/settings/profile` | `ME` |
+| 2 | Name the workspace | Workspace name saved (owner) | `/settings/workspace` | `WORKSPACE` |
+| 3 | Invite a teammate | A second member exists **or** explicit skip | `/settings/people` | `WORKSPACE` |
+| 4 | Add a contact | ≥1 contact (create `?create=1` or import) | `/crm/contacts?create=1` | `CRM` |
+| 5 | Create a deal | ≥1 deal on the default pipeline | `/crm/deals?create=1` | `CRM` |
+| 6 | Log a next activity | ≥1 activity on that deal or contact | `/crm/activities` or record composer | `CRM` |
+| 7 | Open the pipeline | Operator has visited `/crm/deals/board` **or** the deal appears on the board | `/crm/deals/board` | `CRM` |
+| 8 | Connect a channel | Mailbox **or** official WhatsApp Cloud connected **or** explicit “do this later” | `/settings/setup` step or `CHANNEL` leaf | `CHANNEL` |
+| 9 | First CRM outcome | Activity completed **or** deal moved **or** quote sent | Context link to that record | `CRM` |
+
+Step 8 requires **consent**. OAuth / Evolution / Meta connect only after the operator starts that step. Reject auto-connect without consent.
+
+`/settings/setup` remains the connector wizard for step 8. It does not hide the product and does not replace steps 4–7 or 9.
+
+---
+
+## 3. Step states
+
+Every step has exactly one state:
+
+| State | Meaning | UI |
 |---|---|---|
-| OAuth / provider wizard | `pages/settings/setup/wizard.tsx` · `/settings/setup` | Stepper for Meta, Google, WhatsApp, SMS. **Dismissible by leaving the page.** |
-| Settings leaf | “Get started” in Workspace group | Link to the wizard |
-| Home guided actions | `components/dashboard/guided-actions.tsx` · `pages/home.tsx` | Server-driven `guidedActions[]` with categories setup / deal / prospecting. **Not a durable progress checklist** — it is a tabbed action list that vanishes when the payload is empty (`CaughtUpStrip`). |
-| Create from topbar | `AppSidebarHeader` Create menu | Contact / Company / Deal / Quote via `?create=1` |
-| First-run tests | `FirstRunSetupTest`, `OAuthSetupWizardTest` | Backend / wizard contracts |
+| **Not started** | No data, no skip | Empty control, next CTA |
+| **In progress** | Started (e.g. wizard open, import batch) | Progress, not a fake check |
+| **Complete** | Data says so (or recorded explicit skip where skip is allowed: 3, 8) | Check + muted |
+| **Needs attention** | Started and blocked (OAuth error, import failed, stage-required rejected) | Attention treatment, not color-only |
 
-There is **no** persisted “activation checklist” model or Home widget that tracks first-outcome completion independently of whether `guidedActions` happens to be empty.
-
----
-
-## Approved target
-
-```
-KEEP   /settings/setup wizard (connectors / OAuth)
-ADD    durable Home activation checklist → first CRM outcome
-DO NOT treat wizard dismiss as “onboarded”
-```
-
-Checklist is a **signature capability** (`ACTIVATION`). It can read existing backend signals (has contact, has deal, has activity, has connected mailbox / WhatsApp) without a new product object if `HomeDashboardBuilder` already has the facts. If it does not, P23 may add a thin read model — it must not add a second setup wizard.
-
-Placement:
-
-- Home, above vanity charts (same region as today’s Needs attention / Guided actions)
-- Dismiss-for-now is allowed; **completion is data-driven**, not “I clicked skip”
-- Settings “Get started” deep-links to the unfinished item or the wizard step
+Dismiss-for-now hides the **panel** temporarily. It does **not** mark steps Complete. `CaughtUpStrip` today fires when `guidedActions` is empty — that is **not** this checklist.
 
 ---
 
-## Behavior that must not change
+## 4. Current implementation (verified)
+
+| Surface | Path | Gap |
+|---|---|---|
+| OAuth / provider wizard | `pages/settings/setup/wizard.tsx` · `/settings/setup` | Dismissible by leaving; not a 9-step CRM outcome |
+| Settings “Get started” | Workspace group | Wizard link, permanent peer |
+| Home `GuidedActions` | `components/dashboard/guided-actions.tsx` | Tabbed server list; vanishes when empty |
+| Topbar Create | `AppSidebarHeader` | Good entry for steps 4–5 |
+| Tests | `FirstRunSetupTest`, `OAuthSetupWizardTest` | Wizard / first-run contracts — keep |
+
+There is **no** durable activation checklist bound to workspace facts.
+
+---
+
+## 5. ADOPT / REJECT
+
+| Adopt | From | Apply |
+|---|---|---|
+| Persistent Home checklist | **Shopify** | 9 steps, visible until first outcome, empty states point at the next step |
+| First-loop, not a tour | **Linear** | Operator does real CRM work (contact → deal → activity) inside the product |
+| Named milestones | **Stripe** | States Not started / In progress / Complete / Needs attention; no fake % |
+
+| Reject | Why |
+|---|---|
+| **Wizard-hides-product** | `/settings/setup` as a blocking curtain before Home / Contacts / Deals |
+| **Auto-connect without consent** | Connecting Google / Meta / WhatsApp / SMS without the operator starting that step |
+| Wizard dismiss = onboarded | Finding 12 |
+| Fake KPI / 100% bars | Empty workspace stays empty |
+| Forcing WhatsApp before a contact exists | Channel is step 8, not step 1 |
+| A second setup product | One checklist + existing wizard |
+
+**Mobbin (Home density only, not a wizard):** HubSpot guided home — [1f571c85](https://mobbin.com/screens/1f571c85-2b3e-4f10-8125-f6aac6e49748). Salesforce home widget soup is an anti-pattern — [7dac13de](https://mobbin.com/screens/7dac13de-4760-4219-9f58-dabea6659236).
+
+---
+
+## 6. Placement and ownership
+
+| Owner | Owns |
+|---|---|
+| Home (`activation` capability) | Checklist UI, state rendering, deep-links |
+| `HomeDashboardBuilder` | Additive facts: has contact, has deal, has activity, has second member, channel connected, first outcome |
+| `/settings/setup` | OAuth / channel steps only |
+| DataWorkspace empty states | Point at the next unfinished checklist item when relevant |
+
+P23 may add additive Home props. It must not add a second wizard or invent completion.
+
+---
+
+## 7. Behavior that must not change
 
 - Wizard step routes and OAuth callbacks (Google, Meta, Instagram, WhatsApp)
-- `HomeController` / `HomeDashboardBuilder` KPI contracts unless P23 adds additive props
+- `HomeController` KPI contracts except additive checklist facts
 - Simple mode
-- Empty Home copy when the workspace is truly empty (do not fake percentages)
+- Empty Home numbers stay empty
+- Official connector / “No Baileys” rules
 
 ---
 
-## Out of scope
+## 8. Out of scope
 
-- Marketing onboarding site
-- Forcing every workspace through WhatsApp before CRM use
-- Replacing `GuidedActions` categories without a Home PR
+- Marketing landing onboarding
+- Native mobile onboarding
+- Auto-enrolling sequences
+- Replacing `GuidedActions` deal/prospecting tabs without a Home PR (they may remain **beside** the checklist)
