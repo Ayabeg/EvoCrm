@@ -25,9 +25,11 @@ it('lands DataWorkspace with the sketched props and a thin CrmListShell adapter'
         ->and($types)->toContain('views: SavedView[]')
         ->and($types)->toContain('filterFields: ListFieldDef[]')
         ->and($types)->toContain('columnDefs: ListColumnDef[]')
+        ->and($types)->toContain("resultMode: 'shared-table'")
+        ->and($types)->toContain("resultMode: 'domain'")
         ->and($types)->toContain('rowHref: (row: Row) => string')
         ->and($types)->toContain("mode?: 'list' | 'board'")
-        ->and($types)->toContain('selectedIds: number[]');
+        ->and($types)->toContain('selectedIds?: number[]');
 
     expect($workspace)->toContain('SavedViews')
         ->and($workspace)->toContain('FilterBar')
