@@ -25,6 +25,7 @@ const OBJECT_NOUNS: Record<ListObjectType, string> = {
     quote: 'quotes',
 };
 
+/** Thin Inertia mapper. Domain result mode until P03B–P08 own rows. */
 export function CrmListShell({
     title,
     entity,
@@ -101,7 +102,8 @@ export function CrmListShell({
     void primaryClassName;
 
     return (
-        <DataWorkspace<{ id: number }>
+        <DataWorkspace
+            resultMode="domain"
             object={entity}
             title={title}
             description={description}
@@ -152,17 +154,12 @@ export function CrmListShell({
             }))}
             columns={columns}
             columnDefs={listView?.columnDefs ?? []}
-            rows={[]}
-            rowHref={(row) => `${basePath}/${row.id}`}
             onColumnsChange={setColumns}
             sort={
                 listView?.sort
                     ? { id: listView.sort.field, dir: listView.sort.direction }
                     : undefined
             }
-            selectedIds={[]}
-            onSelectedIdsChange={() => undefined}
-            empty={{ title: '', body: '' }}
             extraQuery={query}
             basePath={basePath}
             filterContext={{ members, cities, wilayas, stages }}
@@ -177,8 +174,7 @@ export function CrmListShell({
             mode={entity === 'deal' ? 'list' : undefined}
             className={className}
             contentClassName={contentClassName}
-        >
-            {(nextColumns) => (
+            renderResults={(nextColumns) => (
                 <>
                     {entity === 'deal' || entity === 'ticket' ? (
                         <StagePills
@@ -202,6 +198,6 @@ export function CrmListShell({
                     {typeof children === 'function' ? children(nextColumns) : children}
                 </>
             )}
-        </DataWorkspace>
+        />
     );
 }
