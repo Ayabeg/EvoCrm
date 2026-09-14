@@ -77,7 +77,7 @@ Footer                Settings
 
 | Object | Page | Shell | Table | Create | Bulk | Saved views |
 |---|---|---|---|---|---|---|
-| Contacts | `pages/crm/contacts/index.tsx` | CrmListShell (no CrmShell) | ListViewTable (workspace selection) | CreateDrawer | Domain BulkActionBar (shared selection) | Yes |
+| Contacts | `pages/crm/contacts/index.tsx` | CrmListShell → DataWorkspace `shared-table` (no CrmShell) | ListDataTable / ListViewTable (workspace selection) | CreateDrawer | Domain BulkActionBar via workspace `bulk` slot | Yes |
 | Companies | `pages/crm/companies/index.tsx` | **CrmShell + CrmListShell** | ListViewTable (selection wired, not selectable) | CreateDrawer | No | Yes |
 | Deals list | `pages/crm/deals/index.tsx` | CrmListShell | ListViewTable (workspace selection) | CreateDrawer | Domain BulkActionBar (shared selection) | Yes + stage pills |
 | Deals board | `pages/crm/deals/board.tsx` | Custom CrmObjectHeader | PipelineKanban | CreateDrawer | No | Board options, not DataWorkspace views |

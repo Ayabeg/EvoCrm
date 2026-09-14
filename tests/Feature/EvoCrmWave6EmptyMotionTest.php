@@ -42,7 +42,7 @@ it('wires Home, Contacts, and Deals empties through the shared components', func
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
 
     expect($home)->toContain('HomeWidgetEmpty')
-        ->and($contacts)->toContain('CrmEmptyState')
+        ->and($contacts)->toContain('contactEmptyState')
         ->and($deals)->toContain('CrmEmptyState')
         ->and($board)->toContain('EmptyState')
         ->and($board)->toContain('density="banner"')

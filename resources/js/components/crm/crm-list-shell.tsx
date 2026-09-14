@@ -5,7 +5,11 @@ import { listFilterChips } from '@/components/crm/list-query';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { StagePills } from '@/components/crm/stage-pills';
 import { DataWorkspace, viewHref } from '@/ds/workspace/DataWorkspace';
-import type { WorkspaceSelection, WorkspaceSelectionInput } from '@/ds/workspace/selection';
+import type { RowId, WorkspaceSelection, WorkspaceSelectionInput } from '@/ds/workspace/selection';
+import type {
+    DataWorkspaceEmpty,
+    DataWorkspacePaginator,
+} from '@/ds/workspace/types';
 import {
     applyStageFilter,
     fromActiveFilters,
@@ -19,6 +23,7 @@ import type {
     ListViewMeta,
     SavedView,
 } from '@/lib/list-view-config';
+import { applyContactColumnContract } from '@/pages/crm/contacts/contact-columns';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -33,13 +38,39 @@ const OBJECT_NOUNS: Record<ListObjectType, string> = {
     quote: 'quotes',
 };
 
+type InertiaPaginator = {
+    page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+};
+
+function toWorkspacePaginator(
+    paginator?: DataWorkspacePaginator | InertiaPaginator,
+): DataWorkspacePaginator | undefined {
+    if (!paginator) {
+        return undefined;
+    }
+
+    if ('perPage' in paginator) {
+        return paginator;
+    }
+
+    return {
+        page: paginator.page,
+        perPage: paginator.per_page,
+        total: paginator.total,
+        lastPage: paginator.last_page,
+    };
+}
+
 /**
- * Thin Inertia mapper. Domain result mode; selection is a workspace capability.
- * P03D empty / paginator / board helpers live on DataWorkspace shared-table
- * (and the board slot in both modes). Domain pages keep CrmEmptyState +
- * CrmListFooter in children until P04–P08. Optional `board` is the P11 slot.
+ * Thin Inertia mapper. Domain result mode remains the default for
+ * Companies / Deals / Quotes / Tickets (CrmEmptyState + CrmListFooter
+ * in children until P05–P08). Contacts uses resultMode="shared-table".
+ * Optional `board` is the P11 slot.
  */
-export function CrmListShell({
+export function CrmListShell<Row extends { id: RowId }>({
     title,
     entity,
     basePath,
@@ -55,6 +86,7 @@ export function CrmListShell({
     contacts = [],
     stages = [],
     stagePills = [],
+    exportHref,
     createHref,
     onCreate,
     banner,
@@ -69,6 +101,13 @@ export function CrmListShell({
     mode,
     onModeChange,
     board,
+    resultMode = 'domain',
+    rows,
+    rowHref,
+    empty,
+    paginator,
+    loading,
+    bulk,
     children,
 }: {
     title: string;
@@ -101,7 +140,14 @@ export function CrmListShell({
     mode?: 'list' | 'board';
     onModeChange?: (mode: 'list' | 'board') => void;
     board?: ReactNode;
-    children:
+    resultMode?: 'domain' | 'shared-table';
+    rows?: Row[];
+    rowHref?: (row: Row) => string;
+    empty?: DataWorkspaceEmpty;
+    paginator?: DataWorkspacePaginator | InertiaPaginator;
+    loading?: boolean;
+    bulk?: ReactNode | ((selection: WorkspaceSelection) => ReactNode);
+    children?:
         | ReactNode
         | ((
               columns: ListViewColumn[],
@@ -116,6 +162,11 @@ export function CrmListShell({
             ? `${recordCount.toLocaleString()} ${noun}`
             : undefined;
     const query = extraQuery ?? {};
+    const columnDefs =
+        entity === 'contact'
+            ? applyContactColumnContract(listView?.columnDefs ?? [])
+            : (listView?.columnDefs ?? []);
+    const sharedPaginator = toWorkspacePaginator(paginator);
 
     useEffect(() => {
         // Inertia can replace the active saved view without remounting this shell.
@@ -127,86 +178,106 @@ export function CrmListShell({
     void contacts;
     void primaryClassName;
 
+    const chrome = {
+        object: entity,
+        title,
+        description,
+        primaryAction: {
+            label: primaryLabel,
+            onClick: () => {
+                if (onCreate) {
+                    onCreate();
+
+                    return;
+                }
+
+                window.location.href = createHref ?? `${basePath}?create=1`;
+            },
+        },
+        views: savedFilters ?? [],
+        activeViewId: activeFilters.filter_id
+            ? String(activeFilters.filter_id)
+            : String(activeFilters.view ?? 'all'),
+        onViewChange: (id: string | null) => {
+            // SavedViews <Link href={viewHref(...)}> owns the visit.
+            // Do not router.get here — that was a double navigation.
+            void viewHref(
+                basePath,
+                activeFilters,
+                id,
+                query,
+                auth.user.id,
+                entity as ListQueryObject,
+            );
+        },
+        filters: activeFilters,
+        onFiltersChange: () => {
+            // AdvancedFilterDrawer applies via GET + list-query. Do not
+            // invent a second filter write path here.
+        },
+        filterFields: listView?.filterFields ?? [],
+        chips: listFilterChips(activeFilters, members).map((chip) => ({
+            id: chip.key,
+            label: `${chip.label}: ${chip.value}`,
+            onRemove: () => {
+                navigateListQuery(
+                    basePath,
+                    fromActiveFilters(activeFilters, query),
+                    { filters: { [chip.key as ListQueryFilterKey]: null } },
+                    entity as ListQueryObject,
+                    { preserveState: true },
+                );
+            },
+        })),
+        columns,
+        columnDefs,
+        onColumnsChange: setColumns,
+        sort: listView?.sort
+            ? { id: listView.sort.field, dir: listView.sort.direction as 'asc' | 'desc' }
+            : undefined,
+        extraQuery: query,
+        basePath,
+        selection,
+        filterContext: { members, cities, wilayas, stages },
+        secondaryActions: headerActions,
+        banner,
+        filterExtra: (
+            <>
+                {layoutToggle}
+                {pipelineSwitcher}
+            </>
+        ),
+        mode: mode ?? (entity === 'deal' ? 'list' as const : undefined),
+        onModeChange,
+        board,
+        className,
+        contentClassName,
+        exportHref,
+        bulk,
+    };
+
+    if (resultMode === 'shared-table') {
+        if (!rows || !rowHref || !empty) {
+            throw new Error('shared-table CrmListShell requires rows, rowHref, and empty');
+        }
+
+        return (
+            <DataWorkspace
+                {...chrome}
+                resultMode="shared-table"
+                rows={rows}
+                rowHref={rowHref}
+                empty={empty}
+                paginator={sharedPaginator}
+                loading={loading}
+            />
+        );
+    }
+
     return (
         <DataWorkspace
+            {...chrome}
             resultMode="domain"
-            object={entity}
-            title={title}
-            description={description}
-            primaryAction={{
-                label: primaryLabel,
-                onClick: () => {
-                    if (onCreate) {
-                        onCreate();
-
-                        return;
-                    }
-
-                    window.location.href = createHref ?? `${basePath}?create=1`;
-                },
-            }}
-            views={savedFilters ?? []}
-            activeViewId={
-                activeFilters.filter_id
-                    ? String(activeFilters.filter_id)
-                    : String(activeFilters.view ?? 'all')
-            }
-            onViewChange={(id) => {
-                // SavedViews <Link href={viewHref(...)}> owns the visit.
-                // Do not router.get here — that was a double navigation.
-                void viewHref(
-                    basePath,
-                    activeFilters,
-                    id,
-                    query,
-                    auth.user.id,
-                    entity as ListQueryObject,
-                );
-            }}
-            filters={activeFilters}
-            onFiltersChange={() => {
-                // AdvancedFilterDrawer applies via GET + list-query. Do not
-                // invent a second filter write path here.
-            }}
-            filterFields={listView?.filterFields ?? []}
-            chips={listFilterChips(activeFilters, members).map((chip) => ({
-                id: chip.key,
-                label: `${chip.label}: ${chip.value}`,
-                onRemove: () => {
-                    navigateListQuery(
-                        basePath,
-                        fromActiveFilters(activeFilters, query),
-                        { filters: { [chip.key as ListQueryFilterKey]: null } },
-                        entity as ListQueryObject,
-                        { preserveState: true },
-                    );
-                },
-            }))}
-            columns={columns}
-            columnDefs={listView?.columnDefs ?? []}
-            onColumnsChange={setColumns}
-            sort={
-                listView?.sort
-                    ? { id: listView.sort.field, dir: listView.sort.direction }
-                    : undefined
-            }
-            extraQuery={query}
-            basePath={basePath}
-            selection={selection}
-            filterContext={{ members, cities, wilayas, stages }}
-            secondaryActions={headerActions}
-            banner={banner}
-            filterExtra={
-                <>
-                    {layoutToggle}
-                    {pipelineSwitcher}
-                </>
-            }
-            mode={mode ?? (entity === 'deal' ? 'list' : undefined)}
-            onModeChange={onModeChange}
-            board={board}
-            className={className}
-            contentClassName={contentClassName}
             renderResults={({ columns: nextColumns, selection: workspaceSelection }) => (
                 <>
                     {entity === 'deal' || entity === 'ticket' ? (

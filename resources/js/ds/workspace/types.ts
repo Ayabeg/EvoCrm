@@ -70,7 +70,13 @@ export type DataWorkspaceChromeProps = {
     onColumnsChange: (columns: ListViewColumn[]) => void;
     sort?: { id: string; dir: 'asc' | 'desc' };
 
-    bulk?: ReactNode;
+    /**
+     * Chrome bulk slot. A render function is allowed so shared-table pages
+     * can read workspace selection without a page-local selectedIds store.
+     */
+    bulk?: ReactNode | ((selection: WorkspaceSelection) => ReactNode);
+    /** Optional CSV export link rendered by WorkspacePaginator. */
+    exportHref?: string;
 
     mode?: 'list' | 'board';
     onModeChange?: (mode: 'list' | 'board') => void;

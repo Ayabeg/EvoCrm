@@ -13,9 +13,9 @@ it('rebuilds the contacts list as a HubSpot-dense workspace on the Wave 0 shell'
 
     expect($index)->toContain('data-crm="contacts-workspace"')
         ->and($index)->toContain('CrmListShell')
-        ->and($index)->toContain('ListViewTable')
+        ->and($index)->toContain('resultMode="shared-table"')
         ->and($index)->toContain('primaryLabel="Create contact"')
-        ->and($index)->toContain('CrmEmptyState')
+        ->and($index)->toContain('contactEmptyState')
         ->and($index)->toContain('hasActiveListFilters')
         ->and($index)->toContain('onCreate=')
         ->and($index)->not->toContain('CrmShell')
@@ -26,9 +26,13 @@ it('rebuilds the contacts list as a HubSpot-dense workspace on the Wave 0 shell'
         ->and($index)->not->toContain('#00A4BD')
         ->and($index)->not->toContain('#0176D3');
 
+    $identity = file_get_contents(resource_path('js/pages/crm/contacts/contact-columns.tsx'));
+
     expect($table)->toContain('ContactNameCell')
-        ->and($table)->toContain('lead_status')
-        ->and($table)->toContain('contactInitials');
+        ->and($table)->toContain('lead_status');
+
+    expect($identity)->toContain('ContactIdentityCell')
+        ->and($identity)->toContain('contactInitials');
 
     expect($query)->toContain("filters.q")
         ->and($query)->toContain('query !== \'\'');

@@ -77,13 +77,11 @@ Compile lock: `resources/js/ds/workspace/data-workspace-contract.ts` (`@ts-expec
 
 ## Compatibility mode
 
-Until P04–P08, every live list that uses the shell is **MODE B**:
+Contacts is **MODE A** (P04): `CrmListShell` → `resultMode="shared-table"` → `rows` / `rowHref` / `WorkspaceEmpty` / `WorkspacePaginator`.
 
-`CrmListShell` → `resultMode="domain"` → `renderResults` wraps stage pills + page children.
+Until P05–P08, Companies / Deals / Quotes / Tickets stay **MODE B**: `CrmListShell` → `resultMode="domain"` → `renderResults` wraps stage pills + page children.
 
-Pages do not import `DataWorkspace`. They do not pass `resultMode`. Visual tree is the same chrome + the same domain table / empty / footer.
-
-MODE A is real and typed. No page uses it yet.
+Pages still do not import `DataWorkspace` directly. Contacts now passes `resultMode="shared-table"`. Other list pages do not pass `resultMode`.
 
 ---
 

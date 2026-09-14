@@ -2,8 +2,12 @@ import { Link, router } from '@inertiajs/react';
 import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
 import type { RowId } from '@/ds/workspace/selection';
 import { resolveRowHref } from '@/ds/workspace/surface';
-import { contactInitials, formatContactName } from '@/lib/contact-name';
+import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
+import {
+    applyContactColumnContract,
+    ContactIdentityCell as ContactNameCell,
+} from '@/pages/crm/contacts/contact-columns';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
@@ -106,47 +110,6 @@ function formatDate(value?: string | null, withTime = false): string {
             ? { hour: '2-digit', minute: '2-digit', hour12: false }
             : {}),
     }).format(parsed);
-}
-
-function ContactNameCell({
-    row,
-    href,
-    linked = true,
-}: {
-    row: ContactRow;
-    href: string;
-    linked?: boolean;
-}) {
-    const name = formatContactName(row.first_name, row.last_name);
-    const initials = contactInitials(row.first_name, row.last_name);
-    const body = (
-        <>
-            <span
-                className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-[10px] leading-none font-medium text-white"
-                aria-hidden
-            >
-                {initials || '?'}
-            </span>
-            <span className="truncate">{name}</span>
-        </>
-    );
-
-    if (!linked) {
-        return (
-            <span className="inline-flex min-w-0 items-center gap-2 font-medium text-ink">
-                {body}
-            </span>
-        );
-    }
-
-    return (
-        <Link
-            href={href}
-            className="inline-flex min-w-0 items-center gap-2 font-medium text-ink hover:underline"
-        >
-            {body}
-        </Link>
-    );
 }
 
 function renderContactCell(columnId: string, row: ContactRow): string {
@@ -388,8 +351,10 @@ export default function ListViewTable({
     onTogglePage?: () => void;
     isRowSelectable?: (id: RowId) => boolean;
 }) {
+    const resolvedDefs =
+        entity === 'contact' ? applyContactColumnContract(columnDefs) : columnDefs;
     const visible = visibleColumns({
-        columnDefs,
+        columnDefs: resolvedDefs,
         filterFields: [],
         columns,
         sort: { field: 'created_at', direction: 'desc' },
@@ -439,9 +404,14 @@ export default function ListViewTable({
                             {visible.map((column) => (
                                 <th
                                     key={column.id}
-                                    className="h-12 px-4 text-[11px] font-medium text-mute md:px-8"
+                                    className={cn(
+                                        'h-12 px-4 font-medium text-mute md:px-8',
+                                        entity === 'contact'
+                                            ? 'text-[13px] leading-[18px]'
+                                            : 'text-[11px]',
+                                    )}
                                 >
-                                    {t(columnLabel(columnDefs, column.id))}
+                                    {t(columnLabel(resolvedDefs, column.id))}
                                 </th>
                             ))}
                         </tr>
@@ -455,7 +425,9 @@ export default function ListViewTable({
                             <tr
                                 key={row.id}
                                 className={cn(
-                                    'h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft',
+                                    entity === 'contact'
+                                        ? 'min-h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft'
+                                        : 'h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft',
                                     selected && 'bg-canvas-soft',
                                 )}
                                 onClick={(event) => {
@@ -469,7 +441,7 @@ export default function ListViewTable({
                                 }}
                             >
                                 {selectable ? (
-                                    <td className="h-12 px-4 md:px-8">
+                                    <td className={cn(entity === 'contact' ? 'min-h-12 py-2' : 'h-12', 'px-4 md:px-8')}>
                                         <input
                                             type="checkbox"
                                             checked={selected}
@@ -494,7 +466,8 @@ export default function ListViewTable({
                                         <td
                                             key={column.id}
                                             className={cn(
-                                                'h-12 px-4 md:px-8',
+                                                entity === 'contact' ? 'min-h-12 py-2' : 'h-12',
+                                                'px-4 md:px-8',
                                                 column.id === primaryId
                                                     ? 'font-medium text-ink'
                                                     : 'text-mute',
@@ -584,7 +557,7 @@ export default function ListViewTable({
                                                     className="flex justify-between gap-3"
                                                 >
                                                     <dt className="text-muted-foreground">
-                                                        {t(columnLabel(columnDefs, column.id))}
+                                                        {t(columnLabel(resolvedDefs, column.id))}
                                                     </dt>
                                                     <dd className="truncate text-ink">{value}</dd>
                                                 </div>
