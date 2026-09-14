@@ -66,7 +66,7 @@ Footer                Settings
 | CrmListShell adapter | `components/crm/crm-list-shell.tsx` | **ADAPTER KEEP TEMPORARILY** | Thin Inertia mapper. `resultMode="domain"` + `renderResults` + workspace `selection` (P03B). Domain children still own the table. No stub `rows` / `selectedIds` |
 | ListViewTable | `components/crm/list-view-table.tsx` | **ADAPTER KEEP TEMPORARILY** | Domain cell renderers. `ListDataTable` already delegates here |
 | Domain BulkActionBar | `components/crm/bulk-action-bar.tsx` | **ADAPTER KEEP TEMPORARILY** | Used by contacts + deals pages. DS `ds/workspace/BulkActionBar.tsx` exists in parallel |
-| list-query | `components/crm/list-query.ts`, `lib/list-view-config.ts` | **CANONICAL KEEP** | URL filters, chips, `/crm/filters` |
+| list-query | `lib/list-query/*`, `components/crm/list-query.ts`, `lib/list-view-config.ts` | **CANONICAL KEEP** | P03C canonical query + domain adapters. `list-query.ts` still owns chips + `filterFields` whitelist. URL is SoT |
 | FilterBuilder | `components/crm/filter-builder.tsx` | **CANONICAL KEEP** | Mounted inside AdvancedFilterDrawer |
 | list-toolbar + saved-view-tabs | `list-toolbar.tsx`, `saved-view-tabs.tsx` | **DEPRECATE** | No page imports. Only self-reference |
 | list-chrome header | `list-chrome.tsx` (`CrmListHeader`, `CrmListFooter`, `CrmEmptyState`) | **MIGRATE** | Activities still uses `CrmListHeader`. Footer/empty still used by adapter pages |

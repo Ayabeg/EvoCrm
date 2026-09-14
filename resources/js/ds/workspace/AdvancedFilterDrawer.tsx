@@ -10,9 +10,10 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from '@/components/ui/drawer';
+import type { DataWorkspaceEntity, DataWorkspaceFilterContext } from '@/ds/workspace/types';
+import { fromActiveFilters } from '@/lib/list-query';
 import type { ListFieldDef, ListViewFilters } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
-import type { DataWorkspaceEntity, DataWorkspaceFilterContext } from '@/ds/workspace/types';
 
 export function AdvancedFilterDrawer({
     open,
@@ -36,6 +37,7 @@ export function AdvancedFilterDrawer({
     onFiltersChange: (next: ListViewFilters) => void;
 }) {
     const fields = filterFields(filters);
+    const current = fromActiveFilters(filters, extraQuery);
     const cities = filterContext?.cities ?? [];
     const wilayas = filterContext?.wilayas ?? [];
     const [groups, setGroups] = useState<ListViewFilters>(() =>
@@ -43,6 +45,8 @@ export function AdvancedFilterDrawer({
     );
 
     useEffect(() => {
+        // Drawer draft resets from Inertia filters when the URL query changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setGroups(filterGroupsFromActive(filters));
     }, [filters]);
 
@@ -71,6 +75,12 @@ export function AdvancedFilterDrawer({
                                 <input key={key} type="hidden" name={key} value={String(value)} />
                             ),
                         )}
+                        {current.sort ? (
+                            <>
+                                <input type="hidden" name="sort" value={current.sort.field} />
+                                <input type="hidden" name="direction" value={current.sort.direction} />
+                            </>
+                        ) : null}
                         <input type="hidden" name="view" value={String(fields.view ?? 'all')} />
                         {fields.filter_id ? (
                             <input type="hidden" name="filter_id" value={String(fields.filter_id)} />
@@ -104,6 +114,7 @@ export function AdvancedFilterDrawer({
                             <label className="grid gap-1 text-[13px] text-ink">
                                 City
                                 <select
+                                    key={`city:${String(fields.city ?? '')}`}
                                     name="city"
                                     defaultValue={String(fields.city ?? '')}
                                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
@@ -121,6 +132,7 @@ export function AdvancedFilterDrawer({
                             <label className="grid gap-1 text-[13px] text-ink">
                                 Wilaya
                                 <select
+                                    key={`wilaya:${String(fields.wilaya ?? '')}`}
                                     name="wilaya"
                                     defaultValue={String(fields.wilaya ?? '')}
                                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
@@ -136,6 +148,7 @@ export function AdvancedFilterDrawer({
                         ) : null}
                         <label className="flex h-9 items-center gap-2 text-[13px] text-ink">
                             <input
+                                key={`unanswered:${fields.unanswered ? '1' : '0'}`}
                                 type="checkbox"
                                 name="unanswered"
                                 value="1"
@@ -145,6 +158,7 @@ export function AdvancedFilterDrawer({
                         </label>
                         <label className="flex h-9 items-center gap-2 text-[13px] text-ink">
                             <input
+                                key={`unassigned:${fields.unassigned ? '1' : '0'}`}
                                 type="checkbox"
                                 name="unassigned"
                                 value="1"

@@ -1,4 +1,10 @@
-import { router } from '@inertiajs/react';
+import {
+    applyPipeline,
+    emptyCanonicalListQuery,
+    fromActiveFilters,
+    visitListQuery,
+} from '@/lib/list-query';
+import type { ActiveFilterBag, ListQueryExtraInput } from '@/lib/list-query/serialize';
 
 type PipelineOption = {
     id: number;
@@ -10,23 +16,43 @@ export default function PipelineSwitcher({
     pipelineId,
     pipelines,
     basePath,
+    activeFilters,
+    extraQuery,
 }: {
     pipelineId: number;
     pipelines: PipelineOption[];
     basePath: '/crm/deals' | '/crm/deals/board';
+    activeFilters?: ActiveFilterBag;
+    extraQuery?: ListQueryExtraInput;
 }) {
     if (pipelines.length <= 1) {
         return null;
     }
+
+    const extras = extraQuery ?? { pipeline: pipelineId };
+    const isBoard = basePath === '/crm/deals/board';
+    const current = isBoard
+        ? {
+              ...emptyCanonicalListQuery(),
+              view: null,
+              extras: {
+                  pipeline:
+                      extras.pipeline === null || extras.pipeline === undefined || extras.pipeline === ''
+                          ? pipelineId
+                          : Number(extras.pipeline),
+              },
+          }
+        : fromActiveFilters(activeFilters ?? {}, extras);
 
     return (
         <select
             aria-label="Pipeline"
             value={pipelineId}
             onChange={(event) =>
-                router.get(
+                visitListQuery(
                     basePath,
-                    { pipeline: event.target.value },
+                    applyPipeline(current, Number(event.target.value)),
+                    'deal',
                     { preserveState: true, preserveScroll: true },
                 )
             }

@@ -184,7 +184,7 @@ it('leaves list-query URL keys and page filter write paths untouched', function 
         ->and($query)->toContain('page: page > 1 ? page : null');
 
     expect($shell)->toContain('viewHref(')
-        ->and($shell)->toContain('crmListHref(')
+        ->and($shell)->toContain('listQueryHref(')
         ->and($shell)->toContain('preserveState: true')
         ->and($workspace)->not->toContain('searchParams.set')
         ->and($workspace)->not->toContain('history.replaceState')

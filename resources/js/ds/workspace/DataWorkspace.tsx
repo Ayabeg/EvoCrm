@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { crmListHref, filterFields, listPageHref } from '@/components/crm/list-query';
+import { listPageHref } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +17,13 @@ import type {
     DataWorkspaceSharedTableProps,
 } from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
+import {
+    applyBuiltInView,
+    applySavedFilter,
+    fromActiveFilters,
+    listQueryHref,
+} from '@/lib/list-query';
+import type { ListQueryObject } from '@/lib/list-query';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 
@@ -182,6 +189,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
                 canManageSettings={canManageSettings}
             />
             <FilterBar
+                object={object as ListQueryObject}
                 basePath={basePath}
                 filters={filterRecord}
                 filterFields={fieldDefs}
@@ -322,20 +330,23 @@ export function viewHref(
     id: string | null,
     extraQuery: Record<string, string | number | null | undefined> = {},
     ownerId?: number,
+    object: ListQueryObject = 'contact',
 ): string {
-    const fields = filterFields(filters);
+    const current = fromActiveFilters(filters, extraQuery);
 
     if (id && /^\d+$/.test(id)) {
-        return crmListHref(basePath, { ...extraQuery, filter_id: Number(id) });
+        return listQueryHref(basePath, applySavedFilter(current, Number(id)), object);
     }
 
-    const patch: Record<string, unknown> = {
-        view: id ?? 'all',
-        filter_id: null,
-        owner: id === 'my' && ownerId ? ownerId : null,
-    };
-
-    return crmListHref(basePath, { ...fields, ...extraQuery }, patch);
+    return listQueryHref(
+        basePath,
+        applyBuiltInView(
+            current,
+            id ?? 'all',
+            id === 'my' && ownerId ? ownerId : null,
+        ),
+        object,
+    );
 }
 
 export type { DataWorkspaceProps } from '@/ds/workspace/types';
