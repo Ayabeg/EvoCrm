@@ -64,15 +64,15 @@ it('ships a grouped 64/240 paper rail in the EvoCrm triad', function () {
         ->and($rail)->not->toContain('#000000');
 });
 
-it('places Search EvoCRM on the top bar with AI, Create, Notifications, and Profile', function () {
+it('places Search EvoCRM on the top bar with Ask Evo, Create, Tasks, and Profile', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
 
     expect($header)->toContain('AppLogoIcon')
         ->and($header)->toContain("t('Search EvoCRM…')")
         ->and($header)->toContain('⌘K')
         ->and($header)->toContain('useCommandPaletteShortcut')
-        ->and($header)->toContain("t('AI')")
-        ->and($header)->toContain("t('Notifications')")
+        ->and($header)->toContain("t('Ask Evo')")
+        ->and($header)->toContain("t('Tasks')")
         ->and($header)->toContain("t('Create')")
         ->and($header)->toContain('/crm/quotes?create=1')
         ->and($header)->toContain("from '@phosphor-icons/react'")

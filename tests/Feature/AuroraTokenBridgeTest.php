@@ -224,7 +224,7 @@ it('names topbar icon-only actions for assistive tech', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
 
     expect($header)->toContain("t('Create')");
-    expect($header)->toContain("t('Notifications')");
+    expect($header)->toContain("t('Tasks')");
     expect($header)->toContain("t(':name account menu'");
 });
 
