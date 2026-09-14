@@ -286,6 +286,7 @@ export default function DealBoard({
                                     pipelineId={pipeline.id}
                                     pipelines={pipelines}
                                     basePath="/crm/deals/board"
+                                    extraQuery={{ pipeline: pipeline.id }}
                                 />
                                 <DealLayoutToggle
                                     current="board"

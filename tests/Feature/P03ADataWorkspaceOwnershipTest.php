@@ -117,7 +117,7 @@ it('preserves list-query URL keys and does not add a second write path', functio
         ->and($query)->toContain('page: page > 1 ? page : null');
 
     expect($shell)->toContain('viewHref(')
-        ->and($shell)->toContain('crmListHref(')
+        ->and($shell)->toContain('listQueryHref(')
         ->and($shell)->toContain('preserveState: true')
         ->and($shell)->toContain('AdvancedFilterDrawer applies via GET + list-query')
         ->and($workspace)->toContain('listPageHref')

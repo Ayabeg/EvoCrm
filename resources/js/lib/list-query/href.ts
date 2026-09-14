@@ -13,8 +13,22 @@ export function writeListHref(
             continue;
         }
 
+        if (Array.isArray(value) && value.length === 0) {
+            continue;
+        }
+
         if (key === 'filter_groups' && typeof value === 'object') {
+            const groups = value as { groups?: unknown[] };
+
+            if (!groups.groups?.length) {
+                continue;
+            }
+
             params.set(key, JSON.stringify(value));
+            continue;
+        }
+
+        if (typeof value === 'object') {
             continue;
         }
 

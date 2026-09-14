@@ -1,9 +1,10 @@
-import { listQueryAdapter } from '@/lib/list-query/adapters';
+import { listQueryAdapter, listQueryObjectFromPath } from '@/lib/list-query/adapters';
+import { patchListQuery } from '@/lib/list-query/patch';
 import {
     emptyToNull,
     isEmptyFilterGroups,
-    isListQuerySort,
     normalizePage,
+    parseUrlSort,
     toOptionalBoolean,
     toOptionalNumber,
 } from '@/lib/list-query/empty';
@@ -15,6 +16,7 @@ import type {
     ListQueryExtras,
     ListQueryFilterKey,
     ListQueryObject,
+    ListQueryPatch,
 } from '@/lib/list-query/types';
 import type { ListViewFilters } from '@/lib/list-view-config';
 
@@ -36,6 +38,8 @@ export type ActiveFilterBag = {
     channel?: unknown;
     filter_groups?: unknown;
     sort?: unknown;
+    direction?: unknown;
+    pipeline?: unknown;
 };
 
 export type ListQueryExtraInput = {
@@ -86,8 +90,10 @@ export function fromActiveFilters(
             channel: emptyToNull(filters.channel),
         },
         filterGroups: parseFilterGroups(filters.filter_groups),
-        sort: isListQuerySort(filters.sort) ? filters.sort : null,
-        extras: extrasFromInput(extra),
+        sort: parseUrlSort(filters.sort, filters.direction),
+        extras: extrasFromInput({
+            pipeline: extra?.pipeline ?? filters.pipeline,
+        }),
     };
 }
 
@@ -150,6 +156,11 @@ export function toDomainParams(
 
     if (adapter.extras.includes('pipeline') && query.extras.pipeline !== null) {
         params.pipeline = query.extras.pipeline;
+    }
+
+    if (query.sort) {
+        params.sort = query.sort.field;
+        params.direction = query.sort.direction;
     }
 
     return params;
@@ -226,6 +237,14 @@ export function domainParamsToBag(params: DomainListParams): Record<string, unkn
         bag.pipeline = params.pipeline;
     }
 
+    if (params.sort !== undefined) {
+        bag.sort = params.sort;
+    }
+
+    if (params.direction !== undefined) {
+        bag.direction = params.direction;
+    }
+
     return bag;
 }
 
@@ -242,4 +261,30 @@ export function listQueryHref(
 
 export function domainParamKeys(params: DomainListParams): string[] {
     return Object.keys(domainParamsToBag(params));
+}
+
+/**
+ * Patch the query derived from Inertia filters and write one href.
+ * Navigation must use this (or `navigateListQuery`) — not `filterFields`.
+ */
+export function hrefFromActiveFilters(
+    basePath: string,
+    filters: ActiveFilterBag,
+    extra: ListQueryExtraInput | Record<string, unknown> | undefined,
+    patch: ListQueryPatch,
+    object?: ListQueryObject,
+): string {
+    const resolved = object ?? listQueryObjectFromPath(basePath);
+    const extras: ListQueryExtraInput = {
+        pipeline:
+            extra && 'pipeline' in extra
+                ? (extra.pipeline as ListQueryExtraInput['pipeline'])
+                : undefined,
+    };
+
+    return listQueryHref(
+        basePath,
+        patchListQuery(fromActiveFilters(filters, extras), patch),
+        resolved,
+    );
 }

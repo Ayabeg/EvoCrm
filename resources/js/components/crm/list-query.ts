@@ -1,4 +1,6 @@
+import { listQueryObjectFromPath } from '@/lib/list-query/adapters';
 import { writeListHref } from '@/lib/list-query/href';
+import { hrefFromActiveFilters } from '@/lib/list-query/serialize';
 
 export type ListFilters = Record<string, unknown>;
 
@@ -12,6 +14,12 @@ export function crmListHref(
     return writeListHref(base, merged);
 }
 
+/**
+ * Chrome-filter projection for chips and GET forms.
+ * Not the workspace query bag — it omits page, extras.pipeline,
+ * URL sort/direction, and association keys. Navigation must use
+ * `hrefFromActiveFilters` / `navigateListQuery` so siblings survive.
+ */
 export function filterFields(filters: ListFilters): ListFilters {
     return {
         view: filters.view,
@@ -51,9 +59,13 @@ export function listPageHref(
     page: number,
     extra: ListFilters = {},
 ): string {
-    return crmListHref(base, { ...filterFields(filters), ...extra }, {
-        page: page > 1 ? page : null,
-    });
+    return hrefFromActiveFilters(
+        base,
+        filters,
+        extra,
+        { page: page > 1 ? page : null },
+        listQueryObjectFromPath(base),
+    );
 }
 
 export function hasActiveListFilters(filters: ListFilters): boolean {

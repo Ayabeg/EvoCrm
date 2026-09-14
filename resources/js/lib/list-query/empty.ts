@@ -63,6 +63,30 @@ export function isListQuerySort(value: unknown): value is ListQuerySort {
     );
 }
 
+/**
+ * URL-owned sort only. Inertia `activeFilters.sort` is often the
+ * saved-view / default object — that is listView state, not a URL param.
+ */
+export function parseUrlSort(
+    sort: unknown,
+    direction: unknown,
+): ListQuerySort | null {
+    if (typeof sort !== 'string') {
+        return null;
+    }
+
+    const field = sort.trim();
+
+    if (field === '') {
+        return null;
+    }
+
+    return {
+        field,
+        direction: direction === 'asc' ? 'asc' : 'desc',
+    };
+}
+
 export function emptyToNull(value: unknown): string | null {
     if (value === null || value === undefined || value === false) {
         return null;

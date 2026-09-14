@@ -51,7 +51,12 @@ it('defines an explicit canonical list query contract with domain adapters', fun
         ->and($contract)->toContain('companies request shape')
         ->and($contract)->toContain('deals request shape')
         ->and($contract)->toContain('quotes request shape')
-        ->and($contract)->toContain('leads emit no list query');
+        ->and($contract)->toContain('leads emit no list query')
+        ->and($contract)->toContain('stage preserves search/filters/sort/view/pipeline and resets page')
+        ->and($contract)->toContain('pipeline preserves search/filters/sort/view and drops stage')
+        ->and($contract)->toContain('filter sibling preservation keeps q/sort/direction/view')
+        ->and($contract)->toContain('empty removal deletes only that param')
+        ->and($contract)->toContain('back/forward reconstruction from query hrefs');
 });
 
 it('treats URL and Inertia props as the list query source of truth', function () {
@@ -78,9 +83,11 @@ it('treats URL and Inertia props as the list query source of truth', function ()
     expect($shell)->toContain('navigateListQuery(')
         ->and($shell)->toContain('Do not router.get here')
         ->and($shell)->toContain('viewHref(')
-        ->and($shell)->toContain('crmListHref(')
+        ->and($shell)->toContain('listQueryHref(')
+        ->and($shell)->toContain('applyStageFilter(')
         ->and($shell)->toContain('preserveState: true')
-        ->and($shell)->not->toContain('router.get(');
+        ->and($shell)->not->toContain('router.get(')
+        ->and($shell)->not->toContain('filterFields(activeFilters)');
 
     expect($workspace)->toContain('listPageHref')
         ->and($workspace)->toContain('fromActiveFilters(')
@@ -194,6 +201,43 @@ it('keeps existing backend request params for Contacts Companies Leads Deals and
             ->has('leads')
             ->missing('activeFilters')
         );
+});
+
+it('preserves sibling list query keys when switching pipeline or stage', function () {
+    $switcher = file_get_contents(resource_path('js/components/crm/pipeline-switcher.tsx'));
+    $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
+    $query = file_get_contents(resource_path('js/components/crm/list-query.ts'));
+    $keys = file_get_contents(resource_path('js/lib/list-query/keys.ts'));
+    $navigate = file_get_contents(resource_path('js/lib/list-query/navigate.ts'));
+    $bar = file_get_contents(resource_path('js/ds/workspace/FilterBar.tsx'));
+    $views = file_get_contents(resource_path('js/ds/workspace/SavedViews.tsx'));
+
+    expect($switcher)->toContain('visitListQuery(')
+        ->and($switcher)->toContain('applyPipeline(')
+        ->and($switcher)->toContain('fromActiveFilters(')
+        ->and($switcher)->toContain('preserveScroll: true')
+        ->and($switcher)->not->toContain('router.get(')
+        ->and($switcher)->not->toContain('{ pipeline: event.target.value }');
+
+    expect($shell)->toContain('applyStageFilter(')
+        ->and($shell)->toContain('listQueryHref(')
+        ->and($shell)->not->toContain('crmListHref(');
+
+    expect($query)->toContain('Not the workspace query bag')
+        ->and($query)->toContain('hrefFromActiveFilters(')
+        ->and($query)->toContain('page: page > 1 ? page : null');
+
+    expect($keys)->toContain('CANONICAL_WORKSPACE_KEYS')
+        ->and($keys)->toContain('CHROME_FILTER_KEYS')
+        ->and($keys)->toContain('UNRELATED_PRESERVED_KEYS')
+        ->and($keys)->toContain('UNSAFE_QUERY_KEYS')
+        ->and($keys)->toContain('BACKEND_ASSOCIATION_KEYS');
+
+    expect($navigate)->toContain('visitListQuery')
+        ->and($navigate)->toContain('router.get(href, {}, {')
+        ->and($bar)->not->toContain('useEffect')
+        ->and($views)->not->toContain('router.get')
+        ->and($views)->not->toContain('onClick={() => onViewChange');
 });
 
 it('does not change list routes for the five CRM objects', function () {

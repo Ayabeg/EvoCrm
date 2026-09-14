@@ -20,7 +20,7 @@ List chrome wrote GET URLs from a loose `Record<string, unknown>` bag (`filterFi
 | CrmListShell chips | Separate `router.get` |
 | AdvancedFilterDrawer | GET form (one visit) + local draft groups |
 | Pages `listPageHref` | Pagination Links; `page` omitted when `<= 1` |
-| PipelineSwitcher | `router.get(base, { pipeline })` — drops other query keys (unchanged) |
+| PipelineSwitcher | `router.get(base, { pipeline })` — dropped siblings (fixed in hardening) |
 
 `page` was never in `filterFields`, so search / filter / view naturally dropped it.  
 `sort` and `columns` were never URL-backed. Sort comes from the saved view or `ListViewConfig::defaultSort`. Columns are session React state in `CrmListShell` synced from `listView.columns`.  
@@ -113,6 +113,7 @@ Verified against pre-P03C `filterFields` (no `page`) and `listPageHref` (`page >
 | Search / search clear | reset (omit) |
 | Quick filter / chip / clear all | reset |
 | Built-in or saved view | reset |
+| Stage pill / pipeline switch | reset |
 | Sort patch (canonical only) | reset |
 | Page prev/next | **keep** search, filters, view, extras, sort |
 
@@ -167,9 +168,27 @@ Proofs: `resources/js/lib/list-query/list-query-contract.ts`.
 | 11 | Saved-view change |
 | 12 | Permitted extras (`pipeline`) survive |
 | 13 | One `router.get` helper; SavedViews Links have no `onClick` navigate; no effect loops |
+| H1 | Stage / pipeline preserve q, filters, sort, direction, view, extras |
+| H2 | Empty removal deletes only that param |
+| H3 | Back/forward reconstruction from hrefs |
+| H4 | Board pipeline does not leak list keys |
 | 14–18 | Request shapes Contacts / Companies / Leads / Deals / Quotes |
 | 19 | P03B selection not cleared |
 | 20 | Backend routes unchanged |
+
+---
+
+## Hardening — query preservation
+
+| Bug | Fix |
+|---|---|
+| PipelineSwitcher `router.get(base, { pipeline })` dropped siblings | `applyPipeline` + `visitListQuery`. Preserves q / filters / sort / direction / view / extras. Drops `stage` (pipeline-scoped). Resets page. Board path emits only `pipeline` (list keys are invalid there). |
+| Stage pills `crmListHref(..., filterFields(...), { stage })` dropped `pipeline` / sort | `applyStageFilter` + `listQueryHref` from `fromActiveFilters` + extras. |
+| `filterFields` used as the nav bag | Documented as chrome-filter projection only. Navigation uses `hrefFromActiveFilters` / `navigateListQuery`. `listPageHref` goes through the canonical helper. |
+
+Key classes (`lib/list-query/keys.ts`): canonical workspace · chrome filter · unrelated preserved (`sort`, `direction`, `pipeline`) · backend association (still via `filter_groups`) · unsafe (`owner_id`, `columns`, `create`, `contact_id`, `mode`).
+
+URL-owned `sort` + `direction` (`?sort=amount&direction=desc`) reconstruct into `CanonicalListQuery.sort` and are re-emitted. Inertia `activeFilters.sort` objects from saved-view defaults are **not** URL-owned and are not written.
 
 ---
 
@@ -177,12 +196,11 @@ Proofs: `resources/js/lib/list-query/list-query-contract.ts`.
 
 | Divergence | Why kept |
 |---|---|
-| `filterFields` whitelist omits `deal_stage`, `has_open_deal`, behavior filters | Chrome already dropped them; no silent preserve |
-| Stage pills omit `pipeline` | Pre-existing; not this PR |
-| PipelineSwitcher sends only `{ pipeline }` | Pre-existing; not this PR |
+| `filterFields` / chrome omit `deal_stage`, `has_open_deal`, behavior filters | Backend-supported; chrome writes them through `filter_groups`. Not widened onto the FilterBar projection. |
+| DealLayoutToggle still sends only `pipeline` | Board/list routes — P11 |
 | Quotes skip `CrmFilter::resolve` | Backend contract |
 | Tickets share chrome adapters | Out of page scope; params preserved |
-| `view=all` still serialized when present | Pre-existing `crmListHref` |
+| `view=all` still serialized when present on list pages | Pre-existing `crmListHref` / backend `activeFilters.view` |
 
 ---
 

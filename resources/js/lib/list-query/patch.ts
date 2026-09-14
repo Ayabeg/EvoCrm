@@ -54,7 +54,7 @@ export function patchListQuery(
     const next: CanonicalListQuery = {
         search: current.search,
         page: current.page,
-        view: current.view ?? 'all',
+        view: current.view,
         savedViewId: current.savedViewId,
         filters: { ...current.filters },
         filterGroups: current.filterGroups,
@@ -67,7 +67,7 @@ export function patchListQuery(
     }
 
     if (patch.view !== undefined) {
-        next.view = emptyToNull(patch.view) ?? 'all';
+        next.view = emptyToNull(patch.view);
     }
 
     if (patch.savedViewId !== undefined) {
@@ -158,4 +158,32 @@ export function applySavedFilter(
             ...extras,
         },
     };
+}
+
+/**
+ * Pipeline switch. Stage slugs are pipeline-scoped — drop `stage`.
+ * Preserve search, filters, sort, view, saved view, extras besides pipeline.
+ * Meaning change resets page.
+ */
+export function applyPipeline(
+    current: CanonicalListQuery,
+    pipelineId: number | null,
+): CanonicalListQuery {
+    return patchListQuery(current, {
+        extras: { pipeline: pipelineId },
+        filters: { stage: null },
+    });
+}
+
+/**
+ * Deal stage pill / ticket status pill. Preserve pipeline and unrelated keys.
+ */
+export function applyStageFilter(
+    current: CanonicalListQuery,
+    slug: string | null,
+    key: 'stage' | 'status' = 'stage',
+): CanonicalListQuery {
+    return patchListQuery(current, {
+        filters: { [key]: slug },
+    });
 }

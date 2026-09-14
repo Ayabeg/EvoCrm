@@ -1,13 +1,15 @@
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { crmListHref, filterFields, listFilterChips } from '@/components/crm/list-query';
+import { listFilterChips } from '@/components/crm/list-query';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { StagePills } from '@/components/crm/stage-pills';
 import { DataWorkspace, viewHref } from '@/ds/workspace/DataWorkspace';
 import type { WorkspaceSelection, WorkspaceSelectionInput } from '@/ds/workspace/selection';
 import {
+    applyStageFilter,
     fromActiveFilters,
+    listQueryHref,
     navigateListQuery,
 } from '@/lib/list-query';
 import type { ListQueryFilterKey, ListQueryObject } from '@/lib/list-query';
@@ -207,9 +209,15 @@ export function CrmListShell({
                                       : null
                             }
                             hrefFor={(slug) =>
-                                crmListHref(basePath, filterFields(activeFilters), {
-                                    [entity === 'ticket' ? 'status' : 'stage']: slug,
-                                })
+                                listQueryHref(
+                                    basePath,
+                                    applyStageFilter(
+                                        fromActiveFilters(activeFilters, query),
+                                        slug,
+                                        entity === 'ticket' ? 'status' : 'stage',
+                                    ),
+                                    entity as ListQueryObject,
+                                )
                             }
                         />
                     ) : null}

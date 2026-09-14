@@ -123,6 +123,8 @@ export default function DealsIndex({
                             pipelineId={pipeline.id}
                             pipelines={pipelines}
                             basePath="/crm/deals"
+                            activeFilters={activeFilters}
+                            extraQuery={{ pipeline: pipeline.id }}
                         />
                     }
                     extraQuery={{ pipeline: pipeline.id }}

@@ -106,6 +106,9 @@ export type DomainListParams = {
     channel?: string;
     filter_groups?: ListViewFilters;
     pipeline?: number;
+    /** URL-owned sort only (`?sort=amount&direction=desc`). Not saved-view default sort. */
+    sort?: string;
+    direction?: 'asc' | 'desc';
 };
 
 export type DomainListQueryAdapter = {
