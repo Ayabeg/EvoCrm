@@ -163,8 +163,8 @@ Reducer proofs: `resources/js/ds/workspace/selection-contract.ts`.
 
 | Command | Result |
 |---|---|
-| `php artisan test --filter='P01\|P02\|P03A\|P03B\|P05\|Wave1\|Wave2\|Wave4\|CrmListWorkspace\|CrmBulkActions\|LeadPath\|LeadConversion\|LeadQualify\|EvoCrmP9'` | pass (74 tests, 1183 assertions) |
-| `php artisan test --filter='Contact\|Compan\|Lead\|Deal\|Quote\|P03'` | pass (290 tests, 3415 assertions) |
+| `php artisan test --filter='P01\|P02\|P03A\|P03B\|P05\|Wave1\|Wave2\|Wave4\|CrmListWorkspace\|CrmBulkActions\|LeadPath\|LeadConversion\|LeadQualify\|EvoCrmP9'` | pass (74 tests, 1200 assertions) |
+| `php artisan test --filter='Contact\|Compan\|Lead\|Deal\|Quote\|P03'` | pass (290 tests, 3432 assertions) |
 | `npm run types:check` | pass (after `php artisan wayfinder:generate --with-form`) |
 | `npx eslint` on P03B-touched TS files | pass |
 | `npm run build` | pass |

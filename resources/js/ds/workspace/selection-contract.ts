@@ -5,8 +5,8 @@ import {
     sameRowId,
     togglePageSelectedIds,
     toggleSelectedId,
-    type RowId,
 } from './selection';
+import type { RowId } from './selection';
 
 /**
  * Compile + value lock for P03B selection reducers.
