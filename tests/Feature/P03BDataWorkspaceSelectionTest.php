@@ -57,7 +57,7 @@ it('lets DataWorkspace orchestrate selection and bulk-active state in both resul
         ->and($workspace)->toContain('props.renderResults({ columns, selection })')
         ->and($workspace)->not->toContain("resultMode === 'shared-table' ? (props.selectedIds ?? []) : []");
 
-    expect($shell)->toContain('selection={selection}')
+    expect($shell)->toContain('selection,')
         ->and($shell)->toContain('children(nextColumns, workspaceSelection)')
         ->and($shell)->not->toContain('rows={[]}')
         ->and($shell)->not->toContain('selectedIds={[]}');
