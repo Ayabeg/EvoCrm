@@ -1,15 +1,16 @@
 import { Form } from '@inertiajs/react';
-import { Calendar, CheckSquare, Mail, Phone, StickyNote } from 'lucide-react';
+import type { Icon } from '@phosphor-icons/react';
+import { Calendar, CheckSquare, Envelope, Note, Phone } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 type ActionType = 'note' | 'email' | 'call' | 'task' | 'meeting';
 
-const actions: { type: ActionType; label: string; icon: typeof StickyNote }[] =
+const actions: { type: ActionType; label: string; icon: Icon }[] =
     [
-        { type: 'note', label: 'Note', icon: StickyNote },
-        { type: 'email', label: 'Email', icon: Mail },
+        { type: 'note', label: 'Note', icon: Note },
+        { type: 'email', label: 'Email', icon: Envelope },
         { type: 'call', label: 'Call', icon: Phone },
         { type: 'task', label: 'Task', icon: CheckSquare },
         { type: 'meeting', label: 'Meeting', icon: Calendar },
@@ -44,7 +45,7 @@ export default function RecordActionRow({
                         className="h-8 gap-1.5 px-2 text-[12px] font-medium"
                         onClick={() => setType(action.type)}
                     >
-                        <action.icon className="size-3.5" />
+                        <action.icon className="size-3.5" aria-hidden />
                         {action.label}
                     </Button>
                 ))}

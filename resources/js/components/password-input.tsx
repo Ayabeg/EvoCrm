@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeSlash } from '@phosphor-icons/react';
 import type { ComponentProps, Ref } from 'react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -29,9 +29,9 @@ export default function PasswordInput({
                 tabIndex={-1}
             >
                 {showPassword ? (
-                    <EyeOff className="size-4" />
+                    <EyeSlash className="size-4" aria-hidden />
                 ) : (
-                    <Eye className="size-4" />
+                    <Eye className="size-4" aria-hidden />
                 )}
             </button>
         </div>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
 import { t } from '@/lib/i18n';
 
@@ -52,7 +52,7 @@ export default function ColumnChooser({
     };
 
     return (
-        <Sheet
+        <Drawer
             open={open}
             onOpenChange={(next) => {
                 setOpen(next);
@@ -62,15 +62,15 @@ export default function ColumnChooser({
                 }
             }}
         >
-            <SheetTrigger asChild>
+            <DrawerTrigger asChild>
                 <Button type="button" variant="outline" size="sm" className="h-8 px-2.5 text-[12px]">
                     Columns
                 </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-80">
-                <SheetHeader>
-                    <SheetTitle className="text-sm">Choose columns</SheetTitle>
-                </SheetHeader>
+            </DrawerTrigger>
+            <DrawerContent side="right" className="w-80">
+                <DrawerHeader>
+                    <DrawerTitle className="text-sm">Choose columns</DrawerTitle>
+                </DrawerHeader>
                 <div className="mt-4 space-y-2">
                     {ordered.map((column) => (
                         <div key={column.id} className="flex items-center justify-between gap-2 rounded border px-2 py-1.5">
@@ -98,8 +98,8 @@ export default function ColumnChooser({
                     </Button>
                 </div>
                 <input type="hidden" name="columns" value={JSON.stringify(draft)} />
-            </SheetContent>
-        </Sheet>
+            </DrawerContent>
+        </Drawer>
     );
 }
 

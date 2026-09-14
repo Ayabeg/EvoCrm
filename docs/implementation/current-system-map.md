@@ -18,7 +18,7 @@ This is the P00 freeze of **what exists**. It is not permission to rewrite Larav
 | Tailwind 4 | `@tailwindcss/vite`, `resources/css/app.css` |
 | Wayfinder | `@laravel/vite-plugin-wayfinder` |
 | DS primitives | `resources/js/ds/components/*` re-exported from `@/components/ui/*` |
-| Icons | Phosphor intended (`components.json`); Lucide still in ~34 files |
+| Icons | Phosphor on active product chrome (`components.json`); Lucide remains in leftover/legacy only (see P01 report) |
 | Charts | In-house EvoViz (`resources/js/evoviz/*`) |
 
 Layout switch (`resources/js/app.tsx`):
@@ -100,7 +100,7 @@ Footer                Settings
 | Full record workspace | `record-chrome.tsx`, `record-hub.tsx`, `record-workspace.tsx`, `record-properties.tsx`, `record-activity-panel.tsx`, `adaptive-workspace-shell.tsx` | **CANONICAL KEEP** |
 | Ask Evo | `ask-evo-panel.tsx` + POST `/crm/{object}/{id}/ask` | **CANONICAL KEEP** (unify entry in P24) |
 | Activity composer | `activity-composer.tsx` | **CANONICAL KEEP** |
-| CreateDrawer | `create-drawer.tsx` | **CANONICAL KEEP** for create; **not** a peek |
+| CreateDrawer | `create-drawer.tsx` | **CANONICAL KEEP** for create; **not** a peek. P01: imports `@/components/ui/drawer` |
 | QuickRecordDrawer | — | **REPLACE** gap — does not exist; add in P09 (not a replacement of show pages) |
 | Lead path / convert | `record-path.tsx`, `lead-conversion-dialog.tsx` | **CANONICAL KEEP** |
 
@@ -139,13 +139,13 @@ Move contract: `POST /crm/deals/{deal}/move`. No keyboard move, no undo toast.
 
 | System | Paths | Verdict |
 |---|---|---|
-| CRM palette | `components/crm/command-palette.tsx` | **CANONICAL KEEP** (migrate icons + sections + `/home` href) |
+| CRM palette | `components/crm/command-palette.tsx` | **CANONICAL KEEP** (P01: Phosphor icons; sections + `/home` href still P16) |
 | Aurora palette primitive | `components/aurora/command-palette.tsx` | **ADAPTER KEEP TEMPORARILY** — presentation layer |
 | Search index | `evoSearchIndex` Inertia share | **CANONICAL KEEP** |
 | Tasks overlay | `components/crm/tasks-overlay.tsx` | **ADAPTER KEEP TEMPORARILY** — fold into notifications / activities (P02/P15) |
 | DS overlays | `ds/components/{Drawer,Modal,Toast}` | **CANONICAL KEEP** |
 
-Palette today: sections `records` + `navigate` only. Lucide icons. Home item `href: '/home'` — **`/` is named `home` and redirects; there is no `/home` route.** Dashboard is `/dashboard`.
+Palette today: sections `records` + `navigate` only. Phosphor icons (P01). Home item `href: '/home'` — **`/` is named `home` and redirects; there is no `/home` route.** Dashboard is `/dashboard` (fix in P02/P16).
 
 Topbar Ask Evo opens the palette, not `AskEvoPanel`.
 
@@ -170,9 +170,9 @@ Topbar Ask Evo opens the palette, not `AskEvoPanel`.
 
 | Family | Where | Verdict |
 |---|---|---|
-| Phosphor | Sidebar, topbar, DS FilterBar/SavedViews, many product pages | **CANONICAL KEEP** |
-| Lucide | Command palette, `record-chrome`, `ask-evo-panel`, activity composer, setup wizard, `app-header`, several settings pages | **MIGRATE** to Phosphor on product chrome |
-| `components.json` | `"iconLibrary": "phosphor"` | Already correct — code lags |
+| Phosphor | Sidebar, topbar, command palette, record chrome, Ask Evo, setup wizard, settings chrome, DS FilterBar/SavedViews | **CANONICAL KEEP** (P01 converged) |
+| Lucide | Leftover `app-header`, unused starter-kit/`NavItem` type, orphan `leads/board`, unused Aurora skins | **DEPRECATE** — stop importing; delete in P28 |
+| `components.json` | `"iconLibrary": "phosphor"` | Correct; active chrome now matches |
 
 ---
 

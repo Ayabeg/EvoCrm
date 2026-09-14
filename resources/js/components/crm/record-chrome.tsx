@@ -1,16 +1,16 @@
 import { Form, Link } from '@inertiajs/react';
 import {
-    Bolt,
+    DotsThree,
+    Envelope,
     Handshake,
-    Inbox,
-    Mail,
-    MessageCircle,
-    MoreHorizontal,
-    Send,
-    SendHorizonal,
+    Lightning,
+    PaperPlaneRight,
+    PaperPlaneTilt,
+    Tray,
     UserPlus,
-    Users,
-} from 'lucide-react';
+    UsersThree,
+    ChatCircle,
+} from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
@@ -103,7 +103,7 @@ export function RecordActions({
                         className="h-8 px-2 text-[12px] font-medium"
                     >
                         <Link href={whatsappHref}>
-                            <MessageCircle className="size-3.5" aria-hidden />
+                            <ChatCircle className="size-3.5" aria-hidden />
                             WhatsApp
                         </Link>
                     </Button>
@@ -117,7 +117,7 @@ export function RecordActions({
                                 aria-label={`More actions for record ${entityId}`}
                                 className="h-8 px-2 text-[12px] font-medium"
                             >
-                                <MoreHorizontal
+                                <DotsThree
                                     className="size-3.5"
                                     aria-hidden
                                 />
@@ -130,7 +130,7 @@ export function RecordActions({
                                     <Link
                                         href={`/crm/deals?create=1&contact_id=${contactId}`}
                                     >
-                                        <Handshake className="size-3.5" />
+                                        <Handshake className="size-3.5" aria-hidden />
                                         Create deal
                                     </Link>
                                 </DropdownMenuItem>
@@ -138,7 +138,7 @@ export function RecordActions({
                             {companyId && !contactId ? (
                                 <DropdownMenuItem asChild>
                                     <Link href="/crm/contacts?create=1">
-                                        <UserPlus className="size-3.5" />
+                                        <UserPlus className="size-3.5" aria-hidden />
                                         Add contact
                                     </Link>
                                 </DropdownMenuItem>
@@ -146,7 +146,7 @@ export function RecordActions({
                             {contactId ? (
                                 <DropdownMenuItem asChild>
                                     <Link href="/outbound/sequences">
-                                        <Bolt className="size-3.5" />
+                                        <Lightning className="size-3.5" aria-hidden />
                                         Enroll in sequence
                                     </Link>
                                 </DropdownMenuItem>
@@ -154,7 +154,7 @@ export function RecordActions({
                             {contactId ? (
                                 <DropdownMenuItem asChild>
                                     <Link href="/outbound/campaigns">
-                                        <SendHorizonal className="size-3.5" />
+                                        <PaperPlaneRight className="size-3.5" aria-hidden />
                                         Add to campaign
                                     </Link>
                                 </DropdownMenuItem>
@@ -162,7 +162,7 @@ export function RecordActions({
                             {contactId ? (
                                 <DropdownMenuItem asChild>
                                     <Link href="/crm/segments">
-                                        <Users className="size-3.5" />
+                                        <UsersThree className="size-3.5" aria-hidden />
                                         View segments
                                     </Link>
                                 </DropdownMenuItem>
@@ -179,7 +179,7 @@ export function RecordActions({
                                             type="submit"
                                             className="flex w-full items-center gap-2 px-2 py-1.5 text-sm"
                                         >
-                                            <Mail className="size-3.5" />
+                                            <Envelope className="size-3.5" aria-hidden />
                                             Draft email with Evo
                                         </button>
                                     </Form>
@@ -188,7 +188,7 @@ export function RecordActions({
                             {contactId ? (
                                 <DropdownMenuItem asChild>
                                     <Link href="/inbox">
-                                        <Inbox className="size-3.5" />
+                                        <Tray className="size-3.5" aria-hidden />
                                         Open in Desk
                                     </Link>
                                 </DropdownMenuItem>
@@ -196,14 +196,14 @@ export function RecordActions({
                             {contactId ? (
                                 <DropdownMenuItem asChild>
                                     <Link href="/outbound">
-                                        <Send className="size-3.5" />
+                                        <PaperPlaneTilt className="size-3.5" aria-hidden />
                                         Email via Outbound
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
                             <DropdownMenuItem asChild>
                                 <Link href="/crm/deals/board">
-                                    <Handshake className="size-3.5" />
+                                    <Handshake className="size-3.5" aria-hidden />
                                     View deal board
                                 </Link>
                             </DropdownMenuItem>

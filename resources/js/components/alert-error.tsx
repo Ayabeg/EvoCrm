@@ -1,4 +1,4 @@
-import { AlertCircleIcon } from 'lucide-react';
+import { WarningCircle } from '@phosphor-icons/react';
 import { Callout } from '@/components/ui/callout';
 
 /**
@@ -17,7 +17,7 @@ export default function AlertError({
         <Callout
             variant="error"
             title={title || 'Something went wrong.'}
-            icon={<AlertCircleIcon />}
+            icon={<WarningCircle className="size-4" weight="regular" aria-hidden />}
         >
             <ul className="list-inside list-disc text-sm">
                 {Array.from(new Set(errors)).map((error, index) => (

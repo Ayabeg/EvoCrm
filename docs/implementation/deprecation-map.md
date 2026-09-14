@@ -16,7 +16,7 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 | `components/crm/saved-view-tabs.tsx` | Only used by list-toolbar | already unused | SavedViews |
 | `pages/leads/board.tsx` | Orphan UI; `/leads` redirects to deals board | keep unrouted; delete P28 | `/crm/deals/board` |
 | `app/Http/Controllers/Crm/LeadBoardController.php` | Renders orphan page | P28 **only if** no route/tests require the class — see `LeadsBoardTest` / `EvoCrmP9RetireLeadsBoardTest` before delete | Deal board controller |
-| Lucide imports on product chrome | Dual icon family | P01 | `@phosphor-icons/react` |
+| Lucide imports on leftover / unused files | Dual family leftover after P01 | P28 | `@phosphor-icons/react` — P01 already cleared active chrome. Remaining: `app-header.tsx`, `nav-main.tsx`, `ui/icon.tsx`, `types/navigation.ts`, `leads/board.tsx`, `saved-view-tabs.tsx`, `quick-launch-grid.tsx`, unused Aurora skins |
 | Domain `components/crm/bulk-action-bar.tsx` | Parallel to DS bar | P03C–P08 as each object moves | `ds/workspace/BulkActionBar` |
 | `CrmListHeader` (list-chrome) | Legacy activities header | P15 | PageHeader + queue chrome |
 | Dead Aurora skins unused by DS re-exports | `ui/aurora/{data-table,pagination,toast,combobox}` if still unreferenced | P28 | DS primitives |

@@ -1,16 +1,16 @@
 import { Form } from '@inertiajs/react';
-import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { CaretDown, CaretUp, Sparkle } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from '@/components/ui/drawer';
+import { Input } from '@/components/ui/input';
 
 export type AskEvoPayload = {
     label?: string;
@@ -89,8 +89,8 @@ export function AskEvoTrigger({
     }
 
     return (
-        <Sheet>
-            <SheetTrigger asChild>
+        <Drawer>
+            <DrawerTrigger asChild>
                 <Button
                     data-testid="ask-evo-trigger"
                     type="button"
@@ -98,28 +98,28 @@ export function AskEvoTrigger({
                     size="sm"
                     className={className}
                 >
-                    <Sparkles className="size-3.5 text-mute" aria-hidden />
+                    <Sparkle className="size-3.5 text-mute" aria-hidden />
                     Ask Evo
                 </Button>
-            </SheetTrigger>
-            <SheetContent
+            </DrawerTrigger>
+            <DrawerContent
                 side="bottom"
                 className="max-h-[85dvh] overflow-y-auto"
             >
-                <SheetHeader className="border-b border-hairline pb-3">
-                    <SheetTitle className="flex items-center gap-1.5 text-[13px] font-semibold">
-                        <Sparkles className="size-3.5 text-mute" aria-hidden />
+                <DrawerHeader className="border-b border-hairline pb-3">
+                    <DrawerTitle className="flex items-center gap-1.5 text-[13px] font-semibold">
+                        <Sparkle className="size-3.5 text-mute" aria-hidden />
                         Ask Evo
-                    </SheetTitle>
+                    </DrawerTitle>
                     <p className="text-[10px] text-mute">
                         {insight?.live ? 'Evo + model' : 'This record'}
                     </p>
-                </SheetHeader>
+                </DrawerHeader>
                 <div className="space-y-3 pt-4 text-ui">
                     <AskEvoBody action={action} insight={insight} />
                 </div>
-            </SheetContent>
-        </Sheet>
+            </DrawerContent>
+        </Drawer>
     );
 }
 
@@ -150,7 +150,7 @@ export default function AskEvoPanel({
         >
             <div className="flex items-center justify-between gap-2">
                 <h3 className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-mute uppercase">
-                    <Sparkles className="size-3.5 text-mute" aria-hidden />
+                    <Sparkle className="size-3.5 text-mute" aria-hidden />
                     Ask Evo
                 </h3>
                 <div className="flex items-center gap-1.5">
@@ -170,9 +170,9 @@ export default function AskEvoPanel({
                         onClick={() => setOpen((value) => !value)}
                     >
                         {open ? (
-                            <ChevronUp className="size-3.5" />
+                            <CaretUp className="size-3.5" aria-hidden />
                         ) : (
-                            <ChevronDown className="size-3.5" />
+                            <CaretDown className="size-3.5" aria-hidden />
                         )}
                     </Button>
                 </div>

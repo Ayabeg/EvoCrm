@@ -1,5 +1,5 @@
 import { Form, Link, router } from '@inertiajs/react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash } from '@phosphor-icons/react';
 import { useState } from 'react';
 import {
     CrmObjectHeader,
@@ -280,7 +280,7 @@ export default function LeadCapturesIndex({
                                                                 )
                                                             }
                                                         >
-                                                            <Trash2 className="size-3.5" />
+                                                            <Trash className="size-3.5" aria-hidden />
                                                         </button>
                                                     ) : null}
                                                 </div>
@@ -354,7 +354,7 @@ export default function LeadCapturesIndex({
                                                     ])
                                                 }
                                             >
-                                                <Plus className="size-3.5" />
+                                                <Plus className="size-3.5" aria-hidden />
                                                 Add result
                                             </Button>
                                             <Button

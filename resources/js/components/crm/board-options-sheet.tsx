@@ -2,11 +2,11 @@ import { Form, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-} from '@/components/ui/sheet';
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+} from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
 export type BoardOptions = {
@@ -33,14 +33,14 @@ export function BoardOptionsSheet({
     const [tab, setTab] = useState<'cards' | 'board'>('cards');
 
     return (
-        <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent
+        <Drawer open={open} onOpenChange={onOpenChange}>
+            <DrawerContent
                 side="right"
                 className="bg-canvas text-ink"
                 style={{ background: 'var(--evosales-canvas)', color: 'var(--evosales-ink)' }}
             >
-                <SheetHeader className="border-b border-hairline px-5 py-4">
-                    <SheetTitle className="text-[15px] text-ink">Edit board view</SheetTitle>
+                <DrawerHeader className="border-b border-hairline px-5 py-4">
+                    <DrawerTitle className="text-[15px] text-ink">Edit board view</DrawerTitle>
                     <div className="mt-3 flex gap-4 text-[13px]">
                         <button
                             type="button"
@@ -67,7 +67,7 @@ export function BoardOptionsSheet({
                             Board
                         </button>
                     </div>
-                </SheetHeader>
+                </DrawerHeader>
 
                 {tab === 'cards' ? (
                     <Form
@@ -211,7 +211,7 @@ export function BoardOptionsSheet({
                         </div>
                     </div>
                 )}
-            </SheetContent>
-        </Sheet>
+            </DrawerContent>
+        </Drawer>
     );
 }

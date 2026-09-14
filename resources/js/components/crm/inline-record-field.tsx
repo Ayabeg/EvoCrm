@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { SquarePen } from 'lucide-react';
+import { PencilSimple } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 
@@ -73,7 +73,7 @@ export function InlineRecordField({
                 aria-label={`Edit ${label}`}
                 onClick={() => setEditing(true)}
             >
-                <SquarePen className="size-3.5" aria-hidden />
+                <PencilSimple className="size-3.5" aria-hidden />
             </button>
         </div>
     );

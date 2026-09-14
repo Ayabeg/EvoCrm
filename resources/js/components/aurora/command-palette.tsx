@@ -1,4 +1,4 @@
-import { Clock3, Navigation, Search, Sparkles, Star, Zap } from "lucide-react"
+import { Clock, Compass, Lightning, MagnifyingGlass, Sparkle, Star } from "@phosphor-icons/react"
 import * as React from "react"
 import { Button } from "@/components/ui/aurora/button"
 import { Input } from "@/components/ui/input"
@@ -75,14 +75,14 @@ const DEFAULT_ITEMS: CommandItem[] = [
     label: "Chat with Claude",
     description: "Recent conversation",
     section: "recent",
-    icon: <Clock3 size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Clock size={14} weight="regular" aria-hidden />,
   },
   {
     id: "r2",
     label: "Aurora Design System",
     description: "Opened 2h ago",
     section: "recent",
-    icon: <Clock3 size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Clock size={14} weight="regular" aria-hidden />,
   },
   {
     id: "a1",
@@ -90,7 +90,7 @@ const DEFAULT_ITEMS: CommandItem[] = [
     description: "Start a fresh chat",
     section: "actions",
     shortcut: ["⌘", "N"],
-    icon: <Zap size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Lightning size={14} weight="regular" aria-hidden />,
   },
   {
     id: "a2",
@@ -98,7 +98,7 @@ const DEFAULT_ITEMS: CommandItem[] = [
     description: "Search across your project",
     section: "actions",
     shortcut: ["⌘", "F"],
-    icon: <Search size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <MagnifyingGlass size={14} weight="regular" aria-hidden />,
   },
   {
     id: "a3",
@@ -106,21 +106,21 @@ const DEFAULT_ITEMS: CommandItem[] = [
     description: "Wipe current context",
     section: "actions",
     shortcut: ["⌘", "⇧", "K"],
-    icon: <Zap size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Lightning size={14} weight="regular" aria-hidden />,
   },
   {
     id: "s1",
     label: "Code review",
     description: "AI-powered code reviewer",
     section: "skills",
-    icon: <Sparkles size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Sparkle size={14} weight="regular" aria-hidden />,
   },
   {
     id: "s2",
     label: "Security review",
     description: "Audit for vulnerabilities",
     section: "skills",
-    icon: <Star size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Star size={14} weight="regular" aria-hidden />,
   },
   {
     id: "n1",
@@ -128,14 +128,14 @@ const DEFAULT_ITEMS: CommandItem[] = [
     description: "Open preferences",
     section: "navigate",
     shortcut: ["⌘", ","],
-    icon: <Navigation size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Compass size={14} weight="regular" aria-hidden />,
   },
   {
     id: "n2",
     label: "Documentation",
     description: "Browse Aurora docs",
     section: "navigate",
-    icon: <Navigation size={14} strokeWidth={1.65} aria-hidden />,
+    icon: <Compass size={14} weight="regular" aria-hidden />,
   },
 ]
 
@@ -352,7 +352,7 @@ return null
           }}
         >
           <span style={{ color: "var(--aurora-text-muted)", flexShrink: 0 }}>
-            <Search size={16} strokeWidth={1.65} aria-hidden />
+            <MagnifyingGlass size={16} weight="regular" aria-hidden />
           </span>
           <Input
             ref={inputRef}

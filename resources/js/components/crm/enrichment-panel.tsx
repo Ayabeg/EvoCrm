@@ -1,5 +1,5 @@
 import { Form } from '@inertiajs/react';
-import { Search } from 'lucide-react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import { RecordSection } from '@/components/crm/record-hub';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,7 @@ export default function EnrichmentPanel({
                             disabled={processing}
                             className="h-7 gap-1.5"
                         >
-                            <Search className="size-3.5" aria-hidden />
+                            <MagnifyingGlass className="size-3.5" aria-hidden />
                             Enrich
                         </Button>
                     )}
