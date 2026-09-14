@@ -58,7 +58,7 @@ it('opens advanced filters in a right Drawer and keeps list-query plus /crm/filt
 
     expect($views)->toContain("from '@/components/crm/list-query'")
         ->and($views)->toContain('action="/crm/filters"')
-        ->and($bar)->toContain('crmListHref')
+        ->and($bar)->toContain('navigateListQuery')
         ->and($workspace)->toContain('listPageHref');
 });
 

@@ -60,7 +60,7 @@ Existing chrome tests are often **source-string locks** (they `file_get_contents
 | P00 | n/a (docs) | — | This file |
 | P01 | P03 primitives, Wave0 icons | Any test that asserts `lucide-react` on a migrated file | Phosphor-only on listed chrome files |
 | P02 | P04, Wave0, SimpleModeNav | Header/search / Tasks labels | `P02ActiveShellNormalizationTest`: Home `/dashboard`; leftover header unused |
-| P03A–D | P05, Wave1, `P03ADataWorkspaceOwnershipTest`, `P03BDataWorkspaceSelectionTest` | P05/P03A adapter assertions when selection/rows move | P03B: workspace owns selection; contacts/deals consume it |
+| P03A–D | P05, Wave1, `P03ADataWorkspaceOwnershipTest`, `P03BDataWorkspaceSelectionTest`, `P03CListQueryOwnershipTest` | P05 bar write-path string when query helper moves | P03C: URL SoT; adapters preserve `q` / `filter_id` / `page` |
 | P04 Contacts | Wave1, P05 | `data-crm="contacts-workspace"` | Selection + bulk via DS bar |
 | P05 Companies | Wave1-style if present | Remove CrmShell lock if any | — |
 | P06 Leads | Lead* feature tests | New chrome test for DataWorkspace on leads | Do not break `/crm/leads/{id}` |

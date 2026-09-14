@@ -71,12 +71,13 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 - **Must not own:** cell renderers, bulk POST shapes, create forms, kanban cards, Ask Evo
 - **Result modes (P03A):** `resultMode: 'shared-table'` owns `rows` + shared table chrome. `resultMode: 'domain'` takes `renderResults` and forbids `rows` / `children`. `CrmListShell` is domain mode until P04–P08 migrate objects.
 - **Selection (P03B):** chrome `selection` contract (`RowId = string | number`). Domain consumes `renderResults({ columns, selection })`. Actions stay domain.
+- **Query (P03C):** URL / Inertia `activeFilters` is the durable list-query source of truth. Canonical contract in `lib/list-query`. Domain adapters serialize to existing params (`q`, `view`, `filter_id`, `page`, …). No competing React list-state mirror.
 
 ### SavedViews / FilterBar / AdvancedFilterDrawer
 
 - **Owner:** `ds/workspace/*`
-- **Write path:** existing `list-query.ts` + GET list URLs + POST/PATCH/DELETE `/crm/filters`
-- **Must not** add a second filter store
+- **Write path:** `lib/list-query` canonical patch → existing GET params (`q`, `filter_id`, …) + POST/PATCH/DELETE `/crm/filters`
+- **Must not** add a second filter store or a React mirror of shareable list state
 
 ### DataTable
 

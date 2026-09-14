@@ -1,7 +1,7 @@
 import { Form, Link, usePage } from '@inertiajs/react';
 import { CaretDown, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { crmListHref, filterFields } from '@/components/crm/list-query';
+import { filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -10,6 +10,16 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import type { DataWorkspaceEntity } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
+import {
+    applyBuiltInView,
+    applySavedFilter,
+    fromActiveFilters,
+    listQueryHref,
+    patchListQuery,
+} from '@/lib/list-query';
+import type { ListQueryObject } from '@/lib/list-query';
 import type {
     ListViewColumn,
     ListViewFilters,
@@ -17,8 +27,6 @@ import type {
 } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
-import type { DataWorkspaceEntity } from '@/ds/workspace/types';
-import { t } from '@/lib/i18n';
 
 const OBJECT_NOUNS: Record<DataWorkspaceEntity, string> = {
     contact: 'contacts',
@@ -64,6 +72,7 @@ export function SavedViews({
     canManageSettings?: boolean;
 }) {
     const { auth } = usePage().props;
+    void onViewChange;
     const [naming, setNaming] = useState(false);
     const [visibility, setVisibility] = useState<'private' | 'team' | 'workspace'>(
         'private',
@@ -72,44 +81,51 @@ export function SavedViews({
     const groups = filterGroupsFromActive(filters);
     const nouns = OBJECT_NOUNS[object];
     const userId = auth.user.id;
+    const current = fromActiveFilters(filters, extraQuery);
+    const queryObject = object as ListQueryObject;
 
-    const hrefFor = (id: string | null, patch: Record<string, unknown> = {}) =>
-        crmListHref(basePath, { ...fields, ...extraQuery }, {
-            view: id,
-            filter_id: null,
-            ...patch,
-        });
+    const hrefFor = (id: string, owner: number | null = null) =>
+        listQueryHref(basePath, applyBuiltInView(current, id, owner), queryObject);
+
+    const savedHref = (id: number) =>
+        listQueryHref(basePath, applySavedFilter(current, id), queryObject);
 
     const builtIn: Array<{ id: string; label: string; href: string }> =
         object === 'ticket'
             ? [
-                  { id: 'all', label: t('All open'), href: hrefFor('all', { owner: null }) },
+                  { id: 'all', label: t('All open'), href: hrefFor('all') },
                   {
                       id: 'my',
                       label: t('Assigned to me'),
-                      href: hrefFor('my', { owner: userId }),
+                      href: hrefFor('my', userId),
                   },
                   {
                       id: 'unassigned',
                       label: t('Unassigned'),
-                      href: hrefFor('unassigned', { owner: null }),
+                      href: hrefFor('unassigned'),
                   },
                   {
                       id: 'closed',
                       label: t('Closed'),
-                      href: hrefFor('closed', { owner: null, status: null }),
+                      href: listQueryHref(
+                          basePath,
+                          patchListQuery(applyBuiltInView(current, 'closed'), {
+                              filters: { status: null },
+                          }),
+                          queryObject,
+                      ),
                   },
               ]
             : [
                   {
                       id: 'all',
                       label: t('All :noun', { noun: t(nouns) }),
-                      href: hrefFor('all', { owner: null }),
+                      href: hrefFor('all'),
                   },
                   {
                       id: 'my',
                       label: t('My :noun', { noun: t(nouns) }),
-                      href: hrefFor('my', { owner: userId }),
+                      href: hrefFor('my', userId),
                   },
               ];
 
@@ -128,7 +144,6 @@ export function SavedViews({
                             key={view.id}
                             href={view.href}
                             className={pillClass(active)}
-                            onClick={() => onViewChange(view.id)}
                         >
                             {view.label}
                         </Link>
@@ -137,9 +152,8 @@ export function SavedViews({
                 {pinned.map((view) => (
                     <Link
                         key={view.id}
-                        href={crmListHref(basePath, { ...extraQuery, filter_id: view.id })}
+                        href={savedHref(view.id)}
                         className={pillClass(String(view.id) === activeViewId)}
-                        onClick={() => onViewChange(String(view.id))}
                         title={
                             view.visibility === 'workspace'
                                 ? 'Shared with workspace'
@@ -169,11 +183,7 @@ export function SavedViews({
                             {overflow.map((view) => (
                                 <DropdownMenuItem key={view.id} asChild>
                                     <Link
-                                        href={crmListHref(basePath, {
-                                            ...extraQuery,
-                                            filter_id: view.id,
-                                        })}
-                                        onClick={() => onViewChange(String(view.id))}
+                                        href={savedHref(view.id)}
                                     >
                                         {view.name}
                                         {typeof view.record_count === 'number'

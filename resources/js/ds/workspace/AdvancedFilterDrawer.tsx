@@ -104,6 +104,7 @@ export function AdvancedFilterDrawer({
                             <label className="grid gap-1 text-[13px] text-ink">
                                 City
                                 <select
+                                    key={`city:${String(fields.city ?? '')}`}
                                     name="city"
                                     defaultValue={String(fields.city ?? '')}
                                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
@@ -121,6 +122,7 @@ export function AdvancedFilterDrawer({
                             <label className="grid gap-1 text-[13px] text-ink">
                                 Wilaya
                                 <select
+                                    key={`wilaya:${String(fields.wilaya ?? '')}`}
                                     name="wilaya"
                                     defaultValue={String(fields.wilaya ?? '')}
                                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
@@ -136,6 +138,7 @@ export function AdvancedFilterDrawer({
                         ) : null}
                         <label className="flex h-9 items-center gap-2 text-[13px] text-ink">
                             <input
+                                key={`unanswered:${fields.unanswered ? '1' : '0'}`}
                                 type="checkbox"
                                 name="unanswered"
                                 value="1"
@@ -145,6 +148,7 @@ export function AdvancedFilterDrawer({
                         </label>
                         <label className="flex h-9 items-center gap-2 text-[13px] text-ink">
                             <input
+                                key={`unassigned:${fields.unassigned ? '1' : '0'}`}
                                 type="checkbox"
                                 name="unassigned"
                                 value="1"

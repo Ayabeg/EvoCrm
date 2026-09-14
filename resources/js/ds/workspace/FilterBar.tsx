@@ -1,13 +1,17 @@
-import { router } from '@inertiajs/react';
 import { Funnel, MagnifyingGlass } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import ColumnChooser from '@/components/crm/column-chooser';
-import { crmListHref, filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { ListColumnDef, ListFieldDef, ListViewColumn } from '@/lib/list-view-config';
 import type { DataWorkspaceChip, DataWorkspaceFilterContext } from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
+import {
+    clearQuickFilters,
+    fromActiveFilters,
+    navigateListQuery,
+} from '@/lib/list-query';
+import type { ListQueryFilterKey, ListQueryObject } from '@/lib/list-query';
+import type { ListColumnDef, ListFieldDef, ListViewColumn } from '@/lib/list-view-config';
 
 const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
 
@@ -40,6 +44,7 @@ function optionLabel(value: string): string {
 }
 
 export function FilterBar({
+    object,
     basePath,
     filters,
     filterFields: fieldDefs,
@@ -52,6 +57,7 @@ export function FilterBar({
     onAdvanced,
     extra,
 }: {
+    object: ListQueryObject;
     basePath: string;
     filters: Record<string, unknown>;
     filterFields: ListFieldDef[];
@@ -64,18 +70,15 @@ export function FilterBar({
     onAdvanced: () => void;
     extra?: ReactNode;
 }) {
-    const fields = filterFields(filters);
+    const current = fromActiveFilters(filters, extraQuery);
     const members = filterContext?.members ?? [];
     const quick = fieldDefs
         .filter((field) => QUICK_FIELD_IDS.includes(field.id as (typeof QUICK_FIELD_IDS)[number]))
         .slice(0, 4);
+    const searchKey = String(current.search ?? '');
 
-    const apply = (patch: Record<string, unknown>) => {
-        router.get(
-            crmListHref(basePath, { ...fields, ...extraQuery }, patch),
-            {},
-            { preserveState: true },
-        );
+    const applyFilter = (key: ListQueryFilterKey, value: string | null) => {
+        navigateListQuery(basePath, current, { filters: { [key]: value } }, object);
     };
 
     return (
@@ -87,7 +90,7 @@ export function FilterBar({
                     onSubmit={(event) => {
                         event.preventDefault();
                         const q = String(new FormData(event.currentTarget).get('q') ?? '');
-                        apply({ q: q || null });
+                        navigateListQuery(basePath, current, { search: q || null }, object);
                     }}
                 >
                     <MagnifyingGlass
@@ -95,8 +98,9 @@ export function FilterBar({
                         weight="bold"
                     />
                     <Input
+                        key={`q:${searchKey}`}
                         name="q"
-                        defaultValue={String(fields.q ?? '')}
+                        defaultValue={searchKey}
                         placeholder={t('Search')}
                         className="h-9 pl-9"
                         aria-label={t('Search list')}
@@ -125,10 +129,13 @@ export function FilterBar({
                             <span className="text-mute">{t(field.label)}</span>
                             <select
                                 name={field.id}
-                                defaultValue={String(fields[field.id] ?? '')}
+                                value={String(current.filters[field.id as ListQueryFilterKey] ?? '')}
                                 className="max-w-[9rem] bg-transparent text-[13px] text-ink outline-none"
                                 onChange={(event) =>
-                                    apply({ [field.id]: event.target.value || null })
+                                    applyFilter(
+                                        field.id as ListQueryFilterKey,
+                                        event.target.value || null,
+                                    )
                                 }
                             >
                                 <option value="">{t('Any')}</option>
@@ -181,20 +188,14 @@ export function FilterBar({
                     <button
                         type="button"
                         className="text-[12px] text-mute hover:text-ink"
-                        onClick={() => apply({
-                            owner: null,
-                            created: null,
-                            last_activity: null,
-                            status: null,
-                            stage: null,
-                            city: null,
-                            wilaya: null,
-                            unanswered: null,
-                            unassigned: null,
-                            priority: null,
-                            channel: null,
-                            filter_groups: null,
-                        })}
+                        onClick={() =>
+                            navigateListQuery(
+                                basePath,
+                                clearQuickFilters(current),
+                                {},
+                                object,
+                            )
+                        }
                     >
                         {t('Clear all')}
                     </button>

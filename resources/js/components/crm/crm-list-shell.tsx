@@ -1,4 +1,4 @@
-import { router, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { crmListHref, filterFields, listFilterChips } from '@/components/crm/list-query';
@@ -6,6 +6,11 @@ import type { StagePill } from '@/components/crm/stage-pills';
 import { StagePills } from '@/components/crm/stage-pills';
 import { DataWorkspace, viewHref } from '@/ds/workspace/DataWorkspace';
 import type { WorkspaceSelection, WorkspaceSelectionInput } from '@/ds/workspace/selection';
+import {
+    fromActiveFilters,
+    navigateListQuery,
+} from '@/lib/list-query';
+import type { ListQueryFilterKey, ListQueryObject } from '@/lib/list-query';
 import type {
     ListObjectType,
     ListViewColumn,
@@ -134,10 +139,15 @@ export function CrmListShell({
                     : String(activeFilters.view ?? 'all')
             }
             onViewChange={(id) => {
-                router.get(
-                    viewHref(basePath, activeFilters, id, query, auth.user.id),
-                    {},
-                    { preserveState: true },
+                // SavedViews <Link href={viewHref(...)}> owns the visit.
+                // Do not router.get here — that was a double navigation.
+                void viewHref(
+                    basePath,
+                    activeFilters,
+                    id,
+                    query,
+                    auth.user.id,
+                    entity as ListQueryObject,
                 );
             }}
             filters={activeFilters}
@@ -150,13 +160,11 @@ export function CrmListShell({
                 id: chip.key,
                 label: `${chip.label}: ${chip.value}`,
                 onRemove: () => {
-                    router.get(
-                        crmListHref(
-                            basePath,
-                            { ...filterFields(activeFilters), ...query },
-                            { [chip.key]: null },
-                        ),
-                        {},
+                    navigateListQuery(
+                        basePath,
+                        fromActiveFilters(activeFilters, query),
+                        { filters: { [chip.key as ListQueryFilterKey]: null } },
+                        entity as ListQueryObject,
                         { preserveState: true },
                     );
                 },

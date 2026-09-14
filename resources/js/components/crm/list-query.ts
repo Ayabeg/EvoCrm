@@ -1,3 +1,5 @@
+import { writeListHref } from '@/lib/list-query/href';
+
 export type ListFilters = Record<string, unknown>;
 
 export function crmListHref(
@@ -5,29 +7,9 @@ export function crmListHref(
     filters: ListFilters,
     patch: ListFilters = {},
 ): string {
-    const params = new URLSearchParams();
     const merged: ListFilters = { ...filters, ...patch };
 
-    for (const [key, value] of Object.entries(merged)) {
-        if (value === null || value === undefined || value === '' || value === false) {
-            continue;
-        }
-
-        if (key === 'filter_groups' && typeof value === 'object') {
-            params.set(key, JSON.stringify(value));
-            continue;
-        }
-
-        if (value === true) {
-            params.set(key, '1');
-        } else {
-            params.set(key, String(value));
-        }
-    }
-
-    const query = params.toString();
-
-    return query ? `${base}?${query}` : base;
+    return writeListHref(base, merged);
 }
 
 export function filterFields(filters: ListFilters): ListFilters {

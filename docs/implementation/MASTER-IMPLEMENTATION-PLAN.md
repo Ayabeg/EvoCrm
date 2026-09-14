@@ -110,7 +110,7 @@ P01 icons + overlay imports
 P02 leftover shell
 P03A types/docs lock + tests
 P03B hoist selection/rows API (contacts canary, no visual redesign)
-P03C DS BulkActionBar swap on contacts
+P03C URL / query state ownership (canonical contract; no bar redesign)
 P03D board/paginator/empty ownership helpers
 P04 Contacts (remove children bypass)
 P05 Companies (drop CrmShell)
@@ -318,29 +318,27 @@ Shared **BACKEND CONTRACT THAT MUST NOT CHANGE:** routes in `web.php` / `setting
 **RISKS:** Highest in P03 — split from visual polish.  
 **ROLLBACK:** Revert.  
 **ACCEPTANCE CRITERIA:** `CrmListShell` for contacts no longer hardcodes `selectedIds={[]}` with a no-op; bulk still works.  
-**OUT OF SCOPE:** Companies/leads/deals/quotes; DS bulk swap (P03C).
+**OUT OF SCOPE:** Companies/leads/deals/quotes list migrations; URL/query (P03C).
 
 ---
 
-## P03C — Canonical BulkActionBar on contacts
+## P03C — URL / query state ownership
 
-**OBJECTIVE:** Contacts use `ds/workspace/BulkActionBar` (same POSTs).  
-**REFERENCE PATTERN:** Same HubSpot bulk bar.  
-**CURRENT IMPLEMENTATION:** `components/crm/bulk-action-bar.tsx` on contacts + deals.  
-**TARGET ARCHITECTURE:** DS bar in the `bulk` slot; domain bar remains for deals until P07.  
-**FILES LIKELY AFFECTED:** `contacts/index.tsx`, `ds/workspace/BulkActionBar.tsx`.  
-**NEW / MODIFIED / DEPRECATED:** Domain bar deprecated for contacts.  
-**BEHAVIOR THAT MUST NOT CHANGE:** assign / enroll / delete POST `/crm/contacts/bulk`.  
-**BACKEND CONTRACT THAT MUST NOT CHANGE:** Bulk payload.  
+**OBJECTIVE:** One canonical list-query contract. URL / Inertia query is the durable source of truth. No competing React mirror.  
+**REFERENCE PATTERN:** Shareable HubSpot-style list URLs (existing `q` / `view` / `filter_id` / `page`).  
+**CURRENT IMPLEMENTATION:** See `docs/implementation/p03c-query-ownership.md`.  
+**TARGET ARCHITECTURE:** `lib/list-query` types + patch + domain adapters → existing GET params.  
+**FILES LIKELY AFFECTED:** `lib/list-query/*`, FilterBar, SavedViews, CrmListShell, list-query.ts.  
+**NEW / MODIFIED / DEPRECATED:** New canonical module; chrome write path unified. Domain bulk bar unchanged.  
+**BEHAVIOR THAT MUST NOT CHANGE:** Search / filter / sort / page / saved view / request shapes.  
+**BACKEND CONTRACT THAT MUST NOT CHANGE:** `CrmFilter::resolve`, quote `constrain`, routes.  
 **DEPENDENCIES:** P03B.  
-**TESTS:** Wave1 + any bulk feature test.  
-**A11Y:** Sticky bar announces count.  
-**RESPONSIVE QA:** Bar wraps at 375.  
-**VISUAL QA:** 36px controls, not a second orange.  
-**RISKS:** Sequence enroll options must still pass.  
+**TESTS:** `P03CListQueryOwnershipTest` + P01–P03B, P05, Wave1/2/4.  
+**A11Y / RESPONSIVE / VISUAL:** Zero intentional visual change.  
+**RISKS:** Double navigation; stale `defaultValue`; silent param rename.  
 **ROLLBACK:** Revert.  
-**ACCEPTANCE CRITERIA:** Contacts do not import domain bulk bar; deals unchanged.  
-**OUT OF SCOPE:** Other objects.
+**ACCEPTANCE CRITERIA:** One contract; URL SoT; unrelated state preserved; P03B intact; P03D not started.  
+**OUT OF SCOPE:** BulkActionBar redesign, empty/paginator helpers (P03D), object migrations.
 
 ---
 
