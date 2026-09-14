@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { t } from '@/lib/i18n';
 
 function GoogleMark({ className }: { className?: string }) {
     return (
@@ -48,7 +49,7 @@ export default function GoogleAuthButton({
             <Button type="button" variant="outline" className="w-full" asChild>
                 <a href="/auth/google" data-test="google-login-button">
                     <GoogleMark className="h-4 w-4" />
-                    Continue with Google
+                    {t('Continue with Google')}
                 </a>
             </Button>
 
@@ -58,7 +59,7 @@ export default function GoogleAuthButton({
                 </div>
                 <div className="relative flex justify-center">
                     <span className="bg-white px-2 text-xs text-mute">
-                        {separator}
+                        {t(separator)}
                     </span>
                 </div>
             </div>

@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
+import { t } from '@/lib/i18n';
 import type { Auth } from '@/types';
 
 type Deal = {
@@ -82,7 +83,7 @@ export default function DealsIndex({
 
     return (
         <>
-            <Head title="Deals" />
+            <Head title={t('Deals')} />
             <div
                 className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
                 data-crm="deals-workspace"
@@ -235,26 +236,26 @@ export default function DealsIndex({
                         <>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Deal name <span className="text-brand">*</span>
+                                    {t('Deal name')} <span className="text-brand">*</span>
                                 </Label>
                                 <Input name="title" required />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Amount (DZD)</Label>
+                                <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
                                 <Input name="amount_dzd" type="number" min="0" step="0.01" />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Close date</Label>
+                                <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
                                 <Input name="close_date" type="date" />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Contact</Label>
+                                <Label className="mb-1 block text-[12px]">{t('Contact')}</Label>
                                 <select
                                     name="contact_id"
                                     defaultValue={prefillContactId ?? ''}
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
                                 >
-                                    <option value="">New from deal name</option>
+                                    <option value="">{t('New from deal name')}</option>
                                     {contacts.map((contact) => (
                                         <option key={contact.id} value={contact.id}>
                                             {contact.first_name} {contact.last_name ?? ''}
@@ -263,7 +264,7 @@ export default function DealsIndex({
                                 </select>
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Stage</Label>
+                                <Label className="mb-1 block text-[12px]">{t('Stage')}</Label>
                                 <select
                                     name="stage_id"
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
@@ -278,7 +279,7 @@ export default function DealsIndex({
                             <input type="hidden" name="pipeline_id" value={pipeline.id} />
                             <div className="flex justify-end gap-2 pt-2">
                                 <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
-                                    Cancel
+                                    {t('Cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
@@ -287,9 +288,9 @@ export default function DealsIndex({
                                     variant="outline"
                                     disabled={processing}
                                 >
-                                    Create and add another
+                                    {t('Create and add another')}
                                 </Button>
-                                <Button disabled={processing}>Create</Button>
+                                <Button disabled={processing}>{t('Create')}</Button>
                             </div>
                         </>
                     )}

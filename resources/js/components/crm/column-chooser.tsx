@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
+import { t } from '@/lib/i18n';
 
 export default function ColumnChooser({
     columnDefs,
@@ -78,7 +79,7 @@ export default function ColumnChooser({
                                     checked={column.visible}
                                     onCheckedChange={(checked) => toggle(column.id, checked === true)}
                                 />
-                                {column.label}
+                                {t(column.label)}
                             </label>
                             <div className="flex gap-1">
                                 <button type="button" className="text-[11px] text-mute" onClick={() => move(column.id, -1)}>

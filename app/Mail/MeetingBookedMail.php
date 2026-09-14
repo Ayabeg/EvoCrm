@@ -24,7 +24,10 @@ class MeetingBookedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Meeting with {$this->hostName} — {$this->whenLabel}",
+            subject: __('Meeting with :host — :when', [
+                'host' => $this->hostName,
+                'when' => $this->whenLabel,
+            ]),
         );
     }
 

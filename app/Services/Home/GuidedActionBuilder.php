@@ -86,7 +86,7 @@ class GuidedActionBuilder
                 $actions[] = $this->action(
                     'deal_next_step_'.$deal->id,
                     'deal',
-                    'Set a next step on '.$deal->title,
+                    __('Set a next step on :title', ['title' => $deal->title]),
                     'This open deal has no next action.',
                     'Open deal',
                     '/crm/deals/'.$deal->id,
@@ -129,9 +129,9 @@ class GuidedActionBuilder
         return [
             'key' => $key,
             'category' => $category,
-            'title' => $title,
-            'description' => $description,
-            'actionLabel' => $actionLabel,
+            'title' => __($title),
+            'description' => __($description),
+            'actionLabel' => __($actionLabel),
             'href' => $href,
         ];
     }

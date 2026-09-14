@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type WorkspacePanelKey = 'left' | 'center' | 'right';
@@ -61,7 +62,7 @@ export function WorkspacePanelSwitcher({
                         value={panel.key}
                         className="min-h-9 flex-1 justify-center px-2 py-2 text-center text-[12px] font-medium after:shadow-none data-[state=active]:after:shadow-none"
                     >
-                        {panel.label}
+                        {t(panel.label)}
                     </TabsTrigger>
                 ))}
             </TabsList>

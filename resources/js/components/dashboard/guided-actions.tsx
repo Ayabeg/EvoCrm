@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type GuidedAction = {
@@ -42,13 +43,13 @@ export function GuidedActions({ actions }: { actions: GuidedAction[] }) {
                     id="guided-actions-heading"
                     className="text-[13px] font-semibold tracking-tight text-ink"
                 >
-                    Guided actions
+                    {t('Guided actions')}
                 </h2>
             </header>
 
             <div
                 role="tablist"
-                aria-label="Guided action categories"
+                aria-label={t('Guided action categories')}
                 className="mb-3 flex flex-wrap gap-1"
             >
                 {TABS.map((item) => {
@@ -70,7 +71,7 @@ export function GuidedActions({ actions }: { actions: GuidedAction[] }) {
                                     : 'border-hairline text-mute hover:border-ink/20 hover:text-ink',
                             )}
                         >
-                            {item.label}
+                            {t(item.label)}
                             <span className="ms-1.5 money text-mute">{count}</span>
                         </button>
                     );
@@ -79,7 +80,7 @@ export function GuidedActions({ actions }: { actions: GuidedAction[] }) {
 
             {visible.length === 0 ? (
                 <p className="text-[13px] leading-5 text-mute" role="status">
-                    No actions in this category.
+                    {t('No actions in this category.')}
                 </p>
             ) : (
                 <ul className="divide-y divide-hairline">
@@ -116,23 +117,23 @@ export function CaughtUpStrip({
         <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-md border border-hairline bg-canvas-soft px-4 py-5 text-center">
                 <p className="text-[13px] font-medium text-ink">
-                    {caughtUp ? "You're all caught up." : 'Tasks still need you.'}
+                    {caughtUp ? t("You're all caught up.") : t('Tasks still need you.')}
                 </p>
                 <Link
                     href="/crm/activities?type=task"
                     className="mt-2 inline-block text-[12px] font-medium text-brand hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
-                    Manage tasks
+                    {t('Manage tasks')}
                 </Link>
             </div>
             <div className="rounded-md border border-hairline bg-canvas-soft px-4 py-5 text-center">
-                <p className="text-[13px] font-medium text-ink">Automate outreach</p>
-                <p className="mt-1 text-[12px] text-mute">Sequences from your own mailbox.</p>
+                <p className="text-[13px] font-medium text-ink">{t('Automate outreach')}</p>
+                <p className="mt-1 text-[12px] text-mute">{t('Automate follow-up from your connected mailbox.')}</p>
                 <Link
                     href={sequencesHref}
                     className="mt-2 inline-block text-[12px] font-medium text-brand hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
-                    Manage sequences
+                    {t('Manage sequences')}
                 </Link>
             </div>
         </div>

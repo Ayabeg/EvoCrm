@@ -7,12 +7,13 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
+import { t } from '@/lib/i18n';
 import AuthStatus from './auth-status';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
         <>
-            <Head title="Forgot password" />
+            <Head title={t('Forgot password')} />
 
             {status ? <AuthStatus>{status}</AuthStatus> : null}
 
@@ -21,7 +22,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     {({ processing, errors }) => (
                         <div className="grid gap-5">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">{t('Email address')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -41,14 +42,14 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                 data-test="email-password-reset-link-button"
                             >
                                 {processing && <Spinner />}
-                                Email password reset link
+                                {t('Email password reset link')}
                             </Button>
                         </div>
                     )}
                 </Form>
 
                 <p className="text-center text-sm text-mute">
-                    Or, return to <TextLink href={login()}>log in</TextLink>
+                    <TextLink href={login()}>{t('Or, return to log in')}</TextLink>
                 </p>
             </div>
         </>

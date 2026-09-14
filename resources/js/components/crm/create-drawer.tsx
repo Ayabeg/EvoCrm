@@ -7,6 +7,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export function CreateDrawer({
@@ -46,7 +47,7 @@ export function CreateDrawer({
                     <div className="flex items-start justify-between gap-3 pr-6">
                         <div>
                             <SheetTitle className="text-[15px] font-semibold tracking-tight text-ink">
-                                {title}
+                                {t(title)}
                             </SheetTitle>
                             {description ? (
                                 <SheetDescription className="mt-1 text-[12px] text-mute">
@@ -59,7 +60,7 @@ export function CreateDrawer({
                                 href="#edit-form"
                                 className="shrink-0 text-[12px] font-medium text-brand"
                             >
-                                Edit this form
+                                {t('Edit this form')}
                             </a>
                         ) : null}
                     </div>

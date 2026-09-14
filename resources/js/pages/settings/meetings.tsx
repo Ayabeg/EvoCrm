@@ -6,6 +6,7 @@ import {
     SettingsSaveBar,
 } from '@/components/settings/chrome';
 import { Input } from '@/components/ui/input';
+import { t } from '@/lib/i18n';
 
 type Schedule = {
     slug: string;
@@ -50,7 +51,7 @@ export default function MeetingSettings({
 }) {
     return (
         <>
-            <Head title="Meetings" />
+            <Head title={t('Meetings')} />
 
             <SettingsPageHeader
                 title="Meetings"
@@ -60,7 +61,7 @@ export default function MeetingSettings({
             <div className="grid gap-3">
                 <SettingsCard title="Booking link">
                     <p className="text-[13px] text-ink">
-                        Your link:{' '}
+                        {t('Your link:')}{' '}
                         <a
                             href={schedule.url}
                             className="font-medium text-brand hover:underline"
@@ -70,8 +71,8 @@ export default function MeetingSettings({
                     </p>
                     <p className="text-[12px] text-mute">
                         {schedule.calendar_connected
-                            ? 'Google Calendar is connected. Busy times are hidden from guests.'
-                            : 'Google Calendar is not connected. Guests see working hours only.'}
+                            ? t('Google Calendar is connected. Busy times are hidden from guests.')
+                            : t('Google Calendar is not connected. Guests see working hours only.')}
                     </p>
                 </SettingsCard>
 
@@ -88,7 +89,7 @@ export default function MeetingSettings({
                                 value="1"
                                 defaultChecked={schedule.enabled}
                             />
-                            Page is live
+                            {t('Page is live')}
                         </label>
                         <SettingsFormRow
                             label="Link slug"
@@ -122,9 +123,9 @@ export default function MeetingSettings({
                                 defaultValue={schedule.slot_minutes}
                                 className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px]"
                             >
-                                <option value={30}>30 minutes</option>
-                                <option value={45}>45 minutes</option>
-                                <option value={60}>60 minutes</option>
+                                <option value={30}>{t('30 minutes')}</option>
+                                <option value={45}>{t('45 minutes')}</option>
+                                <option value={60}>{t('60 minutes')}</option>
                             </select>
                         </SettingsFormRow>
                         <div className="grid gap-3 sm:grid-cols-2">
@@ -159,7 +160,7 @@ export default function MeetingSettings({
                         </div>
                         <fieldset>
                             <legend className="text-[13px] font-medium text-ink">
-                                Days
+                                {t('Days')}
                             </legend>
                             <div className="mt-2 flex flex-wrap gap-2">
                                 {DAYS.map((day) => (
@@ -175,7 +176,7 @@ export default function MeetingSettings({
                                                 day.value,
                                             )}
                                         />
-                                        {day.label}
+                                        {t(day.label)}
                                     </label>
                                 ))}
                             </div>
@@ -183,21 +184,21 @@ export default function MeetingSettings({
                         <SettingsFormRow
                             label="Location"
                             htmlFor="meeting-location"
-                            hint={`Timezone is always ${schedule.timezone}.`}
+                            hint={t('Timezone is always Africa/Algiers.')}
                         >
                             <Input
                                 id="meeting-location"
                                 name="location_note"
                                 defaultValue={schedule.location_note ?? ''}
                                 className="h-8"
-                                placeholder="Paste a Meet or Zoom link"
+                                placeholder={t('Paste a Meet or Zoom link')}
                             />
                         </SettingsFormRow>
 
                         <div className="grid gap-3 border-t border-hairline pt-3">
                             <div>
                                 <p className="text-[13px] font-medium text-ink">
-                                    WhatsApp Cloud templates
+                                    {t('WhatsApp Cloud templates')}
                                 </p>
                                 <p className="mt-1 text-[12px] text-mute">
                                     {whatsapp_cloud_connected
@@ -260,9 +261,9 @@ export default function MeetingSettings({
                                     defaultValue={whatsapp.language}
                                     className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px]"
                                 >
-                                    <option value="fr">French (fr)</option>
-                                    <option value="ar">Arabic (ar)</option>
-                                    <option value="en">English (en)</option>
+                                    <option value="fr">{t('French (fr)')}</option>
+                                    <option value="ar">{t('Arabic (ar)')}</option>
+                                    <option value="en">{t('English (en)')}</option>
                                 </select>
                             </SettingsFormRow>
                             <div className="rounded-[4px] bg-canvas p-3 text-[12px] text-mute">

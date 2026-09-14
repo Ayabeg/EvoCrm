@@ -22,6 +22,8 @@
         <env name="APP_NAME" value="EvoSales · Evotechly"/>
         <env name="APP_KEY" value="base64:2fl+KTV4KMX2pH1a1G2g4Oszz5Q2n1m8o0pQrStUvWx="/>
         <env name="APP_TIMEZONE" value="Africa/Algiers"/>
+        <env name="APP_LOCALE" value="en"/>
+        <env name="APP_FALLBACK_LOCALE" value="en"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>

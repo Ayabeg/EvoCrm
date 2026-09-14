@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 
 type QuoteRow = {
@@ -55,7 +56,7 @@ export default function QuotesIndex({
 
     return (
         <>
-            <Head title="Quotes" />
+            <Head title={t('Quotes')} />
             <div
                 className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
                 data-crm="quotes-workspace"
@@ -145,15 +146,15 @@ export default function QuotesIndex({
             >
                 {deals.length === 0 ? (
                     <div className="space-y-3 text-[13px]">
-                        <p className="text-ink">A quote needs a deal first.</p>
+                        <p className="text-ink">{t('A quote needs a deal first.')}</p>
                         <p className="text-mute">
-                            Open Deals, create the opportunity, then come back to price it.
+                            {t('Open Deals, create the opportunity, then come back to price it.')}
                         </p>
                         <Link
                             href="/crm/deals?create=1"
                             className="inline-flex h-8 items-center text-[12px] font-medium text-ink underline-offset-2 hover:underline"
                         >
-                            Create a deal
+                            {t('Create a deal')}
                         </Link>
                     </div>
                 ) : (
@@ -168,7 +169,7 @@ export default function QuotesIndex({
                             <>
                                 <div>
                                     <Label className="mb-1 block text-[12px]">
-                                        Deal <span className="text-brand">*</span>
+                                        {t('Deal')} <span className="text-brand">*</span>
                                     </Label>
                                     <select
                                         required
@@ -185,14 +186,14 @@ export default function QuotesIndex({
                                 </div>
                                 <div>
                                     <Label className="mb-1 block text-[12px]">
-                                        Line name <span className="text-brand">*</span>
+                                        {t('Line name')} <span className="text-brand">*</span>
                                     </Label>
                                     <Input name="items[0][name]" required maxLength={180} />
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
                                         <Label className="mb-1 block text-[12px]">
-                                            Quantity
+                                            {t('Quantity')}
                                         </Label>
                                         <Input
                                             name="items[0][quantity]"
@@ -203,7 +204,7 @@ export default function QuotesIndex({
                                     </div>
                                     <div>
                                         <Label className="mb-1 block text-[12px]">
-                                            Amount (DZD)
+                                            {t('Amount (DZD)')}
                                         </Label>
                                         <Input
                                             name="items[0][unit_dzd]"
@@ -215,7 +216,7 @@ export default function QuotesIndex({
                                     </div>
                                 </div>
                                 <div>
-                                    <Label className="mb-1 block text-[12px]">Notes</Label>
+                                    <Label className="mb-1 block text-[12px]">{t('Notes')}</Label>
                                     <Input name="notes" />
                                 </div>
                                 <div className="flex justify-end gap-2 pt-2">
@@ -224,13 +225,13 @@ export default function QuotesIndex({
                                         variant="ghost"
                                         onClick={() => setDrawer(false)}
                                     >
-                                        Cancel
+                                        {t('Cancel')}
                                     </Button>
                                     <Button
                                         disabled={processing || !dealId}
                                         className="bg-brand text-white hover:bg-brand-hover"
                                     >
-                                        Create quote
+                                        {t('Create quote')}
                                     </Button>
                                 </div>
                             </>

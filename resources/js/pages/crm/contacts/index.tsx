@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
+import { t } from '@/lib/i18n';
 import type { Auth } from '@/types';
 
 type Contact = {
@@ -69,7 +70,7 @@ export default function ContactsIndex({
 
     return (
         <>
-            <Head title="Contacts" />
+            <Head title={t('Contacts')} />
             <div
                 className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
                 data-crm="contacts-workspace"
@@ -95,12 +96,12 @@ export default function ContactsIndex({
                         <>
                             {canMerge ? (
                                 <CrmObjectSecondaryLink href="/crm/contacts/duplicates">
-                                    Duplicates
+                                    {t('Duplicates')}
                                 </CrmObjectSecondaryLink>
                             ) : null}
                             {canImport ? (
                                 <CrmObjectSecondaryLink href="/crm/contacts/import">
-                                    Import
+                                    {t('Import')}
                                 </CrmObjectSecondaryLink>
                             ) : null}
                         </>
@@ -108,12 +109,12 @@ export default function ContactsIndex({
                     banner={
                         !hasMailbox ? (
                             <div className="border-b border-hairline bg-white px-4 py-2 text-[12px] text-mute sm:px-6">
-                                Connect email to log outbound from this list.{' '}
+                                {t('Connect email to log outbound from this list.')}{' '}
                                 <Link
                                     href="/outbound/mailboxes"
                                     className="text-ink underline-offset-2 hover:underline"
                                 >
-                                    Connect email
+                                    {t('Connect email')}
                                 </Link>
                             </div>
                         ) : null
@@ -243,38 +244,38 @@ export default function ContactsIndex({
                         <>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    First name{' '}
+                                    {t('First name')}{' '}
                                     <span className="text-brand">*</span>
                                 </Label>
                                 <Input name="first_name" required />
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Last name
+                                    {t('Last name')}
                                 </Label>
                                 <Input name="last_name" />
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Email
+                                    {t('Email')}
                                 </Label>
                                 <Input name="email" type="email" />
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Phone
+                                    {t('Phone')}
                                 </Label>
                                 <Input name="phone" placeholder="0550…" />
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Company
+                                    {t('Company')}
                                 </Label>
                                 <select
                                     name="company_id"
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
                                 >
-                                    <option value="">None</option>
+                                    <option value="">{t('None')}</option>
                                     {companies.map((company) => (
                                         <option
                                             key={company.id}
@@ -287,17 +288,17 @@ export default function ContactsIndex({
                             </div>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Lead status
+                                    {t('Lead status')}
                                 </Label>
                                 <select
                                     name="lead_status"
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
                                 >
-                                    <option value="">None</option>
-                                    <option value="new">New</option>
-                                    <option value="open">Open</option>
+                                    <option value="">{t('None')}</option>
+                                    <option value="new">{t('New')}</option>
+                                    <option value="open">{t('Open')}</option>
                                     <option value="unqualified">
-                                        Unqualified
+                                        {t('Unqualified')}
                                     </option>
                                 </select>
                             </div>
@@ -307,7 +308,7 @@ export default function ContactsIndex({
                                     variant="ghost"
                                     onClick={() => setDrawer(false)}
                                 >
-                                    Cancel
+                                    {t('Cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
@@ -316,9 +317,9 @@ export default function ContactsIndex({
                                     variant="outline"
                                     disabled={processing}
                                 >
-                                    Create and add another
+                                    {t('Create and add another')}
                                 </Button>
-                                <Button disabled={processing}>Create</Button>
+                                <Button disabled={processing}>{t('Create')}</Button>
                             </div>
                         </>
                     )}

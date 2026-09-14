@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export function RecordBack({ href, label }: { href: string; label: string }) {
@@ -33,7 +34,7 @@ export function RecordBack({ href, label }: { href: string; label: string }) {
             href={href}
             className="inline-flex items-center text-[11px] font-medium text-mute hover:text-ink"
         >
-            ← {label}
+            ← {t(label)}
         </Link>
     );
 }
@@ -70,7 +71,7 @@ export function RecordActions({
             <div className="flex flex-wrap items-center gap-2">
                 <div
                     role="toolbar"
-                    aria-label="Record actions"
+                    aria-label={t('Record actions')}
                     className="record-action-group"
                 >
                     {ACTION_DEFS.map((action) => {
@@ -83,13 +84,13 @@ export function RecordActions({
                                 size="sm"
                                 variant="ghost"
                                 aria-pressed={selected}
-                                title={action.label}
+                                title={t(action.label)}
                                 onClick={() =>
                                     setActive(selected ? null : action.type)
                                 }
                                 className="h-8 px-2 text-[12px] font-medium"
                             >
-                                {action.label}
+                                {t(action.label)}
                             </Button>
                         );
                     })}

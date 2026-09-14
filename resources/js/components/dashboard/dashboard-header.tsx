@@ -2,6 +2,7 @@ import { Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
+import { t } from '@/lib/i18n';
 
 type Owner = { id: number; name: string };
 
@@ -37,7 +38,7 @@ export function DashboardHeader({
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                     <h1 className="text-page-title font-semibold tracking-tight text-ink">
-                        Home
+                        {t('Home')}
                     </h1>
                     <p className="mt-0.5 text-[11px] leading-4 text-mute">
                         {subtitle}
@@ -48,7 +49,7 @@ export function DashboardHeader({
                     size="sm"
                     className="h-8 shrink-0"
                 >
-                    <Link href="/crm/deals?create=1">New deal</Link>
+                    <Link href="/crm/deals?create=1">{t('New deal')}</Link>
                 </Button>
             </div>
 
@@ -59,7 +60,7 @@ export function DashboardHeader({
                         size="sm"
                         value={filters.from ?? ''}
                         onChange={(e) => apply({ from: e.target.value })}
-                        aria-label="From date"
+                        aria-label={t('From date')}
                     />
                 </div>
                 <span className="text-[12px] text-mute" aria-hidden>
@@ -71,7 +72,7 @@ export function DashboardHeader({
                         size="sm"
                         value={filters.to ?? ''}
                         onChange={(e) => apply({ to: e.target.value })}
-                        aria-label="To date"
+                        aria-label={t('To date')}
                     />
                 </div>
                 <div className="w-full min-w-0 sm:w-[11rem] sm:shrink-0">
@@ -84,9 +85,9 @@ export function DashboardHeader({
                                     : null,
                             })
                         }
-                        aria-label="Filter by owner"
+                        aria-label={t('Filter by owner')}
                     >
-                        <option value="">All owners</option>
+                        <option value="">{t('All owners')}</option>
                         {owners.map((owner) => (
                             <option key={owner.id} value={owner.id}>
                                 {owner.name}

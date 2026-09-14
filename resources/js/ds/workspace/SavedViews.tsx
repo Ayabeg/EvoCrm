@@ -18,6 +18,7 @@ import type {
 import { filterGroupsFromActive } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 import type { DataWorkspaceEntity } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
 
 const OBJECT_NOUNS: Record<DataWorkspaceEntity, string> = {
     contact: 'contacts',
@@ -82,32 +83,32 @@ export function SavedViews({
     const builtIn: Array<{ id: string; label: string; href: string }> =
         object === 'ticket'
             ? [
-                  { id: 'all', label: 'All open', href: hrefFor('all', { owner: null }) },
+                  { id: 'all', label: t('All open'), href: hrefFor('all', { owner: null }) },
                   {
                       id: 'my',
-                      label: 'Assigned to me',
+                      label: t('Assigned to me'),
                       href: hrefFor('my', { owner: userId }),
                   },
                   {
                       id: 'unassigned',
-                      label: 'Unassigned',
+                      label: t('Unassigned'),
                       href: hrefFor('unassigned', { owner: null }),
                   },
                   {
                       id: 'closed',
-                      label: 'Closed',
+                      label: t('Closed'),
                       href: hrefFor('closed', { owner: null, status: null }),
                   },
               ]
             : [
                   {
                       id: 'all',
-                      label: `All ${nouns}`,
+                      label: t('All :noun', { noun: t(nouns) }),
                       href: hrefFor('all', { owner: null }),
                   },
                   {
                       id: 'my',
-                      label: `My ${nouns}`,
+                      label: t('My :noun', { noun: t(nouns) }),
                       href: hrefFor('my', { owner: userId }),
                   },
               ];
@@ -160,7 +161,7 @@ export function SavedViews({
                                     overflow.some((view) => String(view.id) === activeViewId),
                                 )}
                             >
-                                All views
+                                {t('All views')}
                                 <CaretDown className="ms-1 size-3" weight="bold" />
                             </button>
                         </DropdownMenuTrigger>
@@ -191,7 +192,7 @@ export function SavedViews({
                         className="inline-flex h-9 shrink-0 items-center gap-1 px-2 text-[13px] text-mute hover:text-ink"
                     >
                         <Plus className="size-3.5" weight="bold" />
-                        Add view
+                        {t('Add view')}
                         {views.length > 0 ? ` (${views.length}/5)` : ''}
                     </button>
                 )}

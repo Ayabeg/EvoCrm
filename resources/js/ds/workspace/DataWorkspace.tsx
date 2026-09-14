@@ -11,6 +11,7 @@ import { FilterBar } from '@/ds/workspace/FilterBar';
 import { SavedViews } from '@/ds/workspace/SavedViews';
 import type { DataWorkspaceProps } from '@/ds/workspace/types';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 const OBJECT_NOUNS = {
@@ -138,7 +139,7 @@ export function DataWorkspace<Row extends { id: number }>({
                                     )}
                                     onClick={() => onModeChange('list')}
                                 >
-                                    List
+                                    {t('List')}
                                 </button>
                                 <button
                                     type="button"
@@ -150,7 +151,7 @@ export function DataWorkspace<Row extends { id: number }>({
                                     )}
                                     onClick={() => onModeChange('board')}
                                 >
-                                    Board
+                                    {t('Board')}
                                 </button>
                             </div>
                         ) : null}
@@ -230,10 +231,13 @@ export function DataWorkspace<Row extends { id: number }>({
                 {!hasChildren && paginator ? (
                     <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute md:px-8">
                         <span>
-                            Showing {rows.length.toLocaleString()} of{' '}
-                            {paginator.total.toLocaleString()} {OBJECT_NOUNS[object]}
+                            {t('Showing :count of :total :noun', {
+                                count: rows.length.toLocaleString(),
+                                total: paginator.total.toLocaleString(),
+                                noun: t(OBJECT_NOUNS[object]),
+                            })}
                         </span>
-                        <nav className="flex items-center gap-2" aria-label="Pagination">
+                        <nav className="flex items-center gap-2" aria-label={t('Pagination')}>
                             {paginator.page > 1 ? (
                                 <Link
                                     href={listPageHref(
@@ -244,10 +248,10 @@ export function DataWorkspace<Row extends { id: number }>({
                                     )}
                                     className="hover:text-ink"
                                 >
-                                    Prev
+                                    {t('Prev')}
                                 </Link>
                             ) : (
-                                <span className="opacity-40">Prev</span>
+                                <span className="opacity-40">{t('Prev')}</span>
                             )}
                             <span>
                                 {paginator.page} / {paginator.lastPage}
@@ -262,10 +266,10 @@ export function DataWorkspace<Row extends { id: number }>({
                                     )}
                                     className="hover:text-ink"
                                 >
-                                    Next
+                                    {t('Next')}
                                 </Link>
                             ) : (
-                                <span className="opacity-40">Next</span>
+                                <span className="opacity-40">{t('Next')}</span>
                             )}
                         </nav>
                     </footer>

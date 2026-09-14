@@ -6,6 +6,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 /** Brand Book + Aurora surface radius for CRM record hubs. */
@@ -271,7 +272,7 @@ export function RecordSection({
             {title ? (
                 <div className="flex items-center justify-between gap-2">
                     <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">
-                        {title}
+                        {t(title)}
                     </h3>
                     {action}
                 </div>

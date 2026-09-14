@@ -24,7 +24,10 @@ class MeetingReminderMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Reminder: meeting with {$this->hostName} — {$this->whenLabel}",
+            subject: __('Reminder: meeting with :host — :when', [
+                'host' => $this->hostName,
+                'when' => $this->whenLabel,
+            ]),
         );
     }
 

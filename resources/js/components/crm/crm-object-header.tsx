@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export function CrmObjectHeader({
@@ -25,7 +26,7 @@ export function CrmObjectHeader({
         >
             <div className="min-w-0">
                 <h1 className="text-page-title text-[15px] font-semibold tracking-tight text-ink">
-                    {title}
+                    {t(title)}
                 </h1>
                 {description ? (
                     <p className="mt-0.5 text-[12px] leading-4 text-mute">
@@ -46,7 +47,7 @@ export function CrmObjectHeader({
                                 primaryClassName,
                             )}
                         >
-                            {primaryLabel}
+                            {t(primaryLabel)}
                         </Button>
                     ) : null}
                 </div>

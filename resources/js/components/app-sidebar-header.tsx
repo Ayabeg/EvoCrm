@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
+import { t } from '@/lib/i18n';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
@@ -59,8 +60,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         readOnly
                         size="sm"
                         value=""
-                        placeholder="Search EvoCRM…"
-                        aria-label="Search EvoCRM…"
+                        placeholder={t('Search EvoCRM…')}
+                        aria-label={t('Search EvoCRM…')}
                         onClick={() => setPaletteOpen(true)}
                         onFocus={() => setPaletteOpen(true)}
                         startAdornment={
@@ -77,8 +78,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         type="button"
                         variant="ghost"
                         size="icon"
-                        title="Ask Evo"
-                        aria-label="AI"
+                        title={t('Ask Evo')}
+                        aria-label={t('AI')}
                         data-chrome="ai"
                         className="rounded-full"
                         onClick={() => setPaletteOpen(true)}
@@ -91,8 +92,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                 type="button"
                                 variant="default"
                                 size="icon"
-                                title="Create"
-                                aria-label="Create"
+                                title={t('Create')}
+                                aria-label={t('Create')}
                                 className="rounded-full"
                             >
                                 <Plus className="size-4" weight="bold" aria-hidden />
@@ -100,16 +101,16 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44">
                             <DropdownMenuItem asChild>
-                                <Link href="/crm/contacts?create=1">Contact</Link>
+                                <Link href="/crm/contacts?create=1">{t('Contact')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/crm/companies?create=1">Company</Link>
+                                <Link href="/crm/companies?create=1">{t('Company')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/crm/deals?create=1">Deal</Link>
+                                <Link href="/crm/deals?create=1">{t('Deal')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/crm/quotes?create=1">Quote</Link>
+                                <Link href="/crm/quotes?create=1">{t('Quote')}</Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -120,8 +121,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                     type="button"
                                     variant="ghost"
                                     size="icon"
-                                    title="Notifications"
-                                    aria-label="Notifications"
+                                    title={t('Notifications')}
+                                    aria-label={t('Notifications')}
                                 >
                                     <Bell className="size-4" weight="regular" aria-hidden />
                                 </Button>
@@ -131,7 +132,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                     onSelect={() => setTasksOpen(true)}
                                 >
                                     <CheckSquare className="size-4" weight="regular" aria-hidden />
-                                    Tasks
+                                    {t('Tasks')}
                                     {taskCount > 0 ? (
                                         <span className="ml-auto tabular-nums text-[11px]">
                                             {taskCount}
@@ -150,7 +151,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                     size="icon"
                                     className="rounded-full bg-ink text-[11px] font-medium text-canvas"
                                     title={user.name}
-                                    aria-label={`${user.name} account menu`}
+                                    aria-label={t(':name account menu', { name: user.name })}
                                 >
                                     {initials(user.name)}
                                 </Button>

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { dateLocale, t } from '@/lib/i18n';
 
 type Slot = {
     starts_at: string;
@@ -42,7 +43,7 @@ export default function PublicBook({
             return null;
         }
 
-        return new Date(picked.starts_at).toLocaleString('en-GB', {
+        return new Date(picked.starts_at).toLocaleString(dateLocale(), {
             timeZone: schedule.timezone,
             weekday: 'short',
             day: 'numeric',
@@ -54,12 +55,12 @@ export default function PublicBook({
 
     return (
         <>
-            <Head title={`Book ${host.name ?? 'a meeting'}`} />
+            <Head title={host.name ? t('Book :host', { host: host.name }) : t('Book a meeting')} />
             <div className="mx-auto max-w-xl space-y-6 p-6">
                 <div>
                     <p className="text-[11px] tracking-wide text-mute uppercase">EvoCrm</p>
                     <h1 className="mt-1 text-xl font-semibold text-ink">
-                        Book {host.name ?? 'a meeting'}
+                        {host.name ? t('Book :host', { host: host.name }) : t('Book a meeting')}
                     </h1>
                     <p className="mt-1 text-[13px] text-mute">
                         {schedule.intro || `${schedule.slot_minutes} min`} · {schedule.timezone}
@@ -69,13 +70,13 @@ export default function PublicBook({
                     ) : null}
                     <p className="mt-2 text-[12px] text-mute">
                         {schedule.calendar_connected
-                            ? 'Busy times from Google Calendar are hidden.'
-                            : 'Showing working hours only — calendar is not connected.'}
+                            ? t('Busy times from Google Calendar are hidden.')
+                            : t('Showing working hours only — calendar is not connected.')}
                     </p>
                 </div>
 
                 {empty ? (
-                    <p className="text-[13px] text-ink">No open slots in the next days.</p>
+                    <p className="text-[13px] text-ink">{t('No open slots in the next days.')}</p>
                 ) : (
                     <div className="space-y-5">
                         {days.map((day) =>
@@ -114,21 +115,21 @@ export default function PublicBook({
                             <>
                                 <input type="hidden" name="starts_at" value={picked.starts_at} />
                                 {deal_id ? <input type="hidden" name="deal_id" value={deal_id} /> : null}
-                                <p className="text-[13px] text-ink">Selected: {when}</p>
+                                <p className="text-[13px] text-ink">{t('Selected: :when', { when: when ?? '' })}</p>
                                 <div>
-                                    <Label htmlFor="book-first">First name</Label>
+                                    <Label htmlFor="book-first">{t('First name')}</Label>
                                     <Input id="book-first" name="first_name" required className="mt-1" />
                                 </div>
                                 <div>
-                                    <Label htmlFor="book-last">Last name</Label>
+                                    <Label htmlFor="book-last">{t('Last name')}</Label>
                                     <Input id="book-last" name="last_name" className="mt-1" />
                                 </div>
                                 <div>
-                                    <Label htmlFor="book-email">Email</Label>
+                                    <Label htmlFor="book-email">{t('Email')}</Label>
                                     <Input id="book-email" name="email" type="email" required className="mt-1" />
                                 </div>
                                 <div>
-                                    <Label htmlFor="book-phone">Phone</Label>
+                                    <Label htmlFor="book-phone">{t('Phone')}</Label>
                                     <Input
                                         id="book-phone"
                                         name="phone"
@@ -138,7 +139,7 @@ export default function PublicBook({
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="book-note">Note</Label>
+                                    <Label htmlFor="book-note">{t('Note')}</Label>
                                     <textarea
                                         id="book-note"
                                         name="note"
@@ -146,7 +147,7 @@ export default function PublicBook({
                                         className="mt-1 w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-sm"
                                     />
                                 </div>
-                                <Button disabled={processing}>Confirm meeting</Button>
+                                <Button disabled={processing}>{t('Confirm meeting')}</Button>
                             </>
                         )}
                     </Form>

@@ -9,6 +9,7 @@ use App\Services\Meetings\MeetingSlotFinder;
 use App\Support\AlgerianPhone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +23,7 @@ class MeetingBookController extends Controller
             ->groupBy('date')
             ->map(fn ($rows, $date) => [
                 'date' => $date,
-                'label' => \Illuminate\Support\Carbon::parse($date, $schedule->timezone)->timezone($schedule->timezone)->format('D j M'),
+                'label' => Carbon::parse($date, $schedule->timezone)->timezone($schedule->timezone)->format('D j M'),
                 'slots' => $rows->values()->all(),
             ])
             ->values()
@@ -62,7 +63,7 @@ class MeetingBookController extends Controller
         $phone = AlgerianPhone::normalize($data['phone']);
 
         if (! $phone) {
-            return back()->withErrors(['phone' => 'Enter an Algerian mobile (+213).']);
+            return back()->withErrors(['phone' => __('Enter an Algerian mobile (+213).')]);
         }
 
         $activity = $booker->book($schedule, $data['starts_at'], [

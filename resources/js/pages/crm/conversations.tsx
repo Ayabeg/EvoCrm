@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
+import { t } from '@/lib/i18n';
 
 type Contact = InboxContact & {
     deals?: { id: number; title: string; stage?: { name: string } }[];
@@ -55,11 +56,11 @@ export default function ConversationHistory({ threads, selected }: Props) {
                         <EmptyState
                             as="h2"
                             icon={<Tray className="size-6" weight="regular" />}
-                            title="No conversation history"
-                            description="You're all caught up. Threads appear after official Desk traffic."
+                            title={t('No conversation history')}
+                            description={t("You're all caught up. Threads appear after official Desk traffic.")}
                             action={
                                 <Button asChild>
-                                    <Link href="/inbox">Open inbox</Link>
+                                    <Link href="/inbox">{t('Open inbox')}</Link>
                                 </Button>
                             }
                             className="border-0"
@@ -73,14 +74,14 @@ export default function ConversationHistory({ threads, selected }: Props) {
                         >
                             <div className="flex items-center justify-between border-b border-hairline px-3 py-1.5">
                                 <p className="text-[12px] font-medium text-ink">
-                                    History
+                                    {t('History')}
                                 </p>
                                 <div className="flex items-center gap-3">
                                     <Link
                                         href="/inbox"
                                         className="text-[12px] font-medium text-brand underline-offset-2 hover:underline"
                                     >
-                                        Open inbox
+                                        {t('Open inbox')}
                                     </Link>
                                     <span className="font-mono text-[11px] tabular-nums text-mute">
                                         {threads.length}
@@ -256,7 +257,7 @@ export default function ConversationHistory({ threads, selected }: Props) {
                                                 weight="regular"
                                             />
                                         }
-                                        title="Select a conversation"
+                                        title={t('Select a conversation')}
                                         description="See contact and deal context from the sold Desk."
                                         className="border-0"
                                     />

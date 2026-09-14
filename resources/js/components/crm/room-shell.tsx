@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type RoomTab = {
@@ -56,10 +57,10 @@ export function RoomShell({
         <div className="flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink">
             <div className="sticky top-0 z-10 border-b border-hairline bg-canvas px-4 pt-3 sm:px-6">
                 <div className="flex items-end justify-between gap-3">
-                    <h1 className="text-page-title text-[15px] font-semibold tracking-tight text-ink">{title}</h1>
+                    <h1 className="text-page-title text-[15px] font-semibold tracking-tight text-ink">{t(title)}</h1>
                     {actions}
                 </div>
-                <nav className="mt-2 flex gap-0 overflow-x-auto" aria-label={`${title} sections`}>
+                <nav className="mt-2 flex gap-0 overflow-x-auto" aria-label={`${t(title)} sections`}>
                     {tabs.map((tab) => (
                         <Link
                             key={tab.href}
@@ -71,7 +72,7 @@ export function RoomShell({
                                     : 'border-transparent text-mute hover:text-ink',
                             )}
                         >
-                            {tab.label}
+                            {t(tab.label)}
                         </Link>
                     ))}
                 </nav>
@@ -88,7 +89,7 @@ export function RoomShell({
                                         : 'text-mute hover:bg-canvas-soft hover:text-ink',
                                 )}
                             >
-                                {tab.label}
+                                {t(tab.label)}
                             </Link>
                         ))}
                     </nav>

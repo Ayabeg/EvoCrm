@@ -14,6 +14,7 @@ import { HomeKpiStrip } from '@/components/dashboard/home-kpi-strip';
 import { HomeWidget, HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 import type { EvoVizPayload } from '@/evoviz/contract';
 import { EvoVizChart } from '@/evoviz/evo-viz-chart';
+import { t } from '@/lib/i18n';
 import { formatCompactDzd, formatDzd } from '@/lib/money';
 
 type Owner = { id: number; name: string };
@@ -117,14 +118,14 @@ function PipelineBars({ pipeline }: { pipeline: PipelineHealth }) {
     if (pipeline.stages.length === 0) {
         return (
             <HomeWidgetEmpty
-                title="No open deals"
-                body="Stages chart here once a deal is in the pipeline."
+                title={t('No open deals')}
+                body={t('Stages chart here once a deal is in the pipeline.')}
                 action={
                     <Link
                         href="/crm/deals?create=1"
                         className="text-[12px] font-medium text-brand hover:underline"
                     >
-                        Create deal
+                        {t('Create deal')}
                     </Link>
                 }
             />
@@ -159,18 +160,18 @@ function PipelineBars({ pipeline }: { pipeline: PipelineHealth }) {
 
 function quotaStatusLabel(status: string): string {
     if (status === 'hit') {
-        return 'Hit';
+        return t('Hit');
     }
 
     if (status === 'on_track') {
-        return 'On track';
+        return t('On track');
     }
 
     if (status === 'behind') {
-        return 'Behind pace';
+        return t('Behind pace');
     }
 
-    return 'No target';
+    return t('No target');
 }
 
 function MonthlyQuota({ quota }: { quota: Quota }) {
@@ -181,8 +182,8 @@ function MonthlyQuota({ quota }: { quota: Quota }) {
     if (!hasTarget && !showTable && !quota.can_manage) {
         return (
             <HomeWidgetEmpty
-                title="No quota this month"
-                body="Set a DZD target to track closed-won against pace."
+                title={t('No quota this month')}
+                body={t('Set a DZD target to track closed-won against pace.')}
             />
         );
     }
@@ -198,13 +199,16 @@ function MonthlyQuota({ quota }: { quota: Quota }) {
                             </span>
                             <span className="text-mute">
                                 {' '}
-                                of {formatDzd(quota.target_cents)} · {quota.attainment_pct}%
+                                {t('of :amount · :pct%', {
+                                    amount: formatDzd(quota.target_cents),
+                                    pct: quota.attainment_pct ?? 0,
+                                })}
                             </span>
                         </p>
                         <p className="text-[12px] text-mute">
                             {quotaStatusLabel(quota.status)}
                             {quota.remaining_cents !== null && quota.status !== 'hit'
-                                ? ` · ${formatCompactDzd(quota.remaining_cents)} remaining`
+                                ? ` · ${formatCompactDzd(quota.remaining_cents)} ${t('remaining')}`
                                 : ''}
                         </p>
                     </div>
@@ -219,12 +223,12 @@ function MonthlyQuota({ quota }: { quota: Quota }) {
                 </div>
             ) : quota.can_manage ? (
                 <p className="mb-3 text-[13px] text-mute">
-                    No workspace target this month.{' '}
+                    {t('No workspace target this month.')}{' '}
                     <Link
                         href={quota.settings_href}
                         className="text-brand underline-offset-2 hover:underline"
                     >
-                        Set monthly quotas
+                        {t('Set monthly quotas')}
                     </Link>
                     .
                 </p>
@@ -235,13 +239,13 @@ function MonthlyQuota({ quota }: { quota: Quota }) {
                     <thead>
                         <tr className="border-b border-hairline text-left">
                             <th className="px-0 py-1.5 text-[11px] font-medium text-mute">
-                                Owner
+                                {t('Owner')}
                             </th>
                             <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
-                                Won
+                                {t('Won')}
                             </th>
                             <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
-                                Quota
+                                {t('Quota')}
                             </th>
                         </tr>
                     </thead>
@@ -285,14 +289,17 @@ export default function Home({
     placesRun = null,
     researchBrief = null,
 }: Props) {
-    const subtitle = `Welcome back · ${window.from} → ${window.to}`;
+    const subtitle = t('Welcome back · :from → :to', {
+        from: window.from,
+        to: window.to,
+    });
     const pipelineEmpty = !pipelineHealth || pipelineHealth.stages.length === 0;
     const attentionEmpty = attention.length === 0 && guidedActions.length === 0 && caughtUp;
     const recentEmpty = activityFeed.length === 0;
 
     return (
         <>
-            <Head title="Home" />
+            <Head title={t('Home')} />
             <div className="flex-1 bg-canvas-soft" data-home="workspace">
                 <div className="px-4 py-3 md:px-5 md:py-4">
                     <DashboardHeader
@@ -306,18 +313,21 @@ export default function Home({
 
                 <div className="grid gap-3 px-4 pb-4 md:px-5 lg:grid-cols-12">
                     <HomeWidget
-                        title="Pipeline"
+                        title={t('Pipeline')}
                         description={
                             pipelineHealth
-                                ? `${formatCompactDzd(pipelineHealth.total_cents)} open · ${pipelineHealth.deal_count} deals`
-                                : 'Open opportunity value by stage'
+                                ? t(':amount open · :count deals', {
+                                      amount: formatCompactDzd(pipelineHealth.total_cents),
+                                      count: pipelineHealth.deal_count,
+                                  })
+                                : t('Open opportunity value by stage')
                         }
                         action={
                             <Link
                                 href="/crm/deals/board"
                                 className="text-[12px] font-medium text-brand hover:underline"
                             >
-                                Open board
+                                {t('Open board')}
                             </Link>
                         }
                         className="lg:col-span-6"
@@ -327,14 +337,14 @@ export default function Home({
                             <PipelineBars pipeline={pipelineHealth} />
                         ) : (
                             <HomeWidgetEmpty
-                                title="No pipeline yet"
-                                body="Deals will stack by stage once the first opportunity lands."
+                                title={t('No pipeline yet')}
+                                body={t('Deals will stack by stage once the first opportunity lands.')}
                                 action={
                                     <Link
                                         href="/crm/deals?create=1"
                                         className="text-[12px] font-medium text-brand hover:underline"
                                     >
-                                        Create deal
+                                        {t('Create deal')}
                                     </Link>
                                 }
                             />
@@ -342,14 +352,14 @@ export default function Home({
                     </HomeWidget>
 
                     <HomeWidget
-                        title="Needs attention"
-                        description="Leads, tasks, and next moves"
+                        title={t('Needs attention')}
+                        description={t('Leads, tasks, and next moves')}
                         action={
                             <Link
                                 href="/crm/activities"
                                 className="text-[12px] font-medium text-brand hover:underline"
                             >
-                                View all
+                                {t('View all')}
                             </Link>
                         }
                         className="lg:col-span-6"
@@ -359,7 +369,7 @@ export default function Home({
                             <CaughtUpStrip caughtUp={caughtUp} />
                             <GuidedActions actions={guidedActions} />
                             {attention.length > 0 ? (
-                                <DashboardSection title="Needs attention">
+                                <DashboardSection title={t('Needs attention')}>
                                     <AttentionList items={attention} />
                                 </DashboardSection>
                             ) : null}
@@ -367,14 +377,14 @@ export default function Home({
                     </HomeWidget>
 
                     <HomeWidget
-                        title="Recent records"
-                        description="Latest activity across contacts and deals"
+                        title={t('Recent records')}
+                        description={t('Latest activity across contacts and deals')}
                         action={
                             <Link
                                 href="/crm/activities"
                                 className="text-[12px] font-medium text-brand hover:underline"
                             >
-                                View all
+                                {t('View all')}
                             </Link>
                         }
                         className="lg:col-span-7"
@@ -382,14 +392,14 @@ export default function Home({
                     >
                         {recentEmpty ? (
                             <HomeWidgetEmpty
-                                title="Nothing recent"
-                                body="New contacts, notes, and deals will list here."
+                                title={t('Nothing recent')}
+                                body={t('New contacts, notes, and deals will list here.')}
                                 action={
                                     <Link
                                         href="/crm/contacts?create=1"
                                         className="text-[12px] font-medium text-brand hover:underline"
                                     >
-                                        Create contact
+                                        {t('Create contact')}
                                     </Link>
                                 }
                             />
@@ -399,11 +409,15 @@ export default function Home({
                     </HomeWidget>
 
                     <HomeWidget
-                        title={quota ? `Quota · ${quota.label}` : 'Quota'}
+                        title={quota ? t('Quota · :label', { label: quota.label }) : t('Quota')}
                         description={
                             quota
-                                ? `Day ${quota.day} of ${quota.days} · ${quota.elapsed_pct}% elapsed`
-                                : 'Closed-won versus monthly DZD target'
+                                ? t('Day :day of :days · :pct% elapsed', {
+                                      day: quota.day,
+                                      days: quota.days,
+                                      pct: quota.elapsed_pct,
+                                  })
+                                : t('Closed-won versus monthly DZD target')
                         }
                         action={
                             quota?.can_manage ? (
@@ -411,7 +425,7 @@ export default function Home({
                                     href={quota.settings_href}
                                     className="text-[12px] font-medium text-brand hover:underline"
                                 >
-                                    Edit quotas
+                                    {t('Edit quotas')}
                                 </Link>
                             ) : null
                         }
@@ -421,16 +435,16 @@ export default function Home({
                             <MonthlyQuota quota={quota} />
                         ) : (
                             <HomeWidgetEmpty
-                                title="No quota loaded"
-                                body="Workspace targets appear here when a monthly quota is set."
+                                title={t('No quota loaded')}
+                                body={t('Workspace targets appear here when a monthly quota is set.')}
                             />
                         )}
                     </HomeWidget>
 
                     {primaryChart ? (
                         <HomeWidget
-                            title="Performance"
-                            description="Revenue won over time"
+                            title={t('Performance')}
+                            description={t('Revenue won over time')}
                             className="lg:col-span-7"
                         >
                             <div className="[&_svg]:h-24 md:[&_svg]:h-28">
@@ -440,18 +454,20 @@ export default function Home({
                     ) : null}
 
                     <HomeWidget
-                        title="Workspace pulse"
-                        description="Lead OS and Places"
+                        title={t('Workspace pulse')}
+                        description={t('Lead OS and Places')}
                         className={primaryChart ? 'lg:col-span-5' : 'lg:col-span-12'}
                     >
                         <div data-testid="home-health" className="space-y-4">
                             <LeadOsGraphStatus graph={leadOsGraph} compact />
                             <DashboardSection
-                                title="Places"
+                                title={t('Places')}
                                 description={
                                     placesRun
-                                        ? `Last Google Places run · ${placesRun.status}`
-                                        : 'No Google Places run yet.'
+                                        ? t('Last Google Places run · :status', {
+                                              status: placesRun.status,
+                                          })
+                                        : t('No Google Places run yet.')
                                 }
                             >
                                 {placesRun ? (
@@ -461,7 +477,7 @@ export default function Home({
                                     </p>
                                 ) : (
                                     <p className="text-[13px] text-mute" data-testid="places-run">
-                                        Waiting on the first Places lookup.
+                                        {t('Waiting on the first Places lookup.')}
                                     </p>
                                 )}
                                 {researchBrief?.answer ? (
@@ -470,7 +486,7 @@ export default function Home({
                                     </p>
                                 ) : (
                                     <p className="mt-2 text-[12px] text-mute" data-testid="research-brief">
-                                        No research brief yet.
+                                        {t('No research brief yet.')}
                                     </p>
                                 )}
                             </DashboardSection>
@@ -479,21 +495,21 @@ export default function Home({
 
                     {salesPerformance && salesPerformance.length > 0 ? (
                         <HomeWidget
-                            title="Won by owner"
-                            description="Closed-won in the selected period"
+                            title={t('Won by owner')}
+                            description={t('Closed-won in the selected period')}
                             className="lg:col-span-12"
                         >
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-hairline text-left">
                                         <th className="px-0 py-1.5 text-[11px] font-medium text-mute">
-                                            Owner
+                                            {t('Owner')}
                                         </th>
                                         <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
-                                            Won
+                                            {t('Won')}
                                         </th>
                                         <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
-                                            Revenue
+                                            {t('Revenue')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -522,8 +538,8 @@ export default function Home({
 
                 <footer className="border-t border-hairline px-4 py-2.5 text-[11px] text-mute md:px-5">
                     {dataAsOf
-                        ? `Data as of ${dataAsOf} · ${window.timezone}`
-                        : `Data as of now · ${window.timezone}`}
+                        ? t('Data as of :when · :tz', { when: dataAsOf, tz: window.timezone })
+                        : t('Data as of now · :tz', { tz: window.timezone })}
                 </footer>
             </div>
         </>

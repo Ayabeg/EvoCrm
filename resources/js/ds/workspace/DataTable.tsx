@@ -1,6 +1,7 @@
 import { router } from '@inertiajs/react';
 import ListViewTable from '@/components/crm/list-view-table';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import type { DataTableProps } from '@/ds/workspace/types';
 
@@ -52,7 +53,7 @@ export function DataTable<Row extends { id: number }>({
                                 className="px-4 text-[11px] font-medium text-mute md:px-8"
                                 style={column.width ? { width: column.width } : undefined}
                             >
-                                {column.label}
+                                {t(column.label)}
                             </th>
                         ))}
                     </tr>

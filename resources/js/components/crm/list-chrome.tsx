@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import type { EmptyKind } from '@/components/ui/empty-illustration';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type ListView = {
@@ -37,7 +38,7 @@ export function CrmListHeader({
                     type="button"
                     className="inline-flex items-center gap-1 text-page-title text-ink"
                 >
-                    {title}
+                    {t(title)}
                     <ChevronDown className="size-4 text-muted-foreground" />
                 </button>
                 <div className="flex items-center gap-2">
@@ -47,7 +48,7 @@ export function CrmListHeader({
                         size="sm"
                         className="h-8 rounded-sm text-ui"
                     >
-                        {primaryLabel}
+                        {t(primaryLabel)}
                     </Button>
                 </div>
             </div>
@@ -73,7 +74,7 @@ export function CrmListHeader({
                         className="mb-2 inline-flex items-center gap-1 text-ui text-muted-foreground hover:text-ink"
                     >
                         <Plus className="size-3.5" />
-                        add view
+                        {t('add view')}
                     </button>
                 ) : null}
             </div>
@@ -104,7 +105,7 @@ export function CrmListToolbar({
                         <Input
                             name="q"
                             defaultValue={query ?? ''}
-                            placeholder="Search"
+                            placeholder={t('Search')}
                             className="h-8 rounded-sm bg-canvas pl-7 text-ui"
                         />
                     </div>
@@ -113,10 +114,10 @@ export function CrmListToolbar({
                         variant="outline"
                         className="h-8 rounded-sm text-ui"
                     >
-                        Filter
+                        {t('Filter')}
                     </Button>
                     <label className="inline-flex h-8 items-center gap-1 rounded-sm border border-hairline px-2 text-ui text-muted-foreground">
-                        Sort by
+                        {t('Sort by')}
                         <select
                             name="sort"
                             defaultValue={sort ?? sortOptions[0]?.value}
@@ -140,7 +141,7 @@ export function CrmListToolbar({
                         className="inline-flex h-7 items-center gap-1 rounded-sm border border-hairline px-2 text-[12px] text-muted-foreground"
                     >
                         <SlidersHorizontal className="size-3" />
-                        Advanced filters
+                        {t('Advanced filters')}
                     </button>
                 </div>
             </FormBar>
@@ -231,8 +232,12 @@ export function CrmListFooter({
 }) {
     const label =
         typeof total === 'number' && total > count
-            ? `Showing ${count.toLocaleString()} of ${total.toLocaleString()} ${noun}`
-            : `${count.toLocaleString()} ${noun}`;
+            ? t('Showing :count of :total :noun', {
+                  count: count.toLocaleString(),
+                  total: total.toLocaleString(),
+                  noun: t(noun),
+              })
+            : t(':count :noun', { count: count.toLocaleString(), noun: t(noun) });
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-canvas px-4 py-2 text-[12px] text-mute md:px-8">
@@ -241,32 +246,32 @@ export function CrmListFooter({
                 {typeof page === 'number' && typeof lastPage === 'number' ? (
                     <nav
                         className="flex items-center gap-2"
-                        aria-label="Pagination"
+                        aria-label={t('Pagination')}
                     >
                         {prevHref ? (
                             <Link href={prevHref} className="hover:text-ink">
-                                Prev
+                                {t('Prev')}
                             </Link>
                         ) : (
-                            <span className="opacity-40">Prev</span>
+                            <span className="opacity-40">{t('Prev')}</span>
                         )}
                         <span>
                             {page} / {lastPage}
                         </span>
                         {nextHref ? (
                             <Link href={nextHref} className="hover:text-ink">
-                                Next
+                                {t('Next')}
                             </Link>
                         ) : (
-                            <span className="opacity-40">Next</span>
+                            <span className="opacity-40">{t('Next')}</span>
                         )}
-                        <span>{perPage} per page</span>
+                        <span>{t(':per per page', { per: perPage })}</span>
                         <span className="sr-only">25 per page</span>
                     </nav>
                 ) : null}
                 {exportHref ? (
                     <a href={exportHref} className="hover:text-ink">
-                        Export
+                        {t('Export')}
                     </a>
                 ) : null}
             </div>
@@ -295,14 +300,14 @@ export function CrmEmptyState({
                 density="page"
                 kind={kind}
                 illustration={illustration}
-                title={title}
-                description={line}
+                title={t(title)}
+                description={t(line)}
                 as="h2"
                 className="w-full max-w-md"
                 action={
                     actionLabel && onAction ? (
                         <Button type="button" size="sm" onClick={onAction}>
-                            {actionLabel}
+                            {t(actionLabel)}
                         </Button>
                     ) : undefined
                 }

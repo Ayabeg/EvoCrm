@@ -99,11 +99,11 @@ class HomeDashboardBuilder
             'activityFeed' => $this->activityFeed($workspace),
             'salesPerformance' => $this->salesPerformance($wonInWindow),
             'quickActions' => [
-                ['label' => 'New deal', 'href' => '/crm/deals'],
-                ['label' => 'New lead', 'href' => '/crm/leads'],
-                ['label' => 'Add contact', 'href' => '/crm/contacts'],
-                ['label' => 'Create task', 'href' => '/crm/activities?type=task'],
-                ['label' => 'Log activity', 'href' => '/crm/activities?type=note'],
+                ['label' => __('New deal'), 'href' => '/crm/deals'],
+                ['label' => __('New lead'), 'href' => '/crm/leads'],
+                ['label' => __('Add contact'), 'href' => '/crm/contacts'],
+                ['label' => __('Create task'), 'href' => '/crm/activities?type=task'],
+                ['label' => __('Log activity'), 'href' => '/crm/activities?type=note'],
             ],
         ];
     }
@@ -150,13 +150,13 @@ class HomeDashboardBuilder
 
         return [
             'key' => $key,
-            'label' => $label,
+            'label' => __($label),
             'value' => $value,
             'format' => $format,
-            'hint' => $hint,
+            'hint' => $hint !== null ? __($hint) : null,
             'href' => $href,
             'change' => $this->percentChange($currentForChange, $previous),
-            'changeLabel' => 'vs previous period',
+            'changeLabel' => __('vs previous period'),
         ];
     }
 
@@ -203,10 +203,10 @@ class HomeDashboardBuilder
 
         return [
             'id' => 'evoviz.area',
-            'title' => 'Revenue won over time',
+            'title' => __('Revenue won over time'),
             'labels' => $labels,
             'series' => [[
-                'name' => 'Won (DZD)',
+                'name' => __('Won (DZD)'),
                 'data' => $amounts,
                 'tone' => 'mark',
             ]],
@@ -236,10 +236,10 @@ class HomeDashboardBuilder
 
         $chart = [
             'id' => 'evoviz.ranked-bars',
-            'title' => 'Open deals by stage',
+            'title' => __('Open deals by stage'),
             'labels' => collect($stageRows)->pluck('name')->all(),
             'series' => [[
-                'name' => 'Deals',
+                'name' => __('Deals'),
                 'data' => collect($stageRows)->pluck('count')->all(),
                 'tone' => 'ink',
             ]],
@@ -272,9 +272,9 @@ class HomeDashboardBuilder
         if ($stalled > 0) {
             $items[] = [
                 'key' => 'stalled_deals',
-                'title' => 'Stalled deals',
+                'title' => __('Stalled deals'),
                 'description' => "{$stalled} deal".($stalled === 1 ? '' : 's').' with no activity for '.self::STALLED_DAYS.'+ days',
-                'actionLabel' => 'Review deals',
+                'actionLabel' => __('Review deals'),
                 'href' => '/crm/deals',
             ];
         }
@@ -290,9 +290,9 @@ class HomeDashboardBuilder
         if ($tasksDueToday > 0) {
             $items[] = [
                 'key' => 'tasks_due',
-                'title' => 'Tasks due today',
+                'title' => __('Tasks due today'),
                 'description' => "{$tasksDueToday} task".($tasksDueToday === 1 ? '' : 's').' due today',
-                'actionLabel' => 'View tasks',
+                'actionLabel' => __('View tasks'),
                 'href' => '/crm/activities?date=today',
             ];
         }
@@ -307,9 +307,9 @@ class HomeDashboardBuilder
         if ($overdue > 0) {
             $items[] = [
                 'key' => 'overdue_activities',
-                'title' => 'Overdue activities',
+                'title' => __('Overdue activities'),
                 'description' => "{$overdue} overdue item".($overdue === 1 ? '' : 's'),
-                'actionLabel' => 'Review',
+                'actionLabel' => __('Review'),
                 'href' => '/crm/activities?overdue=1',
             ];
         }
@@ -318,9 +318,9 @@ class HomeDashboardBuilder
         if ($unread > 0) {
             $items[] = [
                 'key' => 'inbox_unread',
-                'title' => 'Unread conversations',
+                'title' => __('Unread conversations'),
                 'description' => "{$unread} unread in desk",
-                'actionLabel' => 'Open inbox',
+                'actionLabel' => __('Open inbox'),
                 'href' => '/inbox',
             ];
         }
@@ -336,9 +336,9 @@ class HomeDashboardBuilder
         if ($leadsNoFollowUp > 0) {
             $items[] = [
                 'key' => 'leads_followup',
-                'title' => 'Leads without follow-up',
+                'title' => __('Leads without follow-up'),
                 'description' => "{$leadsNoFollowUp} lead".($leadsNoFollowUp === 1 ? '' : 's').' with no scheduled task',
-                'actionLabel' => 'Follow up',
+                'actionLabel' => __('Follow up'),
                 'href' => '/crm/leads',
             ];
         }
@@ -353,9 +353,9 @@ class HomeDashboardBuilder
         if ($deferred > 0) {
             $items[] = [
                 'key' => 'outbound_deferred',
-                'title' => 'Deferred sends',
+                'title' => __('Deferred sends'),
                 'description' => "{$deferred} outbound message".($deferred === 1 ? '' : 's').' queued for later',
-                'actionLabel' => 'Review outbound',
+                'actionLabel' => __('Review outbound'),
                 'href' => '/outbound/outbox',
             ];
         }
@@ -403,7 +403,7 @@ class HomeDashboardBuilder
             $first = $group->first();
 
             return [
-                'owner' => $first->owner?->name ?? 'Unassigned',
+                'owner' => $first->owner?->name ?? __('Unassigned'),
                 'won' => $group->count(),
                 'revenue_cents' => (int) $group->sum('amount_cents'),
             ];

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type PageHeaderProps = {
@@ -23,10 +24,10 @@ export function PageHeader({
         >
             <div className="min-w-0">
                 <h1 className="text-[28px] leading-[34px] font-semibold tracking-tight text-ink">
-                    {title}
+                    {t(title)}
                 </h1>
                 {description ? (
-                    <p className="mt-1 text-[14px] leading-5 text-mute">{description}</p>
+                    <p className="mt-1 text-[14px] leading-5 text-mute">{t(description)}</p>
                 ) : null}
             </div>
             {secondaryActions || primaryAction ? (
@@ -50,7 +51,7 @@ export function PageHeaderAction({
 }) {
     return (
         <Button type="button" onClick={onClick} className={cn('h-9 shrink-0', className)}>
-            {label}
+            {t(label)}
         </Button>
     );
 }

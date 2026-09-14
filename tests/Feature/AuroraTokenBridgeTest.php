@@ -176,7 +176,7 @@ it('uses compact mobile spacing tokens on Home chrome', function () {
 it('places Needs attention above Performance on Home', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
 
-    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, 'title="Performance"'));
+    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, "t('Performance')"));
     expect(strpos($home, 'HomeKpiStrip'))->toBeLessThan(strpos($home, 'Needs attention'));
     expect($home)->not->toContain('QuickActions');
     expect($home)->not->toContain('CrmKpiStrip');
@@ -223,9 +223,9 @@ it('paints the topbar as a frosted hairline instead of an Aurora panel gradient'
 it('names topbar icon-only actions for assistive tech', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
 
-    expect($header)->toContain('aria-label="Create"');
-    expect($header)->toContain('aria-label="Notifications"');
-    expect($header)->toContain('aria-label={`${user.name} account menu`}');
+    expect($header)->toContain("t('Create')");
+    expect($header)->toContain("t('Notifications')");
+    expect($header)->toContain("t(':name account menu'");
 });
 
 it('keeps the top bar as one honest instrument without a second bell', function () {
@@ -234,8 +234,7 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
-    expect($header)->toContain('placeholder="Search EvoCRM…"');
-    expect($header)->toContain('aria-label="Search EvoCRM…"');
+    expect($header)->toContain("t('Search EvoCRM…')");
     expect($header)->not->toContain('Find or Ask');
     expect($header)->not->toContain('Find a record or page');
     expect($header)->not->toContain('unread');

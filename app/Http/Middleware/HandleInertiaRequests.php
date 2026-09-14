@@ -48,6 +48,8 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'locale' => app()->getLocale(),
+            'translations' => $this->chromeTranslations(),
             'auth' => [
                 'user' => $user,
                 'capabilities' => $user
@@ -160,5 +162,36 @@ class HandleInertiaRequests extends Middleware
                     ->all();
             },
         ];
+    }
+
+    /**
+     * Flat day-1 chrome dictionary for Inertia. English keys are the
+     * fallback, so an empty bag (en) leaves the UI on the source strings.
+     *
+     * @return array<string, string>
+     */
+    private function chromeTranslations(): array
+    {
+        $locale = app()->getLocale();
+
+        if ($locale === 'en') {
+            return [];
+        }
+
+        $path = lang_path($locale.'.json');
+
+        if (! is_file($path)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) file_get_contents($path), true);
+
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        return collect($decoded)
+            ->filter(fn (mixed $value): bool => is_string($value))
+            ->all();
     }
 }

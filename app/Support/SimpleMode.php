@@ -73,7 +73,15 @@ class SimpleMode
      */
     public static function nav(?Workspace $workspace): array
     {
-        return self::enabled($workspace) ? self::SIMPLE_NAV : self::FULL_NAV;
+        $items = self::enabled($workspace) ? self::SIMPLE_NAV : self::FULL_NAV;
+
+        return array_map(
+            fn (array $item): array => [
+                ...$item,
+                'label' => __($item['label']),
+            ],
+            $items,
+        );
     }
 
     public static function blocks(Request $request): bool

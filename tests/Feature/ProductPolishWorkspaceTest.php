@@ -15,7 +15,7 @@ it('composes Home as a full workspace without a card stack or max-width stage', 
         ->and($header)->toContain('/crm/deals?create=1')
         ->and($section)->not->toContain('rounded-xl');
 
-    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, 'title="Performance"'));
+    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, "t('Performance')"));
 });
 
 it('keeps shared KPI and page chrome on hairlines instead of dashboard cards', function () {

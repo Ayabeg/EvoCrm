@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Textarea } from '@/components/ui/textarea';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import { t } from '@/lib/i18n';
 import type { Auth, OfficialDeskConnector } from '@/types';
 
 type Thread = {
@@ -126,8 +127,8 @@ function InboxEmpty({
                 <EmptyState
                     as="h2"
                     icon={<Tray className="size-6" weight="regular" />}
-                    title="No conversations"
-                    description="You're all caught up. Connect official WhatsApp Cloud to start. No Baileys."
+                    title={t('No conversations')}
+                    description={t("You're all caught up. Connect official WhatsApp Cloud to start. No Baileys.")}
                     action={
                         <ConnectWhatsAppCta connectors={officialConnectors} />
                     }
@@ -218,7 +219,7 @@ function DeskEmbedWorkspace({
                                 className="mt-3"
                                 onClick={onUseNative}
                             >
-                                Continue in CRM inbox
+                                {t('Continue in CRM inbox')}
                             </Button>
                         </div>
                     </div>
@@ -495,8 +496,8 @@ function FrontDesk({
                                         </h2>
                                         <p className="truncate text-[11px] text-mute">
                                             {selected.contact.owner?.name ??
-                                                'Unassigned'}{' '}
-                                            · Official WhatsApp
+                                                t('Unassigned')}{' '}
+                                            · {t('Official WhatsApp')}
                                         </p>
                                     </div>
                                 </div>
@@ -523,7 +524,7 @@ function FrontDesk({
                                                     disabled={processing}
                                                     data-testid="desk-open-ticket"
                                                 >
-                                                    Open ticket
+                                                    {t('Open ticket')}
                                                 </Button>
                                             )}
                                         </Form>
@@ -545,8 +546,7 @@ function FrontDesk({
                                     >
                                         {message.type === 'note' ? (
                                             <p className="mb-1 text-[10px] font-medium tracking-[0.04em] text-mute uppercase">
-                                                Private note, only visible to
-                                                agents
+                                                {t('Private note, only visible to agents')}
                                             </p>
                                         ) : null}
                                         <p>{message.body}</p>
@@ -573,7 +573,7 @@ function FrontDesk({
                                                         : 'text-[12px] text-mute'
                                                 }
                                             >
-                                                Reply
+                                                {t('Reply')}
                                             </button>
                                             <button
                                                 type="button"
@@ -584,7 +584,7 @@ function FrontDesk({
                                                         : 'text-[12px] text-mute'
                                                 }
                                             >
-                                                Note
+                                                {t('Note')}
                                             </button>
                                         </div>
                                         {mode === 'note' ? (
@@ -599,8 +599,8 @@ function FrontDesk({
                                             required
                                             placeholder={
                                                 mode === 'note'
-                                                    ? 'Private note'
-                                                    : 'Type your message'
+                                                    ? t('Private note')
+                                                    : t('Type your message')
                                             }
                                             className="min-h-16 rounded-none"
                                         />
@@ -611,11 +611,11 @@ function FrontDesk({
                                                     value="1"
                                                     disabled={processing}
                                                 >
-                                                    Send as resolved
+                                                    {t('Send as resolved')}
                                                 </Button>
                                             ) : (
                                                 <Button disabled={processing}>
-                                                    Add note
+                                                    {t('Add note')}
                                                 </Button>
                                             )}
                                         </div>
@@ -629,10 +629,10 @@ function FrontDesk({
                     <div className="grid flex-1 place-items-center bg-white px-5 py-8">
                         <div className="max-w-xs text-center">
                             <p className="text-[13px] font-medium text-ink">
-                                Select a conversation
+                                {t('Select a conversation')}
                             </p>
                             <p className="mt-1 text-[12px] text-mute">
-                                You&apos;re all caught up.
+                                {t("You're all caught up.")}
                             </p>
                         </div>
                     </div>

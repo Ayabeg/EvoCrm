@@ -11,6 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import { t } from '@/lib/i18n';
 import AuthStatus from './auth-status';
 
 type Props = {
@@ -26,7 +27,7 @@ export default function Login({
 }: Props) {
     return (
         <>
-            <Head title="Log in" />
+            <Head title={t('Log in')} />
 
             {status ? <AuthStatus>{status}</AuthStatus> : null}
 
@@ -41,7 +42,7 @@ export default function Login({
                     <>
                         <div className="grid gap-5">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">{t('Email address')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -59,14 +60,14 @@ export default function Login({
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">{t('Password')}</Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
                                             className="ml-auto text-xs"
                                             tabIndex={5}
                                         >
-                                            Forgot your password?
+                                            {t('Forgot your password?')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -76,7 +77,7 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder={t('Password')}
                                 />
                                 {errors.password ? (
                                     <FieldError>{errors.password}</FieldError>
@@ -89,7 +90,7 @@ export default function Login({
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label htmlFor="remember">{t('Remember me')}</Label>
                             </div>
 
                             <Button
@@ -100,14 +101,14 @@ export default function Login({
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                {t('Log in')}
                             </Button>
                         </div>
 
                         <p className="text-center text-sm text-mute">
-                            Don't have an account?{' '}
+                            {t("Don't have an account?")}{' '}
                             <TextLink href={register()} tabIndex={5}>
-                                Sign up
+                                {t('Sign up')}
                             </TextLink>
                         </p>
                     </>

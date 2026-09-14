@@ -1,6 +1,7 @@
 import { CheckCircle, FileText } from '@phosphor-icons/react';
 import { Form, Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { dateLocale, t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 
 type QuoteItem = {
@@ -33,8 +34,8 @@ export default function PublicQuote({
     const accepted = Boolean(quote.accepted_at);
     const title = quote.deal?.title ?? `Quote #${quote.id}`;
     const greet = quote.contact?.first_name
-        ? `${quote.contact.first_name}, review this quote.`
-        : 'Review this quote.';
+        ? t(':name, review this quote.', { name: quote.contact.first_name })
+        : t('Review this quote.');
 
     return (
         <>
@@ -60,15 +61,15 @@ export default function PublicQuote({
                             <FileText className="size-4" weight="bold" />
                         </span>
                         <div className="min-w-0">
-                            <p className="text-[12px] text-mute">Quote #{quote.id}</p>
+                            <p className="text-[12px] text-mute">{t('Quote #:id', { id: quote.id })}</p>
                             <h1 className="text-[22px] leading-tight font-semibold tracking-tight text-ink">
                                 {title}
                             </h1>
                             <p className="mt-1 text-[13px] text-mute">{greet}</p>
                             <p className="mt-1 text-[12px] text-mute">
-                                {accepted ? 'Accepted' : quote.status}
+                                {accepted ? t('Accepted') : quote.status}
                                 {quote.expires_at
-                                    ? ` · Expires ${quote.expires_at}`
+                                    ? ` · ${t('Expires :date', { date: quote.expires_at })}`
                                     : ''}
                             </p>
                         </div>
@@ -78,10 +79,10 @@ export default function PublicQuote({
                         <table className="w-full border-collapse text-[13px]">
                             <thead>
                                 <tr className="border-b border-hairline text-left text-[11px] text-mute">
-                                    <th className="py-2 font-medium">Item</th>
-                                    <th className="py-2 font-medium">Qty</th>
+                                    <th className="py-2 font-medium">{t('Item')}</th>
+                                    <th className="py-2 font-medium">{t('Qty')}</th>
                                     <th className="py-2 text-right font-medium">
-                                        Amount
+                                        {t('Amount')}
                                     </th>
                                 </tr>
                             </thead>
@@ -108,7 +109,7 @@ export default function PublicQuote({
                             dangerouslySetInnerHTML={{ __html: quote.html }}
                         />
                     ) : (
-                        <p className="text-[13px] text-mute">No line items on this quote.</p>
+                        <p className="text-[13px] text-mute">{t('No line items on this quote.')}</p>
                     )}
 
                     {quote.notes ? (
@@ -116,16 +117,16 @@ export default function PublicQuote({
                     ) : null}
 
                     <p className="money mt-6 text-[20px] font-semibold tracking-tight text-ink">
-                        Total {formatDzd(quote.total_cents)}
+                        {t('Total :amount', { amount: formatDzd(quote.total_cents) })}
                     </p>
 
                     <div className="mt-8 border-t border-hairline pt-6">
                         {accepted ? (
                             <p className="inline-flex items-center gap-2 text-[13px] font-medium text-ink">
                                 <CheckCircle className="size-4" weight="fill" />
-                                Accepted
+                                {t('Accepted')}
                                 {quote.accepted_at
-                                    ? ` ${new Date(quote.accepted_at).toLocaleDateString('en-GB')}`
+                                    ? ` ${new Date(quote.accepted_at).toLocaleDateString(dateLocale())}`
                                     : ''}
                             </p>
                         ) : (
@@ -141,7 +142,7 @@ export default function PublicQuote({
                                         disabled={processing}
                                         className="h-10 bg-brand px-5 text-white hover:bg-brand-hover"
                                     >
-                                        Accept quote
+                                        {t('Accept quote')}
                                     </Button>
                                 )}
                             </Form>

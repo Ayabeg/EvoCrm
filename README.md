@@ -13,7 +13,7 @@ EvoCrm is Evotechly’s **all-in-one sales OS** (CRM + Desk + Outbound + Ads): o
 
 This is **slice 2 + Sales Hub**: a sales rep lives in CRM the way they live in Chatwoot inbox — without cloning Chatwoot. Desk remains EvoDesk.
 
-Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Company: **Evotechly**.
+Default timezone: **Africa/Algiers**. Algeria-first (`+213`). Default locale: **French (`APP_LOCALE=fr`)** with English fallback (`APP_FALLBACK_LOCALE=en`). Company: **Evotechly**.
 
 ## What this is not
 

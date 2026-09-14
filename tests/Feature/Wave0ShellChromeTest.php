@@ -68,13 +68,12 @@ it('places Search EvoCRM on the top bar with AI, Create, Notifications, and Prof
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
 
     expect($header)->toContain('AppLogoIcon')
-        ->and($header)->toContain('placeholder="Search EvoCRM…"')
-        ->and($header)->toContain('aria-label="Search EvoCRM…"')
+        ->and($header)->toContain("t('Search EvoCRM…')")
         ->and($header)->toContain('⌘K')
         ->and($header)->toContain('useCommandPaletteShortcut')
-        ->and($header)->toContain('aria-label="AI"')
-        ->and($header)->toContain('aria-label="Notifications"')
-        ->and($header)->toContain('aria-label="Create"')
+        ->and($header)->toContain("t('AI')")
+        ->and($header)->toContain("t('Notifications')")
+        ->and($header)->toContain("t('Create')")
         ->and($header)->toContain('/crm/quotes?create=1')
         ->and($header)->toContain("from '@phosphor-icons/react'")
         ->and($header)->not->toContain('Find a record or page')

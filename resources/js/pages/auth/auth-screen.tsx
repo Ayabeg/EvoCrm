@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { t } from '@/lib/i18n';
 import type { AuthLayoutProps } from '@/types';
 import { home } from '@/routes';
 
@@ -32,7 +33,7 @@ export default function AuthScreen({
                     <span className="text-sm font-semibold tracking-tight text-ink">
                         EvoCrm
                     </span>
-                    <span className="sr-only">{title}</span>
+                    <span className="sr-only">{t(title)}</span>
                 </Link>
 
                 <Card
@@ -45,11 +46,11 @@ export default function AuthScreen({
                         style={{ borderColor: 'transparent' }}
                     >
                         <h1 className="text-xl font-semibold tracking-tight text-balance text-ink">
-                            {title}
+                            {t(title)}
                         </h1>
                         {description ? (
                             <p className="mt-2 text-sm text-pretty text-mute">
-                                {description}
+                                {t(description)}
                             </p>
                         ) : null}
                     </CardHeader>

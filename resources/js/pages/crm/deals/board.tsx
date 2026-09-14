@@ -29,6 +29,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 import { stageUnderlineColor } from '@/lib/stage-colors';
 
@@ -257,7 +258,7 @@ export default function DealBoard({
             {
                 preserveScroll: true,
                 onError: (errors) => {
-                    toast.error(errors.stage_id ?? 'Could not move this deal. Fill the required fields and try again.');
+                    toast.error(errors.stage_id ?? t('Could not move this deal. Fill the required fields and try again.'));
                 },
             },
         );
@@ -265,7 +266,7 @@ export default function DealBoard({
 
     return (
         <>
-            <Head title="Deals" />
+            <Head title={t('Deals')} />
             <div
                 className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
                 data-crm="deals-board"
@@ -293,18 +294,18 @@ export default function DealBoard({
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button type="button" variant="outline" size="sm" className="h-8">
-                                            Board options
+                                            {t('Board options')}
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onSelect={() => setOptionsOpen(true)}>
-                                            Edit cards
+                                            {t('Edit cards')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild>
-                                            <Link href="/settings/pipelines">Edit stages</Link>
+                                            <Link href="/settings/pipelines">{t('Edit stages')}</Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild>
-                                            <a href={exportHref}>Export view</a>
+                                            <a href={exportHref}>{t('Export view')}</a>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -326,8 +327,8 @@ export default function DealBoard({
                             <EmptyState
                                 density="banner"
                                 kind="pipeline"
-                                title="No deals in this pipeline"
-                                description="Create your first deal to start tracking opportunities."
+                                title={t('No deals in this pipeline')}
+                                description={t('Create your first deal to start tracking opportunities.')}
                                 action={
                                     <Button
                                         type="button"
@@ -335,7 +336,7 @@ export default function DealBoard({
                                         className="h-8"
                                         onClick={() => setDrawer(true)}
                                     >
-                                        Create deal
+                                        {t('Create deal')}
                                     </Button>
                                 }
                             />
@@ -434,20 +435,20 @@ export default function DealBoard({
                         <>
                             <div>
                                 <Label className="mb-1 block text-[12px]">
-                                    Deal name <span className="text-brand">*</span>
+                                    {t('Deal name')} <span className="text-brand">*</span>
                                 </Label>
                                 <Input name="title" required />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Amount (DZD)</Label>
+                                <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
                                 <Input name="amount_dzd" type="number" min="0" step="0.01" />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Close date</Label>
+                                <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
                                 <Input name="close_date" type="date" />
                             </div>
                             <div>
-                                <Label className="mb-1 block text-[12px]">Stage</Label>
+                                <Label className="mb-1 block text-[12px]">{t('Stage')}</Label>
                                 <select
                                     name="stage_id"
                                     className="h-9 w-full rounded-md border bg-background px-2 text-sm"
@@ -462,9 +463,9 @@ export default function DealBoard({
                             <input type="hidden" name="pipeline_id" value={pipeline.id} />
                             <div className="flex justify-end gap-2 pt-2">
                                 <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
-                                    Cancel
+                                    {t('Cancel')}
                                 </Button>
-                                <Button disabled={processing}>Create</Button>
+                                <Button disabled={processing}>{t('Create')}</Button>
                             </div>
                         </>
                     )}

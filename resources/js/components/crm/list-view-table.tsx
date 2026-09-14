@@ -3,6 +3,7 @@ import { contactInitials, formatContactName } from '@/lib/contact-name';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 type AttributeMap = Record<string, string | null>;
@@ -421,7 +422,7 @@ export default function ListViewTable({
                                     key={column.id}
                                     className="h-12 px-4 text-[11px] font-medium text-mute md:px-8"
                                 >
-                                    {columnLabel(columnDefs, column.id)}
+                                    {t(columnLabel(columnDefs, column.id))}
                                 </th>
                             ))}
                         </tr>
@@ -560,7 +561,7 @@ export default function ListViewTable({
                                                     className="flex justify-between gap-3"
                                                 >
                                                     <dt className="text-muted-foreground">
-                                                        {columnLabel(columnDefs, column.id)}
+                                                        {t(columnLabel(columnDefs, column.id))}
                                                     </dt>
                                                     <dd className="truncate text-ink">{value}</dd>
                                                 </div>

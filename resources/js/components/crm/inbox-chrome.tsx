@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { Tray } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
+import { dateLocale, t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type InboxEmbedState = 'ok' | 'blocked' | 'unreachable' | 'no-url';
@@ -26,7 +27,7 @@ const ALGIERS = 'Africa/Algiers';
 
 export function inboxContactName(contact?: InboxContact | null): string {
     if (!contact) {
-        return 'Unknown';
+        return t('Unknown');
     }
 
     return formatContactName(contact.first_name, contact.last_name);
@@ -46,7 +47,7 @@ export function formatInboxWhen(iso?: string | null): string {
     }
 
     try {
-        return new Intl.DateTimeFormat('en-GB', {
+        return new Intl.DateTimeFormat(dateLocale(), {
             timeZone: ALGIERS,
             day: 'numeric',
             month: 'short',
@@ -125,9 +126,9 @@ export function InboxFolderRail({
     onSelect: (key: string) => void;
 }) {
     return (
-        <nav aria-label="Inbox folders" className="px-2 py-2">
+        <nav aria-label={t('Inbox folders')} className="px-2 py-2">
             <p className="px-2 pb-1.5 text-[10px] font-medium tracking-[0.08em] text-mute uppercase">
-                Inbox
+                {t('Inbox')}
             </p>
             <ul>
                 {folders.map((item) => {
@@ -145,7 +146,7 @@ export function InboxFolderRail({
                                         : 'text-mute hover:bg-canvas-soft hover:text-ink',
                                 )}
                             >
-                                <span className="truncate">{item.label}</span>
+                                <span className="truncate">{t(item.label)}</span>
                                 {item.count !== null ? (
                                     <span className="font-mono text-[11px] tabular-nums">
                                         {item.count}
@@ -167,19 +168,19 @@ export function InboxContactSidebar({
 }) {
     const facts: Array<{ label: string; value: ReactNode }> = [
         {
-            label: 'Email',
-            value: contact.email ?? 'No email',
+            label: t('Email'),
+            value: contact.email ?? t('No email'),
         },
         {
-            label: 'Phone',
-            value: contact.phone_e164 ?? 'No phone',
+            label: t('Phone'),
+            value: contact.phone_e164 ?? t('No phone'),
         },
         {
-            label: 'Owner',
-            value: contact.owner?.name ?? 'No owner',
+            label: t('Owner'),
+            value: contact.owner?.name ?? t('No owner'),
         },
         {
-            label: 'Company',
+            label: t('Company'),
             value: contact.company ? (
                 <Link
                     href={`/crm/companies/${contact.company.id}`}
@@ -188,21 +189,21 @@ export function InboxContactSidebar({
                     {contact.company.name}
                 </Link>
             ) : (
-                'No company'
+                t('No company')
             ),
         },
     ];
 
     return (
         <aside
-            aria-label="Contact"
+            aria-label={t('Contact')}
             className="w-full shrink-0 border-hairline bg-white lg:w-[15.5rem] lg:border-l"
         >
             <div className="border-b border-hairline px-3 py-2.5">
                 <p className="text-[12px] font-medium text-ink">
                     {inboxContactName(contact)}
                 </p>
-                <p className="mt-0.5 text-[11px] text-mute">Contact</p>
+                <p className="mt-0.5 text-[11px] text-mute">{t('Contact')}</p>
             </div>
             <dl className="divide-y divide-hairline">
                 {facts.map((fact) => (
@@ -221,7 +222,7 @@ export function InboxContactSidebar({
                     href={`/crm/contacts/${contact.id}`}
                     className="text-[12px] font-medium text-brand underline-offset-2 hover:underline"
                 >
-                    Open contact
+                    {t('Open contact')}
                 </Link>
             </div>
         </aside>
@@ -232,7 +233,7 @@ export function InboxEmbedSkeleton() {
     return (
         <div
             aria-busy="true"
-            aria-label="Loading desk"
+            aria-label={t('Loading desk')}
             className="absolute inset-0 z-10 grid grid-cols-[13rem_minmax(18rem,22rem)_minmax(0,1fr)] gap-px bg-hairline"
         >
             <div className="bg-white p-3">

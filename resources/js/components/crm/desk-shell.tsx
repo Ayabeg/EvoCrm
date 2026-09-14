@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { RoomShell } from '@/components/crm/room-shell';
 import type { RoomTab } from '@/components/crm/room-shell';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import { t } from '@/lib/i18n';
 
 const DESK_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
@@ -55,7 +56,7 @@ export function DeskShell({
 
     return (
         <>
-            <Head title={title} />
+            <Head title={t(title)} />
             <RoomShell title="Inbox" tabs={deskTabs(pathname, simpleMode)}>
                 <div className="h-full overflow-hidden">{children}</div>
             </RoomShell>

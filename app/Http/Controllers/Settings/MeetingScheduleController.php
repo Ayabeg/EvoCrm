@@ -51,7 +51,7 @@ class MeetingScheduleController extends Controller
         ]);
 
         if (MeetingSchedule::query()->where('slug', $data['slug'])->whereKeyNot($schedule->id)->exists()) {
-            return back()->withErrors(['slug' => 'That booking link is already taken.']);
+            return back()->withErrors(['slug' => __('That booking link is already taken.')]);
         }
 
         $schedule->forceFill([

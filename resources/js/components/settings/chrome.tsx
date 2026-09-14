@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export function SettingsPageHeader({
@@ -19,11 +20,11 @@ export function SettingsPageHeader({
         >
             <div className="min-w-0">
                 <h1 className="text-[20px] font-semibold tracking-tight text-ink">
-                    {title}
+                    {t(title)}
                 </h1>
                 {description ? (
                     <p className="mt-0.5 max-w-[65ch] text-[13px] leading-5 text-mute">
-                        {description}
+                        {t(description)}
                     </p>
                 ) : null}
             </div>
@@ -59,18 +60,19 @@ export function SettingsCard({
                 <header className="flex items-start justify-between gap-3 border-b border-hairline px-4 py-2.5">
                     <div className="min-w-0">
                         <h2 className="text-[15px] font-semibold text-ink">
-                            {title}
+                            {t(title)}
                         </h2>
                         {description ? (
                             <p className="mt-0.5 text-[12px] leading-4 text-mute">
-                                {description}
+                                {t(description)}
                             </p>
                         ) : null}
                     </div>
                     {required ? (
                         <p className="shrink-0 text-[11px] text-mute">
                             <span className="text-brand">*</span>
-                            {' Required information'}
+                            {' '}
+                            {t('Required information')}
                         </p>
                     ) : null}
                 </header>
@@ -102,7 +104,7 @@ export function SettingsFormRow({
                 htmlFor={htmlFor}
                 className="pt-1.5 text-[13px] font-medium text-ink"
             >
-                {label}
+                {t(label)}
                 {required ? (
                     <span className="ml-0.5 text-brand">*</span>
                 ) : null}
@@ -111,7 +113,7 @@ export function SettingsFormRow({
                 {children}
                 {hint ? (
                     <p className="mt-1 text-[11px] leading-4 text-mute">
-                        {hint}
+                        {t(hint)}
                     </p>
                 ) : null}
                 {error ? (
@@ -142,7 +144,7 @@ export function SettingsSaveBar({
         >
             {showCancel ? (
                 <Button type="reset" variant="ghost" size="sm">
-                    {cancelLabel}
+                    {t(cancelLabel)}
                 </Button>
             ) : null}
             <Button
@@ -153,7 +155,7 @@ export function SettingsSaveBar({
                 data-test={saveTestId}
                 className="bg-brand text-white hover:bg-brand-hover disabled:opacity-60"
             >
-                {saveLabel}
+                {t(saveLabel)}
             </Button>
         </div>
     );

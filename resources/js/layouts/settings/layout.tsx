@@ -6,6 +6,7 @@ import { cn, toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
+import { t } from '@/lib/i18n';
 import type { Auth } from '@/types/auth';
 
 type SettingsNavItem = {
@@ -156,17 +157,17 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             >
                 <div className="px-3 pt-3 pb-1">
                     <p className="text-[11px] font-semibold tracking-wide text-mute uppercase">
-                        Settings
+                        {t('Settings')}
                     </p>
                 </div>
                 <nav
-                    aria-label="Settings"
+                    aria-label={t('Settings')}
                     className="flex gap-4 overflow-x-auto px-2 pb-2 lg:flex-col lg:gap-3 lg:overflow-visible lg:px-2 lg:pb-4"
                 >
                     {groups.map((group) => (
                         <div key={group.title} className="min-w-[10rem]">
                             <p className="px-2 pt-1 pb-0.5 text-[11px] font-medium text-mute">
-                                {group.title}
+                                {t(group.title)}
                             </p>
                             <ul className="flex flex-col">
                                 {group.items.map((item) => {
@@ -189,7 +190,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                                         : 'border-transparent text-mute hover:bg-white/70 hover:text-ink',
                                                 )}
                                             >
-                                                {item.title}
+                                                {t(item.title)}
                                             </Link>
                                         </li>
                                     );

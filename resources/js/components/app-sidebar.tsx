@@ -28,6 +28,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type NavLeaf = {
@@ -190,7 +191,7 @@ function RailLink({
         <Link
             href={item.href}
             prefetch
-            title={item.label}
+            title={t(item.label)}
             onClick={onNavigate}
             aria-current={active ? 'page' : undefined}
             data-active={active || undefined}
@@ -205,7 +206,7 @@ function RailLink({
             )}
         >
             <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
-            {labeled ? <span className="truncate">{item.label}</span> : null}
+            {labeled ? <span className="truncate">{t(item.label)}</span> : null}
         </Link>
     );
 
@@ -217,7 +218,7 @@ function RailLink({
         <Tooltip>
             <TooltipTrigger asChild>{row}</TooltipTrigger>
             <TooltipContent side="right" sideOffset={8}>
-                {item.label}
+                {t(item.label)}
             </TooltipContent>
         </Tooltip>
     );
@@ -334,7 +335,7 @@ export function AppSidebar() {
                         <li key={group.id} className="w-full">
                             {group.label && labeled ? (
                                 <p className="px-3 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-sidebar-mute">
-                                    {group.label}
+                                    {t(group.label)}
                                 </p>
                             ) : null}
                             <ul
@@ -371,12 +372,12 @@ export function AppSidebar() {
                         <li ref={moreRef} className="relative w-full">
                             {labeled ? (
                                 <p className="px-3 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-sidebar-mute">
-                                    More
+                                    {t('More')}
                                 </p>
                             ) : null}
                             <button
                                 type="button"
-                                title="More"
+                                title={t('More')}
                                 aria-expanded={moreOpen}
                                 aria-haspopup="menu"
                                 data-active={moreOpen || undefined}
@@ -392,7 +393,7 @@ export function AppSidebar() {
                                 )}
                             >
                                 <DotsThree className="size-5" weight="bold" />
-                                {labeled ? <span>More</span> : null}
+                                {labeled ? <span>{t('More')}</span> : null}
                             </button>
                             {moreOpen ? (
                                 <div
@@ -417,7 +418,7 @@ export function AppSidebar() {
                                             color: 'var(--evosales-mute)',
                                         }}
                                     >
-                                        More
+                                        {t('More')}
                                     </p>
                                     <ul className="m-0 list-none p-1" data-nav="crm-objects">
                                         {MORE_ITEMS.map((item) => {
@@ -436,7 +437,7 @@ export function AppSidebar() {
                                                         }}
                                                     >
                                                         <Icon className="size-4 shrink-0" />
-                                                        <span className="truncate">{item.label}</span>
+                                                        <span className="truncate">{t(item.label)}</span>
                                                     </Link>
                                                 </li>
                                             );

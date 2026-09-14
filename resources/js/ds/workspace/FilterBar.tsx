@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { ListColumnDef, ListFieldDef, ListViewColumn } from '@/lib/list-view-config';
 import type { DataWorkspaceChip, DataWorkspaceFilterContext } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
 
 const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
 
@@ -35,7 +36,7 @@ const PRESET_LABELS: Record<string, string> = {
 };
 
 function optionLabel(value: string): string {
-    return PRESET_LABELS[value] ?? value.replace(/_/g, ' ');
+    return t(PRESET_LABELS[value] ?? value.replace(/_/g, ' '));
 }
 
 export function FilterBar({
@@ -96,16 +97,16 @@ export function FilterBar({
                     <Input
                         name="q"
                         defaultValue={String(fields.q ?? '')}
-                        placeholder="Search"
+                        placeholder={t('Search')}
                         className="h-9 pl-9"
-                        aria-label="Search list"
+                        aria-label={t('Search list')}
                     />
                 </form>
                 {quick.map((field) => {
                     const options =
                         field.id === 'owner'
                             ? [
-                                  { value: 'unassigned', label: 'Unassigned' },
+                                  { value: 'unassigned', label: t('Unassigned') },
                                   ...members.map((member) => ({
                                       value: String(member.id),
                                       label: member.name,
@@ -121,7 +122,7 @@ export function FilterBar({
                             key={field.id}
                             className="inline-flex h-9 items-center gap-2 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink"
                         >
-                            <span className="text-mute">{field.label}</span>
+                            <span className="text-mute">{t(field.label)}</span>
                             <select
                                 name={field.id}
                                 defaultValue={String(fields[field.id] ?? '')}
@@ -130,7 +131,7 @@ export function FilterBar({
                                     apply({ [field.id]: event.target.value || null })
                                 }
                             >
-                                <option value="">Any</option>
+                                <option value="">{t('Any')}</option>
                                 {options.map((option) => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
@@ -144,11 +145,11 @@ export function FilterBar({
                     type="button"
                     variant="outline"
                     className="h-9"
-                    aria-label="Advanced filters"
+                    aria-label={t('Advanced')}
                     onClick={onAdvanced}
                 >
                     <Funnel className="size-4" weight="bold" />
-                    Advanced
+                    {t('Advanced')}
                 </Button>
                 {columnDefs && columns ? (
                     <ColumnChooser
@@ -169,9 +170,9 @@ export function FilterBar({
                             type="button"
                             onClick={chip.onRemove}
                             className="inline-flex max-w-full items-center gap-1 rounded-md border border-hairline bg-canvas-soft px-2 py-0.5 text-[12px] text-ink"
-                            title={`Clear ${chip.label}`}
+                            title={t('Clear :label', { label: t(chip.label) })}
                         >
-                            <span className="truncate">{chip.label}</span>
+                            <span className="truncate">{t(chip.label)}</span>
                             <span aria-hidden className="text-mute">
                                 ×
                             </span>
@@ -195,7 +196,7 @@ export function FilterBar({
                             filter_groups: null,
                         })}
                     >
-                        Clear all
+                        {t('Clear all')}
                     </button>
                 </div>
             ) : null}
