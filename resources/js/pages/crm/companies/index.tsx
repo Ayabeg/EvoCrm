@@ -65,6 +65,7 @@ export default function CompaniesIndex({
                 wilayas={wilayas}
                 selection={{
                     mode: 'uncontrolled',
+                    // Page does not participate now. Not a permanent bulk ban.
                     selectable: false,
                     pageIds: companies.map((company) => company.id),
                 }}

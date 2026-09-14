@@ -7,6 +7,18 @@ import { useCallback, useMemo, useState } from 'react';
  */
 export type RowId = string | number;
 
+/**
+ * Strict row-id identity. `1` and `"1"` are different ids.
+ * No String()/Number() coercion, no ==, no array-index ids.
+ */
+export function sameRowId(left: RowId, right: RowId): boolean {
+    return Object.is(left, right);
+}
+
+export function hasRowId<Id extends RowId>(ids: readonly Id[], id: Id): boolean {
+    return ids.some((value) => sameRowId(value, id));
+}
+
 export type WorkspaceSelection<Id extends RowId = RowId> = {
     selectedIds: Id[];
     selectedCount: number;
@@ -16,11 +28,16 @@ export type WorkspaceSelection<Id extends RowId = RowId> = {
     clearSelection: () => void;
     allPageSelected: boolean;
     somePageSelected: boolean;
-    /** True when at least one id is selected. Independent of action verbs. */
+    /** Derived: selectedCount > 0. Not independent state. Other-page ids count. */
     bulkActive: boolean;
 };
 
 type SelectionGuard<Id extends RowId> = {
+    /**
+     * Page-level participation, not a permanent object ban.
+     * `false` = this surface does not select rows *now*.
+     * Flip to `true` later (e.g. Companies/Quotes bulk) without a DW API change.
+     */
     selectable?: boolean;
     isRowSelectable?: (id: Id) => boolean;
 };
@@ -28,7 +45,8 @@ type SelectionGuard<Id extends RowId> = {
 /**
  * Uncontrolled: DataWorkspace owns the selected id set.
  * Controlled: parent owns the set and must pass both value + change.
- * Modes are explicit — do not mix `selectedIds?` with an inferred mode.
+ * ONE OWNER AT A TIME — do not mix `selectedIds` / `onSelectedIdsChange`
+ * with `defaultSelectedIds`, and do not omit the controlled pair.
  */
 export type WorkspaceSelectionInput<Id extends RowId = RowId> =
     | {
@@ -64,8 +82,8 @@ export function toggleSelectedId<Id extends RowId>(
         return [...selectedIds];
     }
 
-    return selectedIds.includes(id)
-        ? selectedIds.filter((value) => value !== id)
+    return hasRowId(selectedIds, id)
+        ? selectedIds.filter((value) => !sameRowId(value, id))
         : [...selectedIds, id];
 }
 
@@ -86,13 +104,27 @@ export function togglePageSelectedIds<Id extends RowId>(
     const selectablePageIds = pageIds.filter((id) => rowAllowed(id, guard));
     const allSelected =
         selectablePageIds.length > 0 &&
-        selectablePageIds.every((id) => selectedIds.includes(id));
+        selectablePageIds.every((id) => hasRowId(selectedIds, id));
 
-    return allSelected
-        ? selectedIds.filter((id) => !selectablePageIds.includes(id))
-        : [...new Set([...selectedIds, ...selectablePageIds])];
+    if (allSelected) {
+        return selectedIds.filter((id) => !hasRowId(selectablePageIds, id));
+    }
+
+    const next = [...selectedIds];
+
+    selectablePageIds.forEach((id) => {
+        if (!hasRowId(next, id)) {
+            next.push(id);
+        }
+    });
+
+    return next;
 }
 
+/**
+ * Header flags are computed against CURRENT PAGE ids only.
+ * Other-page ids in the selected set do not force checked or mixed.
+ */
 export function derivePageSelection<Id extends RowId>(
     selectedIds: readonly Id[],
     pageIds: readonly Id[],
@@ -102,7 +134,7 @@ export function derivePageSelection<Id extends RowId>(
         guard.selectable === false ? false : rowAllowed(id, guard),
     );
     const selectedOnPage = selectablePageIds.filter((id) =>
-        selectedIds.includes(id),
+        hasRowId(selectedIds, id),
     );
 
     return {
@@ -126,7 +158,7 @@ export function createWorkspaceSelection<Id extends RowId>(
     return {
         selectedIds,
         selectedCount: selectedIds.length,
-        isSelected: (id) => selectedIds.includes(id),
+        isSelected: (id) => hasRowId(selectedIds, id),
         toggleOne: (id) => setIds(toggleSelectedId(selectedIds, id, guard)),
         togglePage: () => setIds(togglePageSelectedIds(selectedIds, pageIds, guard)),
         clearSelection: () => setIds([]),

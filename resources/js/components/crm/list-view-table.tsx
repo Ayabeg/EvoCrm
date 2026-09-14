@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { derivePageSelection } from '@/ds/workspace/selection';
+import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
 import type { RowId } from '@/ds/workspace/selection';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
@@ -449,7 +449,7 @@ export default function ListViewTable({
                     </thead>
                     <tbody>
                         {rows.map((row) => {
-                            const selected = selectedIds.includes(row.id);
+                            const selected = hasRowId(selectedIds, row.id);
                             const href = recordHref(basePath, row.id);
 
                             return (
@@ -545,7 +545,7 @@ export default function ListViewTable({
                                 <input
                                     type="checkbox"
                                     className="mt-1"
-                                    checked={selectedIds.includes(row.id)}
+                                    checked={hasRowId(selectedIds, row.id)}
                                     disabled={!(isRowSelectable?.(row.id) ?? true)}
                                     onChange={() => onToggle?.(row.id)}
                                     aria-label={`Select ${row.id}`}

@@ -7,6 +7,8 @@ export { SavedViews } from '@/ds/workspace/SavedViews';
 export {
     createWorkspaceSelection,
     derivePageSelection,
+    hasRowId,
+    sameRowId,
     togglePageSelectedIds,
     toggleSelectedId,
     useWorkspaceSelection,

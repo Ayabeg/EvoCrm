@@ -39,7 +39,10 @@ it('defines a typed shared selection contract with explicit controlled and uncon
     expect($contract)->toContain("mode: 'uncontrolled'")
         ->and($contract)->toContain("mode: 'controlled'")
         ->and($contract)->toContain('@ts-expect-error uncontrolled selection cannot pass selectedIds')
+        ->and($contract)->toContain('@ts-expect-error uncontrolled selection cannot pass onSelectedIdsChange')
         ->and($contract)->toContain('@ts-expect-error controlled selection requires onSelectedIdsChange')
+        ->and($contract)->toContain('@ts-expect-error controlled selection requires selectedIds')
+        ->and($contract)->toContain('@ts-expect-error controlled selection cannot take defaultSelectedIds')
         ->and($contract)->toContain("id: 'uuid-1'");
 });
 
@@ -93,13 +96,17 @@ it('wires Companies and Quotes to the contract without inventing selectable bulk
     expect($companies)->toContain("mode: 'uncontrolled'")
         ->and($companies)->toContain('selectable: false')
         ->and($companies)->toContain('pageIds: companies.map((company) => company.id)')
+        ->and($companies)->toContain('Not a permanent bulk ban')
         ->and($companies)->not->toContain('selectable={true}')
-        ->and($companies)->not->toContain('BulkActionBar');
+        ->and($companies)->not->toContain('BulkActionBar')
+        ->and($companies)->not->toContain('type="checkbox"');
 
     expect($quotes)->toContain("mode: 'uncontrolled'")
         ->and($quotes)->toContain('selectable: false')
         ->and($quotes)->toContain('pageIds: quotes.map((quote) => quote.id)')
-        ->and($quotes)->not->toContain('BulkActionBar');
+        ->and($quotes)->toContain('Not a permanent bulk ban')
+        ->and($quotes)->not->toContain('BulkActionBar')
+        ->and($quotes)->not->toContain('type="checkbox"');
 });
 
 it('defers Leads selection because the list is still a raw table outside CrmListShell', function () {
@@ -121,13 +128,23 @@ it('preserves select-all as the current rendered page and marks indeterminate', 
 
     expect($selection)->toContain('Select-all = current rendered page only')
         ->and($selection)->toContain('Dataset-wide select-all does not exist')
+        ->and($selection)->toContain('Object.is')
+        ->and($selection)->toContain('1` and `"1"` are different ids')
+        ->and($selection)->toContain('Header flags are computed against CURRENT PAGE ids only')
+        ->and($selection)->toContain('bulkActive: selectedIds.length > 0')
         ->and($table)->toContain('element.indeterminate = somePageSelected')
         ->and($table)->toContain("aria-checked={")
         ->and($table)->toContain("'mixed'")
         ->and($table)->toContain('aria-label="Select page"')
         ->and($table)->toContain('aria-label={`Select ${row.id}`}')
         ->and($dataTable)->toContain('element.indeterminate = somePageSelected')
+        ->and($dataTable)->toContain('onTogglePage()')
         ->and($proofs)->toContain('select-all is current page and keeps other pages')
+        ->and($proofs)->toContain('page2 deselect-all returns [1,2] not []')
+        ->and($proofs)->toContain('indeterminate ignores other-page ids')
+        ->and($proofs)->toContain('number 1 is not string 1')
+        ->and($proofs)->toContain('select-all excludes non-selectable rows')
+        ->and($proofs)->toContain('other-page ids keep bulkActive true')
         ->and($proofs)->toContain('unselectable protected')
         ->and($proofs)->toContain('string row ids');
 });

@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import ListViewTable from '@/components/crm/list-view-table';
-import { derivePageSelection } from '@/ds/workspace/selection';
+import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
 import type { RowId } from '@/ds/workspace/selection';
 import type { DataTableProps } from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
@@ -13,6 +13,7 @@ export function DataTable<Row extends { id: RowId }>({
     rowHeight = 48,
     selectedIds = [],
     onToggle,
+    onTogglePage,
     onRowClick,
     isRowSelectable,
 }: DataTableProps<Row>) {
@@ -39,13 +40,19 @@ export function DataTable<Row extends { id: RowId }>({
                                         }
                                     }}
                                     onChange={() => {
+                                        if (onTogglePage) {
+                                            onTogglePage();
+
+                                            return;
+                                        }
+
                                         if (allPageSelected) {
                                             pageIds.forEach((id) => {
                                                 if (
                                                     (isRowSelectable?.(id) ?? true) &&
-                                                    selectedIds.includes(id)
+                                                    hasRowId(selectedIds, id)
                                                 ) {
-                                                    onToggle(id);
+                                                    onToggle?.(id);
                                                 }
                                             });
 
@@ -55,9 +62,9 @@ export function DataTable<Row extends { id: RowId }>({
                                         pageIds.forEach((id) => {
                                             if (
                                                 (isRowSelectable?.(id) ?? true) &&
-                                                !selectedIds.includes(id)
+                                                !hasRowId(selectedIds, id)
                                             ) {
-                                                onToggle(id);
+                                                onToggle?.(id);
                                             }
                                         });
                                     }}
@@ -85,7 +92,7 @@ export function DataTable<Row extends { id: RowId }>({
                 </thead>
                 <tbody>
                     {rows.map((row) => {
-                        const selected = selectedIds.includes(row.id);
+                        const selected = hasRowId(selectedIds, row.id);
 
                         const canSelect = isRowSelectable?.(row.id) ?? true;
 

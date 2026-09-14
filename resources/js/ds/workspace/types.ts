@@ -81,7 +81,10 @@ export type DataWorkspaceChromeProps = {
 
     /**
      * Shared selection + bulk-state contract (P03B).
-     * Domain still owns row identity, selectable?, actions, and handlers.
+     * Domain still owns row identity, page participation (`selectable`),
+     * per-row `isRowSelectable`, actions, and handlers.
+     * `selectable: false` means this page does not participate now —
+     * not that the object can never support bulk.
      */
     selection?: WorkspaceSelectionInput;
 
@@ -154,6 +157,7 @@ export type DataTableProps<Row extends { id: RowId } = { id: RowId }> = {
     rowHeight?: 48;
     selectedIds?: RowId[];
     onToggle?: (id: RowId) => void;
+    onTogglePage?: () => void;
     onRowClick?: (row: Row) => void;
     isRowSelectable?: (id: RowId) => boolean;
 };

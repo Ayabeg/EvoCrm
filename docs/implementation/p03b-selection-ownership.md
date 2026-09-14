@@ -55,7 +55,11 @@ Least surprising default: **uncontrolled**. DataWorkspace owns the id set.
 | `uncontrolled` (default) | Live Contacts / Companies / Deals / Quotes | `pageIds`, `selectable?` | `selectedIds`, `onSelectedIdsChange` |
 | `controlled` | Parent must own the set | `mode: 'controlled'`, `selectedIds`, `onSelectedIdsChange` | `defaultSelectedIds` |
 
-Compile lock: `data-workspace-contract.ts` `@ts-expect-error` on mixed modes.
+Compile lock: `data-workspace-contract.ts` `@ts-expect-error` on mixed modes — uncontrolled + `selectedIds` / `onSelectedIdsChange`; controlled missing `selectedIds` or the change handler; controlled + `defaultSelectedIds`.
+
+**Row identity:** `RowId` stays `string | number`. Membership uses `Object.is` (`sameRowId` / `hasRowId`). Numeric `1` and string `"1"` are different IDs. IDs are never stringified, never parsed as UUIDs, and never taken from the array index.
+
+**Per-row `disabled` / `isRowSelectable`:** if a rendered row is not selectable, `togglePage` skips it. Pages in this PR do not ship disabled-row UX; the API is reserved.
 
 ---
 
@@ -65,7 +69,16 @@ Compile lock: `data-workspace-contract.ts` `@ts-expect-error` on mixed modes.
 
 Page toggle **accumulates**: other-page ids stay selected. Unchecking select-all removes only the current page’s selectable ids.
 
-Header checkbox is indeterminate when `somePageSelected` (partial page). `aria-checked="mixed"`.
+Worked example (must stay true):
+
+1. Page 1 selected `[1, 2]`.
+2. Navigate to page 2. Set is still `[1, 2]`. Header flags are **current-page-only**, so `allPageSelected=false` and `somePageSelected=false` (other-page leftovers do not force checked or mixed).
+3. Select-all page 2 → `[1, 2, 11, 12, 13]`.
+4. Deselect-all page 2 → `[1, 2]`, **not** `[]`.
+
+Header checkbox is indeterminate when `somePageSelected` (partial **current page**). `aria-checked="mixed"`.
+
+`bulkActive` is derived from `selectedIds.length > 0`. It is not independent React state. Other-page leftovers keep `bulkActive=true`. `clearSelection` and the last remaining deselect both turn it off.
 
 ---
 
@@ -86,8 +99,8 @@ Preserved from before (no URL work):
 |---|---|---|---|
 | Contacts | `CrmListShell selection=` + `children(columns, selection)` | `canBulk` | Canary. Bar still domain wrapper, same place, same POSTs. |
 | Deals list | Same | `canBulk` | Same as contacts. |
-| Companies | `selection={{ mode: 'uncontrolled', selectable: false, pageIds }}` | No | Contract only. No checkboxes. No bar. |
-| Quotes | Same inert wiring | No | Contract only. |
+| Companies | `selection={{ mode: 'uncontrolled', selectable: false, pageIds }}` | No | Page does not participate **now**. Not a permanent bulk ban. No checkboxes. No bar. Later opt-in is `selectable: true` without a DW API change. |
+| Quotes | Same inert wiring | No | Same as Companies. |
 | Leads | **Deferred** | — | Raw table, no `CrmListShell` / `ListViewTable`. Forcing checkboxes would be a visual + P06 migration. |
 | Tickets | Unchanged children `(columns) =>` | No | Out of scope; adapter keeps working. |
 | Shared-table mode | `selection` chrome + default `pageIds` from `rows` | `selection.selectable` | No page uses MODE A yet (P04–P08). |
@@ -100,7 +113,7 @@ DataWorkspace now knows: count, `bulkActive`, `clearSelection`, and still has th
 
 Contacts/Deals **keep** rendering the existing domain `BulkActionBar` inside results so the bar does not jump out of the white content region. DS `BulkActionBar` classes, labels, and POST body (`action`, `ids`, `owner_id`, `sequence_id`, `stage_id`) are unchanged.
 
-`selectable: false` or `isRowSelectable === false` blocks toggle. Unselectable row checkboxes are `disabled`.
+`selectable: false` means this **page** does not currently participate in shared row selection — not that the object can never support bulk. `isRowSelectable === false` blocks that row’s toggle. Unselectable row checkboxes are `disabled` when a page opts into per-row gating.
 
 ---
 
@@ -138,11 +151,11 @@ Reducer proofs: `resources/js/ds/workspace/selection-contract.ts`.
 | Proof | How |
 |---|---|
 | Select one / deselect | `toggleSelectedId` + contract file |
-| Select-all page + accumulate | `togglePageSelectedIds` |
-| Indeterminate | `derivePageSelection` + ListViewTable / DataTable `indeterminate` + `aria-checked="mixed"` |
-| Clear / accurate count / bulk only with selection | `clearSelection`, `selectedCount`, `bulkActive` |
-| Row id types | `RowId = string \| number`; string-id shared-table accept case |
-| Unselectable protected | reducer no-op + disabled checkbox |
+| Select-all page + accumulate | `togglePageSelectedIds`; Page1 `[1,2]` → Page2 select → `[1,2,11,12,13]` → deselect → `[1,2]` |
+| Indeterminate | current-page ids only; other-page leftovers do not force mixed |
+| Clear / accurate count / bulk only with selection | `clearSelection`, `selectedCount`, `bulkActive`; other-page leftovers keep bulk true |
+| Row id types | `RowId = string \| number`; `Object.is`; `1` ≠ `"1"` |
+| Unselectable protected | reducer no-op + disabled checkbox; select-all skips `isRowSelectable === false` |
 | No backend shape change | DS bar POST keys + `CrmBulkActionsTest` |
 | No URL/query change | `list-query` keys + no `searchParams` / `history.replaceState` |
 

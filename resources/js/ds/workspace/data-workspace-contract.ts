@@ -101,8 +101,28 @@ acceptSelection({
     onSelectedIdsChange: () => undefined,
 });
 
+acceptSelection({
+    mode: 'uncontrolled',
+    // @ts-expect-error uncontrolled selection cannot pass onSelectedIdsChange
+    onSelectedIdsChange: () => undefined,
+});
+
 // @ts-expect-error controlled selection requires onSelectedIdsChange
 acceptSelection({
     mode: 'controlled',
     selectedIds: [1],
+});
+
+// @ts-expect-error controlled selection requires selectedIds
+acceptSelection({
+    mode: 'controlled',
+    onSelectedIdsChange: () => undefined,
+});
+
+acceptSelection({
+    mode: 'controlled',
+    selectedIds: [1],
+    onSelectedIdsChange: () => undefined,
+    // @ts-expect-error controlled selection cannot take defaultSelectedIds
+    defaultSelectedIds: [1],
 });
