@@ -144,16 +144,32 @@ No Dialog / Popover / Dropdown / Tooltip forks were force-merged. Product alread
 
 ## Tests run
 
-See the PR body / end report for the live command log. Planned:
-
-- `php artisan test --filter=P01`
-- `php artisan test --filter=P03`
-- `php artisan test --filter=P04`
-- `php artisan test --filter=Wave0`
-- `php artisan test --filter=Wave1` … `Wave5` as capacity allows
-- `npm run types:check`
-- `npm run lint:check`
-- `npm run build`
+| Command | Result |
+|---|---|
+| `php artisan test --filter=P01` | pass (3 tests, 81 assertions) |
+| `php artisan test --filter=P03` | pass (7 / 331) |
+| `php artisan test --filter=P04` | pass (4 / 57) |
+| `php artisan test --filter=Wave0` | pass (5 / 94) |
+| `php artisan test --filter=Wave1` | pass (3 / 75) |
+| `php artisan test --filter=Wave2` | pass (4 / 117) |
+| `php artisan test --filter=Wave3` | pass (5 / 106) |
+| `php artisan test --filter=Wave4` | pass (6 / 131) |
+| `php artisan test --filter=Wave5` | pass (5 / 98) |
+| `php artisan test --filter=P05` | pass (4 / 99) |
+| `php artisan test --filter=SimpleMode` | pass (10 / 103) |
+| `php artisan test --filter=AuroraToken` | pass (20 / 167) |
+| `php artisan test --filter=MoveDeal` | pass |
+| `php artisan test --filter=Quote` | pass (23 / 250) |
+| `php artisan test --filter=LeadPath` | pass |
+| `php artisan test --filter=LeadConversion` | pass |
+| `php artisan test --filter=Inbox` | pass (16 / 266) |
+| `php artisan test --filter=OAuthSetup` | pass |
+| `php artisan test --filter=FirstRun` | pass |
+| `php artisan test --filter=CrmRecord` | pass |
+| `npm run types:check` | pass (after `php artisan wayfinder:generate --with-form`) |
+| `npx eslint` on P01-touched files | pass (1 pre-existing `command-palette` hook warning) |
+| `npm run lint:check` (repo-wide) | pre-existing errors outside P01 files; not weakened |
+| `npm run build` | pass |
 
 New lock: `tests/Feature/P01PrimitiveConvergenceTest.php`.
 
@@ -161,11 +177,15 @@ New lock: `tests/Feature/P01PrimitiveConvergenceTest.php`.
 
 ## Visual QA / a11y
 
-Manual checklist (viewports 1440 / 1280 / 1024 / 768 / 375):
+**Source + compile (done):** sizes/`aria-*` preserved; Drawer is an alias of the same Aurora sheet; vite production build succeeded; command palette still only `records` + `navigate` and `/home`.
 
-- Home, Contacts, Companies, Leads, Deals list, Pipeline, Quotes, Inbox, Settings, command palette
-- Icons: weight, clip, baseline, button width, no mixed families on one active screen
-- Overlays: Create drawer, Ask Evo sheet, board options, column chooser, record layout editor, dialogs, dropdowns, tooltips
-- Keyboard: ⌘K / Escape / focus return unchanged
+**Live authenticated browser pass (not run here):** no seeded operator session in this environment. Reviewer should still click through Home / Contacts / Companies / Leads / Deals / Pipeline / Quotes / Inbox / Settings / ⌘K at 1440, 1280, 1024, 768, and 375.
 
-A11y: decorative icons `aria-hidden`; icon-only controls keep names; tooltips not made the sole label; overlay labels unchanged.
+Mental model (from source, unchanged contracts):
+
+- Command palette: ⌘K / Escape / backdrop click still close; focus still moves to the search input
+- Sidebar trigger: still `sr-only` “Toggle sidebar”; mobile still `<SheetContent>`
+- Create / Ask Evo / layout / columns / board options: same `open` / `onOpenChange` / `side` props on the same primitive
+- Icon-only: password toggle labels, Ask Evo collapse labels, layout move labels kept
+
+A11y: decorative icons `aria-hidden` on touched chrome; icon-only controls keep names; tooltips not made the sole label; overlay labels unchanged.

@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
-import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
 import { t } from '@/lib/i18n';
+import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
 
 export default function ColumnChooser({
     columnDefs,

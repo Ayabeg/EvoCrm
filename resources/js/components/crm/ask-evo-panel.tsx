@@ -1,7 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { CaretDown, CaretUp, Sparkle } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { Button } from '@/components/ui/button';
 import {
     Drawer,
@@ -11,6 +10,7 @@ import {
     DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 
 export type AskEvoPayload = {
     label?: string;

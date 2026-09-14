@@ -13,8 +13,8 @@ import {
 } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { LogCallForm } from '@/components/crm/activity-composer';
+import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
