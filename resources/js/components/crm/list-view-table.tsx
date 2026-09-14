@@ -1,10 +1,11 @@
 import { Link, router } from '@inertiajs/react';
-import { derivePageSelection, type RowId } from '@/ds/workspace/selection';
+import { derivePageSelection } from '@/ds/workspace/selection';
+import type { RowId } from '@/ds/workspace/selection';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
+import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
-import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 type AttributeMap = Record<string, string | null>;

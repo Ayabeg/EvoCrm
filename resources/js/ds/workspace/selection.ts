@@ -140,7 +140,6 @@ export function useWorkspaceSelection<Id extends RowId = RowId>(
     input: WorkspaceSelectionInput<Id> = { mode: 'uncontrolled' },
 ): WorkspaceSelection<Id> {
     const mode = input.mode ?? 'uncontrolled';
-    const pageIds = input.pageIds ?? [];
     const selectable = input.selectable;
     const isRowSelectable = input.isRowSelectable;
     const defaultSelectedIds =
@@ -172,10 +171,10 @@ export function useWorkspaceSelection<Id extends RowId = RowId>(
 
     return useMemo(
         () =>
-            createWorkspaceSelection(selectedIds, pageIds, setIds, {
+            createWorkspaceSelection(selectedIds, input.pageIds ?? [], setIds, {
                 selectable,
                 isRowSelectable,
             }),
-        [selectedIds, pageIds, setIds, selectable, isRowSelectable],
+        [selectedIds, input.pageIds, setIds, selectable, isRowSelectable],
     );
 }

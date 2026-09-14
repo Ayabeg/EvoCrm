@@ -10,11 +10,8 @@ import { AdvancedFilterDrawer } from '@/ds/workspace/AdvancedFilterDrawer';
 import { ListDataTable } from '@/ds/workspace/DataTable';
 import { FilterBar } from '@/ds/workspace/FilterBar';
 import { SavedViews } from '@/ds/workspace/SavedViews';
-import {
-    useWorkspaceSelection,
-    type RowId,
-    type WorkspaceSelection,
-} from '@/ds/workspace/selection';
+import { useWorkspaceSelection } from '@/ds/workspace/selection';
+import type { RowId, WorkspaceSelection } from '@/ds/workspace/selection';
 import type {
     DataWorkspaceProps,
     DataWorkspaceSharedTableProps,

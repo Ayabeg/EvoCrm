@@ -1,9 +1,10 @@
 import { router } from '@inertiajs/react';
 import ListViewTable from '@/components/crm/list-view-table';
-import { derivePageSelection, type RowId } from '@/ds/workspace/selection';
+import { derivePageSelection } from '@/ds/workspace/selection';
+import type { RowId } from '@/ds/workspace/selection';
 import type { DataTableProps } from '@/ds/workspace/types';
-import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { t } from '@/lib/i18n';
+import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 
 export function DataTable<Row extends { id: RowId }>({
@@ -47,6 +48,7 @@ export function DataTable<Row extends { id: RowId }>({
                                                     onToggle(id);
                                                 }
                                             });
+
                                             return;
                                         }
 

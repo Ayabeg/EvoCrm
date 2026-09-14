@@ -1,3 +1,4 @@
+import type { WorkspaceSelectionInput } from '@/ds/workspace/selection';
 import type { DataWorkspaceChromeProps, DataWorkspaceProps } from '@/ds/workspace/types';
 
 /**
@@ -21,6 +22,7 @@ const chrome: DataWorkspaceChromeProps = {
 };
 
 declare function acceptWorkspace(props: DataWorkspaceProps): void;
+declare function acceptSelection(input: WorkspaceSelectionInput): void;
 
 acceptWorkspace({
     ...chrome,
@@ -92,25 +94,15 @@ acceptWorkspace({
     },
 });
 
-// @ts-expect-error uncontrolled selection cannot pass selectedIds
-acceptWorkspace({
-    ...chrome,
-    resultMode: 'domain',
-    renderResults: null,
-    selection: {
-        mode: 'uncontrolled',
-        selectedIds: [1],
-        onSelectedIdsChange: () => undefined,
-    },
+acceptSelection({
+    mode: 'uncontrolled',
+    // @ts-expect-error uncontrolled selection cannot pass selectedIds
+    selectedIds: [1],
+    onSelectedIdsChange: () => undefined,
 });
 
 // @ts-expect-error controlled selection requires onSelectedIdsChange
-acceptWorkspace({
-    ...chrome,
-    resultMode: 'domain',
-    renderResults: null,
-    selection: {
-        mode: 'controlled',
-        selectedIds: [1],
-    },
+acceptSelection({
+    mode: 'controlled',
+    selectedIds: [1],
 });

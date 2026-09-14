@@ -12,8 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
-import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import { t } from '@/lib/i18n';
+import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import type { Auth } from '@/types';
 
 type Contact = {
