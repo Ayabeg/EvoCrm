@@ -367,8 +367,8 @@ Shared **BACKEND CONTRACT THAT MUST NOT CHANGE:** routes in `web.php` / `setting
 
 **OBJECTIVE:** Contacts index is a first-class DataWorkspace consumer (no table bypass if P03B–D succeeded; otherwise finish it here).  
 **REFERENCE PATTERN:** HubSpot contacts [2c2951a8](https://mobbin.com/screens/2c2951a8-ec56-41c0-a3e0-990330bdc5f4).  
-**CURRENT IMPLEMENTATION:** Adapter + ListViewTable children.  
-**TARGET ARCHITECTURE:** `object="contact"`; domain columns/cells/filters/bulk/create only.  
+**CURRENT IMPLEMENTATION:** Shared-table via `CrmListShell resultMode="shared-table"` (P04). Domain columns/cells/filters/bulk/create only.  
+**TARGET ARCHITECTURE:** `object="contact"`; domain columns/cells/filters/bulk/create only. Landed — see [p04-contacts-workspace.md](./p04-contacts-workspace.md).  
 **FILES LIKELY AFFECTED:** `pages/crm/contacts/index.tsx`, Wave1 test.  
 **NEW / MODIFIED / DEPRECATED:** No CrmShell (already none).  
 **BEHAVIOR THAT MUST NOT CHANGE:** create, saved view, filter, export, import permission, duplicates, bulk.  

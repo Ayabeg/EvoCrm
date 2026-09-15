@@ -93,6 +93,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
         columnDefs,
         onColumnsChange,
         bulk,
+        exportHref,
         mode = 'list',
         onModeChange,
         extraQuery = {},
@@ -227,7 +228,11 @@ export function DataWorkspace<Row extends { id: RowId }>(
                 extraQuery={extraQuery}
                 onFiltersChange={onFiltersChange}
             />
-            {selection.bulkActive && bulk ? bulk : null}
+            {selection.bulkActive && bulk
+                ? typeof bulk === 'function'
+                    ? bulk(selection)
+                    : bulk
+                : null}
             <div className={cn('flex min-h-0 flex-1 flex-col bg-canvas', contentClassName)}>
                 {resultSurface}
                 {resultMode === 'shared-table' && paginator && !boardSurface ? (
@@ -238,6 +243,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
                         extraQuery={extraQuery}
                         pageCount={sharedRows?.length ?? 0}
                         paginator={paginator}
+                        exportHref={exportHref}
                     />
                 ) : null}
             </div>

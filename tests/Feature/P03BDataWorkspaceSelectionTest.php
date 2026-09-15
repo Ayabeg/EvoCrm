@@ -57,7 +57,7 @@ it('lets DataWorkspace orchestrate selection and bulk-active state in both resul
         ->and($workspace)->toContain('props.renderResults({ columns, selection })')
         ->and($workspace)->not->toContain("resultMode === 'shared-table' ? (props.selectedIds ?? []) : []");
 
-    expect($shell)->toContain('selection={selection}')
+    expect($shell)->toContain('selection,')
         ->and($shell)->toContain('children(nextColumns, workspaceSelection)')
         ->and($shell)->not->toContain('rows={[]}')
         ->and($shell)->not->toContain('selectedIds={[]}');
@@ -70,11 +70,7 @@ it('wires Contacts and Deals onto the shared contract without page-local selecte
     expect($contacts)->toContain("mode: 'uncontrolled'")
         ->and($contacts)->toContain('selectable: canBulk')
         ->and($contacts)->toContain('pageIds: contacts.map((contact) => contact.id)')
-        ->and($contacts)->toContain('(columns, selection)')
-        ->and($contacts)->toContain('selection.bulkActive')
         ->and($contacts)->toContain('selectedIds={selection.selectedIds}')
-        ->and($contacts)->toContain('onToggle={selection.toggleOne}')
-        ->and($contacts)->toContain('onTogglePage={selection.togglePage}')
         ->and($contacts)->toContain('onClear={selection.clearSelection}')
         ->and($contacts)->not->toContain('useState<number[]>([])')
         ->and($contacts)->not->toContain('setSelectedIds');
@@ -188,7 +184,7 @@ it('leaves list-query URL keys and page filter write paths untouched', function 
         ->and($shell)->toContain('preserveState: true')
         ->and($workspace)->not->toContain('searchParams.set')
         ->and($workspace)->not->toContain('history.replaceState')
-        ->and($contacts)->toContain('listPageHref');
+        ->and($contacts)->toContain('hasActiveListFilters');
 });
 
 it('keeps Contacts Companies Deals Quotes and Leads Inertia contracts', function () {

@@ -69,7 +69,7 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 - **Owner:** `ds/workspace/DataWorkspace.tsx`
 - **Owns:** orchestration — header, SavedViews, FilterBar, AdvancedFilterDrawer, **shared selection + bulk-active state**, bulk slot, list|board switch, empty/loading, pagination **when it owns rows**
 - **Must not own:** cell renderers, bulk POST shapes, create forms, kanban cards, Ask Evo
-- **Result modes (P03A):** `resultMode: 'shared-table'` owns `rows` + shared table chrome. `resultMode: 'domain'` takes `renderResults` and forbids `rows` / `children`. `CrmListShell` is domain mode until P04–P08 migrate objects.
+- **Result modes (P03A):** `resultMode: 'shared-table'` owns `rows` + shared table chrome. `resultMode: 'domain'` takes `renderResults` and forbids `rows` / `children`. Contacts is on shared-table (P04). Companies / Deals / Quotes / Tickets stay domain until P05–P08.
 - **Selection (P03B):** chrome `selection` contract (`RowId = string | number`). Domain consumes `renderResults({ columns, selection })`. Actions stay domain.
 - **Query (P03C):** URL / Inertia `activeFilters` is the durable list-query source of truth. Canonical contract in `lib/list-query`. Domain adapters serialize to existing params (`q`, `view`, `filter_id`, `page`, …). No competing React list-state mirror.
 - **Empty / paginator / board (P03D):** Shared-table uses `WorkspaceEmpty` (h2), `WorkspacePaginator` (`listPageHref`), and `resolveWorkspaceBoardSlot`. `rowHref` is consumed by `ListDataTable`. Domain pages keep `CrmEmptyState` + `CrmListFooter`. Board slot is ready for P11; deals board is not moved.
@@ -95,7 +95,7 @@ New product work imports `@/ds/*` or the `@/components/ui/*` re-export. Do not a
 
 ### CrmListShell
 
-- **Role after P03B:** thin page helper that maps Inertia list props → `DataWorkspace` domain mode (`renderResults` + `selection`). Domain tables still render via children. Shared-table `rows` wait for P04–P08.
+- **Role after P04:** thin Inertia mapper. Contacts uses `resultMode="shared-table"` (`rows` / `rowHref` / `empty` / `paginator`). Other list objects still map to domain `renderResults` until P05–P08.
 - **Deprecate as a visual fork** once all five objects pass through shared-table mode without a domain result surface.
 
 ---

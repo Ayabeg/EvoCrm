@@ -57,14 +57,13 @@ it('lets CrmListShell pass the P11 board slot without changing domain pages', fu
     $listTable = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
 
     expect($shell)->toContain('resultMode="domain"')
-        ->and($shell)->toContain('board={board}')
-        ->and($shell)->toContain('onModeChange={onModeChange}')
-        ->and($shell)->toContain("mode={mode ?? (entity === 'deal' ? 'list' : undefined)}")
+        ->and($shell)->toContain('resultMode="shared-table"')
+        ->and($shell)->toContain('board,')
+        ->and($shell)->toContain('onModeChange,')
+        ->and($shell)->toContain("mode: mode ?? (entity === 'deal' ? 'list' as const : undefined)")
         ->and($shell)->toContain('CrmEmptyState +')
         ->and($shell)->toContain('CrmListFooter')
-        ->and($shell)->not->toContain('resultMode="shared-table"')
-        ->and($shell)->not->toContain('rows={[]}')
-        ->and($shell)->not->toContain('rowHref=');
+        ->and($shell)->not->toContain('rows={[]}');
 
     expect($listTable)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($listTable)->toContain('rowHref?: (row: { id: RowId }) => string');
@@ -79,12 +78,12 @@ it('keeps Contacts Companies Deals Quotes and Leads on domain empty and footer s
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
 
     expect($contacts)->toContain('CrmListShell')
-        ->and($contacts)->toContain('CrmEmptyState')
-        ->and($contacts)->toContain('CrmListFooter')
-        ->and($contacts)->toContain('listPageHref')
-        ->and($contacts)->not->toContain('resultMode=')
-        ->and($contacts)->not->toContain('WorkspaceEmpty')
-        ->and($contacts)->not->toContain('WorkspacePaginator')
+        ->and($contacts)->toContain('resultMode="shared-table"')
+        ->and($contacts)->toContain('empty={contactEmptyState')
+        ->and($contacts)->toContain('paginator={paginator}')
+        ->and($contacts)->not->toContain('CrmEmptyState')
+        ->and($contacts)->not->toContain('CrmListFooter')
+        ->and($contacts)->not->toContain('listPageHref')
         ->and($contacts)->not->toContain('board=');
 
     expect($companies)->toContain('CrmListShell')

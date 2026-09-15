@@ -118,7 +118,7 @@ it('keeps the contacts index Inertia contract through the CrmListShell adapter',
         ->and($index)->toContain('savedFilters')
         ->and($index)->toContain('activeFilters')
         ->and($index)->toContain('listView')
-        ->and($index)->toContain('ListViewTable');
+        ->and($index)->toContain('resultMode="shared-table"');
 
     $user = User::factory()->create();
     $company = Company::factory()->create(['workspace_id' => $user->workspace_id]);

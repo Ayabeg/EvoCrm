@@ -4,7 +4,7 @@ import type { DataWorkspaceEntity, DataWorkspacePaginator } from '@/ds/workspace
 import { t } from '@/lib/i18n';
 
 const OBJECT_NOUNS = {
-    contact: 'records',
+    contact: 'contacts',
     company: 'records',
     deal: 'records',
     ticket: 'records',
@@ -23,6 +23,7 @@ export function WorkspacePaginator({
     extraQuery = {},
     pageCount,
     paginator,
+    exportHref,
 }: {
     object: DataWorkspaceEntity;
     basePath: string;
@@ -30,6 +31,7 @@ export function WorkspacePaginator({
     extraQuery?: Record<string, string | number | null | undefined>;
     pageCount: number;
     paginator: DataWorkspacePaginator;
+    exportHref?: string;
 }) {
     return (
         <footer
@@ -77,6 +79,11 @@ export function WorkspacePaginator({
                 ) : (
                     <span className="opacity-40">{t('Next')}</span>
                 )}
+                {exportHref ? (
+                    <a href={exportHref} className="hover:text-ink">
+                        {t('Export')}
+                    </a>
+                ) : null}
             </nav>
         </footer>
     );

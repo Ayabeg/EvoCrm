@@ -13,7 +13,9 @@ it('creates a task on a contact timeline and reflects it in activities and home 
             'type' => 'task',
             'subject' => 'Call Amine',
             'body' => 'Before 17h',
-            'due_at' => now()->addHour()->toDateTimeString(),
+            // Home KPIs use Africa/Algiers day bounds. `now()->addHour()`
+            // crosses midnight there after ~22:00 UTC and drops tasks_due.
+            'due_at' => now('Africa/Algiers')->setTime(12, 0)->toDateTimeString(),
             'contact_id' => $contact->id,
             'owner_id' => $user->id,
         ])

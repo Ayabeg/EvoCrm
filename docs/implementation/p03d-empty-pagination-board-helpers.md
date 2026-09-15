@@ -109,7 +109,8 @@ Live pages keep `CrmEmptyState`.
 
 | Item | Phase |
 |---|---|
-| Contacts / Companies / Leads / Deals / Quotes onto `shared-table` | P04–P08 |
+| Contacts onto `shared-table` | **Done in P04** — see `p04-contacts-workspace.md` |
+| Companies / Leads / Deals / Quotes onto `shared-table` | P05–P08 |
 | `sort` / `columns` on the URL | later (needs a backend read path) |
 | BulkActionBar redesign / moving the bar into chrome | later |
 | PipelineBoard on `mode="board"` / moving deals board | **P11** |

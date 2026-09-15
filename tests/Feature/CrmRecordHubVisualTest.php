@@ -1,11 +1,16 @@
 <?php
 
 it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListViewTable swap', function () {
+    $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $hubs = [
-        resource_path('js/pages/crm/contacts/index.tsx'),
         resource_path('js/pages/crm/companies/index.tsx'),
         resource_path('js/pages/crm/deals/index.tsx'),
     ];
+
+    expect($contacts)->toContain('CrmListShell')
+        ->and($contacts)->toContain('resultMode="shared-table"')
+        ->and($contacts)->not->toContain('aurora/data-table')
+        ->and($contacts)->not->toContain('HubSpot');
 
     foreach ($hubs as $path) {
         $src = file_get_contents($path);

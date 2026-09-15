@@ -36,13 +36,13 @@ it('stops CrmListShell from passing rows={[]} or stub selection', function () {
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
 
     expect($shell)->toContain('resultMode="domain"')
+        ->and($shell)->toContain('resultMode="shared-table"')
         ->and($shell)->toContain('renderResults=')
         ->and($shell)->toContain("from '@/ds/workspace/DataWorkspace'")
         ->and($shell)->not->toContain('rows={[]}')
         ->and($shell)->not->toContain('selectedIds={[]}')
         ->and($shell)->not->toContain('onSelectedIdsChange={() => undefined}')
-        ->and($shell)->not->toContain("empty={{ title: '', body: '' }}")
-        ->and($shell)->not->toContain('rowHref=');
+        ->and($shell)->not->toContain("empty={{ title: '', body: '' }}");
 });
 
 it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same owners', function () {
@@ -54,11 +54,12 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
     $tickets = file_get_contents(resource_path('js/pages/crm/tickets/index.tsx'));
 
     expect($contacts)->toContain('CrmListShell')
-        ->and($contacts)->toContain('ListViewTable')
-        ->and($contacts)->toContain('CrmEmptyState')
-        ->and($contacts)->toContain('CrmListFooter')
-        ->and($contacts)->toContain('listPageHref')
-        ->and($contacts)->not->toContain('resultMode=')
+        ->and($contacts)->toContain('resultMode="shared-table"')
+        ->and($contacts)->toContain('rows={contacts}')
+        ->and($contacts)->toContain('rowHref={contactRowHref}')
+        ->and($contacts)->not->toContain('ListViewTable')
+        ->and($contacts)->not->toContain('CrmEmptyState')
+        ->and($contacts)->not->toContain('CrmListFooter')
         ->and($contacts)->not->toContain('DataWorkspace');
 
     expect($companies)->toContain('CrmListShell')
@@ -98,7 +99,7 @@ it('keeps domain pages off the shared-table result mode after selection hoist', 
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
     expect($contacts)->toContain("entity=\"contact\"")
-        ->and($contacts)->not->toContain('resultMode=')
+        ->and($contacts)->toContain('resultMode="shared-table"')
         ->and($deals)->not->toContain('resultMode=')
         ->and($shell)->toContain('resultMode="domain"')
         ->and($workspace)->toContain('useWorkspaceSelection');

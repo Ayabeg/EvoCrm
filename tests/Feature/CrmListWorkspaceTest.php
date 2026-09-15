@@ -19,7 +19,7 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     expect($contacts)->toContain('data-crm="contacts-workspace"')
         ->and($contacts)->toContain('CrmListShell')
-        ->and($contacts)->toContain('ListViewTable')
+        ->and($contacts)->toContain('resultMode="shared-table"')
         ->and($contacts)->toContain('hasActiveListFilters')
         ->and($contacts)->not->toContain('CrmShell')
         ->and($contacts)->not->toContain('RecordHubPanel')

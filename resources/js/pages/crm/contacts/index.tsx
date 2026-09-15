@@ -4,32 +4,19 @@ import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
-import { SkeletonList } from '@/components/crm/empty-room';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
-import ListViewTable from '@/components/crm/list-view-table';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
+import {
+    contactEmptyState,
+    contactRowHref,
+} from '@/pages/crm/contacts/contact-columns';
+import type { ContactListRow } from '@/pages/crm/contacts/contact-columns';
 import type { Auth } from '@/types';
-
-type Contact = {
-    id: number;
-    first_name: string;
-    last_name?: string | null;
-    email?: string | null;
-    phone_e164?: string | null;
-    city?: string | null;
-    wilaya?: string | null;
-    lead_status?: string | null;
-    created_at?: string | null;
-    last_activity_at?: string | null;
-    company?: { name: string } | null;
-    owner?: { name: string } | null;
-};
 
 export default function ContactsIndex({
     contacts,
@@ -46,7 +33,7 @@ export default function ContactsIndex({
     createOpen,
     bulk,
 }: {
-    contacts: Contact[];
+    contacts: ContactListRow[];
     companies: { id: number; name: string }[];
     members: { id: number; name: string }[];
     savedFilters: SavedView[];
@@ -75,6 +62,7 @@ export default function ContactsIndex({
                 data-crm="contacts-workspace"
             >
                 <CrmListShell
+                    resultMode="shared-table"
                     title="Contacts"
                     entity="contact"
                     basePath="/crm/contacts"
@@ -91,6 +79,11 @@ export default function ContactsIndex({
                     exportHref="/crm/contacts/export"
                     className="bg-white"
                     contentClassName="bg-white"
+                    rows={contacts}
+                    rowHref={contactRowHref}
+                    empty={contactEmptyState(hasActiveListFilters(activeFilters))}
+                    paginator={paginator}
+                    loading={loading}
                     headerActions={
                         <>
                             {canMerge ? (
@@ -110,6 +103,19 @@ export default function ContactsIndex({
                         selectable: canBulk,
                         pageIds: contacts.map((contact) => contact.id),
                     }}
+                    bulk={
+                        canBulk
+                            ? (selection) => (
+                                  <BulkActionBar
+                                      entity="contact"
+                                      selectedIds={selection.selectedIds}
+                                      members={members}
+                                      sequences={bulk?.sequences ?? []}
+                                      onClear={selection.clearSelection}
+                                  />
+                              )
+                            : undefined
+                    }
                     banner={
                         !hasMailbox ? (
                             <div className="border-b border-hairline bg-white px-4 py-2 text-[12px] text-mute sm:px-6">
@@ -123,80 +129,7 @@ export default function ContactsIndex({
                             </div>
                         ) : null
                     }
-                >
-                    {(columns, selection) => (
-                        <>
-                            {canBulk && selection.bulkActive ? (
-                                <BulkActionBar
-                                    entity="contact"
-                                    selectedIds={selection.selectedIds}
-                                    members={members}
-                                    sequences={bulk?.sequences ?? []}
-                                    onClear={selection.clearSelection}
-                                />
-                            ) : null}
-                            {loading ? (
-                                <SkeletonList />
-                            ) : contacts.length === 0 ? (
-                                <CrmEmptyState
-                                    title={
-                                        hasActiveListFilters(activeFilters)
-                                            ? 'No contacts match these filters'
-                                            : 'No contacts yet'
-                                    }
-                                    line={
-                                        hasActiveListFilters(activeFilters)
-                                            ? 'Clear filters or open another saved view to see records.'
-                                            : 'Add the first person you sell to. Name, phone, and company are enough to start.'
-                                    }
-                                    actionLabel={
-                                        hasActiveListFilters(activeFilters)
-                                            ? undefined
-                                            : 'Create contact'
-                                    }
-                                    onAction={
-                                        hasActiveListFilters(activeFilters)
-                                            ? undefined
-                                            : () => setDrawer(true)
-                                    }
-                                />
-                            ) : (
-                                <div className="min-h-0 flex-1 overflow-auto bg-white">
-                                    <ListViewTable
-                                        entity="contact"
-                                        rows={contacts}
-                                        columnDefs={listView.columnDefs}
-                                        columns={columns}
-                                        basePath="/crm/contacts"
-                                        selectable={canBulk}
-                                        selectedIds={selection.selectedIds}
-                                        onToggle={selection.toggleOne}
-                                        onTogglePage={selection.togglePage}
-                                    />
-                                </div>
-                            )}
-                            <CrmListFooter
-                                count={contacts.length}
-                                total={recordCount}
-                                noun="contacts"
-                                exportHref="/crm/contacts/export"
-                                page={paginator?.page}
-                                lastPage={paginator?.last_page}
-                                perPage={paginator?.per_page}
-                                prevHref={
-                                    paginator && paginator.page > 1
-                                        ? listPageHref('/crm/contacts', activeFilters, paginator.page - 1)
-                                        : null
-                                }
-                                nextHref={
-                                    paginator && paginator.page < paginator.last_page
-                                        ? listPageHref('/crm/contacts', activeFilters, paginator.page + 1)
-                                        : null
-                                }
-                            />
-                        </>
-                    )}
-                </CrmListShell>
+                />
             </div>
 
             <CreateDrawer
