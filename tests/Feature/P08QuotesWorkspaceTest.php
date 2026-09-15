@@ -104,7 +104,8 @@ it('keeps Quotes row identity customer status money validity deal and selection 
         ->and($columns)->toContain('text-mute')
         ->and($columns)->toContain("['draft', 'sent', 'accepted']")
         ->and($columns)->toContain('Do not infer expired from expires_at')
-        ->and($columns)->toContain('Do not invent a universal Customer column')
+        ->and($columns)->toContain('Customer lives on the Deal')
+        ->and($columns)->toContain('Do not invent a universal')
         ->and($columns)->not->toContain('forecast')
         ->and($columns)->not->toContain('QuickRecordDrawer');
 
