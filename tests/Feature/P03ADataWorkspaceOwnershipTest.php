@@ -63,10 +63,14 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($contacts)->not->toContain('DataWorkspace');
 
     expect($companies)->toContain('CrmListShell')
-        ->and($companies)->toContain('ListViewTable')
-        ->and($companies)->toContain('CrmEmptyState')
-        ->and($companies)->toContain('chrome="workspace"')
-        ->and($companies)->not->toContain('resultMode=');
+        ->and($companies)->toContain('resultMode="shared-table"')
+        ->and($companies)->toContain('rows={companies}')
+        ->and($companies)->toContain('rowHref={companyRowHref}')
+        ->and($companies)->not->toContain('ListViewTable')
+        ->and($companies)->not->toContain('CrmEmptyState')
+        ->and($companies)->not->toContain('CrmListFooter')
+        ->and($companies)->not->toContain('CrmShell')
+        ->and($companies)->not->toContain('DataWorkspace');
 
     expect($deals)->toContain('CrmListShell')
         ->and($deals)->toContain('ListViewTable')

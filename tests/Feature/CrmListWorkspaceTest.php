@@ -1,20 +1,15 @@
 <?php
 
 it('gives CRM list pages one workspace shell without room tabs or a card stack', function () {
-    $hubs = [
-        resource_path('js/pages/crm/companies/index.tsx'),
-    ];
-
-    foreach ($hubs as $path) {
-        $src = file_get_contents($path);
-
-        expect($src)->toContain('chrome="workspace"')
-            ->and($src)->toContain('CrmListShell')
-            ->and($src)->toContain('ListViewTable')
-            ->and($src)->toContain('hasActiveListFilters')
-            ->and($src)->not->toContain('RecordHubPanel')
-            ->and($src)->not->toContain('aurora/data-table');
-    }
+    $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
+    expect($companies)->toContain('data-crm="companies-workspace"')
+        ->and($companies)->toContain('CrmListShell')
+        ->and($companies)->toContain('resultMode="shared-table"')
+        ->and($companies)->toContain('hasActiveListFilters')
+        ->and($companies)->not->toContain('CrmShell')
+        ->and($companies)->not->toContain('chrome="workspace"')
+        ->and($companies)->not->toContain('RecordHubPanel')
+        ->and($companies)->not->toContain('aurora/data-table');
 
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     expect($contacts)->toContain('data-crm="contacts-workspace"')
