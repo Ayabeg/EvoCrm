@@ -68,7 +68,7 @@ it('lets CrmListShell pass the P11 board slot without changing domain pages', fu
         ->and($listTable)->toContain('rowHref?: (row: { id: RowId }) => string');
 });
 
-it('keeps Contacts and Companies on shared empty/paginator and other lists on domain footers', function () {
+it('keeps Contacts Companies and Leads on shared empty/paginator and other lists on domain footers', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
@@ -104,10 +104,13 @@ it('keeps Contacts and Companies on shared empty/paginator and other lists on do
         ->and($quotes)->toContain('CrmListFooter')
         ->and($quotes)->not->toContain('WorkspaceEmpty');
 
-    expect($leads)->toContain('CrmObjectHeader')
-        ->and($leads)->toContain('<table')
-        ->and($leads)->not->toContain('CrmListShell')
-        ->and($leads)->not->toContain('DataWorkspace');
+    expect($leads)->toContain('CrmListShell')
+        ->and($leads)->toContain('resultMode="shared-table"')
+        ->and($leads)->toContain('empty={leadEmptyState')
+        ->and($leads)->toContain('paginator={paginator}')
+        ->and($leads)->not->toContain('CrmEmptyState')
+        ->and($leads)->not->toContain('CrmListFooter')
+        ->and($leads)->not->toContain('listPageHref');
 
     expect($board)->toContain('PipelineKanban')
         ->and($board)->not->toContain('resultMode=')

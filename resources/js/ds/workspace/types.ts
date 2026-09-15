@@ -11,7 +11,7 @@ import type {
 
 export type { RowId, WorkspaceSelection, WorkspaceSelectionInput };
 
-export type DataWorkspaceObject = 'contact' | 'company' | 'deal' | 'quote';
+export type DataWorkspaceObject = 'contact' | 'company' | 'deal' | 'quote' | 'lead';
 
 export type DataWorkspaceEntity = DataWorkspaceObject | Extract<ListObjectType, 'ticket'>;
 

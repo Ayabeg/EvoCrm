@@ -9,6 +9,7 @@ const OBJECT_NOUNS = {
     deal: 'records',
     ticket: 'records',
     quote: 'records',
+    lead: 'leads',
 } as const;
 
 /**

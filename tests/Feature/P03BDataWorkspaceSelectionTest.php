@@ -105,13 +105,15 @@ it('wires Companies and Quotes to the contract without inventing selectable bulk
         ->and($quotes)->not->toContain('type="checkbox"');
 });
 
-it('defers Leads selection because the list is still a raw table outside CrmListShell', function () {
+it('wires Leads to the contract without inventing selectable bulk UI', function () {
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
 
-    expect($leads)->toContain('<table')
-        ->and($leads)->not->toContain('CrmListShell')
+    expect($leads)->toContain('CrmListShell')
+        ->and($leads)->toContain("mode: 'uncontrolled'")
+        ->and($leads)->toContain('selectable: false')
+        ->and($leads)->toContain('pageIds: leads.map((lead) => lead.id)')
+        ->and($leads)->toContain('Not a permanent bulk ban')
         ->and($leads)->not->toContain('useWorkspaceSelection')
-        ->and($leads)->not->toContain('selection={{')
         ->and($leads)->not->toContain('type="checkbox"')
         ->and($leads)->not->toContain('BulkActionBar');
 });
@@ -258,5 +260,8 @@ it('keeps Contacts Companies Deals Quotes and Leads Inertia contracts', function
             ->component('crm/leads/index')
             ->has('leads')
             ->has('contacts')
+            ->has('listView.columnDefs')
+            ->has('paginator')
+            ->missing('bulk')
         );
 });

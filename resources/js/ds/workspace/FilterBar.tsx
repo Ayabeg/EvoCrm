@@ -8,6 +8,7 @@ import { t } from '@/lib/i18n';
 import {
     clearQuickFilters,
     fromActiveFilters,
+    listQueryAdapter,
     navigateListQuery,
 } from '@/lib/list-query';
 import type { ListQueryFilterKey, ListQueryObject } from '@/lib/list-query';
@@ -80,6 +81,7 @@ export function FilterBar({
     const members = filterContext?.members ?? [];
     const cities = filterContext?.cities ?? [];
     const wilayas = filterContext?.wilayas ?? [];
+    const queryEnabled = listQueryAdapter(object).supportsQuery;
     const quickIds = quickFieldIdsFor(object);
     const quick = fieldDefs
         .filter((field) => quickIds.includes(field.id))
@@ -89,12 +91,22 @@ export function FilterBar({
         object === 'company' ? t('Search companies…') : t('Search');
     const searchLabel =
         object === 'company' ? t('Search companies') : t('Search list');
+    const wrapQuickFilters = object === 'company' || object === 'lead';
 
     const applyFilter = (key: ListQueryFilterKey, value: string | null) => {
         navigateListQuery(basePath, current, { filters: { [key]: value } }, object);
     };
 
-    const quickFilters = (
+    const columnChooser =
+        columnDefs && columns ? (
+            <ColumnChooser
+                columnDefs={columnDefs}
+                columns={columns}
+                onChange={onColumnsChange}
+            />
+        ) : null;
+
+    const quickFilters = !queryEnabled ? null : (
         <>
             {quick.map((field) => {
                 const options =
@@ -152,13 +164,6 @@ export function FilterBar({
                 <Funnel className="size-4" weight="bold" />
                 {t('Advanced')}
             </Button>
-            {columnDefs && columns ? (
-                <ColumnChooser
-                    columnDefs={columnDefs}
-                    columns={columns}
-                    onChange={onColumnsChange}
-                />
-            ) : null}
         </>
     );
 
@@ -166,39 +171,45 @@ export function FilterBar({
         <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar" data-ds="filter-bar">
             <div className="flex flex-wrap items-center gap-2 px-4 py-3 md:px-8">
                 {extra}
-                <form
-                    className={cn(
-                        'relative min-w-[12rem] flex-1',
-                        object === 'company' && 'max-w-md basis-[16rem]',
-                    )}
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        const q = String(new FormData(event.currentTarget).get('q') ?? '');
-                        navigateListQuery(basePath, current, { search: q || null }, object);
-                    }}
-                >
-                    <MagnifyingGlass
-                        className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-mute"
-                        weight="bold"
-                    />
-                    <Input
-                        key={`q:${searchKey}`}
-                        name="q"
-                        defaultValue={searchKey}
-                        placeholder={searchPlaceholder}
-                        className="h-9 pl-9"
-                        aria-label={searchLabel}
-                    />
-                </form>
-                {object === 'company' ? (
+                {queryEnabled ? (
+                    <form
+                        className={cn(
+                            'relative min-w-[12rem] flex-1',
+                            object === 'company' && 'max-w-md basis-[16rem]',
+                        )}
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            const q = String(new FormData(event.currentTarget).get('q') ?? '');
+                            navigateListQuery(basePath, current, { search: q || null }, object);
+                        }}
+                    >
+                        <MagnifyingGlass
+                            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-mute"
+                            weight="bold"
+                        />
+                        <Input
+                            key={`q:${searchKey}`}
+                            name="q"
+                            defaultValue={searchKey}
+                            placeholder={searchPlaceholder}
+                            className="h-9 pl-9"
+                            aria-label={searchLabel}
+                        />
+                    </form>
+                ) : null}
+                {wrapQuickFilters ? (
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                         {quickFilters}
+                        {columnChooser}
                     </div>
                 ) : (
-                    quickFilters
+                    <>
+                        {quickFilters}
+                        {columnChooser}
+                    </>
                 )}
             </div>
-            {chips.length > 0 ? (
+            {queryEnabled && chips.length > 0 ? (
                 <div
                     className="flex flex-wrap items-center gap-1.5 px-4 pb-3 md:px-8"
                     data-crm="active-filters"

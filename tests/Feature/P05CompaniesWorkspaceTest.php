@@ -82,7 +82,8 @@ it('keeps Companies row identity href columns and selection on the shared contra
         ->and($table)->toContain('applyCompanyColumnContract')
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($table)->toContain("target.closest('a, input, button, label')")
-        ->and($table)->toContain("companyTable ? 'table-fixed min-w-[52rem]'")
+        ->and($table)->toContain("fixedTable ? 'table-fixed min-w-[52rem]'")
+        ->and($table)->toContain('const companyTable = entity === \'company\'')
         ->and($table)->toContain("name: 'w-[36%]'")
         ->and($table)->toContain("owner: 'w-[18%]'");
 
@@ -138,7 +139,7 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($companyFilters->pluck('id')->all())->not->toContain('status');
 
     expect($dataTable)->toContain('overflow-x-hidden overflow-y-auto')
-        ->and($dataTable)->toContain("object === 'company' && '[scrollbar-gutter:stable]'");
+        ->and($dataTable)->toContain("(object === 'company' || object === 'lead') && '[scrollbar-gutter:stable]'");
 
     expect($workspace)->not->toContain('searchParams.set');
 
@@ -147,7 +148,7 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($empty)->toContain('as="h2"');
 });
 
-it('does not migrate Deals Quotes or Leads and does not invent QuickRecordDrawer', function () {
+it('does not migrate Deals or Quotes and does not invent QuickRecordDrawer', function () {
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
@@ -164,10 +165,9 @@ it('does not migrate Deals Quotes or Leads and does not invent QuickRecordDrawer
         ->and($quotes)->toContain('CrmListFooter')
         ->and($quotes)->not->toContain('resultMode=');
 
-    expect($leads)->toContain('<table')
-        ->and($leads)->not->toContain('CrmListShell')
-        ->and($leads)->not->toContain('DataWorkspace')
-        ->and($leads)->not->toContain('resultMode=');
+    expect($leads)->toContain('CrmListShell')
+        ->and($leads)->toContain('resultMode="shared-table"')
+        ->and($leads)->not->toContain('QuickRecordDrawer');
 
     expect($companies)->not->toContain('QuickRecordDrawer')
         ->and($workspace)->toContain('onRowPeek is reserved for P09');
