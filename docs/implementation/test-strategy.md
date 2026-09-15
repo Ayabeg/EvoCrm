@@ -62,7 +62,7 @@ Existing chrome tests are often **source-string locks** (they `file_get_contents
 | P02 | P04, Wave0, SimpleModeNav | Header/search / Tasks labels | `P02ActiveShellNormalizationTest`: Home `/dashboard`; leftover header unused |
 | P03A–D | P05, Wave1, `P03ADataWorkspaceOwnershipTest`, `P03BDataWorkspaceSelectionTest`, `P03CListQueryOwnershipTest` | P05 bar write-path string when query helper moves | P03C: URL SoT; adapters preserve `q` / `filter_id` / `page` |
 | P04 Contacts | Wave1, P05, `P04ContactsWorkspaceTest` | `data-crm="contacts-workspace"` | Shared-table; selection + bulk via DS bar |
-| P05 Companies | Wave1-style if present | Remove CrmShell lock if any | — |
+| P05 Companies | Wave1, P03A–D, P04, `CrmListWorkspaceTest` | Remove CrmShell / domain-children locks | `P05CompaniesWorkspaceTest`: shared-table; no bulk; wilaya filters |
 | P06 Leads | Lead* feature tests | New chrome test for DataWorkspace on leads | Do not break `/crm/leads/{id}` |
 | P07 Deals list | Wave2 | Layout toggle still present | Bulk still posts `/crm/deals/bulk` |
 | P08 Quotes list | Wave4 | Hex leftovers | Create still needs a deal |
