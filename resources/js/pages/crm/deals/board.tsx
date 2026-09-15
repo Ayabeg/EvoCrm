@@ -6,8 +6,8 @@ import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
-import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import { hasActiveListFilters } from '@/components/crm/list-query';
+import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +16,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
@@ -27,9 +28,8 @@ import {
 } from '@/pages/crm/deals/deal-columns';
 import {
     DealPipelineBoard,
-    type BoardDeal,
-    type BoardStage,
 } from '@/pages/crm/deals/deal-pipeline-board';
+import type { BoardDeal, BoardStage } from '@/pages/crm/deals/deal-pipeline-board';
 
 type PipelineOption = {
     id: number;
@@ -191,14 +191,37 @@ export default function DealBoard({
                                 forecastBand={forecastBand}
                                 forecastBacktest={forecastBacktest}
                             />
-                            {emptyCopy ? (
-                                <p
-                                    className="border-b border-hairline bg-white px-4 py-2 text-[12px] text-mute md:px-8"
+                            {deals.length === 0 ? (
+                                <div
+                                    className="border-b border-hairline bg-white"
                                     data-crm="pipeline-empty"
-                                    role="status"
                                 >
-                                    {emptyCopy}
-                                </p>
+                                    {filtered ? (
+                                        <p
+                                            className="px-4 py-2 text-[12px] text-mute md:px-8"
+                                            role="status"
+                                        >
+                                            {emptyCopy}
+                                        </p>
+                                    ) : (
+                                        <EmptyState
+                                            density="banner"
+                                            kind="pipeline"
+                                            title={t('No deals in this pipeline')}
+                                            description={t('Create your first deal to start tracking opportunities.')}
+                                            action={
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    className="h-8"
+                                                    onClick={() => setDrawer(true)}
+                                                >
+                                                    {t('Create deal')}
+                                                </Button>
+                                            }
+                                        />
+                                    )}
+                                </div>
                             ) : null}
                         </>
                     }

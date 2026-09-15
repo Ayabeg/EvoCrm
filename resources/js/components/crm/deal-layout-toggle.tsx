@@ -1,5 +1,5 @@
-import { ListBullets, SquaresFour } from '@phosphor-icons/react';
 import { Link } from '@inertiajs/react';
+import { ListBullets, SquaresFour } from '@phosphor-icons/react';
 import {
     dealLayoutHrefFromFilters,
 } from '@/lib/list-query/deal-layout';

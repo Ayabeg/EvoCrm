@@ -1,10 +1,10 @@
-import { emptyCanonicalListQuery } from '@/lib/list-query/empty';
 import {
     DEAL_BOARD_PATH,
     DEAL_LIST_PATH,
     dealLayoutHref,
     dealLayoutQuery,
 } from '@/lib/list-query/deal-layout';
+import { emptyCanonicalListQuery } from '@/lib/list-query/empty';
 import { applyPipeline, patchListQuery } from '@/lib/list-query/patch';
 import { fromActiveFilters, listQueryHref } from '@/lib/list-query/serialize';
 import type { CanonicalListQuery } from '@/lib/list-query/types';

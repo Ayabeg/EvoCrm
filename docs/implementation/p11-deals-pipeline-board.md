@@ -202,7 +202,7 @@ Forecast math: `DealBoardForecast::weightedCents($amountCents, $probability)` un
 ## 36–43 — EMPTY / CREATE / VIEWS / FILTERS / SEARCH / SELECTION
 
 - Empty stage: compact dashed `PipelineKanbanEmpty`.
-- Filtered-empty vs true-empty: banner copy (`No deals match these filters` vs `No deals in this pipeline`) plus existing `dealEmptyState`.
+- Filtered-empty vs true-empty: compact filter banner vs Wave6 `EmptyState` `density="banner"` (`No deals in this pipeline`) plus existing `dealEmptyState`.
 - Create Deal: same `CreateDrawer` + POST `/crm/deals`.
 - Saved views: same `/crm/filters` entity `deal`. No `BoardSavedViews`.
 - Filters / `q`: same `CrmFilter` language. No client-only subset filter.

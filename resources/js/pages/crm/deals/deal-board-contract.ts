@@ -2,11 +2,11 @@ import {
     CARD_DRAG_THRESHOLD_PX,
     pointerMovedPastThreshold,
 } from '@/components/crm/pipeline-card-interaction';
-import { dealStageColumnAccent } from '@/lib/stage-colors';
 import { resolveRowActivation } from '@/ds/workspace/quick-record/row-peek';
 import { dealLayoutHref } from '@/lib/list-query/deal-layout';
 import { emptyCanonicalListQuery } from '@/lib/list-query/empty';
 import { UNSAFE_QUERY_KEYS } from '@/lib/list-query/keys';
+import { dealStageColumnAccent } from '@/lib/stage-colors';
 
 function assert(condition: boolean, message: string): void {
     if (!condition) {
