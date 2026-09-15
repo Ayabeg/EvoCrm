@@ -1,5 +1,7 @@
 import { HydrateI18n } from '@/components/i18n-provider';
 import { PosthogIdentity } from '@/components/posthog-identity';
+import { QuickRecordProvider } from '@/ds/workspace/quick-record';
+import { QuickRecordDrawer } from '@/ds/workspace/QuickRecordDrawer';
 // Canonical 64/240 product shell. Leftover header layout stays unwired (P02 / P28).
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -12,12 +14,13 @@ export default function AppLayout({
     children: React.ReactNode;
 }) {
     return (
-        <>
+        <QuickRecordProvider>
             <HydrateI18n />
             <AppLayoutTemplate breadcrumbs={breadcrumbs}>
                 <PosthogIdentity />
                 {children}
             </AppLayoutTemplate>
-        </>
+            <QuickRecordDrawer />
+        </QuickRecordProvider>
     );
 }

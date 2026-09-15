@@ -22,6 +22,8 @@ use App\Http\Controllers\Crm\FunnelController;
 use App\Http\Controllers\Crm\LeadCaptureController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\LeadOsController;
+use App\Http\Controllers\Crm\QuickRecordController;
+use App\Http\Controllers\Crm\QuickRecordHarnessController;
 use App\Http\Controllers\Crm\QuoteController;
 use App\Http\Controllers\Crm\RecordLayoutController;
 use App\Http\Controllers\Crm\ReportController;
@@ -158,6 +160,16 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');
     Route::patch('/crm/filters/{savedFilter}', [SavedFilterController::class, 'update'])->name('crm.filters.update');
     Route::delete('/crm/filters/{savedFilter}', [SavedFilterController::class, 'destroy'])->name('crm.filters.destroy');
+    Route::get('/crm/records/{type}/{id}/peek', [QuickRecordController::class, 'peek'])
+        ->whereIn('type', ['contact', 'company', 'lead', 'deal', 'quote'])
+        ->whereNumber('id')
+        ->name('crm.records.peek');
+
+    if (app()->environment(['local', 'testing'])) {
+        Route::get('/crm/quick-record-drawer/harness', [QuickRecordHarnessController::class, 'show'])
+            ->name('crm.quick-record-drawer.harness');
+    }
+
     Route::get('/crm/record-layouts/{entity}', [RecordLayoutController::class, 'show'])->name('crm.record-layouts.show');
     Route::put('/crm/record-layouts/{entity}', [RecordLayoutController::class, 'update'])->name('crm.record-layouts.update');
     Route::put('/crm/record-layouts/{entity}/workspace-default', [RecordLayoutController::class, 'updateWorkspaceDefault'])->name('crm.record-layouts.workspace-default');
