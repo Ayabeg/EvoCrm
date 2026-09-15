@@ -2,24 +2,24 @@
 
 it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListViewTable swap', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
-    $hubs = [
-        resource_path('js/pages/crm/companies/index.tsx'),
-        resource_path('js/pages/crm/deals/index.tsx'),
-    ];
+    $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
+    $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
 
     expect($contacts)->toContain('CrmListShell')
         ->and($contacts)->toContain('resultMode="shared-table"')
         ->and($contacts)->not->toContain('aurora/data-table')
         ->and($contacts)->not->toContain('HubSpot');
 
-    foreach ($hubs as $path) {
-        $src = file_get_contents($path);
+    expect($companies)->toContain('CrmListShell')
+        ->and($companies)->toContain('resultMode="shared-table"')
+        ->and($companies)->not->toContain('ListViewTable')
+        ->and($companies)->not->toContain('aurora/data-table')
+        ->and($companies)->not->toContain('HubSpot');
 
-        expect($src)->toContain('ListViewTable')
-            ->and($src)->toContain('CrmListShell')
-            ->and($src)->not->toContain('aurora/data-table')
-            ->and($src)->not->toContain('HubSpot');
-    }
+    expect($deals)->toContain('ListViewTable')
+        ->and($deals)->toContain('CrmListShell')
+        ->and($deals)->not->toContain('aurora/data-table')
+        ->and($deals)->not->toContain('HubSpot');
 
     $shows = [
         resource_path('js/pages/crm/contacts/show.tsx'),

@@ -9,7 +9,6 @@ use App\Models\User;
  * P04 — Contacts workspace migration.
  * Contacts is the first shared-table consumer. Other objects stay domain.
  */
-
 it('moves Contacts onto DataWorkspace shared-table without a domain children path', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
@@ -72,7 +71,7 @@ it('keeps Contacts row identity href columns and selection on the shared contrac
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($table)->toContain("target.closest('a, input, button, label')")
         ->and($table)->toContain('aria-label="Select page"')
-        ->and($table)->toContain("aria-checked={")
+        ->and($table)->toContain('aria-checked={')
         ->and($table)->toContain("'mixed'")
         ->and($table)->toContain('aria-label={`Select ${row.id}`}');
 
@@ -95,10 +94,10 @@ it('preserves Contact bulk actions permissions header and query ownership', func
     $empty = file_get_contents(resource_path('js/ds/workspace/WorkspaceEmpty.tsx'));
 
     expect($contacts)->toContain("from '@/components/crm/bulk-action-bar'")
-        ->and($contacts)->toContain("entity=\"contact\"")
-        ->and($contacts)->toContain("primaryLabel=\"Create contact\"")
-        ->and($contacts)->toContain("href=\"/crm/contacts/duplicates\"")
-        ->and($contacts)->toContain("href=\"/crm/contacts/import\"")
+        ->and($contacts)->toContain('entity="contact"')
+        ->and($contacts)->toContain('primaryLabel="Create contact"')
+        ->and($contacts)->toContain('href="/crm/contacts/duplicates"')
+        ->and($contacts)->toContain('href="/crm/contacts/import"')
         ->and($contacts)->toContain("capabilities.includes('crm.import')")
         ->and($contacts)->toContain("capabilities.includes('crm.merge')")
         ->and($contacts)->toContain('bulk?.enabled')
@@ -120,7 +119,7 @@ it('preserves Contact bulk actions permissions header and query ownership', func
         ->and($empty)->toContain('as="h2"');
 });
 
-it('does not migrate Companies Deals Quotes or Leads and does not invent QuickRecordDrawer', function () {
+it('does not migrate Deals Quotes or Leads and does not invent QuickRecordDrawer', function () {
     $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
@@ -129,10 +128,8 @@ it('does not migrate Companies Deals Quotes or Leads and does not invent QuickRe
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
     expect($companies)->toContain('CrmListShell')
-        ->and($companies)->toContain('ListViewTable')
-        ->and($companies)->toContain('CrmEmptyState')
-        ->and($companies)->toContain('CrmListFooter')
-        ->and($companies)->not->toContain('resultMode=');
+        ->and($companies)->toContain('resultMode="shared-table"')
+        ->and($companies)->not->toContain('CrmShell');
 
     expect($deals)->toContain('ListViewTable')
         ->and($deals)->toContain('DealLayoutToggle')

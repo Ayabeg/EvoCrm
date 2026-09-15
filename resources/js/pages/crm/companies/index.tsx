@@ -1,26 +1,18 @@
-import { Form } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
-import { CrmShell } from '@/components/crm/crm-shell';
-import { SkeletonList } from '@/components/crm/empty-room';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
-import ListViewTable from '@/components/crm/list-view-table';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
-
-type Company = {
-    id: number;
-    name: string;
-    city?: string | null;
-    wilaya?: string | null;
-    created_at?: string | null;
-    owner?: { name: string } | null;
-};
+import {
+    companyEmptyState,
+    companyRowHref,
+} from '@/pages/crm/companies/company-columns';
+import type { CompanyListRow } from '@/pages/crm/companies/company-columns';
 
 export default function CompaniesIndex({
     companies,
@@ -34,7 +26,7 @@ export default function CompaniesIndex({
     wilayas,
     createOpen,
 }: {
-    companies: Company[];
+    companies: CompanyListRow[];
     members: { id: number; name: string }[];
     savedFilters: SavedView[];
     activeFilters: Record<string, unknown>;
@@ -50,86 +42,40 @@ export default function CompaniesIndex({
 
     return (
         <>
-            <CrmShell title="Companies" chrome="workspace">
-                <CrmListShell
-                title="Companies"
-                entity="company"
-                basePath="/crm/companies"
-                primaryLabel="Create company"
-                activeFilters={activeFilters}
-                savedFilters={savedFilters}
-                listView={listView}
-                recordCount={recordCount}
-                members={members}
-                cities={cities}
-                wilayas={wilayas}
-                selection={{
-                    mode: 'uncontrolled',
-                    // Page does not participate now. Not a permanent bulk ban.
-                    selectable: false,
-                    pageIds: companies.map((company) => company.id),
-                }}
+            <Head title="Companies" />
+            <div
+                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                data-crm="companies-workspace"
             >
-                {(columns) => (
-                    <>
-                        {loading ? (
-                            <SkeletonList />
-                        ) : companies.length === 0 ? (
-                            <CrmEmptyState
-                                title={
-                                    hasActiveListFilters(activeFilters)
-                                        ? 'No companies match these filters'
-                                        : 'No companies yet'
-                                }
-                                line={
-                                    hasActiveListFilters(activeFilters)
-                                        ? 'Clear filters or save a different view to see records.'
-                                        : 'Create a company to keep accounts next to their contacts and deals.'
-                                }
-                                actionLabel={
-                                    hasActiveListFilters(activeFilters)
-                                        ? undefined
-                                        : 'Create company'
-                                }
-                                onAction={
-                                    hasActiveListFilters(activeFilters)
-                                        ? undefined
-                                        : () => setDrawer(true)
-                                }
-                            />
-                        ) : (
-                            <div className="min-h-0 flex-1 overflow-auto">
-                                <ListViewTable
-                                    entity="company"
-                                    rows={companies}
-                                    columnDefs={listView.columnDefs}
-                                    columns={columns}
-                                    basePath="/crm/companies"
-                                />
-                            </div>
-                        )}
-                        <CrmListFooter
-                            count={companies.length}
-                            total={recordCount}
-                            noun="companies"
-                            page={paginator?.page}
-                            lastPage={paginator?.last_page}
-                            perPage={paginator?.per_page}
-                            prevHref={
-                                paginator && paginator.page > 1
-                                    ? listPageHref('/crm/companies', activeFilters, paginator.page - 1)
-                                    : null
-                            }
-                            nextHref={
-                                paginator && paginator.page < paginator.last_page
-                                    ? listPageHref('/crm/companies', activeFilters, paginator.page + 1)
-                                    : null
-                            }
-                        />
-                    </>
-                )}
-            </CrmListShell>
-            </CrmShell>
+                <CrmListShell
+                    resultMode="shared-table"
+                    title="Companies"
+                    entity="company"
+                    basePath="/crm/companies"
+                    primaryLabel="Create company"
+                    onCreate={() => setDrawer(true)}
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    listView={listView}
+                    recordCount={recordCount}
+                    members={members}
+                    cities={cities}
+                    wilayas={wilayas}
+                    className="bg-white"
+                    contentClassName="bg-white"
+                    rows={companies}
+                    rowHref={companyRowHref}
+                    empty={companyEmptyState(hasActiveListFilters(activeFilters))}
+                    paginator={paginator}
+                    loading={loading}
+                    selection={{
+                        mode: 'uncontrolled',
+                        // Page does not participate now. Not a permanent bulk ban.
+                        selectable: false,
+                        pageIds: companies.map((company) => company.id),
+                    }}
+                />
+            </div>
 
             <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create company">
                 <Form

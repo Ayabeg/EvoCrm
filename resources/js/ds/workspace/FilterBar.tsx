@@ -12,8 +12,14 @@ import {
 } from '@/lib/list-query';
 import type { ListQueryFilterKey, ListQueryObject } from '@/lib/list-query';
 import type { ListColumnDef, ListFieldDef, ListViewColumn } from '@/lib/list-view-config';
+import { cn } from '@/lib/utils';
 
 const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
+const COMPANY_QUICK_FIELD_IDS = ['owner', 'created', 'city', 'wilaya'] as const;
+
+function quickFieldIdsFor(object: ListQueryObject): readonly string[] {
+    return object === 'company' ? COMPANY_QUICK_FIELD_IDS : QUICK_FIELD_IDS;
+}
 
 const PRESET_LABELS: Record<string, string> = {
     today: 'Today',
@@ -72,21 +78,99 @@ export function FilterBar({
 }) {
     const current = fromActiveFilters(filters, extraQuery);
     const members = filterContext?.members ?? [];
+    const cities = filterContext?.cities ?? [];
+    const wilayas = filterContext?.wilayas ?? [];
+    const quickIds = quickFieldIdsFor(object);
     const quick = fieldDefs
-        .filter((field) => QUICK_FIELD_IDS.includes(field.id as (typeof QUICK_FIELD_IDS)[number]))
+        .filter((field) => quickIds.includes(field.id))
         .slice(0, 4);
     const searchKey = String(current.search ?? '');
+    const searchPlaceholder =
+        object === 'company' ? t('Search companies…') : t('Search');
+    const searchLabel =
+        object === 'company' ? t('Search companies') : t('Search list');
 
     const applyFilter = (key: ListQueryFilterKey, value: string | null) => {
         navigateListQuery(basePath, current, { filters: { [key]: value } }, object);
     };
+
+    const quickFilters = (
+        <>
+            {quick.map((field) => {
+                const options =
+                    field.id === 'owner'
+                        ? [
+                              { value: 'unassigned', label: t('Unassigned') },
+                              ...members.map((member) => ({
+                                  value: String(member.id),
+                                  label: member.name,
+                              })),
+                          ]
+                        : field.id === 'city'
+                          ? cities.map((city) => ({ value: city, label: city }))
+                          : field.id === 'wilaya'
+                            ? wilayas.map((wilaya) => ({ value: wilaya, label: wilaya }))
+                            : (field.options ?? []).map((value) => ({
+                                  value,
+                                  label: optionLabel(value),
+                              }));
+
+                return (
+                    <label
+                        key={field.id}
+                        className="inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink"
+                    >
+                        <span className="text-mute">{t(field.label)}</span>
+                        <select
+                            name={field.id}
+                            value={String(current.filters[field.id as ListQueryFilterKey] ?? '')}
+                            className="max-w-[9rem] bg-transparent text-[13px] text-ink outline-none"
+                            onChange={(event) =>
+                                applyFilter(
+                                    field.id as ListQueryFilterKey,
+                                    event.target.value || null,
+                                )
+                            }
+                        >
+                            <option value="">{t('Any')}</option>
+                            {options.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                );
+            })}
+            <Button
+                type="button"
+                variant="outline"
+                className="h-9 shrink-0"
+                aria-label={t('Advanced')}
+                onClick={onAdvanced}
+            >
+                <Funnel className="size-4" weight="bold" />
+                {t('Advanced')}
+            </Button>
+            {columnDefs && columns ? (
+                <ColumnChooser
+                    columnDefs={columnDefs}
+                    columns={columns}
+                    onChange={onColumnsChange}
+                />
+            ) : null}
+        </>
+    );
 
     return (
         <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar" data-ds="filter-bar">
             <div className="flex flex-wrap items-center gap-2 px-4 py-3 md:px-8">
                 {extra}
                 <form
-                    className="relative min-w-[12rem] flex-1"
+                    className={cn(
+                        'relative min-w-[12rem] flex-1',
+                        object === 'company' && 'max-w-md basis-[16rem]',
+                    )}
                     onSubmit={(event) => {
                         event.preventDefault();
                         const q = String(new FormData(event.currentTarget).get('q') ?? '');
@@ -101,70 +185,18 @@ export function FilterBar({
                         key={`q:${searchKey}`}
                         name="q"
                         defaultValue={searchKey}
-                        placeholder={t('Search')}
+                        placeholder={searchPlaceholder}
                         className="h-9 pl-9"
-                        aria-label={t('Search list')}
+                        aria-label={searchLabel}
                     />
                 </form>
-                {quick.map((field) => {
-                    const options =
-                        field.id === 'owner'
-                            ? [
-                                  { value: 'unassigned', label: t('Unassigned') },
-                                  ...members.map((member) => ({
-                                      value: String(member.id),
-                                      label: member.name,
-                                  })),
-                              ]
-                            : (field.options ?? []).map((value) => ({
-                                  value,
-                                  label: optionLabel(value),
-                              }));
-
-                    return (
-                        <label
-                            key={field.id}
-                            className="inline-flex h-9 items-center gap-2 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink"
-                        >
-                            <span className="text-mute">{t(field.label)}</span>
-                            <select
-                                name={field.id}
-                                value={String(current.filters[field.id as ListQueryFilterKey] ?? '')}
-                                className="max-w-[9rem] bg-transparent text-[13px] text-ink outline-none"
-                                onChange={(event) =>
-                                    applyFilter(
-                                        field.id as ListQueryFilterKey,
-                                        event.target.value || null,
-                                    )
-                                }
-                            >
-                                <option value="">{t('Any')}</option>
-                                {options.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                    );
-                })}
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="h-9"
-                    aria-label={t('Advanced')}
-                    onClick={onAdvanced}
-                >
-                    <Funnel className="size-4" weight="bold" />
-                    {t('Advanced')}
-                </Button>
-                {columnDefs && columns ? (
-                    <ColumnChooser
-                        columnDefs={columnDefs}
-                        columns={columns}
-                        onChange={onColumnsChange}
-                    />
-                ) : null}
+                {object === 'company' ? (
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        {quickFilters}
+                    </div>
+                ) : (
+                    quickFilters
+                )}
             </div>
             {chips.length > 0 ? (
                 <div

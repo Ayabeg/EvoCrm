@@ -77,11 +77,11 @@ Compile lock: `resources/js/ds/workspace/data-workspace-contract.ts` (`@ts-expec
 
 ## Compatibility mode
 
-Contacts is **MODE A** (P04): `CrmListShell` → `resultMode="shared-table"` → `rows` / `rowHref` / `WorkspaceEmpty` / `WorkspacePaginator`.
+Contacts (P04) and Companies (P05) are **MODE A**: `CrmListShell` → `resultMode="shared-table"` → `rows` / `rowHref` / `WorkspaceEmpty` / `WorkspacePaginator`.
 
-Until P05–P08, Companies / Deals / Quotes / Tickets stay **MODE B**: `CrmListShell` → `resultMode="domain"` → `renderResults` wraps stage pills + page children.
+Until P06–P08, Deals / Quotes / Tickets stay **MODE B**: `CrmListShell` → `resultMode="domain"` → `renderResults` wraps stage pills + page children.
 
-Pages still do not import `DataWorkspace` directly. Contacts now passes `resultMode="shared-table"`. Other list pages do not pass `resultMode`.
+Pages still do not import `DataWorkspace` directly. Contacts and Companies pass `resultMode="shared-table"`. Other list pages do not pass `resultMode`.
 
 ---
 

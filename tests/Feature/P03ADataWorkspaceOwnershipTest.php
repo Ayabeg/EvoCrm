@@ -9,7 +9,6 @@ use App\Models\User;
  * P03A — DataWorkspace ownership contract.
  * Domain-result mode is truthful. No fake rows. Selection / URL / backend stay put.
  */
-
 it('lets domain-result mode render without fake rows', function () {
     $types = file_get_contents(resource_path('js/ds/workspace/types.ts'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
@@ -63,10 +62,14 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($contacts)->not->toContain('DataWorkspace');
 
     expect($companies)->toContain('CrmListShell')
-        ->and($companies)->toContain('ListViewTable')
-        ->and($companies)->toContain('CrmEmptyState')
-        ->and($companies)->toContain('chrome="workspace"')
-        ->and($companies)->not->toContain('resultMode=');
+        ->and($companies)->toContain('resultMode="shared-table"')
+        ->and($companies)->toContain('rows={companies}')
+        ->and($companies)->toContain('rowHref={companyRowHref}')
+        ->and($companies)->not->toContain('ListViewTable')
+        ->and($companies)->not->toContain('CrmEmptyState')
+        ->and($companies)->not->toContain('CrmListFooter')
+        ->and($companies)->not->toContain('CrmShell')
+        ->and($companies)->not->toContain('DataWorkspace');
 
     expect($deals)->toContain('CrmListShell')
         ->and($deals)->toContain('ListViewTable')
@@ -98,7 +101,7 @@ it('keeps domain pages off the shared-table result mode after selection hoist', 
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
-    expect($contacts)->toContain("entity=\"contact\"")
+    expect($contacts)->toContain('entity="contact"')
         ->and($contacts)->toContain('resultMode="shared-table"')
         ->and($deals)->not->toContain('resultMode=')
         ->and($shell)->toContain('resultMode="domain"')

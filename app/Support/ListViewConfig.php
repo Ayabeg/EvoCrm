@@ -103,7 +103,6 @@ class ListViewConfig
                 ['id' => 'wilaya', 'label' => 'Wilaya', 'type' => 'select'],
                 ['id' => 'created', 'label' => 'Create date', 'type' => 'select', 'options' => ['today', '7d', '30d', '90d']],
                 ['id' => 'last_activity', 'label' => 'Last activity', 'type' => 'select', 'options' => ['7d', '30d', 'none']],
-                ['id' => 'status', 'label' => 'Deal status', 'type' => 'select', 'options' => ['open', 'won', 'lost']],
                 ['id' => 'unassigned', 'label' => 'Unassigned', 'type' => 'boolean'],
             ],
             'ticket' => [
