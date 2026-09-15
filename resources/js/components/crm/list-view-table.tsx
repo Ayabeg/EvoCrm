@@ -1,4 +1,5 @@
 import { Link, router } from '@inertiajs/react';
+import LeadScorePill from '@/components/crm/lead-score-pill';
 import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
 import type { RowId } from '@/ds/workspace/selection';
 import { resolveRowHref } from '@/ds/workspace/surface';
@@ -8,7 +9,6 @@ import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-v
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
-import LeadScorePill from '@/components/crm/lead-score-pill';
 import {
     applyCompanyColumnContract,
     CompanyIdentityCell as CompanyNameCell,

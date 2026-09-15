@@ -186,9 +186,10 @@ it('does not migrate Deals Quotes Pipeline or invent QuickRecordDrawer', functio
         ->and($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')");
 
     expect($show)->toContain('LeadConversionDialog')
-        ->and($show)->toContain('LeadPath')
+        ->and($show)->toContain('RecordPath')
         ->and($converter)->toContain('public function convert')
         ->and($path)->toContain("'converted'")
+        ->and($path)->toContain('class LeadPath')
         ->and($qualify)->toContain("function qualify")
         ->and($qualify)->toContain("'mode' => ['nullable', 'in:create,link']");
 
