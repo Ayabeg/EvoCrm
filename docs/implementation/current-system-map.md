@@ -81,7 +81,7 @@ Footer                Settings
 | Companies | `pages/crm/companies/index.tsx` | **CrmShell + CrmListShell** | ListViewTable (selection wired, not selectable) | CreateDrawer | No | Yes |
 | Deals list | `pages/crm/deals/index.tsx` | CrmListShell | ListViewTable (workspace selection) | CreateDrawer | Domain BulkActionBar (shared selection) | Yes + stage pills |
 | Deals board | `pages/crm/deals/board.tsx` | Custom CrmObjectHeader | PipelineKanban | CreateDrawer | No | Board options, not DataWorkspace views |
-| Quotes | `pages/crm/quotes/index.tsx` | CrmListShell | ListViewTable (selection wired, not selectable) | CreateDrawer (needs deal id) | No | Yes |
+| Quotes | `pages/crm/quotes/index.tsx` | CrmListShell → DataWorkspace `shared-table` | ListDataTable / ListViewTable (`selectable: false`) | CreateDrawer (needs deal id) | No | Yes (consume-only) |
 | Tickets list | `pages/crm/tickets/index.tsx` | CrmShell + CrmListShell | ListViewTable | CreateDrawer | No | Yes |
 | Tickets board | `pages/crm/tickets/board.tsx` | CrmShell + header | PipelineKanban | — | — | Status columns |
 | Leads | `pages/crm/leads/index.tsx` | CrmShell + CrmObjectHeader | **Raw `<table>`** | CreateDrawer | No | **No** |
@@ -157,7 +157,7 @@ Topbar Ask Evo opens the palette, not `AskEvoPanel`. Topbar Tasks opens `TasksOv
 |---|---|---|
 | Home | `pages/home.tsx`, `components/dashboard/*`, `HomeController` | **CANONICAL KEEP** (P17 hierarchy) |
 | Guided actions | `guided-actions.tsx` | **ADAPTER KEEP TEMPORARILY** toward durable ACTIVATION checklist |
-| Quotes list | `pages/crm/quotes/index.tsx` | **MIGRATE** onto full DataWorkspace contract (P08) |
+| Quotes list | `pages/crm/quotes/index.tsx` | **CANONICAL KEEP** — DataWorkspace `shared-table` (P08). Builder stays P18 |
 | Quotes show / editor | `pages/crm/quotes/show.tsx` | **CANONICAL KEEP** (P18 is builder polish, not a rewrite) |
 | Public quote | `pages/public/quote.tsx`, `/q/{token}` | **CANONICAL KEEP** — do not touch in UI phases |
 | Workflows | `pages/crm/workflows/index.tsx` | **CANONICAL KEEP** structured authoring (not n8n canvas) |

@@ -183,9 +183,10 @@ it('does not migrate Quotes Pipeline or invent QuickRecordDrawer after the Deals
         ->and($deals)->not->toContain('CrmListFooter')
         ->and($deals)->not->toContain('QuickRecordDrawer');
 
-    expect($quotes)->toContain('ListViewTable')
-        ->and($quotes)->toContain('CrmListFooter')
-        ->and($quotes)->not->toContain('resultMode=');
+    expect($quotes)->toContain('resultMode="shared-table"')
+        ->and($quotes)->toContain('rowHref={quoteRowHref}')
+        ->and($quotes)->not->toContain('CrmListFooter')
+        ->and($quotes)->not->toContain('QuickRecordDrawer');
 
     expect($board)->toContain('PipelineKanban')
         ->and($board)->not->toContain('resultMode=')

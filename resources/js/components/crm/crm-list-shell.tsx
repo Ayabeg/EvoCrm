@@ -27,6 +27,7 @@ import { applyCompanyColumnContract } from '@/pages/crm/companies/company-column
 import { applyContactColumnContract } from '@/pages/crm/contacts/contact-columns';
 import { applyDealColumnContract } from '@/pages/crm/deals/deal-columns';
 import { applyLeadColumnContract } from '@/pages/crm/leads/lead-columns';
+import { applyQuoteColumnContract } from '@/pages/crm/quotes/quote-columns';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -70,8 +71,8 @@ function toWorkspacePaginator(
 
 /**
  * Thin Inertia mapper. Domain result mode remains the default for
- * Quotes / Tickets (CrmEmptyState + CrmListFooter in children until P08).
- * Contacts, Companies, Leads, and Deals use resultMode="shared-table".
+ * Tickets (CrmEmptyState + CrmListFooter in children until later).
+ * Contacts, Companies, Leads, Deals, and Quotes use resultMode="shared-table".
  * Optional `board` is the P11 slot — Deals list does not pass it.
  */
 export function CrmListShell<Row extends { id: RowId }>({
@@ -175,7 +176,9 @@ export function CrmListShell<Row extends { id: RowId }>({
                 ? applyLeadColumnContract(listView?.columnDefs ?? [])
                 : entity === 'deal'
                   ? applyDealColumnContract(listView?.columnDefs ?? [])
-                  : (listView?.columnDefs ?? []);
+                  : entity === 'quote'
+                    ? applyQuoteColumnContract(listView?.columnDefs ?? [])
+                    : (listView?.columnDefs ?? []);
     const sharedPaginator = toWorkspacePaginator(paginator);
 
     useEffect(() => {

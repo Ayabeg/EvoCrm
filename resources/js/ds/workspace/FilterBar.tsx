@@ -92,14 +92,19 @@ export function FilterBar({
             ? t('Search companies…')
             : object === 'deal'
               ? t('Search deals…')
-              : t('Search');
+              : object === 'quote'
+                ? t('Search quotes…')
+                : t('Search');
     const searchLabel =
         object === 'company'
             ? t('Search companies')
             : object === 'deal'
               ? t('Search deals')
-              : t('Search list');
-    const wrapQuickFilters = object === 'company' || object === 'lead' || object === 'deal';
+              : object === 'quote'
+                ? t('Search quotes')
+                : t('Search list');
+    const wrapQuickFilters =
+        object === 'company' || object === 'lead' || object === 'deal' || object === 'quote';
 
     const applyFilter = (key: ListQueryFilterKey, value: string | null) => {
         navigateListQuery(basePath, current, { filters: { [key]: value } }, object);

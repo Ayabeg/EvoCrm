@@ -449,8 +449,8 @@ Shared **BACKEND CONTRACT THAT MUST NOT CHANGE:** routes in `web.php` / `setting
 
 **OBJECTIVE:** Quotes index on DataWorkspace `object="quote"`.  
 **REFERENCE PATTERN:** Stripe/HubSpot list density; create stays compact.  
-**CURRENT IMPLEMENTATION:** CrmListShell + CreateDrawer posting `/crm/deals/{id}/quotes`.  
-**TARGET ARCHITECTURE:** Same create contract; remove leftover mark hex if any.  
+**CURRENT IMPLEMENTATION:** Shared-table via `CrmListShell resultMode="shared-table"` (P08). CreateDrawer still posts `/crm/deals/{id}/quotes`.  
+**TARGET ARCHITECTURE:** Same create contract; list chrome is DataWorkspace. Builder stays P18.  
 **FILES LIKELY AFFECTED:** `pages/crm/quotes/index.tsx`, Wave4.  
 **NEW / MODIFIED / DEPRECATED:** —  
 **BEHAVIOR THAT MUST NOT CHANGE:** create-from-deal, show, send/revoke from show.  

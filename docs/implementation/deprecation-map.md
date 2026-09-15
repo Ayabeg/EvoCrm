@@ -28,12 +28,12 @@ Nothing in this file authorizes a behavior change to Laravel routes or Inertia c
 
 | Adapter | Keep until | Then |
 |---|---|---|
-| `CrmListShell` domain `renderResults` (pages still own tables) | P07–P08 (Contacts + Companies + Leads done) | Shared-table `rows`; shell only maps Inertia → DataWorkspace props. Selection already workspace-owned (P03B). |
+| `CrmListShell` domain `renderResults` (pages still own tables) | P08 done for Quotes; Tickets remain | Shared-table `rows`; shell only maps Inertia → DataWorkspace props. Selection already workspace-owned (P03B). |
 | `CrmShell` on tickets / activities / workflows | Each page’s migrate PR | Remove double chrome; rail is enough. Companies list dropped CrmShell in P05. Leads list dropped it in P06. |
 | `components/aurora/command-palette.tsx` | P16 | Either become `ds/chrome/CommandPalette` or a thin re-export |
 | `TasksOverlay` as a second notify surface | P15 (P02 kept overlay as the only topbar tasks entry) | `/crm/activities` work queue |
 | `GuidedActions` as the only activation UI | P23 | Durable checklist **plus** leftover guided deals/prospecting if still useful |
-| `list-chrome` `CrmListFooter` / `CrmEmptyState` | P07–P08 (Contacts + Companies + Leads use P03D helpers) | `WorkspacePaginator` + `WorkspaceEmpty` on shared-table; domain pages still use list-chrome |
+| `list-chrome` `CrmListFooter` / `CrmEmptyState` | P08 done for Quotes; Tickets / other domain pages remain | `WorkspacePaginator` + `WorkspaceEmpty` on shared-table; domain pages still use list-chrome |
 | `CrmObjectHeader` on boards | P11 | PageHeader inside DataWorkspace |
 
 ---

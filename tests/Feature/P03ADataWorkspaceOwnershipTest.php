@@ -82,9 +82,13 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($deals)->not->toContain('CrmListFooter');
 
     expect($quotes)->toContain('CrmListShell')
-        ->and($quotes)->toContain('ListViewTable')
+        ->and($quotes)->toContain('resultMode="shared-table"')
+        ->and($quotes)->toContain('rows={quotes}')
+        ->and($quotes)->toContain('rowHref={quoteRowHref}')
         ->and($quotes)->toContain('primaryLabel="Create quote"')
-        ->and($quotes)->not->toContain('resultMode=');
+        ->and($quotes)->not->toContain('ListViewTable')
+        ->and($quotes)->not->toContain('CrmEmptyState')
+        ->and($quotes)->not->toContain('CrmListFooter');
 
     expect($leads)->toContain('CrmListShell')
         ->and($leads)->toContain('resultMode="shared-table"')
@@ -102,17 +106,19 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($tickets)->not->toContain('resultMode=');
 });
 
-it('keeps Quotes and Tickets on domain result mode after the Deals shared-table migration', function () {
+it('keeps Tickets on domain result mode after the Quotes shared-table migration', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
+    $tickets = file_get_contents(resource_path('js/pages/crm/tickets/index.tsx'));
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
     expect($contacts)->toContain('entity="contact"')
         ->and($contacts)->toContain('resultMode="shared-table"')
         ->and($deals)->toContain('resultMode="shared-table"')
-        ->and($quotes)->not->toContain('resultMode=')
+        ->and($quotes)->toContain('resultMode="shared-table"')
+        ->and($tickets)->not->toContain('resultMode=')
         ->and($shell)->toContain('resultMode="domain"')
         ->and($workspace)->toContain('useWorkspaceSelection');
 });
