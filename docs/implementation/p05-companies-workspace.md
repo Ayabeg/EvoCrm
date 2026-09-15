@@ -123,6 +123,30 @@ P03C only. Companies search still maps to `q`. Preserved: search, owner, create 
 Wilaya/city stay domain `filterContext` on `CrmListShell` (`cities` / `wilayas` from `config('evosales.*')`).  
 No second URL writer. No double navigation (`onViewChange` still does not `router.get`).
 
+### City / Wilaya apply + persist (live QA hold)
+
+Contabo QA on `7ccc47b` failed P05 acceptance (“wilaya filters work”). No 500.
+
+**Audit (real path, not guessed):**
+
+| Layer | What it actually did |
+|---|---|
+| `ListViewConfig::filterFields('company')` | Had `city` / `wilaya` **and** a copied `status` labeled **Deal status** |
+| `FilterBar` `QUICK_FIELD_IDS` | Hardcoded `owner / created / status / priority`. Company `status` surfaced as Deal status. City and wilaya were not quick fields, so the toolbar showed Owner / Create date / Deal status |
+| Advanced | Dedicated City / Wilaya `<select name="city\|wilaya">` plus `FilterBuilder` hidden `filter_groups` JSON. Options come from `filterContext.cities / wilayas` |
+| `list-query` adapters | Company already lists `city` / `wilaya` in `WORKSPACE_FILTER_KEYS`. `fromActiveFilters` / `toDomainParams` already serialize them |
+| `CompanyController@index` | `CrmFilter::resolve` reads `city` / `wilaya` query params into `activeFilters`, then `apply('company', …)` |
+| `CrmFilter::apply` | If `filter_groups` has any rule, **only** `applyFilterGroups` ran. Top-level `city` / `wilaya` / `q` were skipped. Advanced FilterBuilder always posts `filter_groups`, so a builder rule dropped the dedicated City / Wilaya selects |
+
+**Fix (domain filter wiring only — no chrome restyle, no column URL ownership, no bulk):**
+
+1. Company `filterFields` no longer include Deal status. Companies toolbar cannot show it.
+2. `FilterBar` uses `COMPANY_QUICK_FIELD_IDS = owner / created / city / wilaya`. Options for city / wilaya come from `filterContext` (same arrays Advanced already used). Contacts / Deals / Tickets / Quotes keep the previous quick set.
+3. `CrmFilter::applyCompanyUrlFilters` always applies URL `q` / `city` / `wilaya` for `object=company`, including when Advanced `filter_groups` are present.
+4. Tests prove `GET /crm/companies?city=&wilaya=` hits the index, writes `activeFilters`, and **filters the result rows**. Overlay with `filter_groups` still keeps city / wilaya.
+
+Column chooser reset-on-reload stays session-not-URL (same as Contacts). Not changed.
+
 ---
 
 ## SAVED VIEWS
@@ -188,8 +212,8 @@ This agent did not run a real browser against a deployed preview. Do not treat t
 Exercise at **1440 / 1280 / 1024 / 768**:
 
 1. Search (`q`) persists on page change
-2. Owner / create date quick filters
-3. Advanced filters: city + wilaya chips
+2. Owner / create date / **City / Wilaya** quick filters (not Deal status)
+3. Advanced filters: city + wilaya still apply and persist on the URL; chips match
 4. Built-in and saved views (pin/max unchanged)
 5. Column chooser (session only; not URL)
 6. No checkboxes / no bulk bar
@@ -221,6 +245,7 @@ Not deleted: `list-view-table.tsx`, `list-chrome.tsx`, `CrmListShell` domain pat
 - `CrmListShell` still maps Inertia; page does not import DataWorkspace directly
 - No QuickRecordDrawer, no mobile sheet
 - Create form still omits wilaya (pre-existing; store accepts it)
+- Company Deal status is no longer a list filter field (it was a deal copy). `?status=` still hits `applyCompanyDealStatus` if crafted by URL
 
 ---
 

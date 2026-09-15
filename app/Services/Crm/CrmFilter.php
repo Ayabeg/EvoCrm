@@ -110,7 +110,16 @@ class CrmFilter
     public function apply(string $entity, Builder $query, array $filters): Builder
     {
         if ($this->hasFilterGroups($filters)) {
-            return $this->applyFilterGroups($entity, $query, $filters['filter_groups']);
+            $this->applyFilterGroups($entity, $query, $filters['filter_groups']);
+
+            // Advanced FilterBuilder always posts filter_groups. Top-level
+            // P03C city / wilaya / q must still apply for companies so the
+            // dedicated Advanced selects and toolbar quick filters survive.
+            if ($entity === 'company') {
+                $this->applyCompanyUrlFilters($query, $filters);
+            }
+
+            return $query;
         }
 
         return match ($entity) {
@@ -659,20 +668,15 @@ class CrmFilter
     }
 
     /**
+     * URL / query city, wilaya, and search. Shared by applyToCompanies and
+     * the filter_groups overlay so Advanced + toolbar stay on P03C params.
+     *
      * @param  Builder<Company>  $query
      * @param  array<string, mixed>  $filters
      */
-    public function applyToCompanies(Builder $query, array $filters): Builder
+    protected function applyCompanyUrlFilters(Builder $query, array $filters): void
     {
         $this->applySearch($query, 'company', $filters['q'] ?? null);
-
-        if (filled($filters['owner'] ?? null) && ($filters['owner'] ?? '') !== 'unassigned') {
-            $query->where('owner_id', $filters['owner']);
-        }
-
-        if (! empty($filters['unassigned']) || ($filters['owner'] ?? null) === 'unassigned') {
-            $query->whereNull('owner_id');
-        }
 
         if (filled($filters['city'] ?? null)) {
             $query->where('city', $filters['city']);
@@ -680,6 +684,23 @@ class CrmFilter
 
         if (filled($filters['wilaya'] ?? null)) {
             $query->where('wilaya', $filters['wilaya']);
+        }
+    }
+
+    /**
+     * @param  Builder<Company>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function applyToCompanies(Builder $query, array $filters): Builder
+    {
+        $this->applyCompanyUrlFilters($query, $filters);
+
+        if (filled($filters['owner'] ?? null) && ($filters['owner'] ?? '') !== 'unassigned') {
+            $query->where('owner_id', $filters['owner']);
+        }
+
+        if (! empty($filters['unassigned']) || ($filters['owner'] ?? null) === 'unassigned') {
+            $query->whereNull('owner_id');
         }
 
         $this->applyCreated($query, $filters['created'] ?? null);

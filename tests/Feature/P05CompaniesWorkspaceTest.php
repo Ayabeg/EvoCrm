@@ -4,6 +4,7 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\User;
+use App\Support\ListViewConfig;
 
 /**
  * P05 — Companies workspace migration.
@@ -116,6 +117,17 @@ it('preserves Company create filters header and query ownership without inventin
     expect($config)->toContain("['id' => 'city', 'label' => 'City', 'defaultVisible' => true]")
         ->and($config)->toContain("['id' => 'wilaya', 'label' => 'Wilaya', 'defaultVisible' => true]");
 
+    $filterBar = file_get_contents(resource_path('js/ds/workspace/FilterBar.tsx'));
+    $companyFilters = collect(ListViewConfig::filterFields('company'));
+
+    expect($filterBar)->toContain("COMPANY_QUICK_FIELD_IDS = ['owner', 'created', 'city', 'wilaya']")
+        ->and($filterBar)->toContain("object === 'company' ? COMPANY_QUICK_FIELD_IDS")
+        ->and($filterBar)->toContain("field.id === 'city'")
+        ->and($filterBar)->toContain("field.id === 'wilaya'")
+        ->and($companyFilters->pluck('id')->all())->toContain('city')
+        ->and($companyFilters->pluck('id')->all())->toContain('wilaya')
+        ->and($companyFilters->pluck('id')->all())->not->toContain('status');
+
     expect($workspace)->not->toContain('searchParams.set');
 
     expect($paginator)->toContain('workspacePageHref')
@@ -206,6 +218,8 @@ it('keeps the Companies Inertia backend shape routes and permissions', function 
             ->where('activeFilters.q', 'atlas')
             ->where('activeFilters.wilaya', 'Alger')
             ->where('activeFilters.city', 'Hydra')
+            ->has('companies', 1)
+            ->where('companies.0.id', $company->id)
         );
 
     $this->actingAs($user)
@@ -237,4 +251,109 @@ it('keeps the Companies Inertia backend shape routes and permissions', function 
         ->get('/crm/leads')
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('crm/leads/index'));
+});
+
+it('filters the companies index by city and wilaya query params', function () {
+    $user = User::factory()->create();
+    $kept = Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Hydra Clinic',
+        'city' => 'Hydra',
+        'wilaya' => 'Alger',
+        'owner_id' => null,
+    ]);
+    Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Oran Lab',
+        'city' => 'Oran',
+        'wilaya' => 'Oran',
+        'owner_id' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->get('/crm/companies?city=Hydra')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/index')
+            ->where('activeFilters.city', 'Hydra')
+            ->has('companies', 1)
+            ->where('companies.0.id', $kept->id)
+            ->where('companies.0.city', 'Hydra')
+        );
+
+    $this->actingAs($user)
+        ->get('/crm/companies?wilaya=Alger')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/index')
+            ->where('activeFilters.wilaya', 'Alger')
+            ->has('companies', 1)
+            ->where('companies.0.id', $kept->id)
+            ->where('companies.0.wilaya', 'Alger')
+        );
+
+    $this->actingAs($user)
+        ->get('/crm/companies?city=Hydra&wilaya=Alger&view=all')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/index')
+            ->where('activeFilters.city', 'Hydra')
+            ->where('activeFilters.wilaya', 'Alger')
+            ->where('activeFilters.view', 'all')
+            ->has('companies', 1)
+            ->where('companies.0.id', $kept->id)
+        );
+
+    $this->actingAs($user)
+        ->get('/crm/companies?city=Hydra&page=1&view=all')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/index')
+            ->where('activeFilters.city', 'Hydra')
+            ->has('companies', 1)
+            ->where('companies.0.id', $kept->id)
+        );
+});
+
+it('keeps company city and wilaya URL filters when Advanced filter_groups are present', function () {
+    $user = User::factory()->create();
+    $kept = Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Hydra Clinic',
+        'city' => 'Hydra',
+        'wilaya' => 'Alger',
+        'owner_id' => null,
+    ]);
+    Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Oran Lab',
+        'city' => 'Oran',
+        'wilaya' => 'Oran',
+        'owner_id' => null,
+    ]);
+
+    $groups = json_encode([
+        'logic' => 'and',
+        'groups' => [[
+            'logic' => 'and',
+            'rules' => [
+                ['field' => 'unassigned', 'operator' => 'is_true'],
+            ],
+        ]],
+    ], JSON_THROW_ON_ERROR);
+
+    $this->actingAs($user)
+        ->get('/crm/companies?'.http_build_query([
+            'city' => 'Hydra',
+            'wilaya' => 'Alger',
+            'filter_groups' => $groups,
+        ]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/index')
+            ->where('activeFilters.city', 'Hydra')
+            ->where('activeFilters.wilaya', 'Alger')
+            ->has('companies', 1)
+            ->where('companies.0.id', $kept->id)
+        );
 });

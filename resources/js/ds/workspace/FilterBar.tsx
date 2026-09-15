@@ -14,6 +14,11 @@ import type { ListQueryFilterKey, ListQueryObject } from '@/lib/list-query';
 import type { ListColumnDef, ListFieldDef, ListViewColumn } from '@/lib/list-view-config';
 
 const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
+const COMPANY_QUICK_FIELD_IDS = ['owner', 'created', 'city', 'wilaya'] as const;
+
+function quickFieldIdsFor(object: ListQueryObject): readonly string[] {
+    return object === 'company' ? COMPANY_QUICK_FIELD_IDS : QUICK_FIELD_IDS;
+}
 
 const PRESET_LABELS: Record<string, string> = {
     today: 'Today',
@@ -72,8 +77,11 @@ export function FilterBar({
 }) {
     const current = fromActiveFilters(filters, extraQuery);
     const members = filterContext?.members ?? [];
+    const cities = filterContext?.cities ?? [];
+    const wilayas = filterContext?.wilayas ?? [];
+    const quickIds = quickFieldIdsFor(object);
     const quick = fieldDefs
-        .filter((field) => QUICK_FIELD_IDS.includes(field.id as (typeof QUICK_FIELD_IDS)[number]))
+        .filter((field) => quickIds.includes(field.id))
         .slice(0, 4);
     const searchKey = String(current.search ?? '');
 
@@ -116,10 +124,14 @@ export function FilterBar({
                                       label: member.name,
                                   })),
                               ]
-                            : (field.options ?? []).map((value) => ({
-                                  value,
-                                  label: optionLabel(value),
-                              }));
+                            : field.id === 'city'
+                              ? cities.map((city) => ({ value: city, label: city }))
+                              : field.id === 'wilaya'
+                                ? wilayas.map((wilaya) => ({ value: wilaya, label: wilaya }))
+                                : (field.options ?? []).map((value) => ({
+                                      value,
+                                      label: optionLabel(value),
+                                  }));
 
                     return (
                         <label
