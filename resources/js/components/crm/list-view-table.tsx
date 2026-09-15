@@ -1,9 +1,9 @@
 import { Link, router } from '@inertiajs/react';
 import LeadScorePill from '@/components/crm/lead-score-pill';
-import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
-import type { RowId } from '@/ds/workspace/selection';
 import { resolveRowActivation } from '@/ds/workspace/quick-record/row-peek';
 import type { RowPeekContext } from '@/ds/workspace/quick-record/row-peek';
+import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
+import type { RowId } from '@/ds/workspace/selection';
 import { resolveRowHref } from '@/ds/workspace/surface';
 import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';

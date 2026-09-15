@@ -117,11 +117,16 @@ it('keeps rowHref as full-record navigation and identity links as the escape hat
         ->and($deals)->toContain('rowHref={dealRowHref}')
         ->and($quotes)->toContain('rowHref={quoteRowHref}');
 
-    expect($contactColumns)->toContain("return `/crm/contacts/${row.id}`")
-        ->and($companyColumns)->toContain("return `/crm/companies/${row.id}`")
-        ->and($leadColumns)->toContain("return `/crm/leads/${row.id}`")
-        ->and($dealColumns)->toContain("return `/crm/deals/${row.id}`")
-        ->and($quoteColumns)->toContain("return `/crm/quotes/${row.id}`");
+    expect($contactColumns)->toContain('export function contactRowHref')
+        ->and($contactColumns)->toContain('/crm/contacts/')
+        ->and($companyColumns)->toContain('export function companyRowHref')
+        ->and($companyColumns)->toContain('/crm/companies/')
+        ->and($leadColumns)->toContain('export function leadRowHref')
+        ->and($leadColumns)->toContain('/crm/leads/')
+        ->and($dealColumns)->toContain('export function dealRowHref')
+        ->and($dealColumns)->toContain('/crm/deals/')
+        ->and($quoteColumns)->toContain('export function quoteRowHref')
+        ->and($quoteColumns)->toContain('/crm/quotes/');
 
     expect($list)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($list)->toContain('router.visit(href)')

@@ -165,7 +165,7 @@ export function CrmListShell<Row extends { id: RowId }>({
     const { auth } = usePage().props as { auth: { user: { id: number } } };
     const { openRecord } = useQuickRecord();
     const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
-    // Shared P10 seam. List pages do not pass onContactPeek × 5.
+    // Shared P10 seam. List pages do not pass per-object peek callbacks.
     // Row background → drawer. Identity Link / mailto / tel / checkbox → nested only.
     const onRowPeek = useCallback(
         (row: Row, context?: RowPeekContext) => {
