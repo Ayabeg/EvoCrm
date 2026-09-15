@@ -1,5 +1,4 @@
 import { Head } from '@inertiajs/react';
-import '@/ds/workspace/quick-record-drawer-contract';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { RECORD_TYPES } from '@/ds/workspace/quick-record/types';
 import { t } from '@/lib/i18n';

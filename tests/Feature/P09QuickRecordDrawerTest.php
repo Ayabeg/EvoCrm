@@ -8,6 +8,7 @@ use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\Quote;
 use App\Models\User;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -179,10 +180,21 @@ it('locks RecordRef descriptors adapters history stale protection and the P10 in
         ->and($link)->toContain('openRecord(record')
         ->and($link)->toContain('They do not choose hydration');
 
+    $runner = file_get_contents(base_path('tests/js/p09-quick-record-drawer-contract.ts'));
+
     expect($contract)->toContain('A then C cannot render A over C')
         ->and($contract)->toContain('open then replace then back is deterministic')
         ->and($contract)->toContain('lead adapter uses qualification not stage')
-        ->and($contract)->toContain('quote adapter deal title + total + draft/sent/accepted + expires');
+        ->and($contract)->toContain('quote adapter deal title + total + draft/sent/accepted + expires')
+        ->and($contract)->toContain('formatDzd(500_000)')
+        ->and($contract)->toContain('export function assertP09DrawerProofs')
+        ->and($contract)->not->toContain("includes(\n            'DZD'")
+        ->and($contract)->not->toContain('assertP09DrawerProofs();')
+        ->and($contract)->not->toContain("for (const [label, ok] of Object.entries(P09_DRAWER_PROOFS)) {\n    assert(ok, label);");
+
+    expect($runner)->toContain('assertP09DrawerProofs')
+        ->and($runner)->toContain('Test-only P09 drawer proofs')
+        ->and($runner)->not->toContain('pages/crm');
 
     expect($lead)->toContain('Qualification')
         ->and($lead)->not->toContain("id: 'stage'");
@@ -236,6 +248,11 @@ it('registers one permission-aware peek endpoint and a local testing harness onl
     $harnessPage = file_get_contents(resource_path('js/pages/crm/quick-record-drawer/harness.tsx'));
     $docs = file_get_contents(base_path('docs/implementation/p09-quick-record-drawer.md'));
 
+    $pageSources = collect(File::allFiles(resource_path('js/pages')))
+        ->filter(fn ($file): bool => $file->getExtension() === 'tsx')
+        ->map(fn ($file): string => File::get($file->getPathname()))
+        ->implode("\n");
+
     expect($routes)->toContain('/crm/records/{type}/{id}/peek')
         ->and($routes)->toContain("app()->environment(['local', 'testing'])")
         ->and($routes)->toContain('/crm/quick-record-drawer/harness')
@@ -244,6 +261,8 @@ it('registers one permission-aware peek endpoint and a local testing harness onl
         ->and($peek)->toContain('forWorkspace')
         ->and($harnessPage)->toContain('data-ds="quick-record-drawer-harness"')
         ->and($harnessPage)->toContain('openRecord({ type, id }')
+        ->and($harnessPage)->not->toContain('quick-record-drawer-contract')
+        ->and($pageSources)->not->toContain('quick-record-drawer-contract')
         ->and($docs)->toContain('P10 INTEGRATION CONTRACT');
 
     expect(Route::getRoutes()->getByName('crm.records.peek')?->uri())->toBe('crm/records/{type}/{id}/peek');

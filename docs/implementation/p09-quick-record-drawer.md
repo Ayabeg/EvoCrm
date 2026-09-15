@@ -80,7 +80,7 @@ Identity: `title`. **Stage** from `stage.name` — not qualification. Amount: `a
 
 ## QUOTE ADAPTER
 
-Identity: deal title (`deal.title` / `deal_title`), subtitle `Quote #{id}`. Status: `draft` / `sent` / `accepted` only. **Do not infer `expired` from `expires_at`.** Total: `total_cents` + DZD. Expires: `expires_at`. Owner from `deal.owner`. Association: **Deal only** (Quote has no customer FK). Activity/notes/tasks omitted. Open full → `/crm/quotes/:id`.
+Identity: deal title (`deal.title` / `deal_title`), subtitle `Quote #{id}`. Status: `draft` / `sent` / `accepted` only. **Do not infer `expired` from `expires_at`.** Total: `total_cents` formatted with existing `formatDzd` (ISO currency stays `DZD`; `fr-DZ` display is typically **DA**, not the substring `DZD`). Expires: `expires_at`. Owner from `deal.owner`. Association: **Deal only** (Quote has no customer FK). Activity/notes/tasks omitted. Open full → `/crm/quotes/:id`.
 
 ## HYDRATION CONTRACT
 
@@ -225,7 +225,7 @@ No blank drawer.
 
 ## STALE REQUEST PROTECTION
 
-Each open/replace/back/retry increments `requestId`. `isStaleHydration(active, incoming)` drops older responses. In-flight fetch is aborted. **A → B → C cannot render A over C.** Locked in `quick-record-drawer-contract.ts` + Pest source lock.
+Each open/replace/back/retry increments `requestId`. `isStaleHydration(active, incoming)` drops older responses. In-flight fetch is aborted. **A → B → C cannot render A over C.** Locked in `quick-record-drawer-contract.ts` (export-only proofs) + `tests/js/p09-quick-record-drawer-contract.ts` + Pest source lock. The contract module does **not** assert at import time.
 
 ## CACHE STRATEGY
 
@@ -273,6 +273,8 @@ Wider sheet `min(92vw, 520px)`. **NEEDS HUMAN / RESEARCH BOX.**
 
 `GET /crm/quick-record-drawer/harness` registered **only** when `app()->environment(['local', 'testing'])`. Not a production debug route. Does not change `rowHref`. Opens all five types via `openRecord({type,id})` using latest workspace ids.
 
+The harness page must **not** import `quick-record-drawer-contract`. Import-time proofs crashed `#app` on Contabo (quote total asserted `.includes('DZD')` while `formatDzd` renders `DA`). Proofs stay in the contract module as exports and run only from `tests/js/p09-quick-record-drawer-contract.ts`.
+
 ## FIVE-RECORD QA
 
 Pest hydrates one real Contact / Company / Lead / Deal / Quote and asserts identity, associations, capabilities, and existing show routes. Live visual pass on Contabo is **NEEDS HUMAN / RESEARCH BOX**.
@@ -298,18 +300,19 @@ List pages still must not contain `QuickRecordDrawer` or `onRowPeek`. `rowHref` 
 - `resources/js/ds/workspace/QuickRecordDrawer.tsx`
 - `resources/js/ds/workspace/quick-record/*`
 - `resources/js/ds/workspace/record-adapters/*`
-- `resources/js/ds/workspace/quick-record-drawer-contract.ts`
+- `resources/js/ds/workspace/quick-record-drawer-contract.ts` — export-only proofs; no import-time assert
 - `resources/js/ds/workspace/index.ts`
 - `resources/js/layouts/app-layout.tsx` — provider + host
 - `resources/js/lib/list-query/keys.ts` — reserve `peek`
 - `resources/js/lib/list-query/list-query-contract.ts`
-- `resources/js/pages/crm/quick-record-drawer/harness.tsx`
+- `resources/js/pages/crm/quick-record-drawer/harness.tsx` — no contract import
+- `tests/js/p09-quick-record-drawer-contract.ts` — test-only proof runner
 - `tests/Feature/P09QuickRecordDrawerTest.php`
 - `docs/implementation/p09-quick-record-drawer.md`
 
 ## TESTS
 
-`P09QuickRecordDrawerTest` plus P01–P08 / `CrmListWorkspace` / `CrmBulkActions` / object show tests remain green. Contract file locks stale A→B→C and adapter semantics.
+`P09QuickRecordDrawerTest` plus P01–P08 / `CrmListWorkspace` / `CrmBulkActions` / object show tests remain green. Contract file locks stale A→B→C and adapter semantics. Quote total equals `formatDzd(500_000)` (accepts `DA`). Pest locks: no Inertia page imports the contract; no import-time `assert` loop; test-only runner exists.
 
 ## LIVE VISUAL QA
 

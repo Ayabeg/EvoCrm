@@ -1,3 +1,8 @@
+/**
+ * P09 drawer proofs. Export-only — never import from an Inertia page.
+ * Import-time asserts blank `#app` if a proof fails (Contabo harness, 2026-09-15).
+ * Run via tests/js/p09-quick-record-drawer-contract.ts or assertP09DrawerProofs().
+ */
 import {
     initialQuickRecordState,
     reduceQuickRecord,
@@ -11,6 +16,7 @@ import { adaptContact } from '@/ds/workspace/record-adapters/contact';
 import { adaptDeal } from '@/ds/workspace/record-adapters/deal';
 import { adaptLead } from '@/ds/workspace/record-adapters/lead';
 import { adaptQuote } from '@/ds/workspace/record-adapters/quote';
+import { formatDzd } from '@/lib/money';
 
 const capabilities = (partial: Partial<RecordCapabilities>): RecordCapabilities => ({
     overview: true,
@@ -110,9 +116,11 @@ const quotePayload: QuickRecordPeekPayload = {
     permissions,
 };
 
-function assert(condition: boolean, label: string): void {
-    if (!condition) {
-        throw new Error(`P09 contract failed: ${label}`);
+export function assertP09DrawerProofs(): void {
+    for (const [label, ok] of Object.entries(P09_DRAWER_PROOFS)) {
+        if (!ok) {
+            throw new Error(`P09 contract failed: ${label}`);
+        }
     }
 }
 
@@ -152,13 +160,20 @@ export const P09_DRAWER_PROOFS = {
     'deal adapter uses stage not qualification':
         adaptDeal(dealPayload).status?.label === 'New' &&
         adaptDeal(dealPayload).keyProperties.some((property) => property.id === 'stage'),
-    'quote adapter deal title + total + draft/sent/accepted + expires':
-        adaptQuote(quotePayload).title === 'Clinic landing page' &&
-        (adaptQuote(quotePayload).keyProperties.find((property) => property.id === 'total')?.value ?? '').includes(
-            'DZD',
-        ) &&
-        adaptQuote(quotePayload).status?.label === 'Draft' &&
-        adaptQuote(quotePayload).keyProperties.some((property) => property.id === 'expires_at'),
+    'quote adapter deal title + total + draft/sent/accepted + expires': (() => {
+        const quote = adaptQuote(quotePayload);
+        const total = quote.keyProperties.find((property) => property.id === 'total')?.value ?? '';
+        const formatted = formatDzd(500_000);
+
+        return (
+            quote.title === 'Clinic landing page' &&
+            total === formatted &&
+            total.length > 0 &&
+            /5[\s\u00a0\u202f]?000/.test(total) &&
+            quote.status?.label === 'Draft' &&
+            quote.keyProperties.some((property) => property.id === 'expires_at')
+        );
+    })(),
     'quote associations are deal only':
         adaptQuote(quotePayload).associations.length === 1 &&
         adaptQuote(quotePayload).associations[0]?.ref.type === 'deal',
@@ -201,7 +216,3 @@ export const P09_DRAWER_PROOFS = {
             { type: 'close' },
         ).open === false,
 };
-
-for (const [label, ok] of Object.entries(P09_DRAWER_PROOFS)) {
-    assert(ok, label);
-}
