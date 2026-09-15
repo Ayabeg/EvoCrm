@@ -343,7 +343,7 @@ Click/drag misfires if a browser fires click after a short drag — 6px + `dragg
 
 ## MERGE READY
 
-YES — pending CI green and Contabo research-box visual QA (not faked).
+YES — local Pest 912/912, types, eslint, build, and GitHub `ci` are green. Contabo populated-pipeline visual QA is still NEEDS HUMAN / RESEARCH BOX (not faked).
 
 ---
 
