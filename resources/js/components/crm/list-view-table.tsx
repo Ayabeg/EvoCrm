@@ -2,6 +2,8 @@ import { Link, router } from '@inertiajs/react';
 import LeadScorePill from '@/components/crm/lead-score-pill';
 import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
 import type { RowId } from '@/ds/workspace/selection';
+import { resolveRowActivation } from '@/ds/workspace/quick-record/row-peek';
+import type { RowPeekContext } from '@/ds/workspace/quick-record/row-peek';
 import { resolveRowHref } from '@/ds/workspace/surface';
 import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
@@ -260,6 +262,68 @@ function renderTicketCell(columnId: string, row: TicketRow): string {
     }
 }
 
+function contactCommunicationHref(columnId: string, row: ContactRow): string | null {
+    if (columnId === 'email' && row.email) {
+        return `mailto:${row.email}`;
+    }
+
+    if (columnId === 'phone' && row.phone_e164) {
+        return `tel:${row.phone_e164}`;
+    }
+
+    return null;
+}
+
+function activateListRow(
+    event: {
+        target: EventTarget | null;
+        metaKey: boolean;
+        ctrlKey: boolean;
+        shiftKey: boolean;
+        altKey: boolean;
+        button?: number;
+        preventDefault?: () => void;
+    },
+    row: { id: RowId },
+    href: string,
+    opener: HTMLElement,
+    onRowPeek?: (row: { id: RowId }, context?: RowPeekContext) => void,
+): void {
+    const target = event.target as HTMLElement;
+
+    if (target.closest('a, input, button, label')) {
+        return;
+    }
+
+    const action = resolveRowActivation({
+        peekEnabled: Boolean(onRowPeek),
+        nestedInteractive: false,
+        metaOrCtrl: event.metaKey || event.ctrlKey,
+        shiftOrAlt: event.shiftKey || event.altKey,
+        middle: event.button === 1,
+    });
+
+    if (action === 'ignore') {
+        return;
+    }
+
+    event.preventDefault?.();
+
+    if (action === 'peek') {
+        onRowPeek?.(row, { opener });
+
+        return;
+    }
+
+    if (action === 'new-tab') {
+        window.open(href, '_blank', 'noopener,noreferrer');
+
+        return;
+    }
+
+    router.visit(href);
+}
+
 function primaryColumnId(entity: ListObjectType): string {
     if (entity === 'deal' || entity === 'quote' || entity === 'lead') {
         return 'title';
@@ -375,6 +439,7 @@ export default function ListViewTable({
     columns,
     basePath,
     rowHref,
+    onRowPeek,
     selectable = false,
     selectedIds = [],
     onToggle,
@@ -387,6 +452,7 @@ export default function ListViewTable({
     columns: ListViewColumn[];
     basePath: string;
     rowHref?: (row: { id: RowId }) => string;
+    onRowPeek?: (row: { id: RowId }, context?: RowPeekContext) => void;
     selectable?: boolean;
     selectedIds?: RowId[];
     onToggle?: (id: RowId) => void;
@@ -512,20 +578,54 @@ export default function ListViewTable({
                             return (
                             <tr
                                 key={row.id}
+                                tabIndex={onRowPeek ? 0 : undefined}
+                                aria-label={
+                                    onRowPeek
+                                        ? `Inspect ${renderCell(entity, primaryId, row)}`
+                                        : undefined
+                                }
+                                data-row-peek={onRowPeek ? 'true' : undefined}
                                 className={cn(
                                     identityRow
                                         ? 'min-h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft'
                                         : 'h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft',
                                     selected && 'bg-canvas-soft',
+                                    onRowPeek && 'focus-visible:outline-none focus-visible:bg-canvas-soft',
                                 )}
                                 onClick={(event) => {
-                                    const target = event.target as HTMLElement;
-
-                                    if (target.closest('a, input, button, label')) {
+                                    activateListRow(
+                                        event,
+                                        row,
+                                        href,
+                                        event.currentTarget,
+                                        onRowPeek,
+                                    );
+                                }}
+                                onAuxClick={(event) => {
+                                    activateListRow(
+                                        event,
+                                        row,
+                                        href,
+                                        event.currentTarget,
+                                        onRowPeek,
+                                    );
+                                }}
+                                onKeyDown={(event) => {
+                                    if (event.key !== 'Enter') {
                                         return;
                                     }
 
-                                    router.visit(href);
+                                    if (event.target !== event.currentTarget) {
+                                        return;
+                                    }
+
+                                    activateListRow(
+                                        event,
+                                        row,
+                                        href,
+                                        event.currentTarget,
+                                        onRowPeek,
+                                    );
                                 }}
                             >
                                 {selectable ? (
@@ -573,6 +673,13 @@ export default function ListViewTable({
                                     const isQuoteAmount =
                                         entity === 'quote' &&
                                         column.id === 'amount';
+                                    const communicationHref =
+                                        entity === 'contact'
+                                            ? contactCommunicationHref(
+                                                  column.id,
+                                                  row as ContactRow,
+                                              )
+                                            : null;
 
                                     return (
                                         <td
@@ -642,6 +749,13 @@ export default function ListViewTable({
                                                 <QuoteAmountCell
                                                     cents={(row as QuoteRow).total_cents}
                                                 />
+                                            ) : communicationHref ? (
+                                                <a
+                                                    href={communicationHref}
+                                                    className="hover:underline"
+                                                >
+                                                    {label}
+                                                </a>
                                             ) : column.id === primaryId ? (
                                                 <Link
                                                     href={href}
@@ -676,7 +790,20 @@ export default function ListViewTable({
                     const href = resolveRowHref(row, rowHref, basePath);
 
                     return (
-                        <li key={row.id} className="flex items-start gap-2 px-4 py-2">
+                        <li
+                            key={row.id}
+                            data-row-peek={onRowPeek ? 'true' : undefined}
+                            className="flex cursor-pointer items-start gap-2 px-4 py-2"
+                            onClick={(event) => {
+                                activateListRow(
+                                    event,
+                                    row,
+                                    href,
+                                    event.currentTarget,
+                                    onRowPeek,
+                                );
+                            }}
+                        >
                             {selectable ? (
                                 <input
                                     type="checkbox"
@@ -687,44 +814,39 @@ export default function ListViewTable({
                                     aria-label={`Select ${row.id}`}
                                 />
                             ) : null}
-                            <Link
-                                href={href}
-                                className="block min-w-0 flex-1 no-underline"
-                            >
+                            <div className="min-w-0 flex-1">
                                 {entity === 'contact' ? (
                                     <ContactNameCell
                                         row={row as ContactRow}
                                         href={href}
-                                        linked={false}
                                     />
                                 ) : entity === 'company' ? (
                                     <CompanyNameCell
                                         row={row as CompanyRow}
                                         href={href}
-                                        linked={false}
                                     />
                                 ) : entity === 'deal' ? (
                                     <DealNameCell
                                         row={row as DealRow}
                                         href={href}
-                                        linked={false}
                                     />
                                 ) : entity === 'lead' ? (
                                     <LeadNameCell
                                         row={row as LeadListRow}
                                         href={href}
-                                        linked={false}
                                     />
                                 ) : entity === 'quote' ? (
                                     <QuoteNameCell
                                         row={row as QuoteRow}
                                         href={href}
-                                        linked={false}
                                     />
                                 ) : (
-                                    <p className="font-medium text-ink">
+                                    <Link
+                                        href={href}
+                                        className="font-medium text-ink hover:underline"
+                                    >
                                         {primaryLabel}
-                                    </p>
+                                    </Link>
                                 )}
                                 <dl className="mt-1 grid gap-1 text-[11px]">
                                     {visible
@@ -732,6 +854,13 @@ export default function ListViewTable({
                                         .slice(0, 3)
                                         .map((column) => {
                                             const value = renderCell(entity, column.id, row);
+                                            const communicationHref =
+                                                entity === 'contact'
+                                                    ? contactCommunicationHref(
+                                                          column.id,
+                                                          row as ContactRow,
+                                                      )
+                                                    : null;
 
                                             return (
                                                 <div
@@ -741,12 +870,20 @@ export default function ListViewTable({
                                                     <dt className="text-muted-foreground">
                                                         {t(columnLabel(resolvedDefs, column.id))}
                                                     </dt>
-                                                    <dd className="truncate text-ink">{value}</dd>
+                                                    <dd className="truncate text-ink">
+                                                        {communicationHref ? (
+                                                            <a href={communicationHref}>
+                                                                {value}
+                                                            </a>
+                                                        ) : (
+                                                            value
+                                                        )}
+                                                    </dd>
                                                 </div>
                                             );
                                         })}
                                 </dl>
-                            </Link>
+                            </div>
                         </li>
                     );
                 })}

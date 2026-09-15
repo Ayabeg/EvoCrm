@@ -32,8 +32,7 @@ function renderSharedTableSurface<Row extends { id: RowId }>(
     props: DataWorkspaceSharedTableProps<Row>,
     selection: WorkspaceSelection,
 ): ReactNode {
-    // onRowPeek is reserved for P09 QuickRecordDrawer. Do not invent peek here.
-    void props.onRowPeek;
+    // onRowPeek is reserved for P09 QuickRecordDrawer. P10 activates the seam.
 
     if (props.loading) {
         return (
@@ -65,6 +64,7 @@ function renderSharedTableSurface<Row extends { id: RowId }>(
             columns={props.columns}
             basePath={props.basePath}
             rowHref={props.rowHref}
+            onRowPeek={props.onRowPeek}
             selectable={props.selection?.selectable ?? false}
             selectedIds={selection.selectedIds}
             onToggle={selection.toggleOne}

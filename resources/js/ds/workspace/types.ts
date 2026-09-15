@@ -124,10 +124,13 @@ export type DataWorkspaceSharedTableProps<Row extends { id: RowId } = { id: RowI
     DataWorkspaceChromeProps & {
         resultMode: 'shared-table';
         rows: Row[];
-        /** Consumed by ListDataTable (P03D). Not voided. */
+        /** Consumed by ListDataTable (P03D). Not voided. Full-record href. */
         rowHref: (row: Row) => string;
-        /** Reserved for P09 QuickRecordDrawer. Not wired in P03D. */
-        onRowPeek?: (row: Row) => void;
+        /**
+         * P10 peek seam (reserved for P09 QuickRecordDrawer).
+         * Contextual inspection — must not replace rowHref.
+         */
+        onRowPeek?: (row: Row, context?: { opener?: HTMLElement | null }) => void;
         loading?: boolean;
         /** WorkspaceEmpty — heading required. Domain pages keep CrmEmptyState. */
         empty: DataWorkspaceEmpty;
