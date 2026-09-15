@@ -1,5 +1,11 @@
-import type { DragEvent, MouseEvent, ReactNode } from 'react';
+import { router } from '@inertiajs/react';
+import type { DragEvent, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 import { useRef } from 'react';
+import { pointerMovedPastThreshold } from '@/components/crm/pipeline-card-interaction';
+import {
+    isNestedInteractiveTarget,
+    resolveRowActivation,
+} from '@/ds/workspace/quick-record/row-peek';
 import { cn } from '@/lib/utils';
 
 /**
@@ -7,7 +13,7 @@ import { cn } from '@/lib/utils';
  * Callers own drag payloads, move requests, and weighted math.
  */
 
-const cardRadius = 'rounded-[var(--radius-1)]';
+const cardRadius = 'rounded-[10px]';
 const motion =
     'duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-out)]';
 
@@ -23,7 +29,7 @@ export function PipelineKanban({
     return (
         <div
             className={cn(
-                'flex min-h-[22rem] items-stretch overflow-x-auto',
+                'flex min-h-[22rem] items-stretch overflow-x-auto overflow-y-hidden',
                 className,
             )}
             data-testid="pipeline-kanban"
@@ -59,7 +65,7 @@ export function PipelineKanbanColumn({
             onDrop={onDrop}
             data-testid={testId}
             className={cn(
-                'flex w-72 shrink-0 flex-col border-r border-hairline px-2.5 py-2 last:border-r-0',
+                'flex h-full min-h-0 w-[280px] min-w-[260px] max-w-[320px] shrink-0 flex-col overflow-y-auto border-r border-hairline px-2.5 py-2 last:border-r-0',
                 over &&
                     'bg-canvas-soft outline outline-1 outline-offset-[-1px] outline-[color-mix(in_srgb,var(--evosales-ink)_22%,var(--evosales-hairline))]',
                 className,
@@ -87,6 +93,9 @@ export function PipelineKanbanHeader({
     accent: string;
     unit?: string;
 }) {
+    void weighted;
+    void probability;
+
     return (
         <header className="mb-2 px-0.5">
             <div className="flex items-baseline justify-between gap-2">
@@ -149,6 +158,8 @@ export function PipelineKanbanCard({
     children,
     dragging,
     testId,
+    href,
+    label,
     onDragStart,
     onDragEnd,
     onOpen,
@@ -157,30 +168,95 @@ export function PipelineKanbanCard({
     children: ReactNode;
     dragging: boolean;
     testId?: string;
+    href?: string;
+    label?: string;
     onDragStart: (event: DragEvent) => void;
     onDragEnd: () => void;
-    onOpen?: () => void;
+    onOpen?: (opener?: HTMLElement) => void;
     className?: string;
 }) {
     const dragged = useRef(false);
+    const origin = useRef<{ x: number; y: number } | null>(null);
 
-    const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    const activate = (
+        event: {
+            target: EventTarget | null;
+            metaKey: boolean;
+            ctrlKey: boolean;
+            shiftKey: boolean;
+            altKey: boolean;
+            button?: number;
+            preventDefault?: () => void;
+        },
+        opener: HTMLElement,
+    ) => {
         if (dragged.current || !onOpen) {
             return;
         }
 
-        const target = event.target as HTMLElement;
+        const action = resolveRowActivation({
+            peekEnabled: true,
+            nestedInteractive: isNestedInteractiveTarget(event.target),
+            metaOrCtrl: event.metaKey || event.ctrlKey,
+            shiftOrAlt: event.shiftKey || event.altKey,
+            middle: event.button === 1,
+        });
 
-        if (target.closest('a, button, input, label')) {
+        if (action === 'ignore') {
             return;
         }
 
-        onOpen();
+        event.preventDefault?.();
+
+        if (action === 'new-tab' && href) {
+            window.open(href, '_blank', 'noopener,noreferrer');
+
+            return;
+        }
+
+        if (action === 'visit' && href) {
+            router.visit(href);
+
+            return;
+        }
+
+        onOpen(opener);
+    };
+
+    const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+        activate(event, event.currentTarget);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+
+        activate(event, event.currentTarget);
     };
 
     return (
         <div
             draggable
+            tabIndex={0}
+            aria-label={label}
+            onPointerDown={(event) => {
+                origin.current = { x: event.clientX, y: event.clientY };
+            }}
+            onPointerMove={(event) => {
+                if (
+                    origin.current &&
+                    pointerMovedPastThreshold(origin.current, {
+                        x: event.clientX,
+                        y: event.clientY,
+                    })
+                ) {
+                    dragged.current = true;
+                }
+            }}
+            onPointerUp={() => {
+                origin.current = null;
+            }}
             onDragStart={(event) => {
                 dragged.current = true;
                 onDragStart(event);
@@ -189,21 +265,23 @@ export function PipelineKanbanCard({
                 onDragEnd();
                 window.setTimeout(() => {
                     dragged.current = false;
+                    origin.current = null;
                 }, 0);
             }}
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
             data-testid={testId}
             aria-grabbed={dragging}
             className={cn(
                 cardRadius,
-                'cursor-grab select-none border border-hairline bg-white px-2.5 py-2 text-[13px] shadow-[var(--aurora-shadow-medium)]',
-                'transition-[box-shadow,opacity,border-color]',
+                'cursor-grab select-none border border-hairline bg-white px-2.5 py-2 text-[13px] shadow-none',
+                'transition-[opacity,border-color]',
                 motion,
-                'hover:border-[color-mix(in_srgb,var(--evosales-ink)_16%,var(--evosales-hairline))] hover:shadow-[var(--aurora-shadow-strong)]',
+                'hover:border-[color-mix(in_srgb,var(--evosales-ink)_16%,var(--evosales-hairline))]',
+                'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent)]',
                 'active:cursor-grabbing',
                 'motion-reduce:transition-none',
-                dragging &&
-                    'cursor-grabbing opacity-50 shadow-[var(--aurora-shadow-strong)]',
+                dragging && 'cursor-grabbing opacity-50',
                 className,
             )}
         >

@@ -235,14 +235,15 @@ it('does not migrate Tickets Deals board or invent QuickRecordDrawer builder or 
         ->and($tickets)->toContain('CrmListFooter')
         ->and($tickets)->not->toContain('resultMode=');
 
-    expect($board)->toContain('PipelineKanban')
+    expect($board)->toContain('DealPipelineBoard')
         ->and($board)->toContain('DealLayoutToggle')
-        ->and($board)->not->toContain('resultMode=')
-        ->and($board)->not->toContain('mode="board"')
+        ->and($board)->toContain('resultMode="shared-table"')
+        ->and($board)->toContain('mode="board"')
         ->and($board)->not->toContain('WorkspaceBoard')
-        ->and($board)->not->toContain('DataWorkspace');
+        ->and($board)->not->toContain('BoardDealDrawer');
 
-    expect($board)->toContain('/crm/deals/${dealId}/move')
+    $pipelineBoard = file_get_contents(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
+    expect($pipelineBoard)->toContain('/crm/deals/${dealId}/move')
         ->and($kanban)->toContain('Weighted:');
 
     expect($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')")

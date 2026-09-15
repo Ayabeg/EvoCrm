@@ -115,8 +115,8 @@ it('keeps Deals row identity amount stage owner next step and selection on the s
         ->and($selection)->toContain('togglePageSelectedIds')
         ->and($selection)->toContain('bulkActive: selectedIds.length > 0');
 
-    expect($toggle)->toContain('const listHref = `/crm/deals${query}`')
-        ->and($toggle)->toContain('const boardHref = `/crm/deals/board${query}`')
+    expect($toggle)->toContain('dealLayoutHrefFromFilters')
+        ->and($toggle)->toContain("current === 'list'")
         ->and($toggle)->not->toContain('mode=board')
         ->and($toggle)->not->toContain('onModeChange');
 
@@ -227,15 +227,17 @@ it('does not migrate Quotes Pipeline board or invent QuickRecordDrawer attention
         ->and($quotes)->not->toContain('CrmListFooter')
         ->and($quotes)->not->toContain('QuickRecordDrawer');
 
-    expect($board)->toContain('PipelineKanban')
+    expect($board)->toContain('DealPipelineBoard')
         ->and($board)->toContain('DealLayoutToggle')
-        ->and($board)->not->toContain('resultMode=')
-        ->and($board)->not->toContain('mode="board"')
+        ->and($board)->toContain('resultMode="shared-table"')
+        ->and($board)->toContain('mode="board"')
         ->and($board)->not->toContain('WorkspaceBoard')
-        ->and($board)->not->toContain('DataWorkspace');
+        ->and($board)->not->toContain('BoardDealDrawer');
 
-    expect($board)->toContain('/crm/deals/${dealId}/move')
-        ->and($kanban)->toContain('Weighted:');
+    expect($kanban)->toContain('Weighted:');
+
+    $pipelineBoard = file_get_contents(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
+    expect($pipelineBoard)->toContain('/crm/deals/${dealId}/move');
 
     expect($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')")
         ->and($routes)->toContain("Route::get('/crm/deals/board'");
@@ -247,7 +249,7 @@ it('does not migrate Quotes Pipeline board or invent QuickRecordDrawer attention
         ->and($workspace)->toContain('onRowPeek is reserved for P09');
 
     $types = file_get_contents(resource_path('js/ds/workspace/types.ts'));
-    expect($types)->toContain('Pass `<PipelineKanban />` later');
+    expect($types)->toContain('Deals board passes');
 
     expect($show)->toContain('RecordPageFrame')
         ->and($show)->toContain('/move');

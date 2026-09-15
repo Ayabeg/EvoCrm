@@ -47,16 +47,17 @@ it('rebuilds the pipeline board cards and columns to HubSpot density', function 
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
     $kanban = file_get_contents(resource_path('js/components/crm/pipeline-kanban.tsx'));
 
+    $pipelineBoard = file_get_contents(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
+
     expect($board)->toContain('data-crm="deals-board"')
-        ->and($board)->toContain('data-crm="pipeline-workspace"')
-        ->and($board)->toContain('PipelineKanban')
-        ->and($board)->toContain('PipelineKanbanFooter')
+        ->and($board)->toContain('DealPipelineBoard')
         ->and($board)->toContain('DealLayoutToggle')
         ->and($board)->toContain('Create deal')
-        ->and($board)->toContain('/crm/deals/')
-        ->and($board)->toContain('/move')
-        ->and($board)->toContain('No activity for')
         ->and($board)->toContain('No deals in this pipeline')
+        ->and($pipelineBoard)->toContain('/crm/deals/')
+        ->and($pipelineBoard)->toContain('/move')
+        ->and($pipelineBoard)->toContain('No activity for')
+        ->and($pipelineBoard)->toContain('PipelineKanbanFooter')
         ->and($board)->not->toContain('CrmShell')
         ->and($board)->not->toContain('chrome="workspace"')
         ->and($board)->not->toContain('HubSpot')

@@ -10,6 +10,7 @@ use App\Models\Stage;
 use App\Models\Thread;
 use App\Models\Workspace;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -83,21 +84,27 @@ class PipelineManager
 
     /**
      * @param  array<string, mixed>  $options
+     * @param  (callable(Builder<Deal>): void)|null  $constrain
      * @return array{
      *     stages: Collection<int, array<string, mixed>>,
      *     deals: Collection<int, array<string, mixed>>,
      *     forecast: array{count: int, amount_cents: int, weighted_cents: int}
      * }
      */
-    public function boardData(Workspace $workspace, Pipeline $pipeline, array $options = []): array
+    public function boardData(Workspace $workspace, Pipeline $pipeline, array $options = [], ?callable $constrain = null): array
     {
         $options = array_merge(DealBoardOptions::defaults(), $options);
-        $deals = Deal::query()
+        $query = Deal::query()
             ->forWorkspace($workspace)
             ->where('pipeline_id', $pipeline->id)
             ->with(['contact.company', 'company', 'stage', 'owner'])
-            ->limit(200)
-            ->get();
+            ->withCount('quotes');
+
+        if ($constrain) {
+            $constrain($query);
+        }
+
+        $deals = $query->limit(200)->get();
 
         $touches = $this->lastTouches($workspace, $deals);
         $nextByDeal = $this->nextActivityByDeal($workspace, $deals);
@@ -109,7 +116,8 @@ class PipelineManager
                 : null;
             $threshold = (int) $options['inactive_after_days'];
             $isInactive = $inactiveDays === null || $inactiveDays >= $threshold;
-            $hasNext = ($nextByDeal[$deal->id] ?? null) !== null
+            $next = $nextByDeal[$deal->id] ?? null;
+            $hasNext = $next !== null
                 || $deal->next_activity_at instanceof CarbonInterface;
 
             return [
@@ -129,6 +137,8 @@ class PipelineManager
                 'inactive_days' => $inactiveDays,
                 'is_inactive' => $isInactive,
                 'has_next_activity' => $hasNext,
+                'next_activity_label' => is_array($next) ? ($next['label'] ?? null) : null,
+                'quote_count' => (int) ($deal->quotes_count ?? 0),
                 'url' => "/crm/deals/{$deal->id}",
             ];
         });
@@ -211,7 +221,7 @@ class PipelineManager
 
     /**
      * @param  Collection<int, Deal>  $deals
-     * @return array<int, string>
+     * @return array<int, array{at: string, label: string}>
      */
     private function nextActivityByDeal(Workspace $workspace, Collection $deals): array
     {
@@ -223,9 +233,24 @@ class PipelineManager
             ->where('done', false)
             ->whereNotNull('due_at')
             ->where('due_at', '>=', now('Africa/Algiers'))
-            ->get(['deal_id', 'due_at'])
+            ->get(['deal_id', 'due_at', 'subject', 'type'])
             ->groupBy('deal_id')
-            ->map(fn (Collection $rows) => $rows->min('due_at')?->toIso8601String())
+            ->map(function (Collection $rows) {
+                $row = $rows->sortBy('due_at')->first();
+
+                if (! $row?->due_at) {
+                    return null;
+                }
+
+                $when = $row->due_at->timezone('Africa/Algiers')->format('d M H:i');
+                $label = trim(($row->subject ?: ucfirst((string) $row->type)).($when ? ' · '.$when : ''));
+
+                return [
+                    'at' => $row->due_at->timezone('Africa/Algiers')->toIso8601String(),
+                    'label' => $label,
+                ];
+            })
+            ->filter()
             ->all();
     }
 

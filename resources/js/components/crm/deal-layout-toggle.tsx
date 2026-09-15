@@ -1,17 +1,25 @@
-import { ListBullets, SquaresFour } from '@phosphor-icons/react';
 import { Link } from '@inertiajs/react';
+import { ListBullets, SquaresFour } from '@phosphor-icons/react';
+import {
+    dealLayoutHrefFromFilters,
+} from '@/lib/list-query/deal-layout';
+import type { ActiveFilterBag, ListQueryExtraInput } from '@/lib/list-query/serialize';
 import { cn } from '@/lib/utils';
 
 export default function DealLayoutToggle({
     current,
     pipelineId,
+    activeFilters,
+    extraQuery,
 }: {
     current: 'list' | 'board';
     pipelineId?: number;
+    activeFilters?: ActiveFilterBag;
+    extraQuery?: ListQueryExtraInput;
 }) {
-    const query = pipelineId && pipelineId > 0 ? `?pipeline=${pipelineId}` : '';
-    const listHref = `/crm/deals${query}`;
-    const boardHref = `/crm/deals/board${query}`;
+    const extras = extraQuery ?? (pipelineId && pipelineId > 0 ? { pipeline: pipelineId } : undefined);
+    const listHref = dealLayoutHrefFromFilters(activeFilters ?? {}, extras, 'list');
+    const boardHref = dealLayoutHrefFromFilters(activeFilters ?? {}, extras, 'board');
 
     return (
         <div

@@ -144,12 +144,44 @@ class DealController extends Controller
         ]);
     }
 
-    public function board(Request $request, PipelineManager $pipelines, DealBoardOptions $boardOptions): Response
+    public function board(Request $request, PipelineManager $pipelines, DealBoardOptions $boardOptions, CrmFilter $filter, CrmHub $hub): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
+        $filters = $filter->resolve($request, $workspace, 'deal');
+
+        $teamOnly = $request->user()->role === WorkspaceRole::Member
+            && $request->user()->canPermission('deals.team_only');
+
+        if ($teamOnly || ($filters['view'] ?? 'all') === 'mine') {
+            $filters['owner'] = (string) $request->user()->id;
+        }
+
         $options = $boardOptions->forUser($request->user());
-        $board = $pipelines->boardData($workspace, $pipeline, $options);
+        $board = $pipelines->boardData(
+            $workspace,
+            $pipeline,
+            $options,
+            function ($query) use ($filter, $filters): void {
+                $filter->applyToDeals($query, $filters);
+            },
+        );
+
+        $stagePills = $pipeline->stages->map(function (Stage $stage) use ($workspace, $pipeline, $filters, $filter) {
+            $countQuery = Deal::query()
+                ->forWorkspace($workspace)
+                ->where('pipeline_id', $pipeline->id);
+            $countFilters = $filters;
+            unset($countFilters['stage']);
+            $filter->applyToDeals($countQuery, $countFilters);
+
+            return [
+                'id' => $stage->id,
+                'name' => $stage->name,
+                'slug' => $stage->slug,
+                'count' => (clone $countQuery)->where('stage_id', $stage->id)->count(),
+            ];
+        })->values();
 
         return Inertia::render('crm/deals/board', [
             'pipeline' => $pipeline->only(['id', 'name']),
@@ -164,6 +196,14 @@ class DealController extends Controller
             'forecastBand' => app(RecordInsight::class)->pipelineForecastBand($workspace, $pipeline),
             'forecastBacktest' => app(RecordInsight::class)->pipelineForecastBacktest($workspace, $pipeline),
             'boardOptions' => $options,
+            'savedFilters' => $hub->filters($workspace, 'deal', $request->user()),
+            'activeFilters' => $filters,
+            'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
+            'members' => $hub->members($workspace),
+            'recordCount' => $board['forecast']['count'],
+            'stagePills' => $stagePills,
+            'cities' => config('evosales.cities'),
+            'wilayas' => config('evosales.wilayas'),
         ]);
     }
 
