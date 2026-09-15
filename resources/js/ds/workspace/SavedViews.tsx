@@ -34,6 +34,7 @@ const OBJECT_NOUNS: Record<DataWorkspaceEntity, string> = {
     deal: 'deals',
     ticket: 'tickets',
     quote: 'quotes',
+    lead: 'leads',
 };
 
 const pillClass = (active: boolean) =>

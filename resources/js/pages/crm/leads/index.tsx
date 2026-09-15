@@ -1,25 +1,19 @@
-import { Form, Link, router } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
-import {
-    CrmObjectHeader,
-    CrmObjectSecondaryLink,
-} from '@/components/crm/crm-object-header';
-import { CrmShell } from '@/components/crm/crm-shell';
-import LeadScorePill from '@/components/crm/lead-score-pill';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-type Lead = {
-    id: number;
-    title: string;
-    status?: string | null;
-    score?: number | null;
-    contact?: { first_name?: string; last_name?: string | null } | null;
-    latest_score?: { score: number; reason?: string | null } | null;
-};
+import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
+import {
+    leadEmptyState,
+    leadRowHref,
+} from '@/pages/crm/leads/lead-columns';
+import type { LeadListRow } from '@/pages/crm/leads/lead-columns';
 
 type ContactOption = {
     id: number;
@@ -30,117 +24,60 @@ type ContactOption = {
 export default function LeadsIndex({
     leads,
     contacts,
+    savedFilters = [],
+    activeFilters = {},
+    listView,
+    recordCount,
+    paginator,
 }: {
-    leads: Lead[];
+    leads: LeadListRow[];
     contacts: ContactOption[];
+    savedFilters?: SavedView[];
+    activeFilters?: Record<string, unknown>;
+    listView: ListViewMeta;
+    recordCount: number;
+    paginator?: { page: number; per_page: number; total: number; last_page: number };
 }) {
     const [drawer, setDrawer] = useState(false);
+    const loading = useInertiaLoading();
 
     return (
-        <CrmShell title="Leads" chrome="workspace">
+        <>
+            <Head title="Leads" />
             <div
-                className="flex h-full min-h-0 flex-col bg-canvas-soft text-ui text-ink"
-                data-crm="list-workspace"
+                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                data-crm="leads-workspace"
             >
-                <CrmObjectHeader
+                <CrmListShell
+                    resultMode="shared-table"
                     title="Leads"
-                    description={`${leads.length.toLocaleString()} leads`}
+                    entity="lead"
+                    basePath="/crm/leads"
                     primaryLabel="Create lead"
-                    onPrimary={() => setDrawer(true)}
-                    secondary={
+                    onCreate={() => setDrawer(true)}
+                    activeFilters={activeFilters}
+                    savedFilters={savedFilters}
+                    listView={listView}
+                    recordCount={recordCount}
+                    className="bg-white"
+                    contentClassName="bg-white"
+                    rows={leads}
+                    rowHref={leadRowHref}
+                    empty={leadEmptyState(hasActiveListFilters(activeFilters))}
+                    paginator={paginator}
+                    loading={loading}
+                    headerActions={
                         <CrmObjectSecondaryLink href="/crm/leads/captures">
                             Capture inbox
                         </CrmObjectSecondaryLink>
                     }
+                    selection={{
+                        mode: 'uncontrolled',
+                        // Page does not participate now. Not a permanent bulk ban.
+                        selectable: false,
+                        pageIds: leads.map((lead) => lead.id),
+                    }}
                 />
-                <div className="flex min-h-0 flex-1 flex-col bg-canvas">
-                    {leads.length === 0 ? (
-                        <CrmEmptyState
-                            title="No leads yet"
-                            line="Create a lead from an existing contact to work inbound records here."
-                            actionLabel="Create lead"
-                            onAction={() => setDrawer(true)}
-                        />
-                    ) : (
-                        <div className="min-h-0 flex-1 overflow-auto">
-                            <table className="w-full min-w-[480px] border-collapse text-[13px]">
-                                <thead>
-                                    <tr className="border-b border-hairline bg-canvas-soft text-left">
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:px-6">
-                                            Title
-                                        </th>
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
-                                            Contact
-                                        </th>
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
-                                            Status
-                                        </th>
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pr-6">
-                                            Score
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {leads.map((lead) => (
-                                        <tr
-                                            key={lead.id}
-                                            className="cursor-pointer border-b border-hairline hover:bg-canvas-soft"
-                                            onClick={(event) => {
-                                                const target = event.target as HTMLElement;
-
-                                                if (target.closest('a, input, button, label')) {
-                                                    return;
-                                                }
-
-                                                router.visit(`/crm/leads/${lead.id}`);
-                                            }}
-                                        >
-                                            <td className="px-4 py-1.5 sm:px-6">
-                                                <Link
-                                                    href={`/crm/leads/${lead.id}`}
-                                                    className="font-medium text-ink hover:underline"
-                                                >
-                                                    {lead.title}
-                                                </Link>
-                                            </td>
-                                            <td className="px-4 py-1.5 text-mute">
-                                                {[
-                                                    lead.contact?.first_name,
-                                                    lead.contact?.last_name,
-                                                ]
-                                                    .filter(Boolean)
-                                                    .join(' ') || '—'}
-                                            </td>
-                                            <td className="px-4 py-1.5 text-mute capitalize">
-                                                {lead.status ?? '—'}
-                                            </td>
-                                            <td className="px-4 py-1.5 sm:pr-6">
-                                                <LeadScorePill
-                                                    compact
-                                                    score={
-                                                        lead.latest_score
-                                                            ? {
-                                                                  score:
-                                                                      lead.score ??
-                                                                      lead
-                                                                          .latest_score
-                                                                          .score,
-                                                                  reason: lead
-                                                                      .latest_score
-                                                                      .reason,
-                                                              }
-                                                            : null
-                                                    }
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                    <CrmListFooter count={leads.length} noun="leads" />
-                </div>
             </div>
 
             <CreateDrawer
@@ -205,7 +142,7 @@ export default function LeadsIndex({
                     )}
                 </Form>
             </CreateDrawer>
-        </CrmShell>
+        </>
     );
 }
 

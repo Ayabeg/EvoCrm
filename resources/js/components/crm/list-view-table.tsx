@@ -8,6 +8,7 @@ import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-v
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
+import LeadScorePill from '@/components/crm/lead-score-pill';
 import {
     applyCompanyColumnContract,
     CompanyIdentityCell as CompanyNameCell,
@@ -16,6 +17,13 @@ import {
     applyContactColumnContract,
     ContactIdentityCell as ContactNameCell,
 } from '@/pages/crm/contacts/contact-columns';
+import {
+    applyLeadColumnContract,
+    LeadIdentityCell as LeadNameCell,
+    leadContactName,
+    leadScorePayload,
+} from '@/pages/crm/leads/lead-columns';
+import type { LeadListRow } from '@/pages/crm/leads/lead-columns';
 
 type AttributeMap = Record<string, string | null>;
 
@@ -291,16 +299,12 @@ function renderTicketCell(columnId: string, row: TicketRow): string {
 }
 
 function primaryColumnId(entity: ListObjectType): string {
-    if (entity === 'deal') {
+    if (entity === 'deal' || entity === 'quote' || entity === 'lead') {
         return 'title';
     }
 
     if (entity === 'ticket') {
         return 'subject';
-    }
-
-    if (entity === 'quote') {
-        return 'title';
     }
 
     return 'name';
@@ -314,14 +318,43 @@ const COMPANY_COLUMN_WIDTHS: Record<string, string> = {
     created_at: 'w-[14%]',
 };
 
+const LEAD_COLUMN_WIDTHS: Record<string, string> = {
+    title: 'w-[40%]',
+    contact: 'w-[22%]',
+    status: 'w-[18%]',
+    score: 'w-[20%]',
+};
+
 function companyColumnWidth(columnId: string): string {
     return COMPANY_COLUMN_WIDTHS[columnId] ?? 'w-[14%]';
+}
+
+function leadColumnWidth(columnId: string): string {
+    return LEAD_COLUMN_WIDTHS[columnId] ?? 'w-[14%]';
+}
+
+function renderLeadCell(columnId: string, row: LeadListRow): string {
+    switch (columnId) {
+        case 'title':
+            return row.title.trim() || '—';
+        case 'contact':
+            return leadContactName(row) ?? '—';
+        case 'status':
+            return titleCase(row.status);
+        case 'score': {
+            const score = leadScorePayload(row);
+
+            return score ? String(score.score) : '—';
+        }
+        default:
+            return '—';
+    }
 }
 
 function renderCell(
     entity: ListObjectType,
     columnId: string,
-    row: ContactRow | DealRow | CompanyRow | TicketRow | QuoteRow,
+    row: ContactRow | DealRow | CompanyRow | TicketRow | QuoteRow | LeadListRow,
 ): string {
     if (entity === 'contact') {
         return renderContactCell(columnId, row as ContactRow);
@@ -337,6 +370,10 @@ function renderCell(
 
     if (entity === 'quote') {
         return renderQuoteCell(columnId, row as QuoteRow);
+    }
+
+    if (entity === 'lead') {
+        return renderLeadCell(columnId, row as LeadListRow);
     }
 
     return renderCompanyCell(columnId, row as CompanyRow);
@@ -356,7 +393,7 @@ export default function ListViewTable({
     isRowSelectable,
 }: {
     entity: ListObjectType;
-    rows: ContactRow[] | DealRow[] | CompanyRow[] | TicketRow[] | QuoteRow[];
+    rows: ContactRow[] | DealRow[] | CompanyRow[] | TicketRow[] | QuoteRow[] | LeadListRow[];
     columnDefs: ListColumnDef[];
     columns: ListViewColumn[];
     basePath: string;
@@ -372,8 +409,10 @@ export default function ListViewTable({
             ? applyContactColumnContract(columnDefs)
             : entity === 'company'
               ? applyCompanyColumnContract(columnDefs)
-              : columnDefs;
-    const identityRow = entity === 'contact' || entity === 'company';
+              : entity === 'lead'
+                ? applyLeadColumnContract(columnDefs)
+                : columnDefs;
+    const identityRow = entity === 'contact' || entity === 'company' || entity === 'lead';
     const visible = visibleColumns({
         columnDefs: resolvedDefs,
         filterFields: [],
@@ -389,6 +428,8 @@ export default function ListViewTable({
     );
 
     const companyTable = entity === 'company';
+    const leadTable = entity === 'lead';
+    const fixedTable = companyTable || leadTable;
 
     return (
         <div className="@container/list min-h-0 min-w-0 flex-1">
@@ -396,7 +437,7 @@ export default function ListViewTable({
             <div
                 className={cn(
                     'hidden overflow-x-auto overflow-y-visible @[480px]/list:block',
-                    entity === 'contact' || entity === 'company' || entity === 'deal'
+                    entity === 'contact' || entity === 'company' || entity === 'deal' || entity === 'lead'
                         ? 'bg-white'
                         : 'bg-canvas',
                 )}
@@ -404,7 +445,7 @@ export default function ListViewTable({
                 <table
                     className={cn(
                         'w-full border-collapse text-[13px]',
-                        companyTable ? 'table-fixed min-w-[52rem]' : 'min-w-[640px]',
+                        fixedTable ? 'table-fixed min-w-[52rem]' : 'min-w-[640px]',
                     )}
                 >
                     <thead>
@@ -440,7 +481,8 @@ export default function ListViewTable({
                                             ? 'text-[13px] leading-[18px]'
                                             : 'text-[11px]',
                                         companyTable && companyColumnWidth(column.id),
-                                        companyTable &&
+                                        leadTable && leadColumnWidth(column.id),
+                                        fixedTable &&
                                             index === visible.length - 1 &&
                                             'pr-6 md:pr-10',
                                     )}
@@ -498,6 +540,12 @@ export default function ListViewTable({
                                     const isDealName =
                                         entity === 'deal' &&
                                         column.id === 'title';
+                                    const isLeadName =
+                                        entity === 'lead' &&
+                                        column.id === 'title';
+                                    const isLeadScore =
+                                        entity === 'lead' &&
+                                        column.id === 'score';
 
                                     return (
                                         <td
@@ -510,9 +558,10 @@ export default function ListViewTable({
                                                     : 'text-mute',
                                                 column.id === 'amount' &&
                                                     'money tabular-nums text-ink',
-                                                companyTable && 'overflow-hidden',
+                                                fixedTable && 'overflow-hidden',
                                                 companyTable && companyColumnWidth(column.id),
-                                                companyTable &&
+                                                leadTable && leadColumnWidth(column.id),
+                                                fixedTable &&
                                                     index === visible.length - 1 &&
                                                     'pr-6 md:pr-10',
                                             )}
@@ -532,6 +581,16 @@ export default function ListViewTable({
                                                     row={row as DealRow}
                                                     href={href}
                                                 />
+                                            ) : isLeadName ? (
+                                                <LeadNameCell
+                                                    row={row as LeadListRow}
+                                                    href={href}
+                                                />
+                                            ) : isLeadScore ? (
+                                                <LeadScorePill
+                                                    compact
+                                                    score={leadScorePayload(row as LeadListRow)}
+                                                />
                                             ) : column.id === primaryId ? (
                                                 <Link
                                                     href={href}
@@ -539,7 +598,7 @@ export default function ListViewTable({
                                                 >
                                                     {label}
                                                 </Link>
-                                            ) : companyTable ? (
+                                            ) : fixedTable ? (
                                                 <span
                                                     className="block truncate"
                                                     title={label !== '—' ? label : undefined}
@@ -596,6 +655,12 @@ export default function ListViewTable({
                                 ) : entity === 'deal' ? (
                                     <DealNameCell
                                         row={row as DealRow}
+                                        href={href}
+                                        linked={false}
+                                    />
+                                ) : entity === 'lead' ? (
+                                    <LeadNameCell
+                                        row={row as LeadListRow}
                                         href={href}
                                         linked={false}
                                     />

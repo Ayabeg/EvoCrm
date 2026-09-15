@@ -22,13 +22,28 @@ use Inertia\Response;
 
 class LeadController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, CrmHub $hub): Response
     {
         $workspace = $request->user()->workspace;
+        $leads = Lead::query()
+            ->forWorkspace($workspace)
+            ->with(['contact', 'latestScore'])
+            ->latest()
+            ->limit(100)
+            ->get();
+        $total = $leads->count();
 
         return Inertia::render('crm/leads/index', [
-            'leads' => Lead::query()->forWorkspace($workspace)->with(['contact', 'latestScore'])->latest()->limit(100)->get(),
+            'leads' => $leads,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
+            'listView' => $hub->listViewMeta('lead'),
+            'recordCount' => $total,
+            'paginator' => [
+                'page' => 1,
+                'per_page' => 100,
+                'total' => $total,
+                'last_page' => 1,
+            ],
         ]);
     }
 

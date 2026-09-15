@@ -147,7 +147,7 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($empty)->toContain('as="h2"');
 });
 
-it('does not migrate Deals Quotes or Leads and does not invent QuickRecordDrawer', function () {
+it('does not migrate Deals or Quotes and does not invent QuickRecordDrawer', function () {
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
@@ -164,10 +164,9 @@ it('does not migrate Deals Quotes or Leads and does not invent QuickRecordDrawer
         ->and($quotes)->toContain('CrmListFooter')
         ->and($quotes)->not->toContain('resultMode=');
 
-    expect($leads)->toContain('<table')
-        ->and($leads)->not->toContain('CrmListShell')
-        ->and($leads)->not->toContain('DataWorkspace')
-        ->and($leads)->not->toContain('resultMode=');
+    expect($leads)->toContain('CrmListShell')
+        ->and($leads)->toContain('resultMode="shared-table"')
+        ->and($leads)->not->toContain('QuickRecordDrawer');
 
     expect($companies)->not->toContain('QuickRecordDrawer')
         ->and($workspace)->toContain('onRowPeek is reserved for P09');

@@ -26,6 +26,7 @@ const OBJECT_NOUNS: Record<ListObjectType, string> = {
     deal: 'deals',
     ticket: 'tickets',
     quote: 'quotes',
+    lead: 'leads',
 };
 
 export default function SavedViewTabs({

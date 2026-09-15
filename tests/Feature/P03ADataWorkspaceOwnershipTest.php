@@ -82,12 +82,15 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($quotes)->toContain('primaryLabel="Create quote"')
         ->and($quotes)->not->toContain('resultMode=');
 
-    expect($leads)->toContain('CrmObjectHeader')
-        ->and($leads)->toContain('chrome="workspace"')
-        ->and($leads)->toContain('<table')
-        ->and($leads)->not->toContain('CrmListShell')
-        ->and($leads)->not->toContain('DataWorkspace')
-        ->and($leads)->not->toContain('ListViewTable');
+    expect($leads)->toContain('CrmListShell')
+        ->and($leads)->toContain('resultMode="shared-table"')
+        ->and($leads)->toContain('rows={leads}')
+        ->and($leads)->toContain('rowHref={leadRowHref}')
+        ->and($leads)->not->toContain('ListViewTable')
+        ->and($leads)->not->toContain('CrmEmptyState')
+        ->and($leads)->not->toContain('CrmListFooter')
+        ->and($leads)->not->toContain('CrmShell')
+        ->and($leads)->not->toContain('DataWorkspace');
 
     expect($tickets)->toContain('CrmListShell')
         ->and($tickets)->toContain('ListViewTable')
@@ -214,5 +217,9 @@ it('keeps Contacts Companies Deals Quotes and Leads Inertia contracts', function
             ->component('crm/leads/index')
             ->has('leads')
             ->has('contacts')
+            ->has('listView.columnDefs')
+            ->has('recordCount')
+            ->has('paginator')
+            ->missing('activeFilters')
         );
 });

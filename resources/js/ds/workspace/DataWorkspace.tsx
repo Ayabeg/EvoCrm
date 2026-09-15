@@ -21,6 +21,7 @@ import {
     applyBuiltInView,
     applySavedFilter,
     fromActiveFilters,
+    listQueryAdapter,
     listQueryHref,
 } from '@/lib/list-query';
 import type { ListQueryObject } from '@/lib/list-query';
@@ -110,6 +111,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
     const { auth } = usePage().props as { auth: { user: { role: string } } };
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const [advancedOpen, setAdvancedOpen] = useState(false);
+    const queryEnabled = listQueryAdapter(object as ListQueryObject).supportsQuery;
     const filterRecord = filters as Record<string, unknown>;
     const sharedRows = resultMode === 'shared-table' ? props.rows : undefined;
     const paginator = resultMode === 'shared-table' ? props.paginator : undefined;
@@ -158,18 +160,20 @@ export function DataWorkspace<Row extends { id: RowId }>(
                 }
             />
             {banner}
-            <SavedViews
-                object={object}
-                basePath={basePath}
-                views={views}
-                activeViewId={activeViewId}
-                onViewChange={onViewChange}
-                onViewSave={onViewSave}
-                filters={filterRecord}
-                columns={columns}
-                extraQuery={extraQuery}
-                canManageSettings={canManageSettings}
-            />
+            {queryEnabled ? (
+                <SavedViews
+                    object={object}
+                    basePath={basePath}
+                    views={views}
+                    activeViewId={activeViewId}
+                    onViewChange={onViewChange}
+                    onViewSave={onViewSave}
+                    filters={filterRecord}
+                    columns={columns}
+                    extraQuery={extraQuery}
+                    canManageSettings={canManageSettings}
+                />
+            ) : null}
             <FilterBar
                 object={object as ListQueryObject}
                 basePath={basePath}
@@ -217,17 +221,19 @@ export function DataWorkspace<Row extends { id: RowId }>(
                 }
             />
             {toolbarExtra}
-            <AdvancedFilterDrawer
-                open={advancedOpen}
-                onOpenChange={setAdvancedOpen}
-                object={object}
-                basePath={basePath}
-                filters={filterRecord}
-                filterFields={fieldDefs}
-                filterContext={filterContext}
-                extraQuery={extraQuery}
-                onFiltersChange={onFiltersChange}
-            />
+            {queryEnabled ? (
+                <AdvancedFilterDrawer
+                    open={advancedOpen}
+                    onOpenChange={setAdvancedOpen}
+                    object={object}
+                    basePath={basePath}
+                    filters={filterRecord}
+                    filterFields={fieldDefs}
+                    filterContext={filterContext}
+                    extraQuery={extraQuery}
+                    onFiltersChange={onFiltersChange}
+                />
+            ) : null}
             {selection.bulkActive && bulk
                 ? typeof bulk === 'function'
                     ? bulk(selection)

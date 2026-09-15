@@ -1,4 +1,4 @@
-export type ListObjectType = 'contact' | 'deal' | 'company' | 'ticket' | 'quote';
+export type ListObjectType = 'contact' | 'deal' | 'company' | 'ticket' | 'quote' | 'lead';
 
 export type ListViewColumn = {
     id: string;

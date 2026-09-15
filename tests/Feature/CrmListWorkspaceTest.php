@@ -96,11 +96,14 @@ it('keeps the leads list on workspace chrome and retires the duplicate board pro
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
     $routes = file_get_contents(base_path('routes/web.php'));
 
-    expect($leads)->toContain('chrome="workspace"')
-        ->and($leads)->toContain('CrmObjectHeader')
+    expect($leads)->toContain('data-crm="leads-workspace"')
+        ->and($leads)->toContain('CrmListShell')
+        ->and($leads)->toContain('resultMode="shared-table"')
         ->and($leads)->toContain('Create lead')
-        ->and($leads)->toContain('CrmEmptyState')
-        ->and($leads)->not->toContain('PageHeader')
+        ->and($leads)->toContain('hasActiveListFilters')
+        ->and($leads)->not->toContain('CrmShell')
+        ->and($leads)->not->toContain('chrome="workspace"')
+        ->and($leads)->not->toContain('CrmEmptyState')
         ->and($leads)->not->toContain('name="q"');
 
     expect($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')")

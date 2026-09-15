@@ -63,6 +63,12 @@ class ListViewConfig
                 ['id' => 'expires_at', 'label' => 'Expiration', 'defaultVisible' => true],
                 ['id' => 'sent_at', 'label' => 'Sent', 'defaultVisible' => false],
             ],
+            'lead' => [
+                ['id' => 'title', 'label' => 'Title', 'defaultVisible' => true],
+                ['id' => 'contact', 'label' => 'Contact', 'defaultVisible' => true],
+                ['id' => 'status', 'label' => 'Status', 'defaultVisible' => true],
+                ['id' => 'score', 'label' => 'Score', 'defaultVisible' => true],
+            ],
             default => [],
         };
     }
