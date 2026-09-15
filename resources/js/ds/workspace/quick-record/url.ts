@@ -4,7 +4,8 @@ import type { RecordRef } from '@/ds/workspace/quick-record/types';
 /**
  * Reserved list-query sibling. Classified unsafe in P03C keys so chrome
  * never treats it as a filter. P09 does not sync it on production lists.
- * P10 must preserve this key when building list hrefs.
+ * P10 defers URL sync (decision B): context preservation > clever URLs.
+ * Helpers stay; production lists do not write `peek`.
  */
 export const PEEK_QUERY_KEY = 'peek';
 

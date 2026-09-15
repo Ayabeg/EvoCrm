@@ -35,6 +35,9 @@ acceptWorkspace({
     resultMode: 'shared-table',
     rows: [{ id: 1 }],
     rowHref: (row) => `/crm/contacts/${row.id}`,
+    onRowPeek: (row) => {
+        void row.id;
+    },
     empty: { title: 'No contacts yet', body: '' },
 });
 

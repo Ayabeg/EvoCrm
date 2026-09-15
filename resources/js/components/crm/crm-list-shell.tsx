@@ -1,10 +1,13 @@
 import { usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { listFilterChips } from '@/components/crm/list-query';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { StagePills } from '@/components/crm/stage-pills';
 import { DataWorkspace, viewHref } from '@/ds/workspace/DataWorkspace';
+import { useQuickRecord } from '@/ds/workspace/quick-record';
+import { isRecordType } from '@/ds/workspace/quick-record/ref';
+import type { RowPeekContext } from '@/ds/workspace/quick-record/row-peek';
 import type { RowId, WorkspaceSelection, WorkspaceSelectionInput } from '@/ds/workspace/selection';
 import type {
     DataWorkspaceEmpty,
@@ -160,7 +163,20 @@ export function CrmListShell<Row extends { id: RowId }>({
           ) => ReactNode);
 }) {
     const { auth } = usePage().props as { auth: { user: { id: number } } };
+    const { openRecord } = useQuickRecord();
     const [columns, setColumns] = useState<ListViewColumn[]>(listView?.columns ?? []);
+    // Shared P10 seam. List pages do not pass per-object peek callbacks.
+    // Row background → drawer. Identity Link / mailto / tel / checkbox → nested only.
+    const onRowPeek = useCallback(
+        (row: Row, context?: RowPeekContext) => {
+            if (!isRecordType(entity)) {
+                return;
+            }
+
+            openRecord({ type: entity, id: row.id }, { opener: context?.opener ?? null });
+        },
+        [entity, openRecord],
+    );
     const noun = OBJECT_NOUNS[entity];
     const description =
         typeof recordCount === 'number'
@@ -302,6 +318,7 @@ export function CrmListShell<Row extends { id: RowId }>({
                 resultMode="shared-table"
                 rows={rows}
                 rowHref={rowHref}
+                onRowPeek={onRowPeek}
                 empty={empty}
                 paginator={sharedPaginator}
                 loading={loading}

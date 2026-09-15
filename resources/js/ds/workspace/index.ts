@@ -9,6 +9,12 @@ export {
     useQuickRecord,
 } from '@/ds/workspace/quick-record';
 export {
+    NESTED_INTERACTIVE_SELECTOR,
+    recordRefFromRow,
+    resolveRowActivation,
+} from '@/ds/workspace/quick-record/row-peek';
+export type { RowActivation, RowPeekContext } from '@/ds/workspace/quick-record/row-peek';
+export {
     resolveRowHref,
     resolveWorkspaceBoardSlot,
     workspacePageHref,

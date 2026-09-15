@@ -146,6 +146,7 @@ export function ListDataTable<Row extends { id: RowId }>({
     columns,
     basePath,
     rowHref,
+    onRowPeek,
     selectable = false,
     selectedIds = [],
     onToggle,
@@ -158,6 +159,7 @@ export function ListDataTable<Row extends { id: RowId }>({
     columns: ListViewColumn[];
     basePath: string;
     rowHref: (row: Row) => string;
+    onRowPeek?: (row: Row, context?: { opener?: HTMLElement | null }) => void;
     selectable?: boolean;
     selectedIds?: RowId[];
     onToggle?: (id: RowId) => void;
@@ -179,6 +181,7 @@ export function ListDataTable<Row extends { id: RowId }>({
                 columns={columns}
                 basePath={basePath}
                 rowHref={rowHref as (row: { id: RowId }) => string}
+                onRowPeek={onRowPeek as (row: { id: RowId }, context?: { opener?: HTMLElement | null }) => void}
                 selectable={selectable}
                 selectedIds={selectedIds}
                 onToggle={onToggle}
