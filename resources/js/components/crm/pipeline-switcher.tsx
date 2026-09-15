@@ -1,6 +1,5 @@
 import {
     applyPipeline,
-    emptyCanonicalListQuery,
     fromActiveFilters,
     visitListQuery,
 } from '@/lib/list-query';
@@ -30,19 +29,7 @@ export default function PipelineSwitcher({
     }
 
     const extras = extraQuery ?? { pipeline: pipelineId };
-    const isBoard = basePath === '/crm/deals/board';
-    const current = isBoard
-        ? {
-              ...emptyCanonicalListQuery(),
-              view: null,
-              extras: {
-                  pipeline:
-                      extras.pipeline === null || extras.pipeline === undefined || extras.pipeline === ''
-                          ? pipelineId
-                          : Number(extras.pipeline),
-              },
-          }
-        : fromActiveFilters(activeFilters ?? {}, extras);
+    const current = fromActiveFilters(activeFilters ?? {}, extras);
 
     return (
         <select

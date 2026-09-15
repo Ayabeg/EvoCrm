@@ -32,10 +32,11 @@ it('§9.2 deals list has saved views, chips, and Create deal', function () {
 
 it('§9.3 deals board has inactivity line and weighted footer', function () {
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
+    $pipelineBoard = file_get_contents(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
     $forecast = file_get_contents(resource_path('js/components/crm/deal-forecast-bar.tsx'));
     $kanban = file_get_contents(resource_path('js/components/crm/pipeline-kanban.tsx'));
 
-    expect($board)->toContain('No activity for')
+    expect($pipelineBoard)->toContain('No activity for')
         ->and($board)->toContain('mark_inactive')
         ->and($board)->toContain('Create deal')
         ->and($forecast)->toContain('Weighted')

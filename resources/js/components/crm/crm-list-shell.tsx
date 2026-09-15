@@ -77,6 +77,7 @@ function toWorkspacePaginator(
  * Tickets (CrmEmptyState + CrmListFooter in children until later).
  * Contacts, Companies, Leads, Deals, and Quotes use resultMode="shared-table".
  * Optional `board` is the P11 slot — Deals list does not pass it.
+ * The deals board page passes `mode="board"` and the kanban node.
  */
 export function CrmListShell<Row extends { id: RowId }>({
     title,

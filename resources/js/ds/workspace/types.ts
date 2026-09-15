@@ -82,7 +82,7 @@ export type DataWorkspaceChromeProps = {
     onModeChange?: (mode: 'list' | 'board') => void;
     /**
      * P11 board slot. Rendered when `mode="board"` in either result mode.
-     * Pass `<PipelineKanban />` later — do not move the deals board here (P03D).
+     * Deals board passes `<DealPipelineBoard />` / PipelineKanban here.
      */
     board?: ReactNode;
 

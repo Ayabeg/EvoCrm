@@ -18,6 +18,15 @@ export {
     patchListQuery,
 } from '@/lib/list-query/patch';
 export {
+    DEAL_BOARD_PATH,
+    DEAL_LIST_PATH,
+    dealLayoutHref,
+    dealLayoutHrefFromFilters,
+    dealLayoutPath,
+    dealLayoutQuery,
+} from '@/lib/list-query/deal-layout';
+export type { DealLayoutTarget } from '@/lib/list-query/deal-layout';
+export {
     domainParamKeys,
     extrasFromInput,
     fromActiveFilters,

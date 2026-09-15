@@ -46,6 +46,26 @@ export function stageUnderlineColor(slug: string): string {
     }
 }
 
+/**
+ * Deal board column accent. Open stays neutral; Won/Lost use semantic
+ * tokens only. Orange is not a stage color.
+ */
+export function dealStageColumnAccent(stage: {
+    slug?: string;
+    is_won?: boolean;
+    is_lost?: boolean;
+}): string {
+    if (stage.is_won || stage.slug === 'won') {
+        return 'var(--color-success)';
+    }
+
+    if (stage.is_lost || stage.slug === 'lost') {
+        return 'var(--color-danger)';
+    }
+
+    return STAGE_COLOR_VARS.hairline;
+}
+
 /** Tailwind classes for stage filter pills (index cycles for custom stages). */
 export const STAGE_PILL_CLASSES = [
     'bg-brand/15 text-ink',

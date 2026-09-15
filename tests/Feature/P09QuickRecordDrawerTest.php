@@ -237,7 +237,7 @@ it('does not change production list rowHref board inbox or command surfaces', fu
         ->and($workspace)->toContain('onRowPeek is reserved for P09');
 
     expect($board)->not->toContain('QuickRecordDrawer')
-        ->and($board)->toContain('PipelineKanban');
+        ->and($board)->toContain('DealPipelineBoard');
     expect($inbox)->not->toContain('QuickRecordDrawer');
     expect($palette)->not->toContain('QuickRecordDrawer')
         ->and($palette)->not->toContain('openRecord');

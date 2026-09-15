@@ -121,9 +121,9 @@ it('keeps Contacts Companies Leads Deals and Quotes on shared empty/paginator', 
         ->and($leads)->not->toContain('CrmListFooter')
         ->and($leads)->not->toContain('listPageHref');
 
-    expect($board)->toContain('PipelineKanban')
-        ->and($board)->not->toContain('resultMode=')
-        ->and($board)->not->toContain('mode="board"')
+    expect($board)->toContain('DealPipelineBoard')
+        ->and($board)->toContain('resultMode="shared-table"')
+        ->and($board)->toContain('mode="board"')
         ->and($board)->not->toContain('WorkspaceBoard');
 });
 

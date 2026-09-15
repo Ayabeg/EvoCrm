@@ -188,8 +188,8 @@ it('does not migrate Quotes Pipeline or invent QuickRecordDrawer after the Deals
         ->and($quotes)->not->toContain('CrmListFooter')
         ->and($quotes)->not->toContain('QuickRecordDrawer');
 
-    expect($board)->toContain('PipelineKanban')
-        ->and($board)->not->toContain('resultMode=')
+    expect($board)->toContain('DealPipelineBoard')
+        ->and($board)->toContain('resultMode="shared-table"')
         ->and($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')");
 
     expect($show)->toContain('LeadConversionDialog')

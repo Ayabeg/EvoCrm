@@ -170,10 +170,12 @@ it('preserves each object list contract while wiring peek at CrmListShell', func
         ->and($quotes)->not->toContain('BulkActionBar')
         ->and($quotes)->toContain('Create a deal');
 
-    expect($board)->not->toContain('onRowPeek')
-        ->and($board)->not->toContain('QuickRecordDrawer')
-        ->and($board)->not->toContain('openRecord')
-        ->and($board)->toContain('PipelineKanban')
+    $pipelineBoard = File::get(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
+    expect($board)->not->toContain('QuickRecordDrawer')
+        ->and($board)->not->toContain('BoardDealDrawer')
+        ->and($board)->toContain('DealPipelineBoard')
+        ->and($pipelineBoard)->toContain('openRecord')
+        ->and($pipelineBoard)->toContain("type: 'deal'")
         ->and($inbox)->not->toContain('QuickRecordDrawer')
         ->and($inbox)->not->toContain('onRowPeek')
         ->and($palette)->not->toContain('QuickRecordDrawer')

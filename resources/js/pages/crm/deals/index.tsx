@@ -109,7 +109,12 @@ export default function DealsIndex({
                         </>
                     }
                     layoutToggle={
-                        <DealLayoutToggle current="list" pipelineId={pipeline.id} />
+                        <DealLayoutToggle
+                            current="list"
+                            pipelineId={pipeline.id}
+                            activeFilters={activeFilters}
+                            extraQuery={{ pipeline: pipeline.id }}
+                        />
                     }
                     pipelineSwitcher={
                         <PipelineSwitcher

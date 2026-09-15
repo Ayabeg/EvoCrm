@@ -115,8 +115,11 @@ it('does not clear P03B selection on query change and leaves columns and board r
     expect($shell)->toContain('useState<ListViewColumn[]>')
         ->and($shell)->toContain('setColumns(listView?.columns ?? [])');
 
-    expect($toggle)->toContain('const listHref = `/crm/deals${query}`')
-        ->and($toggle)->toContain('const boardHref = `/crm/deals/board${query}`')
+    expect($toggle)->toContain('dealLayoutHrefFromFilters')
+        ->and($toggle)->toContain("current === 'list'")
+        ->and($toggle)->toContain("current === 'board'")
+        ->and($toggle)->not->toContain('mode=board')
+        ->and($toggle)->not->toContain('`${query}`')
         ->and($deals)->toContain('DealLayoutToggle')
         ->and($deals)->not->toContain('onModeChange');
 
