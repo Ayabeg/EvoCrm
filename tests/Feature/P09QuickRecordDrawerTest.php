@@ -186,6 +186,7 @@ it('locks RecordRef descriptors adapters history stale protection and the P10 in
         ->and($contract)->toContain('open then replace then back is deterministic')
         ->and($contract)->toContain('lead adapter uses qualification not stage')
         ->and($contract)->toContain('quote adapter deal title + total + draft/sent/accepted + expires')
+        ->and($contract)->toContain('quote total uses formatDzd DA display not literal DZD substring')
         ->and($contract)->toContain('formatDzd(500_000)')
         ->and($contract)->toContain('export function assertP09DrawerProofs')
         ->and($contract)->not->toContain("includes(\n            'DZD'")
@@ -368,4 +369,43 @@ it('serves the harness in testing without exposing a production debug page on li
         ->get('/crm/contacts')
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('crm/contacts/index'));
+});
+
+it('does not import or execute test-only drawer contract assertions from the harness page', function () {
+    $harness = File::get(resource_path('js/pages/crm/quick-record-drawer/harness.tsx'));
+    $drawer = File::get(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
+    $layout = File::get(resource_path('js/layouts/app-layout.tsx'));
+    $appSources = collect(File::allFiles(resource_path('js')))
+        ->reject(fn ($file): bool => str_contains($file->getPathname(), 'quick-record-drawer-contract'))
+        ->filter(fn ($file): bool => in_array($file->getExtension(), ['ts', 'tsx'], true))
+        ->map(fn ($file): string => File::get($file->getPathname()))
+        ->implode("\n");
+
+    expect($harness)->not->toContain('quick-record-drawer-contract')
+        ->and($harness)->not->toContain('P09_DRAWER_PROOFS')
+        ->and($harness)->not->toContain('assertP09DrawerProofs');
+    expect($drawer)->not->toContain('quick-record-drawer-contract');
+    expect($layout)->not->toContain('quick-record-drawer-contract');
+    expect($appSources)->not->toContain('quick-record-drawer-contract');
+});
+
+it('preserves established DA quote amount formatting on the quote descriptor', function () {
+    $quote = File::get(resource_path('js/ds/workspace/record-adapters/quote.ts'));
+    $present = File::get(resource_path('js/ds/workspace/record-adapters/present.ts'));
+    $money = File::get(resource_path('js/lib/money.ts'));
+    $contract = File::get(resource_path('js/ds/workspace/quick-record-drawer-contract.ts'));
+
+    expect($quote)->toContain('formatMoneyCents(record.total_cents, currency)')
+        ->and($quote)->not->toContain(".includes('DZD')")
+        ->and($quote)->not->toContain(' + \' DZD\'');
+    expect($present)->toContain('export function formatMoneyCents')
+        ->and($present)->toContain("if (currency === 'DZD')")
+        ->and($present)->toContain('return formatDzd(amount)');
+    expect($money)->toContain("Intl.NumberFormat('fr-DZ'")
+        ->and($money)->toContain("currency: 'DZD'");
+    expect($contract)->toContain('quote total uses formatDzd DA display not literal DZD substring')
+        ->and($contract)->toContain('formatDzd(500_000)')
+        ->and($contract)->toContain('total === formatted')
+        ->and($contract)->not->toContain(".includes('DZD')")
+        ->and($contract)->not->toContain('includes("DZD")');
 });

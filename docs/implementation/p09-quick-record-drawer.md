@@ -312,7 +312,7 @@ List pages still must not contain `QuickRecordDrawer` or `onRowPeek`. `rowHref` 
 
 ## TESTS
 
-`P09QuickRecordDrawerTest` plus P01–P08 / `CrmListWorkspace` / `CrmBulkActions` / object show tests remain green. Contract file locks stale A→B→C and adapter semantics. Quote total equals `formatDzd(500_000)` (accepts `DA`). Pest locks: no Inertia page imports the contract; no import-time `assert` loop; test-only runner exists.
+`P09QuickRecordDrawerTest` plus P01–P08 / `CrmListWorkspace` / `CrmBulkActions` / object show tests remain green. Contract file locks stale A→B→C and adapter semantics. Incident locks: harness.tsx (and the rest of `resources/js` except the contract module) must not contain `quick-record-drawer-contract`; quote descriptor total uses `formatMoneyCents` → `formatDzd` (`fr-DZ` / **DA** display, ISO currency stays DZD). Proofs are export-only and run from `tests/js/p09-quick-record-drawer-contract.ts` only.
 
 ## LIVE VISUAL QA
 

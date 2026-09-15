@@ -162,17 +162,18 @@ export const P09_DRAWER_PROOFS = {
         adaptDeal(dealPayload).keyProperties.some((property) => property.id === 'stage'),
     'quote adapter deal title + total + draft/sent/accepted + expires': (() => {
         const quote = adaptQuote(quotePayload);
-        const total = quote.keyProperties.find((property) => property.id === 'total')?.value ?? '';
-        const formatted = formatDzd(500_000);
 
         return (
             quote.title === 'Clinic landing page' &&
-            total === formatted &&
-            total.length > 0 &&
-            /5[\s\u00a0\u202f]?000/.test(total) &&
             quote.status?.label === 'Draft' &&
             quote.keyProperties.some((property) => property.id === 'expires_at')
         );
+    })(),
+    'quote total uses formatDzd DA display not literal DZD substring': (() => {
+        const total = adaptQuote(quotePayload).keyProperties.find((property) => property.id === 'total')?.value ?? '';
+        const formatted = formatDzd(500_000);
+
+        return total === formatted && total.length > 0 && /5[\s\u00a0\u202f]?000/.test(total);
     })(),
     'quote associations are deal only':
         adaptQuote(quotePayload).associations.length === 1 &&
