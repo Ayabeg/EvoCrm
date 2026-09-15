@@ -77,11 +77,11 @@ Compile lock: `resources/js/ds/workspace/data-workspace-contract.ts` (`@ts-expec
 
 ## Compatibility mode
 
-Contacts (P04) and Companies (P05) are **MODE A**: `CrmListShell` → `resultMode="shared-table"` → `rows` / `rowHref` / `WorkspaceEmpty` / `WorkspacePaginator`.
+Contacts (P04), Companies (P05), and Leads (P06) are **MODE A**: `CrmListShell` → `resultMode="shared-table"` → `rows` / `rowHref` / `WorkspaceEmpty` / `WorkspacePaginator`.
 
-Until P06–P08, Deals / Quotes / Tickets stay **MODE B**: `CrmListShell` → `resultMode="domain"` → `renderResults` wraps stage pills + page children.
+Until P07–P08, Deals / Quotes / Tickets stay **MODE B**: `CrmListShell` → `resultMode="domain"` → `renderResults` wraps stage pills + page children.
 
-Pages still do not import `DataWorkspace` directly. Contacts and Companies pass `resultMode="shared-table"`. Other list pages do not pass `resultMode`.
+Pages still do not import `DataWorkspace` directly. Contacts, Companies, and Leads pass `resultMode="shared-table"`. Other list pages do not pass `resultMode`.
 
 ---
 
@@ -98,7 +98,8 @@ Thin Inertia → DataWorkspace mapper. Maps title, views, filters, chips, column
 | Hoist selection + bulk state (not full `rows`) | **Done in P03B** — see `p03b-selection-ownership.md` |
 | URL / query authority | **P03C** (user phase map) |
 | Empty / pagination / board helpers without domain surface | **Done in P03D** — see `p03d-empty-pagination-board-helpers.md` |
-| Contacts / Companies / Leads / Deals / Quotes onto shared-table | P04–P08 |
+| Contacts / Companies / Leads onto shared-table | **Done in P04–P06** |
+| Deals / Quotes onto shared-table | P07–P08 |
 | URL/query authority move | not this wave unless a later AC says so |
 | QuickRecordDrawer, Pipeline board on `mode="board"` | P09 / P11 |
 

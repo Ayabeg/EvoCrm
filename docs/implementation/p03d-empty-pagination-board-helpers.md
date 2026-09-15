@@ -89,14 +89,14 @@ Domain pages still use `CrmListFooter` + page-local `listPageHref`. That is inte
 
 `WorkspaceEmpty` always renders the title as `h2` (`role="status"` comes from Aurora `EmptyState`). Copy still comes from `empty.title` / `empty.body` / `empty.actionLabel`. No filtered-empty heuristic — domain supplies copy.
 
-Contacts and Companies use `WorkspaceEmpty`. Other live pages keep `CrmEmptyState`.
+Contacts, Companies, and Leads use `WorkspaceEmpty`. Other live pages keep `CrmEmptyState`.
 
 ---
 
 ## Preserved behavior
 
-- Contacts / Companies shared-table empty + paginator (P04 / P05)
-- Deals / Quotes / Tickets / Leads domain result surfaces
+- Contacts / Companies / Leads shared-table empty + paginator (P04 / P05 / P06)
+- Deals / Quotes / Tickets domain result surfaces
 - `CrmListFooter` / `CrmEmptyState` on remaining domain pages
 - P03A `resultMode` union
 - P03B selection / `data-bulk-active`
@@ -112,7 +112,8 @@ Contacts and Companies use `WorkspaceEmpty`. Other live pages keep `CrmEmptyStat
 |---|---|
 | Contacts onto `shared-table` | **Done in P04** — see `p04-contacts-workspace.md` |
 | Companies onto `shared-table` | **Done in P05** — see `p05-companies-workspace.md` |
-| Leads / Deals / Quotes onto `shared-table` | P06–P08 |
+| Leads onto `shared-table` | **Done in P06** — see `p06-leads-workspace.md` |
+| Deals / Quotes onto `shared-table` | P07–P08 |
 | `sort` / `columns` on the URL | later (needs a backend read path) |
 | BulkActionBar redesign / moving the bar into chrome | later |
 | PipelineBoard on `mode="board"` / moving deals board | **P11** |

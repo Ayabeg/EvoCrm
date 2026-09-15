@@ -101,7 +101,7 @@ Preserved from before (no URL work):
 | Deals list | Same | `canBulk` | Same as contacts. |
 | Companies | `selection={{ mode: 'uncontrolled', selectable: false, pageIds }}` | No | Page does not participate **now**. Not a permanent bulk ban. No checkboxes. No bar. Later opt-in is `selectable: true` without a DW API change. |
 | Quotes | Same inert wiring | No | Same as Companies. |
-| Leads | **Deferred** | — | Raw table, no `CrmListShell` / `ListViewTable`. Forcing checkboxes would be a visual + P06 migration. |
+| Leads | Same inert wiring as Companies | No | Shared-table in P06. `selectable: false`. No `/crm/leads/bulk`. |
 | Tickets | Unchanged children `(columns) =>` | No | Out of scope; adapter keeps working. |
 | Shared-table mode | `selection` chrome + default `pageIds` from `rows` | `selection.selectable` | Contacts uses MODE A (P04). |
 
@@ -124,8 +124,8 @@ Contacts/Deals **keep** rendering the existing domain `BulkActionBar` inside res
 - Row click → show page
 - `list-query` keys and GET write path
 - Inertia page names and props
-- Leads raw table
-- Companies `CrmShell` double chrome
+- Leads shared-table with `selectable: false` (P06)
+- Companies `CrmShell` removed in P05
 
 ---
 
@@ -137,8 +137,8 @@ Contacts/Deals **keep** rendering the existing domain `BulkActionBar` inside res
 | Empty / pagination / board helpers without domain surface | **Done in P03D** — see `p03d-empty-pagination-board-helpers.md` |
 | Contacts onto `shared-table` | **Done in P04** |
 | Companies onto `shared-table` | **Done in P05** |
-| Leads/Deals/Quotes onto `shared-table` | P06–P08 |
-| Leads selection UI | P06 (needs workspace table first) |
+| Leads onto `shared-table` | **Done in P06** — `selectable: false` |
+| Deals/Quotes onto `shared-table` | P07–P08 |
 | DS bulk bar visual swap / moving the bar into the chrome slot | later (not P03C in the user phase map) |
 | QuickRecordDrawer, board `mode="board"` | P09 / P11 |
 | Company/quote/lead bulk APIs | do not invent |
