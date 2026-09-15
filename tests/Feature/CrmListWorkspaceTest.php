@@ -110,3 +110,18 @@ it('keeps the leads list on workspace chrome and retires the duplicate board pro
     expect($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')")
         ->and($routes)->not->toContain('LeadBoardController');
 });
+
+it('keeps the quotes list on workspace chrome without a domain children path', function () {
+    $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
+
+    expect($quotes)->toContain('data-crm="quotes-workspace"')
+        ->and($quotes)->toContain('CrmListShell')
+        ->and($quotes)->toContain('resultMode="shared-table"')
+        ->and($quotes)->toContain('Create quote')
+        ->and($quotes)->toContain('hasActiveListFilters')
+        ->and($quotes)->not->toContain('CrmShell')
+        ->and($quotes)->not->toContain('chrome="workspace"')
+        ->and($quotes)->not->toContain('CrmEmptyState')
+        ->and($quotes)->not->toContain('CrmListFooter')
+        ->and($quotes)->not->toContain('name="q"');
+});

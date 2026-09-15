@@ -210,7 +210,7 @@ it('preserves Deal query adapter pipeline saved views filters bulk and create wi
     expect($bulk)->toContain("entity === 'deal'")
         ->and($bulk)->toContain("'assign_owner', 'move_stage', 'delete'");
 
-    expect($dataTable)->toContain("object === 'company' || object === 'lead' || object === 'deal'");
+    expect($dataTable)->toContain("object === 'company' || object === 'lead' || object === 'deal' || object === 'quote'");
 });
 
 it('does not migrate Quotes Pipeline board or invent QuickRecordDrawer attention or Quotes list', function () {
@@ -222,9 +222,10 @@ it('does not migrate Quotes Pipeline board or invent QuickRecordDrawer attention
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
     $show = file_get_contents(resource_path('js/pages/crm/deals/show.tsx'));
 
-    expect($quotes)->toContain('ListViewTable')
-        ->and($quotes)->toContain('CrmListFooter')
-        ->and($quotes)->not->toContain('resultMode=');
+    expect($quotes)->toContain('resultMode="shared-table"')
+        ->and($quotes)->toContain('rowHref={quoteRowHref}')
+        ->and($quotes)->not->toContain('CrmListFooter')
+        ->and($quotes)->not->toContain('QuickRecordDrawer');
 
     expect($board)->toContain('PipelineKanban')
         ->and($board)->toContain('DealLayoutToggle')

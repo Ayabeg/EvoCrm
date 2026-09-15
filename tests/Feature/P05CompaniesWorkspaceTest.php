@@ -139,7 +139,7 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($companyFilters->pluck('id')->all())->not->toContain('status');
 
     expect($dataTable)->toContain('overflow-x-hidden overflow-y-auto')
-        ->and($dataTable)->toContain("(object === 'company' || object === 'lead' || object === 'deal') && '[scrollbar-gutter:stable]'");
+        ->and($dataTable)->toContain("(object === 'company' || object === 'lead' || object === 'deal' || object === 'quote') && '[scrollbar-gutter:stable]'");
 
     expect($workspace)->not->toContain('searchParams.set');
 
@@ -161,9 +161,10 @@ it('does not migrate Quotes or invent QuickRecordDrawer after the Deals shared-t
         ->and($deals)->not->toContain('CrmListFooter')
         ->and($deals)->not->toContain('QuickRecordDrawer');
 
-    expect($quotes)->toContain('ListViewTable')
-        ->and($quotes)->toContain('CrmListFooter')
-        ->and($quotes)->not->toContain('resultMode=');
+    expect($quotes)->toContain('resultMode="shared-table"')
+        ->and($quotes)->toContain('rowHref={quoteRowHref}')
+        ->and($quotes)->not->toContain('CrmListFooter')
+        ->and($quotes)->not->toContain('QuickRecordDrawer');
 
     expect($leads)->toContain('CrmListShell')
         ->and($leads)->toContain('resultMode="shared-table"')

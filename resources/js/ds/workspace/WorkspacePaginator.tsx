@@ -8,7 +8,7 @@ const OBJECT_NOUNS = {
     company: 'companies',
     deal: 'deals',
     ticket: 'records',
-    quote: 'records',
+    quote: 'quotes',
     lead: 'leads',
 } as const;
 

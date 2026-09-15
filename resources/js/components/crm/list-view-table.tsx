@@ -31,6 +31,13 @@ import {
     leadScorePayload,
 } from '@/pages/crm/leads/lead-columns';
 import type { LeadListRow } from '@/pages/crm/leads/lead-columns';
+import {
+    applyQuoteColumnContract,
+    QuoteAmountCell,
+    QuoteIdentityCell as QuoteNameCell,
+    QuoteStatusCell,
+} from '@/pages/crm/quotes/quote-columns';
+import type { QuoteListRow } from '@/pages/crm/quotes/quote-columns';
 
 type AttributeMap = Record<string, string | null>;
 
@@ -82,18 +89,7 @@ type TicketRow = {
     owner?: { name: string } | null;
 };
 
-type QuoteRow = {
-    id: number;
-    title: string;
-    status: string;
-    status_label?: string;
-    total_cents?: number | null;
-    created_at?: string | null;
-    expires_at?: string | null;
-    sent_at?: string | null;
-    owner?: { name: string } | null;
-    deal?: { id: number; title: string } | null;
-};
+type QuoteRow = QuoteListRow;
 
 const ALGIERS = 'Africa/Algiers';
 
@@ -301,6 +297,15 @@ const DEAL_COLUMN_WIDTHS: Record<string, string> = {
     contact: 'w-[14%]',
 };
 
+const QUOTE_COLUMN_WIDTHS: Record<string, string> = {
+    title: 'w-[28%]',
+    amount: 'w-[14%]',
+    status: 'w-[10%]',
+    owner: 'w-[16%]',
+    created_at: 'w-[16%]',
+    expires_at: 'w-[16%]',
+};
+
 function companyColumnWidth(columnId: string): string {
     return COMPANY_COLUMN_WIDTHS[columnId] ?? 'w-[14%]';
 }
@@ -311,6 +316,10 @@ function leadColumnWidth(columnId: string): string {
 
 function dealColumnWidth(columnId: string): string {
     return DEAL_COLUMN_WIDTHS[columnId] ?? 'w-[12%]';
+}
+
+function quoteColumnWidth(columnId: string): string {
+    return QUOTE_COLUMN_WIDTHS[columnId] ?? 'w-[14%]';
 }
 
 function renderLeadCell(columnId: string, row: LeadListRow): string {
@@ -393,8 +402,15 @@ export default function ListViewTable({
                 ? applyLeadColumnContract(columnDefs)
                 : entity === 'deal'
                   ? applyDealColumnContract(columnDefs)
-                  : columnDefs;
-    const identityRow = entity === 'contact' || entity === 'company' || entity === 'lead' || entity === 'deal';
+                  : entity === 'quote'
+                    ? applyQuoteColumnContract(columnDefs)
+                    : columnDefs;
+    const identityRow =
+        entity === 'contact' ||
+        entity === 'company' ||
+        entity === 'lead' ||
+        entity === 'deal' ||
+        entity === 'quote';
     const visible = visibleColumns({
         columnDefs: resolvedDefs,
         filterFields: [],
@@ -412,7 +428,8 @@ export default function ListViewTable({
     const companyTable = entity === 'company';
     const leadTable = entity === 'lead';
     const dealTable = entity === 'deal';
-    const fixedTable = companyTable || leadTable || dealTable;
+    const quoteTable = entity === 'quote';
+    const fixedTable = companyTable || leadTable || dealTable || quoteTable;
 
     return (
         <div className="@container/list min-h-0 min-w-0 flex-1">
@@ -420,7 +437,11 @@ export default function ListViewTable({
             <div
                 className={cn(
                     'hidden overflow-x-auto overflow-y-visible @[480px]/list:block',
-                    entity === 'contact' || entity === 'company' || entity === 'deal' || entity === 'lead'
+                    entity === 'contact' ||
+                    entity === 'company' ||
+                    entity === 'deal' ||
+                    entity === 'lead' ||
+                    entity === 'quote'
                         ? 'bg-white'
                         : 'bg-canvas',
                 )}
@@ -430,9 +451,11 @@ export default function ListViewTable({
                         'w-full border-collapse text-[13px]',
                         dealTable
                             ? 'table-fixed min-w-[68rem]'
-                            : fixedTable
-                              ? 'table-fixed min-w-[52rem]'
-                              : 'min-w-[640px]',
+                            : quoteTable
+                              ? 'table-fixed min-w-[60rem]'
+                              : fixedTable
+                                ? 'table-fixed min-w-[52rem]'
+                                : 'min-w-[640px]',
                     )}
                 >
                     <thead>
@@ -470,6 +493,7 @@ export default function ListViewTable({
                                         companyTable && companyColumnWidth(column.id),
                                         leadTable && leadColumnWidth(column.id),
                                         dealTable && dealColumnWidth(column.id),
+                                        quoteTable && quoteColumnWidth(column.id),
                                         fixedTable &&
                                             index === visible.length - 1 &&
                                             'pr-6 md:pr-10',
@@ -540,6 +564,15 @@ export default function ListViewTable({
                                     const isDealAmount =
                                         entity === 'deal' &&
                                         column.id === 'amount';
+                                    const isQuoteName =
+                                        entity === 'quote' &&
+                                        column.id === 'title';
+                                    const isQuoteStatus =
+                                        entity === 'quote' &&
+                                        column.id === 'status';
+                                    const isQuoteAmount =
+                                        entity === 'quote' &&
+                                        column.id === 'amount';
 
                                     return (
                                         <td
@@ -556,6 +589,7 @@ export default function ListViewTable({
                                                 companyTable && companyColumnWidth(column.id),
                                                 leadTable && leadColumnWidth(column.id),
                                                 dealTable && dealColumnWidth(column.id),
+                                                quoteTable && quoteColumnWidth(column.id),
                                                 fixedTable &&
                                                     index === visible.length - 1 &&
                                                     'pr-6 md:pr-10',
@@ -593,6 +627,20 @@ export default function ListViewTable({
                                                 <LeadScorePill
                                                     compact
                                                     score={leadScorePayload(row as LeadListRow)}
+                                                />
+                                            ) : isQuoteName ? (
+                                                <QuoteNameCell
+                                                    row={row as QuoteRow}
+                                                    href={href}
+                                                />
+                                            ) : isQuoteStatus ? (
+                                                <QuoteStatusCell
+                                                    status={(row as QuoteRow).status}
+                                                    statusLabel={(row as QuoteRow).status_label}
+                                                />
+                                            ) : isQuoteAmount ? (
+                                                <QuoteAmountCell
+                                                    cents={(row as QuoteRow).total_cents}
                                                 />
                                             ) : column.id === primaryId ? (
                                                 <Link
@@ -664,6 +712,12 @@ export default function ListViewTable({
                                 ) : entity === 'lead' ? (
                                     <LeadNameCell
                                         row={row as LeadListRow}
+                                        href={href}
+                                        linked={false}
+                                    />
+                                ) : entity === 'quote' ? (
+                                    <QuoteNameCell
+                                        row={row as QuoteRow}
                                         href={href}
                                         linked={false}
                                     />

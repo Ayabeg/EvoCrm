@@ -2,29 +2,18 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
-import { SkeletonList } from '@/components/crm/empty-room';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
-import ListViewTable from '@/components/crm/list-view-table';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
-
-type QuoteRow = {
-    id: number;
-    title: string;
-    status: string;
-    status_label?: string;
-    total_cents?: number | null;
-    created_at?: string | null;
-    expires_at?: string | null;
-    sent_at?: string | null;
-    owner?: { name: string } | null;
-    deal?: { id: number; title: string } | null;
-};
+import {
+    quoteEmptyState,
+    quoteRowHref,
+} from '@/pages/crm/quotes/quote-columns';
+import type { QuoteListRow } from '@/pages/crm/quotes/quote-columns';
 
 type DealOption = { id: number; title: string };
 
@@ -39,7 +28,7 @@ export default function QuotesIndex({
     paginator,
     createOpen,
 }: {
-    quotes: QuoteRow[];
+    quotes: QuoteListRow[];
     deals: DealOption[];
     members: { id: number; name: string }[];
     savedFilters: SavedView[];
@@ -52,7 +41,6 @@ export default function QuotesIndex({
     const [drawer, setDrawer] = useState(Boolean(createOpen));
     const [dealId, setDealId] = useState(deals[0] ? String(deals[0].id) : '');
     const loading = useInertiaLoading();
-    const filtered = hasActiveListFilters(activeFilters);
 
     return (
         <>
@@ -62,6 +50,7 @@ export default function QuotesIndex({
                 data-crm="quotes-workspace"
             >
                 <CrmListShell
+                    resultMode="shared-table"
                     title="Quotes"
                     entity="quote"
                     basePath="/crm/quotes"
@@ -72,77 +61,20 @@ export default function QuotesIndex({
                     listView={listView}
                     recordCount={recordCount}
                     members={members}
-                    className="bg-canvas"
-                    contentClassName="bg-canvas"
-                    primaryClassName="bg-brand text-white hover:bg-brand-hover"
+                    className="bg-white"
+                    contentClassName="bg-white"
+                    rows={quotes}
+                    rowHref={quoteRowHref}
+                    empty={quoteEmptyState(hasActiveListFilters(activeFilters))}
+                    paginator={paginator}
+                    loading={loading}
                     selection={{
                         mode: 'uncontrolled',
                         // Page does not participate now. Not a permanent bulk ban.
                         selectable: false,
                         pageIds: quotes.map((quote) => quote.id),
                     }}
-                >
-                    {(columns) => (
-                        <>
-                            {loading ? (
-                                <SkeletonList />
-                            ) : quotes.length === 0 ? (
-                                <CrmEmptyState
-                                    title={
-                                        filtered
-                                            ? 'No quotes match these filters'
-                                            : 'No quotes yet'
-                                    }
-                                    line={
-                                        filtered
-                                            ? 'Clear filters or pick another owner to see records.'
-                                            : 'Create a quote on a deal. Amount, status, and owner stay on this list.'
-                                    }
-                                    actionLabel={filtered ? undefined : 'Create quote'}
-                                    onAction={
-                                        filtered ? undefined : () => setDrawer(true)
-                                    }
-                                />
-                            ) : (
-                                <div className="min-h-0 flex-1 overflow-auto">
-                                    <ListViewTable
-                                        entity="quote"
-                                        rows={quotes}
-                                        columnDefs={listView.columnDefs}
-                                        columns={columns}
-                                        basePath="/crm/quotes"
-                                    />
-                                </div>
-                            )}
-                            <CrmListFooter
-                                count={quotes.length}
-                                total={recordCount}
-                                noun="quotes"
-                                page={paginator?.page}
-                                lastPage={paginator?.last_page}
-                                perPage={paginator?.per_page}
-                                prevHref={
-                                    paginator && paginator.page > 1
-                                        ? listPageHref(
-                                              '/crm/quotes',
-                                              activeFilters,
-                                              paginator.page - 1,
-                                          )
-                                        : null
-                                }
-                                nextHref={
-                                    paginator && paginator.page < paginator.last_page
-                                        ? listPageHref(
-                                              '/crm/quotes',
-                                              activeFilters,
-                                              paginator.page + 1,
-                                          )
-                                        : null
-                                }
-                            />
-                        </>
-                    )}
-                </CrmListShell>
+                />
             </div>
 
             <CreateDrawer
