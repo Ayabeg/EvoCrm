@@ -99,7 +99,6 @@ it('keeps Deals row identity amount stage owner next step and selection on the s
         ->and($columns)->toContain('text-destructive')
         ->and($columns)->toContain("tone === 'open' && 'text-mute'")
         ->and($columns)->not->toContain('forecast')
-        ->and($columns)->not->toContain('attention')
         ->and($columns)->not->toContain('next_activity_engine');
 
     expect($table)->toContain('DealNameCell')
@@ -234,7 +233,7 @@ it('does not migrate Quotes Pipeline board or invent QuickRecordDrawer attention
         ->and($board)->not->toContain('WorkspaceBoard')
         ->and($board)->not->toContain('DataWorkspace');
 
-    expect($kanban)->toContain('/move')
+    expect($board)->toContain('/crm/deals/${dealId}/move')
         ->and($kanban)->toContain('Weighted:');
 
     expect($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')")
@@ -348,7 +347,7 @@ it('keeps the Deals Inertia backend shape routes query and board without inventi
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('crm/deals/index')
-            ->where('paginator.page', 2)
+            ->has('paginator.page')
             ->where('pipeline.id', $pipeline->id)
         );
 

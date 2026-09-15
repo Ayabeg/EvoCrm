@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
  *
  * Visibility + order stay on ListViewConfig / session / saved views.
  * This file only owns Deals cell semantics and copy — no new backend fields.
- * Forecast, board movement, and next-activity attention stay out of this list.
+ * Board movement and P12 next-step scoring stay out of this list.
  *
  * Recommended scan hierarchy (identity → stage → amount → close → owner
  * → association → activity → metadata). Default visible order from

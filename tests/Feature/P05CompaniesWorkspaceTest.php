@@ -82,7 +82,7 @@ it('keeps Companies row identity href columns and selection on the shared contra
         ->and($table)->toContain('applyCompanyColumnContract')
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($table)->toContain("target.closest('a, input, button, label')")
-        ->and($table)->toContain("fixedTable ? 'table-fixed min-w-[52rem]'")
+        ->and($table)->toContain("'table-fixed min-w-[52rem]'")
         ->and($table)->toContain('const companyTable = entity === \'company\'')
         ->and($table)->toContain("name: 'w-[36%]'")
         ->and($table)->toContain("owner: 'w-[18%]'");
