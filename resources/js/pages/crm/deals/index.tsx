@@ -5,10 +5,7 @@ import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
-import { SkeletonList } from '@/components/crm/empty-room';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
-import ListViewTable from '@/components/crm/list-view-table';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
 import type { StagePill } from '@/components/crm/stage-pills';
 import { Button } from '@/components/ui/button';
@@ -17,22 +14,12 @@ import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
+import {
+    dealEmptyState,
+    dealRowHref,
+} from '@/pages/crm/deals/deal-columns';
+import type { DealListRow } from '@/pages/crm/deals/deal-columns';
 import type { Auth } from '@/types';
-
-type Deal = {
-    id: number;
-    title: string;
-    amount_cents: number;
-    close_date?: string | null;
-    created_at?: string | null;
-    last_activity_at?: string | null;
-    owner?: { id: number; name: string } | null;
-    company?: { name: string } | null;
-    contact?: { first_name: string; last_name?: string | null } | null;
-    stage?: { id: number; name: string; slug: string } | null;
-    health?: { score: number; band?: string; label?: string } | null;
-    next_step?: string | null;
-};
 
 type Stage = { id: number; name: string; slug: string };
 type Contact = { id: number; first_name: string; last_name?: string | null; company_id?: number | null };
@@ -56,7 +43,7 @@ export default function DealsIndex({
     prefillContactId,
     bulk,
 }: {
-    deals: Deal[];
+    deals: DealListRow[];
     stages: Stage[];
     stagePills: StagePill[];
     pipeline: { id: number; name: string };
@@ -88,6 +75,7 @@ export default function DealsIndex({
                 data-crm="deals-workspace"
             >
                 <CrmListShell
+                    resultMode="shared-table"
                     title="Deals"
                     entity="deal"
                     basePath="/crm/deals"
@@ -106,6 +94,11 @@ export default function DealsIndex({
                     exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
                     className="bg-white"
                     contentClassName="bg-white"
+                    rows={deals}
+                    rowHref={dealRowHref}
+                    empty={dealEmptyState(hasActiveListFilters(activeFilters))}
+                    paginator={paginator}
+                    loading={loading}
                     headerActions={
                         <>
                             {canImport ? (
@@ -133,84 +126,20 @@ export default function DealsIndex({
                         selectable: canBulk,
                         pageIds: deals.map((deal) => deal.id),
                     }}
-                >
-                    {(columns, selection) => (
-                        <>
-                            {canBulk && selection.bulkActive ? (
-                                <BulkActionBar
-                                    entity="deal"
-                                    selectedIds={selection.selectedIds}
-                                    members={members}
-                                    stages={stages}
-                                    onClear={selection.clearSelection}
-                                />
-                            ) : null}
-                            {loading ? (
-                                <SkeletonList />
-                            ) : deals.length === 0 ? (
-                                <CrmEmptyState
-                                    title={
-                                        hasActiveListFilters(activeFilters)
-                                            ? 'No deals match these filters'
-                                            : 'No deals yet'
-                                    }
-                                    line={
-                                        hasActiveListFilters(activeFilters)
-                                            ? 'Clear filters or pick another stage to see records.'
-                                            : 'Create a deal to start working your pipeline from this list.'
-                                    }
-                                    actionLabel={
-                                        hasActiveListFilters(activeFilters)
-                                            ? undefined
-                                            : 'Create deal'
-                                    }
-                                    onAction={
-                                        hasActiveListFilters(activeFilters)
-                                            ? undefined
-                                            : () => setDrawer(true)
-                                    }
-                                />
-                            ) : (
-                                <div className="min-h-0 flex-1 overflow-auto bg-white">
-                                    <ListViewTable
-                                        entity="deal"
-                                        rows={deals}
-                                        columnDefs={listView.columnDefs}
-                                        columns={columns}
-                                        basePath="/crm/deals"
-                                        selectable={canBulk}
-                                        selectedIds={selection.selectedIds}
-                                        onToggle={selection.toggleOne}
-                                        onTogglePage={selection.togglePage}
-                                    />
-                                </div>
-                            )}
-                            <CrmListFooter
-                                count={deals.length}
-                                total={recordCount}
-                                noun="deals"
-                                exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}
-                                page={paginator?.page}
-                                lastPage={paginator?.last_page}
-                                perPage={paginator?.per_page}
-                                prevHref={
-                                    paginator && paginator.page > 1
-                                        ? listPageHref('/crm/deals', activeFilters, paginator.page - 1, {
-                                              pipeline: pipeline.id,
-                                          })
-                                        : null
-                                }
-                                nextHref={
-                                    paginator && paginator.page < paginator.last_page
-                                        ? listPageHref('/crm/deals', activeFilters, paginator.page + 1, {
-                                              pipeline: pipeline.id,
-                                          })
-                                        : null
-                                }
-                            />
-                        </>
-                    )}
-                </CrmListShell>
+                    bulk={
+                        canBulk
+                            ? (selection) => (
+                                  <BulkActionBar
+                                      entity="deal"
+                                      selectedIds={selection.selectedIds}
+                                      members={members}
+                                      stages={stages}
+                                      onClear={selection.clearSelection}
+                                  />
+                              )
+                            : undefined
+                    }
+                />
             </div>
 
             <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create deal">

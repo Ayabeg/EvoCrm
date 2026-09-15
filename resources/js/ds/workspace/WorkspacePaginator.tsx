@@ -6,7 +6,7 @@ import { t } from '@/lib/i18n';
 const OBJECT_NOUNS = {
     contact: 'contacts',
     company: 'companies',
-    deal: 'records',
+    deal: 'deals',
     ticket: 'records',
     quote: 'records',
     lead: 'leads',

@@ -18,6 +18,13 @@ import {
     ContactIdentityCell as ContactNameCell,
 } from '@/pages/crm/contacts/contact-columns';
 import {
+    applyDealColumnContract,
+    DealAmountCell,
+    DealIdentityCell as DealNameCell,
+    DealStageCell,
+} from '@/pages/crm/deals/deal-columns';
+import type { DealListRow } from '@/pages/crm/deals/deal-columns';
+import {
     applyLeadColumnContract,
     LeadIdentityCell as LeadNameCell,
     leadContactName,
@@ -43,20 +50,8 @@ type ContactRow = {
     attributes?: AttributeMap;
 };
 
-type DealRow = {
-    id: number;
-    title: string;
-    amount_cents?: number | null;
-    close_date?: string | null;
-    created_at?: string | null;
-    last_activity_at?: string | null;
-    stage?: { name: string } | null;
-    company?: { name: string } | null;
-    contact?: { first_name: string; last_name?: string | null } | null;
-    owner?: { name: string } | null;
+type DealRow = DealListRow & {
     attributes?: AttributeMap;
-    health?: { score: number; band?: string; label?: string } | null;
-    next_step?: string | null;
 };
 
 type CompanyRow = {
@@ -159,35 +154,6 @@ function customAttributeValue(attributes: AttributeMap | undefined, columnId: st
     const value = attributes?.[columnId.slice(7)];
 
     return value == null || value === '' ? '—' : value;
-}
-
-function DealNameCell({
-    row,
-    href,
-    linked = true,
-}: {
-    row: DealRow;
-    href: string;
-    linked?: boolean;
-}) {
-    const body = <span className="truncate">{row.title}</span>;
-
-    if (!linked) {
-        return (
-            <span className="inline-flex min-w-0 items-center font-medium text-ink">
-                {body}
-            </span>
-        );
-    }
-
-    return (
-        <Link
-            href={href}
-            className="inline-flex min-w-0 items-center font-medium text-ink hover:underline"
-        >
-            {body}
-        </Link>
-    );
 }
 
 function renderDealCell(columnId: string, row: DealRow): string {
@@ -325,12 +291,26 @@ const LEAD_COLUMN_WIDTHS: Record<string, string> = {
     score: 'w-[20%]',
 };
 
+const DEAL_COLUMN_WIDTHS: Record<string, string> = {
+    title: 'w-[24%]',
+    stage: 'w-[11%]',
+    amount: 'w-[12%]',
+    close_date: 'w-[12%]',
+    owner: 'w-[13%]',
+    company: 'w-[14%]',
+    contact: 'w-[14%]',
+};
+
 function companyColumnWidth(columnId: string): string {
     return COMPANY_COLUMN_WIDTHS[columnId] ?? 'w-[14%]';
 }
 
 function leadColumnWidth(columnId: string): string {
     return LEAD_COLUMN_WIDTHS[columnId] ?? 'w-[14%]';
+}
+
+function dealColumnWidth(columnId: string): string {
+    return DEAL_COLUMN_WIDTHS[columnId] ?? 'w-[12%]';
 }
 
 function renderLeadCell(columnId: string, row: LeadListRow): string {
@@ -411,8 +391,10 @@ export default function ListViewTable({
               ? applyCompanyColumnContract(columnDefs)
               : entity === 'lead'
                 ? applyLeadColumnContract(columnDefs)
-                : columnDefs;
-    const identityRow = entity === 'contact' || entity === 'company' || entity === 'lead';
+                : entity === 'deal'
+                  ? applyDealColumnContract(columnDefs)
+                  : columnDefs;
+    const identityRow = entity === 'contact' || entity === 'company' || entity === 'lead' || entity === 'deal';
     const visible = visibleColumns({
         columnDefs: resolvedDefs,
         filterFields: [],
@@ -429,7 +411,8 @@ export default function ListViewTable({
 
     const companyTable = entity === 'company';
     const leadTable = entity === 'lead';
-    const fixedTable = companyTable || leadTable;
+    const dealTable = entity === 'deal';
+    const fixedTable = companyTable || leadTable || dealTable;
 
     return (
         <div className="@container/list min-h-0 min-w-0 flex-1">
@@ -445,7 +428,11 @@ export default function ListViewTable({
                 <table
                     className={cn(
                         'w-full border-collapse text-[13px]',
-                        fixedTable ? 'table-fixed min-w-[52rem]' : 'min-w-[640px]',
+                        dealTable
+                            ? 'table-fixed min-w-[68rem]'
+                            : fixedTable
+                              ? 'table-fixed min-w-[52rem]'
+                              : 'min-w-[640px]',
                     )}
                 >
                     <thead>
@@ -482,6 +469,7 @@ export default function ListViewTable({
                                             : 'text-[11px]',
                                         companyTable && companyColumnWidth(column.id),
                                         leadTable && leadColumnWidth(column.id),
+                                        dealTable && dealColumnWidth(column.id),
                                         fixedTable &&
                                             index === visible.length - 1 &&
                                             'pr-6 md:pr-10',
@@ -546,6 +534,12 @@ export default function ListViewTable({
                                     const isLeadScore =
                                         entity === 'lead' &&
                                         column.id === 'score';
+                                    const isDealStage =
+                                        entity === 'deal' &&
+                                        column.id === 'stage';
+                                    const isDealAmount =
+                                        entity === 'deal' &&
+                                        column.id === 'amount';
 
                                     return (
                                         <td
@@ -561,6 +555,7 @@ export default function ListViewTable({
                                                 fixedTable && 'overflow-hidden',
                                                 companyTable && companyColumnWidth(column.id),
                                                 leadTable && leadColumnWidth(column.id),
+                                                dealTable && dealColumnWidth(column.id),
                                                 fixedTable &&
                                                     index === visible.length - 1 &&
                                                     'pr-6 md:pr-10',
@@ -580,6 +575,14 @@ export default function ListViewTable({
                                                 <DealNameCell
                                                     row={row as DealRow}
                                                     href={href}
+                                                />
+                                            ) : isDealStage ? (
+                                                <DealStageCell
+                                                    stage={(row as DealRow).stage}
+                                                />
+                                            ) : isDealAmount ? (
+                                                <DealAmountCell
+                                                    cents={(row as DealRow).amount_cents}
                                                 />
                                             ) : isLeadName ? (
                                                 <LeadNameCell

@@ -78,8 +78,7 @@ it('wires Contacts and Deals onto the shared contract without page-local selecte
     expect($deals)->toContain("mode: 'uncontrolled'")
         ->and($deals)->toContain('selectable: canBulk')
         ->and($deals)->toContain('pageIds: deals.map((deal) => deal.id)')
-        ->and($deals)->toContain('(columns, selection)')
-        ->and($deals)->toContain('selection.bulkActive')
+        ->and($deals)->toContain('selectedIds={selection.selectedIds}')
         ->and($deals)->toContain('onClear={selection.clearSelection}')
         ->and($deals)->not->toContain('useState<number[]>([])')
         ->and($deals)->not->toContain('setSelectedIds');

@@ -165,7 +165,7 @@ it('preserves Lead create capture inbox and refuses invented query bulk and draw
         ->and($saved)->toContain("'in:contact,deal,company'");
 });
 
-it('does not migrate Deals Quotes Pipeline or invent QuickRecordDrawer', function () {
+it('does not migrate Quotes Pipeline or invent QuickRecordDrawer after the Deals shared-table migration', function () {
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
@@ -177,10 +177,10 @@ it('does not migrate Deals Quotes Pipeline or invent QuickRecordDrawer', functio
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
-    expect($deals)->toContain('ListViewTable')
+    expect($deals)->toContain('resultMode="shared-table"')
         ->and($deals)->toContain('DealLayoutToggle')
-        ->and($deals)->toContain('CrmListFooter')
-        ->and($deals)->not->toContain('resultMode=')
+        ->and($deals)->not->toContain('ListViewTable')
+        ->and($deals)->not->toContain('CrmListFooter')
         ->and($deals)->not->toContain('QuickRecordDrawer');
 
     expect($quotes)->toContain('ListViewTable')

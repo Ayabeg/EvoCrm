@@ -25,6 +25,7 @@ import type {
 } from '@/lib/list-view-config';
 import { applyCompanyColumnContract } from '@/pages/crm/companies/company-columns';
 import { applyContactColumnContract } from '@/pages/crm/contacts/contact-columns';
+import { applyDealColumnContract } from '@/pages/crm/deals/deal-columns';
 import { applyLeadColumnContract } from '@/pages/crm/leads/lead-columns';
 
 type Member = { id: number; name: string };
@@ -69,9 +70,9 @@ function toWorkspacePaginator(
 
 /**
  * Thin Inertia mapper. Domain result mode remains the default for
- * Deals / Quotes / Tickets (CrmEmptyState + CrmListFooter in children
- * until P07–P08). Contacts, Companies, and Leads use resultMode="shared-table".
- * Optional `board` is the P11 slot.
+ * Quotes / Tickets (CrmEmptyState + CrmListFooter in children until P08).
+ * Contacts, Companies, Leads, and Deals use resultMode="shared-table".
+ * Optional `board` is the P11 slot — Deals list does not pass it.
  */
 export function CrmListShell<Row extends { id: RowId }>({
     title,
@@ -172,7 +173,9 @@ export function CrmListShell<Row extends { id: RowId }>({
               ? applyCompanyColumnContract(listView?.columnDefs ?? [])
               : entity === 'lead'
                 ? applyLeadColumnContract(listView?.columnDefs ?? [])
-                : (listView?.columnDefs ?? []);
+                : entity === 'deal'
+                  ? applyDealColumnContract(listView?.columnDefs ?? [])
+                  : (listView?.columnDefs ?? []);
     const sharedPaginator = toWorkspacePaginator(paginator);
 
     useEffect(() => {
@@ -254,6 +257,28 @@ export function CrmListShell<Row extends { id: RowId }>({
                 {pipelineSwitcher}
             </>
         ),
+        toolbarExtra:
+            resultMode === 'shared-table' && entity === 'deal' && stagePills.length > 0 ? (
+                <StagePills
+                    stages={stagePills}
+                    activeSlug={
+                        typeof activeFilters.stage === 'string'
+                            ? activeFilters.stage
+                            : null
+                    }
+                    hrefFor={(slug) =>
+                        listQueryHref(
+                            basePath,
+                            applyStageFilter(
+                                fromActiveFilters(activeFilters, query),
+                                slug,
+                                'stage',
+                            ),
+                            entity as ListQueryObject,
+                        )
+                    }
+                />
+            ) : undefined,
         mode: mode ?? (entity === 'deal' ? 'list' as const : undefined),
         onModeChange,
         board,

@@ -72,10 +72,14 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($companies)->not->toContain('DataWorkspace');
 
     expect($deals)->toContain('CrmListShell')
-        ->and($deals)->toContain('ListViewTable')
+        ->and($deals)->toContain('resultMode="shared-table"')
+        ->and($deals)->toContain('rows={deals}')
+        ->and($deals)->toContain('rowHref={dealRowHref}')
         ->and($deals)->toContain('DealLayoutToggle')
         ->and($deals)->toContain('PipelineSwitcher')
-        ->and($deals)->not->toContain('resultMode=');
+        ->and($deals)->not->toContain('ListViewTable')
+        ->and($deals)->not->toContain('CrmEmptyState')
+        ->and($deals)->not->toContain('CrmListFooter');
 
     expect($quotes)->toContain('CrmListShell')
         ->and($quotes)->toContain('ListViewTable')
@@ -98,15 +102,17 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($tickets)->not->toContain('resultMode=');
 });
 
-it('keeps domain pages off the shared-table result mode after selection hoist', function () {
+it('keeps Quotes and Tickets on domain result mode after the Deals shared-table migration', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
+    $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
     expect($contacts)->toContain('entity="contact"')
         ->and($contacts)->toContain('resultMode="shared-table"')
-        ->and($deals)->not->toContain('resultMode=')
+        ->and($deals)->toContain('resultMode="shared-table"')
+        ->and($quotes)->not->toContain('resultMode=')
         ->and($shell)->toContain('resultMode="domain"')
         ->and($workspace)->toContain('useWorkspaceSelection');
 });

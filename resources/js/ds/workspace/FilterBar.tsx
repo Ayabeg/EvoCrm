@@ -88,10 +88,18 @@ export function FilterBar({
         .slice(0, 4);
     const searchKey = String(current.search ?? '');
     const searchPlaceholder =
-        object === 'company' ? t('Search companies…') : t('Search');
+        object === 'company'
+            ? t('Search companies…')
+            : object === 'deal'
+              ? t('Search deals…')
+              : t('Search');
     const searchLabel =
-        object === 'company' ? t('Search companies') : t('Search list');
-    const wrapQuickFilters = object === 'company' || object === 'lead';
+        object === 'company'
+            ? t('Search companies')
+            : object === 'deal'
+              ? t('Search deals')
+              : t('Search list');
+    const wrapQuickFilters = object === 'company' || object === 'lead' || object === 'deal';
 
     const applyFilter = (key: ListQueryFilterKey, value: string | null) => {
         navigateListQuery(basePath, current, { filters: { [key]: value } }, object);
@@ -175,7 +183,7 @@ export function FilterBar({
                     <form
                         className={cn(
                             'relative min-w-[12rem] flex-1',
-                            object === 'company' && 'max-w-md basis-[16rem]',
+                            (object === 'company' || object === 'deal') && 'max-w-md basis-[16rem]',
                         )}
                         onSubmit={(event) => {
                             event.preventDefault();
