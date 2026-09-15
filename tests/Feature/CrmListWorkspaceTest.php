@@ -72,7 +72,7 @@ it('exposes CRM objects on the icon rail without replacing AppSidebar', function
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
     expect($rail)->toContain('CRM_RAIL_OBJECTS')
-        ->and($rail)->toContain("data-nav=\"crm-objects\"")
+        ->and($rail)->toContain('data-nav="crm-objects"')
         ->and($rail)->toContain("label: 'Contacts'")
         ->and($rail)->toContain("label: 'Companies'")
         ->and($rail)->toContain("label: 'Deals'")

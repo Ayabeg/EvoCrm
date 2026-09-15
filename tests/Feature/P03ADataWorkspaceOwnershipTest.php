@@ -9,7 +9,6 @@ use App\Models\User;
  * P03A — DataWorkspace ownership contract.
  * Domain-result mode is truthful. No fake rows. Selection / URL / backend stay put.
  */
-
 it('lets domain-result mode render without fake rows', function () {
     $types = file_get_contents(resource_path('js/ds/workspace/types.ts'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
@@ -102,7 +101,7 @@ it('keeps domain pages off the shared-table result mode after selection hoist', 
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
-    expect($contacts)->toContain("entity=\"contact\"")
+    expect($contacts)->toContain('entity="contact"')
         ->and($contacts)->toContain('resultMode="shared-table"')
         ->and($deals)->not->toContain('resultMode=')
         ->and($shell)->toContain('resultMode="domain"')

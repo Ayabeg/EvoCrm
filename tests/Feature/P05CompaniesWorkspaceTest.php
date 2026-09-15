@@ -9,7 +9,6 @@ use App\Models\User;
  * P05 — Companies workspace migration.
  * Companies joins DataWorkspace shared-table. No bulk. No CrmShell.
  */
-
 it('moves Companies onto DataWorkspace shared-table without a domain children path', function () {
     $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
@@ -22,7 +21,7 @@ it('moves Companies onto DataWorkspace shared-table without a domain children pa
         ->and($companies)->toContain('paginator={paginator}')
         ->and($companies)->toContain('loading={loading}')
         ->and($companies)->toContain('data-crm="companies-workspace"')
-        ->and($companies)->toContain("entity=\"company\"")
+        ->and($companies)->toContain('entity="company"')
         ->and($companies)->not->toContain('ListViewTable')
         ->and($companies)->not->toContain('CrmEmptyState')
         ->and($companies)->not->toContain('CrmListFooter')
@@ -98,7 +97,7 @@ it('preserves Company create filters header and query ownership without inventin
     $empty = file_get_contents(resource_path('js/ds/workspace/WorkspaceEmpty.tsx'));
     $config = file_get_contents(app_path('Support/ListViewConfig.php'));
 
-    expect($companies)->toContain("primaryLabel=\"Create company\"")
+    expect($companies)->toContain('primaryLabel="Create company"')
         ->and($companies)->toContain('onCreate=')
         ->and($companies)->toContain('hasActiveListFilters(activeFilters)')
         ->and($companies)->toContain('CreateDrawer')

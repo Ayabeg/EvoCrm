@@ -9,7 +9,6 @@ use App\Models\User;
  * P03D — Empty, pagination, board slot helpers.
  * Shared-table helpers work without domain children. Live pages stay domain.
  */
-
 it('exposes empty paginator and board helpers that do not require domain children', function () {
     $surface = file_get_contents(resource_path('js/ds/workspace/surface.ts'));
     $empty = file_get_contents(resource_path('js/ds/workspace/WorkspaceEmpty.tsx'));
