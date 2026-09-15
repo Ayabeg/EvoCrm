@@ -52,10 +52,24 @@ export const P06_SCORE = leadScorePayload({
     latest_score: { score: 60, reason: 'Fit and intent' },
 });
 
-export const P06_SCORE_NONE = leadScorePayload({
+export const P06_SCORE_DENORMALIZED = leadScorePayload({
     id: 5,
     title: 'Clinic Atlas inbound',
+    score: 92,
+    latest_score: null,
+});
+
+export const P06_SCORE_ZERO = leadScorePayload({
+    id: 6,
+    title: 'Clinic Atlas inbound',
     score: 0,
+    latest_score: null,
+});
+
+export const P06_SCORE_NONE = leadScorePayload({
+    id: 7,
+    title: 'Clinic Atlas inbound',
+    score: null,
     latest_score: null,
 });
 
@@ -87,8 +101,20 @@ if (P06_INITIALS !== 'CA') {
     throw new Error('lead initials use the first two title tokens');
 }
 
-if (P06_SCORE?.score !== 72 || P06_SCORE.reason !== 'Fit and intent' || P06_SCORE_NONE !== null) {
-    throw new Error('score payload prefers denormalized score and needs latest_score');
+if (P06_SCORE?.score !== 72 || P06_SCORE.reason !== 'Fit and intent') {
+    throw new Error('score payload prefers denormalized score and latest_score reason');
+}
+
+if (P06_SCORE_DENORMALIZED?.score !== 92 || P06_SCORE_DENORMALIZED.reason !== undefined) {
+    throw new Error('denormalized score without latest_score still surfaces');
+}
+
+if (P06_SCORE_ZERO?.score !== 0) {
+    throw new Error('score 0 is a valid denormalized score');
+}
+
+if (P06_SCORE_NONE !== null) {
+    throw new Error('score hides only when score and latest_score are both absent');
 }
 
 export const P06_LEAD_COLUMN_CONTRACT = {
@@ -97,4 +123,6 @@ export const P06_LEAD_COLUMN_CONTRACT = {
     'true empty vs filtered empty': true,
     'title column relabels to Lead': true,
     'identity secondary is contact': true,
+    'denormalized score without latest_score still surfaces': true,
+    'score 0 is a valid denormalized score': true,
 } as const;

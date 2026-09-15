@@ -135,16 +135,31 @@ export function LeadIdentityCell({
     );
 }
 
+function finiteLeadScore(value: number | null | undefined): number | null {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Prefer latest_score (value + reason) when present. Contabo can store a
+ * denormalized leads.score with no lead_scores rows — 0 is a real score.
+ * Hide only when both latest_score and score are absent.
+ */
 export function leadScorePayload(row: LeadListRow): {
     score: number;
     reason?: string | null;
 } | null {
-    if (!row.latest_score) {
+    if (row.latest_score) {
+        return {
+            score: finiteLeadScore(row.score) ?? row.latest_score.score,
+            reason: row.latest_score.reason,
+        };
+    }
+
+    const denormalized = finiteLeadScore(row.score);
+
+    if (denormalized === null) {
         return null;
     }
 
-    return {
-        score: row.score ?? row.latest_score.score,
-        reason: row.latest_score.reason,
-    };
+    return { score: denormalized };
 }

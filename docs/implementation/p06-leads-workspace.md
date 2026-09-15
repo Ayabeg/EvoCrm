@@ -47,7 +47,7 @@ Leads is a real shared-table consumer. The page no longer renders a raw table or
 | Empty | P03D `WorkspaceEmpty` via `empty={leadEmptyState(...)}` |
 | Pagination | P03D `WorkspacePaginator` reflecting the existing 100-row cap |
 | Bulk chrome slot | Unused. Do not fake a Lead bulk API |
-| Domain columns / cells | `lead-columns.tsx` + `ListViewConfig::columns('lead')` |
+| Domain columns / cells | `lead-columns.tsx` + `ListViewConfig::columns('lead')`. Score prefers `latest_score`, else finite denormalized `leads.score` (including 0). |
 | Create | Unchanged `CreateDrawer` + POST `/crm/leads` |
 | Capture inbox | Unchanged secondary link `/crm/leads/captures` |
 
@@ -331,6 +331,7 @@ Realistic Contabo QA data:
 - `CrmListShell` still maps Inertia; page does not import DataWorkspace directly
 - No QuickRecordDrawer, no mobile sheet
 - Column chooser is session-only (same as Contacts / Companies)
+- Contabo can have `leads.score` with `lead_scores` = 0; the list now shows the denormalized score and does not invent `lead_scores` rows
 
 ---
 

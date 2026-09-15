@@ -99,7 +99,13 @@ it('keeps Leads row identity href columns and selection on the shared contracts'
     expect($contract)->toContain('rowHref is /crm/leads/:id')
         ->and($contract)->toContain('true empty vs filtered empty')
         ->and($contract)->toContain('title column relabels to Lead')
-        ->and($contract)->toContain('identity secondary is contact');
+        ->and($contract)->toContain('identity secondary is contact')
+        ->and($contract)->toContain('denormalized score without latest_score still surfaces')
+        ->and($contract)->toContain('score 0 is a valid denormalized score');
+
+    expect($columns)->toContain('finiteLeadScore')
+        ->and($columns)->toContain('0 is a real score')
+        ->and($columns)->toContain('return { score: denormalized }');
 });
 
 it('preserves Lead create capture inbox and refuses invented query bulk and drawers', function () {
