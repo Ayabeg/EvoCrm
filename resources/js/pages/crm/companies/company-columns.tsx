@@ -116,14 +116,14 @@ export function CompanyIdentityCell({
 
     if (!linked) {
         return (
-            <span className="inline-flex min-w-0 items-start gap-2">{body}</span>
+            <span className="flex w-full min-w-0 items-start gap-2">{body}</span>
         );
     }
 
     return (
         <Link
             href={href}
-            className="inline-flex min-w-0 items-start gap-2 hover:underline"
+            className="flex w-full min-w-0 items-start gap-2 hover:underline"
         >
             {body}
         </Link>

@@ -188,6 +188,19 @@ No export link (Companies has no export route). Noun is `companies`.
 - Filter / saved-view chrome is the existing DataWorkspace spacing (pad-x 32)
 - Removed CrmShell / room tabs from this page only
 
+### Visual hardening (final QA)
+
+Table right-edge clip was auto-layout + unconstrained identity: a long company name grew the `name` column and pushed Owner under the vertical scrollbar (or off the overflow edge). Nested `overflow-auto` on `ListDataTable` plus `overflow-x-auto` on the table wrapper also stacked a second horizontal scroller.
+
+| Viewport | Intended behavior |
+|---|---|
+| 1440 | All default columns visible. Toolbar one balanced row (Search companies… / Owner / City / Wilaya / Create date / Advanced / Columns). Identity truncates; full name in `title`. |
+| 1280 | Same columns visible. Toolbar stays one row when the content pane is wide enough; wrap the filter group if the sidebar eats the row. |
+| 1024 | Table `min-w-[52rem]` + one intentional horizontal scroller if the pane is narrower than the columns. Vertical scroll stays on the table body (`scrollbar-gutter: stable`). Toolbar wraps. |
+| 768 | Same H-scroll contract above 480px container. Below `@[480px]/list` the existing card rows (no page-level H overflow). Toolbar wraps. |
+
+Mechanics: company `table-fixed` with identity 36% / city 16% / wilaya 16% / owner 18% / created 14%. Identity is `flex w-full min-w-0` + ellipsis + `title`. Last column extra right padding. Vertical scrollbar reserved. Horizontal scroll only on the table wrapper. Search placeholder `Search companies…` (query still `q`). Typography size unchanged.
+
 No new cards, gradients, orange surfaces, or app-shell redesign.
 
 ---

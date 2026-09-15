@@ -165,7 +165,13 @@ export function ListDataTable<Row extends { id: RowId }>({
     isRowSelectable?: (id: RowId) => boolean;
 }) {
     return (
-        <div className="min-h-0 flex-1 overflow-auto" data-ds="data-table">
+        <div
+            className={cn(
+                'min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto',
+                object === 'company' && '[scrollbar-gutter:stable]',
+            )}
+            data-ds="data-table"
+        >
             <ListViewTable
                 entity={object}
                 rows={rows as never}

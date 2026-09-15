@@ -71,6 +71,9 @@ it('keeps Companies row identity href columns and selection on the shared contra
         ->and($columns)->toContain("label: 'Company'")
         ->and($columns)->toContain('companyIdentitySecondary')
         ->and($columns)->toContain('Secondary line is compact location')
+        ->and($columns)->toContain('flex w-full min-w-0 items-start gap-2')
+        ->and($columns)->toContain('block truncate text-[13px] leading-[18px]')
+        ->and($columns)->toContain('title={name}')
         ->and($columns)->not->toContain('row.owner?.name')
         ->and($columns)->not->toContain('contacts_count')
         ->and($columns)->not->toContain('deals_count');
@@ -78,7 +81,10 @@ it('keeps Companies row identity href columns and selection on the shared contra
     expect($table)->toContain('CompanyNameCell')
         ->and($table)->toContain('applyCompanyColumnContract')
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
-        ->and($table)->toContain("target.closest('a, input, button, label')");
+        ->and($table)->toContain("target.closest('a, input, button, label')")
+        ->and($table)->toContain("companyTable ? 'table-fixed min-w-[52rem]'")
+        ->and($table)->toContain("name: 'w-[36%]'")
+        ->and($table)->toContain("owner: 'w-[18%]'");
 
     expect($selection)->toContain('Select-all = current rendered page only')
         ->and($selection)->toContain('togglePageSelectedIds')
@@ -118,15 +124,21 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($config)->toContain("['id' => 'wilaya', 'label' => 'Wilaya', 'defaultVisible' => true]");
 
     $filterBar = file_get_contents(resource_path('js/ds/workspace/FilterBar.tsx'));
+    $dataTable = file_get_contents(resource_path('js/ds/workspace/DataTable.tsx'));
     $companyFilters = collect(ListViewConfig::filterFields('company'));
 
     expect($filterBar)->toContain("COMPANY_QUICK_FIELD_IDS = ['owner', 'created', 'city', 'wilaya']")
         ->and($filterBar)->toContain("object === 'company' ? COMPANY_QUICK_FIELD_IDS")
         ->and($filterBar)->toContain("field.id === 'city'")
         ->and($filterBar)->toContain("field.id === 'wilaya'")
+        ->and($filterBar)->toContain("t('Search companies…')")
+        ->and($filterBar)->toContain("object === 'company' && 'max-w-md basis-[16rem]'")
         ->and($companyFilters->pluck('id')->all())->toContain('city')
         ->and($companyFilters->pluck('id')->all())->toContain('wilaya')
         ->and($companyFilters->pluck('id')->all())->not->toContain('status');
+
+    expect($dataTable)->toContain('overflow-x-hidden overflow-y-auto')
+        ->and($dataTable)->toContain("object === 'company' && '[scrollbar-gutter:stable]'");
 
     expect($workspace)->not->toContain('searchParams.set');
 
