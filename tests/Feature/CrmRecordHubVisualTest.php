@@ -16,8 +16,9 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
         ->and($companies)->not->toContain('aurora/data-table')
         ->and($companies)->not->toContain('HubSpot');
 
-    expect($deals)->toContain('ListViewTable')
+    expect($deals)->toContain('resultMode="shared-table"')
         ->and($deals)->toContain('CrmListShell')
+        ->and($deals)->not->toContain('ListViewTable')
         ->and($deals)->not->toContain('aurora/data-table')
         ->and($deals)->not->toContain('HubSpot');
 

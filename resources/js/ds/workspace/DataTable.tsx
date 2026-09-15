@@ -168,7 +168,7 @@ export function ListDataTable<Row extends { id: RowId }>({
         <div
             className={cn(
                 'min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto',
-                (object === 'company' || object === 'lead') && '[scrollbar-gutter:stable]',
+                (object === 'company' || object === 'lead' || object === 'deal') && '[scrollbar-gutter:stable]',
             )}
             data-ds="data-table"
         >

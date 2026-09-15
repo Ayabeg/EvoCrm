@@ -82,7 +82,7 @@ it('keeps Companies row identity href columns and selection on the shared contra
         ->and($table)->toContain('applyCompanyColumnContract')
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($table)->toContain("target.closest('a, input, button, label')")
-        ->and($table)->toContain("fixedTable ? 'table-fixed min-w-[52rem]'")
+        ->and($table)->toContain("'table-fixed min-w-[52rem]'")
         ->and($table)->toContain('const companyTable = entity === \'company\'')
         ->and($table)->toContain("name: 'w-[36%]'")
         ->and($table)->toContain("owner: 'w-[18%]'");
@@ -133,13 +133,13 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($filterBar)->toContain("field.id === 'city'")
         ->and($filterBar)->toContain("field.id === 'wilaya'")
         ->and($filterBar)->toContain("t('Search companies…')")
-        ->and($filterBar)->toContain("object === 'company' && 'max-w-md basis-[16rem]'")
+        ->and($filterBar)->toContain("(object === 'company' || object === 'deal') && 'max-w-md basis-[16rem]'")
         ->and($companyFilters->pluck('id')->all())->toContain('city')
         ->and($companyFilters->pluck('id')->all())->toContain('wilaya')
         ->and($companyFilters->pluck('id')->all())->not->toContain('status');
 
     expect($dataTable)->toContain('overflow-x-hidden overflow-y-auto')
-        ->and($dataTable)->toContain("(object === 'company' || object === 'lead') && '[scrollbar-gutter:stable]'");
+        ->and($dataTable)->toContain("(object === 'company' || object === 'lead' || object === 'deal') && '[scrollbar-gutter:stable]'");
 
     expect($workspace)->not->toContain('searchParams.set');
 
@@ -148,17 +148,17 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($empty)->toContain('as="h2"');
 });
 
-it('does not migrate Deals or Quotes and does not invent QuickRecordDrawer', function () {
+it('does not migrate Quotes or invent QuickRecordDrawer after the Deals shared-table migration', function () {
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
     $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
-    expect($deals)->toContain('ListViewTable')
+    expect($deals)->toContain('resultMode="shared-table"')
         ->and($deals)->toContain('DealLayoutToggle')
-        ->and($deals)->toContain('CrmListFooter')
-        ->and($deals)->not->toContain('resultMode=')
+        ->and($deals)->not->toContain('ListViewTable')
+        ->and($deals)->not->toContain('CrmListFooter')
         ->and($deals)->not->toContain('QuickRecordDrawer');
 
     expect($quotes)->toContain('ListViewTable')

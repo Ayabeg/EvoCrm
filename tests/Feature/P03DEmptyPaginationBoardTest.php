@@ -68,7 +68,7 @@ it('lets CrmListShell pass the P11 board slot without changing domain pages', fu
         ->and($listTable)->toContain('rowHref?: (row: { id: RowId }) => string');
 });
 
-it('keeps Contacts Companies and Leads on shared empty/paginator and other lists on domain footers', function () {
+it('keeps Contacts Companies Leads and Deals on shared empty/paginator and Quotes on domain footers', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
@@ -94,9 +94,14 @@ it('keeps Contacts Companies and Leads on shared empty/paginator and other lists
         ->and($companies)->not->toContain('listPageHref');
 
     expect($deals)->toContain('CrmListShell')
+        ->and($deals)->toContain('resultMode="shared-table"')
+        ->and($deals)->toContain('empty={dealEmptyState')
+        ->and($deals)->toContain('paginator={paginator}')
         ->and($deals)->toContain('DealLayoutToggle')
         ->and($deals)->toContain('PipelineSwitcher')
-        ->and($deals)->toContain('CrmListFooter')
+        ->and($deals)->not->toContain('CrmEmptyState')
+        ->and($deals)->not->toContain('CrmListFooter')
+        ->and($deals)->not->toContain('listPageHref')
         ->and($deals)->not->toContain('onModeChange')
         ->and($deals)->not->toContain('board={');
 

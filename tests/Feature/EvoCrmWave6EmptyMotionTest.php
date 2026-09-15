@@ -43,7 +43,7 @@ it('wires Home, Contacts, and Deals empties through the shared components', func
 
     expect($home)->toContain('HomeWidgetEmpty')
         ->and($contacts)->toContain('contactEmptyState')
-        ->and($deals)->toContain('CrmEmptyState')
+        ->and($deals)->toContain('dealEmptyState')
         ->and($board)->toContain('EmptyState')
         ->and($board)->toContain('density="banner"')
         ->and($board)->toContain('No deals in this pipeline');

@@ -54,11 +54,12 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     expect($deals)->toContain('data-crm="deals-workspace"')
         ->and($deals)->toContain('CrmListShell')
-        ->and($deals)->toContain('ListViewTable')
+        ->and($deals)->toContain('resultMode="shared-table"')
         ->and($deals)->toContain('hasActiveListFilters')
         ->and($deals)->toContain('Create deal')
         ->and($deals)->toContain('layoutToggle')
         ->and($deals)->toContain('DealLayoutToggle')
+        ->and($deals)->not->toContain('ListViewTable')
         ->and($deals)->not->toContain('CrmShell')
         ->and($deals)->not->toContain('chrome="workspace"')
         ->and($deals)->not->toContain('RecordHubPanel')

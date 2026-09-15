@@ -119,7 +119,7 @@ it('preserves Contact bulk actions permissions header and query ownership', func
         ->and($empty)->toContain('as="h2"');
 });
 
-it('does not migrate Deals or Quotes and does not invent QuickRecordDrawer', function () {
+it('does not migrate Quotes or invent QuickRecordDrawer after the Deals shared-table migration', function () {
     $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
@@ -131,10 +131,10 @@ it('does not migrate Deals or Quotes and does not invent QuickRecordDrawer', fun
         ->and($companies)->toContain('resultMode="shared-table"')
         ->and($companies)->not->toContain('CrmShell');
 
-    expect($deals)->toContain('ListViewTable')
+    expect($deals)->toContain('resultMode="shared-table"')
         ->and($deals)->toContain('DealLayoutToggle')
-        ->and($deals)->toContain('CrmListFooter')
-        ->and($deals)->not->toContain('resultMode=')
+        ->and($deals)->not->toContain('ListViewTable')
+        ->and($deals)->not->toContain('CrmListFooter')
         ->and($deals)->not->toContain('QuickRecordDrawer');
 
     expect($quotes)->toContain('ListViewTable')
