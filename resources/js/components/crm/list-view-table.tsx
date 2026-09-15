@@ -9,6 +9,10 @@ import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 import {
+    applyCompanyColumnContract,
+    CompanyIdentityCell as CompanyNameCell,
+} from '@/pages/crm/companies/company-columns';
+import {
     applyContactColumnContract,
     ContactIdentityCell as ContactNameCell,
 } from '@/pages/crm/contacts/contact-columns';
@@ -352,7 +356,12 @@ export default function ListViewTable({
     isRowSelectable?: (id: RowId) => boolean;
 }) {
     const resolvedDefs =
-        entity === 'contact' ? applyContactColumnContract(columnDefs) : columnDefs;
+        entity === 'contact'
+            ? applyContactColumnContract(columnDefs)
+            : entity === 'company'
+              ? applyCompanyColumnContract(columnDefs)
+              : columnDefs;
+    const identityRow = entity === 'contact' || entity === 'company';
     const visible = visibleColumns({
         columnDefs: resolvedDefs,
         filterFields: [],
@@ -373,7 +382,9 @@ export default function ListViewTable({
             <div
                 className={cn(
                     'hidden overflow-x-auto @[480px]/list:block',
-                    entity === 'contact' || entity === 'deal' ? 'bg-white' : 'bg-canvas',
+                    entity === 'contact' || entity === 'company' || entity === 'deal'
+                        ? 'bg-white'
+                        : 'bg-canvas',
                 )}
             >
                 <table className="w-full min-w-[640px] border-collapse text-[13px]">
@@ -406,7 +417,7 @@ export default function ListViewTable({
                                     key={column.id}
                                     className={cn(
                                         'h-12 px-4 font-medium text-mute md:px-8',
-                                        entity === 'contact'
+                                        identityRow
                                             ? 'text-[13px] leading-[18px]'
                                             : 'text-[11px]',
                                     )}
@@ -425,7 +436,7 @@ export default function ListViewTable({
                             <tr
                                 key={row.id}
                                 className={cn(
-                                    entity === 'contact'
+                                    identityRow
                                         ? 'min-h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft'
                                         : 'h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft',
                                     selected && 'bg-canvas-soft',
@@ -441,7 +452,7 @@ export default function ListViewTable({
                                 }}
                             >
                                 {selectable ? (
-                                    <td className={cn(entity === 'contact' ? 'min-h-12 py-2' : 'h-12', 'px-4 md:px-8')}>
+                                    <td className={cn(identityRow ? 'min-h-12 py-2' : 'h-12', 'px-4 md:px-8')}>
                                         <input
                                             type="checkbox"
                                             checked={selected}
@@ -458,6 +469,9 @@ export default function ListViewTable({
                                     const isContactName =
                                         entity === 'contact' &&
                                         column.id === 'name';
+                                    const isCompanyName =
+                                        entity === 'company' &&
+                                        column.id === 'name';
                                     const isDealName =
                                         entity === 'deal' &&
                                         column.id === 'title';
@@ -466,7 +480,7 @@ export default function ListViewTable({
                                         <td
                                             key={column.id}
                                             className={cn(
-                                                entity === 'contact' ? 'min-h-12 py-2' : 'h-12',
+                                                identityRow ? 'min-h-12 py-2' : 'h-12',
                                                 'px-4 md:px-8',
                                                 column.id === primaryId
                                                     ? 'font-medium text-ink'
@@ -478,6 +492,11 @@ export default function ListViewTable({
                                             {isContactName ? (
                                                 <ContactNameCell
                                                     row={row as ContactRow}
+                                                    href={href}
+                                                />
+                                            ) : isCompanyName ? (
+                                                <CompanyNameCell
+                                                    row={row as CompanyRow}
                                                     href={href}
                                                 />
                                             ) : isDealName ? (
@@ -530,6 +549,12 @@ export default function ListViewTable({
                                 {entity === 'contact' ? (
                                     <ContactNameCell
                                         row={row as ContactRow}
+                                        href={href}
+                                        linked={false}
+                                    />
+                                ) : entity === 'company' ? (
+                                    <CompanyNameCell
+                                        row={row as CompanyRow}
                                         href={href}
                                         linked={false}
                                     />
