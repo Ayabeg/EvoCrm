@@ -2,6 +2,12 @@ export { AdvancedFilterDrawer } from '@/ds/workspace/AdvancedFilterDrawer';
 export { BulkActionBar } from '@/ds/workspace/BulkActionBar';
 export { DataTable, ListDataTable } from '@/ds/workspace/DataTable';
 export { DataWorkspace } from '@/ds/workspace/DataWorkspace';
+export { QuickRecordDrawer } from '@/ds/workspace/QuickRecordDrawer';
+export {
+    QuickRecordProvider,
+    RecordLink,
+    useQuickRecord,
+} from '@/ds/workspace/quick-record';
 export {
     resolveRowHref,
     resolveWorkspaceBoardSlot,

@@ -408,7 +408,8 @@ export function runP03CQueryProofs(): void {
             classifyListQueryKey('owner_id') === 'unsafe' &&
             classifyListQueryKey('deal_stage') === 'backend-association' &&
             UNRELATED_PRESERVED_KEYS.includes('direction') &&
-            UNSAFE_QUERY_KEYS.includes('columns'),
+            UNSAFE_QUERY_KEYS.includes('columns') &&
+            UNSAFE_QUERY_KEYS.includes('peek'),
         'explicit key classes — filterFields is not the workspace bag',
     );
     assert(

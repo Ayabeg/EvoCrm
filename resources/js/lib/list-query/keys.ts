@@ -48,6 +48,7 @@ export const UNSAFE_QUERY_KEYS = [
     'create',
     'contact_id',
     'mode',
+    'peek',
 ] as const;
 
 /**
