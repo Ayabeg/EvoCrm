@@ -4,6 +4,7 @@ import { BoardOptionsSheet } from '@/components/crm/board-options-sheet';
 import type { BoardOptions } from '@/components/crm/board-options-sheet';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import DealAttentionQueue from '@/components/crm/deal-attention-queue';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { hasActiveListFilters } from '@/components/crm/list-query';
@@ -20,6 +21,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import type { DealAttentionQueueItem } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {
@@ -70,6 +72,7 @@ export default function DealBoard({
     stagePills = [],
     cities = [],
     wilayas = [],
+    attentionQueue = [],
 }: {
     pipeline: { id: number; name: string };
     pipelines: PipelineOption[];
@@ -98,6 +101,7 @@ export default function DealBoard({
     stagePills?: StagePill[];
     cities?: string[];
     wilayas?: string[];
+    attentionQueue?: DealAttentionQueueItem[];
 }) {
     const [optionsOpen, setOptionsOpen] = useState(false);
     const [drawer, setDrawer] = useState(false);
@@ -190,6 +194,12 @@ export default function DealBoard({
                                 forecast={forecast}
                                 forecastBand={forecastBand}
                                 forecastBacktest={forecastBacktest}
+                            />
+                            <DealAttentionQueue
+                                items={attentionQueue}
+                                basePath="/crm/deals/board"
+                                activeFilters={activeFilters}
+                                extraQuery={{ pipeline: pipeline.id }}
                             />
                             {deals.length === 0 ? (
                                 <div

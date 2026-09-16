@@ -1,6 +1,8 @@
 import { Link } from '@inertiajs/react';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
 import { formatContactName } from '@/lib/contact-name';
+import type { DealAttention } from '@/lib/deal-attention';
+import { attentionToneClass } from '@/lib/deal-attention';
 import type { ListColumnDef } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -24,6 +26,7 @@ export const DEAL_COLUMN_IDS = [
     'owner',
     'company',
     'contact',
+    'attention',
     'health',
     'next_step',
     'last_activity_at',
@@ -49,6 +52,7 @@ export type DealListRow = {
     } | null;
     health?: { score: number; band?: string; label?: string } | null;
     next_step?: string | null;
+    attention?: DealAttention | null;
 };
 
 export function dealRowHref(row: { id: number | string }): string {
@@ -200,6 +204,36 @@ export function dealStageTone(
     }
 
     return 'open';
+}
+
+export function DealAttentionCell({
+    attention,
+}: {
+    attention?: DealAttention | null;
+}) {
+    const primary = attention?.primary;
+
+    if (!primary) {
+        return (
+            <span className="block truncate text-[13px] leading-[18px] text-mute" data-attention="">
+                —
+            </span>
+        );
+    }
+
+    return (
+        <span
+            className={cn(
+                'block truncate text-[13px] leading-[18px]',
+                attentionToneClass(primary.severity),
+            )}
+            title={primary.reason ?? primary.label}
+            data-attention={primary.type}
+            data-attention-severity={primary.severity}
+        >
+            {primary.label}
+        </span>
+    );
 }
 
 export function DealStageCell({

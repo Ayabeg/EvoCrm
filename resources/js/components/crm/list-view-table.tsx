@@ -22,6 +22,7 @@ import {
 import {
     applyDealColumnContract,
     DealAmountCell,
+    DealAttentionCell,
     DealIdentityCell as DealNameCell,
     DealStageCell,
 } from '@/pages/crm/deals/deal-columns';
@@ -182,6 +183,8 @@ function renderDealCell(columnId: string, row: DealRow): string {
                 : '—';
         case 'next_step':
             return row.next_step ?? '—';
+        case 'attention':
+            return row.attention?.primary?.label ?? '—';
         default:
             return customAttributeValue(row.attributes, columnId);
     }
@@ -359,6 +362,7 @@ const DEAL_COLUMN_WIDTHS: Record<string, string> = {
     owner: 'w-[13%]',
     company: 'w-[14%]',
     contact: 'w-[14%]',
+    attention: 'w-[12%]',
 };
 
 const QUOTE_COLUMN_WIDTHS: Record<string, string> = {
@@ -664,6 +668,9 @@ export default function ListViewTable({
                                     const isDealAmount =
                                         entity === 'deal' &&
                                         column.id === 'amount';
+                                    const isDealAttention =
+                                        entity === 'deal' &&
+                                        column.id === 'attention';
                                     const isQuoteName =
                                         entity === 'quote' &&
                                         column.id === 'title';
@@ -724,6 +731,10 @@ export default function ListViewTable({
                                             ) : isDealAmount ? (
                                                 <DealAmountCell
                                                     cents={(row as DealRow).amount_cents}
+                                                />
+                                            ) : isDealAttention ? (
+                                                <DealAttentionCell
+                                                    attention={(row as DealRow).attention}
                                                 />
                                             ) : isLeadName ? (
                                                 <LeadNameCell

@@ -5,7 +5,7 @@ import {
     dealLayoutQuery,
 } from '@/lib/list-query/deal-layout';
 import { emptyCanonicalListQuery } from '@/lib/list-query/empty';
-import { applyPipeline, patchListQuery } from '@/lib/list-query/patch';
+import { applyAttentionFilter, applyPipeline, patchListQuery } from '@/lib/list-query/patch';
 import { fromActiveFilters, listQueryHref } from '@/lib/list-query/serialize';
 import type { CanonicalListQuery } from '@/lib/list-query/types';
 
@@ -31,6 +31,7 @@ const LIST_STATE = query({
         created: '7d',
         status: 'open',
         stage: 'qualified',
+        attention: 'needs_attention',
     },
     sort: { field: 'amount', direction: 'desc' },
     extras: { pipeline: 4 },
@@ -50,6 +51,7 @@ export const P11_LIST_ROUND_TRIP = dealLayoutHref(
         created: '7d',
         status: 'open',
         stage: 'qualified',
+        attention: 'needs_attention',
         sort: 'amount',
         direction: 'desc',
         pipeline: 4,
@@ -99,6 +101,7 @@ export function runP11DealLayoutProofs(): void {
             P11_LIST_TO_BOARD.includes('sort=amount') &&
             P11_LIST_TO_BOARD.includes('direction=desc') &&
             P11_LIST_TO_BOARD.includes('pipeline=4') &&
+            P11_LIST_TO_BOARD.includes('attention=needs_attention') &&
             !P11_LIST_TO_BOARD.includes('page=') &&
             !P11_LIST_TO_BOARD.includes('peek=') &&
             !P11_LIST_TO_BOARD.includes('mode='),
@@ -111,6 +114,7 @@ export function runP11DealLayoutProofs(): void {
             P11_BOARD_TO_LIST.includes('stage=qualified') &&
             P11_BOARD_TO_LIST.includes('filter_id=12') &&
             P11_BOARD_TO_LIST.includes('pipeline=4') &&
+            P11_BOARD_TO_LIST.includes('attention=needs_attention') &&
             !P11_BOARD_TO_LIST.includes('page=') &&
             !P11_BOARD_TO_LIST.includes('peek='),
         '2 board→list restores compatible query; page stays reset',
@@ -142,6 +146,14 @@ export function runP11DealLayoutProofs(): void {
         dealLayoutQuery(LIST_STATE, 'board').page === null &&
             dealLayoutQuery(LIST_STATE, 'list').page === 2,
         '7 page reset is board-only',
+    );
+    assert(
+        applyAttentionFilter(LIST_STATE, 'overdue').filters.attention === 'overdue' &&
+            applyAttentionFilter(LIST_STATE, 'overdue').search === 'clinic' &&
+            applyAttentionFilter(LIST_STATE, 'overdue').filters.owner === '7' &&
+            applyAttentionFilter(LIST_STATE, 'overdue').extras.pipeline === 4 &&
+            applyAttentionFilter(LIST_STATE, null).filters.attention === null,
+        '8 attention filter composes with q/owner/pipeline and clears to All',
     );
 }
 

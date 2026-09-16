@@ -16,6 +16,7 @@ import type {
     RecordStatusTone,
 } from '@/ds/workspace/quick-record/types';
 import { EMPTY_VALUE } from '@/ds/workspace/record-adapters/present';
+import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
@@ -359,11 +360,43 @@ export function QuickRecordDrawer() {
                     {status === 'ready' && descriptor ? (
                         <div>
                             {section === 'overview' ? (
-                                <dl>
-                                    {descriptor.keyProperties.map((property) => (
-                                        <PropertyRow key={property.id} property={property} />
-                                    ))}
-                                </dl>
+                                <div>
+                                    {descriptor.attention?.signals &&
+                                    descriptor.attention.signals.length > 0 ? (
+                                        <section
+                                            className="mb-4"
+                                            data-crm="deal-attention"
+                                            aria-labelledby="drawer-attention-heading"
+                                        >
+                                            <h3
+                                                id="drawer-attention-heading"
+                                                className="text-[12px] font-medium text-[#161616]"
+                                            >
+                                                {t('Needs attention')}
+                                            </h3>
+                                            <ul className="mt-2 space-y-2">
+                                                {descriptor.attention.signals.map((signal) => (
+                                                    <li
+                                                        key={`${signal.type}-${signal.ref?.id ?? 'none'}`}
+                                                        className={attentionToneClass(signal.severity)}
+                                                    >
+                                                        <p className="text-[13px] font-medium">
+                                                            {signal.label}
+                                                        </p>
+                                                        <p className="text-[12px] text-[#929292]">
+                                                            {signal.reason}
+                                                        </p>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </section>
+                                    ) : null}
+                                    <dl>
+                                        {descriptor.keyProperties.map((property) => (
+                                            <PropertyRow key={property.id} property={property} />
+                                        ))}
+                                    </dl>
+                                </div>
                             ) : null}
                             {section === 'activity' ? (
                                 <ActivityList

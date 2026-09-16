@@ -10,6 +10,7 @@ export {
 export { writeListHref } from '@/lib/list-query/href';
 export { navigateListQuery, visitListQuery } from '@/lib/list-query/navigate';
 export {
+    applyAttentionFilter,
     applyBuiltInView,
     applyPipeline,
     applySavedFilter,

@@ -10,6 +10,7 @@ use App\Models\Lead;
 use App\Models\Quote;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Crm\DealAttentionEvaluator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 
@@ -216,10 +217,13 @@ class QuickRecordPeek
         ]);
 
         $timeline = $this->hub->timeline(deal: $deal);
+        $deal->loadMissing(['stage']);
+        $attention = app(DealAttentionEvaluator::class)->presentMany(collect([$deal]))[(int) $deal->id] ?? null;
 
         return $this->envelope(
             type: 'deal',
             id: (int) $deal->id,
+            attention: $attention,
             record: [
                 'title' => $deal->title,
                 'amount_cents' => (int) $deal->amount_cents,
@@ -346,6 +350,7 @@ class QuickRecordPeek
         User $user,
         Model $model,
         bool $supportsActivity = true,
+        ?array $attention = null,
     ): array {
         $presented = array_map(fn (Activity $item): array => $this->presentActivity($item), $activity);
 
@@ -353,6 +358,7 @@ class QuickRecordPeek
             'type' => $type,
             'id' => $id,
             'record' => $record,
+            'attention' => $attention,
             'associations' => $associations,
             'activity' => $supportsActivity ? array_slice($presented, 0, 8) : [],
             'notes' => $supportsActivity ? $this->ofType($presented, 'note') : [],

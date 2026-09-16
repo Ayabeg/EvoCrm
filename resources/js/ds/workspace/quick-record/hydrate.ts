@@ -68,6 +68,7 @@ export function parsePeekPayload(data: unknown): QuickRecordPeekPayload | null {
         tasks: Array.isArray(payload.tasks) ? payload.tasks : [],
         capabilities: payload.capabilities,
         permissions: payload.permissions,
+        attention: payload.attention ?? null,
     };
 }
 

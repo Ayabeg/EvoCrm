@@ -41,6 +41,7 @@ export type ListQueryFilters = {
     unassigned: boolean | null;
     priority: string | null;
     channel: string | null;
+    attention: string | null;
 };
 
 export type ListQuerySort = {
@@ -104,6 +105,7 @@ export type DomainListParams = {
     unassigned?: true;
     priority?: string;
     channel?: string;
+    attention?: string;
     filter_groups?: ListViewFilters;
     pipeline?: number;
     /** URL-owned sort only (`?sort=amount&direction=desc`). Not saved-view default sort. */

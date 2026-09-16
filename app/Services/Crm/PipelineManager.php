@@ -108,8 +108,10 @@ class PipelineManager
 
         $touches = $this->lastTouches($workspace, $deals);
         $nextByDeal = $this->nextActivityByDeal($workspace, $deals);
+        $evaluator = app(DealAttentionEvaluator::class);
+        $attentions = $evaluator->presentMany($deals);
 
-        $presented = $deals->map(function (Deal $deal) use ($touches, $nextByDeal, $options) {
+        $presented = $deals->map(function (Deal $deal) use ($touches, $nextByDeal, $options, $evaluator, $attentions) {
             $lastTouch = $touches[$deal->id] ?? $deal->last_activity_at;
             $inactiveDays = $lastTouch instanceof CarbonInterface
                 ? (int) $lastTouch->diffInDays(now('Africa/Algiers'))
@@ -140,6 +142,7 @@ class PipelineManager
                 'next_activity_label' => is_array($next) ? ($next['label'] ?? null) : null,
                 'quote_count' => (int) ($deal->quotes_count ?? 0),
                 'url' => "/crm/deals/{$deal->id}",
+                'attention' => $evaluator->compact($attentions[(int) $deal->id] ?? null),
             ];
         });
 

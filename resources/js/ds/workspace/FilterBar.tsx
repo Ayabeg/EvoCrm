@@ -17,10 +17,7 @@ import { cn } from '@/lib/utils';
 
 const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
 const COMPANY_QUICK_FIELD_IDS = ['owner', 'created', 'city', 'wilaya'] as const;
-
-function quickFieldIdsFor(object: ListQueryObject): readonly string[] {
-    return object === 'company' ? COMPANY_QUICK_FIELD_IDS : QUICK_FIELD_IDS;
-}
+const DEAL_QUICK_FIELD_IDS = ['owner', 'created', 'status', 'attention'] as const;
 
 const PRESET_LABELS: Record<string, string> = {
     today: 'Today',
@@ -44,6 +41,9 @@ const PRESET_LABELS: Record<string, string> = {
     high: 'High',
     medium: 'Medium',
     low: 'Low',
+    needs_attention: 'Needs attention',
+    overdue: 'Overdue',
+    no_next_action: 'No next action',
 };
 
 function optionLabel(value: string): string {
@@ -82,7 +82,9 @@ export function FilterBar({
     const cities = filterContext?.cities ?? [];
     const wilayas = filterContext?.wilayas ?? [];
     const queryEnabled = listQueryAdapter(object).supportsQuery;
-    const quickIds = quickFieldIdsFor(object);
+    const quickIds: readonly string[] = object === 'company' ? COMPANY_QUICK_FIELD_IDS
+        : object === 'deal' ? DEAL_QUICK_FIELD_IDS
+        : QUICK_FIELD_IDS;
     const quick = fieldDefs
         .filter((field) => quickIds.includes(field.id))
         .slice(0, 4);
@@ -157,7 +159,9 @@ export function FilterBar({
                                 )
                             }
                         >
-                            <option value="">{t('Any')}</option>
+                            <option value="">
+                                {field.id === 'attention' ? t('All') : t('Any')}
+                            </option>
                             {options.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}

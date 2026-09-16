@@ -30,6 +30,7 @@ export const CHROME_FILTER_KEYS = [
     'unassigned',
     'priority',
     'channel',
+    'attention',
 ] as const;
 
 /**

@@ -32,6 +32,7 @@ class CrmFilter
             'last_activity' => $fromSaved['last_activity'] ?? null,
             'created' => $fromSaved['created'] ?? null,
             'status' => $fromSaved['status'] ?? null,
+            'attention' => DealAttentionEvaluator::normalizeFilter($fromSaved['attention'] ?? null),
             'unanswered' => ($fromSaved['unanswered'] ?? null) === true || ($fromSaved['unanswered'] ?? null) === '1',
             'unassigned' => ($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1',
             'deal_stage' => $fromSaved['deal_stage'] ?? null,
@@ -84,6 +85,9 @@ class CrmFilter
             'last_activity' => $request->input('last_activity', $fromSaved['last_activity'] ?? null),
             'created' => $request->input('created', $fromSaved['created'] ?? null),
             'status' => $request->input('status', $fromSaved['status'] ?? null),
+            'attention' => DealAttentionEvaluator::normalizeFilter(
+                $request->input('attention', $fromSaved['attention'] ?? null),
+            ),
             'unanswered' => $request->boolean('unanswered') || (($fromSaved['unanswered'] ?? null) === true || ($fromSaved['unanswered'] ?? null) === '1'),
             'unassigned' => $request->boolean('unassigned') || (($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1'),
             'enrolled_in_sequence' => $request->input('enrolled_in_sequence', $fromSaved['enrolled_in_sequence'] ?? null),
@@ -117,6 +121,10 @@ class CrmFilter
             // dedicated Advanced selects and toolbar quick filters survive.
             if ($entity === 'company') {
                 $this->applyCompanyUrlFilters($query, $filters);
+            }
+
+            if ($entity === 'deal') {
+                $this->applyDealAttention($query, $filters['attention'] ?? null);
             }
 
             return $query;
@@ -659,12 +667,23 @@ class CrmFilter
         $this->applyLastActivity($query, $filters['last_activity'] ?? null);
         $this->applyCreated($query, $filters['created'] ?? null);
         $this->applyDealStatus($query, $filters['status'] ?? null);
+        $this->applyDealAttention($query, $filters['attention'] ?? null);
 
         if (! empty($filters['has_associated_company'])) {
             $query->whereNotNull('company_id');
         }
 
         return $query;
+    }
+
+    /**
+     * P12 attention composes with existing deal chrome. Unknown values are no-ops.
+     *
+     * @param  Builder<Deal>  $query
+     */
+    protected function applyDealAttention(Builder $query, mixed $attention): void
+    {
+        app(DealAttentionEvaluator::class)->apply($query, DealAttentionEvaluator::normalizeFilter($attention));
     }
 
     /**

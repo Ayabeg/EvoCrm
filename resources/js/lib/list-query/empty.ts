@@ -19,6 +19,7 @@ export function emptyListQueryFilters(): ListQueryFilters {
         unassigned: null,
         priority: null,
         channel: null,
+        attention: null,
     };
 }
 

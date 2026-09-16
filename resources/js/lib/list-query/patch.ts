@@ -34,6 +34,7 @@ function compactFilters(filters: ListQueryFilters): ListQueryFilters {
         unassigned: filters.unassigned ? true : null,
         priority: emptyToNull(filters.priority),
         channel: emptyToNull(filters.channel),
+        attention: emptyToNull(filters.attention),
     };
 }
 
@@ -185,5 +186,18 @@ export function applyStageFilter(
 ): CanonicalListQuery {
     return patchListQuery(current, {
         filters: { [key]: slug },
+    });
+}
+
+/**
+ * P12 attention chrome. Only shipped modes: needs_attention | overdue | no_next_action.
+ * Null clears to All. Preserves q / owner / stage / pipeline / view / sort.
+ */
+export function applyAttentionFilter(
+    current: CanonicalListQuery,
+    mode: string | null,
+): CanonicalListQuery {
+    return patchListQuery(current, {
+        filters: { attention: mode },
     });
 }

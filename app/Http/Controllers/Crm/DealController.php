@@ -9,12 +9,15 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealHealthSnapshot;
 use App\Models\DealSuggestion;
+use App\Models\Pipeline;
 use App\Models\Product;
 use App\Models\Stage;
+use App\Models\Workspace;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
+use App\Services\Crm\DealAttentionEvaluator;
 use App\Services\Crm\DealBoardOptions;
 use App\Services\Crm\PipelineManager;
 use App\Services\Crm\StagePropertyGate;
@@ -30,7 +33,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DealController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub, PipelineManager $pipelines, RecordInsight $insight): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub, PipelineManager $pipelines, RecordInsight $insight, DealAttentionEvaluator $attention): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
@@ -64,7 +67,9 @@ class DealController extends Controller
             ->unique('deal_id')
             ->keyBy('deal_id');
 
-        $deals = collect($deals)->map(function (array $row) use ($insight, $dealRows, $nextByDeal) {
+        $attentions = $attention->presentMany($dealRows);
+
+        $deals = collect($deals)->map(function (array $row) use ($insight, $dealRows, $nextByDeal, $attention, $attentions) {
             $model = $dealRows->firstWhere('id', $row['id']);
             $health = $model ? $insight->dealHealth($model) : null;
             $next = $nextByDeal->get($row['id']);
@@ -85,6 +90,7 @@ class DealController extends Controller
                     'label' => $health['label'],
                 ] : null,
                 'next_step' => $nextLabel,
+                'attention' => $model ? $attention->compact($attentions[(int) $model->id] ?? null) : null,
             ];
         })->values()->all();
 
@@ -138,13 +144,14 @@ class DealController extends Controller
             'forecast' => $forecast,
             'createOpen' => $request->boolean('create'),
             'prefillContactId' => $request->integer('contact_id') ?: null,
+            'attentionQueue' => $this->attentionQueue($workspace, $pipeline, $filters, $filter, $attention, $teamOnly),
             'bulk' => [
                 'enabled' => $request->user()->canPermission('crm.bulk'),
             ],
         ]);
     }
 
-    public function board(Request $request, PipelineManager $pipelines, DealBoardOptions $boardOptions, CrmFilter $filter, CrmHub $hub): Response
+    public function board(Request $request, PipelineManager $pipelines, DealBoardOptions $boardOptions, CrmFilter $filter, CrmHub $hub, DealAttentionEvaluator $attention): Response
     {
         $workspace = $request->user()->workspace;
         $pipeline = $pipelines->resolve($workspace, $request->integer('pipeline') ?: null);
@@ -204,6 +211,7 @@ class DealController extends Controller
             'stagePills' => $stagePills,
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
+            'attentionQueue' => $this->attentionQueue($workspace, $pipeline, $filters, $filter, $attention, $teamOnly),
         ]);
     }
 
@@ -445,6 +453,37 @@ class DealController extends Controller
         $deal->moveTo($stage, $request->user());
 
         return back();
+    }
+
+    /**
+     * Compact Needs Attention queue. Same evaluator as List/Board.
+     * Composes with the current workspace slice; always needs_attention.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return list<array{id: int, title: string, href: string, primary: array<string, mixed>}>
+     */
+    protected function attentionQueue(
+        Workspace $workspace,
+        Pipeline $pipeline,
+        array $filters,
+        CrmFilter $filter,
+        DealAttentionEvaluator $attention,
+        bool $teamOnly,
+    ): array {
+        $queueFilters = $filters;
+        $queueFilters['attention'] = DealAttentionEvaluator::FILTER_NEEDS_ATTENTION;
+
+        $query = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id);
+
+        if ($teamOnly) {
+            $query->where('owner_id', $filters['owner'] ?? null);
+        }
+
+        $filter->applyToDeals($query, $queueFilters);
+
+        return $attention->queue($query);
     }
 
     /**
