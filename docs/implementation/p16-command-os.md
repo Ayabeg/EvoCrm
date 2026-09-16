@@ -21,7 +21,7 @@ Audit complete on fresh main @ `b1be269`. CURRENT COMMAND SYSTEM recorded **befo
 - Base: `b1be269acbf8c231b3640593a64665df6e3962e4`
 - Branch: `cursor/p16-command-os`
 - PR title: P16 — Command OS
-- Tip: `0eb170a` (`cursor/p16-command-os`)
+- Tip: `cursor/p16-command-os` after the P16 commits
 
 ---
 
@@ -290,7 +290,7 @@ Commands:
 | `npm run types:check` | passed |
 | eslint on P16-touched JS | passed |
 | `npm run build` | passed |
-| GitHub CI | pending on PR #225 |
+| GitHub CI | passed (`tests / ci` on #225) |
 
 ## LIVE VISUAL QA
 
