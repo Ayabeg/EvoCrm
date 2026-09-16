@@ -16,6 +16,7 @@ import type {
     RecordStatusTone,
 } from '@/ds/workspace/quick-record/types';
 import { EMPTY_VALUE } from '@/ds/workspace/record-adapters/present';
+import { handleQuickRecordEscapeKeyDown } from '@/lib/command-os';
 import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -229,6 +230,9 @@ export function QuickRecordDrawer() {
                 data-ds="quick-record-drawer"
                 overlayClassName="bg-black/20"
                 overlayStyle={{ backgroundColor: 'rgba(22, 22, 22, 0.18)' }}
+                onEscapeKeyDown={(event) => {
+                    handleQuickRecordEscapeKeyDown(event, document);
+                }}
                 onCloseAutoFocus={(event) => {
                     event.preventDefault();
                     state.opener?.focus();

@@ -141,6 +141,27 @@ export function visibleCommandRemoteHits(input: {
     return input.remoteHits ?? [];
 }
 
+export const COMMAND_OS_ROOT_SELECTOR = '[data-command="os"]';
+
+export function isCommandOsOpen(
+    root: { querySelector?: (selector: string) => unknown } | null | undefined,
+): boolean {
+    return typeof root?.querySelector === 'function' && root.querySelector(COMMAND_OS_ROOT_SELECTOR) != null;
+}
+
+export function handleQuickRecordEscapeKeyDown(
+    event: { preventDefault: () => void },
+    root: { querySelector?: (selector: string) => unknown } | null | undefined,
+): boolean {
+    if (!isCommandOsOpen(root)) {
+        return false;
+    }
+
+    event.preventDefault();
+
+    return true;
+}
+
 export function shouldOpenCommandFromSearchFocus(suppressFocusOpen: boolean): boolean {
     return !suppressFocusOpen;
 }

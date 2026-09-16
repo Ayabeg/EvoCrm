@@ -79,6 +79,7 @@ it('extends the one existing command surface without a second palette', function
     $search = File::get(app_path('Services/Crm/CommandSearch.php'));
     $share = File::get(app_path('Http/Middleware/HandleInertiaRequests.php'));
     $js = File::get(base_path('tests/js/p16-command-os.ts'));
+    $drawer = File::get(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
 
     expect(class_exists('App\\Http\\Controllers\\Crm\\CommandPaletteV2Controller'))->toBeFalse()
         ->and($palette)->toContain('from \'@/components/aurora/command-palette\'')
@@ -114,7 +115,13 @@ it('extends the one existing command surface without a second palette', function
         ->and($search)->not->toContain("'phone'")
         ->and($search)->not->toContain('phone_e164')
         ->and($share)->toContain("'evoSearchIndex' => []")
-        ->and($js)->toContain('a→am→ami is stale once acme is current');
+        ->and($js)->toContain('a→am→ami is stale once acme is current')
+        ->and($js)->toContain('after needle changes, visible hits are empty until hitsForQuery matches')
+        ->and($palette)->toContain('setRemoteHits([])')
+        ->and($palette)->toContain("setHitsForQuery('')")
+        ->and($drawer)->toContain('onEscapeKeyDown')
+        ->and($drawer)->toContain('handleQuickRecordEscapeKeyDown')
+        ->and($drawer)->not->toContain('CommandPaletteV2');
 
     expect(Route::getRoutes()->getByName('crm.command.search')?->uri())->toBe('crm/command/search');
 });

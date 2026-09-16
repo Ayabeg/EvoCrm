@@ -205,17 +205,19 @@ export function CommandPalette({
             return;
         }
 
+        setRemoteHits([]);
+        setHitsForQuery('');
+
         const needle = query.trim();
         abortRef.current?.abort();
 
-        if (needle === '') {
-            requestIdRef.current = nextCommandSearchRequestId(requestIdRef.current);
+        const requestId = nextCommandSearchRequestId(requestIdRef.current);
+        requestIdRef.current = requestId;
 
+        if (needle === '') {
             return;
         }
 
-        const requestId = nextCommandSearchRequestId(requestIdRef.current);
-        requestIdRef.current = requestId;
         const controller = new AbortController();
         abortRef.current = controller;
 

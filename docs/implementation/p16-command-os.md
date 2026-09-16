@@ -16,7 +16,7 @@ Audit complete on fresh main @ `b1be269`. CURRENT COMMAND SYSTEM recorded **befo
 
 **MERGE READY: NO** until Research Contabo populated QA is PASS.
 
-Contabo Research (pre-fix) returned **PARTIAL — MERGE_BLOCKING: yes**. Two Sev2 blockers are fixed in this tip and need a Research recheck. Do not merge. Do not start P17.
+Contabo Research re-QA (round 2) returned **PARTIAL — MERGE_BLOCKING: yes**. Standalone Escape passed. Stale-race and Escape-over-QRD still failed and are fixed in this tip. Do not merge. Do not start P17.
 
 ## BASE / PR / TIP
 
@@ -130,7 +130,8 @@ Default empty-query is Recents + Create + Act + Ask + Navigate. No empty white b
 - Amount cannot match a deal or quote.
 - Empty `q` returns `[]` (does not dump latest records).
 - Debounce 180ms. Palette opens instantly with local commands. Progressive remote.
-- Stale race: incrementing request id + `AbortController`. Display also gates on `hitsForQuery` via `visibleCommandRemoteHits` so prior needles (`ami`) never render after the input is already `acme`, including empty-query clear. Abort + requestId remain.
+- Stale race: on every `query` change the effect immediately `setRemoteHits([])` + `setHitsForQuery('')` before debounce, so a prior needle cannot paint. Incrementing request id + `AbortController` stay. Display also gates on `hitsForQuery` via `visibleCommandRemoteHits` so prior needles (`ami`) never render after the input is already `acme`, including empty-query clear.
+- Next Contabo stale-race FAIL only if a **Contact** row labeled `Amine Benali` (or another prior-needle-only contact) is visible while the input is exactly `acme`. An activity whose subject contains both Amine and Acme is allowed for query `acme`.
 - Remote failure: Navigate / Create / Act / Ask still work; footer says search is unavailable.
 - Enter on a record hit → `openRecord`. Activity hits peek the first viewable related deal/contact/company, else visit `/crm/activities`.
 - Open full stays on QRD. No Command Record Drawer.
@@ -200,7 +201,7 @@ localStorage `evo:command-os:recents`: `{ id, kind }` only. Max 5. Navigate / Cr
 - Focus the input on open; restore the opener on close unless the opener is the topbar Search trigger (`data-command-trigger="search"`).
 - Escape closes Command (`preventDefault` + `stopPropagation`, capture). Search `onFocus` is suppressed for `COMMAND_FOCUS_OPEN_SUPPRESS_MS` after programmatic close so focus restore cannot reopen Command.
 - Arrows + Enter. IME-safe (`isComposing` / keyCode 229).
-- Overlay interop: Command z-index 201 > QRD `--z-modal` 50. Cmd+K while QRD is open stacks Command on top; Escape closes Command first; QRD stays.
+- Overlay interop: Command z-index 201 > QRD `--z-modal` 50. Cmd+K while QRD is open stacks Command on top. QRD `onEscapeKeyDown` calls `preventDefault()` when `[data-command="os"]` is present so Radix does not close the drawer; Command's capture Escape closes Command first. Second Escape then closes QRD. Command Escape remains capture + `preventDefault` + `stopPropagation`.
 
 ---
 
@@ -235,11 +236,12 @@ P09/P10/P11 source locks that forbade `openRecord` in the palette are updated: C
 
 | File | Change |
 |---|---|
-| `docs/implementation/p16-command-os.md` | Audit + matrix + AFTER + Contabo PARTIAL |
-| `resources/js/lib/command-os.ts` | Typed CommandResult, catalog, race, recents, P15 hrefs, visible hits + Escape helpers |
-| `resources/js/components/crm/command-palette.tsx` | Command OS orchestration; drop stale hits on needle change |
+| `docs/implementation/p16-command-os.md` | Audit + matrix + AFTER + Contabo round-2 PARTIAL |
+| `resources/js/lib/command-os.ts` | Typed CommandResult, catalog, race, recents, P15 hrefs, visible hits + Escape + QRD overlay helpers |
+| `resources/js/components/crm/command-palette.tsx` | Command OS orchestration; clear remote hits immediately on query change |
 | `resources/js/components/aurora/command-palette.tsx` | Controlled query, IME, width, overflow, Escape capture |
 | `resources/js/components/app-sidebar-header.tsx` | Same surface; Search focus-open suppress after close |
+| `resources/js/ds/workspace/QuickRecordDrawer.tsx` | `onEscapeKeyDown` defers to Command when `[data-command="os"]` is present |
 | `app/Services/Crm/CommandSearch.php` | Permission-safe bounded search |
 | `app/Http/Controllers/Crm/CommandSearchController.php` | GET JSON |
 | `routes/web.php` | `crm.command.search` |
@@ -251,7 +253,7 @@ P09/P10/P11 source locks that forbade `openRecord` in the palette are updated: C
 | `tests/Feature/P10QuickRecordDrawerIntegrationTest.php` | Same |
 | `tests/Feature/P11DealsPipelineBoardTest.php` | Same |
 
-**Not changed:** QRD adapters, P15 query/evaluator classes, Inbox, board, AskEvoPanel POSTs, DataWorkspace, create forms.
+**Not changed:** QRD adapters, peek contracts, hydration, P15 query/evaluator classes, Inbox, board, AskEvoPanel POSTs, DataWorkspace, create forms.
 
 ---
 
@@ -289,11 +291,11 @@ Commands:
 | Command | Result |
 |---|---|
 | `php artisan test` | 949 passed (pre-fix P16 tip; PHP not in this fix environment) |
-| `npx vite-node tests/js/p16-command-os.ts` | passed after Sev2 fix (stale-display + Escape helpers) |
+| `npx vite-node tests/js/p16-command-os.ts` | passed after Sev2 fix 2 (immediate remote-hit clear + QRD Escape defer) |
 | `npm run types:check` | passed on pre-fix tip; this environment lacks Wayfinder `@/routes` |
-| eslint on P16-touched JS | passed after Sev2 fix |
+| eslint on P16-touched JS | pending this tip |
 | `npm run build` | passed (pre-fix P16 tip) |
-| GitHub CI | passed (`tests / ci` on #225) for the pre-fix tip; recheck after this push |
+| GitHub CI | passed (`tests / ci` on #225) for the prior tip; recheck after this push |
 
 ## LIVE VISUAL QA
 
@@ -301,40 +303,34 @@ Commands:
 
 ### Contabo Research — PARTIAL (merge-blocking)
 
-Research walked populated Contabo before this fix tip. Result: **PARTIAL — MERGE_BLOCKING: yes**.
+Round 1 (pre-fix): **PARTIAL — MERGE_BLOCKING: yes** (stale race + standalone Escape).
 
-| Check | Result | Notes |
+Round 2 (after Sev2 tip `2b5b591`): **PARTIAL — MERGE_BLOCKING: yes**.
+
+| Walk | Result | Notes |
 |---|---|---|
-| Empty-state sections | PASS | Recents / Create / Act / Navigate present |
-| Search `a→am→ami→acme` | **FAIL Sev2** | Acme eventually appeared, but Amine hits stayed visible while the input already showed `acme` |
-| Search→QRD Enter | PASS | Record Enter opened QRD |
-| Create `?create=1` | PASS | Existing drawers |
-| P15 Act group URLs | PASS | Unchanged |
-| Responsive 768 / 1440 | PASS | No H-overflow reported |
-| Inbox / Board / Activities | PASS | Do not regress |
-| Escape over QRD | PASS once | Command closed first |
-| Standalone Escape | **FAIL Sev2** | Often failed to dismiss; Search focus restore reopened Command |
-| Ask Evo | FEATURE_OFF | Out of scope |
-| Ctrl+Enter full record | Out of scope | Opened QRD instead |
-| Lead create | Out of scope | P06 frozen |
+| Standalone Escape | **PASS** | 3/3 Search→Escape + Ctrl+K |
+| Stale race | **FAIL** | Research flagged `P16SEED Follow Amine Acme` (activity) while input was `acme`. Backend `CommandSearch` legitimately returns that subject. Still hardened so prior-needle hits never paint. |
+| Escape over QRD | **FAIL** | Sheet/Radix capture closed QRD; Command stayed open |
+| Smoke | PASS | |
 
 **Fixes in this tip (need Research recheck, not agent-claimed PASS):**
 
-1. **Stale search race** — `visibleCommandRemoteHits` ignores `remoteHits` unless `hitsForQuery` matches the current needle (including empty query). AbortController + requestId stay; late responses still do not apply.
-2. **Escape** — Aurora Escape `preventDefault` + `stopPropagation` (capture). Header suppresses Search `onFocus` open after programmatic close. Search trigger is not the restored opener.
+1. **Stale search race** — effect start on every `query` change immediately `setRemoteHits([])` + `setHitsForQuery('')` before debounce. `visibleCommandRemoteHits` still ignores `remoteHits` unless `hitsForQuery` matches. AbortController + requestId stay. FAIL next walk only if a **Contact** `Amine Benali` (or other prior-needle-only contact) is visible while the input is exactly `acme`.
+2. **Escape over QRD** — QRD `onEscapeKeyDown` `preventDefault()` when `[data-command="os"]` is present. First Escape closes Command only; second Escape closes QRD. Standalone Escape from round 2 stays the existing capture + Search-focus suppress.
 
 Contabo checklist (Research-owned recheck):
 
 - Core commands: Navigate Home/Contacts/Pipeline/Inbox/Activities/Settings
-- Search race: type `a` → `am` → `ami` → `acme` — **Amine must disappear as soon as the input is `acme`**, not only after the Acme response
+- Search race: type `a` → `am` → `ami` → `acme` — **Contact Amine Benali must not remain while the input is `acme`**. Activity subjects that contain Acme may remain.
 - Standalone Escape from Search-opened Command must stay closed
+- With QRD open and Command on top: first Escape closes Command only; QRD remains; second Escape closes QRD
 - Create contact/deal/quote via existing drawers
 - P15 Overdue / Today / Upcoming / Completed URLs
 - Pipeline + Inbox still open from Command
 - Permission: view-only member sees search, not Create; other-workspace names/emails absent
 - Remote failure: unplug search — Navigate/Create/Act still work
 - 1440 / 1280 / 1024 / 768 no H-overflow
-- Cmd+K while QRD open; Escape closes Command first
 
 ## MERGE READY
 

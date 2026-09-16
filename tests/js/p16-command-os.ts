@@ -11,7 +11,9 @@ import {
     composeCommandResults,
     filterValidRecents,
     handleCommandEscapeKey,
+    handleQuickRecordEscapeKeyDown,
     isCommandCommitKey,
+    isCommandOsOpen,
     isStaleCommandSearch,
     matchesCommandQuery,
     nextCommandSearchRequestId,
@@ -236,6 +238,35 @@ expectTrue(
     'display logic does not keep prior hits for a newer needle',
 );
 
+const afterNeedleChange = {
+    query: 'acme',
+    hitsForQuery: '',
+    remoteHits: [] as typeof amineHits,
+};
+expectEqual(
+    visibleCommandRemoteHits(afterNeedleChange),
+    [],
+    'after needle changes, visible hits are empty until hitsForQuery matches',
+);
+expectEqual(
+    visibleCommandRemoteHits({
+        query: 'acme',
+        hitsForQuery: '',
+        remoteHits: amineHits,
+    }),
+    [],
+    'cleared hitsForQuery hides leftover prior-needle rows',
+);
+expectEqual(
+    visibleCommandRemoteHits({
+        query: 'acme',
+        hitsForQuery: 'acme',
+        remoteHits: acmeHits,
+    }).map((hit) => hit.label),
+    ['Acme'],
+    'matching hitsForQuery paints only after the current needle lands',
+);
+
 expectEqual(
     shouldOpenCommandFromSearchFocus(true),
     false,
@@ -272,6 +303,38 @@ expectEqual(
     false,
     'other keys pass through Escape handling',
 );
+
+let qrdEscapePrevented = false;
+expectTrue(isCommandOsOpen({ querySelector: () => ({}) }), 'Command OS marker counts as open');
+expectEqual(
+    handleQuickRecordEscapeKeyDown(
+        {
+            preventDefault: () => {
+                qrdEscapePrevented = true;
+            },
+        },
+        { querySelector: () => ({}) },
+    ),
+    true,
+    'QRD Escape is deferred while Command OS is open',
+);
+expectTrue(qrdEscapePrevented, 'QRD preventDefault when Command is open');
+
+qrdEscapePrevented = false;
+expectTrue(!isCommandOsOpen({ querySelector: () => null }), 'missing Command OS marker is closed');
+expectEqual(
+    handleQuickRecordEscapeKeyDown(
+        {
+            preventDefault: () => {
+                qrdEscapePrevented = true;
+            },
+        },
+        { querySelector: () => null },
+    ),
+    false,
+    'QRD Escape proceeds when Command is closed',
+);
+expectTrue(!qrdEscapePrevented, 'QRD does not preventDefault when Command is closed');
 
 const hits = commandSearchHitsToResults([
     {
