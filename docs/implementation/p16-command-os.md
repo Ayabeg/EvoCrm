@@ -16,6 +16,8 @@ Audit complete on fresh main @ `b1be269`. CURRENT COMMAND SYSTEM recorded **befo
 
 **MERGE READY: NO** until Research Contabo populated QA is PASS.
 
+Contabo Research (pre-fix) returned **PARTIAL — MERGE_BLOCKING: yes**. Two Sev2 blockers are fixed in this tip and need a Research recheck. Do not merge. Do not start P17.
+
 ## BASE / PR / TIP
 
 - Base: `b1be269acbf8c231b3640593a64665df6e3962e4`
@@ -128,7 +130,7 @@ Default empty-query is Recents + Create + Act + Ask + Navigate. No empty white b
 - Amount cannot match a deal or quote.
 - Empty `q` returns `[]` (does not dump latest records).
 - Debounce 180ms. Palette opens instantly with local commands. Progressive remote.
-- Stale race: incrementing request id + `AbortController`. Final keystroke wins (`a→am→ami→acme`).
+- Stale race: incrementing request id + `AbortController`. Display also gates on `hitsForQuery` via `visibleCommandRemoteHits` so prior needles (`ami`) never render after the input is already `acme`, including empty-query clear. Abort + requestId remain.
 - Remote failure: Navigate / Create / Act / Ask still work; footer says search is unavailable.
 - Enter on a record hit → `openRecord`. Activity hits peek the first viewable related deal/contact/company, else visit `/crm/activities`.
 - Open full stays on QRD. No Command Record Drawer.
@@ -195,8 +197,9 @@ localStorage `evo:command-os:recents`: `{ id, kind }` only. Max 5. Navigate / Cr
 - Topbar “Search EvoCRM… ⌘K” opens the same Command OS.
 - Sparkle opens the same Command OS.
 - One listener. Cmd/Ctrl+K toggles.
-- Focus the input on open; restore the opener on close.
-- Escape closes Command. Arrows + Enter. IME-safe (`isComposing` / keyCode 229).
+- Focus the input on open; restore the opener on close unless the opener is the topbar Search trigger (`data-command-trigger="search"`).
+- Escape closes Command (`preventDefault` + `stopPropagation`, capture). Search `onFocus` is suppressed for `COMMAND_FOCUS_OPEN_SUPPRESS_MS` after programmatic close so focus restore cannot reopen Command.
+- Arrows + Enter. IME-safe (`isComposing` / keyCode 229).
 - Overlay interop: Command z-index 201 > QRD `--z-modal` 50. Cmd+K while QRD is open stacks Command on top; Escape closes Command first; QRD stays.
 
 ---
@@ -232,11 +235,11 @@ P09/P10/P11 source locks that forbade `openRecord` in the palette are updated: C
 
 | File | Change |
 |---|---|
-| `docs/implementation/p16-command-os.md` | Audit + matrix + AFTER |
-| `resources/js/lib/command-os.ts` | Typed CommandResult, catalog, race, recents, P15 hrefs |
-| `resources/js/components/crm/command-palette.tsx` | Command OS orchestration |
-| `resources/js/components/aurora/command-palette.tsx` | Controlled query, IME, width, overflow |
-| `resources/js/components/app-sidebar-header.tsx` | Same surface; toggle listener |
+| `docs/implementation/p16-command-os.md` | Audit + matrix + AFTER + Contabo PARTIAL |
+| `resources/js/lib/command-os.ts` | Typed CommandResult, catalog, race, recents, P15 hrefs, visible hits + Escape helpers |
+| `resources/js/components/crm/command-palette.tsx` | Command OS orchestration; drop stale hits on needle change |
+| `resources/js/components/aurora/command-palette.tsx` | Controlled query, IME, width, overflow, Escape capture |
+| `resources/js/components/app-sidebar-header.tsx` | Same surface; Search focus-open suppress after close |
 | `app/Services/Crm/CommandSearch.php` | Permission-safe bounded search |
 | `app/Http/Controllers/Crm/CommandSearchController.php` | GET JSON |
 | `routes/web.php` | `crm.command.search` |
@@ -296,10 +299,35 @@ Commands:
 
 **NEEDS RESEARCH.** Agent did not walk Contabo populated Command OS.
 
-Contabo checklist (Research-owned):
+### Contabo Research — PARTIAL (merge-blocking)
+
+Research walked populated Contabo before this fix tip. Result: **PARTIAL — MERGE_BLOCKING: yes**.
+
+| Check | Result | Notes |
+|---|---|---|
+| Empty-state sections | PASS | Recents / Create / Act / Navigate present |
+| Search `a→am→ami→acme` | **FAIL Sev2** | Acme eventually appeared, but Amine hits stayed visible while the input already showed `acme` |
+| Search→QRD Enter | PASS | Record Enter opened QRD |
+| Create `?create=1` | PASS | Existing drawers |
+| P15 Act group URLs | PASS | Unchanged |
+| Responsive 768 / 1440 | PASS | No H-overflow reported |
+| Inbox / Board / Activities | PASS | Do not regress |
+| Escape over QRD | PASS once | Command closed first |
+| Standalone Escape | **FAIL Sev2** | Often failed to dismiss; Search focus restore reopened Command |
+| Ask Evo | FEATURE_OFF | Out of scope |
+| Ctrl+Enter full record | Out of scope | Opened QRD instead |
+| Lead create | Out of scope | P06 frozen |
+
+**Fixes in this tip (need Research recheck, not agent-claimed PASS):**
+
+1. **Stale search race** — `visibleCommandRemoteHits` ignores `remoteHits` unless `hitsForQuery` matches the current needle. Query changes (including empty) clear stored hits immediately. AbortController + requestId stay.
+2. **Escape** — Aurora Escape `preventDefault` + `stopPropagation` (capture). Header suppresses Search `onFocus` open after programmatic close. Search trigger is not the restored opener.
+
+Contabo checklist (Research-owned recheck):
 
 - Core commands: Navigate Home/Contacts/Pipeline/Inbox/Activities/Settings
-- Search race: type `a` → `am` → `ami` → `acme` — final = Acme, no stale overwrite
+- Search race: type `a` → `am` → `ami` → `acme` — **Amine must disappear as soon as the input is `acme`**, not only after the Acme response
+- Standalone Escape from Search-opened Command must stay closed
 - Create contact/deal/quote via existing drawers
 - P15 Overdue / Today / Upcoming / Completed URLs
 - Pipeline + Inbox still open from Command

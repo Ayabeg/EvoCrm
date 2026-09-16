@@ -272,13 +272,17 @@ return
 }
 
     function handler(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        onOpenChange(false)
+      if (e.key !== "Escape") {
+        return
       }
-    }
-    document.addEventListener("keydown", handler)
 
-    return () => document.removeEventListener("keydown", handler)
+      e.preventDefault()
+      e.stopPropagation()
+      onOpenChange(false)
+    }
+    document.addEventListener("keydown", handler, true)
+
+    return () => document.removeEventListener("keydown", handler, true)
   }, [open, onOpenChange])
 
   function handleKeyDown(e: React.KeyboardEvent) {

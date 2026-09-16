@@ -10,6 +10,7 @@ import {
     commandSearchHitsToResults,
     composeCommandResults,
     filterValidRecents,
+    handleCommandEscapeKey,
     isCommandCommitKey,
     isStaleCommandSearch,
     matchesCommandQuery,
@@ -17,6 +18,8 @@ import {
     parseStoredRecents,
     rememberCommandRecent,
     scoreCommandResult,
+    shouldOpenCommandFromSearchFocus,
+    visibleCommandRemoteHits,
 } from '../../resources/js/lib/command-os';
 
 function expectEqual<T>(actual: T, expected: T, label: string): void {
@@ -172,6 +175,103 @@ const race = nextCommandSearchRequestId(1);
 expectEqual(race, 2, 'search request ids increment');
 expectEqual(isStaleCommandSearch(3, 2), true, 'a→am→ami is stale once acme is current');
 expectEqual(isStaleCommandSearch(3, 3), false, 'final acme request wins');
+
+const amineHits = [
+    {
+        type: 'contact',
+        id: 11,
+        label: 'Amine Benali',
+        href: '/crm/contacts/11',
+        recordRef: { type: 'contact' as const, id: 11 },
+    },
+];
+const acmeHits = [
+    {
+        type: 'company',
+        id: 4,
+        label: 'Acme',
+        href: '/crm/companies/4',
+        recordRef: { type: 'company' as const, id: 4 },
+    },
+];
+expectEqual(
+    visibleCommandRemoteHits({
+        query: 'acme',
+        hitsForQuery: 'ami',
+        remoteHits: amineHits,
+    }),
+    [],
+    'amine hits are ignored once the needle is already acme',
+);
+expectEqual(
+    visibleCommandRemoteHits({
+        query: 'acme',
+        hitsForQuery: 'acme',
+        remoteHits: acmeHits,
+    }).map((hit) => hit.label),
+    ['Acme'],
+    'acme hits render only for the matching needle',
+);
+expectEqual(
+    visibleCommandRemoteHits({
+        query: '',
+        hitsForQuery: 'ami',
+        remoteHits: amineHits,
+    }),
+    [],
+    'empty query never shows stale records',
+);
+
+const staleDisplayed = composeCommandResults({
+    query: 'acme',
+    catalog,
+    remoteHits: visibleCommandRemoteHits({
+        query: 'acme',
+        hitsForQuery: 'ami',
+        remoteHits: amineHits,
+    }),
+});
+expectTrue(
+    staleDisplayed.every((item) => item.kind !== 'search'),
+    'display logic does not keep prior hits for a newer needle',
+);
+
+expectEqual(
+    shouldOpenCommandFromSearchFocus(true),
+    false,
+    'search focus is suppressed after programmatic close',
+);
+expectEqual(
+    shouldOpenCommandFromSearchFocus(false),
+    true,
+    'search focus opens Command once the suppress window ends',
+);
+
+let escapePrevented = false;
+let escapeStopped = false;
+expectEqual(
+    handleCommandEscapeKey({
+        key: 'Escape',
+        preventDefault: () => {
+            escapePrevented = true;
+        },
+        stopPropagation: () => {
+            escapeStopped = true;
+        },
+    }),
+    true,
+    'Escape is handled',
+);
+expectTrue(escapePrevented && escapeStopped, 'Escape preventDefault + stopPropagation');
+expectEqual(
+    handleCommandEscapeKey({
+        key: 'k',
+        preventDefault: () => undefined,
+        stopPropagation: () => undefined,
+    }),
+    false,
+    'other keys pass through Escape handling',
+);
 
 const hits = commandSearchHitsToResults([
     {

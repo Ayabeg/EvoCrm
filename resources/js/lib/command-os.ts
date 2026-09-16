@@ -121,6 +121,45 @@ export function isStaleCommandSearch(current: number, requestId: number): boolea
     return requestId !== current;
 }
 
+export const COMMAND_FOCUS_OPEN_SUPPRESS_MS = 400;
+
+export function visibleCommandRemoteHits(input: {
+    query: string;
+    hitsForQuery?: string | null;
+    remoteHits?: CommandSearchHit[];
+}): CommandSearchHit[] {
+    const needle = commandNeedle(input.query);
+
+    if (needle === '') {
+        return [];
+    }
+
+    if (commandNeedle(input.hitsForQuery ?? '') !== needle) {
+        return [];
+    }
+
+    return input.remoteHits ?? [];
+}
+
+export function shouldOpenCommandFromSearchFocus(suppressFocusOpen: boolean): boolean {
+    return !suppressFocusOpen;
+}
+
+export function handleCommandEscapeKey(event: {
+    key: string;
+    preventDefault: () => void;
+    stopPropagation: () => void;
+}): boolean {
+    if (event.key !== 'Escape') {
+        return false;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    return true;
+}
+
 export function isCommandCommitKey(event: {
     key: string;
     isComposing?: boolean;

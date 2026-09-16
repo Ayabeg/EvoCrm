@@ -28,6 +28,7 @@ import { useSimpleMode } from '@/hooks/use-simple-mode';
 import {
     COMMAND_SEARCH_DEBOUNCE_MS,
     buildCommandCatalog,
+    commandNeedle,
     composeCommandResults,
     filterValidRecents,
     isStaleCommandSearch,
@@ -35,6 +36,7 @@ import {
     nextCommandSearchRequestId,
     persistCommandRecents,
     rememberCommandRecent,
+    visibleCommandRemoteHits,
 } from '@/lib/command-os';
 import type { CommandRecent, CommandResult, CommandSearchHit } from '@/lib/command-os';
 
@@ -135,6 +137,7 @@ export function CommandPalette({
     const abortRef = useRef<AbortController | null>(null);
     const [query, setQuery] = useState('');
     const [remoteHits, setRemoteHits] = useState<CommandSearchHit[]>([]);
+    const [hitsForQuery, setHitsForQuery] = useState('');
     const [searchFailed, setSearchFailed] = useState(false);
     const [searching, setSearching] = useState(false);
     const [recents, setRecents] = useState<CommandRecent[]>(() => loadCommandRecents());
@@ -159,15 +162,17 @@ export function CommandPalette({
     );
 
     const results = useMemo(() => {
-        const needle = query.trim();
-
         return composeCommandResults({
             query,
             catalog,
             recents: filterValidRecents(recents, availableIds),
-            remoteHits: needle === '' ? [] : remoteHits,
+            remoteHits: visibleCommandRemoteHits({
+                query,
+                hitsForQuery,
+                remoteHits,
+            }),
         });
-    }, [availableIds, catalog, query, recents, remoteHits]);
+    }, [availableIds, catalog, hitsForQuery, query, recents, remoteHits]);
 
     useEffect(() => {
         if (open) {
@@ -184,7 +189,11 @@ export function CommandPalette({
         const opener = openerRef.current;
         openerRef.current = null;
 
-        if (opener && typeof opener.focus === 'function') {
+        if (
+            opener &&
+            opener.dataset.commandTrigger !== 'search' &&
+            typeof opener.focus === 'function'
+        ) {
             window.setTimeout(() => opener.focus(), 0);
         }
     }, [open]);
@@ -198,9 +207,13 @@ export function CommandPalette({
 
         const needle = query.trim();
         abortRef.current?.abort();
+        setRemoteHits([]);
+        setHitsForQuery('');
+        setSearchFailed(false);
 
         if (needle === '') {
             requestIdRef.current = nextCommandSearchRequestId(requestIdRef.current);
+            setSearching(false);
 
             return;
         }
@@ -233,6 +246,7 @@ export function CommandPalette({
                     }
 
                     setRemoteHits(Array.isArray(payload.hits) ? payload.hits : []);
+                    setHitsForQuery(commandNeedle(needle));
                     setSearchFailed(false);
                     setSearching(false);
                 })
@@ -246,6 +260,7 @@ export function CommandPalette({
                     }
 
                     setRemoteHits([]);
+                    setHitsForQuery(commandNeedle(needle));
                     setSearchFailed(true);
                     setSearching(false);
                 });
@@ -263,6 +278,7 @@ export function CommandPalette({
         if (!next) {
             setQuery('');
             setRemoteHits([]);
+            setHitsForQuery('');
             setSearchFailed(false);
             setSearching(false);
             abortRef.current?.abort();

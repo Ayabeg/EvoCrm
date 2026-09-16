@@ -4,7 +4,7 @@
  */
 import { Link, usePage } from '@inertiajs/react';
 import { Bell, MagnifyingGlass, Plus, Sparkle } from '@phosphor-icons/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { CommandPalette, useCommandPaletteShortcut } from '@/components/crm/command-palette';
 import { TasksOverlay } from '@/components/crm/tasks-overlay';
@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
+import { COMMAND_FOCUS_OPEN_SUPPRESS_MS, shouldOpenCommandFromSearchFocus } from '@/lib/command-os';
 import { t } from '@/lib/i18n';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
@@ -32,9 +33,29 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     const user = auth.user;
     const [paletteOpen, setPaletteOpen] = useState(false);
     const [tasksOpen, setTasksOpen] = useState(false);
+    const suppressSearchFocusOpenRef = useRef(false);
     void breadcrumbs;
 
     useCommandPaletteShortcut(() => setPaletteOpen((current) => !current));
+
+    const handlePaletteOpenChange = (next: boolean) => {
+        if (!next) {
+            suppressSearchFocusOpenRef.current = true;
+            window.setTimeout(() => {
+                suppressSearchFocusOpenRef.current = false;
+            }, COMMAND_FOCUS_OPEN_SUPPRESS_MS);
+        }
+
+        setPaletteOpen(next);
+    };
+
+    const openFromSearchFocus = () => {
+        if (!shouldOpenCommandFromSearchFocus(suppressSearchFocusOpenRef.current)) {
+            return;
+        }
+
+        setPaletteOpen(true);
+    };
 
     useEffect(() => {
         const open = () => setTasksOpen(true);
@@ -66,8 +87,9 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         value=""
                         placeholder={t('Search EvoCRM…')}
                         aria-label={t('Search EvoCRM…')}
+                        data-command-trigger="search"
                         onClick={() => setPaletteOpen(true)}
-                        onFocus={() => setPaletteOpen(true)}
+                        onFocus={openFromSearchFocus}
                         startAdornment={
                             <MagnifyingGlass className="size-4" weight="regular" aria-hidden />
                         }
@@ -155,7 +177,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                     ) : null}
                 </div>
             </header>
-            <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+            <CommandPalette open={paletteOpen} onOpenChange={handlePaletteOpenChange} />
             <TasksOverlay open={tasksOpen} onOpenChange={setTasksOpen} />
         </>
     );
