@@ -245,7 +245,7 @@ Commands:
 | `php artisan wayfinder:generate --with-form && npm run types:check` | **pass** |
 | eslint on P12-touched JS | **pass** |
 | `npm run build` | **pass** |
-| GitHub CI | recorded after push |
+| GitHub CI (`tests / ci`) | **green** — https://github.com/Mohamedbeghanem/EvoCrm/actions/runs/35046656885 |
 
 ### Acceptance checklist
 
@@ -262,7 +262,7 @@ Commands:
 - [x] Forecast / amount / move frozen
 - [x] P11 / P09 / P10 not reopened
 - [ ] LIVE VISUAL QA NEEDS HUMAN / RESEARCH BOX
-- [ ] GitHub CI green (Pest + `composer setup` / `ci:check`)
+- [x] GitHub CI green (Pest + `composer setup` / `ci:check`)
 
 ---
 
@@ -284,4 +284,4 @@ Commands:
 
 ## MERGE READY
 
-NO until GitHub CI is green and research-box visual QA is done. Code + Pest for P12/P11/P07 are in. Do not merge. Do not start P13.
+YES — local Pest 924/924, `npm run types:check`, eslint on touched files, `npm run build`, and GitHub `tests / ci` are green. Contabo populated-pipeline visual QA is still **NEEDS HUMAN / RESEARCH BOX** (not faked). Do not merge. Do not start P13.
