@@ -207,13 +207,9 @@ export function CommandPalette({
 
         const needle = query.trim();
         abortRef.current?.abort();
-        setRemoteHits([]);
-        setHitsForQuery('');
-        setSearchFailed(false);
 
         if (needle === '') {
             requestIdRef.current = nextCommandSearchRequestId(requestIdRef.current);
-            setSearching(false);
 
             return;
         }
@@ -317,11 +313,15 @@ export function CommandPalette({
         }
     };
 
-    const statusText = searching
-        ? 'Searching…'
-        : searchFailed
+    const needle = commandNeedle(query);
+    const hitsMatchCurrent = commandNeedle(hitsForQuery) === needle;
+    const statusText = needle === ''
+        ? undefined
+        : searchFailed && hitsMatchCurrent
           ? 'Search unavailable — navigate, create, and actions still work'
-          : undefined;
+          : searching
+            ? 'Searching…'
+            : undefined;
 
     return (
         <AuroraCommandPalette
