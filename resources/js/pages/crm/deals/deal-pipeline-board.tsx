@@ -21,10 +21,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
-import { t } from '@/lib/i18n';
-import { formatDzd } from '@/lib/money';
 import type { DealAttention } from '@/lib/deal-attention';
 import { attentionToneClass } from '@/lib/deal-attention';
+import { t } from '@/lib/i18n';
+import { formatDzd } from '@/lib/money';
 import { dealStageColumnAccent } from '@/lib/stage-colors';
 
 export type BoardStage = {

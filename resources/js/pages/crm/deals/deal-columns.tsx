@@ -1,9 +1,9 @@
 import { Link } from '@inertiajs/react';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
 import { formatContactName } from '@/lib/contact-name';
-import type { ListColumnDef } from '@/lib/list-view-config';
 import type { DealAttention } from '@/lib/deal-attention';
 import { attentionToneClass } from '@/lib/deal-attention';
+import type { ListColumnDef } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -212,6 +212,7 @@ export function DealAttentionCell({
     attention?: DealAttention | null;
 }) {
     const primary = attention?.primary;
+
     if (!primary) {
         return (
             <span className="block truncate text-[13px] leading-[18px] text-mute" data-attention="">

@@ -236,7 +236,16 @@ Research will deploy the tip. Checklist after deploy:
 
 This file.
 
-Commands: `php artisan test`; `composer types:check` (phpstan); `npm run types:check`; eslint on touched files; `npm run build`; GitHub CI green.
+Commands:
+
+| Command | Result |
+|---|---|
+| `php artisan test` | **924 passed** (11002 assertions) |
+| `composer types:check` | Repo-wide phpstan already red (~1545 errors on main-era files). P12 evaluator has the same Eloquent-cast noise as the rest of CRM. Not a GitHub CI gate (`composer ci:check` = Pest only). |
+| `php artisan wayfinder:generate --with-form && npm run types:check` | **pass** |
+| eslint on P12-touched JS | **pass** |
+| `npm run build` | **pass** |
+| GitHub CI | recorded after push |
 
 ### Acceptance checklist
 
@@ -253,7 +262,7 @@ Commands: `php artisan test`; `composer types:check` (phpstan); `npm run types:c
 - [x] Forecast / amount / move frozen
 - [x] P11 / P09 / P10 not reopened
 - [ ] LIVE VISUAL QA NEEDS HUMAN / RESEARCH BOX
-- [ ] GitHub CI green (recorded after push)
+- [ ] GitHub CI green (Pest + `composer setup` / `ci:check`)
 
 ---
 

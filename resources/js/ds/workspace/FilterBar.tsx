@@ -19,18 +19,6 @@ const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
 const COMPANY_QUICK_FIELD_IDS = ['owner', 'created', 'city', 'wilaya'] as const;
 const DEAL_QUICK_FIELD_IDS = ['owner', 'created', 'status', 'attention'] as const;
 
-function quickFieldIdsFor(object: ListQueryObject): readonly string[] {
-    if (object === 'company') {
-        return COMPANY_QUICK_FIELD_IDS;
-    }
-
-    if (object === 'deal') {
-        return DEAL_QUICK_FIELD_IDS;
-    }
-
-    return QUICK_FIELD_IDS;
-}
-
 const PRESET_LABELS: Record<string, string> = {
     today: 'Today',
     '7d': 'Last 7 days',
@@ -94,7 +82,9 @@ export function FilterBar({
     const cities = filterContext?.cities ?? [];
     const wilayas = filterContext?.wilayas ?? [];
     const queryEnabled = listQueryAdapter(object).supportsQuery;
-    const quickIds = quickFieldIdsFor(object);
+    const quickIds: readonly string[] = object === 'company' ? COMPANY_QUICK_FIELD_IDS
+        : object === 'deal' ? DEAL_QUICK_FIELD_IDS
+        : QUICK_FIELD_IDS;
     const quick = fieldDefs
         .filter((field) => quickIds.includes(field.id))
         .slice(0, 4);
