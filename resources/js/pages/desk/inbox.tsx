@@ -29,6 +29,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
+import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
+import { shouldRenderInboxCrmContext } from '@/lib/inbox-crm-context';
 import {
     buildInboxFolders,
     inboxChannelLabel,
@@ -38,8 +40,6 @@ import {
     normalizeInboxFolder,
     resolveInboxRequestedThreadId,
 } from '@/lib/inbox-workspace';
-import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
-import { shouldRenderInboxCrmContext } from '@/lib/inbox-crm-context';
 import type { OfficialDeskConnector } from '@/types';
 
 type Thread = {

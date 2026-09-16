@@ -1,20 +1,22 @@
 import { Link } from '@inertiajs/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useQuickRecord } from '@/ds/workspace/quick-record/context';
+import { formatMoneyCents } from '@/ds/workspace/record-adapters/present';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { attentionToneClass } from '@/lib/deal-attention';
+import { dateLocale, t } from '@/lib/i18n';
 import {
     focusedDealAttention,
     focusedDealNextActivity,
     resolveInspectedDealId,
     sortInboxContextDeals,
-    type InboxCrmActivitySummary,
-    type InboxCrmContextPayload,
-    type InboxCrmDeal,
 } from '@/lib/inbox-crm-context';
-import { formatMoneyCents } from '@/ds/workspace/record-adapters/present';
-import { dateLocale, t } from '@/lib/i18n';
+import type {
+    InboxCrmActivitySummary,
+    InboxCrmContextPayload,
+    InboxCrmDeal,
+} from '@/lib/inbox-crm-context';
 import { cn } from '@/lib/utils';
 
 function formatContextWhen(iso?: string | null): string {
@@ -234,11 +236,12 @@ export function InboxCrmContext({
     context: InboxCrmContextPayload;
 }) {
     const [, copy] = useClipboard();
-    const [inspectedDealId, setInspectedDealId] = useState<number | null>(null);
-
-    useEffect(() => {
-        setInspectedDealId(null);
-    }, [context.thread_id]);
+    const [inspectState, setInspectState] = useState<{
+        threadId: number | null;
+        dealId: number | null;
+    }>({ threadId: null, dealId: null });
+    const inspectedDealId =
+        inspectState.threadId === context.thread_id ? inspectState.dealId : null;
 
     const deals = useMemo(
         () => sortInboxContextDeals(context.deals),
@@ -377,7 +380,12 @@ export function InboxCrmContext({
                                 key={deal.id}
                                 deal={deal}
                                 focused={deal.id === focusedDealId}
-                                onInspect={setInspectedDealId}
+                                onInspect={(dealId) =>
+                                    setInspectState({
+                                        threadId: context.thread_id,
+                                        dealId,
+                                    })
+                                }
                             />
                         ))}
                     </div>

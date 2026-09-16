@@ -10,8 +10,8 @@ import {
     resolveInspectedDealId,
     shouldRenderInboxCrmContext,
     sortInboxContextDeals,
-    type InboxCrmContextPayload,
 } from '../../resources/js/lib/inbox-crm-context';
+import type { InboxCrmContextPayload } from '../../resources/js/lib/inbox-crm-context';
 
 function expectEqual<T>(actual: T, expected: T, label: string): void {
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {

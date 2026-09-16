@@ -108,8 +108,10 @@ export function resolveAuthoritativePrimaryDealId(input: {
 }
 
 export function pickPrimaryDealFromList(
-    _deals: Array<{ id: number; amount_cents?: number }>,
+    deals: Array<{ id: number; amount_cents?: number }>,
 ): null {
+    void deals;
+
     return null;
 }
 
