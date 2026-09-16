@@ -184,10 +184,12 @@ export function rememberCommandRecent(
         return recents;
     }
 
-    return [
-        entry,
-        ...recents.filter((recent) => recent.id !== entry.id),
-    ].slice(0, limit);
+    const recent: CommandRecent = {
+        id: entry.id,
+        kind: entry.kind,
+    };
+
+    return [recent, ...recents.filter((item) => item.id !== recent.id)].slice(0, limit);
 }
 
 export function filterValidRecents(
@@ -205,22 +207,18 @@ export function parseStoredRecents(value: unknown): CommandRecent[] {
     }
 
     return value.flatMap((entry) => {
-        if (
-            !entry ||
-            typeof entry !== 'object' ||
-            typeof (entry as CommandRecent).id !== 'string' ||
-            !isCommandKind((entry as CommandRecent).kind) ||
-            (entry as CommandRecent).kind === 'search'
-        ) {
+        if (!entry || typeof entry !== 'object') {
             return [];
         }
 
-        return [
-            {
-                id: (entry as CommandRecent).id,
-                kind: (entry as CommandRecent).kind,
-            },
-        ];
+        const id = 'id' in entry ? entry.id : null;
+        const kind = 'kind' in entry ? entry.kind : null;
+
+        if (typeof id !== 'string' || !isCommandKind(kind) || kind === 'search') {
+            return [];
+        }
+
+        return [{ id, kind }];
     });
 }
 
