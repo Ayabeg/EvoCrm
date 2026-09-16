@@ -370,6 +370,27 @@ No AI ranking, summaries, or deal scores on the queue.
 - Completing the last dated activity on an open deal surfaces P12 `no_next_action` — correct, not a bug
 - Contabo is a merge blocker owned by Research
 
+## TESTS
+
+- `tests/Feature/P15ActivitiesWorkQueueTest.php` (5)
+- `tests/js/p15-activities-work-queue.ts` (`npx vite-node`)
+- ActivitiesIndex / ActivityCreate / P12 / P14 / P13 / P11 / P10 / P09 / P6 composer
+
+Commands:
+
+| Command | Result |
+|---|---|
+| `php artisan test` | **944 passed** (11567 assertions) |
+| `php artisan wayfinder:generate --with-form && npm run types:check` | **pass** |
+| eslint on P15-touched JS | **pass** |
+| `npx vite-node tests/js/p15-activities-work-queue.ts` | **pass** |
+| `npm run build` | **pass** |
+| GitHub CI | pending on PR |
+
+## LIVE VISUAL QA
+
+**NEEDS RESEARCH.** Agent did not walk Contabo populated activities.
+
 ## MERGE READY
 
 NO — Contabo populated QA pending Research. Do not merge. Do not start P16.

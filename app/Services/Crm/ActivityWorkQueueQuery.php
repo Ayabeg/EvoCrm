@@ -162,9 +162,9 @@ class ActivityWorkQueueQuery
             ])
             ->with([
                 'owner:id,name',
-                'contact:id,first_name,last_name',
-                'deal:id,title',
-                'company:id,name',
+                'contact:id,workspace_id,first_name,last_name',
+                'deal:id,workspace_id,title',
+                'company:id,workspace_id,name',
             ]);
 
         if ($filters['scope'] === 'mine') {

@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react';
 import { Check, Circle } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { toast } from 'sonner';
 import ActivityComposer from '@/components/crm/activity-composer';
 import { MeetingAttendanceButtons } from '@/components/crm/meeting-attendance';
@@ -16,14 +16,37 @@ import {
     parseActivityQueueSearch,
     patchActivityQueueSearch,
     requestedActivityQueueGroup,
-    type ActivityQueueFilters,
-    type ActivityQueueItem,
-    type ActivityQueuePayload,
-    type ActivityQueueSearch,
-    type ActivityQueueSection,
+} from '@/lib/activity-work-queue';
+import type {
+    ActivityQueueFilters,
+    ActivityQueueItem,
+    ActivityQueuePayload,
+    ActivityQueueSearch,
+    ActivityQueueSection,
 } from '@/lib/activity-work-queue';
 import { dateLocale, t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
+
+const visitGeneration = { current: 0 };
+
+function startQueueVisit(
+    next: ActivityQueueSearch,
+    onSettled: () => void,
+): void {
+    const requestId = ++visitGeneration.current;
+
+    router.cancelAll({ prefetch: false });
+    router.get(activityQueueHref(next), {}, {
+        preserveScroll: true,
+        onFinish: () => {
+            if (isStaleActivityQueueVisit(visitGeneration.current, requestId)) {
+                return;
+            }
+
+            onSettled();
+        },
+    });
+}
 
 const OPEN_GROUP_ORDER = ['overdue', 'today', 'upcoming', 'unscheduled'] as const;
 
@@ -59,6 +82,59 @@ function typeLabel(type: string): string {
     return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
+function QueueGroupSection({
+    section,
+    empty,
+    viewAllHref,
+    children,
+}: {
+    section: ActivityQueueSection;
+    empty: string | null;
+    viewAllHref: string | null;
+    children: ReactNode;
+}) {
+    return (
+        <section
+            data-activity-group={section.key}
+            aria-labelledby={`activity-group-${section.key}`}
+        >
+            <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-hairline bg-canvas px-4 py-2 sm:px-6">
+                <h2
+                    id={`activity-group-${section.key}`}
+                    className={cn(
+                        'text-[12px] font-medium tracking-[0.04em] uppercase',
+                        section.key === 'overdue' ? 'text-destructive' : 'text-mute',
+                    )}
+                >
+                    {t(section.label)}
+                    <span className="ms-2 font-normal normal-case text-mute">
+                        {section.count}
+                    </span>
+                </h2>
+                {viewAllHref ? (
+                    <a
+                        href={viewAllHref}
+                        className="text-[12px] text-mute hover:text-ink hover:underline"
+                        onClick={(event) => {
+                            event.preventDefault();
+                            startQueueVisit(parseActivityQueueSearch(viewAllHref.split('?')[1] ?? ''), () => undefined);
+                        }}
+                    >
+                        {t('View all')}
+                    </a>
+                ) : null}
+            </header>
+            {empty ? (
+                <p className="px-4 py-6 text-[13px] text-mute sm:px-6" role="status">
+                    {empty}
+                </p>
+            ) : (
+                children
+            )}
+        </section>
+    );
+}
+
 export default function ActivityWorkQueue({
     queue,
     members,
@@ -72,7 +148,6 @@ export default function ActivityWorkQueue({
     capabilities: { can_create: boolean; can_complete: boolean };
     url: string;
 }) {
-    const visitGeneration = useRef(0);
     const [pending, setPending] = useState(false);
     const [completingId, setCompletingId] = useState<number | null>(null);
     const completeRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
@@ -91,47 +166,31 @@ export default function ActivityWorkQueue({
     const matchesRequest = activityQueueMatchesRequest(filters.group, requestedGroup);
 
     useEffect(() => {
-        if (pending && matchesRequest) {
-            setPending(false);
-        }
-    }, [matchesRequest, pending]);
-
-    useEffect(() => {
         const nextId = focusAfterId.current;
+
         if (nextId === null) {
             return;
         }
 
         const node = completeRefs.current.get(nextId);
+
         if (node) {
             node.focus();
             focusAfterId.current = null;
         }
     }, [queue]);
 
-    const visit = (next: ActivityQueueSearch, generation?: number) => {
-        const requestId = generation ?? ++visitGeneration.current;
-        setPending(true);
-        router.cancelAll({ prefetch: false });
-        router.get(activityQueueHref(next), {}, {
-            preserveScroll: true,
-            onFinish: () => {
-                if (isStaleActivityQueueVisit(visitGeneration.current, requestId)) {
-                    return;
-                }
-
-                setPending(false);
-            },
-        });
-    };
-
     const apply = (patch: Partial<ActivityQueueSearch>) => {
-        visit(patchActivityQueueSearch(current, patch));
+        setPending(true);
+        startQueueVisit(patchActivityQueueSearch(current, patch), () => {
+            setPending(false);
+        });
     };
 
     const visibleIds = OPEN_GROUP_ORDER.flatMap(
         (key) => queue.groups[key]?.items.map((item) => item.id) ?? [],
     );
+
     if (queue.groups.completed && current.group === 'completed') {
         visibleIds.push(...queue.groups.completed.items.map((item) => item.id));
     }
@@ -290,46 +349,21 @@ export default function ActivityWorkQueue({
                       ? t('Nothing assigned to you in this group.')
                       : t('No activities in this group.')
                 : null;
+        const viewAllHref = activityQueueHref(
+            patchActivityQueueSearch(current, {
+                group: section.key as ActivityQueueSearch['group'],
+            }),
+        );
 
         return (
-            <section
+            <QueueGroupSection
                 key={section.key}
-                data-activity-group={section.key}
-                aria-labelledby={`activity-group-${section.key}`}
+                section={section}
+                empty={empty}
+                viewAllHref={current.group === null && section.has_more ? viewAllHref : null}
             >
-                <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-hairline bg-canvas px-4 py-2 sm:px-6">
-                    <h2
-                        id={`activity-group-${section.key}`}
-                        className={cn(
-                            'text-[12px] font-medium tracking-[0.04em] uppercase',
-                            section.key === 'overdue' ? 'text-destructive' : 'text-mute',
-                        )}
-                    >
-                        {t(section.label)}
-                        <span className="ms-2 font-normal normal-case text-mute">
-                            {section.count}
-                        </span>
-                    </h2>
-                    {section.has_more && current.group === null ? (
-                        <button
-                            type="button"
-                            className="text-[12px] text-mute hover:text-ink hover:underline"
-                            onClick={() =>
-                                apply({ group: section.key as ActivityQueueSearch['group'] })
-                            }
-                        >
-                            {t('View all')}
-                        </button>
-                    ) : null}
-                </header>
-                {empty ? (
-                    <p className="px-4 py-6 text-[13px] text-mute sm:px-6" role="status">
-                        {empty}
-                    </p>
-                ) : (
-                    <ul>{section.items.map(renderRow)}</ul>
-                )}
-            </section>
+                <ul>{section.items.map(renderRow)}</ul>
+            </QueueGroupSection>
         );
     };
 
