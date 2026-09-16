@@ -288,12 +288,12 @@ Commands:
 
 | Command | Result |
 |---|---|
-| `php artisan test` | 949 passed |
-| `npx vite-node tests/js/p16-command-os.ts` | passed |
-| `npm run types:check` | passed |
-| eslint on P16-touched JS | passed |
-| `npm run build` | passed |
-| GitHub CI | passed (`tests / ci` on #225) |
+| `php artisan test` | 949 passed (pre-fix P16 tip; PHP not in this fix environment) |
+| `npx vite-node tests/js/p16-command-os.ts` | passed after Sev2 fix (stale-display + Escape helpers) |
+| `npm run types:check` | passed on pre-fix tip; this environment lacks Wayfinder `@/routes` |
+| eslint on P16-touched JS | passed after Sev2 fix |
+| `npm run build` | passed (pre-fix P16 tip) |
+| GitHub CI | passed (`tests / ci` on #225) for the pre-fix tip; recheck after this push |
 
 ## LIVE VISUAL QA
 
@@ -320,7 +320,7 @@ Research walked populated Contabo before this fix tip. Result: **PARTIAL — MER
 
 **Fixes in this tip (need Research recheck, not agent-claimed PASS):**
 
-1. **Stale search race** — `visibleCommandRemoteHits` ignores `remoteHits` unless `hitsForQuery` matches the current needle. Query changes (including empty) clear stored hits immediately. AbortController + requestId stay.
+1. **Stale search race** — `visibleCommandRemoteHits` ignores `remoteHits` unless `hitsForQuery` matches the current needle (including empty query). AbortController + requestId stay; late responses still do not apply.
 2. **Escape** — Aurora Escape `preventDefault` + `stopPropagation` (capture). Header suppresses Search `onFocus` open after programmatic close. Search trigger is not the restored opener.
 
 Contabo checklist (Research-owned recheck):
