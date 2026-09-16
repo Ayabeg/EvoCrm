@@ -1,5 +1,4 @@
 /**
-/**
  * Canonical topbar (P02/P16): Search/⌘K and Sparkle open the SAME Command OS.
  * Create stays the existing dropdown. One Tasks overlay. No second palette.
  */

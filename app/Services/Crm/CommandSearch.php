@@ -169,7 +169,7 @@ class CommandSearch
                     );
 
                 if ($numericId) {
-                    $inner->orWhereKey($numericId);
+                    $inner->orWhere('quotes.id', $numericId);
                 }
             })
             ->orderByDesc('id')

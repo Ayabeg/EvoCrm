@@ -35,10 +35,8 @@ import {
     nextCommandSearchRequestId,
     persistCommandRecents,
     rememberCommandRecent,
-    type CommandRecent,
-    type CommandResult,
-    type CommandSearchHit,
 } from '@/lib/command-os';
+import type { CommandRecent, CommandResult, CommandSearchHit } from '@/lib/command-os';
 
 const SECTIONS = [
     { id: 'recent', label: 'Recent' },
@@ -131,7 +129,7 @@ export function CommandPalette({
     const page = usePage();
     const { openRecord } = useQuickRecord();
     const { features } = useSimpleMode();
-    const capabilities = (page.props.auth?.capabilities ?? []) as string[];
+    const rawCapabilities = page.props.auth?.capabilities;
     const openerRef = useRef<HTMLElement | null>(null);
     const requestIdRef = useRef(0);
     const abortRef = useRef<AbortController | null>(null);
@@ -142,8 +140,12 @@ export function CommandPalette({
     const [recents, setRecents] = useState<CommandRecent[]>(() => loadCommandRecents());
 
     const catalog = useMemo(
-        () => buildCommandCatalog({ capabilities, features }),
-        [capabilities, features],
+        () =>
+            buildCommandCatalog({
+                capabilities: (Array.isArray(rawCapabilities) ? rawCapabilities : []) as string[],
+                features,
+            }),
+        [features, rawCapabilities],
     );
 
     const availableIds = useMemo(
@@ -156,16 +158,16 @@ export function CommandPalette({
         [catalog],
     );
 
-    const results = useMemo(
-        () =>
-            composeCommandResults({
-                query,
-                catalog,
-                recents: filterValidRecents(recents, availableIds),
-                remoteHits,
-            }),
-        [availableIds, catalog, query, recents, remoteHits],
-    );
+    const results = useMemo(() => {
+        const needle = query.trim();
+
+        return composeCommandResults({
+            query,
+            catalog,
+            recents: filterValidRecents(recents, availableIds),
+            remoteHits: needle === '' ? [] : remoteHits,
+        });
+    }, [availableIds, catalog, query, recents, remoteHits]);
 
     useEffect(() => {
         if (open) {
@@ -177,10 +179,6 @@ export function CommandPalette({
             return;
         }
 
-        setQuery('');
-        setRemoteHits([]);
-        setSearchFailed(false);
-        setSearching(false);
         abortRef.current?.abort();
 
         const opener = openerRef.current;
@@ -193,6 +191,8 @@ export function CommandPalette({
 
     useEffect(() => {
         if (!open) {
+            abortRef.current?.abort();
+
             return;
         }
 
@@ -201,9 +201,6 @@ export function CommandPalette({
 
         if (needle === '') {
             requestIdRef.current = nextCommandSearchRequestId(requestIdRef.current);
-            setRemoteHits([]);
-            setSearchFailed(false);
-            setSearching(false);
 
             return;
         }
@@ -212,9 +209,10 @@ export function CommandPalette({
         requestIdRef.current = requestId;
         const controller = new AbortController();
         abortRef.current = controller;
-        setSearching(true);
 
         const timer = window.setTimeout(() => {
+            setSearching(true);
+
             void fetch(`/crm/command/search?q=${encodeURIComponent(needle)}`, {
                 headers: {
                     Accept: 'application/json',
@@ -261,6 +259,18 @@ export function CommandPalette({
 
     const items = useMemo(() => results.map(toCommandItem), [results]);
 
+    const handleOpenChange = (next: boolean) => {
+        if (!next) {
+            setQuery('');
+            setRemoteHits([]);
+            setSearchFailed(false);
+            setSearching(false);
+            abortRef.current?.abort();
+        }
+
+        onOpenChange(next);
+    };
+
     const handleSelect = (item: CommandItem) => {
         const result = results.find((entry) => entry.id === item.id);
 
@@ -278,7 +288,7 @@ export function CommandPalette({
             setRecents(next);
         }
 
-        onOpenChange(false);
+        handleOpenChange(false);
 
         if (result.recordRef) {
             openRecord(result.recordRef);
@@ -300,7 +310,7 @@ export function CommandPalette({
     return (
         <AuroraCommandPalette
             open={open}
-            onOpenChange={onOpenChange}
+            onOpenChange={handleOpenChange}
             items={items}
             sections={SECTIONS}
             query={query}

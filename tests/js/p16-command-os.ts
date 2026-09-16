@@ -203,7 +203,7 @@ expectTrue(
 );
 
 const queried = composeCommandResults({
-    query: 'acme',
+    query: 'deal',
     catalog,
     remoteHits: [
         {
@@ -217,15 +217,15 @@ const queried = composeCommandResults({
 });
 expectEqual(queried[0]?.kind, 'search', 'typed query leads with remote records');
 expectTrue(
-    queried.some((item) => item.id === 'create-company'),
+    queried.some((item) => item.id === 'create-deal'),
     'remote failure or success still keeps matching Create',
 );
 expectTrue(
-    queried.some((item) => item.id === 'nav-companies'),
+    queried.some((item) => item.id === 'nav-deals'),
     'Navigate still matches while records load',
 );
 expectEqual(
-    commandResultKind(queried.find((item) => item.id === 'create-company')!),
+    commandResultKind(queried.find((item) => item.id === 'create-deal')!),
     'create',
     'Create is kind-typed, not label.startsWith',
 );

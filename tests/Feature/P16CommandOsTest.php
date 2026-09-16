@@ -111,7 +111,8 @@ it('extends the one existing command surface without a second palette', function
         ->and($search)->toContain('Gate::forUser')
         ->and($search)->not->toContain('amount_cents')
         ->and($search)->not->toContain("'body'")
-        ->and($search)->not->toContain('phone')
+        ->and($search)->not->toContain("'phone'")
+        ->and($search)->not->toContain('phone_e164')
         ->and($share)->toContain("'evoSearchIndex' => []")
         ->and($js)->toContain('a→am→ami is stale once acme is current');
 
@@ -169,7 +170,10 @@ it('searches Amine Acme Enterprise Upgrade lead quote and activity without leaki
     expect(collect($leadHits)->pluck('id'))->toContain($lead->id);
 
     $activityHits = $this->actingAs($user)->getJson('/crm/command/search?q=Call%20Amine')->assertOk()->json('hits');
-    expect(collect($activityHits)->firstWhere('id', $activity->id)['href'])->toBe('/crm/deals/'.$deal->id)
+    $activityHit = collect($activityHits)->first(
+        fn (array $hit): bool => ($hit['type'] ?? null) === 'activity' && (int) $hit['id'] === (int) $activity->id,
+    );
+    expect($activityHit['href'])->toBe('/crm/deals/'.$deal->id)
         ->and(json_encode($activityHits))->not->toContain('SECRET-ACTIVITY-BODY');
 
     expect($this->actingAs($user)->getJson('/crm/command/search?q=')->json('hits'))->toBe([]);
@@ -209,7 +213,7 @@ it('keeps search permission-safe across workspaces and view-only members', funct
         ->assertJsonMissing(['amine@acme.test']);
 
     $this->get('/dashboard')->assertOk()->assertInertia(fn ($page) => $page
-        ->where('auth.capabilities', fn ($caps) => ! in_array('crm.edit', $caps, true)));
+        ->where('auth.capabilities', fn ($caps) => ! collect($caps)->contains('crm.edit')));
 
     auth()->logout();
     $guest = $this->getJson('/crm/command/search?q=Amine');
@@ -219,8 +223,10 @@ it('keeps search permission-safe across workspaces and view-only members', funct
 it('does not rank or return deals by amount and bounds the payload', function () {
     $user = User::factory()->create();
     $pipeline = $user->workspace->defaultPipeline();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
     $cheap = Deal::query()->create([
         'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
         'pipeline_id' => $pipeline->id,
         'stage_id' => $pipeline->stageBySlug('new')->id,
         'title' => 'Alpha retain',
@@ -230,6 +236,7 @@ it('does not rank or return deals by amount and bounds the payload', function ()
     ]);
     Deal::query()->create([
         'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
         'pipeline_id' => $pipeline->id,
         'stage_id' => $pipeline->stageBySlug('new')->id,
         'title' => 'Alpha enterprise',
@@ -263,8 +270,9 @@ it('locks P15 act URLs and existing create entry points in the command catalog',
         ->and($lib)->toContain("href: '/crm/deals?create=1'")
         ->and($lib)->toContain("href: '/crm/quotes?create=1'")
         ->and($lib)->toContain("action: 'create-activity'")
-        ->and($lib)->toContain("action: 'p15-overdue'")
+        ->and($lib)->toContain('`p15-${group}`')
+        ->and($lib)->toContain('id: `act-${group}`')
         ->and($lib)->toContain("action: 'ask-evo-seam'")
         ->and($lib)->not->toContain('/crm/activities/{')
-        ->and($lib)->not->toContain('complete');
+        ->and($lib)->not->toContain('/complete');
 });

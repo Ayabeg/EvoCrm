@@ -1,8 +1,8 @@
+import type { RecordType } from '@/ds/workspace/quick-record/types';
 import {
     activityQueueHref,
     parseActivityQueueSearch,
 } from '@/lib/activity-work-queue';
-import type { RecordType } from '@/ds/workspace/quick-record/types';
 
 export const COMMAND_SEARCH_DEBOUNCE_MS = 180;
 export const COMMAND_SEARCH_PER_TYPE = 6;
