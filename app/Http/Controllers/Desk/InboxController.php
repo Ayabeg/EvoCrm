@@ -14,6 +14,7 @@ use App\Models\Workspace;
 use App\Services\Connectors\ConnectorRegistrar;
 use App\Services\Desk\DeskComposer;
 use App\Services\Desk\DeskEmbedProbe;
+use App\Services\Desk\InboxCrmContextComposer;
 use App\Support\Integrations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -66,11 +67,22 @@ class InboxController extends Controller
             ->get();
 
         $selected = null;
+        $crmContext = null;
+        $crmContextError = null;
         if ($threadId = $request->integer('thread')) {
             $selected = Thread::query()
                 ->forWorkspace($workspace)
                 ->with(['contact.company', 'contact.owner', 'channel', 'messages.user', 'ticket'])
                 ->find($threadId);
+
+            if ($selected instanceof Thread) {
+                try {
+                    $crmContext = app(InboxCrmContextComposer::class)->present($request->user(), $selected);
+                } catch (\Throwable $exception) {
+                    $crmContext = app(InboxCrmContextComposer::class)->failed((int) $selected->id, $exception);
+                    $crmContextError = 'context_failed';
+                }
+            }
         }
 
         $embedUrl = $workspace->inboxEmbedUrl();
@@ -94,6 +106,8 @@ class InboxController extends Controller
             'configuredUrl' => $embedUrl,
             'threads' => $threads,
             'selected' => $selected,
+            'crmContext' => $crmContext,
+            'crmContextError' => $crmContextError,
             'channels' => [
                 [
                     'key' => 'whatsapp',
