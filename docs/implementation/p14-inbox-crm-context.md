@@ -183,6 +183,129 @@ Selected thread only. Queries: 1 deals (`contact_id` + optional ticket deal), 1 
 
 P13 adaptive remains authoritative. Host width `17.5rem`. Page `overflow-x-hidden`. 1024/768: collapse/overlay. No four-column squeeze.
 
----
+## 1440 QA
 
-The remaining QA / regression / handoff sections are completed after implementation in this same file.
+Four panes; conversation dominant; context host `17.5rem`; no page H-overflow. **Agent layout contract PASS (P13 + host fill). Contabo NEEDS RESEARCH.**
+
+## 1280 QA
+
+Four panes if context open; host stays `17.5rem`. **Agent layout contract PASS. Contabo NEEDS RESEARCH.**
+
+## 1024 QA
+
+Three panes; context collapsed / overlay; conversation readable. **Agent layout contract PASS. Contabo NEEDS RESEARCH.**
+
+## 768 QA
+
+Switcher + list/conversation; context overlay/sheet; no four-column crush. **Agent layout contract PASS. Contabo NEEDS RESEARCH.**
+
+## PAGE H-OVERFLOW
+
+Workspace `overflow-x-hidden` unchanged. Independent pane scroll only. Fourth pane owns vertical context scroll.
+
+## LIVE CONTEXT QA
+
+**NEEDS RESEARCH / Contabo.** Populated Contact+Company+Deal+Activity walk after Research deploy.
+
+## LIVE MULTI-DEAL QA
+
+**NEEDS RESEARCH / Contabo.** Need a contact with several open deals and one ticket-linked deal.
+
+## LIVE ATTENTION PARITY QA
+
+**NEEDS RESEARCH / Contabo.** Same deal must show the same P12 primary on List / Board / Inbox context.
+
+## LIVE RESOLUTION QA
+
+**NEEDS RESEARCH / Contabo.** Complete overdue activity / schedule next action → Inbox attention disappears after refresh. No dismiss control.
+
+## LIVE RAPID-SELECTION QA
+
+**NEEDS RESEARCH / Contabo.** Contract tests cover delayed A under C. Prior P13 Contabo fail on stale thread must not regress.
+
+## LIVE PARTIAL-DATA QA
+
+**NEEDS RESEARCH / Contabo.** Contact-only, no-viewable-contact, Won/Lost-only, restricted deal.
+
+## P13 REGRESSION
+
+Native four-pane host, folders, composer, visit generation, embed path unchanged. `InboxContactSidebar` remains the host. `/conversations` keeps the P13 fallback facts. Wave3 + P13 tests green (939/939).
+
+## P12 REGRESSION
+
+`DealAttentionEvaluator` unchanged. Inbox does not recompute overdue / no_next_action. P12 tests green.
+
+## P11 REGRESSION
+
+No board in Inbox. Stages and DZD/DA money path unchanged. P11 tests green.
+
+## P09/P10 REGRESSION
+
+No `QuickRecordDrawer` import in Inbox. Peek via `openRecord` only. Peek URL decision B frozen. P09/P10 tests green.
+
+## EVODESK REGRESSION
+
+Embed iframe, probe, CSP, Continue in CRM inbox unchanged.
+
+## FILES CHANGED
+
+| File | Change |
+|---|---|
+| `docs/implementation/p14-inbox-crm-context.md` | Audit + SOURCE-OF-TRUTH MATRIX + AFTER contract |
+| `app/Services/Desk/InboxCrmContextComposer.php` | One permission-safe composition |
+| `app/Http/Controllers/Desk/InboxController.php` | `crmContext` / `crmContextError` on selected visit |
+| `resources/js/lib/inbox-crm-context.ts` | Payload types + stale / primary / inspect helpers |
+| `resources/js/components/crm/inbox-crm-context.tsx` | Context surface |
+| `resources/js/components/crm/inbox-chrome.tsx` | Host fills with context; fallback for `/conversations` |
+| `resources/js/pages/desk/inbox.tsx` | Same-visit context + pending geometry |
+| `tests/Feature/P14InboxCrmContextTest.php` | Fixtures, permissions, N+1, source locks |
+| `tests/js/p14-inbox-crm-context.ts` | Rapid A→B→C + no fake primary |
+
+**Not changed:** Thread/Message/Channel models, `DeskComposer`, QRD shell, P12 evaluator class, AdaptiveWorkspaceShell defaults, `/conversations` layout.
+
+## TESTS
+
+- `tests/Feature/P14InboxCrmContextTest.php` (10)
+- `tests/js/p14-inbox-crm-context.ts`
+- P13 / P12 / P11 / P09 / P10 / Wave3 inbox locks
+
+Commands:
+
+| Command | Result |
+|---|---|
+| `php artisan test` | **939 passed** (11393 assertions) |
+| `php artisan wayfinder:generate --with-form && npm run types:check` | **pass** |
+| eslint on P14-touched JS | **pass** |
+| `npm run build` | **pass** |
+| GitHub CI | pending on PR |
+
+## LIVE VISUAL QA
+
+**NEEDS RESEARCH.** Agent did not walk Contabo populated inbox.
+
+## REMAINING DEBT
+
+- Create/Link contact for threads with no viewable contact (no API today)
+- Thread.contact_id is NOT NULL in schema — null-contact is defensive; restricted contact is the live empty
+- Company deals that are not on this contact
+- Activities queue redesign (P15)
+- Contabo populated QA
+
+## P15 HANDOFF
+
+Do not start P15 here. Activities remain compact last/next + `/crm/activities` links. P15 owns the work queue.
+
+## P24 HANDOFF
+
+No Ask Evo, summaries, or deal scores in Inbox.
+
+## RISKS
+
+- Wave3 still requires `InboxContactSidebar` + `No owner` in chrome (fallback kept)
+- Inbox.tsx must not contain `QuickRecordDrawer` / `DealAttentionEvaluator`
+- Ticket.deal_id is uncommon (`openFromThread` does not set it) — most conversations will show a deal list, not a primary
+- Contabo is a merge blocker owned by Research
+
+## MERGE READY
+
+NO — Contabo populated QA pending Research. Do not merge. Do not start P15.
