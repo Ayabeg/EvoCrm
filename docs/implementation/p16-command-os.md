@@ -130,7 +130,7 @@ Default empty-query is Recents + Create + Act + Ask + Navigate. No empty white b
 - Amount cannot match a deal or quote.
 - Empty `q` returns `[]` (does not dump latest records).
 - Debounce 180ms. Palette opens instantly with local commands. Progressive remote.
-- Stale race: on every `query` change the effect immediately `setRemoteHits([])` + `setHitsForQuery('')` before debounce, so a prior needle cannot paint. Incrementing request id + `AbortController` stay. Display also gates on `hitsForQuery` via `visibleCommandRemoteHits` so prior needles (`ami`) never render after the input is already `acme`, including empty-query clear.
+- Stale race: on every query write (`onQueryChange`), immediately `setRemoteHits([])` + `setHitsForQuery('')`, bump requestId, and abort the in-flight request so a prior needle cannot paint (including one frame before the debounce effect). The search effect still uses AbortController + requestId. Display also gates on `hitsForQuery` via `visibleCommandRemoteHits`. Clearing is on the query write, not `setState` inside the effect (`react-hooks/set-state-in-effect`).
 - Next Contabo stale-race FAIL only if a **Contact** row labeled `Amine Benali` (or another prior-needle-only contact) is visible while the input is exactly `acme`. An activity whose subject contains both Amine and Acme is allowed for query `acme`.
 - Remote failure: Navigate / Create / Act / Ask still work; footer says search is unavailable.
 - Enter on a record hit → `openRecord`. Activity hits peek the first viewable related deal/contact/company, else visit `/crm/activities`.
@@ -238,7 +238,7 @@ P09/P10/P11 source locks that forbade `openRecord` in the palette are updated: C
 |---|---|
 | `docs/implementation/p16-command-os.md` | Audit + matrix + AFTER + Contabo round-2 PARTIAL |
 | `resources/js/lib/command-os.ts` | Typed CommandResult, catalog, race, recents, P15 hrefs, visible hits + Escape + QRD overlay helpers |
-| `resources/js/components/crm/command-palette.tsx` | Command OS orchestration; clear remote hits immediately on query change |
+| `resources/js/components/crm/command-palette.tsx` | Command OS orchestration; clear remote hits on query write (lint-safe) |
 | `resources/js/components/aurora/command-palette.tsx` | Controlled query, IME, width, overflow, Escape capture |
 | `resources/js/components/app-sidebar-header.tsx` | Same surface; Search focus-open suppress after close |
 | `resources/js/ds/workspace/QuickRecordDrawer.tsx` | `onEscapeKeyDown` defers to Command when `[data-command="os"]` is present |
@@ -293,7 +293,7 @@ Commands:
 | `php artisan test` | 949 passed (pre-fix P16 tip; PHP not in this fix environment) |
 | `npx vite-node tests/js/p16-command-os.ts` | passed after Sev2 fix 2 (immediate remote-hit clear + QRD Escape defer) |
 | `npm run types:check` | passed on pre-fix tip; this environment lacks Wayfinder `@/routes` |
-| eslint on P16-touched JS | pending this tip |
+| eslint on P16-touched JS | passed after Sev2 fix 2 |
 | `npm run build` | passed (pre-fix P16 tip) |
 | GitHub CI | passed (`tests / ci` on #225) for the prior tip; recheck after this push |
 
@@ -316,7 +316,7 @@ Round 2 (after Sev2 tip `2b5b591`): **PARTIAL — MERGE_BLOCKING: yes**.
 
 **Fixes in this tip (need Research recheck, not agent-claimed PASS):**
 
-1. **Stale search race** — effect start on every `query` change immediately `setRemoteHits([])` + `setHitsForQuery('')` before debounce. `visibleCommandRemoteHits` still ignores `remoteHits` unless `hitsForQuery` matches. AbortController + requestId stay. FAIL next walk only if a **Contact** `Amine Benali` (or other prior-needle-only contact) is visible while the input is exactly `acme`.
+1. **Stale search race** — on every query write, immediately `setRemoteHits([])` + `setHitsForQuery('')`, bump requestId, and abort. `visibleCommandRemoteHits` still ignores `remoteHits` unless `hitsForQuery` matches. AbortController + requestId stay in the search effect. FAIL next walk only if a **Contact** `Amine Benali` (or other prior-needle-only contact) is visible while the input is exactly `acme`.
 2. **Escape over QRD** — QRD `onEscapeKeyDown` `preventDefault()` when `[data-command="os"]` is present. First Escape closes Command only; second Escape closes QRD. Standalone Escape from round 2 stays the existing capture + Search-focus suppress.
 
 Contabo checklist (Research-owned recheck):

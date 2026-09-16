@@ -205,9 +205,6 @@ export function CommandPalette({
             return;
         }
 
-        setRemoteHits([]);
-        setHitsForQuery('');
-
         const needle = query.trim();
         abortRef.current?.abort();
 
@@ -332,7 +329,13 @@ export function CommandPalette({
             items={items}
             sections={SECTIONS}
             query={query}
-            onQueryChange={setQuery}
+            onQueryChange={(next) => {
+                requestIdRef.current = nextCommandSearchRequestId(requestIdRef.current);
+                abortRef.current?.abort();
+                setQuery(next);
+                setRemoteHits([]);
+                setHitsForQuery('');
+            }}
             placeholder="Search, navigate, create, or act"
             statusText={statusText}
             filter={() => 1}
