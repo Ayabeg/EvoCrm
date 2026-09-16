@@ -189,6 +189,7 @@ it('preserves Deal query adapter pipeline saved views filters bulk and create wi
         'owner',
         'company',
         'contact',
+        'attention',
         'health',
         'next_step',
         'last_activity_at',
@@ -202,6 +203,7 @@ it('preserves Deal query adapter pipeline saved views filters bulk and create wi
             'created',
             'last_activity',
             'status',
+            'attention',
             'unanswered',
             'unassigned',
         ])
@@ -325,6 +327,7 @@ it('keeps the Deals Inertia backend shape routes query and board without inventi
                 'owner',
                 'company',
                 'contact',
+                'attention',
                 'health',
                 'next_step',
                 'last_activity_at',

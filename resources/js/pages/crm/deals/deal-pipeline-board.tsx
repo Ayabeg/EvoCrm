@@ -23,6 +23,8 @@ import {
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
+import type { DealAttention } from '@/lib/deal-attention';
+import { attentionToneClass } from '@/lib/deal-attention';
 import { dealStageColumnAccent } from '@/lib/stage-colors';
 
 export type BoardStage = {
@@ -56,6 +58,7 @@ export type BoardDeal = {
     next_activity_label?: string | null;
     quote_count?: number;
     url: string;
+    attention?: DealAttention | null;
 };
 
 function formatCloseDate(value: string): string {
@@ -177,6 +180,15 @@ function DealCard({
                     {deal.owner_name ?? t('Unassigned')}
                 </p>
             )}
+            {deal.attention?.primary ? (
+                <p
+                    className={`mt-0.5 truncate text-[11px] ${attentionToneClass(deal.attention.primary.severity)}`}
+                    data-attention={deal.attention.primary.type}
+                    data-attention-severity={deal.attention.primary.severity}
+                >
+                    {deal.attention.primary.label}
+                </p>
+            ) : null}
             {nextLabel ? (
                 <p className="mt-0.5 truncate text-[11px] text-mute">{nextLabel}</p>
             ) : null}

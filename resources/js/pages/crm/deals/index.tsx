@@ -4,6 +4,7 @@ import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
+import DealAttentionQueue from '@/components/crm/deal-attention-queue';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { hasActiveListFilters } from '@/components/crm/list-query';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import type { DealAttentionQueueItem } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {
@@ -41,6 +43,7 @@ export default function DealsIndex({
     wilayas,
     createOpen,
     prefillContactId,
+    attentionQueue = [],
     bulk,
 }: {
     deals: DealListRow[];
@@ -59,6 +62,7 @@ export default function DealsIndex({
     wilayas: string[];
     createOpen?: boolean;
     prefillContactId?: number | null;
+    attentionQueue?: DealAttentionQueueItem[];
     bulk?: { enabled: boolean };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
@@ -126,6 +130,14 @@ export default function DealsIndex({
                         />
                     }
                     extraQuery={{ pipeline: pipeline.id }}
+                    banner={
+                        <DealAttentionQueue
+                            items={attentionQueue}
+                            basePath="/crm/deals"
+                            activeFilters={activeFilters}
+                            extraQuery={{ pipeline: pipeline.id }}
+                        />
+                    }
                     selection={{
                         mode: 'uncontrolled',
                         selectable: canBulk,

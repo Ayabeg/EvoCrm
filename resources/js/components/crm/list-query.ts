@@ -35,6 +35,7 @@ export function filterFields(filters: ListFilters): ListFilters {
         unassigned: filters.unassigned,
         priority: filters.priority,
         channel: filters.channel,
+        attention: filters.attention,
         filter_id: filters.filter_id,
         filter_groups: filters.filter_groups,
     };
@@ -136,6 +137,22 @@ export function listFilterChips(
             key: 'channel',
             label: 'Channel',
             value: String(fields.channel).replace(/_/g, ' '),
+        });
+    }
+
+    if (fields.attention) {
+        const key = String(fields.attention);
+        chips.push({
+            key: 'attention',
+            label: 'Attention',
+            value:
+                key === 'needs_attention'
+                    ? 'Needs attention'
+                    : key === 'no_next_action'
+                      ? 'No next action'
+                      : key === 'overdue'
+                        ? 'Overdue'
+                        : key,
         });
     }
 

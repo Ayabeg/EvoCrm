@@ -16,6 +16,7 @@ const WORKSPACE_FILTER_KEYS = [
     'unassigned',
     'priority',
     'channel',
+    'attention',
 ] as const satisfies readonly ListQueryFilterKey[];
 
 const QUOTE_FILTER_KEYS = [

@@ -36,6 +36,7 @@ export type ActiveFilterBag = {
     unassigned?: unknown;
     priority?: unknown;
     channel?: unknown;
+    attention?: unknown;
     filter_groups?: unknown;
     sort?: unknown;
     direction?: unknown;
@@ -88,6 +89,7 @@ export function fromActiveFilters(
             unassigned: toOptionalBoolean(filters.unassigned),
             priority: emptyToNull(filters.priority),
             channel: emptyToNull(filters.channel),
+            attention: emptyToNull(filters.attention),
         },
         filterGroups: parseFilterGroups(filters.filter_groups),
         sort: parseUrlSort(filters.sort, filters.direction),
@@ -227,6 +229,10 @@ export function domainParamsToBag(params: DomainListParams): Record<string, unkn
 
     if (params.channel !== undefined) {
         bag.channel = params.channel;
+    }
+
+    if (params.attention !== undefined) {
+        bag.attention = params.attention;
     }
 
     if (params.filter_groups !== undefined) {

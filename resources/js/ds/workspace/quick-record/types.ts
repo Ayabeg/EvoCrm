@@ -1,3 +1,5 @@
+import type { DealAttention } from '@/lib/deal-attention';
+
 export const RECORD_TYPES = ['contact', 'company', 'lead', 'deal', 'quote'] as const;
 
 export type RecordType = (typeof RECORD_TYPES)[number];
@@ -80,6 +82,7 @@ export type RecordDescriptor = {
     actions: RecordAction[];
     capabilities: RecordCapabilities;
     permissions: RecordPermissions;
+    attention?: DealAttention | null;
 };
 
 export type PeekAssociation = {
@@ -110,6 +113,7 @@ export type QuickRecordPeekPayload = {
     tasks: PeekActivity[];
     capabilities: RecordCapabilities;
     permissions: RecordPermissions;
+    attention?: DealAttention | null;
 };
 
 export type DrawerErrorCode = 'not_found' | 'forbidden' | 'network' | 'malformed';

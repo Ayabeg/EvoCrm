@@ -49,5 +49,6 @@ export function adaptDeal(payload: QuickRecordPeekPayload): RecordDescriptor {
         actions: compactActions(href, asString(record.contact_email), asString(record.contact_phone_e164)),
         capabilities: payload.capabilities,
         permissions: payload.permissions,
+        attention: payload.attention ?? null,
     };
 }

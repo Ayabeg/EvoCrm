@@ -17,9 +17,18 @@ import { cn } from '@/lib/utils';
 
 const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
 const COMPANY_QUICK_FIELD_IDS = ['owner', 'created', 'city', 'wilaya'] as const;
+const DEAL_QUICK_FIELD_IDS = ['owner', 'created', 'status', 'attention'] as const;
 
 function quickFieldIdsFor(object: ListQueryObject): readonly string[] {
-    return object === 'company' ? COMPANY_QUICK_FIELD_IDS : QUICK_FIELD_IDS;
+    if (object === 'company') {
+        return COMPANY_QUICK_FIELD_IDS;
+    }
+
+    if (object === 'deal') {
+        return DEAL_QUICK_FIELD_IDS;
+    }
+
+    return QUICK_FIELD_IDS;
 }
 
 const PRESET_LABELS: Record<string, string> = {
@@ -44,6 +53,9 @@ const PRESET_LABELS: Record<string, string> = {
     high: 'High',
     medium: 'Medium',
     low: 'Low',
+    needs_attention: 'Needs attention',
+    overdue: 'Overdue',
+    no_next_action: 'No next action',
 };
 
 function optionLabel(value: string): string {
@@ -157,7 +169,9 @@ export function FilterBar({
                                 )
                             }
                         >
-                            <option value="">{t('Any')}</option>
+                            <option value="">
+                                {field.id === 'attention' ? t('All') : t('Any')}
+                            </option>
                             {options.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
