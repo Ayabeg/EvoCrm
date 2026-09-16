@@ -41,6 +41,10 @@ export interface CommandPaletteProps {
    * used and the incoming item order is kept.
    */
   filter?: (query: string, item: CommandItem) => number
+  /** Controlled query. When omitted, the palette keeps its own draft. */
+  query?: string
+  onQueryChange?: (query: string) => void
+  statusText?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -185,6 +189,18 @@ function KbdBadge({ keys }: { keys: string[] }) {
 
 // Styles: registry/aurora/styles/aurora-components.css (@layer aurora-components).
 
+function isCommitKey(event: React.KeyboardEvent): boolean {
+  if (event.key !== "Enter") {
+    return false
+  }
+
+  if (event.nativeEvent.isComposing || event.keyCode === 229) {
+    return false
+  }
+
+  return true
+}
+
 export function CommandPalette({
   open,
   onOpenChange,
@@ -193,8 +209,19 @@ export function CommandPalette({
   sections = DEFAULT_SECTIONS,
   placeholder = "Search commands, skills, files…",
   filter,
+  query: queryProp,
+  onQueryChange,
+  statusText,
 }: CommandPaletteProps) {
-  const [query, setQuery] = React.useState("")
+  const [uncontrolledQuery, setUncontrolledQuery] = React.useState("")
+  const query = queryProp ?? uncontrolledQuery
+  const setQuery = React.useCallback((next: string) => {
+    if (queryProp === undefined) {
+      setUncontrolledQuery(next)
+    }
+
+    onQueryChange?.(next)
+  }, [onQueryChange, queryProp])
   const [activeIdx, setActiveIdx] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const listRef = React.useRef<HTMLDivElement>(null)
@@ -261,7 +288,7 @@ return
     } else if (e.key === "ArrowUp") {
       e.preventDefault()
       setActiveIdx((i) => (i - 1 + flatItems.length) % Math.max(flatItems.length, 1))
-    } else if (e.key === "Enter") {
+    } else if (isCommitKey(e)) {
       e.preventDefault()
       const item = flatItems[activeIdx]
 
@@ -319,6 +346,7 @@ return null
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
+        data-command="os"
         onKeyDown={handleKeyDown}
         style={{
           position: "fixed",
@@ -326,7 +354,7 @@ return null
           left: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 201,
-          width: "560px",
+          width: "640px",
           maxWidth: "calc(100vw - 32px)",
           maxHeight: "70vh",
           display: "flex",
@@ -336,6 +364,7 @@ return null
           borderRadius: "var(--aurora-radius-2)",
           boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)",
           overflow: "hidden",
+          overflowX: "hidden",
           animation: "aurora-cmd-in 0.15s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
@@ -392,6 +421,7 @@ return null
           aria-label="Command results"
           style={{
             overflowY: "auto",
+            overflowX: "hidden",
             flex: 1,
             padding: "6px 0",
           }}
@@ -442,7 +472,8 @@ return null
                         alignItems: "center",
                         gap: "10px",
                         width: "100%",
-                        padding: "8px 16px",
+                        minHeight: "44px",
+                        padding: "10px 16px",
                         background: isActive ? "var(--aurora-hover-bg)" : "transparent",
                         border: "none",
                         borderLeft: isActive
@@ -450,6 +481,7 @@ return null
                           : "2px solid transparent",
                         cursor: "pointer",
                         textAlign: "left",
+                        overflow: "hidden",
                         transition: "background 0.08s",
                       }}
                     >
@@ -525,6 +557,11 @@ return null
             background: "var(--aurora-panel-medium)",
           }}
         >
+          {statusText ? (
+            <span style={{ fontSize: "11px", color: "var(--aurora-text-muted)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {statusText}
+            </span>
+          ) : null}
           {[
             { keys: ["↑", "↓"], label: "Navigate" },
             { keys: ["↵"], label: "Select" },

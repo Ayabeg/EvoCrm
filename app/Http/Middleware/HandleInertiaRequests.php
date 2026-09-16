@@ -3,10 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Models\Activity;
-use App\Models\Company;
-use App\Models\Contact;
-use App\Models\Deal;
-use App\Models\Lead;
 use App\Support\Integrations;
 use App\Support\SimpleMode;
 use Illuminate\Http\Request;
@@ -101,66 +97,9 @@ class HandleInertiaRequests extends Middleware
                     ])
                     ->all();
             },
-            'evoSearchIndex' => function () use ($workspace) {
-                if (! $workspace) {
-                    return [];
-                }
-
-                $contacts = Contact::query()
-                    ->forWorkspace($workspace)
-                    ->latest('id')
-                    ->limit(8)
-                    ->get(['id', 'first_name', 'last_name', 'email'])
-                    ->map(fn (Contact $row): array => [
-                        'type' => 'Contact',
-                        'label' => $row->displayName(),
-                        'hint' => $row->email,
-                        'href' => '/crm/contacts/'.$row->id,
-                    ]);
-
-                $companies = Company::query()
-                    ->forWorkspace($workspace)
-                    ->latest('id')
-                    ->limit(8)
-                    ->get(['id', 'name'])
-                    ->map(fn (Company $row): array => [
-                        'type' => 'Company',
-                        'label' => $row->name,
-                        'hint' => null,
-                        'href' => '/crm/companies/'.$row->id,
-                    ]);
-
-                $leads = Lead::query()
-                    ->forWorkspace($workspace)
-                    ->latest('id')
-                    ->limit(8)
-                    ->get(['id', 'title'])
-                    ->map(fn (Lead $row): array => [
-                        'type' => 'Lead',
-                        'label' => $row->title ?: 'Lead #'.$row->id,
-                        'hint' => null,
-                        'href' => '/crm/leads/'.$row->id,
-                    ]);
-
-                $deals = Deal::query()
-                    ->forWorkspace($workspace)
-                    ->latest('id')
-                    ->limit(8)
-                    ->get(['id', 'title'])
-                    ->map(fn (Deal $row): array => [
-                        'type' => 'Deal',
-                        'label' => $row->title,
-                        'hint' => null,
-                        'href' => '/crm/deals/'.$row->id,
-                    ]);
-
-                return $contacts
-                    ->concat($companies)
-                    ->concat($leads)
-                    ->concat($deals)
-                    ->values()
-                    ->all();
-            },
+            // P16: keep the shared key. Do not load CRM rows onto every page.
+            // Record search is GET /crm/command/search — permission-safe and bounded.
+            'evoSearchIndex' => [],
         ];
     }
 

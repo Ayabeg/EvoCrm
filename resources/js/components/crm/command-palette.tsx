@@ -1,66 +1,125 @@
 import { router, usePage } from '@inertiajs/react';
 import {
     AddressBook,
-    Books,
     Buildings,
-    ChartLine,
+    CalendarBlank,
     ChatCircle,
     CheckSquare,
+    FileText,
     FlowArrow,
+    GearSix,
     Handshake,
     House,
-    Lightning,
-    Megaphone,
-    PaperPlaneRight,
-    PaperPlaneTilt,
     Path,
-    PencilSimple,
+    Plus,
+    Sparkle,
     SquaresFour,
-    Ticket,
     Tray,
-    UsersThree,
+    WarningCircle,
 } from '@phosphor-icons/react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import {
     CommandPalette as AuroraCommandPalette,
 } from '@/components/aurora/command-palette';
 import type { CommandItem } from '@/components/aurora/command-palette';
+import { useQuickRecord } from '@/ds/workspace/quick-record';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
+import {
+    COMMAND_SEARCH_DEBOUNCE_MS,
+    buildCommandCatalog,
+    composeCommandResults,
+    filterValidRecents,
+    isStaleCommandSearch,
+    loadCommandRecents,
+    nextCommandSearchRequestId,
+    persistCommandRecents,
+    rememberCommandRecent,
+    type CommandRecent,
+    type CommandResult,
+    type CommandSearchHit,
+} from '@/lib/command-os';
 
-type SearchHit = {
-    type: string;
-    label: string;
-    hint?: string | null;
-    href: string;
+const SECTIONS = [
+    { id: 'recent', label: 'Recent' },
+    { id: 'search', label: 'Search' },
+    { id: 'create', label: 'Create' },
+    { id: 'act', label: 'Act' },
+    { id: 'ask', label: 'Ask Evo' },
+    { id: 'navigate', label: 'Navigate' },
+];
+
+const ICONS: Record<string, ReactNode> = {
+    'nav-home': <House className="size-3.5" weight="regular" aria-hidden />,
+    'nav-contacts': <AddressBook className="size-3.5" weight="regular" aria-hidden />,
+    'nav-companies': <Buildings className="size-3.5" weight="regular" aria-hidden />,
+    'nav-leads': <Path className="size-3.5" weight="regular" aria-hidden />,
+    'nav-deals': <Handshake className="size-3.5" weight="regular" aria-hidden />,
+    'nav-pipeline': <SquaresFour className="size-3.5" weight="regular" aria-hidden />,
+    'nav-inbox': <Tray className="size-3.5" weight="regular" aria-hidden />,
+    'nav-activities': <CheckSquare className="size-3.5" weight="regular" aria-hidden />,
+    'nav-quotes': <FileText className="size-3.5" weight="regular" aria-hidden />,
+    'nav-automation': <FlowArrow className="size-3.5" weight="regular" aria-hidden />,
+    'nav-settings': <GearSix className="size-3.5" weight="regular" aria-hidden />,
+    'act-overdue': <WarningCircle className="size-3.5" weight="regular" aria-hidden />,
+    'act-today': <CalendarBlank className="size-3.5" weight="regular" aria-hidden />,
+    'act-upcoming': <CalendarBlank className="size-3.5" weight="regular" aria-hidden />,
+    'act-completed': <CheckSquare className="size-3.5" weight="regular" aria-hidden />,
+    'ask-evo': <Sparkle className="size-3.5" weight="regular" aria-hidden />,
 };
 
-const NAV_ITEMS = [
-    { label: 'Home', href: '/dashboard', icon: House, keywords: 'dashboard command center' },
-    { label: 'Contacts', href: '/crm/contacts', icon: AddressBook, keywords: 'crm people leads' },
-    { label: 'Companies', href: '/crm/companies', icon: Buildings, keywords: 'accounts organizations' },
-    { label: 'Leads', href: '/crm/leads', icon: Path, keywords: 'pipeline prospects' },
-    { label: 'Tickets', href: '/crm/tickets', icon: Ticket, keywords: 'help desk support cases whatsapp' },
-    { label: 'Captures', href: '/crm/leads/captures', icon: Tray, keywords: 'inbox capture csv meta maps url' },
-    { label: 'Deals', href: '/crm/deals', icon: Handshake, keywords: 'pipeline opportunities' },
-    { label: 'Pipelines', href: '/crm/deals/board', icon: SquaresFour, keywords: 'kanban board stages' },
-    { label: 'Activities', href: '/crm/activities', icon: CheckSquare, keywords: 'tasks calls meetings' },
-    { label: 'Segments', href: '/crm/segments', icon: UsersThree, keywords: 'saved views audiences filters' },
-    { label: 'Automation', href: '/crm/workflows', icon: FlowArrow, keywords: 'workflows triggers' },
-    { label: 'Conversations', href: '/conversations', icon: ChatCircle, keywords: 'crm activities history' },
-    { label: 'Desk', href: '/inbox', icon: Tray, keywords: 'inbox conversations evodesk' },
-    { label: 'Outbound', href: '/outbound', icon: PaperPlaneTilt, keywords: 'email sequences campaigns' },
-    { label: 'Prospects', href: '/crm/contacts?status=new', icon: AddressBook, keywords: 'outbound new leads' },
-    { label: 'Outbound campaigns', href: '/outbound/campaigns', icon: PaperPlaneRight, keywords: 'newsletter broadcast' },
-    { label: 'Sequences', href: '/outbound/sequences', icon: Lightning, keywords: 'drip enrollments' },
-    { label: 'Outbox', href: '/outbound/outbox', icon: PaperPlaneTilt, keywords: 'sent mail activity' },
-    { label: 'Replies', href: '/outbound/replies', icon: ChatCircle, keywords: 'inbound email' },
-    { label: 'Ads', href: '/ads', icon: Megaphone, keywords: 'meta facebook instagram' },
-    { label: 'Ads attribution', href: '/ads/attribution', icon: Megaphone, keywords: 'funnel spend deals won' },
-    { label: 'Ads audiences', href: '/ads/audiences', icon: UsersThree, keywords: 'meta custom audience segments' },
-    { label: 'Reports', href: '/reports', icon: ChartLine, keywords: 'analytics overview' },
-    { label: 'Conversion funnels', href: '/reports/funnels', icon: ChartLine, keywords: 'reports funnels' },
-    { label: 'Report builder', href: '/crm/report-builder', icon: PencilSimple, keywords: 'custom reports saved' },
-    { label: 'Outbound reports', href: '/outbound/reports', icon: Books, keywords: 'email performance' },
-];
+function resultIcon(result: CommandResult): ReactNode {
+    if (ICONS[result.id]) {
+        return ICONS[result.id];
+    }
+
+    if (result.kind === 'create') {
+        return <Plus className="size-3.5" weight="regular" aria-hidden />;
+    }
+
+    if (result.kind === 'search') {
+        if (result.recordRef?.type === 'company' || result.description === 'company') {
+            return <Buildings className="size-3.5" weight="regular" aria-hidden />;
+        }
+
+        if (result.recordRef?.type === 'deal' || result.description === 'deal') {
+            return <Handshake className="size-3.5" weight="regular" aria-hidden />;
+        }
+
+        if (result.recordRef?.type === 'lead' || result.description === 'lead') {
+            return <Path className="size-3.5" weight="regular" aria-hidden />;
+        }
+
+        if (result.recordRef?.type === 'quote' || result.description === 'quote') {
+            return <FileText className="size-3.5" weight="regular" aria-hidden />;
+        }
+
+        if (result.description === 'activity') {
+            return <CheckSquare className="size-3.5" weight="regular" aria-hidden />;
+        }
+
+        return <AddressBook className="size-3.5" weight="regular" aria-hidden />;
+    }
+
+    if (result.kind === 'ask') {
+        return <Sparkle className="size-3.5" weight="regular" aria-hidden />;
+    }
+
+    return <ChatCircle className="size-3.5" weight="regular" aria-hidden />;
+}
+
+function toCommandItem(result: CommandResult): CommandItem {
+    return {
+        id: result.id,
+        label: result.label,
+        description: result.description,
+        section: result.section,
+        icon: resultIcon(result),
+        onSelect: () => {
+            // Selection is handled by the wrapper so kind stays authoritative.
+        },
+    };
+}
 
 export function CommandPalette({
     open,
@@ -69,75 +128,205 @@ export function CommandPalette({
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }) {
-    const records = ((usePage().props.evoSearchIndex as SearchHit[] | undefined) ?? []);
+    const page = usePage();
+    const { openRecord } = useQuickRecord();
+    const { features } = useSimpleMode();
+    const capabilities = (page.props.auth?.capabilities ?? []) as string[];
+    const openerRef = useRef<HTMLElement | null>(null);
+    const requestIdRef = useRef(0);
+    const abortRef = useRef<AbortController | null>(null);
+    const [query, setQuery] = useState('');
+    const [remoteHits, setRemoteHits] = useState<CommandSearchHit[]>([]);
+    const [searchFailed, setSearchFailed] = useState(false);
+    const [searching, setSearching] = useState(false);
+    const [recents, setRecents] = useState<CommandRecent[]>(() => loadCommandRecents());
 
-    const items = useMemo<CommandItem[]>(() => {
-        const nav = NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
+    const catalog = useMemo(
+        () => buildCommandCatalog({ capabilities, features }),
+        [capabilities, features],
+    );
 
-            return {
-                id: item.href,
-                label: item.label,
-                description: item.keywords,
-                section: 'navigate',
-                icon: <Icon className="size-3.5" weight="regular" aria-hidden />,
-                onSelect: () => {
-                    onOpenChange(false);
-                    router.visit(item.href);
+    const availableIds = useMemo(
+        () => [
+            ...catalog.navigate,
+            ...catalog.create,
+            ...catalog.act,
+            ...catalog.ask,
+        ].map((item) => item.id),
+        [catalog],
+    );
+
+    const results = useMemo(
+        () =>
+            composeCommandResults({
+                query,
+                catalog,
+                recents: filterValidRecents(recents, availableIds),
+                remoteHits,
+            }),
+        [availableIds, catalog, query, recents, remoteHits],
+    );
+
+    useEffect(() => {
+        if (open) {
+            openerRef.current =
+                document.activeElement instanceof HTMLElement
+                    ? document.activeElement
+                    : null;
+
+            return;
+        }
+
+        setQuery('');
+        setRemoteHits([]);
+        setSearchFailed(false);
+        setSearching(false);
+        abortRef.current?.abort();
+
+        const opener = openerRef.current;
+        openerRef.current = null;
+
+        if (opener && typeof opener.focus === 'function') {
+            window.setTimeout(() => opener.focus(), 0);
+        }
+    }, [open]);
+
+    useEffect(() => {
+        if (!open) {
+            return;
+        }
+
+        const needle = query.trim();
+        abortRef.current?.abort();
+
+        if (needle === '') {
+            requestIdRef.current = nextCommandSearchRequestId(requestIdRef.current);
+            setRemoteHits([]);
+            setSearchFailed(false);
+            setSearching(false);
+
+            return;
+        }
+
+        const requestId = nextCommandSearchRequestId(requestIdRef.current);
+        requestIdRef.current = requestId;
+        const controller = new AbortController();
+        abortRef.current = controller;
+        setSearching(true);
+
+        const timer = window.setTimeout(() => {
+            void fetch(`/crm/command/search?q=${encodeURIComponent(needle)}`, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
-            };
-        });
+                signal: controller.signal,
+            })
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error('search-failed');
+                    }
 
-        const hits = records.map((hit) => ({
-            id: hit.href,
-            label: hit.label,
-            description: [hit.type, hit.hint].filter(Boolean).join(' · '),
-            section: 'records',
-            onSelect: () => {
-                onOpenChange(false);
-                router.visit(hit.href);
-            },
-        }));
+                    return (await response.json()) as { hits?: CommandSearchHit[] };
+                })
+                .then((payload) => {
+                    if (isStaleCommandSearch(requestIdRef.current, requestId)) {
+                        return;
+                    }
 
-        return [...hits, ...nav];
-    }, [onOpenChange, records]);
+                    setRemoteHits(Array.isArray(payload.hits) ? payload.hits : []);
+                    setSearchFailed(false);
+                    setSearching(false);
+                })
+                .catch((error: unknown) => {
+                    if (error instanceof DOMException && error.name === 'AbortError') {
+                        return;
+                    }
+
+                    if (isStaleCommandSearch(requestIdRef.current, requestId)) {
+                        return;
+                    }
+
+                    setRemoteHits([]);
+                    setSearchFailed(true);
+                    setSearching(false);
+                });
+        }, COMMAND_SEARCH_DEBOUNCE_MS);
+
+        return () => {
+            window.clearTimeout(timer);
+            controller.abort();
+        };
+    }, [open, query]);
+
+    const items = useMemo(() => results.map(toCommandItem), [results]);
+
+    const handleSelect = (item: CommandItem) => {
+        const result = results.find((entry) => entry.id === item.id);
+
+        if (!result) {
+            return;
+        }
+
+        if (result.kind !== 'search') {
+            const next = persistCommandRecents(
+                rememberCommandRecent(recents, {
+                    id: result.id,
+                    kind: result.kind,
+                }),
+            );
+            setRecents(next);
+        }
+
+        onOpenChange(false);
+
+        if (result.recordRef) {
+            openRecord(result.recordRef);
+
+            return;
+        }
+
+        if (result.href) {
+            router.visit(result.href);
+        }
+    };
+
+    const statusText = searching
+        ? 'Searching…'
+        : searchFailed
+          ? 'Search unavailable — navigate, create, and actions still work'
+          : undefined;
 
     return (
         <AuroraCommandPalette
             open={open}
             onOpenChange={onOpenChange}
             items={items}
-            sections={[
-                { id: 'records', label: 'Records' },
-                { id: 'navigate', label: 'Navigate' },
-            ]}
-            placeholder="Find a record or page"
-            filter={(query, item) => {
-                const needle = query.trim().toLowerCase();
-
-                if (!needle) {
-                    return 1;
-                }
-
-                const hay = `${item.label} ${item.description ?? ''}`.toLowerCase();
-
-                return hay.includes(needle) ? 1 : 0;
-            }}
-            onSelect={(item) => item.onSelect?.()}
+            sections={SECTIONS}
+            query={query}
+            onQueryChange={setQuery}
+            placeholder="Search, navigate, create, or act"
+            statusText={statusText}
+            filter={() => 1}
+            onSelect={handleSelect}
         />
     );
 }
 
-export function useCommandPaletteShortcut(onOpen: () => void) {
+export function useCommandPaletteShortcut(onToggle: () => void) {
     useEffect(() => {
         const handler = (event: KeyboardEvent) => {
+            if (event.isComposing || event.keyCode === 229) {
+                return;
+            }
+
             if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
                 event.preventDefault();
-                onOpen();
+                onToggle();
             }
         };
         window.addEventListener('keydown', handler);
 
         return () => window.removeEventListener('keydown', handler);
-    }, [onOpen]);
+    }, [onToggle]);
 }

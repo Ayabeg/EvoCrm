@@ -1,12 +1,7 @@
 /**
- * Canonical topbar (P02): Search/⌘K → command palette; Sparkle/Ask Evo → same
- * palette (Ask section waits for P16/P24); Create stays Create; one Tasks
- * overlay (not a second notify bell, not a competing /crm/activities topbar link).
- */
 /**
- * Canonical topbar (P02): Search/⌘K → command palette; Sparkle/Ask Evo → same
- * palette (Ask section waits for P16/P24); Create stays Create; one Tasks
- * overlay (not a second notify bell, not a competing /crm/activities topbar link).
+ * Canonical topbar (P02/P16): Search/⌘K and Sparkle open the SAME Command OS.
+ * Create stays the existing dropdown. One Tasks overlay. No second palette.
  */
 import { Link, usePage } from '@inertiajs/react';
 import { Bell, MagnifyingGlass, Plus, Sparkle } from '@phosphor-icons/react';
@@ -40,7 +35,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     const [tasksOpen, setTasksOpen] = useState(false);
     void breadcrumbs;
 
-    useCommandPaletteShortcut(() => setPaletteOpen(true));
+    useCommandPaletteShortcut(() => setPaletteOpen((current) => !current));
 
     useEffect(() => {
         const open = () => setTasksOpen(true);
