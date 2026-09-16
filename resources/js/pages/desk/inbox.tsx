@@ -38,6 +38,8 @@ import {
     normalizeInboxFolder,
     resolveInboxRequestedThreadId,
 } from '@/lib/inbox-workspace';
+import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
+import { shouldRenderInboxCrmContext } from '@/lib/inbox-crm-context';
 import type { OfficialDeskConnector } from '@/types';
 
 type Thread = {
@@ -46,7 +48,7 @@ type Thread = {
     unread_count?: number;
     last_message_at?: string | null;
     subject?: string | null;
-    contact: InboxContact;
+    contact?: InboxContact | null;
     channel?: { name: string; type: string };
     ticket?: {
         id: number;
@@ -80,6 +82,8 @@ type Props = {
     configuredUrl: string | null;
     threads: Thread[];
     selected: Thread | null;
+    crmContext?: InboxCrmContextPayload | null;
+    crmContextError?: string | null;
     channels?: ChannelChip[];
     officialConnectors: OfficialDeskConnector[];
     folder?: string;
@@ -255,6 +259,8 @@ export default function DeskInbox({
     configuredUrl,
     threads,
     selected,
+    crmContext = null,
+    crmContextError = null,
     channels = [],
     officialConnectors = [],
     folder = 'all',
@@ -306,6 +312,8 @@ export default function DeskInbox({
                         <FrontDesk
                             threads={threads}
                             selected={selected}
+                            crmContext={crmContext}
+                            crmContextError={crmContextError}
                             channels={channels}
                             folder={folder}
                             q={q}
@@ -322,6 +330,8 @@ export default function DeskInbox({
 function FrontDesk({
     threads,
     selected,
+    crmContext,
+    crmContextError,
     channels,
     folder: folderProp,
     q: qProp,
@@ -330,6 +340,8 @@ function FrontDesk({
 }: {
     threads: Thread[];
     selected: Thread | null;
+    crmContext: InboxCrmContextPayload | null;
+    crmContextError: string | null;
     channels: ChannelChip[];
     folder: string;
     q: string;
@@ -447,7 +459,16 @@ function FrontDesk({
         }, 250);
     };
 
-    const showContextHost = contextOpen && selectedMatchesRequest;
+    const contextMatches = shouldRenderInboxCrmContext({
+        contextThreadId: crmContext?.thread_id,
+        requestedThreadId,
+        selectedId: selected?.id ?? null,
+    });
+    const showContextHost =
+        contextOpen && Boolean(requestedThreadId || selectedMatchesRequest);
+    const contextPending =
+        showContextHost && (!selectedMatchesRequest || !contextMatches);
+    const liveContext = contextMatches ? crmContext : null;
     const channelName = inboxChannelLabel(selected?.channel);
 
     return (
@@ -554,7 +575,7 @@ function FrontDesk({
                                                     )}
                                                 </h2>
                                                 <p className="truncate text-[11px] text-mute">
-                                                    {selected.contact.owner
+                                                    {selected.contact?.owner
                                                         ?.name ??
                                                         t('Unassigned')}{' '}
                                                     · {channelName}
@@ -633,6 +654,20 @@ function FrontDesk({
                                     <div className="absolute inset-y-0 right-0 z-20 w-[17.5rem] border-l border-hairline bg-white xl:hidden">
                                         <InboxContactSidebar
                                             contact={selected.contact}
+                                            context={liveContext}
+                                            contextError={
+                                                contextMatches
+                                                    ? crmContextError
+                                                    : null
+                                            }
+                                            contextPending={contextPending}
+                                            requestedThreadId={requestedThreadId}
+                                            selectedId={selected.id}
+                                            onRetry={() =>
+                                                visitInbox({
+                                                    thread: selected.id,
+                                                })
+                                            }
                                             onCollapse={() =>
                                                 setContextOverlay(false)
                                             }
@@ -673,10 +708,24 @@ function FrontDesk({
                     desktopGridClassName="lg:grid-cols-[minmax(11.25rem,13.75rem)_minmax(17.5rem,21.25rem)_minmax(0,1fr)]"
                 />
             </div>
-            {showContextHost && selectedMatchesRequest && selected ? (
+            {showContextHost ? (
                 <InboxContactSidebar
-                    contact={selected.contact}
+                    contact={
+                        selectedMatchesRequest ? selected?.contact : undefined
+                    }
+                    context={liveContext}
+                    contextError={contextMatches ? crmContextError : null}
+                    contextPending={contextPending}
+                    requestedThreadId={requestedThreadId}
+                    selectedId={
+                        selectedMatchesRequest ? (selected?.id ?? null) : null
+                    }
                     className="hidden xl:flex"
+                    onRetry={() => {
+                        if (requestedThreadId) {
+                            visitInbox({ thread: requestedThreadId });
+                        }
+                    }}
                     onCollapse={() => visitInbox({ context: '0' })}
                 />
             ) : null}
