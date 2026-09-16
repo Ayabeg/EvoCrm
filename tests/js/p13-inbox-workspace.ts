@@ -7,8 +7,10 @@ import {
     inboxChannelFolderKeys,
     inboxChannelLabel,
     inboxSearchParams,
+    inboxThreadMatchesRequest,
     isStaleInboxVisit,
     normalizeInboxFolder,
+    resolveInboxRequestedThreadId,
 } from '../../resources/js/lib/inbox-workspace';
 import type { InboxMessage } from '../../resources/js/lib/inbox-workspace';
 
@@ -34,15 +36,24 @@ expectEqual(
 );
 
 const folders = buildInboxFolders(
-    { all: 4, unassigned: 1, mine: 2, open: 3, closed: 1, whatsapp: 4 },
+    { all: 4, unassigned: 1, mine: 2, open: 3, closed: 1, whatsapp: 4, email: 2, sms: 1 },
     [
         { key: 'whatsapp', label: 'WhatsApp' },
         { key: 'instagram', label: 'Instagram' },
+        { key: 'facebook', label: 'Facebook' },
     ],
 );
 
-if (folders.some((folder) => folder.key === 'instagram')) {
+if (folders.some((folder) => folder.key === 'instagram' || folder.key === 'facebook')) {
     throw new Error('buildInboxFolders must not create Instagram folders');
+}
+
+if (!folders.some((folder) => folder.key === 'email' && folder.count === 2)) {
+    throw new Error('email folder must appear from honest ChannelType counts');
+}
+
+if (!folders.some((folder) => folder.key === 'sms' && folder.count === 1)) {
+    throw new Error('sms folder must appear from honest ChannelType counts');
 }
 
 if (!folders.some((folder) => folder.label === 'Assigned to me')) {
@@ -67,6 +78,22 @@ expectEqual(
 
 expectEqual(isStaleInboxVisit(3, 2), true, 'older visit is stale');
 expectEqual(isStaleInboxVisit(3, 3), false, 'current visit is live');
+expectEqual(
+    resolveInboxRequestedThreadId({
+        pendingId: 12,
+        url: '/inbox?thread=9',
+        selectedId: 4,
+    }),
+    12,
+    'pending thread wins over stale selected',
+);
+expectEqual(
+    resolveInboxRequestedThreadId({ url: '/inbox?thread=9&folder=open', selectedId: 4 }),
+    9,
+    'URL thread wins over stale selected',
+);
+expectEqual(inboxThreadMatchesRequest(4, 9), false, 'old selected must not render');
+expectEqual(inboxThreadMatchesRequest(9, 9), true, 'matching selected may render');
 
 const messages: InboxMessage[] = [
     {

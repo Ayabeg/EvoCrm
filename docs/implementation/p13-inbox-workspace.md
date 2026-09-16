@@ -18,11 +18,23 @@ Audit complete on fresh main. BEFORE MATRIX recorded before product-code changes
 
 **MERGE READY: NO** until Research Contabo populated QA is PASS.
 
+## AFTER — Contabo live QA fail on `c459e927`
+
+Research Contabo QA failed on tip `c459e927`. Fixes landed on the same PR #222 (no new PR, P14 not started):
+
+1. **Rapid selection (Sev2)** — Thread pane renders header/messages/composer only when `selected.id` matches the requested/URL thread. `router.cancelAll` + visit generation drop stale Inertia `preserveState` payloads. Pending pane (`data-inbox="conversation-pending"`) while they differ. Composer/thread still remount by id.
+2. **WhatsApp folder mismatch (Sev2)** — `folder=whatsapp` scopes only `ChannelType::WhatsApp`. `folder=whatsapp_cloud` scopes only `WhatsAppCloud`. Counts and lists use the same predicate.
+3. **Email folder missing (Sev3)** — Native rail adds honest `email` / `sms` / `telegram` chips from `folderCounts`. Instagram/Facebook stay on the `channels` payload and never become folders.
+4. **1280 crush (optional)** — Context host width `17.5rem` (280px, spec floor) to give the conversation pane more room. No H-overflow change.
+
+Contabo redeploy / re-QA remains Research-owned.
+
 ## BASE / PR / TIP
 
 - Base: `bdda504b52bbff8bddfddb1c212e07a176f84e10`
 - Branch: `cursor/p13-inbox-workspace`
-- Tip: this branch after the P13 commits
+- PR: https://github.com/Mohamedbeghanem/EvoCrm/pull/222
+- Tip: this branch after the Contabo fail fixes
 
 ---
 
@@ -148,10 +160,12 @@ Real folders only:
 - Unassigned (`contact.owner` missing) — honest: this is contact owner, not a thread assignee
 - Assigned to me
 - All open (`status` not `resolved` / `closed`)
-- Channel folders for **actual** `ChannelType` values present or sendable (`whatsapp`, `whatsapp_cloud`; plus email/sms/telegram only when threads exist)
+- Channel folders for **actual** `ChannelType` values present or sendable (`whatsapp`, `whatsapp_cloud` from the channels payload; plus `email` / `sms` / `telegram` when `folderCounts` has them)
 - All closed
 
-Instagram / Facebook remain on the `channels` Inertia payload (Wave3 `has('channels', 4)`) but are **not** inbox folders.
+Instagram / Facebook remain on the `channels` Inertia payload (Wave3 `has('channels', 4)`) but are **not** inbox folders (`isInboxChannelFolder` filter stays).
+
+`folder=whatsapp` lists only WhatsApp. `folder=whatsapp_cloud` lists only WhatsApp Business. Counts use the same type predicate as the list.
 
 Counts come from workspace aggregates of the same predicates, not invented SLAs.
 
@@ -223,7 +237,7 @@ Keep Wave3 copy: No conversations / You’re all caught up / No open conversatio
 
 ## LOADING STATES
 
-Embed: `InboxEmbedSkeleton`. Thread visit: Inertia preserveState; row remains selected via URL. No fake skeleton that looks like another conversation.
+Embed: `InboxEmbedSkeleton`. Thread visit: Inertia `preserveState` plus a requested-thread guard. Row highlight follows the requested/URL id immediately. If `selected.id !== requestedThreadId`, the conversation pane shows `conversation-pending` — never the previous thread’s header, messages, or composer. No fake skeleton that looks like another conversation.
 
 ## CRM CONTEXT HOST
 
@@ -257,7 +271,7 @@ Inertia `router.get` with `preserveState` + query params. Back/forward restore t
 
 ## STALE REQUEST SAFETY
 
-Each list selection increments a visit generation. A newer `thread=` visit supersedes an older one (Inertia cancels in-flight). Composer `key={selected.id}` so a reply cannot post to the previous thread after a swap.
+Each list selection increments a visit generation, sets `pendingThreadId`, and calls `router.cancelAll` before the next `router.get`. `onFinish` is a no-op when `isStaleInboxVisit`. The conversation pane must not render a thread whose id does not match `resolveInboxRequestedThreadId({ pending, url, selected })`. Back/forward clear a pending id that no longer matches the URL. Composer `key={threadId}` remounts only for the matching thread.
 
 ## PERMISSIONS
 
@@ -277,7 +291,7 @@ Four panes; conversation dominant; no page H-overflow. **Agent viewport PASS. Co
 
 ## 1280 QA
 
-Four panes if context open; still no crush. **Agent viewport PASS. Contabo NEEDS RESEARCH.**
+Four panes if context open; context host `17.5rem` to ease conversation crush. **Agent viewport PASS on prior tip. Contabo FAILED on `c459e927`; re-QA NEEDS RESEARCH.**
 
 ## 1024 QA
 
@@ -301,7 +315,7 @@ Workspace `overflow-x-hidden`. Independent pane scroll only.
 
 ## LIVE RAPID-SELECTION QA
 
-**NEEDS RESEARCH / Contabo.** Contract tests cover visit generation + composer remount.
+**NEEDS RESEARCH / Contabo.** Contract tests cover visit generation, `cancelAll`, requested-id guard, and composer remount. Prior tip FAILED rapid-selection stale content.
 
 ## EVODESK REGRESSION
 

@@ -247,16 +247,7 @@ class InboxController extends Controller
             return;
         }
 
-        if ($folder === 'whatsapp') {
-            $query->whereHas('channel', fn (Builder $channel) => $channel->whereIn('type', [
-                ChannelType::WhatsApp,
-                ChannelType::WhatsAppCloud,
-            ]));
-
-            return;
-        }
-
-        if (in_array($folder, ['whatsapp_cloud', 'email', 'telegram', 'sms'], true)) {
+        if (in_array($folder, ['whatsapp', 'whatsapp_cloud', 'email', 'telegram', 'sms'], true)) {
             $query->whereHas('channel', fn (Builder $channel) => $channel->where('type', $folder));
         }
     }

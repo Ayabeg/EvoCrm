@@ -81,12 +81,20 @@ it('locks P13 native four-pane inbox without a third implementation', function (
 
     expect($workspace)->toContain('normalizeInboxFolder')
         ->and($workspace)->toContain('isStaleInboxVisit')
+        ->and($workspace)->toContain('inboxThreadMatchesRequest')
+        ->and($workspace)->toContain('resolveInboxRequestedThreadId')
         ->and($workspace)->toContain('groupInboxMessages')
         ->and($workspace)->not->toContain('instagram');
 
+    expect($inbox)->toContain('router.cancelAll')
+        ->and($inbox)->toContain('conversation-pending')
+        ->and($inbox)->toContain('pendingThreadId')
+        ->and($inbox)->toContain('selectedMatchesRequest');
+
     expect($controller)->toContain('folderCounts')
         ->and($controller)->toContain('applySearch')
-        ->and($controller)->not->toContain('InboxV2');
+        ->and($controller)->not->toContain('InboxV2')
+        ->and($controller)->not->toContain('ChannelType::WhatsAppCloud');
 
     expect($shell)->toContain('px-4 py-3')
         ->and($conversations)->toContain('data-crm="conversations-workspace"')
@@ -143,6 +151,76 @@ it('scopes inbox folders and name search without exposing another workspace', fu
         ->assertInertia(fn ($page) => $page
             ->where('folder', 'all')
             ->has('threads', 2)
+        );
+});
+
+it('aligns whatsapp folder counts with whatsapp-only lists and exposes email folders', function () {
+    $user = User::factory()->create();
+    $whatsapp = p13Channel($user, ChannelType::WhatsApp);
+    $cloud = p13Channel($user, ChannelType::WhatsAppCloud);
+    $email = p13Channel($user, ChannelType::Email);
+
+    foreach (range(1, 3) as $index) {
+        p13Thread($user, [
+            'channel_id' => $whatsapp->id,
+            'first_name' => 'Wa'.$index,
+            'subject' => 'WhatsApp '.$index,
+        ]);
+    }
+
+    foreach (range(1, 2) as $index) {
+        p13Thread($user, [
+            'channel_id' => $cloud->id,
+            'first_name' => 'Cloud'.$index,
+            'subject' => 'Cloud '.$index,
+        ]);
+    }
+
+    $emailThread = p13Thread($user, [
+        'channel_id' => $email->id,
+        'first_name' => 'Mail',
+        'last_name' => 'Desk',
+        'subject' => 'Invoice follow-up',
+    ]);
+
+    $this->actingAs($user)
+        ->get('/inbox?folder=whatsapp')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('desk/inbox')
+            ->where('folder', 'whatsapp')
+            ->where('folderCounts.whatsapp', 3)
+            ->where('folderCounts.whatsapp_cloud', 2)
+            ->where('folderCounts.email', 1)
+            ->has('threads', 3)
+            ->where('threads.0.channel.type', ChannelType::WhatsApp->value)
+            ->where('threads.1.channel.type', ChannelType::WhatsApp->value)
+            ->where('threads.2.channel.type', ChannelType::WhatsApp->value)
+            ->has('channels', 4)
+            ->where('channels.2.key', 'instagram')
+            ->where('channels.3.key', 'facebook')
+        );
+
+    $this->actingAs($user)
+        ->get('/inbox?folder=whatsapp_cloud')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('folder', 'whatsapp_cloud')
+            ->where('folderCounts.whatsapp_cloud', 2)
+            ->has('threads', 2)
+            ->where('threads.0.channel.type', ChannelType::WhatsAppCloud->value)
+            ->where('threads.1.channel.type', ChannelType::WhatsAppCloud->value)
+        );
+
+    $this->actingAs($user)
+        ->get('/inbox?folder=email')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('folder', 'email')
+            ->where('folderCounts.email', 1)
+            ->has('threads', 1)
+            ->where('threads.0.id', $emailThread->id)
+            ->where('threads.0.channel.type', ChannelType::Email->value)
         );
 });
 

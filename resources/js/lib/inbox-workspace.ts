@@ -90,6 +90,30 @@ export function buildInboxFolders(
     counts: InboxFolderCountMap,
     channelFolders: InboxChannelFolder[],
 ): Array<{ key: string; label: string; count: number }> {
+    const fromPayload = new Map(
+        inboxChannelFolderKeys(channelFolders).map((channel) => [
+            channel.key,
+            channel,
+        ]),
+    );
+
+    const channelItems = INBOX_CHANNEL_FOLDERS.flatMap((key) => {
+        const fromChannel = fromPayload.get(key);
+        const count = counts[key];
+
+        if (fromChannel === undefined && count === undefined) {
+            return [];
+        }
+
+        return [
+            {
+                key,
+                label: fromChannel?.label ?? inboxChannelLabel({ type: key }),
+                count: count ?? 0,
+            },
+        ];
+    });
+
     return [
         { key: 'all', label: 'All', count: counts.all ?? 0 },
         { key: 'unassigned', label: 'Unassigned', count: counts.unassigned ?? 0 },
@@ -99,11 +123,7 @@ export function buildInboxFolders(
             count: counts.mine ?? 0,
         },
         { key: 'open', label: 'All open', count: counts.open ?? 0 },
-        ...inboxChannelFolderKeys(channelFolders).map((channel) => ({
-            key: channel.key,
-            label: channel.label,
-            count: counts[channel.key] ?? 0,
-        })),
+        ...channelItems,
         { key: 'closed', label: 'All closed', count: counts.closed ?? 0 },
     ];
 }
@@ -135,6 +155,49 @@ export function inboxSearchParams(query: InboxQuery): Record<string, string> {
 
 export function isStaleInboxVisit(active: number, incoming: number): boolean {
     return incoming < active;
+}
+
+export function inboxRequestedThreadId(url: string): number | null {
+    const queryIndex = url.indexOf('?');
+    const query = queryIndex >= 0 ? url.slice(queryIndex + 1) : '';
+    const thread = new URLSearchParams(query).get('thread');
+
+    if (!thread) {
+        return null;
+    }
+
+    const id = Number(thread);
+
+    return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+export function resolveInboxRequestedThreadId(input: {
+    pendingId?: number | null;
+    url?: string;
+    selectedId?: number | null;
+}): number | null {
+    if (input.pendingId) {
+        return input.pendingId;
+    }
+
+    const fromUrl = input.url ? inboxRequestedThreadId(input.url) : null;
+
+    if (fromUrl) {
+        return fromUrl;
+    }
+
+    return input.selectedId ?? null;
+}
+
+export function inboxThreadMatchesRequest(
+    selectedId: number | null | undefined,
+    requestedId: number | null,
+): boolean {
+    return (
+        selectedId != null &&
+        requestedId != null &&
+        selectedId === requestedId
+    );
 }
 
 export function algiersDayKey(iso?: string | null): string {

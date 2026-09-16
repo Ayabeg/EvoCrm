@@ -215,7 +215,7 @@ export function InboxContactSidebar({
             data-inbox="context-host"
             data-inbox-pane="context"
             className={cn(
-                'flex h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[18.5rem] lg:border-l',
+                'flex h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.5rem] lg:border-l',
                 className,
             )}
         >

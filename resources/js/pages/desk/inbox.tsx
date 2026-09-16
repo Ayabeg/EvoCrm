@@ -1,6 +1,6 @@
-import { Form, Link, router } from '@inertiajs/react';
+import { Form, Link, router, usePage } from '@inertiajs/react';
 import { Tray } from '@phosphor-icons/react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { DeskShell } from '@/components/crm/desk-shell';
 import {
@@ -33,8 +33,10 @@ import {
     buildInboxFolders,
     inboxChannelLabel,
     inboxSearchParams,
+    inboxThreadMatchesRequest,
     isStaleInboxVisit,
     normalizeInboxFolder,
+    resolveInboxRequestedThreadId,
 } from '@/lib/inbox-workspace';
 import type { OfficialDeskConnector } from '@/types';
 
@@ -335,9 +337,11 @@ function FrontDesk({
     folderCounts: Record<string, number>;
 }) {
     const folder = normalizeInboxFolder(folderProp);
+    const page = usePage();
     const [mode, setMode] = useState<'reply' | 'note'>('reply');
     const [draftQuery, setDraftQuery] = useState(qProp);
     const [prevQuery, setPrevQuery] = useState(qProp);
+    const [pendingThreadId, setPendingThreadId] = useState<number | null>(null);
     const [contextOverlay, setContextOverlay] = useState(false);
     const visitGeneration = useRef(0);
     const { features } = useSimpleMode();
@@ -346,6 +350,30 @@ function FrontDesk({
         setPrevQuery(qProp);
         setDraftQuery(qProp);
     }
+
+    if (pendingThreadId !== null && selected?.id === pendingThreadId) {
+        setPendingThreadId(null);
+    }
+
+    useEffect(() => {
+        const onPopState = () => {
+            setPendingThreadId(null);
+        };
+
+        window.addEventListener('popstate', onPopState);
+
+        return () => window.removeEventListener('popstate', onPopState);
+    }, []);
+
+    const requestedThreadId = resolveInboxRequestedThreadId({
+        pendingId: pendingThreadId,
+        url: page.url,
+        selectedId: selected?.id ?? null,
+    });
+    const selectedMatchesRequest = inboxThreadMatchesRequest(
+        selected?.id,
+        requestedThreadId,
+    );
 
     const assignedToMe = 'Assigned to me';
     const allOpen = 'All open';
@@ -375,10 +403,14 @@ function FrontDesk({
     ) => {
         const requestId = generation ?? visitGeneration.current;
 
+        router.cancelAll({ prefetch: false });
         router.get(
             '/inbox',
             inboxSearchParams({
-                thread: next.thread === undefined ? selected?.id : next.thread,
+                thread:
+                    next.thread === undefined
+                        ? (requestedThreadId ?? selected?.id)
+                        : next.thread,
                 folder: next.folder ?? folder,
                 q: next.q === undefined ? qProp : next.q,
                 context: next.context ?? (contextOpen ? '1' : '0'),
@@ -390,6 +422,8 @@ function FrontDesk({
                     if (isStaleInboxVisit(visitGeneration.current, requestId)) {
                         return;
                     }
+
+                    setPendingThreadId(null);
                 },
             },
         );
@@ -397,6 +431,7 @@ function FrontDesk({
 
     const selectThread = (threadId: number) => {
         const requestId = ++visitGeneration.current;
+        setPendingThreadId(threadId);
         setMode('reply');
         setContextOverlay(false);
         visitInbox({ thread: threadId }, requestId);
@@ -412,7 +447,7 @@ function FrontDesk({
         }, 250);
     };
 
-    const showContextHost = contextOpen && Boolean(selected);
+    const showContextHost = contextOpen && selectedMatchesRequest;
     const channelName = inboxChannelLabel(selected?.channel);
 
     return (
@@ -479,7 +514,7 @@ function FrontDesk({
                                             )}
                                             unread={thread.unread_count ?? 0}
                                             selected={
-                                                selected?.id === thread.id
+                                                requestedThreadId === thread.id
                                             }
                                             onSelect={() =>
                                                 selectThread(thread.id)
@@ -491,10 +526,11 @@ function FrontDesk({
                         </div>
                     }
                     right={
-                        selected ? (
+                        selectedMatchesRequest && selected ? (
                             <div
                                 className="relative flex min-h-0 flex-1 bg-white"
                                 data-inbox-pane="conversation"
+                                data-inbox-thread={selected.id}
                             >
                                 <div className="flex min-h-0 min-w-0 flex-1 flex-col">
                                     <DeskGlass
@@ -594,7 +630,7 @@ function FrontDesk({
                                     />
                                 </div>
                                 {contextOverlay ? (
-                                    <div className="absolute inset-y-0 right-0 z-20 w-[18.5rem] border-l border-hairline bg-white xl:hidden">
+                                    <div className="absolute inset-y-0 right-0 z-20 w-[17.5rem] border-l border-hairline bg-white xl:hidden">
                                         <InboxContactSidebar
                                             contact={selected.contact}
                                             onCollapse={() =>
@@ -603,6 +639,18 @@ function FrontDesk({
                                         />
                                     </div>
                                 ) : null}
+                            </div>
+                        ) : requestedThreadId ? (
+                            <div
+                                className="grid flex-1 place-items-center bg-white px-5 py-8"
+                                data-inbox-pane="conversation"
+                                data-inbox="conversation-pending"
+                            >
+                                <div className="max-w-xs text-center">
+                                    <p className="text-[13px] font-medium text-ink">
+                                        Opening conversation
+                                    </p>
+                                </div>
                             </div>
                         ) : (
                             <div className="grid flex-1 place-items-center bg-white px-5 py-8">
@@ -625,7 +673,7 @@ function FrontDesk({
                     desktopGridClassName="lg:grid-cols-[minmax(11.25rem,13.75rem)_minmax(17.5rem,21.25rem)_minmax(0,1fr)]"
                 />
             </div>
-            {showContextHost && selected ? (
+            {showContextHost && selectedMatchesRequest && selected ? (
                 <InboxContactSidebar
                     contact={selected.contact}
                     className="hidden xl:flex"
