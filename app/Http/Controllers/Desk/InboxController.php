@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers\Desk;
 
+use App\Enums\ChannelType;
 use App\Http\Controllers\Controller;
+use App\Models\Channel;
 use App\Models\Integration;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Models\Ticket;
+use App\Models\User;
+use App\Models\Workspace;
 use App\Services\Connectors\ConnectorRegistrar;
 use App\Services\Desk\DeskComposer;
 use App\Services\Desk\DeskEmbedProbe;
 use App\Support\Integrations;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -38,6 +43,12 @@ class InboxController extends Controller
     {
         $workspace = $request->user()->workspace;
 
+        $folder = $this->normalizedFolder($request->query('folder'));
+        $search = trim((string) $request->query('q', ''));
+        $contextOpen = $request->query('context', '1') !== '0';
+
+        $folderCounts = $this->folderCounts($workspace, $request->user());
+
         $threads = Thread::query()
             ->forWorkspace($workspace)
             ->with([
@@ -48,6 +59,8 @@ class InboxController extends Controller
                 'ticket:id,thread_id,number,status,subject',
                 'messages' => fn ($q) => $q->latest()->limit(1),
             ])
+            ->tap(fn (Builder $query) => $this->applyFolder($query, $folder, $request->user()))
+            ->tap(fn (Builder $query) => $this->applySearch($query, $search))
             ->orderByDesc('last_message_at')
             ->limit(50)
             ->get();
@@ -110,6 +123,10 @@ class InboxController extends Controller
                 ],
             ],
             'officialConnectors' => $connectors->deskCatalog($workspace),
+            'folder' => $folder,
+            'q' => $search,
+            'contextOpen' => $contextOpen,
+            'folderCounts' => $folderCounts,
         ]);
     }
 
@@ -161,5 +178,103 @@ class InboxController extends Controller
         }
 
         return redirect()->route('crm.tickets.show', $ticket);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function folderCounts(Workspace $workspace, User $user): array
+    {
+        $base = Thread::query()->forWorkspace($workspace);
+
+        $counts = [
+            'all' => (clone $base)->count(),
+            'unassigned' => (clone $base)->whereHas('contact', fn (Builder $query) => $query->whereNull('owner_id'))->count(),
+            'mine' => (clone $base)->whereHas('contact', fn (Builder $query) => $query->where('owner_id', $user->id))->count(),
+            'open' => (clone $base)->whereNotIn('status', ['resolved', 'closed'])->count(),
+            'closed' => (clone $base)->whereIn('status', ['resolved', 'closed'])->count(),
+        ];
+
+        $channelCounts = Channel::query()
+            ->forWorkspace($workspace)
+            ->withCount('threads')
+            ->get();
+
+        foreach ($channelCounts as $channel) {
+            $type = $channel->type instanceof ChannelType
+                ? $channel->type->value
+                : (string) $channel->type;
+
+            $counts[$type] = ($counts[$type] ?? 0) + (int) $channel->threads_count;
+        }
+
+        return $counts;
+    }
+
+    private function normalizedFolder(mixed $folder): string
+    {
+        $value = is_string($folder) ? $folder : 'all';
+
+        return match ($value) {
+            'unassigned', 'mine', 'open', 'closed', 'whatsapp', 'whatsapp_cloud', 'email', 'telegram', 'sms' => $value,
+            default => 'all',
+        };
+    }
+
+    private function applyFolder(Builder $query, string $folder, User $user): void
+    {
+        if ($folder === 'unassigned') {
+            $query->whereHas('contact', fn (Builder $contact) => $contact->whereNull('owner_id'));
+
+            return;
+        }
+
+        if ($folder === 'mine') {
+            $query->whereHas('contact', fn (Builder $contact) => $contact->where('owner_id', $user->id));
+
+            return;
+        }
+
+        if ($folder === 'open') {
+            $query->whereNotIn('status', ['resolved', 'closed']);
+
+            return;
+        }
+
+        if ($folder === 'closed') {
+            $query->whereIn('status', ['resolved', 'closed']);
+
+            return;
+        }
+
+        if ($folder === 'whatsapp') {
+            $query->whereHas('channel', fn (Builder $channel) => $channel->whereIn('type', [
+                ChannelType::WhatsApp,
+                ChannelType::WhatsAppCloud,
+            ]));
+
+            return;
+        }
+
+        if (in_array($folder, ['whatsapp_cloud', 'email', 'telegram', 'sms'], true)) {
+            $query->whereHas('channel', fn (Builder $channel) => $channel->where('type', $folder));
+        }
+    }
+
+    private function applySearch(Builder $query, string $search): void
+    {
+        if ($search === '') {
+            return;
+        }
+
+        $like = '%'.addcslashes($search, '%_\\').'%';
+
+        $query->where(function (Builder $inner) use ($like) {
+            $inner->where('subject', 'like', $like)
+                ->orWhereHas('contact', function (Builder $contact) use ($like) {
+                    $contact->where('first_name', 'like', $like)
+                        ->orWhere('last_name', 'like', $like);
+                });
+        });
     }
 }

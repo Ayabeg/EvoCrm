@@ -6,6 +6,8 @@
 
 P00–P12 merged and frozen. P13 does not replace the messaging engine, create a third Inbox, or start P14 CRM context.
 
+Native FrontDesk is now four logical panes (nav / list / conversation / context host). EvoDesk embed and CSP fallback are unchanged.
+
 Live Contabo deploy + populated QA is owned by Research after this PR opens.
 
 ---
@@ -323,11 +325,25 @@ No `QuickRecordDrawer` in Inbox. Peek/`openRecord` stay off this surface. Comman
 
 ## FILES CHANGED
 
-(Filled after implementation.)
+| File | Change |
+|---|---|
+| `docs/implementation/p13-inbox-workspace.md` | Audit + AFTER contract |
+| `app/Http/Controllers/Desk/InboxController.php` | URL `folder` / `q` / `context`; set-based folder counts; list scope. Reply/ticket unchanged |
+| `resources/js/lib/inbox-workspace.ts` | Folder/search/URL/grouping helpers |
+| `resources/js/components/crm/inbox-chrome.tsx` | List header/row, thread grouping + scroll, composer Send, context host |
+| `resources/js/pages/desk/inbox.tsx` | Native 4-pane host; URL visits; no Official WhatsApp lie |
+| `tests/Feature/P13InboxWorkspaceTest.php` | Source, folder/search, send, N+1 locks |
+| `tests/js/p13-inbox-workspace.ts` | Folder/search/stale/grouping proofs |
+
+**Not changed:** Thread/Message/Channel models, `DeskComposer`, embed probe, CSP middleware, `/conversations` page, AdaptiveWorkspaceShell defaults, QRD, P12 attention, DataWorkspace.
 
 ## TESTS
 
-(Filled after implementation.)
+- `tests/Feature/P13InboxWorkspaceTest.php`
+- `tests/js/p13-inbox-workspace.ts` (tsx proofs)
+- Wave3, InboxCspHeaders, DeskHandoff, DeskEmptyState, DeskComposer, ProductPolish, P09–P12 inbox source locks
+
+Required commands: `php artisan test`, `npm run types:check` (after wayfinder), eslint touched files, `npm run build`.
 
 ## LIVE VISUAL QA
 
