@@ -25,13 +25,13 @@ it('lists activities with type and owner filters', function () {
     ]);
 
     $this->actingAs($user)
-        ->get('/crm/activities')
+        ->get('/crm/activities?scope=all')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('crm/activities/index')
             ->has('activities', 2));
 
     $this->actingAs($user)
-        ->get('/crm/activities?type=task')
+        ->get('/crm/activities?scope=all&type=task')
         ->assertInertia(fn ($page) => $page->has('activities', 1));
 });
