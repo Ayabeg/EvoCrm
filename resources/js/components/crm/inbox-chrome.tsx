@@ -1,8 +1,15 @@
-import { Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import { Tray } from '@phosphor-icons/react';
+import { useLayoutEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
 import { dateLocale, t } from '@/lib/i18n';
+import { formatInboxDay, groupInboxMessages } from '@/lib/inbox-workspace';
+import type { InboxMessage } from '@/lib/inbox-workspace';
 import { cn } from '@/lib/utils';
 
 export type InboxEmbedState = 'ok' | 'blocked' | 'unreachable' | 'no-url';
@@ -126,7 +133,11 @@ export function InboxFolderRail({
     onSelect: (key: string) => void;
 }) {
     return (
-        <nav aria-label={t('Inbox folders')} className="px-2 py-2">
+        <nav
+            aria-label={t('Inbox folders')}
+            data-inbox-pane="nav"
+            className="px-2 py-2"
+        >
             <p className="px-2 pb-1.5 text-[10px] font-medium tracking-[0.08em] text-mute uppercase">
                 {t('Inbox')}
             </p>
@@ -163,8 +174,12 @@ export function InboxFolderRail({
 
 export function InboxContactSidebar({
     contact,
+    onCollapse,
+    className,
 }: {
     contact: InboxContact;
+    onCollapse?: () => void;
+    className?: string;
 }) {
     const facts: Array<{ label: string; value: ReactNode }> = [
         {
@@ -197,13 +212,29 @@ export function InboxContactSidebar({
     return (
         <aside
             aria-label={t('Contact')}
-            className="w-full shrink-0 border-hairline bg-white lg:w-[15.5rem] lg:border-l"
+            data-inbox="context-host"
+            data-inbox-pane="context"
+            className={cn(
+                'flex h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.5rem] lg:border-l',
+                className,
+            )}
         >
-            <div className="border-b border-hairline px-3 py-2.5">
-                <p className="text-[12px] font-medium text-ink">
-                    {inboxContactName(contact)}
-                </p>
-                <p className="mt-0.5 text-[11px] text-mute">{t('Contact')}</p>
+            <div className="flex items-start justify-between gap-2 border-b border-hairline px-3 py-2.5">
+                <div className="min-w-0">
+                    <p className="text-[12px] font-medium text-ink">
+                        {inboxContactName(contact)}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-mute">{t('Contact')}</p>
+                </div>
+                {onCollapse ? (
+                    <button
+                        type="button"
+                        onClick={onCollapse}
+                        className="shrink-0 text-[11px] text-mute hover:text-ink"
+                    >
+                        {t('Hide')}
+                    </button>
+                ) : null}
             </div>
             <dl className="divide-y divide-hairline">
                 {facts.map((fact) => (
@@ -275,6 +306,283 @@ export function InboxCaughtUpMark() {
         >
             <Tray className="size-5" weight="regular" />
         </span>
+    );
+}
+
+export function InboxListHeader({
+    query,
+    count,
+    onQueryChange,
+}: {
+    query: string;
+    count: number;
+    onQueryChange: (value: string) => void;
+}) {
+    return (
+        <div
+            data-inbox="conversation-list-header"
+            className="border-b border-hairline px-3 py-1.5"
+        >
+            <div className="flex items-center justify-between gap-2">
+                <p className="text-[12px] font-medium text-ink">{t('Inbox')}</p>
+                <p className="font-mono text-[11px] tabular-nums text-mute">
+                    {count}
+                </p>
+            </div>
+            <label className="mt-1.5 block">
+                <span className="sr-only">{t('Filter loaded conversations')}</span>
+                <Input
+                    type="search"
+                    value={query}
+                    onChange={(event) => onQueryChange(event.target.value)}
+                    placeholder={t('Filter by name or subject')}
+                    className="h-7 rounded-none text-[12px]"
+                    autoComplete="off"
+                />
+            </label>
+        </div>
+    );
+}
+
+export function InboxConversationRow({
+    name,
+    initials,
+    when,
+    preview,
+    channel,
+    unread,
+    selected,
+    onSelect,
+}: {
+    name: string;
+    initials: string;
+    when: string;
+    preview: string;
+    channel: string;
+    unread: number;
+    selected: boolean;
+    onSelect: () => void;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onSelect}
+            data-inbox="conversation-row"
+            aria-current={selected ? 'true' : undefined}
+            className={cn(
+                'flex w-full items-start gap-2.5 border-b border-hairline px-3 py-1.5 text-left transition-colors duration-150',
+                selected ? 'bg-canvas-soft' : 'hover:bg-canvas-soft',
+            )}
+        >
+            <InboxPersonMark name={name} initials={initials} />
+            <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-2">
+                    <span
+                        className={cn(
+                            'truncate text-[13px] text-ink',
+                            unread > 0 ? 'font-semibold' : 'font-medium',
+                        )}
+                    >
+                        {name}
+                    </span>
+                    <span className="shrink-0 font-mono text-[10px] tabular-nums text-mute">
+                        {when}
+                    </span>
+                </div>
+                <p className="mt-0.5 truncate text-[12px] text-mute">{preview}</p>
+                <div className="mt-0.5 flex items-center gap-2 text-[11px] text-mute">
+                    <span className="truncate">{channel}</span>
+                    {unread > 0 ? (
+                        <Badge
+                            variant="default"
+                            className="h-4 min-w-4 rounded-none px-1 font-mono text-[10px]"
+                        >
+                            {unread}
+                        </Badge>
+                    ) : null}
+                </div>
+            </div>
+        </button>
+    );
+}
+
+export function InboxMessageThread({
+    threadId,
+    messages,
+}: {
+    threadId: number;
+    messages: InboxMessage[];
+}) {
+    const endRef = useRef<HTMLDivElement>(null);
+    const groups = groupInboxMessages(messages);
+
+    useLayoutEffect(() => {
+        endRef.current?.scrollIntoView({ block: 'end' });
+    }, [threadId, messages.length]);
+
+    return (
+        <div
+            data-inbox="thread"
+            data-inbox-pane="thread"
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-canvas-soft p-3"
+        >
+            {groups.map((group) => (
+                <section key={`${group.day}-${group.kind}-${group.messages[0]?.id}`}>
+                    <p className="mb-1.5 text-center font-mono text-[10px] tabular-nums text-mute">
+                        {formatInboxDay(group.messages[0]?.created_at)}
+                    </p>
+                    <div className="space-y-1">
+                        {group.messages.map((message, index) => {
+                            const last = index === group.messages.length - 1;
+                            const note = message.type === 'note';
+                            const outbound = message.direction === 'outbound';
+
+                            return (
+                                <div
+                                    key={message.id}
+                                    data-inbox="message"
+                                    className={cn(
+                                        'max-w-[78%] px-3 py-2 text-[13px] leading-5',
+                                        note
+                                            ? 'bg-white text-ink'
+                                            : outbound
+                                              ? 'ml-auto border border-hairline bg-white text-ink'
+                                              : 'bg-white text-ink',
+                                    )}
+                                >
+                                    {note ? (
+                                        <p className="mb-1 text-[10px] font-medium tracking-[0.04em] text-mute uppercase">
+                                            {t(
+                                                'Private note, only visible to agents',
+                                            )}
+                                        </p>
+                                    ) : null}
+                                    <p className="whitespace-pre-wrap">{message.body}</p>
+                                    {message.status === 'failed' &&
+                                    message.failure_reason ? (
+                                        <p
+                                            role="status"
+                                            className="mt-1 text-[11px] text-destructive"
+                                        >
+                                            {message.failure_reason}
+                                        </p>
+                                    ) : null}
+                                    {last ? (
+                                        <p className="mt-1 font-mono text-[10px] tabular-nums text-mute">
+                                            {formatInboxWhen(message.created_at)}
+                                            {message.status === 'sent' ||
+                                            message.status === 'queued' ||
+                                            message.status === 'logged' ||
+                                            message.status === 'received'
+                                                ? ` · ${message.status}`
+                                                : message.status === 'failed'
+                                                  ? ` · ${message.status}`
+                                                  : ''}
+                                        </p>
+                                    ) : null}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+            ))}
+            <div ref={endRef} />
+        </div>
+    );
+}
+
+export function InboxComposer({
+    threadId,
+    mode,
+    onModeChange,
+}: {
+    threadId: number;
+    mode: 'reply' | 'note';
+    onModeChange: (mode: 'reply' | 'note') => void;
+}) {
+    return (
+        <Form
+            key={threadId}
+            action={`/desk/threads/${threadId}/reply`}
+            method="post"
+            resetOnSuccess={['body']}
+            data-inbox="composer"
+        >
+            {({ processing, errors }) => (
+                <div className="border-t border-hairline bg-white p-3">
+                    <div className="mb-2 flex gap-3">
+                        <button
+                            type="button"
+                            onClick={() => onModeChange('reply')}
+                            className={
+                                mode === 'reply'
+                                    ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
+                                    : 'text-[12px] text-mute'
+                            }
+                        >
+                            {t('Reply')}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onModeChange('note')}
+                            className={
+                                mode === 'note'
+                                    ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
+                                    : 'text-[12px] text-mute'
+                            }
+                        >
+                            {t('Note')}
+                        </button>
+                    </div>
+                    {mode === 'note' ? (
+                        <input type="hidden" name="as_note" value="1" />
+                    ) : null}
+                    <Textarea
+                        name="body"
+                        required
+                        placeholder={
+                            mode === 'note'
+                                ? t('Private note')
+                                : t('Type your message')
+                        }
+                        className="max-h-32 min-h-16 rounded-none"
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' && !event.shiftKey) {
+                                event.preventDefault();
+                                event.currentTarget.form?.requestSubmit();
+                            }
+                        }}
+                    />
+                    {errors.body ? (
+                        <p role="alert" className="mt-1 text-[12px] text-destructive">
+                            {errors.body}
+                        </p>
+                    ) : null}
+                    <div className="mt-2 flex flex-wrap justify-end gap-2">
+                        {mode === 'reply' ? (
+                            <>
+                                <Button
+                                    type="submit"
+                                    name="resolve"
+                                    value="1"
+                                    variant="outline"
+                                    disabled={processing}
+                                >
+                                    {t('Send as resolved')}
+                                </Button>
+                                <Button type="submit" disabled={processing}>
+                                    {t('Send')}
+                                </Button>
+                            </>
+                        ) : (
+                            <Button type="submit" disabled={processing}>
+                                {t('Add note')}
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            )}
+        </Form>
     );
 }
 

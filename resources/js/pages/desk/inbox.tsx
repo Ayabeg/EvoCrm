@@ -1,13 +1,17 @@
 import { Form, Link, router, usePage } from '@inertiajs/react';
 import { Tray } from '@phosphor-icons/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { DeskShell } from '@/components/crm/desk-shell';
 import {
     InboxCaughtUpMark,
+    InboxComposer,
     InboxContactSidebar,
+    InboxConversationRow,
     InboxEmbedSkeleton,
     InboxFolderRail,
+    InboxListHeader,
+    InboxMessageThread,
     InboxPersonMark,
     InboxStatusBanner,
     formatInboxWhen,
@@ -21,13 +25,20 @@ import type {
 } from '@/components/crm/inbox-chrome';
 import { DeskGlass } from '@/components/desk/desk-glass';
 import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Textarea } from '@/components/ui/textarea';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
-import type { Auth, OfficialDeskConnector } from '@/types';
+import {
+    buildInboxFolders,
+    inboxChannelLabel,
+    inboxSearchParams,
+    inboxThreadMatchesRequest,
+    isStaleInboxVisit,
+    normalizeInboxFolder,
+    resolveInboxRequestedThreadId,
+} from '@/lib/inbox-workspace';
+import type { OfficialDeskConnector } from '@/types';
 
 type Thread = {
     id: number;
@@ -71,11 +82,11 @@ type Props = {
     selected: Thread | null;
     channels?: ChannelChip[];
     officialConnectors: OfficialDeskConnector[];
+    folder?: string;
+    q?: string;
+    contextOpen?: boolean;
+    folderCounts?: Record<string, number>;
 };
-
-function isClosed(status: string): boolean {
-    return status === 'resolved' || status === 'closed';
-}
 
 function ConnectWhatsAppCta({
     connectors,
@@ -246,6 +257,10 @@ export default function DeskInbox({
     selected,
     channels = [],
     officialConnectors = [],
+    folder = 'all',
+    q = '',
+    contextOpen = true,
+    folderCounts = {},
 }: Props) {
     const [useNative, setUseNative] = useState(false);
 
@@ -262,16 +277,19 @@ export default function DeskInbox({
         );
     }
 
-    const empty = threads.length === 0;
+    const workspaceEmpty =
+        !q &&
+        normalizeInboxFolder(folder) === 'all' &&
+        (folderCounts.all ?? threads.length) === 0;
 
     return (
         <DeskShell title="Inbox">
             <div
-                className="flex h-full min-h-0 flex-col bg-canvas-soft text-[13px] text-ink"
+                className="flex h-full min-h-0 flex-col overflow-x-hidden bg-canvas-soft text-[13px] text-ink"
                 data-crm="inbox-workspace"
                 data-inbox="native"
             >
-                {empty ? (
+                {workspaceEmpty ? (
                     <InboxEmpty
                         embedState={embedState}
                         embedReason={embedReason}
@@ -289,6 +307,10 @@ export default function DeskInbox({
                             threads={threads}
                             selected={selected}
                             channels={channels}
+                            folder={folder}
+                            q={q}
+                            contextOpen={contextOpen}
+                            folderCounts={folderCounts}
                         />
                     </>
                 )}
@@ -301,350 +323,364 @@ function FrontDesk({
     threads,
     selected,
     channels,
+    folder: folderProp,
+    q: qProp,
+    contextOpen,
+    folderCounts,
 }: {
     threads: Thread[];
     selected: Thread | null;
     channels: ChannelChip[];
+    folder: string;
+    q: string;
+    contextOpen: boolean;
+    folderCounts: Record<string, number>;
 }) {
-    const [folder, setFolder] = useState('all');
+    const folder = normalizeInboxFolder(folderProp);
+    const page = usePage();
     const [mode, setMode] = useState<'reply' | 'note'>('reply');
+    const [draftQuery, setDraftQuery] = useState(qProp);
+    const [prevQuery, setPrevQuery] = useState(qProp);
+    const [pendingThreadId, setPendingThreadId] = useState<number | null>(null);
+    const [contextOverlay, setContextOverlay] = useState(false);
+    const visitGeneration = useRef(0);
     const { features } = useSimpleMode();
-    const { auth } = usePage<{ auth: Auth }>().props;
-    const userId = auth.user.id;
+
+    if (qProp !== prevQuery) {
+        setPrevQuery(qProp);
+        setDraftQuery(qProp);
+    }
+
+    if (pendingThreadId !== null && selected?.id === pendingThreadId) {
+        setPendingThreadId(null);
+    }
+
+    useEffect(() => {
+        const onPopState = () => {
+            setPendingThreadId(null);
+        };
+
+        window.addEventListener('popstate', onPopState);
+
+        return () => window.removeEventListener('popstate', onPopState);
+    }, []);
+
+    const requestedThreadId = resolveInboxRequestedThreadId({
+        pendingId: pendingThreadId,
+        url: page.url,
+        selectedId: selected?.id ?? null,
+    });
+    const selectedMatchesRequest = inboxThreadMatchesRequest(
+        selected?.id,
+        requestedThreadId,
+    );
+
+    const assignedToMe = 'Assigned to me';
+    const allOpen = 'All open';
 
     const folders = useMemo<InboxFolder[]>(() => {
-        const channelFolders = channels.map((channel) => ({
-            key: channel.key,
-            label: channel.label,
-            count: threads.filter((thread) => thread.channel?.type === channel.key)
-                .length,
-        }));
+        return buildInboxFolders(folderCounts, channels).map((item) => {
+            if (item.key === 'mine') {
+                return { ...item, label: assignedToMe };
+            }
 
-        return [
-            { key: 'all', label: 'All', count: threads.length },
+            if (item.key === 'open') {
+                return { ...item, label: allOpen };
+            }
+
+            return item;
+        });
+    }, [channels, folderCounts]);
+
+    const visitInbox = (
+        next: {
+            thread?: number | null;
+            folder?: string;
+            q?: string;
+            context?: '0' | '1';
+        },
+        generation?: number,
+    ) => {
+        const requestId = generation ?? visitGeneration.current;
+
+        router.cancelAll({ prefetch: false });
+        router.get(
+            '/inbox',
+            inboxSearchParams({
+                thread:
+                    next.thread === undefined
+                        ? (requestedThreadId ?? selected?.id)
+                        : next.thread,
+                folder: next.folder ?? folder,
+                q: next.q === undefined ? qProp : next.q,
+                context: next.context ?? (contextOpen ? '1' : '0'),
+            }),
             {
-                key: 'unassigned',
-                label: 'Unassigned',
-                count: threads.filter((thread) => !thread.contact.owner).length,
+                preserveState: true,
+                preserveScroll: true,
+                onFinish: () => {
+                    if (isStaleInboxVisit(visitGeneration.current, requestId)) {
+                        return;
+                    }
+
+                    setPendingThreadId(null);
+                },
             },
-            {
-                key: 'mine',
-                label: 'Assigned to me',
-                count: threads.filter(
-                    (thread) => thread.contact.owner?.id === userId,
-                ).length,
-            },
-            {
-                key: 'open',
-                label: 'All open',
-                count: threads.filter((thread) => !isClosed(thread.status)).length,
-            },
-            ...channelFolders,
-            {
-                key: 'closed',
-                label: 'All closed',
-                count: threads.filter((thread) => isClosed(thread.status)).length,
-            },
-        ];
-    }, [channels, threads, userId]);
+        );
+    };
 
-    const filtered = useMemo(() => {
-        if (folder === 'unassigned') {
-            return threads.filter((thread) => !thread.contact.owner);
-        }
+    const selectThread = (threadId: number) => {
+        const requestId = ++visitGeneration.current;
+        setPendingThreadId(threadId);
+        setMode('reply');
+        setContextOverlay(false);
+        visitInbox({ thread: threadId }, requestId);
+    };
 
-        if (folder === 'mine') {
-            return threads.filter(
-                (thread) => thread.contact.owner?.id === userId,
-            );
-        }
+    const searchTimer = useRef<number | undefined>(undefined);
 
-        if (folder === 'open') {
-            return threads.filter((thread) => !isClosed(thread.status));
-        }
+    const onQueryChange = (value: string) => {
+        setDraftQuery(value);
+        window.clearTimeout(searchTimer.current);
+        searchTimer.current = window.setTimeout(() => {
+            visitInbox({ q: value });
+        }, 250);
+    };
 
-        if (folder === 'closed') {
-            return threads.filter((thread) => isClosed(thread.status));
-        }
-
-        if (folder === 'whatsapp') {
-            return threads.filter(
-                (thread) =>
-                    thread.channel?.type === 'whatsapp' ||
-                    thread.channel?.type === 'whatsapp_cloud',
-            );
-        }
-
-        if (channels.some((channel) => channel.key === folder)) {
-            return threads.filter(
-                (thread) => thread.channel?.type === folder,
-            );
-        }
-
-        return threads;
-    }, [channels, folder, threads, userId]);
+    const showContextHost = contextOpen && selectedMatchesRequest;
+    const channelName = inboxChannelLabel(selected?.channel);
 
     return (
-        <AdaptiveWorkspaceShell
-            leftLabel="Folders"
-            centerLabel="Inbox"
-            rightLabel="Conversation"
-            defaultPanel="center"
-            left={
-                <InboxFolderRail
-                    folders={folders}
-                    folder={folder}
-                    onSelect={setFolder}
-                />
-            }
-            center={
-                <div className="flex min-h-0 flex-1 flex-col">
-                    <div className="flex items-center justify-between border-b border-hairline px-3 py-1.5">
-                        <p className="text-[12px] font-medium text-ink">
-                            Inbox
-                        </p>
-                        <p className="font-mono text-[11px] tabular-nums text-mute">
-                            {filtered.length}
-                        </p>
-                    </div>
-                    {filtered.length === 0 ? (
-                        <div className="grid flex-1 place-items-center px-4 py-10">
-                            <div className="max-w-xs text-center">
-                                <p className="text-[13px] font-medium text-ink">
-                                    No open conversations here
-                                </p>
-                                <p className="mt-1 text-[12px] text-mute">
-                                    You&apos;re all caught up.
-                                </p>
-                            </div>
-                        </div>
-                    ) : (
-                        filtered.map((thread) => (
-                            <button
-                                key={thread.id}
-                                type="button"
-                                onClick={() =>
-                                    router.get(
-                                        '/inbox',
-                                        { thread: thread.id },
-                                        { preserveState: true },
-                                    )
-                                }
-                                className={`flex w-full items-start gap-2.5 border-b border-hairline px-3 py-2 text-left transition-colors duration-150 ${
-                                    selected?.id === thread.id
-                                        ? 'bg-canvas-soft'
-                                        : 'hover:bg-canvas-soft'
-                                }`}
-                            >
-                                <InboxPersonMark
-                                    name={inboxContactName(thread.contact)}
-                                    initials={inboxInitials(thread.contact)}
-                                />
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex items-baseline justify-between gap-2">
-                                        <span className="truncate text-[13px] font-medium text-ink">
-                                            {inboxContactName(thread.contact)}
-                                        </span>
-                                        <span className="shrink-0 font-mono text-[10px] tabular-nums text-mute">
-                                            {formatInboxWhen(
-                                                thread.last_message_at,
-                                            )}
-                                        </span>
-                                    </div>
-                                    <p className="mt-0.5 truncate text-[12px] text-mute">
-                                        {thread.messages?.[0]?.body ??
-                                            thread.subject ??
-                                            'No preview'}
-                                    </p>
-                                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-mute">
-                                        <span className="truncate">
-                                            {thread.channel?.name ??
-                                                'WhatsApp Cloud'}
-                                        </span>
-                                        {(thread.unread_count ?? 0) > 0 ? (
-                                            <Badge
-                                                variant="default"
-                                                className="h-4 min-w-4 rounded-none px-1 font-mono text-[10px]"
-                                            >
-                                                {thread.unread_count}
-                                            </Badge>
-                                        ) : null}
-                                    </div>
-                                </div>
-                            </button>
-                        ))
-                    )}
-                </div>
-            }
-            right={
-                selected ? (
-                    <div className="flex min-h-0 flex-1 bg-white">
-                        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-                            <DeskGlass
-                                as="header"
-                                className="flex flex-wrap items-center justify-between gap-2 border-b bg-white px-3 py-2"
-                            >
-                                <div className="flex min-w-0 items-center gap-2.5">
-                                    <InboxPersonMark
-                                        name={inboxContactName(selected.contact)}
-                                        initials={inboxInitials(selected.contact)}
-                                        size="md"
-                                    />
-                                    <div className="min-w-0">
-                                        <h2 className="truncate text-[13px] font-semibold text-ink">
-                                            {inboxContactName(selected.contact)}
-                                        </h2>
-                                        <p className="truncate text-[11px] text-mute">
-                                            {selected.contact.owner?.name ??
-                                                t('Unassigned')}{' '}
-                                            · {t('Official WhatsApp')}
+        <div
+            className="flex min-h-0 flex-1 overflow-x-hidden"
+            data-inbox="panes"
+        >
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <AdaptiveWorkspaceShell
+                    leftLabel="Folders"
+                    centerLabel="Inbox"
+                    rightLabel="Conversation"
+                    defaultPanel="center"
+                    left={
+                        <InboxFolderRail
+                            folders={folders}
+                            folder={folder}
+                            onSelect={(key) => visitInbox({ folder: key })}
+                        />
+                    }
+                    center={
+                        <div
+                            className="flex min-h-0 flex-1 flex-col"
+                            data-inbox-pane="list"
+                            data-inbox="conversation-list"
+                        >
+                            <InboxListHeader
+                                query={draftQuery}
+                                count={threads.length}
+                                onQueryChange={onQueryChange}
+                            />
+                            {threads.length === 0 ? (
+                                <div className="grid flex-1 place-items-center px-4 py-10">
+                                    <div className="max-w-xs text-center">
+                                        <p className="text-[13px] font-medium text-ink">
+                                            No open conversations here
+                                        </p>
+                                        <p className="mt-1 text-[12px] text-mute">
+                                            You&apos;re all caught up.
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                                    {features.tickets && selected.ticket ? (
-                                        <Link
-                                            href={`/crm/tickets/${selected.ticket.id}`}
-                                            data-testid="desk-ticket-link"
-                                            className="text-[12px] font-medium text-ink underline-offset-2 hover:underline"
-                                        >
-                                            {selected.ticket.number}
-                                        </Link>
-                                    ) : null}
-                                    {features.tickets ? (
-                                        <Form
-                                            action={`/desk/threads/${selected.id}/ticket`}
-                                            method="post"
-                                        >
-                                            {({ processing }) => (
-                                                <Button
-                                                    type="submit"
-                                                    size="sm"
-                                                    className="h-7"
-                                                    disabled={processing}
-                                                    data-testid="desk-open-ticket"
-                                                >
-                                                    {t('Open ticket')}
-                                                </Button>
+                            ) : (
+                                <div className="min-h-0 flex-1 overflow-y-auto">
+                                    {threads.map((thread) => (
+                                        <InboxConversationRow
+                                            key={thread.id}
+                                            name={inboxContactName(
+                                                thread.contact,
                                             )}
-                                        </Form>
-                                    ) : null}
-                                </div>
-                            </DeskGlass>
-                            <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-canvas-soft p-3">
-                                {(selected.messages ?? []).map((message) => (
-                                    <div
-                                        key={message.id}
-                                        className={`max-w-[78%] px-3 py-2 text-[13px] leading-5 ${
-                                            message.type === 'note'
-                                                ? 'bg-white text-ink'
-                                                : message.direction ===
-                                                    'outbound'
-                                                  ? 'ml-auto border border-hairline bg-white text-ink'
-                                                  : 'bg-white text-ink'
-                                        }`}
-                                    >
-                                        {message.type === 'note' ? (
-                                            <p className="mb-1 text-[10px] font-medium tracking-[0.04em] text-mute uppercase">
-                                                {t('Private note, only visible to agents')}
-                                            </p>
-                                        ) : null}
-                                        <p>{message.body}</p>
-                                    </div>
-                                ))}
-                            </div>
-                            <Form
-                                action={`/desk/threads/${selected.id}/reply`}
-                                method="post"
-                                resetOnSuccess={['body']}
-                            >
-                                {({ processing }) => (
-                                    <DeskGlass
-                                        as="footer"
-                                        className="border-t bg-white p-3"
-                                    >
-                                        <div className="mb-2 flex gap-3">
-                                            <button
-                                                type="button"
-                                                onClick={() => setMode('reply')}
-                                                className={
-                                                    mode === 'reply'
-                                                        ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
-                                                        : 'text-[12px] text-mute'
-                                                }
-                                            >
-                                                {t('Reply')}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setMode('note')}
-                                                className={
-                                                    mode === 'note'
-                                                        ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
-                                                        : 'text-[12px] text-mute'
-                                                }
-                                            >
-                                                {t('Note')}
-                                            </button>
-                                        </div>
-                                        {mode === 'note' ? (
-                                            <input
-                                                type="hidden"
-                                                name="as_note"
-                                                value="1"
-                                            />
-                                        ) : null}
-                                        <Textarea
-                                            name="body"
-                                            required
-                                            placeholder={
-                                                mode === 'note'
-                                                    ? t('Private note')
-                                                    : t('Type your message')
+                                            initials={inboxInitials(
+                                                thread.contact,
+                                            )}
+                                            when={formatInboxWhen(
+                                                thread.last_message_at,
+                                            )}
+                                            preview={
+                                                thread.messages?.[0]?.body ??
+                                                thread.subject ??
+                                                'No preview'
                                             }
-                                            className="min-h-16 rounded-none"
-                                        />
-                                        <div className="mt-2 flex justify-end">
-                                            {mode === 'reply' ? (
-                                                <Button
-                                                    name="resolve"
-                                                    value="1"
-                                                    disabled={processing}
-                                                >
-                                                    {t('Send as resolved')}
-                                                </Button>
-                                            ) : (
-                                                <Button disabled={processing}>
-                                                    {t('Add note')}
-                                                </Button>
+                                            channel={inboxChannelLabel(
+                                                thread.channel,
                                             )}
+                                            unread={thread.unread_count ?? 0}
+                                            selected={
+                                                requestedThreadId === thread.id
+                                            }
+                                            onSelect={() =>
+                                                selectThread(thread.id)
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    }
+                    right={
+                        selectedMatchesRequest && selected ? (
+                            <div
+                                className="relative flex min-h-0 flex-1 bg-white"
+                                data-inbox-pane="conversation"
+                                data-inbox-thread={selected.id}
+                            >
+                                <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                                    <DeskGlass
+                                        as="header"
+                                        className="flex flex-wrap items-center justify-between gap-2 border-b bg-white px-3 py-2"
+                                    >
+                                        <div className="flex min-w-0 items-center gap-2.5">
+                                            <InboxPersonMark
+                                                name={inboxContactName(
+                                                    selected.contact,
+                                                )}
+                                                initials={inboxInitials(
+                                                    selected.contact,
+                                                )}
+                                                size="md"
+                                            />
+                                            <div className="min-w-0">
+                                                <h2 className="truncate text-[13px] font-semibold text-ink">
+                                                    {inboxContactName(
+                                                        selected.contact,
+                                                    )}
+                                                </h2>
+                                                <p className="truncate text-[11px] text-mute">
+                                                    {selected.contact.owner
+                                                        ?.name ??
+                                                        t('Unassigned')}{' '}
+                                                    · {channelName}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex shrink-0 flex-wrap items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (showContextHost) {
+                                                        visitInbox({
+                                                            context: '0',
+                                                        });
+                                                        setContextOverlay(
+                                                            false,
+                                                        );
+                                                    } else {
+                                                        visitInbox({
+                                                            context: '1',
+                                                        });
+                                                        setContextOverlay(
+                                                            true,
+                                                        );
+                                                    }
+                                                }}
+                                                className="text-[12px] text-mute hover:text-ink"
+                                            >
+                                                {showContextHost
+                                                    ? t('Hide context')
+                                                    : t('Context')}
+                                            </button>
+                                            {features.tickets &&
+                                            selected.ticket ? (
+                                                <Link
+                                                    href={`/crm/tickets/${selected.ticket.id}`}
+                                                    data-testid="desk-ticket-link"
+                                                    className="text-[12px] font-medium text-ink underline-offset-2 hover:underline"
+                                                >
+                                                    {selected.ticket.number}
+                                                </Link>
+                                            ) : null}
+                                            {features.tickets ? (
+                                                <Form
+                                                    action={`/desk/threads/${selected.id}/ticket`}
+                                                    method="post"
+                                                >
+                                                    {({ processing }) => (
+                                                        <Button
+                                                            type="submit"
+                                                            size="sm"
+                                                            className="h-7"
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                            data-testid="desk-open-ticket"
+                                                        >
+                                                            {t('Open ticket')}
+                                                        </Button>
+                                                    )}
+                                                </Form>
+                                            ) : null}
                                         </div>
                                     </DeskGlass>
-                                )}
-                            </Form>
-                        </div>
-                        <InboxContactSidebar contact={selected.contact} />
-                    </div>
-                ) : (
-                    <div className="grid flex-1 place-items-center bg-white px-5 py-8">
-                        <div className="max-w-xs text-center">
-                            <p className="text-[13px] font-medium text-ink">
-                                {t('Select a conversation')}
-                            </p>
-                            <p className="mt-1 text-[12px] text-mute">
-                                {t("You're all caught up.")}
-                            </p>
-                        </div>
-                    </div>
-                )
-            }
-            leftClassName="bg-white p-0"
-            centerClassName="bg-white p-0"
-            rightClassName="bg-white p-0"
-            scrollPanels={{ left: true, center: true, right: false }}
-            tabletGridClassName="grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]"
-            desktopGridClassName="lg:grid-cols-[minmax(11rem,13rem)_minmax(18rem,22rem)_minmax(0,1fr)]"
-        />
+                                    <InboxMessageThread
+                                        threadId={selected.id}
+                                        messages={selected.messages ?? []}
+                                    />
+                                    <InboxComposer
+                                        threadId={selected.id}
+                                        mode={mode}
+                                        onModeChange={setMode}
+                                    />
+                                </div>
+                                {contextOverlay ? (
+                                    <div className="absolute inset-y-0 right-0 z-20 w-[17.5rem] border-l border-hairline bg-white xl:hidden">
+                                        <InboxContactSidebar
+                                            contact={selected.contact}
+                                            onCollapse={() =>
+                                                setContextOverlay(false)
+                                            }
+                                        />
+                                    </div>
+                                ) : null}
+                            </div>
+                        ) : requestedThreadId ? (
+                            <div
+                                className="grid flex-1 place-items-center bg-white px-5 py-8"
+                                data-inbox-pane="conversation"
+                                data-inbox="conversation-pending"
+                            >
+                                <div className="max-w-xs text-center">
+                                    <p className="text-[13px] font-medium text-ink">
+                                        Opening conversation
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="grid flex-1 place-items-center bg-white px-5 py-8">
+                                <div className="max-w-xs text-center">
+                                    <p className="text-[13px] font-medium text-ink">
+                                        {t('Select a conversation')}
+                                    </p>
+                                    <p className="mt-1 text-[12px] text-mute">
+                                        {t("You're all caught up.")}
+                                    </p>
+                                </div>
+                            </div>
+                        )
+                    }
+                    leftClassName="bg-white p-0"
+                    centerClassName="bg-white p-0"
+                    rightClassName="bg-white p-0"
+                    scrollPanels={{ left: true, center: false, right: false }}
+                    tabletGridClassName="grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]"
+                    desktopGridClassName="lg:grid-cols-[minmax(11.25rem,13.75rem)_minmax(17.5rem,21.25rem)_minmax(0,1fr)]"
+                />
+            </div>
+            {showContextHost && selectedMatchesRequest && selected ? (
+                <InboxContactSidebar
+                    contact={selected.contact}
+                    className="hidden xl:flex"
+                    onCollapse={() => visitInbox({ context: '0' })}
+                />
+            ) : null}
+        </div>
     );
 }
 
