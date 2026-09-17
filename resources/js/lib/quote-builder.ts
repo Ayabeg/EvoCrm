@@ -9,7 +9,7 @@ export const QUOTE_BUILDER_SPLIT_CLASS =
     'flex min-h-0 flex-1 flex-col overflow-hidden';
 
 export const QUOTE_BUILDER_DESKTOP_GRID_CLASS =
-    'hidden min-h-0 flex-1 gap-px overflow-hidden bg-hairline lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)]';
+    'flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:gap-px lg:bg-hairline';
 
 export const QUOTE_DOCUMENT_PAPER_CLASS =
     'mx-auto w-full max-w-[40rem] border border-hairline bg-canvas px-5 py-6 sm:px-8 sm:py-8';

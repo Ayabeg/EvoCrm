@@ -1,6 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { PaperPlaneTilt, Prohibit } from '@phosphor-icons/react';
 import { useState } from 'react';
+import { WorkspacePanelSwitcher } from '@/components/crm/adaptive-workspace-shell';
 import {
     AssociationCard,
     RelatedRecordLink,
@@ -10,11 +11,12 @@ import {
     RecordFactList,
     RecordSection,
 } from '@/components/crm/record-hub';
-import { WorkspacePanelSwitcher } from '@/components/crm/adaptive-workspace-shell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { t } from '@/lib/i18n';
+import { formatDzd } from '@/lib/money';
 import {
     QUOTE_BUILDER_DESKTOP_GRID_CLASS,
     QUOTE_BUILDER_SPLIT_CLASS,
@@ -27,8 +29,6 @@ import {
     quoteUnitDzd,
     quoteUpdateAction,
 } from '@/lib/quote-builder';
-import { t } from '@/lib/i18n';
-import { formatDzd } from '@/lib/money';
 import type { QuoteRecord } from '@/pages/crm/quotes/quote-record';
 
 export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
@@ -340,12 +340,25 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                 active={panel}
                 onChange={setPanel}
             />
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:hidden">
-                {panel === 'left' ? properties : document}
-            </div>
             <div className={QUOTE_BUILDER_DESKTOP_GRID_CLASS}>
-                {document}
-                {properties}
+                <div
+                    className={
+                        panel === 'center'
+                            ? 'flex min-h-0 min-w-0 flex-1 flex-col'
+                            : 'hidden min-h-0 min-w-0 lg:flex lg:flex-1 lg:flex-col'
+                    }
+                >
+                    {document}
+                </div>
+                <div
+                    className={
+                        panel === 'left'
+                            ? 'flex min-h-0 min-w-0 flex-1 flex-col'
+                            : 'hidden min-h-0 min-w-0 lg:flex lg:flex-1 lg:flex-col'
+                    }
+                >
+                    {properties}
+                </div>
             </div>
         </div>
     );

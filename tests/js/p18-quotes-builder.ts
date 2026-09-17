@@ -39,14 +39,17 @@ expectEqual(quoteCanEdit(false), true, 'draft is editable');
 expectEqual(quoteCanEdit(true), false, 'sent is immutable');
 expectEqual(quoteUnitDzd(18_000_000), '180000', 'cents to DZD input');
 expectEqual(quoteDateInputValue(null), '', 'empty date');
-expectTrue(!formatQuoteWhen('2026-09-17T09:00:00+01:00')?.includes('NaN') ?? false, 'formats Algiers date');
+const formattedWhen = formatQuoteWhen('2026-09-17T09:00:00+01:00');
+expectTrue(formattedWhen !== null && !formattedWhen.includes('NaN'), 'formats Algiers date');
 expectTrue(QUOTE_BUILDER_SPLIT_CLASS.includes('flex-col'), 'stacked below lg');
+expectTrue(QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('flex-col'), 'one tree stacks below lg');
 expectTrue(QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('lg:grid'), 'split from lg');
 expectTrue(
     QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)]'),
     'document + properties rail',
 );
 expectTrue(!QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('grid-cols-3'), 'not a 3-pane triad');
+expectTrue(!QUOTE_BUILDER_DESKTOP_GRID_CLASS.startsWith('hidden'), 'builder is not display-none below lg');
 expectTrue(QUOTE_DOCUMENT_PAPER_CLASS.includes('max-w-[40rem]'), 'paper is readable at 768');
 expectTrue(QUOTE_DOCUMENT_PAPER_CLASS.includes('bg-canvas'), 'paper uses canvas token');
 

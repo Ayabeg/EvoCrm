@@ -88,10 +88,10 @@ it('locks the quote show page as a split document/properties builder without a V
         ->and($builder)->not->toContain('HubSpot')
         ->and($builder)->not->toContain('#00A4BD');
 
-    expect($lib)->toContain("return `/crm/quotes/${id}/preview`")
-        ->and($lib)->toContain("return `/crm/quotes/${id}/send`")
-        ->and($lib)->toContain("return `/crm/quotes/${id}/revoke`")
-        ->and($lib)->toContain("return `/crm/quotes/${id}`")
+    expect($lib)->toContain('return `/crm/quotes/${id}/preview`')
+        ->and($lib)->toContain('return `/crm/quotes/${id}/send`')
+        ->and($lib)->toContain('return `/crm/quotes/${id}/revoke`')
+        ->and($lib)->toContain('return `/crm/quotes/${id}`')
         ->and($lib)->toContain('Africa/Algiers');
 
     expect($index)->toContain('CreateDrawer')

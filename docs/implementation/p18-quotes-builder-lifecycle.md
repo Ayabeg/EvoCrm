@@ -12,7 +12,7 @@ P00–P17 merged and frozen. P18 owns Quotes product chrome and quote lifecycle 
 
 Audit complete on fresh main @ `71e3d8b` **before** product code. CURRENT SHOW recorded below. The active `resources/js/pages/crm/quotes/show.tsx` remains the only quote record. No QuoteBuilderV2 / QuoteWorkspaceNew.
 
-**MERGE READY: NO** until Research Contabo populated QA is PASS. Do not merge. Do not start P19/P20/P21.
+**MERGE READY: NO** — local Pest / types / eslint / build are green. Contabo populated QA is not done. Do not merge. Do not start P19/P20/P21.
 
 ## BASE / PR / TIP
 
@@ -102,10 +102,22 @@ None. Existing quote columns already represent document + lifecycle.
 
 ## TESTS
 
-- `tests/Feature/P18QuotesBuilderTest.php`
-- `tests/js/p18-quotes-builder.ts` (`npx vite-node`)
-- Updated Wave4 show chrome lock
-- Existing QuoteAcceptance, QuoteDelivery, QuoteTotal, P08 list locks
+Commands:
+
+| Command | Result |
+|---|---|
+| Focused Pest (P18 + Wave4 + Quote* + P08) | **23 passed** |
+| `php artisan test` | **957 passed** (11930 assertions) |
+| `npx vite-node tests/js/p18-quotes-builder.ts` | **pass** |
+| eslint on P18-touched JS | **pass** |
+| `npm run types:check` | **pass** |
+| `npm run build` | **pass** |
+
+## LIVE VISUAL QA
+
+**NEEDS RESEARCH / Contabo.** This agent did not walk a populated quote show at 1440 / 1280 / 1024 / 768. Do not merge until that pass.
+
+Exercise: draft edit + save lines; sent show (immutable, send/resend/revoke); Preview PDF; public `/q/{token}` accept; list create drawer unchanged.
 
 ---
 

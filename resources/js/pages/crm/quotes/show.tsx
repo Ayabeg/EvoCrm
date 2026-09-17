@@ -8,8 +8,8 @@ import {
 } from '@/components/crm/record-hub';
 import { Button } from '@/components/ui/button';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
-import { quoteListHref, quotePreviewHref } from '@/lib/quote-builder';
 import { t } from '@/lib/i18n';
+import { quoteListHref, quotePreviewHref } from '@/lib/quote-builder';
 import type { QuoteRecord } from '@/pages/crm/quotes/quote-record';
 import { QuoteSplitBuilder } from '@/pages/crm/quotes/quote-split-builder';
 
