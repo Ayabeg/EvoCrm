@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\WorkspaceRole;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Quote;
@@ -79,6 +80,9 @@ it('locks the quote show page as a split document/properties builder without a V
         ->and($builder)->toContain('quoteSendAction(quote.id)')
         ->and($builder)->toContain('quoteRevokeAction(quote.id)')
         ->and($builder)->toContain('quoteUpdateAction(quote.id)')
+        ->and($builder)->toContain('quote.can.update')
+        ->and($builder)->toContain('canUpdate: quote.can.update')
+        ->and($builder)->not->toContain('quoteCanEdit(quote.immutable)')
         ->and($builder)->toContain('name="to"')
         ->and($builder)->toContain('items[${index}][name]')
         ->and($builder)->toContain('items[${index}][unit_dzd]')
@@ -92,10 +96,15 @@ it('locks the quote show page as a split document/properties builder without a V
         ->and($lib)->toContain('return `/crm/quotes/${id}/send`')
         ->and($lib)->toContain('return `/crm/quotes/${id}/revoke`')
         ->and($lib)->toContain('return `/crm/quotes/${id}`')
-        ->and($lib)->toContain('Africa/Algiers');
+        ->and($lib)->toContain('Africa/Algiers')
+        ->and($lib)->toContain('canUpdate')
+        ->and($lib)->toContain('input.canUpdate')
+        ->and($lib)->toContain('!input.immutable');
 
     expect($index)->toContain('CreateDrawer')
         ->and($index)->toContain('items[0][unit_dzd]')
+        ->and($index)->toContain('can.create')
+        ->and($index)->toContain('canCreate={can.create}')
         ->and($index)->not->toContain('QuoteBuilder')
         ->and($index)->not->toContain('QuoteSplitBuilder')
         ->and($public)->toContain('Accept quote')
@@ -104,6 +113,8 @@ it('locks the quote show page as a split document/properties builder without a V
         ->and($controller)->toContain('function revoke')
         ->and($controller)->toContain('function update')
         ->and($controller)->toContain('abort_if($quote->isImmutable(), 422')
+        ->and($controller)->toContain("\$user->can('update', \$quote)")
+        ->and($controller)->toContain("\$user->can('create', Quote::class)")
         ->and($routes)->toContain("Route::put('/crm/quotes/{quote}'")
         ->and($routes)->toContain("Route::post('/crm/quotes/{quote}/send'")
         ->and($routes)->toContain("Route::post('/crm/quotes/{quote}/revoke'")
@@ -138,6 +149,13 @@ it('keeps quote show inertia payload and lets drafts save through the existing u
     $quote = Quote::query()->where('deal_id', $deal->id)->sole();
 
     $this->actingAs($user)
+        ->get('/crm/quotes')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/quotes/index')
+            ->where('can.create', true));
+
+    $this->actingAs($user)
         ->get("/crm/quotes/{$quote->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
@@ -145,6 +163,7 @@ it('keeps quote show inertia payload and lets drafts save through the existing u
             ->where('quote.id', $quote->id)
             ->where('quote.status', 'draft')
             ->where('quote.immutable', false)
+            ->where('quote.can.update', true)
             ->where('quote.deal.title', 'Quoted clinic deal')
             ->has('quote.items', 1)
             ->has('quote.owner')
@@ -189,4 +208,53 @@ it('does not let a sent quote be edited after the builder chrome change', functi
             'notes' => 'changed after send',
         ])
         ->assertStatus(422);
+});
+
+it('hides quote authoring capabilities for a workspace member without crm.edit', function () {
+    $owner = User::factory()->create();
+    $member = User::factory()->create([
+        'workspace_id' => $owner->workspace_id,
+        'role' => WorkspaceRole::Member,
+        'permissions' => [],
+    ]);
+    $quote = p18Quote($owner, [
+        'status' => 'draft',
+        'notes' => 'Member must not see save',
+    ]);
+
+    expect($member->can('update', $quote))->toBeFalse()
+        ->and($member->can('create', Quote::class))->toBeFalse()
+        ->and($owner->can('update', $quote))->toBeTrue();
+
+    $this->actingAs($member)
+        ->get('/crm/quotes')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/quotes/index')
+            ->where('can.create', false));
+
+    $this->actingAs($member)
+        ->get("/crm/quotes/{$quote->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/quotes/show')
+            ->where('quote.id', $quote->id)
+            ->where('quote.immutable', false)
+            ->where('quote.can.update', false));
+
+    $this->actingAs($member)
+        ->put("/crm/quotes/{$quote->id}", [
+            'notes' => 'should 403',
+        ])
+        ->assertForbidden();
+
+    $this->actingAs($member)
+        ->post("/crm/deals/{$quote->deal_id}/quotes", [
+            'items' => [
+                ['name' => 'Should not create', 'quantity' => 1, 'unit_dzd' => 100],
+            ],
+        ])
+        ->assertForbidden();
+
+    expect($quote->fresh()->notes)->toBe('Member must not see save');
 });

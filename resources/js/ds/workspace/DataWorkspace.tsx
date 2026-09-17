@@ -48,10 +48,14 @@ function renderSharedTableSurface<Row extends { id: RowId }>(
         return (
             <WorkspaceEmpty
                 empty={props.empty}
-                action={workspaceEmptyAction(
-                    props.empty.actionLabel,
-                    props.primaryAction.onClick,
-                )}
+                action={
+                    props.primaryAction
+                        ? workspaceEmptyAction(
+                              props.empty.actionLabel,
+                              props.primaryAction.onClick,
+                          )
+                        : undefined
+                }
             />
         );
     }
@@ -153,10 +157,12 @@ export function DataWorkspace<Row extends { id: RowId }>(
                 description={description}
                 secondaryActions={secondaryActions}
                 primaryAction={
-                    <PageHeaderAction
-                        label={primaryAction.label}
-                        onClick={primaryAction.onClick}
-                    />
+                    primaryAction ? (
+                        <PageHeaderAction
+                            label={primaryAction.label}
+                            onClick={primaryAction.onClick}
+                        />
+                    ) : undefined
                 }
             />
             {banner}

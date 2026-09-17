@@ -12,7 +12,7 @@ P00–P17 merged and frozen. P18 owns Quotes product chrome and quote lifecycle 
 
 Audit complete on fresh main @ `71e3d8b` **before** product code. CURRENT SHOW recorded below. The active `resources/js/pages/crm/quotes/show.tsx` remains the only quote record. No QuoteBuilderV2 / QuoteWorkspaceNew.
 
-**MERGE READY: NO** — local Pest / types / eslint / build are green. Contabo populated QA is not done. Do not merge. Do not start P19/P20/P21.
+**MERGE READY: NO** — P18.1 gates authoring on QuotePolicy. Research owns Contabo QA. Do not merge. Do not start P20.
 
 ## BASE / PR / TIP
 
@@ -121,9 +121,17 @@ Exercise: draft edit + save lines; sent show (immutable, send/resend/revoke); Pr
 
 ---
 
+## P18.1 — MEMBER AUTHORING GATE
+
+Contabo: member saw Save/Create/send controls; PUT/POST 403. Root cause: `quoteCanEdit(immutable)` ignored QuotePolicy.
+
+Server now sends `quote.can.update` (`$user->can('update', $quote)`) and list `can.create` (`$user->can('create', Quote::class)`). Builder Save, send/resend/revoke, and Create quote render only when those capabilities are true **and** the quote is not immutable.
+
+No Contabo deploy from this lane. No P20.
+
 ## OUT OF SCOPE
 
-P19 Automation. P21 Settings. Payments. E-sign. New tax / discount / currency. New trigger types. P28 cleanup. List rewrite. Public accept redesign.
+P19 Automation. P21 Settings. Payments. E-sign. New tax / discount / currency. New trigger types. P28 cleanup. List rewrite. Public accept redesign. Contabo deploy.
 
 ## P19 / P21 HANDOFF
 

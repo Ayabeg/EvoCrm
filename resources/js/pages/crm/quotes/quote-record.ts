@@ -21,6 +21,9 @@ export type QuoteRecord = {
     revoked_at?: string | null;
     public_url?: string | null;
     immutable: boolean;
+    can: {
+        update: boolean;
+    };
     owner?: { id: number; name: string } | null;
     deal?: { id: number; title: string } | null;
     contact?: {

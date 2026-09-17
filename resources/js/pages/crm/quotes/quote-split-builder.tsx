@@ -37,7 +37,11 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
         ? `${quote.contact.first_name} ${quote.contact.last_name ?? ''}`.trim()
         : null;
     const items = quote.items ?? [];
-    const editable = quoteCanEdit(quote.immutable);
+    const canUpdate = quote.can.update;
+    const editable = quoteCanEdit({
+        immutable: quote.immutable,
+        canUpdate: quote.can.update,
+    });
     const sent = Boolean(quote.sent_at);
     const accepted = Boolean(quote.accepted_at);
     const revoked = Boolean(quote.revoked_at);
@@ -222,7 +226,7 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                             <p className="text-[13px] text-ink">
                                 {t('This public link is revoked.')}
                             </p>
-                        ) : (
+                        ) : canUpdate ? (
                             <Form
                                 action={quoteSendAction(quote.id)}
                                 method="post"
@@ -261,8 +265,8 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                                     </>
                                 )}
                             </Form>
-                        )}
-                        {sent && !accepted && !revoked ? (
+                        ) : null}
+                        {canUpdate && sent && !accepted && !revoked ? (
                             <Form
                                 action={quoteRevokeAction(quote.id)}
                                 method="post"

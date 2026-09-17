@@ -98,6 +98,7 @@ export function CrmListShell<Row extends { id: RowId }>({
     exportHref,
     createHref,
     onCreate,
+    canCreate = true,
     banner,
     headerActions,
     layoutToggle,
@@ -137,6 +138,7 @@ export function CrmListShell<Row extends { id: RowId }>({
     exportHref?: string;
     createHref?: string;
     onCreate?: () => void;
+    canCreate?: boolean;
     banner?: ReactNode;
     headerActions?: ReactNode;
     layoutToggle?: ReactNode;
@@ -212,18 +214,23 @@ export function CrmListShell<Row extends { id: RowId }>({
         object: entity,
         title,
         description,
-        primaryAction: {
-            label: primaryLabel,
-            onClick: () => {
-                if (onCreate) {
-                    onCreate();
+        ...(canCreate
+            ? {
+                  primaryAction: {
+                      label: primaryLabel,
+                      onClick: () => {
+                          if (onCreate) {
+                              onCreate();
 
-                    return;
-                }
+                              return;
+                          }
 
-                window.location.href = createHref ?? `${basePath}?create=1`;
-            },
-        },
+                          window.location.href =
+                              createHref ?? `${basePath}?create=1`;
+                      },
+                  },
+              }
+            : {}),
         views: savedFilters ?? [],
         activeViewId: activeFilters.filter_id
             ? String(activeFilters.filter_id)

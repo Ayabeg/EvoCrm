@@ -27,6 +27,7 @@ export default function QuotesIndex({
     recordCount,
     paginator,
     createOpen,
+    can,
 }: {
     quotes: QuoteListRow[];
     deals: DealOption[];
@@ -37,8 +38,9 @@ export default function QuotesIndex({
     recordCount: number;
     paginator?: { page: number; per_page: number; total: number; last_page: number };
     createOpen?: boolean;
+    can: { create: boolean };
 }) {
-    const [drawer, setDrawer] = useState(Boolean(createOpen));
+    const [drawer, setDrawer] = useState(Boolean(createOpen) && can.create);
     const [dealId, setDealId] = useState(deals[0] ? String(deals[0].id) : '');
     const loading = useInertiaLoading();
 
@@ -55,7 +57,8 @@ export default function QuotesIndex({
                     entity="quote"
                     basePath="/crm/quotes"
                     primaryLabel="Create quote"
-                    onCreate={() => setDrawer(true)}
+                    canCreate={can.create}
+                    onCreate={can.create ? () => setDrawer(true) : undefined}
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -78,7 +81,7 @@ export default function QuotesIndex({
             </div>
 
             <CreateDrawer
-                open={drawer}
+                open={can.create && drawer}
                 onOpenChange={setDrawer}
                 title="Create quote"
             >

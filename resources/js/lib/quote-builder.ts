@@ -52,8 +52,11 @@ export function quoteUnitDzd(unitCents: number | null | undefined): string {
     return String(Math.round((unitCents ?? 0) / 100));
 }
 
-export function quoteCanEdit(immutable: boolean): boolean {
-    return !immutable;
+export function quoteCanEdit(input: {
+    immutable: boolean;
+    canUpdate: boolean;
+}): boolean {
+    return Boolean(input.canUpdate) && !input.immutable;
 }
 
 export function quoteListHref(): string {
