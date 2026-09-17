@@ -149,6 +149,17 @@ Not touched: `command-os.ts`, `app.tsx` (import path unchanged), `routes/*.php`,
 - Updated `EvoCrmWave5SettingsChromeTest`
 - Existing Settings/*, People, Connectors, FirstRunSetup, Security, Profile
 
+Commands:
+
+| Command | Result |
+|---|---|
+| Focused Pest (P21 + Wave5 + Settings/* + FirstRun + PipelineSettings) | **82 passed** |
+| `php artisan test` | **962 passed** (12117 assertions) |
+| eslint on P21-touched JS | **pass** |
+| `npm run types:check` | **pass** |
+| `composer types:check` | Repo-wide phpstan already red on main-era files. Not a GitHub CI gate (`composer ci:check` = Pest only). |
+| `npm run build` | **pass** |
+
 ## LIVE VISUAL QA
 
 **NEEDS RESEARCH.** Agent did not walk Contabo populated Settings. Research owns Contabo after the PR opens.
