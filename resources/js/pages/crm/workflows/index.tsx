@@ -1,292 +1,51 @@
-import { Form } from '@inertiajs/react';
-import { useState } from 'react';
+import { Form, router, usePage } from '@inertiajs/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { FormEvent } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmShell } from '@/components/crm/crm-shell';
+import { WorkflowBuilder } from '@/components/crm/workflow-builder';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
-import {
-    HairlineRow,
-    HairlineTable,
-    HairlineTd,
-    HairlineTh,
-} from '@/components/surface/hairline-table';
 import { SurfaceHeader } from '@/components/surface/surface-header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+import {
+    draftFromWorkflow,
+    draftsEqual,
+    emptyWorkflowDraft,
+    formatWorkflowTimestamp,
+    summarizeWorkflowRow,
+    triggerLabel,
+    validateWorkflowDraft,
+    workflowFormPayload,
+    workflowStatusLabel,
+} from '@/lib/workflow-authoring';
+import type {
+    WorkflowCapabilities,
+    WorkflowConditionField,
+    WorkflowDraft,
+    WorkflowMember,
+    WorkflowRow,
+    WorkflowSequence,
+    WorkflowStage,
+    WorkflowTemplate,
+    WorkflowTicketStatus,
+} from '@/lib/workflow-authoring';
 
-type WorkflowRow = {
-    id: number;
-    name: string;
-    trigger: string;
-    trigger_stage: string | null;
-    trigger_status: string | null;
-    trigger_status_label: string | null;
-    action: string;
-    action_config: Record<string, unknown>;
-    condition_field: string | null;
-    condition_operator: string | null;
-    condition_value: string | null;
-    else_action: string | null;
-    else_action_config: Record<string, unknown>;
-    active: boolean;
-    template_key: string | null;
-    created_at: string | null;
+type Segment = { id: number; name: string };
+
+const DEFAULT_CAPABILITIES: WorkflowCapabilities = {
+    can_manage: false,
+    has_mailbox: false,
+    has_sequences: false,
 };
 
-type Template = {
-    key: string;
-    name: string;
-    description: string;
-    trigger: string;
-    action: string;
-};
-
-type Stage = {
-    id: number;
-    name: string;
-    slug: string;
-};
-
-type Sequence = {
-    id: number;
-    name: string;
-    channel: string;
-};
-
-type ConditionField = {
-    value: string;
-    label: string;
-};
-
-const triggerLabel: Record<string, string> = {
-    'contact.created': 'Contact created',
-    'deal.stage_changed': 'Deal stage changed',
-    'deal.created': 'Deal created',
-    'enrollment.finished': 'Sequence finished',
-    'segment.entered': 'Segment entered',
-    'segment.exited': 'Segment exited',
-    'enrollment.replied': 'Sequence reply received',
-    'lead.scored': 'Lead scored',
-    'lead.qualified': 'Lead qualified',
-    'meeting.booked': 'Meeting booked',
-    'meeting.no_show': 'Meeting no-show',
-    'ticket.created': 'Ticket created',
-    'ticket.status_changed': 'Ticket status changed',
-    'ticket.sla_breached': 'Ticket SLA breached',
-};
-
-const actionLabel: Record<string, string> = {
-    create_task: 'Create task',
-    enroll_sequence: 'Enroll in sequence',
-    send_webhook: 'Send webhook',
-    set_property: 'Set property',
-    assign_owner: 'Assign owner',
-    create_deal: 'Create deal',
-    send_email: 'Send email',
-    notify_user: 'Notify user',
-};
-
-const operatorLabel: Record<string, string> = {
-    eq: '=',
-    neq: '≠',
-    gt: '>',
-    gte: '≥',
-    lt: '<',
-    lte: '≤',
-    contains: 'contains',
-    is_set: 'is set',
-    is_empty: 'is empty',
-};
-
-function FieldLabel({ children }: { children: string }) {
-    return <Label className="mb-1 block">{children}</Label>;
-}
-
-function ActionFields({
-    action,
-    prefix,
-    sequences,
-}: {
-    action: string;
-    prefix: '' | 'else_';
-    sequences: Sequence[];
-}) {
-    if (action === 'enroll_sequence') {
-        return (
-            <div>
-                <FieldLabel>{prefix ? 'Else sequence' : 'Sequence'}</FieldLabel>
-                <NativeSelect name={`${prefix}sequence_id`} defaultValue="">
-                    <option value="">First sequence in the workspace</option>
-                    {sequences.map((sequence) => (
-                        <option key={sequence.id} value={sequence.id}>
-                            {sequence.name}
-                        </option>
-                    ))}
-                </NativeSelect>
-            </div>
-        );
-    }
-
-    if (action === 'send_webhook') {
-        return (
-            <div className="md:col-span-2">
-                <FieldLabel>{prefix ? 'Else webhook URL' : 'Webhook URL'}</FieldLabel>
-                <Input
-                    name={`${prefix}webhook_url`}
-                    type="url"
-                    required
-                    placeholder="https://hooks.evotechly.dz/deals"
-                />
-            </div>
-        );
-    }
-
-    if (action === 'set_property') {
-        return (
-            <>
-                <div>
-                    <FieldLabel>{prefix ? 'Else entity' : 'Entity'}</FieldLabel>
-                    <NativeSelect
-                        name={`${prefix}property_entity`}
-                        defaultValue="contact"
-                    >
-                        <option value="contact">Contact</option>
-                        <option value="deal">Deal</option>
-                    </NativeSelect>
-                </div>
-                <div>
-                    <FieldLabel>
-                        {prefix ? 'Else property field' : 'Property field'}
-                    </FieldLabel>
-                    <Input
-                        name={`${prefix}property_field`}
-                        placeholder="wilaya"
-                        required
-                    />
-                </div>
-                <div className="md:col-span-2">
-                    <FieldLabel>
-                        {prefix ? 'Else property value' : 'Property value'}
-                    </FieldLabel>
-                    <Input
-                        name={`${prefix}property_value`}
-                        placeholder="Alger"
-                        required
-                    />
-                </div>
-            </>
-        );
-    }
-
-    if (action === 'assign_owner') {
-        return (
-            <>
-                <div>
-                    <FieldLabel>{prefix ? 'Else record' : 'Record'}</FieldLabel>
-                    <NativeSelect
-                        name={`${prefix}assign_entity`}
-                        defaultValue="contact"
-                    >
-                        <option value="contact">Contact</option>
-                        <option value="deal">Deal</option>
-                    </NativeSelect>
-                </div>
-                <div>
-                    <FieldLabel>
-                        {prefix ? 'Else owner user id' : 'Owner user id'}
-                    </FieldLabel>
-                    <Input
-                        name={`${prefix}assign_owner_id`}
-                        type="number"
-                        min={1}
-                        required
-                    />
-                </div>
-            </>
-        );
-    }
-
-    if (action === 'create_deal') {
-        return (
-            <>
-                <div>
-                    <FieldLabel>
-                        {prefix ? 'Else deal title' : 'Deal title'}
-                    </FieldLabel>
-                    <Input
-                        name={`${prefix}subject`}
-                        placeholder="New opportunity"
-                        required
-                    />
-                </div>
-                <div>
-                    <FieldLabel>
-                        {prefix ? 'Else amount (DZD)' : 'Amount (DZD)'}
-                    </FieldLabel>
-                    <Input
-                        name={`${prefix}property_value`}
-                        type="number"
-                        min={0}
-                        placeholder="500000"
-                    />
-                </div>
-            </>
-        );
-    }
-
-    if (action === 'send_email' || action === 'notify_user') {
-        return (
-            <>
-                <div>
-                    <FieldLabel>{prefix ? 'Else subject' : 'Subject'}</FieldLabel>
-                    <Input
-                        name={`${prefix}subject`}
-                        placeholder="Follow up from EvoSales"
-                        required
-                    />
-                </div>
-                <div className="md:col-span-2">
-                    <FieldLabel>{prefix ? 'Else body' : 'Body'}</FieldLabel>
-                    <Input
-                        name={`${prefix}body`}
-                        placeholder="Message body"
-                        required
-                    />
-                </div>
-            </>
-        );
-    }
-
-    if (action === 'create_task') {
-        return (
-            <>
-                <div>
-                    <FieldLabel>
-                        {prefix ? 'Else task subject' : 'Task subject'}
-                    </FieldLabel>
-                    <Input
-                        name={`${prefix}subject`}
-                        placeholder="Introduce Evotechly to {{contact}}"
-                    />
-                </div>
-                <div>
-                    <FieldLabel>
-                        {prefix ? 'Else due in days' : 'Due in days'}
-                    </FieldLabel>
-                    <Input
-                        name={`${prefix}due_in_days`}
-                        type="number"
-                        min={0}
-                        max={90}
-                        defaultValue={1}
-                    />
-                </div>
-            </>
-        );
-    }
-
-    return null;
+function flattenErrors(errors: Record<string, string | string[]>): Record<string, string> {
+    return Object.fromEntries(
+        Object.entries(errors).map(([key, value]) => [
+            key,
+            Array.isArray(value) ? (value[0] ?? '') : value,
+        ]),
+    );
 }
 
 export default function WorkflowsIndex({
@@ -296,36 +55,198 @@ export default function WorkflowsIndex({
     sequences,
     segments = [],
     condition_fields = [],
+    members = [],
+    ticket_statuses = [],
+    capabilities = DEFAULT_CAPABILITIES,
 }: {
     workflows: WorkflowRow[];
-    templates: Template[];
-    stages: Stage[];
-    sequences: Sequence[];
-    segments?: Array<{ id: number; name: string }>;
-    condition_fields?: ConditionField[];
+    templates: WorkflowTemplate[];
+    stages: WorkflowStage[];
+    sequences: WorkflowSequence[];
+    segments?: Segment[];
+    condition_fields?: WorkflowConditionField[];
+    members?: WorkflowMember[];
+    ticket_statuses?: WorkflowTicketStatus[];
+    capabilities?: WorkflowCapabilities;
 }) {
-    const [createOpen, setCreateOpen] = useState(false);
-    const [trigger, setTrigger] = useState('contact.created');
-    const [action, setAction] = useState('create_task');
-    const [branched, setBranched] = useState(false);
-    const [conditionField, setConditionField] = useState('deal.amount');
-    const [conditionOperator, setConditionOperator] = useState('gte');
-    const [elseAction, setElseAction] = useState('');
+    const [editorOpen, setEditorOpen] = useState(false);
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [draft, setDraft] = useState<WorkflowDraft>(emptyWorkflowDraft);
+    const [baseline, setBaseline] = useState<WorkflowDraft>(emptyWorkflowDraft);
+    const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+    const [submitting, setSubmitting] = useState(false);
+    const [togglingId, setTogglingId] = useState<number | null>(null);
+    const ignoreDirtyClose = useRef(false);
+    const submittingRef = useRef(false);
+    const page = usePage<{ errors?: Record<string, string | string[]> }>();
 
-    const needsConditionValue =
-        conditionOperator !== 'is_set' && conditionOperator !== 'is_empty';
+    const dirty = !draftsEqual(draft, baseline);
+    const canManage = capabilities.can_manage;
+    const editing = editingId !== null;
+    const serverErrors = flattenErrors(page.props.errors ?? {});
+    const errors = { ...clientErrors, ...serverErrors };
+
+    const editorTitle = editing ? 'Edit workflow' : 'Create workflow';
+
+    const openCreate = () => {
+        const next = emptyWorkflowDraft();
+        setEditingId(null);
+        setDraft(next);
+        setBaseline(next);
+        setClientErrors({});
+        setEditorOpen(true);
+    };
+
+    const openEdit = (workflow: WorkflowRow) => {
+        const next = draftFromWorkflow(workflow);
+        setEditingId(workflow.id);
+        setDraft(next);
+        setBaseline(next);
+        setClientErrors({});
+        setEditorOpen(true);
+    };
+
+    const requestClose = (open: boolean) => {
+        if (open) {
+            setEditorOpen(true);
+
+            return;
+        }
+
+        if (!ignoreDirtyClose.current && dirty) {
+            const confirmed = window.confirm('Discard unsaved changes?');
+
+            if (!confirmed) {
+                return;
+            }
+        }
+
+        ignoreDirtyClose.current = false;
+        setEditorOpen(false);
+        setEditingId(null);
+        setClientErrors({});
+    };
+
+    const patchDraft = (patch: Partial<WorkflowDraft>) => {
+        setDraft((current) => ({ ...current, ...patch }));
+        setClientErrors({});
+    };
+
+    const submitEditor = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const issues = validateWorkflowDraft(draft);
+
+        if (issues.length > 0) {
+            setClientErrors(
+                Object.fromEntries(issues.map((issue) => [issue.field, issue.message])),
+            );
+
+            return;
+        }
+
+        if (submitting) {
+            return;
+        }
+
+        submittingRef.current = true;
+        setSubmitting(true);
+        const payload = workflowFormPayload(draft, {
+            includeActive: !editing,
+            active: false,
+        });
+
+        const visit = {
+            preserveScroll: true,
+            onSuccess: () => {
+                ignoreDirtyClose.current = true;
+                setEditorOpen(false);
+                setEditingId(null);
+                setBaseline(draft);
+            },
+            onFinish: () => {
+                submittingRef.current = false;
+                setSubmitting(false);
+            },
+        };
+
+        if (editing) {
+            router.put(`/crm/workflows/${editingId}`, payload, visit);
+
+            return;
+        }
+
+        router.post('/crm/workflows', payload, visit);
+    };
+
+    const toggleWorkflow = (workflow: WorkflowRow) => {
+        if (togglingId !== null) {
+            return;
+        }
+
+        setTogglingId(workflow.id);
+        router.post(
+            `/crm/workflows/${workflow.id}/toggle`,
+            {},
+            {
+                preserveScroll: true,
+                onFinish: () => setTogglingId(null),
+            },
+        );
+    };
+
+    useEffect(() => {
+        if (!editorOpen || !dirty) {
+            return;
+        }
+
+        const onBefore = (event: { preventDefault: () => void }) => {
+            if (submittingRef.current) {
+                return;
+            }
+
+            if (!window.confirm('You have unsaved changes. Leave anyway?')) {
+                event.preventDefault();
+            }
+        };
+        const remove = router.on('before', onBefore);
+        const onUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+        };
+        window.addEventListener('beforeunload', onUnload);
+
+        return () => {
+            remove();
+            window.removeEventListener('beforeunload', onUnload);
+        };
+    }, [dirty, editorOpen]);
+
+    const ticketStatuses = useMemo(
+        () =>
+            ticket_statuses.length > 0
+                ? ticket_statuses
+                : [
+                      { value: 'new', label: 'New' },
+                      { value: 'waiting_on_contact', label: 'Waiting on contact' },
+                      { value: 'waiting_on_us', label: 'Waiting on us' },
+                      { value: 'closed', label: 'Closed' },
+                  ],
+        [ticket_statuses],
+    );
 
     return (
         <CrmShell title="Automation">
-            <div className="h-full overflow-y-auto">
-                <div className="flex-1 space-y-5 p-6">
+            <div className="h-full overflow-y-auto overflow-x-hidden" data-workflow="page">
+                <div className="flex-1 space-y-5 p-4 md:p-6">
                     <SurfaceHeader
                         title="Automation"
-                        description="Triggers on contacts, deals, sequences, and segments. Actions include tasks, sequences, property updates, email, webhooks, and delayed runs."
+                        description="Structured workflows the runner can execute: when, if, then, else."
                     >
-                        <Button size="sm" onClick={() => setCreateOpen(true)}>
-                            Create workflow
-                        </Button>
+                        {canManage ? (
+                            <Button size="sm" onClick={openCreate} data-workflow="create">
+                                Create workflow
+                            </Button>
+                        ) : null}
                     </SurfaceHeader>
 
                     <HairlinePanel>
@@ -334,8 +255,7 @@ export default function WorkflowsIndex({
                                 Evo templates
                             </h2>
                             <p className="aurora-text-caption mt-1 text-mute">
-                                Evotechly starters for Algerian sales work. They write
-                                into your workspace.
+                                Starters that write a valid workflow into this workspace.
                             </p>
                         </div>
                         <ul className="divide-y divide-hairline">
@@ -344,7 +264,7 @@ export default function WorkflowsIndex({
                                     key={template.key}
                                     className="flex flex-wrap items-start justify-between gap-3 px-4 py-3"
                                 >
-                                    <div>
+                                    <div className="min-w-0">
                                         <p className="aurora-text-body-sm font-medium text-ink">
                                             {template.name}
                                         </p>
@@ -352,99 +272,95 @@ export default function WorkflowsIndex({
                                             {template.description}
                                         </p>
                                     </div>
-                                    <Form
-                                        action="/crm/workflows/templates"
-                                        method="post"
-                                    >
-                                        <input
-                                            type="hidden"
-                                            name="template_key"
-                                            value={template.key}
-                                        />
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="shrink-0"
+                                    {canManage ? (
+                                        <Form
+                                            action="/crm/workflows/templates"
+                                            method="post"
                                         >
-                                            Use template
-                                        </Button>
-                                    </Form>
+                                            <input
+                                                type="hidden"
+                                                name="template_key"
+                                                value={template.key}
+                                            />
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="shrink-0"
+                                            >
+                                                Use template
+                                            </Button>
+                                        </Form>
+                                    ) : null}
                                 </li>
                             ))}
                         </ul>
                     </HairlinePanel>
 
-                    <HairlinePanel>
-                        <HairlineTable minWidth="40rem">
-                            <thead>
-                                <tr className="border-b border-hairline">
-                                    <HairlineTh>Name</HairlineTh>
-                                    <HairlineTh>Trigger</HairlineTh>
-                                    <HairlineTh>Action</HairlineTh>
-                                    <HairlineTh>Status</HairlineTh>
-                                    <HairlineTh align="right" />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {workflows.map((workflow) => (
-                                    <HairlineRow key={workflow.id}>
-                                        <HairlineTd className="font-medium">
+                    <HairlinePanel data-workflow="list">
+                        <div className="hidden border-b border-hairline px-4 py-2 text-[12px] text-mute md:grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_7rem_7rem_auto] md:gap-3">
+                            <span>Name</span>
+                            <span>Trigger</span>
+                            <span>Status</span>
+                            <span>Last modified</span>
+                            <span className="text-right"> </span>
+                        </div>
+                        <ul className="divide-y divide-hairline">
+                            {workflows.map((workflow) => (
+                                <li
+                                    key={workflow.id}
+                                    className="grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_7rem_7rem_auto] md:items-center md:gap-3"
+                                >
+                                    <div className="min-w-0">
+                                        <p className="truncate font-medium text-ink">
                                             {workflow.name}
-                                        </HairlineTd>
-                                        <HairlineTd>
-                                            {triggerLabel[workflow.trigger] ??
-                                                workflow.trigger}
-                                            {workflow.trigger_stage
-                                                ? ` → ${workflow.trigger_stage}`
-                                                : ''}
-                                            {workflow.trigger_status_label
-                                                ? ` → ${workflow.trigger_status_label}`
-                                                : ''}
-                                        </HairlineTd>
-                                        <HairlineTd>
-                                            <div>
-                                                {actionLabel[workflow.action] ??
-                                                    workflow.action}
-                                            </div>
-                                            {workflow.condition_field ? (
-                                                <div className="aurora-text-caption mt-1 text-mute">
-                                                    If {workflow.condition_field}{' '}
-                                                    {operatorLabel[
-                                                        workflow.condition_operator ??
-                                                            ''
-                                                    ] ??
-                                                        workflow.condition_operator}{' '}
-                                                    {workflow.condition_operator ===
-                                                        'is_set' ||
-                                                    workflow.condition_operator ===
-                                                        'is_empty'
-                                                        ? ''
-                                                        : (workflow.condition_value ??
-                                                          '')}
-                                                    {workflow.else_action
-                                                        ? ` · else ${actionLabel[workflow.else_action] ?? workflow.else_action}`
-                                                        : ''}
-                                                </div>
-                                            ) : null}
-                                        </HairlineTd>
-                                        <HairlineTd>
-                                            {workflow.active ? 'On' : 'Off'}
-                                        </HairlineTd>
-                                        <HairlineTd>
-                                            <div className="flex justify-end gap-2">
-                                                <Form
-                                                    action={`/crm/workflows/${workflow.id}/toggle`}
-                                                    method="post"
+                                        </p>
+                                        <p className="mt-0.5 text-[12px] leading-4 text-mute">
+                                            {summarizeWorkflowRow(
+                                                workflow,
+                                                condition_fields,
+                                                stages,
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div className="text-[13px] text-ink">
+                                        {triggerLabel(workflow.trigger)}
+                                        {workflow.trigger_stage
+                                            ? ` → ${workflow.trigger_stage}`
+                                            : ''}
+                                        {workflow.trigger_status_label
+                                            ? ` → ${workflow.trigger_status_label}`
+                                            : ''}
+                                    </div>
+                                    <div>
+                                        <Badge
+                                            variant={workflow.active ? 'default' : 'outline'}
+                                        >
+                                            {workflowStatusLabel(workflow.active)}
+                                        </Badge>
+                                    </div>
+                                    <div className="text-[13px] text-mute">
+                                        {formatWorkflowTimestamp(workflow.updated_at)}
+                                    </div>
+                                    <div className="flex flex-wrap justify-start gap-2 md:justify-end">
+                                        {canManage ? (
+                                            <>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => openEdit(workflow)}
                                                 >
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                    >
-                                                        {workflow.active
-                                                            ? 'Turn off'
-                                                            : 'Turn on'}
-                                                    </Button>
-                                                </Form>
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    disabled={togglingId === workflow.id}
+                                                    onClick={() => toggleWorkflow(workflow)}
+                                                >
+                                                    {workflow.active ? 'Turn off' : 'Turn on'}
+                                                </Button>
                                                 <Form
                                                     action={`/crm/workflows/${workflow.id}`}
                                                     method="delete"
@@ -457,359 +373,60 @@ export default function WorkflowsIndex({
                                                         Delete
                                                     </Button>
                                                 </Form>
-                                            </div>
-                                        </HairlineTd>
-                                    </HairlineRow>
-                                ))}
-                                {workflows.length === 0 ? (
-                                    <HairlineRow>
-                                        <HairlineTd
-                                            colSpan={5}
-                                            className="py-6 text-mute"
-                                        >
-                                            No workflows yet. Use an Evo template
-                                            or create one.
-                                        </HairlineTd>
-                                    </HairlineRow>
-                                ) : null}
-                            </tbody>
-                        </HairlineTable>
+                                            </>
+                                        ) : null}
+                                    </div>
+                                </li>
+                            ))}
+                            {workflows.length === 0 ? (
+                                <li className="px-4 py-6 text-mute">
+                                    No workflows yet. Use an Evo template or create one.
+                                </li>
+                            ) : null}
+                        </ul>
                     </HairlinePanel>
                 </div>
             </div>
 
             <CreateDrawer
-                open={createOpen}
-                onOpenChange={setCreateOpen}
-                title="Create workflow"
-                description="Name a trigger, optional delay, then an action. Add an if/then branch for deal amount, stage, or a contact property."
+                open={editorOpen}
+                onOpenChange={requestClose}
+                title={editorTitle}
+                description="Save writes the structure. Enable is a separate action."
                 showFormLink={false}
-                className="sm:max-w-lg"
+                className="sm:max-w-2xl"
             >
-                <Form
-                    action="/crm/workflows"
-                    method="post"
-                    className="grid gap-3 md:grid-cols-2"
-                    resetOnSuccess
-                    onSuccess={() => {
-                        setCreateOpen(false);
-                        setBranched(false);
-                        setTrigger('contact.created');
-                        setAction('create_task');
-                        setElseAction('');
-                    }}
+                <form
+                    onSubmit={submitEditor}
+                    className="space-y-4"
+                    data-workflow="editor-form"
                 >
-                    {({ processing }) => (
-                        <>
-                            <div className="md:col-span-2">
-                                <FieldLabel>Name</FieldLabel>
-                                <Input
-                                    name="name"
-                                    required
-                                    placeholder="New Evotechly contact - first task"
-                                />
-                            </div>
-                            <div>
-                                <FieldLabel>Trigger</FieldLabel>
-                                <NativeSelect
-                                    name="trigger"
-                                    value={trigger}
-                                    onChange={(event) =>
-                                        setTrigger(event.target.value)
-                                    }
-                                >
-                                    <option value="contact.created">
-                                        Contact created
-                                    </option>
-                                    <option value="deal.created">Deal created</option>
-                                    <option value="deal.stage_changed">
-                                        Deal stage changed
-                                    </option>
-                                    <option value="enrollment.finished">
-                                        Sequence finished
-                                    </option>
-                                    <option value="segment.entered">
-                                        Segment entered
-                                    </option>
-                                    <option value="segment.exited">
-                                        Segment exited
-                                    </option>
-                                    <option value="enrollment.replied">
-                                        Sequence reply received
-                                    </option>
-                                    <option value="lead.scored">
-                                        Lead scored
-                                    </option>
-                                    <option value="lead.qualified">
-                                        Lead qualified
-                                    </option>
-                                    <option value="meeting.booked">
-                                        Meeting booked
-                                    </option>
-                                    <option value="meeting.no_show">
-                                        Meeting no-show
-                                    </option>
-                                    <option value="ticket.created">
-                                        Ticket created
-                                    </option>
-                                    <option value="ticket.status_changed">
-                                        Ticket status changed
-                                    </option>
-                                    <option value="ticket.sla_breached">
-                                        Ticket SLA breached
-                                    </option>
-                                </NativeSelect>
-                            </div>
-                            {trigger === 'deal.stage_changed' ? (
-                                <div>
-                                    <FieldLabel>To stage</FieldLabel>
-                                    <NativeSelect name="trigger_stage_id" required>
-                                        {stages.map((stage) => (
-                                            <option key={stage.id} value={stage.id}>
-                                                {stage.name}
-                                            </option>
-                                        ))}
-                                    </NativeSelect>
-                                </div>
-                            ) : trigger === 'ticket.status_changed' ? (
-                                <div>
-                                    <FieldLabel>To status</FieldLabel>
-                                    <NativeSelect name="trigger_status">
-                                        <option value="">Any status</option>
-                                        <option value="new">New</option>
-                                        <option value="waiting_on_contact">
-                                            Waiting on contact
-                                        </option>
-                                        <option value="waiting_on_us">
-                                            Waiting on us
-                                        </option>
-                                        <option value="closed">Closed</option>
-                                    </NativeSelect>
-                                </div>
-                            ) : trigger === 'segment.entered' ||
-                              trigger === 'segment.exited' ? (
-                                <div>
-                                    <FieldLabel>Segment</FieldLabel>
-                                    <NativeSelect
-                                        name="trigger_saved_filter_id"
-                                        required
-                                    >
-                                        <option value="">
-                                            Pick a contact segment…
-                                        </option>
-                                        {segments.map((segment) => (
-                                            <option
-                                                key={segment.id}
-                                                value={segment.id}
-                                            >
-                                                {segment.name}
-                                            </option>
-                                        ))}
-                                    </NativeSelect>
-                                </div>
-                            ) : (
-                                <div />
-                            )}
-                            <div>
-                                <FieldLabel>Delay (minutes, optional)</FieldLabel>
-                                <Input
-                                    name="delay_minutes"
-                                    type="number"
-                                    min={0}
-                                    defaultValue={0}
-                                />
-                            </div>
-                            <div>
-                                <FieldLabel>Then action</FieldLabel>
-                                <NativeSelect
-                                    name="action"
-                                    value={action}
-                                    onChange={(event) =>
-                                        setAction(event.target.value)
-                                    }
-                                >
-                                    <option value="create_task">
-                                        Create task on the record
-                                    </option>
-                                    <option value="enroll_sequence">
-                                        Enroll contact in a sequence
-                                    </option>
-                                    <option value="set_property">Set property</option>
-                                    <option value="assign_owner">
-                                        Assign owner
-                                    </option>
-                                    <option value="create_deal">Create deal</option>
-                                    <option value="send_email">Send email</option>
-                                    <option value="notify_user">Notify user</option>
-                                    <option value="send_webhook">
-                                        Send webhook URL
-                                    </option>
-                                </NativeSelect>
-                            </div>
-                            <ActionFields
-                                action={action}
-                                prefix=""
-                                sequences={sequences}
-                            />
-
-                            <div className="md:col-span-2 flex items-center gap-2 pt-1">
-                                <input
-                                    id="workflow-branch"
-                                    type="checkbox"
-                                    checked={branched}
-                                    onChange={(event) =>
-                                        setBranched(event.target.checked)
-                                    }
-                                    className="size-4 accent-brand"
-                                />
-                                <Label htmlFor="workflow-branch">
-                                    If / then branch (deal amount, stage, or contact
-                                    property)
-                                </Label>
-                            </div>
-
-                            {branched ? (
-                                <>
-                                    <div>
-                                        <FieldLabel>If field</FieldLabel>
-                                        <NativeSelect
-                                            name="condition_field"
-                                            value={conditionField}
-                                            onChange={(event) =>
-                                                setConditionField(event.target.value)
-                                            }
-                                        >
-                                            {condition_fields.map((field) => (
-                                                <option
-                                                    key={field.value}
-                                                    value={field.value}
-                                                >
-                                                    {field.label}
-                                                </option>
-                                            ))}
-                                        </NativeSelect>
-                                    </div>
-                                    <div>
-                                        <FieldLabel>Operator</FieldLabel>
-                                        <NativeSelect
-                                            name="condition_operator"
-                                            value={conditionOperator}
-                                            onChange={(event) =>
-                                                setConditionOperator(
-                                                    event.target.value,
-                                                )
-                                            }
-                                        >
-                                            <option value="eq">equals</option>
-                                            <option value="neq">does not equal</option>
-                                            <option value="gt">greater than</option>
-                                            <option value="gte">
-                                                greater or equal
-                                            </option>
-                                            <option value="lt">less than</option>
-                                            <option value="lte">less or equal</option>
-                                            <option value="contains">contains</option>
-                                            <option value="is_set">is set</option>
-                                            <option value="is_empty">is empty</option>
-                                        </NativeSelect>
-                                    </div>
-                                    {needsConditionValue ? (
-                                        conditionField === 'deal.stage' ? (
-                                            <div>
-                                                <FieldLabel>Stage value</FieldLabel>
-                                                <NativeSelect
-                                                    name="condition_value"
-                                                    required
-                                                >
-                                                    {stages.map((stage) => (
-                                                        <option
-                                                            key={stage.id}
-                                                            value={stage.slug}
-                                                        >
-                                                            {stage.name}
-                                                        </option>
-                                                    ))}
-                                                </NativeSelect>
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                <FieldLabel>
-                                                    {conditionField === 'deal.amount'
-                                                        ? 'Amount (DZD)'
-                                                        : 'Value'}
-                                                </FieldLabel>
-                                                <Input
-                                                    name="condition_value"
-                                                    required
-                                                    placeholder={
-                                                        conditionField ===
-                                                        'deal.amount'
-                                                            ? '500000'
-                                                            : 'Alger'
-                                                    }
-                                                />
-                                            </div>
-                                        )
-                                    ) : null}
-                                    <div>
-                                        <FieldLabel>Else action</FieldLabel>
-                                        <NativeSelect
-                                            name="else_action"
-                                            value={elseAction}
-                                            onChange={(event) =>
-                                                setElseAction(event.target.value)
-                                            }
-                                        >
-                                            <option value="">Do nothing</option>
-                                            <option value="create_task">
-                                                Create task on the record
-                                            </option>
-                                            <option value="enroll_sequence">
-                                                Enroll contact in a sequence
-                                            </option>
-                                            <option value="set_property">
-                                                Set property
-                                            </option>
-                                            <option value="assign_owner">
-                                                Assign owner
-                                            </option>
-                                            <option value="create_deal">
-                                                Create deal
-                                            </option>
-                                            <option value="send_email">
-                                                Send email
-                                            </option>
-                                            <option value="notify_user">
-                                                Notify user
-                                            </option>
-                                            <option value="send_webhook">
-                                                Send webhook URL
-                                            </option>
-                                        </NativeSelect>
-                                    </div>
-                                    <ActionFields
-                                        action={elseAction}
-                                        prefix="else_"
-                                        sequences={sequences}
-                                    />
-                                </>
-                            ) : null}
-
-                            <div className="md:col-span-2 flex justify-end gap-2 pt-2">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => setCreateOpen(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button disabled={processing}>
-                                    Create workflow
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
+                    <WorkflowBuilder
+                        draft={draft}
+                        onChange={patchDraft}
+                        stages={stages}
+                        sequences={sequences}
+                        segments={segments}
+                        members={members}
+                        conditionFields={condition_fields}
+                        ticketStatuses={ticketStatuses}
+                        capabilities={capabilities}
+                        errors={errors}
+                        disabled={!canManage || submitting}
+                    />
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => requestClose(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled={!canManage || submitting}>
+                            {submitting ? 'Saving…' : 'Save'}
+                        </Button>
+                    </div>
+                </form>
             </CreateDrawer>
         </CrmShell>
     );

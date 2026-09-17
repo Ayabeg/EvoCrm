@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomAttributeDefinition;
+use App\Models\Mailbox;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
 use App\Models\Stage;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Models\Workflow;
 use App\Models\Workspace;
 use App\Services\Crm\EvoWorkflowTemplates;
+use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -20,24 +23,27 @@ use Inertia\Response;
 
 class WorkflowController extends Controller
 {
-    public function index(Request $request, EvoWorkflowTemplates $templates): Response
+    public function index(Request $request, EvoWorkflowTemplates $templates, CrmHub $hub): Response
     {
         $workspace = $request->user()->workspace;
+        $user = $request->user();
 
         $workflows = Workflow::query()
             ->forWorkspace($workspace)
             ->with('triggerStage')
-            ->latest()
+            ->latest('updated_at')
             ->get()
             ->map(fn (Workflow $workflow) => [
                 'id' => $workflow->id,
                 'name' => $workflow->name,
                 'trigger' => $workflow->trigger,
                 'trigger_stage' => $workflow->triggerStage?->name,
+                'trigger_stage_id' => $workflow->trigger_stage_id,
                 'trigger_status' => $workflow->trigger_status,
                 'trigger_status_label' => $workflow->trigger_status
                     ? Ticket::statusLabel((string) $workflow->trigger_status)
                     : null,
+                'trigger_saved_filter_id' => $workflow->trigger_saved_filter_id,
                 'action' => $workflow->action,
                 'action_config' => $workflow->config(),
                 'condition_field' => $workflow->condition_field,
@@ -49,6 +55,7 @@ class WorkflowController extends Controller
                 'template_key' => $workflow->template_key,
                 'delay_minutes' => (int) ($workflow->delay_minutes ?? 0),
                 'created_at' => $workflow->created_at?->toIso8601String(),
+                'updated_at' => $workflow->updated_at?->toIso8601String(),
             ]);
 
         $stages = Stage::query()
@@ -61,6 +68,11 @@ class WorkflowController extends Controller
             ->orderBy('id')
             ->get(['id', 'name', 'channel']);
 
+        $hasMailbox = Mailbox::query()
+            ->forWorkspace($workspace)
+            ->where('enabled', true)
+            ->exists();
+
         return Inertia::render('crm/workflows/index', [
             'workflows' => $workflows,
             'templates' => $templates->all(),
@@ -72,6 +84,25 @@ class WorkflowController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'name']),
             'condition_fields' => $this->conditionFieldOptions($workspace),
+            'members' => collect($hub->members($workspace))
+                ->map(fn (User $member): array => [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                ])
+                ->values()
+                ->all(),
+            'ticket_statuses' => collect(Ticket::STATUSES)
+                ->map(fn (string $status): array => [
+                    'value' => $status,
+                    'label' => Ticket::statusLabel($status),
+                ])
+                ->values()
+                ->all(),
+            'capabilities' => [
+                'can_manage' => $user->canPermission('automation.manage'),
+                'has_mailbox' => $hasMailbox,
+                'has_sequences' => $sequences->isNotEmpty(),
+            ],
         ]);
     }
 
@@ -108,7 +139,7 @@ class WorkflowController extends Controller
             'else_action_config' => $data['condition_field'] && $data['else_action']
                 ? $this->actionConfig($data['else_action'], $data['else'])
                 : null,
-            'active' => true,
+            'active' => $data['active'],
             'delay_minutes' => (int) ($data['delay_minutes'] ?? 0),
         ]);
 
@@ -197,7 +228,8 @@ class WorkflowController extends Controller
      *     condition_value: string|null,
      *     else_action: string|null,
      *     else: array{subject: string|null, body: string|null, due_in_days: int, sequence_id: int|null, webhook_url: string|null},
-     *     delay_minutes: int
+     *     delay_minutes: int,
+     *     active: bool
      * }
      */
     protected function validated(Request $request, Workspace $workspace): array
@@ -269,6 +301,14 @@ class WorkflowController extends Controller
             'property_value' => ['nullable', 'string', 'max:500'],
             'assign_owner_id' => ['nullable', 'integer'],
             'assign_entity' => ['nullable', 'in:contact,deal'],
+            'notify_user_id' => ['nullable', 'integer'],
+            'else_property_entity' => ['nullable', 'in:contact,deal'],
+            'else_property_field' => ['nullable', 'string', 'max:80'],
+            'else_property_value' => ['nullable', 'string', 'max:500'],
+            'else_assign_owner_id' => ['nullable', 'integer'],
+            'else_assign_entity' => ['nullable', 'in:contact,deal'],
+            'else_notify_user_id' => ['nullable', 'integer'],
+            'active' => ['sometimes', 'boolean'],
         ]);
 
         return [
@@ -288,13 +328,15 @@ class WorkflowController extends Controller
                 'due_in_days' => (int) ($data['else_due_in_days'] ?? 1),
                 'sequence_id' => isset($data['else_sequence_id']) ? (int) $data['else_sequence_id'] : null,
                 'webhook_url' => $data['else_webhook_url'] ?? null,
-                'property_entity' => $data['property_entity'] ?? null,
-                'property_field' => $data['property_field'] ?? null,
-                'property_value' => $data['property_value'] ?? null,
-                'assign_owner_id' => isset($data['assign_owner_id']) ? (int) $data['assign_owner_id'] : null,
-                'assign_entity' => $data['assign_entity'] ?? null,
+                'property_entity' => $data['else_property_entity'] ?? null,
+                'property_field' => $data['else_property_field'] ?? null,
+                'property_value' => $data['else_property_value'] ?? null,
+                'assign_owner_id' => isset($data['else_assign_owner_id']) ? (int) $data['else_assign_owner_id'] : null,
+                'assign_entity' => $data['else_assign_entity'] ?? null,
+                'notify_user_id' => isset($data['else_notify_user_id']) ? (int) $data['else_notify_user_id'] : null,
             ],
             'delay_minutes' => (int) ($data['delay_minutes'] ?? 0),
+            'active' => array_key_exists('active', $data) ? (bool) $data['active'] : true,
             'then' => [
                 'subject' => $data['subject'] ?? null,
                 'body' => $data['body'] ?? null,
@@ -306,12 +348,13 @@ class WorkflowController extends Controller
                 'property_value' => $data['property_value'] ?? null,
                 'assign_owner_id' => isset($data['assign_owner_id']) ? (int) $data['assign_owner_id'] : null,
                 'assign_entity' => $data['assign_entity'] ?? null,
+                'notify_user_id' => isset($data['notify_user_id']) ? (int) $data['notify_user_id'] : null,
             ],
         ];
     }
 
     /**
-     * @param  array{subject: string|null, body: string|null, due_in_days: int, sequence_id: int|null, webhook_url: string|null, property_entity?: string|null, property_field?: string|null, property_value?: string|null, assign_owner_id?: int|null, assign_entity?: string|null}  $data
+     * @param  array{subject: string|null, body: string|null, due_in_days: int, sequence_id: int|null, webhook_url: string|null, property_entity?: string|null, property_field?: string|null, property_value?: string|null, assign_owner_id?: int|null, assign_entity?: string|null, notify_user_id?: int|null}  $data
      * @return array<string, mixed>
      */
     protected function actionConfig(string $action, array $data): array
@@ -340,6 +383,26 @@ class WorkflowController extends Controller
             return [
                 'entity' => $data['assign_entity'] ?? 'contact',
                 'owner_id' => $data['assign_owner_id'] ?? null,
+            ];
+        }
+
+        if ($action === Workflow::ACTION_CREATE_DEAL) {
+            $amount = $data['property_value'] ?? null;
+
+            return [
+                'title' => $data['subject'] ?: null,
+                'amount_cents' => filled($amount) ? (int) round(((float) $amount) * 100) : 0,
+                'subject' => $data['subject'] ?: 'Follow up in EvoSales',
+                'body' => $data['body'] ?? null,
+                'due_in_days' => $data['due_in_days'] ?? 1,
+            ];
+        }
+
+        if ($action === Workflow::ACTION_NOTIFY_USER) {
+            return [
+                'subject' => $data['subject'] ?: 'Workflow notification',
+                'body' => $data['body'],
+                'user_id' => $data['notify_user_id'] ?? null,
             ];
         }
 
