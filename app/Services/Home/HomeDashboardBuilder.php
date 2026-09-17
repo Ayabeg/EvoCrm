@@ -3,151 +3,378 @@
 namespace App\Services\Home;
 
 use App\Models\Activity;
+use App\Models\Company;
+use App\Models\Contact;
 use App\Models\Deal;
-use App\Models\Lead;
-use App\Models\OutboundMessage;
+use App\Models\Pipeline;
 use App\Models\Stage;
-use App\Models\Thread;
+use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Crm\ActivityWorkQueueQuery;
+use App\Services\Crm\DealAttentionEvaluator;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 
 /**
- * Home command center — real workspace metrics only. Omits sections when
- * there is no underlying data (never fabricates charts or KPIs).
+ * Operating Home — one bounded composition over P11 / P12 / P15.
+ * Does not recalculate attention, timing, or financial truth.
  */
 class HomeDashboardBuilder
 {
-    private const TZ = 'Africa/Algiers';
+    public const TZ = DealAttentionEvaluator::TIMEZONE;
 
-    private const MAX_DAYS = 92;
+    public const ATTENTION_LIMIT = 6;
 
-    private const STALLED_DAYS = 7;
+    public const WORK_LIMIT = 6;
+
+    public const RECENT_LIMIT = 6;
 
     public function __construct(
-        private ?int $ownerId = null,
+        private DealAttentionEvaluator $attention,
+        private ActivityWorkQueueQuery $workQueue,
     ) {}
 
     /**
      * @return array<string, mixed>
      */
-    public function build(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): array
+    public function build(User $user): array
     {
-        $days = (int) $from->diffInDays($to) + 1;
-        $prevTo = $from->copy()->subDay()->endOfDay();
-        $prevFrom = $prevTo->copy()->subDays($days - 1)->startOfDay();
-
-        $deals = $this->constrainOwner(Deal::query()->forWorkspace($workspace)->with(['stage', 'owner']))->get();
+        $now = DealAttentionEvaluator::now();
+        $workspace = $user->workspace;
         $pipeline = $workspace->defaultPipeline();
-        $stages = $pipeline->stages()->orderBy('position')->get();
+        $canEdit = $user->canPermission('crm.edit');
 
-        $open = $deals->filter(fn (Deal $d) => $d->stage && ! $d->stage->isTerminal());
-        $wonInWindow = $deals->filter(fn (Deal $d) => $d->stage?->is_won && $this->inWindow($d->closed_at, $from, $to));
-        $wonPrev = $deals->filter(fn (Deal $d) => $d->stage?->is_won && $this->inWindow($d->closed_at, $prevFrom, $prevTo));
-        $lostInWindow = $deals->filter(fn (Deal $d) => $d->stage?->is_lost && $this->inWindow($d->closed_at, $from, $to));
-        $closedInWindow = $wonInWindow->count() + $lostInWindow->count();
-
-        $revenueCents = (int) $wonInWindow->sum('amount_cents');
-        $revenuePrevCents = (int) $wonPrev->sum('amount_cents');
-        $pipelineCents = (int) $open->sum('amount_cents');
-
-        $activitiesDone = $this->constrainOwner(
-            Activity::query()->forWorkspace($workspace)->where('done', true)
-                ->whereBetween('completed_at', [$from, $to])
-        )->count();
-        $activitiesDonePrev = $this->constrainOwner(
-            Activity::query()->forWorkspace($workspace)->where('done', true)
-                ->whereBetween('completed_at', [$prevFrom, $prevTo])
-        )->count();
-
-        $winRate = $closedInWindow > 0
-            ? (int) round($wonInWindow->count() / $closedInWindow * 100)
-            : null;
-
-        $kpis = array_values(array_filter([
-            $this->kpi('revenue', 'Revenue', $revenueCents, 'money', $revenueCents, $revenuePrevCents, '/crm/reports?category=sales'),
-            $this->kpi('pipeline', 'Pipeline', $pipelineCents, 'money', $pipelineCents, null, '/crm/deals/board', 'Open opportunity value'),
-            $this->kpi('win_rate', 'Win rate', $winRate, 'percent', $winRate, null, '/crm/reports?category=pipeline', $closedInWindow > 0 ? 'Closed in period' : null),
-            $this->kpi('open_deals', 'Open deals', $open->count(), 'number', $open->count(), null, '/crm/deals', 'Active in pipeline'),
-            $deals->isNotEmpty() || $activitiesDone > 0
-                ? $this->kpi('activities', 'Activities done', $activitiesDone, 'number', $activitiesDone, $activitiesDonePrev, '/crm/activities', 'Completed in period')
-                : null,
-        ]));
-
-        $primaryChart = $this->wonRevenueChart($wonInWindow, $from, $to);
-        $pipelineHealth = $this->pipelineHealth($open, $stages, $pipelineCents);
-        $attention = $this->attention($workspace, $open, $from);
-
-        $tasksDueToday = collect($attention)->contains(fn (array $item) => $item['key'] === 'tasks_due');
-        $overdue = collect($attention)->contains(fn (array $item) => $item['key'] === 'overdue_activities');
+        $metrics = $this->metrics($workspace, $pipeline, $now);
+        $attention = $this->attention($workspace, $pipeline);
+        $work = $this->work($user, $now);
+        $pipelineOverview = $this->pipeline($workspace, $pipeline);
+        $recent = $this->recent($user, $now);
 
         return [
-            'window' => [
-                'from' => $from->toDateString(),
-                'to' => $to->toDateString(),
-                'days' => $days,
-                'timezone' => self::TZ,
-            ],
-            'kpis' => $kpis,
-            'primaryChart' => $primaryChart,
-            'pipelineHealth' => $pipelineHealth,
+            'context' => $this->context($user, $now),
+            'metrics' => $metrics,
             'attention' => $attention,
-            'guidedActions' => app(GuidedActionBuilder::class)->build($workspace, $open),
-            'caughtUp' => ! $tasksDueToday && ! $overdue,
-            'activityFeed' => $this->activityFeed($workspace),
-            'salesPerformance' => $this->salesPerformance($wonInWindow),
-            'quickActions' => [
-                ['label' => __('New deal'), 'href' => '/crm/deals'],
-                ['label' => __('New lead'), 'href' => '/crm/leads'],
-                ['label' => __('Add contact'), 'href' => '/crm/contacts'],
-                ['label' => __('Create task'), 'href' => '/crm/activities?type=task'],
-                ['label' => __('Log activity'), 'href' => '/crm/activities?type=note'],
-            ],
+            'work' => $work,
+            'pipeline' => $pipelineOverview,
+            'recent' => $recent,
+            'activation' => $this->activation($workspace, $canEdit),
         ];
     }
 
     /**
      * @return array<string, mixed>
      */
-    public static function parseWindow(?string $fromInput, ?string $toInput): array
+    private function context(User $user, CarbonInterface $now): array
     {
-        $to = $toInput
-            ? Carbon::parse($toInput, self::TZ)->endOfDay()
-            : now(self::TZ)->endOfDay();
-        $from = $fromInput
-            ? Carbon::parse($fromInput, self::TZ)->startOfDay()
-            : $to->copy()->subDays(29)->startOfDay();
+        $name = trim((string) $user->name);
+        $first = $name !== '' ? explode(' ', $name, 2)[0] : $name;
 
-        if ($from->gt($to)) {
-            [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
-        }
-
-        if ($from->diffInDays($to) >= self::MAX_DAYS) {
-            $from = $to->copy()->subDays(self::MAX_DAYS - 1)->startOfDay();
-        }
-
-        return [$from, $to];
+        return [
+            'name' => $first,
+            'date' => $now->copy()->locale('en')->isoFormat('dddd, D MMMM YYYY'),
+            'timezone' => self::TZ,
+        ];
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>
+     */
+    private function metrics(Workspace $workspace, Pipeline $pipeline, CarbonInterface $now): array
+    {
+        $from = $now->copy()->startOfMonth();
+        $to = $now->copy()->endOfMonth();
+        $prevFrom = $from->copy()->subMonthNoOverflow()->startOfMonth();
+        $prevTo = $from->copy()->subMonthNoOverflow()->endOfMonth();
+
+        $hasDeals = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->exists();
+
+        $wonCents = $this->closedSum($workspace, $pipeline, true, $from, $to);
+        $wonPrevCents = $this->closedSum($workspace, $pipeline, true, $prevFrom, $prevTo);
+        $wonCount = $this->closedCount($workspace, $pipeline, true, $from, $to);
+        $lostCount = $this->closedCount($workspace, $pipeline, false, $from, $to);
+        $closedCount = $wonCount + $lostCount;
+        $winRate = $closedCount > 0 ? (int) round($wonCount / $closedCount * 100) : null;
+
+        $stageRows = $this->openStageAggregates($workspace, $pipeline);
+        $openCount = (int) collect($stageRows)->sum('count');
+        $pipelineCents = (int) collect($stageRows)->sum('amount_cents');
+
+        $monthLabel = $from->copy()->locale('en')->isoFormat('MMMM YYYY');
+
+        $kpis = $hasDeals ? [
+            $this->kpi(
+                'revenue',
+                'Won this month',
+                $wonCents,
+                'money',
+                '/crm/deals?status=won',
+                $monthLabel,
+                $this->percentChange($wonCents, $wonPrevCents),
+            ),
+            $this->kpi(
+                'pipeline',
+                'Open pipeline',
+                $pipelineCents,
+                'money',
+                '/crm/deals/board?pipeline='.$pipeline->id,
+                'Unweighted open value',
+                null,
+            ),
+            $this->kpi(
+                'win_rate',
+                'Win rate',
+                $winRate,
+                'percent',
+                '/crm/deals',
+                $closedCount > 0 ? 'Won / closed this month' : 'No closed deals this month',
+                null,
+            ),
+            $this->kpi(
+                'open_deals',
+                'Open deals',
+                $openCount,
+                'number',
+                '/crm/deals',
+                'Active in default pipeline',
+                null,
+            ),
+        ] : [];
+
+        return [
+            'window' => [
+                'from' => $from->toDateString(),
+                'to' => $to->toDateString(),
+                'label' => $monthLabel,
+                'timezone' => self::TZ,
+            ],
+            'kpis' => $kpis,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function attention(Workspace $workspace, Pipeline $pipeline): array
+    {
+        $query = Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id);
+
+        return [
+            'items' => $this->attention->queue($query, self::ATTENTION_LIMIT),
+            'view_all_href' => '/crm/deals?attention=needs_attention',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function work(User $user, CarbonInterface $now): array
+    {
+        $preview = $this->workQueue->dashboardWork($user, self::WORK_LIMIT, $now);
+
+        return [
+            'counts' => $preview['counts'],
+            'items' => $preview['items'],
+            'view_all_href' => '/crm/activities',
+            'overdue_href' => '/crm/activities?group=overdue',
+            'today_href' => '/crm/activities?group=today',
+            'upcoming_href' => '/crm/activities?group=upcoming',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function pipeline(Workspace $workspace, Pipeline $pipeline): array
+    {
+        $stages = $this->openStageAggregates($workspace, $pipeline);
+
+        return [
+            'pipeline_id' => (int) $pipeline->id,
+            'label' => (string) $pipeline->name,
+            'deal_count' => (int) collect($stages)->sum('count'),
+            'amount_cents' => (int) collect($stages)->sum('amount_cents'),
+            'currency' => 'DZD',
+            'weighted' => false,
+            'stages' => $stages,
+            'view_all_href' => '/crm/deals/board?pipeline='.$pipeline->id,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function recent(User $user, CarbonInterface $now): array
+    {
+        $rows = Activity::query()
+            ->forWorkspace($user->workspace)
+            ->select([
+                'id',
+                'workspace_id',
+                'type',
+                'subject',
+                'done',
+                'created_at',
+                'owner_id',
+                'contact_id',
+                'deal_id',
+                'company_id',
+            ])
+            ->with([
+                'contact:id,workspace_id,first_name,last_name',
+                'deal:id,workspace_id,title',
+                'company:id,workspace_id,name',
+            ])
+            ->latest('created_at')
+            ->limit(12)
+            ->get()
+            ->filter(fn (Activity $activity): bool => Gate::forUser($user)->allows('view', $activity))
+            ->take(self::RECENT_LIMIT)
+            ->values();
+
+        $items = $rows->map(function (Activity $activity) use ($user): array {
+            $subject = trim((string) ($activity->subject ?? ''));
+            $created = $activity->created_at instanceof CarbonInterface
+                ? $activity->created_at->timezone(self::TZ)->toIso8601String()
+                : null;
+
+            return [
+                'id' => (int) $activity->id,
+                'type' => (string) $activity->type,
+                'subject' => $subject !== '' ? $subject : ucfirst((string) $activity->type),
+                'at' => $created,
+                'recordRef' => $this->recentRecordRef($user, $activity),
+                'related' => $this->recentRelated($user, $activity),
+            ];
+        })->all();
+
+        return [
+            'kind' => 'logged_activity',
+            'items' => $items,
+            'view_all_href' => '/crm/activities',
+        ];
+    }
+
+    /**
+     * @return list<array{label: string, href: string}>
+     */
+    private function activation(Workspace $workspace, bool $canEdit): array
+    {
+        if (! $canEdit) {
+            return [];
+        }
+
+        $hasDeals = Deal::query()->forWorkspace($workspace)->exists();
+        $hasActivities = Activity::query()->forWorkspace($workspace)->exists();
+
+        if ($hasDeals || $hasActivities) {
+            return [];
+        }
+
+        return [
+            ['label' => __('Create deal'), 'href' => '/crm/deals?create=1'],
+            ['label' => __('Create contact'), 'href' => '/crm/contacts?create=1'],
+            ['label' => __('Log activity'), 'href' => '/crm/activities?create=1'],
+        ];
+    }
+
+    /**
+     * @return list<array{id: int, name: string, slug: string, count: int, amount_cents: int, href: string}>
+     */
+    private function openStageAggregates(Workspace $workspace, Pipeline $pipeline): array
+    {
+        $stages = $pipeline->stages()
+            ->orderBy('position')
+            ->get(['id', 'name', 'slug', 'is_won', 'is_lost', 'position']);
+
+        $open = $stages->filter(
+            fn (Stage $stage): bool => ! $stage->is_won && ! $stage->is_lost,
+        )->values();
+
+        $ids = $open->pluck('id');
+        $sums = $ids->isEmpty()
+            ? collect()
+            : Deal::query()
+                ->forWorkspace($workspace)
+                ->where('pipeline_id', $pipeline->id)
+                ->whereIn('stage_id', $ids)
+                ->selectRaw('stage_id, COUNT(*) as deal_count, COALESCE(SUM(amount_cents), 0) as amount_cents')
+                ->groupBy('stage_id')
+                ->get()
+                ->keyBy('stage_id');
+
+        return $open->map(function (Stage $stage) use ($sums, $pipeline): array {
+            $row = $sums->get($stage->id);
+
+            return [
+                'id' => (int) $stage->id,
+                'name' => (string) $stage->name,
+                'slug' => (string) $stage->slug,
+                'count' => (int) ($row->deal_count ?? 0),
+                'amount_cents' => (int) ($row->amount_cents ?? 0),
+                'href' => '/crm/deals?pipeline='.$pipeline->id.'&stage='.$stage->slug,
+            ];
+        })->all();
+    }
+
+    private function closedSum(
+        Workspace $workspace,
+        Pipeline $pipeline,
+        bool $won,
+        CarbonInterface $from,
+        CarbonInterface $to,
+    ): int {
+        return (int) Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->whereNotNull('closed_at')
+            ->whereBetween('closed_at', [$from, $to])
+            ->whereHas(
+                'stage',
+                fn ($stage) => $won
+                    ? $stage->where('is_won', true)
+                    : $stage->where('is_lost', true),
+            )
+            ->sum('amount_cents');
+    }
+
+    private function closedCount(
+        Workspace $workspace,
+        Pipeline $pipeline,
+        bool $won,
+        CarbonInterface $from,
+        CarbonInterface $to,
+    ): int {
+        return (int) Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->whereNotNull('closed_at')
+            ->whereBetween('closed_at', [$from, $to])
+            ->whereHas(
+                'stage',
+                fn ($stage) => $won
+                    ? $stage->where('is_won', true)
+                    : $stage->where('is_lost', true),
+            )
+            ->count();
+    }
+
+    /**
+     * @return array<string, mixed>
      */
     private function kpi(
         string $key,
         string $label,
         ?int $value,
         string $format,
-        ?int $currentForChange,
-        ?int $previous,
         string $href,
-        ?string $hint = null,
-    ): ?array {
-        if ($value === null && $format !== 'percent') {
-            return null;
-        }
-
+        ?string $hint,
+        ?int $change,
+    ): array {
         return [
             'key' => $key,
             'label' => __($label),
@@ -155,308 +382,76 @@ class HomeDashboardBuilder
             'format' => $format,
             'hint' => $hint !== null ? __($hint) : null,
             'href' => $href,
-            'change' => $this->percentChange($currentForChange, $previous),
-            'changeLabel' => __('vs previous period'),
+            'change' => $change,
+            'changeLabel' => $change !== null ? __('vs last month') : null,
         ];
     }
 
-    private function percentChange(?int $current, ?int $previous): ?int
+    private function percentChange(int $current, int $previous): ?int
     {
-        if ($current === null || $previous === null) {
+        if ($previous <= 0) {
             return null;
-        }
-
-        if ($previous === 0) {
-            return $current > 0 ? 100 : ($current < 0 ? -100 : 0);
         }
 
         return (int) round(($current - $previous) / $previous * 100);
     }
 
     /**
-     * @param  Collection<int, Deal>  $won
-     * @return array<string, mixed>|null
+     * @return array{type: string, id: int}|null
      */
-    private function wonRevenueChart(Collection $won, CarbonInterface $from, CarbonInterface $to): ?array
+    private function recentRecordRef(User $user, Activity $activity): ?array
     {
-        if ($won->isEmpty()) {
-            return null;
+        $deal = $activity->deal;
+        if ($deal instanceof Deal && Gate::forUser($user)->allows('view', $deal)) {
+            return ['type' => 'deal', 'id' => (int) $deal->id];
         }
 
-        [$labels, $counts] = $this->dailySeries(
-            $won->pluck('closed_at'),
-            $from,
-            $to,
-        );
-        [, $amounts] = $this->dailySeries(
-            $won->pluck('closed_at'),
-            $from,
-            $to,
-            $won->pluck('amount_cents')->map(fn ($c) => (int) round($c / 100)),
-        );
-
-        $hasSignal = collect($amounts)->contains(fn ($v) => $v > 0);
-
-        if (! $hasSignal) {
-            return null;
+        $contact = $activity->contact;
+        if ($contact instanceof Contact && Gate::forUser($user)->allows('view', $contact)) {
+            return ['type' => 'contact', 'id' => (int) $contact->id];
         }
 
-        return [
-            'id' => 'evoviz.area',
-            'title' => __('Revenue won over time'),
-            'labels' => $labels,
-            'series' => [[
-                'name' => __('Won (DZD)'),
-                'data' => $amounts,
-                'tone' => 'mark',
-            ]],
-            'total' => (int) round($won->sum('amount_cents') / 100),
-            'valueLabel' => 'DZD',
-            'href' => '/crm/reports?category=sales',
-        ];
+        $company = $activity->company;
+        if ($company instanceof Company && Gate::forUser($user)->allows('view', $company)) {
+            return ['type' => 'company', 'id' => (int) $company->id];
+        }
+
+        return null;
     }
 
     /**
-     * @param  Collection<int, Deal>  $open
-     * @param  Collection<int, Stage>  $stages
-     * @return array<string, mixed>|null
+     * @return list<array{type: string, id: int, label: string}>
      */
-    private function pipelineHealth(Collection $open, Collection $stages, int $pipelineCents): ?array
+    private function recentRelated(User $user, Activity $activity): array
     {
-        if ($open->isEmpty()) {
-            return null;
-        }
-
-        $openStages = $stages->where('is_won', false)->where('is_lost', false);
-        $stageRows = $openStages->map(fn ($stage) => [
-            'name' => $stage->name,
-            'count' => $open->where('stage_id', $stage->id)->count(),
-            'amount_cents' => (int) $open->where('stage_id', $stage->id)->sum('amount_cents'),
-        ])->values()->all();
-
-        $chart = [
-            'id' => 'evoviz.ranked-bars',
-            'title' => __('Open deals by stage'),
-            'labels' => collect($stageRows)->pluck('name')->all(),
-            'series' => [[
-                'name' => __('Deals'),
-                'data' => collect($stageRows)->pluck('count')->all(),
-                'tone' => 'ink',
-            ]],
-            'total' => $open->count(),
-            'valueLabel' => 'deals',
-            'href' => '/crm/deals/board',
-        ];
-
-        return [
-            'total_cents' => $pipelineCents,
-            'deal_count' => $open->count(),
-            'stages' => $stageRows,
-            'chart' => collect($stageRows)->contains(fn ($s) => $s['count'] > 0) ? $chart : null,
-        ];
-    }
-
-    /**
-     * @param  Collection<int, Deal>  $open
-     * @return array<int, array<string, mixed>>
-     */
-    private function attention(Workspace $workspace, Collection $open, CarbonInterface $from): array
-    {
-        $items = [];
-        $stalledCutoff = now(self::TZ)->subDays(self::STALLED_DAYS);
-
-        $stalled = $open->filter(function (Deal $deal) use ($stalledCutoff) {
-            return $deal->last_activity_at === null || $deal->last_activity_at->lt($stalledCutoff);
-        })->count();
-
-        if ($stalled > 0) {
-            $items[] = [
-                'key' => 'stalled_deals',
-                'title' => __('Stalled deals'),
-                'description' => "{$stalled} deal".($stalled === 1 ? '' : 's').' with no activity for '.self::STALLED_DAYS.'+ days',
-                'actionLabel' => __('Review deals'),
-                'href' => '/crm/deals',
+        $related = [];
+        $deal = $activity->deal;
+        if ($deal instanceof Deal && Gate::forUser($user)->allows('view', $deal)) {
+            $related[] = [
+                'type' => 'deal',
+                'id' => (int) $deal->id,
+                'label' => (string) $deal->title,
             ];
         }
 
-        $tasksDueToday = $this->constrainOwner(
-            Activity::query()->forWorkspace($workspace)
-                ->where('type', 'task')
-                ->where('done', false)
-                ->whereNotNull('due_at')
-                ->whereBetween('due_at', [now(self::TZ)->startOfDay(), now(self::TZ)->endOfDay()])
-        )->count();
-
-        if ($tasksDueToday > 0) {
-            $items[] = [
-                'key' => 'tasks_due',
-                'title' => __('Tasks due today'),
-                'description' => "{$tasksDueToday} task".($tasksDueToday === 1 ? '' : 's').' due today',
-                'actionLabel' => __('View tasks'),
-                'href' => '/crm/activities?date=today',
+        $contact = $activity->contact;
+        if ($contact instanceof Contact && Gate::forUser($user)->allows('view', $contact)) {
+            $related[] = [
+                'type' => 'contact',
+                'id' => (int) $contact->id,
+                'label' => $contact->displayName(),
             ];
         }
 
-        $overdue = $this->constrainOwner(
-            Activity::query()->forWorkspace($workspace)
-                ->where('done', false)
-                ->whereNotNull('due_at')
-                ->where('due_at', '<', now(self::TZ))
-        )->count();
-
-        if ($overdue > 0) {
-            $items[] = [
-                'key' => 'overdue_activities',
-                'title' => __('Overdue activities'),
-                'description' => "{$overdue} overdue item".($overdue === 1 ? '' : 's'),
-                'actionLabel' => __('Review'),
-                'href' => '/crm/activities?overdue=1',
+        $company = $activity->company;
+        if ($company instanceof Company && Gate::forUser($user)->allows('view', $company)) {
+            $related[] = [
+                'type' => 'company',
+                'id' => (int) $company->id,
+                'label' => (string) $company->name,
             ];
         }
 
-        $unread = (int) Thread::query()->forWorkspace($workspace)->sum('unread_count');
-        if ($unread > 0) {
-            $items[] = [
-                'key' => 'inbox_unread',
-                'title' => __('Unread conversations'),
-                'description' => "{$unread} unread in desk",
-                'actionLabel' => __('Open inbox'),
-                'href' => '/inbox',
-            ];
-        }
-
-        $leadsNoFollowUp = $this->constrainOwner(
-            Lead::query()->forWorkspace($workspace)
-                ->whereDoesntHave('contact.activities', fn (Builder $q) => $q
-                    ->where('type', 'task')
-                    ->where('done', false)
-                    ->whereNotNull('due_at'))
-        )->count();
-
-        if ($leadsNoFollowUp > 0) {
-            $items[] = [
-                'key' => 'leads_followup',
-                'title' => __('Leads without follow-up'),
-                'description' => "{$leadsNoFollowUp} lead".($leadsNoFollowUp === 1 ? '' : 's').' with no scheduled task',
-                'actionLabel' => __('Follow up'),
-                'href' => '/crm/leads',
-            ];
-        }
-
-        $deferred = OutboundMessage::query()->forWorkspace($workspace)
-            ->where('direction', 'out')
-            ->where('status', 'queued')
-            ->whereNotNull('deferred_until')
-            ->where('deferred_until', '>', now())
-            ->count();
-
-        if ($deferred > 0) {
-            $items[] = [
-                'key' => 'outbound_deferred',
-                'title' => __('Deferred sends'),
-                'description' => "{$deferred} outbound message".($deferred === 1 ? '' : 's').' queued for later',
-                'actionLabel' => __('Review outbound'),
-                'href' => '/outbound/outbox',
-            ];
-        }
-
-        return $items;
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function activityFeed(Workspace $workspace): array
-    {
-        return $this->constrainOwner(
-            Activity::query()->forWorkspace($workspace)
-                ->with(['actor', 'contact', 'deal'])
-                ->latest('updated_at')
-                ->limit(12)
-        )->get()->map(fn (Activity $activity) => [
-            'id' => $activity->id,
-            'type' => $activity->type,
-            'subject' => $activity->subject,
-            'done' => $activity->done,
-            'actor' => $activity->actor?->name,
-            'contact' => $activity->contact?->displayName(),
-            'deal' => $activity->deal?->title,
-            'at' => $activity->updated_at?->timezone(self::TZ)->format('Y-m-d H:i'),
-            'href' => $activity->deal_id
-                ? "/crm/deals/{$activity->deal_id}"
-                : ($activity->contact_id ? "/crm/contacts/{$activity->contact_id}" : '/crm/activities'),
-        ])->all();
-    }
-
-    /**
-     * @param  Collection<int, Deal>  $won
-     * @return array<int, array<string, mixed>>|null
-     */
-    private function salesPerformance(Collection $won): ?array
-    {
-        if ($won->isEmpty()) {
-            return null;
-        }
-
-        $rows = $won->groupBy('owner_id')->map(function (Collection $group) {
-            /** @var Deal $first */
-            $first = $group->first();
-
-            return [
-                'owner' => $first->owner?->name ?? __('Unassigned'),
-                'won' => $group->count(),
-                'revenue_cents' => (int) $group->sum('amount_cents'),
-            ];
-        })->sortByDesc('revenue_cents')->take(5)->values()->all();
-
-        return count($rows) > 0 ? $rows : null;
-    }
-
-    private function inWindow(?CarbonInterface $date, CarbonInterface $from, CarbonInterface $to): bool
-    {
-        return $date !== null && $date->betweenIncluded($from, $to);
-    }
-
-    /**
-     * @param  Collection<int, CarbonInterface|null>  $dates
-     * @param  Collection<int, int|float>|null  $weights
-     * @return array{0: array<int, string>, 1: array<int, int>}
-     */
-    private function dailySeries(Collection $dates, CarbonInterface $from, CarbonInterface $to, ?Collection $weights = null): array
-    {
-        $days = collect();
-        for ($day = $from->copy()->startOfDay(); $day->lte($to); $day = $day->addDay()) {
-            $days->push($day->toDateString());
-        }
-
-        $sums = collect();
-        $dates->values()->each(function (?CarbonInterface $date, $i) use ($sums, $weights) {
-            if ($date === null) {
-                return;
-            }
-
-            $key = $date->copy()->setTimezone(self::TZ)->toDateString();
-            $sums[$key] = ($sums[$key] ?? 0) + ($weights ? (float) ($weights[$i] ?? 1) : 1);
-        });
-
-        return [
-            $days->map(fn (string $day) => Carbon::parse($day)->format('d/m'))->all(),
-            $days->map(fn (string $day) => (int) round($sums[$day] ?? 0))->all(),
-        ];
-    }
-
-    /**
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     *
-     * @param  Builder<TModel>  $query
-     * @return Builder<TModel>
-     */
-    private function constrainOwner(Builder $query, string $column = 'owner_id'): Builder
-    {
-        if ($this->ownerId !== null) {
-            $query->where($column, $this->ownerId);
-        }
-
-        return $query;
+        return $related;
     }
 }

@@ -5,6 +5,7 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\SalesQuota;
 use App\Models\User;
+use App\Services\Home\QuotaTracker;
 use Illuminate\Support\Carbon;
 
 function quotaDeal(User $user, int $amountCents, ?User $owner = null, ?Carbon $closedAt = null): Deal
@@ -26,19 +27,33 @@ function quotaDeal(User $user, int $amountCents, ?User $owner = null, ?Carbon $c
     ]);
 }
 
-it('exposes a no-target quota on home with a settings CTA for managers', function () {
+it('keeps quota off the operating home', function () {
     $user = User::factory()->create();
+    $user->workspace->forceFill(['monthly_quota_cents' => 8_000_000_00])->save();
+    quotaDeal($user, 3_000_000_00);
 
     $this->actingAs($user)
         ->get('/dashboard')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('home')
-            ->where('quota.status', 'no_target')
-            ->where('quota.target_cents', null)
-            ->where('quota.can_manage', true)
-            ->where('quota.settings_href', '/settings/quotas')
-            ->where('quota.timezone', 'Africa/Algiers'));
+            ->missing('quota'));
+});
+
+it('exposes a no-target quota from the tracker for managers', function () {
+    $user = User::factory()->create();
+
+    $payload = app(QuotaTracker::class)->present(
+        $user->workspace,
+        null,
+        $user->role->canManageSettings(),
+    );
+
+    expect($payload['status'])->toBe('no_target')
+        ->and($payload['target_cents'])->toBeNull()
+        ->and($payload['can_manage'])->toBeTrue()
+        ->and($payload['settings_href'])->toBe('/settings/quotas')
+        ->and($payload['timezone'])->toBe('Africa/Algiers');
 });
 
 it('measures workspace quota against closed-won in the Algiers calendar month', function () {
@@ -50,20 +65,18 @@ it('measures workspace quota against closed-won in the Algiers calendar month', 
     quotaDeal($user, 3_000_000_00);
     quotaDeal($user, 1_000_000_00, $user, Carbon::parse('2026-08-31 18:00:00', 'Africa/Algiers'));
 
-    $this->actingAs($user)
-        ->get('/dashboard')
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->where('quota.month', '2026-09')
-            ->where('quota.label', 'September 2026')
-            ->where('quota.target_cents', 8_000_000_00)
-            ->where('quota.won_cents', 3_000_000_00)
-            ->where('quota.won_count', 1)
-            ->where('quota.remaining_cents', 5_000_000_00)
-            ->where('quota.attainment_pct', 37.5)
-            ->where('quota.status', 'on_track')
-            ->where('quota.day', 10)
-            ->where('quota.days', 30));
+    $payload = app(QuotaTracker::class)->present($user->workspace);
+
+    expect($payload['month'])->toBe('2026-09')
+        ->and($payload['label'])->toBe('September 2026')
+        ->and($payload['target_cents'])->toBe(8_000_000_00)
+        ->and($payload['won_cents'])->toBe(3_000_000_00)
+        ->and($payload['won_count'])->toBe(1)
+        ->and($payload['remaining_cents'])->toBe(5_000_000_00)
+        ->and($payload['attainment_pct'])->toBe(37.5)
+        ->and($payload['status'])->toBe('on_track')
+        ->and($payload['day'])->toBe(10)
+        ->and($payload['days'])->toBe(30);
 });
 
 it('marks the workspace behind pace when won is under expected', function () {
@@ -73,12 +86,11 @@ it('marks the workspace behind pace when won is under expected', function () {
     $user->workspace->forceFill(['monthly_quota_cents' => 2_000_000_00])->save();
     quotaDeal($user, 200_000_00);
 
-    $this->actingAs($user)
-        ->get('/dashboard')
-        ->assertInertia(fn ($page) => $page
-            ->where('quota.status', 'behind')
-            ->where('quota.won_cents', 200_000_00)
-            ->where('quota.target_cents', 2_000_000_00));
+    $payload = app(QuotaTracker::class)->present($user->workspace);
+
+    expect($payload['status'])->toBe('behind')
+        ->and($payload['won_cents'])->toBe(200_000_00)
+        ->and($payload['target_cents'])->toBe(2_000_000_00);
 });
 
 it('marks quota hit when closed-won meets the monthly target', function () {
@@ -88,11 +100,10 @@ it('marks quota hit when closed-won meets the monthly target', function () {
     $user->workspace->forceFill(['monthly_quota_cents' => 1_000_000_00])->save();
     quotaDeal($user, 1_200_000_00);
 
-    $this->actingAs($user)
-        ->get('/dashboard')
-        ->assertInertia(fn ($page) => $page
-            ->where('quota.status', 'hit')
-            ->where('quota.remaining_cents', 0));
+    $payload = app(QuotaTracker::class)->present($user->workspace);
+
+    expect($payload['status'])->toBe('hit')
+        ->and($payload['remaining_cents'])->toBe(0);
 });
 
 it('lists per-person quotas independently of the workspace target', function () {
@@ -120,22 +131,21 @@ it('lists per-person quotas independently of the workspace target', function () 
     quotaDeal($user, 1_000_000_00, $user);
     quotaDeal($user, 500_000_00, $other);
 
-    $this->actingAs($user)
-        ->get('/dashboard')
-        ->assertInertia(fn ($page) => $page
-            ->where('quota.target_cents', 5_000_000_00)
-            ->where('quota.won_cents', 1_500_000_00)
-            ->has('quota.owners', 2)
-            ->where('quota.owners.0.name', 'Amine')
-            ->where('quota.owners.0.won_cents', 1_000_000_00)
-            ->where('quota.owners.0.target_cents', 2_000_000_00)
-            ->where('quota.owners.0.attainment_pct', 50)
-            ->where('quota.owners.1.name', 'Sara')
-            ->where('quota.owners.1.target_cents', 3_000_000_00)
-            ->where('quota.owners.1.won_cents', 500_000_00));
+    $payload = app(QuotaTracker::class)->present($user->workspace);
+
+    expect($payload['target_cents'])->toBe(5_000_000_00)
+        ->and($payload['won_cents'])->toBe(1_500_000_00)
+        ->and($payload['owners'])->toHaveCount(2)
+        ->and($payload['owners'][0]['name'])->toBe('Amine')
+        ->and($payload['owners'][0]['won_cents'])->toBe(1_000_000_00)
+        ->and($payload['owners'][0]['target_cents'])->toBe(2_000_000_00)
+        ->and($payload['owners'][0]['attainment_pct'])->toBe(50)
+        ->and($payload['owners'][1]['name'])->toBe('Sara')
+        ->and($payload['owners'][1]['target_cents'])->toBe(3_000_000_00)
+        ->and($payload['owners'][1]['won_cents'])->toBe(500_000_00);
 });
 
-it('scopes quota owners and won amount when Home is filtered by owner', function () {
+it('scopes quota owners and won amount when the tracker is filtered by owner', function () {
     $this->travelTo(Carbon::parse('2026-09-10 12:00:00', 'Africa/Algiers'));
 
     $user = User::factory()->create(['name' => 'Amine']);
@@ -159,11 +169,10 @@ it('scopes quota owners and won amount when Home is filtered by owner', function
     quotaDeal($user, 1_000_000_00, $user);
     quotaDeal($user, 900_000_00, $other);
 
-    $this->actingAs($user)
-        ->get('/dashboard?owner_id='.$user->id)
-        ->assertInertia(fn ($page) => $page
-            ->where('quota.target_cents', 2_000_000_00)
-            ->where('quota.won_cents', 1_000_000_00)
-            ->has('quota.owners', 1)
-            ->where('quota.owners.0.name', 'Amine'));
+    $payload = app(QuotaTracker::class)->present($user->workspace, $user->id);
+
+    expect($payload['target_cents'])->toBe(2_000_000_00)
+        ->and($payload['won_cents'])->toBe(1_000_000_00)
+        ->and($payload['owners'])->toHaveCount(1)
+        ->and($payload['owners'][0]['name'])->toBe('Amine');
 });

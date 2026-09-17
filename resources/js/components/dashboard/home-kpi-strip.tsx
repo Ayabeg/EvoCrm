@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 function formatKpiValue(kpi: KpiTile): string {
     if (kpi.value === null || kpi.value === undefined) {
-        return '-';
+        return '—';
     }
 
     if (kpi.format === 'money' && typeof kpi.value === 'number') {
@@ -29,8 +29,8 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
     }
 
     return (
-        <section aria-label="Command KPIs">
-            <div className="flex overflow-x-auto border-y border-hairline md:grid md:grid-cols-5 md:divide-x md:overflow-visible">
+        <section aria-label="Sales snapshot">
+            <div className="flex overflow-x-auto border-y border-hairline md:grid md:grid-cols-4 md:divide-x md:overflow-visible">
                 {kpis.map((kpi) => {
                     const value = formatKpiValue(kpi);
                     const change =
@@ -47,7 +47,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             </p>
                             {change || kpi.hint ? (
                                 <p className="hidden truncate text-[11px] leading-4 text-mute sm:block">
-                                    {[change, kpi.hint]
+                                    {[change, kpi.changeLabel, kpi.hint]
                                         .filter(Boolean)
                                         .join(' · ')}
                                 </p>

@@ -32,8 +32,7 @@ it('creates a task on a contact timeline and reflects it in activities and home 
         ->get('/dashboard')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->where('attention.0.key', 'tasks_due')
-            ->where('attention.0.title', 'Tasks due today')
+            ->where('work.items.0.subject', 'Call Amine')
             ->missing('nextSteps')
         );
 

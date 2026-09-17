@@ -126,7 +126,7 @@ it('serves the live surfaces the Mobbin checklist names', function () {
     ]);
 
     $this->actingAs($user)->get('/dashboard')->assertOk()
-        ->assertInertia(fn ($page) => $page->component('home')->has('guidedActions')->has('activityFeed'));
+        ->assertInertia(fn ($page) => $page->component('home')->has('attention')->has('work'));
     $this->actingAs($user)->get('/crm/deals')->assertOk()
         ->assertInertia(fn ($page) => $page->component('crm/deals/index')->has('listView.columnDefs'));
     $this->actingAs($user)->get('/crm/deals/board')->assertOk()

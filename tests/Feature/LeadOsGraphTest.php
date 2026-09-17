@@ -315,7 +315,7 @@ it('drafts weekly lost review reasons for a human to confirm', function () {
         ->and($deal->fresh()->lost_reason)->not->toBeEmpty();
 });
 
-it('surfaces last graph run on Home', function () {
+it('surfaces last graph run on Reports not the operating home', function () {
     $user = User::factory()->create();
     app(GraphRunner::class)->start($user->workspace, 'nightly');
 
@@ -324,6 +324,12 @@ it('surfaces last graph run on Home', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('home')
+            ->missing('leadOsGraph'));
+
+    $this->actingAs($user)
+        ->get('/reports')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
             ->where('leadOsGraph.triggered_by', 'nightly')
             ->where('leadOsGraph.nodes.0.key', 'capture-drain')
             ->where('leadOsGraph.nodes.4.key', 'deal-health')

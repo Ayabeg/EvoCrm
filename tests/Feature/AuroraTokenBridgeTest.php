@@ -170,14 +170,15 @@ it('uses compact mobile spacing tokens on Home chrome', function () {
     expect($header)->toContain('flex flex-col gap-2');
     expect($header)->toContain('create=1');
     expect($strip)->toContain('overflow-x-auto');
-    expect($strip)->toContain('md:grid-cols-5');
+    expect($strip)->toContain('md:grid-cols-4');
 });
 
-it('places Needs attention above Performance on Home', function () {
+it('places Needs attention and Today above the KPI strip on Home', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
 
-    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, "t('Performance')"));
-    expect(strpos($home, 'HomeKpiStrip'))->toBeLessThan(strpos($home, 'Needs attention'));
+    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, 'HomeKpiStrip'));
+    expect(strpos($home, "t('Today')"))->toBeLessThan(strpos($home, 'HomeKpiStrip'));
+    expect(strpos($home, 'HomeKpiStrip'))->toBeLessThan(strpos($home, 'Pipeline'));
     expect($home)->not->toContain('QuickActions');
     expect($home)->not->toContain('CrmKpiStrip');
 });
