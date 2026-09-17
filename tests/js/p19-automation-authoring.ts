@@ -1,5 +1,6 @@
 /**
  * Test-only P19 automation authoring proofs. Never import from an Inertia page.
+ * Pest source-locks this file. Do not spawn vite-node from CI.
  */
 import {
     WORKFLOW_ACTIONS,

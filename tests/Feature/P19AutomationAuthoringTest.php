@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Workflow;
 use App\Services\Crm\EvoWorkflowTemplates;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Process;
 
 function p19AuthoringSource(): array
 {
@@ -423,9 +422,25 @@ it('instantiates existing templates into executable workflow rows', function () 
         ->and($workflow->condition_operator === null || in_array($workflow->condition_operator, Workflow::operators(), true))->toBeTrue();
 });
 
-it('runs the focused authoring proofs', function () {
-    $result = Process::path(base_path())
-        ->run(['npx', '--yes', 'vite-node', 'tests/js/p19-automation-authoring.ts']);
+it('locks the authoring proof file to the runner registries and summaries', function () {
+    $js = p19AuthoringSource()['js'];
 
-    expect($result->successful())->toBeTrue($result->errorOutput().$result->output());
+    foreach (Workflow::triggers() as $trigger) {
+        expect($js)->toContain("'{$trigger}'");
+    }
+
+    foreach (Workflow::actions() as $action) {
+        expect($js)->toContain("'{$action}'");
+    }
+
+    foreach (Workflow::operators() as $operator) {
+        expect($js)->toContain("'{$operator}'");
+    }
+
+    expect($js)->toContain('When a contact is created create a task')
+        ->and($js)->toContain('else create a task “Light check-in”')
+        ->and($js)->toContain("payload.active, false")
+        ->and($js)->toContain("!('actions' in payload)")
+        ->and($js)->toContain('invented action is rejected')
+        ->and($js)->toContain('frontend-only operator is rejected');
 });

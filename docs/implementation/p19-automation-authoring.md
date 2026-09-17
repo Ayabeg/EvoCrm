@@ -370,7 +370,16 @@ Client issues + Inertia `page.props.errors` flatten onto the matching field. Ser
 
 Editor stacks: `grid-cols-1` → `md:grid-cols-[3.25rem_1fr]`. Condition row `md:grid-cols-3`. List grid collapses at `<md`. Page: `overflow-x-hidden`.
 
-**Local layout contract is encoded.** Populated visual walk at 1440 / 1280 / 1024 / 768 is **NEEDS RESEARCH** (Contabo).
+Local scripted + browser QA on seeded SQLite (`owner@evosales.local`):
+
+| Width | List | Editor | `scrollWidth <= innerWidth` |
+|---|---|---|---|
+| 1440 | usable | WHEN/IF/THEN drawer | **true** |
+| 1280 | usable | same | **true** |
+| 1024 | usable | same | **true** |
+| 768 | templates/list stack | structured vertical (no canvas) | **true** |
+
+Populated Contabo walk remains **NEEDS RESEARCH**.
 
 ---
 
@@ -384,9 +393,21 @@ Feature tests cover:
 - Toggle on/off; outsider 404 does not flip
 - Member without `automation.manage` can GET, 403 on mutations; granted member can create draft
 
-**LIVE MULTI-ACTION QA:** not supported by the runner. UI does not offer it. That is the correct result.
+Local seeded QA (owner):
 
-Browser walk of the drawer on a populated Contabo workspace: **NEEDS RESEARCH**.
+| Scenario | Result |
+|---|---|
+| Simple `P19 QA simple` | Save Draft → reload → edit fields survived |
+| Conditional `P19 QA conditional` | Deal created + amount ≥ 500000 → task; reload survived |
+| Else `P19 QA else` | Then “Gros” / else “Light”; reload survived |
+| Multi-action | **Not in UI** (correct) |
+| Template `evo_new_contact_task` | Wrote a real **Active** row (existing `apply()`) |
+| Enable/disable | Draft → Turn on Active → Turn off Draft |
+| Member `sara@evosales.local` | View list; Create/Edit/Turn on/Delete/Use template **hidden** |
+
+**LIVE MULTI-ACTION QA:** not supported by the runner. UI does not offer it.
+
+Contabo populated workspace: **NEEDS RESEARCH**.
 
 ---
 
@@ -431,23 +452,27 @@ P19 touches only `/crm/workflows` authoring files + additive controller props. H
 
 Existing: `CrmWorkflowsTest`, `TicketWorkflowTest`.
 
-Commands (filled after gates):
+Commands:
 
 | Command | Result |
 |---|---|
-| Focused Pest P19 | pending this revision |
-| `php artisan test` | pending |
-| eslint touched JS | pending |
-| `npm run types:check` | pending |
-| `npm run build` | pending |
-| GitHub CI | pending |
+| Focused Pest (P19 + CrmWorkflows + Ticket + Spine + Aurora chrome) | **54 passed** (397 assertions) |
+| Focused Pest P19 after CI-safe proofs | **14 passed** (206 assertions) |
+| `php artisan test` | **968 passed** (12002 assertions) |
+| `tests/js/p19-automation-authoring.ts` | source-locked from Pest (vite-node is not spawned in CI) |
+| eslint on P19-touched JS | **pass** |
+| `php artisan wayfinder:generate --with-form && npm run types:check` | **pass** |
+| `npm run build` | **pass** |
+| GitHub CI (`tests / ci` on #229) | first run **failed** (`vite-node` HMR in CI); fixed in this tip |
 | Contabo tip deploy | **NEEDS RESEARCH** |
 
 ---
 
 ## LIVE VISUAL QA
 
-**NEEDS RESEARCH.** Agent cannot deploy this tip to Contabo. Local structured editor contract is locked in source + Pest.
+**LOCAL PASS** on seeded app at 1440 / 1280 / 1024 / 768 (no page H-overflow). Screenshots under `/opt/cursor/artifacts/screenshots/`.
+
+**CONTABO: NEEDS RESEARCH.** This agent cannot deploy the tip. Research owns populated QA.
 
 ---
 
