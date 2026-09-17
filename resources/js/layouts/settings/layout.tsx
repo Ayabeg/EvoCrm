@@ -1,6 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import { useMemo, useState, type PropsWithChildren } from 'react';
+import { useMemo, useState } from 'react';
+import type { PropsWithChildren } from 'react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
@@ -10,8 +11,8 @@ import {
     isSettingsNavActive,
     visibleSettingsDestinations,
     WIDE_SETTINGS_COMPONENTS,
-    type SettingsDestination,
 } from '@/lib/settings/ia';
+import type { SettingsDestination } from '@/lib/settings/ia';
 import { cn } from '@/lib/utils';
 import type { Auth } from '@/types/auth';
 
