@@ -1,37 +1,18 @@
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { NativeSelect } from '@/components/ui/native-select';
+import type { DashboardContext } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
 
-type Owner = { id: number; name: string };
-
-type Filters = {
-    owner_id?: number | null;
-    from?: string;
-    to?: string;
-};
-
 export function DashboardHeader({
-    subtitle,
-    owners = [],
-    filters,
+    context,
+    canCreate = false,
 }: {
-    subtitle: string;
-    owners?: Owner[];
-    filters: Filters;
+    context: DashboardContext;
+    canCreate?: boolean;
 }) {
-    const apply = (next: Partial<Filters>) => {
-        router.get(
-            '/dashboard',
-            {
-                owner_id: next.owner_id ?? filters.owner_id ?? '',
-                from: next.from ?? filters.from ?? '',
-                to: next.to ?? filters.to ?? '',
-            },
-            { preserveState: true, preserveScroll: true },
-        );
-    };
+    const subtitle = [context.name, context.date, context.timezone]
+        .filter(Boolean)
+        .join(' · ');
 
     return (
         <header className="flex flex-col gap-2">
@@ -40,61 +21,15 @@ export function DashboardHeader({
                     <h1 className="text-page-title font-semibold tracking-tight text-ink">
                         {t('Home')}
                     </h1>
-                    <p className="mt-0.5 text-[11px] leading-4 text-mute">
+                    <p className="mt-0.5 truncate text-[11px] leading-4 text-mute">
                         {subtitle}
                     </p>
                 </div>
-                <Button
-                    asChild
-                    size="sm"
-                    className="h-8 shrink-0"
-                >
-                    <Link href="/crm/deals?create=1">{t('New deal')}</Link>
-                </Button>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 md:flex-nowrap">
-                <div className="w-[9.5rem] max-w-[calc(50%-0.75rem)] shrink-0">
-                    <Input
-                        type="date"
-                        size="sm"
-                        value={filters.from ?? ''}
-                        onChange={(e) => apply({ from: e.target.value })}
-                        aria-label={t('From date')}
-                    />
-                </div>
-                <span className="text-[12px] text-mute" aria-hidden>
-                    -
-                </span>
-                <div className="w-[9.5rem] max-w-[calc(50%-0.75rem)] shrink-0">
-                    <Input
-                        type="date"
-                        size="sm"
-                        value={filters.to ?? ''}
-                        onChange={(e) => apply({ to: e.target.value })}
-                        aria-label={t('To date')}
-                    />
-                </div>
-                <div className="w-full min-w-0 sm:w-[11rem] sm:shrink-0">
-                    <NativeSelect
-                        value={filters.owner_id ?? ''}
-                        onChange={(e) =>
-                            apply({
-                                owner_id: e.target.value
-                                    ? Number(e.target.value)
-                                    : null,
-                            })
-                        }
-                        aria-label={t('Filter by owner')}
-                    >
-                        <option value="">{t('All owners')}</option>
-                        {owners.map((owner) => (
-                            <option key={owner.id} value={owner.id}>
-                                {owner.name}
-                            </option>
-                        ))}
-                    </NativeSelect>
-                </div>
+                {canCreate ? (
+                    <Button asChild size="sm" className="h-8 shrink-0">
+                        <Link href="/crm/deals?create=1">{t('New deal')}</Link>
+                    </Button>
+                ) : null}
             </div>
         </header>
     );

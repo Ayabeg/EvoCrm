@@ -149,19 +149,25 @@ it('keeps the P04 rail at 240px expanded, 64px collapsed, and a 240px mobile She
 it('keeps Home KPI values on the Brand Book --text-kpi scale', function () {
     $card = file_get_contents(resource_path('js/components/crm/evo-kpi-card.tsx'));
     $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
+    $helpers = file_get_contents(resource_path('js/lib/dashboard-operating-home.ts'));
 
     expect($card)->toContain('text-kpi');
     expect($card)->toContain('break-words');
     expect($card)->not->toContain('text-[1.875rem]');
     expect($card)->not->toContain('min-h-[7.5rem]');
-    expect($strip)->toContain('text-kpi');
+    expect($strip)->toContain('HOME_KPI_VALUE_CLASS');
     expect($strip)->toContain('formatCompactDzd');
+    expect($strip)->not->toContain('whitespace-nowrap');
+    expect($helpers)->toContain('text-kpi');
+    expect($helpers)->toContain('break-words');
+    expect($helpers)->not->toContain('whitespace-nowrap');
 });
 
 it('uses compact mobile spacing tokens on Home chrome', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
     $header = file_get_contents(resource_path('js/components/dashboard/dashboard-header.tsx'));
     $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
+    $helpers = file_get_contents(resource_path('js/lib/dashboard-operating-home.ts'));
 
     expect($home)->toContain('px-4 py-3 md:px-5 md:py-4');
     expect($home)->toContain('data-home="workspace"');
@@ -169,15 +175,20 @@ it('uses compact mobile spacing tokens on Home chrome', function () {
     expect($header)->toContain('text-page-title');
     expect($header)->toContain('flex flex-col gap-2');
     expect($header)->toContain('create=1');
-    expect($strip)->toContain('overflow-x-auto');
-    expect($strip)->toContain('md:grid-cols-5');
+    expect($strip)->toContain('HOME_KPI_STRIP_TRACK_CLASS');
+    expect($strip)->not->toContain('overflow-x-auto');
+    expect($strip)->not->toContain('min-w-[7.5rem]');
+    expect($helpers)->toContain('grid-cols-2');
+    expect($helpers)->toContain('md:grid-cols-4');
+    expect($helpers)->not->toContain('overflow-x-auto');
 });
 
-it('places Needs attention above Performance on Home', function () {
+it('places Needs attention and Today above the KPI strip on Home', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
 
-    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, "t('Performance')"));
-    expect(strpos($home, 'HomeKpiStrip'))->toBeLessThan(strpos($home, 'Needs attention'));
+    expect(strpos($home, "title={t('Needs attention')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'));
+    expect(strpos($home, "title={t('Today')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'));
+    expect(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "title={t('Pipeline')}"));
     expect($home)->not->toContain('QuickActions');
     expect($home)->not->toContain('CrmKpiStrip');
 });

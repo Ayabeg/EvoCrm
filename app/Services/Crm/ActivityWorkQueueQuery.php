@@ -90,6 +90,53 @@ class ActivityWorkQueueQuery
     }
 
     /**
+     * Compact My work preview for the operating home. Same timing predicates
+     * and row presenter as the P15 queue. Does not recalculate overdue/today.
+     *
+     * @return array{counts: array{overdue: int, today: int, upcoming: int}, items: list<array<string, mixed>>}
+     */
+    public function dashboardWork(User $user, int $limit = 6, ?CarbonInterface $now = null): array
+    {
+        $now = ActivityTiming::now($now);
+        $limit = max(1, min(8, $limit));
+        $base = $this->baseQuery($user, [
+            'scope' => 'mine',
+            'type' => null,
+            'owner_id' => (int) $user->id,
+        ]);
+
+        $counts = [
+            'overdue' => (int) ActivityTiming::constrain(clone $base, ActivityTiming::GROUP_OVERDUE, $now)->count(),
+            'today' => (int) ActivityTiming::constrain(clone $base, ActivityTiming::GROUP_TODAY, $now)->count(),
+            'upcoming' => (int) ActivityTiming::constrain(clone $base, ActivityTiming::GROUP_UPCOMING, $now)->count(),
+        ];
+
+        $items = [];
+        foreach ([
+            ActivityTiming::GROUP_OVERDUE,
+            ActivityTiming::GROUP_TODAY,
+            ActivityTiming::GROUP_UPCOMING,
+        ] as $group) {
+            $remaining = $limit - count($items);
+            if ($remaining <= 0) {
+                break;
+            }
+
+            $query = ActivityTiming::constrain(clone $base, $group, $now);
+            $this->orderGroup($query, $group);
+            $items = array_merge(
+                $items,
+                $this->presentRows($user, $query->limit($remaining)->get(), $now),
+            );
+        }
+
+        return [
+            'counts' => $counts,
+            'items' => array_slice($items, 0, $limit),
+        ];
+    }
+
+    /**
      * @return array{
      *     scope: string,
      *     group: ?string,
