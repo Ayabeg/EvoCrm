@@ -18,6 +18,10 @@ Authoring UI is a structured WHEN / IF / THEN / ELSE drawer over the existing ru
 
 **MERGE READY: NO** until Research Contabo populated QA is PASS.
 
+### P19.1 — Duplicate submit hardening
+
+`beginExclusiveAction` / `releaseExclusiveAction` in `workflow-authoring.ts`. The authoring page claims the lock **before** Save (create/update), Turn on/off, Use template, and Delete. 422/`onError` keeps the editor dirty and unlocks retry via `onFinish`. Two synchronous Saves grant one request. WorkflowRunner unchanged. Contabo is Research-only.
+
 ## BASE / PR / TIP
 
 - Base: `71e3d8b8db85a3e253520b56bfd9603c184d45ac`
@@ -350,7 +354,9 @@ UI hides mutation controls when `capabilities.can_manage` is false. Middleware s
 
 ## SAVE SAFETY
 
-`submitting` + `submittingRef` reject duplicate submit. Save button shows “Saving…”.
+P19.1: `beginExclusiveAction(mutatingRef)` runs **synchronously before** Create/Save, Turn on/off, Use template, and Delete. React `mutating` state only disables controls; it is not the lock. `onFinish` calls `releaseExclusiveAction` so a 422/failure can retry. `onError` leaves the editor open and dirty (`ignoreDirtyClose` stays false). Dirty Inertia `before` skips confirm only while `mutatingRef.current` is true (in-flight submit).
+
+Two synchronous Save clicks grant one request. Save button shows “Saving…”.
 
 ---
 

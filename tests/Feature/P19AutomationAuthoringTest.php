@@ -45,7 +45,9 @@ it('keeps structured authoring on the existing engine without a canvas or AI sea
         ->and($src['builder'])->not->toContain('ReactFlow')
         ->and($src['lib'])->toContain('summarizeWorkflow')
         ->and($src['lib'])->not->toContain('starts_with')
-        ->and($src['page'])->toContain('disabled={!canManage || submitting}')
+        ->and($src['page'])->toContain('disabled={!canManage || mutating}')
+        ->and($src['page'])->toContain('if (!beginExclusiveAction(mutatingRef))')
+        ->and($src['page'])->toContain('releaseExclusiveAction(mutatingRef)')
         ->and($src['page'])->toContain('Discard unsaved changes')
         ->and($src['controller'])->not->toContain('WorkflowV2');
 });
@@ -442,5 +444,28 @@ it('locks the authoring proof file to the runner registries and summaries', func
         ->and($js)->toContain("payload.active, false")
         ->and($js)->toContain("!('actions' in payload)")
         ->and($js)->toContain('invented action is rejected')
-        ->and($js)->toContain('frontend-only operator is rejected');
+        ->and($js)->toContain('frontend-only operator is rejected')
+        ->and($js)->toContain('two synchronous save attempts create one workflow')
+        ->and($js)->toContain('422/failure releaseExclusiveAction unlocks retry')
+        ->and($js)->toContain('failed save keeps a dirty draft');
+});
+
+it('claims a synchronous mutation lock before every authoring write', function () {
+    $page = p19AuthoringSource()['page'];
+    $lib = p19AuthoringSource()['lib'];
+
+    expect($lib)->toContain('export function beginExclusiveAction')
+        ->and($lib)->toContain('if (lock.current)')
+        ->and($page)->toContain('if (!beginExclusiveAction(mutatingRef))')
+        ->and(substr_count($page, 'if (!beginExclusiveAction(mutatingRef))'))->toBe(4)
+        ->and($page)->toContain("router.post('/crm/workflows', payload, visit)")
+        ->and($page)->toContain('router.put(`/crm/workflows/${editingId}`, payload, visit)')
+        ->and($page)->toContain('`/crm/workflows/${workflow.id}/toggle`')
+        ->and($page)->toContain("'/crm/workflows/templates'")
+        ->and($page)->toContain('router.delete(`/crm/workflows/${workflow.id}`')
+        ->and($page)->toContain('onError: () => {')
+        ->and($page)->toContain('ignoreDirtyClose.current = false')
+        ->and($page)->toContain('if (mutatingRef.current)')
+        ->and($page)->not->toContain('if (submitting)')
+        ->and($page)->not->toContain('togglingId');
 });

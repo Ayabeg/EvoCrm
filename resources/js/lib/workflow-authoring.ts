@@ -743,3 +743,21 @@ export function isRegisteredAction(value: string): boolean {
 export function isRegisteredOperator(value: string): boolean {
     return WORKFLOW_OPERATORS.includes(value as WorkflowOperator);
 }
+
+export type ExclusiveLock = {
+    current: boolean;
+};
+
+export function beginExclusiveAction(lock: ExclusiveLock): boolean {
+    if (lock.current) {
+        return false;
+    }
+
+    lock.current = true;
+
+    return true;
+}
+
+export function releaseExclusiveAction(lock: ExclusiveLock): void {
+    lock.current = false;
+}

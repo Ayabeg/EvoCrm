@@ -7,6 +7,7 @@ import {
     WORKFLOW_OPERATORS,
     WORKFLOW_TRIGGERS,
     actionAvailability,
+    beginExclusiveAction,
     draftFromWorkflow,
     draftsEqual,
     emptyWorkflowDraft,
@@ -14,6 +15,7 @@ import {
     isRegisteredOperator,
     isRegisteredTrigger,
     operatorNeedsValue,
+    releaseExclusiveAction,
     summarizeWorkflow,
     validateWorkflowDraft,
     workflowFormPayload,
@@ -214,5 +216,27 @@ expectEqual(roundTrip.else_subject, 'Light check-in', 'round-trip else subject')
 expectTrue(draftsEqual(hydrated, draftFromWorkflow(row)), 'hydrate is stable');
 expectEqual(workflowStatusLabel(false), 'Draft', 'inactive is Draft');
 expectEqual(workflowStatusLabel(true), 'Active', 'active is Active');
+
+const lock = { current: false };
+const workflows: string[] = [];
+const saveOnce = () => {
+    if (!beginExclusiveAction(lock)) {
+        return;
+    }
+
+    workflows.push('P19 exclusive save');
+};
+saveOnce();
+saveOnce();
+expectEqual(workflows, ['P19 exclusive save'], 'two synchronous save attempts create one workflow');
+expectTrue(lock.current, 'lock stays held until release so a 422 can retry after release');
+releaseExclusiveAction(lock);
+expectTrue(!lock.current, '422/failure releaseExclusiveAction unlocks retry');
+saveOnce();
+expectEqual(workflows, ['P19 exclusive save', 'P19 exclusive save'], 'retry after failure is allowed');
+expectTrue(!draftsEqual(emptyWorkflowDraft(), {
+    ...emptyWorkflowDraft(),
+    name: 'Dirty after 422',
+}), 'failed save keeps a dirty draft');
 
 console.log('p19-automation-authoring proofs passed');

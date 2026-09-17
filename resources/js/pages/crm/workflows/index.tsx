@@ -1,4 +1,4 @@
-import { Form, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
@@ -9,10 +9,12 @@ import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
+    beginExclusiveAction,
     draftFromWorkflow,
     draftsEqual,
     emptyWorkflowDraft,
     formatWorkflowTimestamp,
+    releaseExclusiveAction,
     summarizeWorkflowRow,
     triggerLabel,
     validateWorkflowDraft,
@@ -74,11 +76,15 @@ export default function WorkflowsIndex({
     const [draft, setDraft] = useState<WorkflowDraft>(emptyWorkflowDraft);
     const [baseline, setBaseline] = useState<WorkflowDraft>(emptyWorkflowDraft);
     const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
-    const [submitting, setSubmitting] = useState(false);
-    const [togglingId, setTogglingId] = useState<number | null>(null);
+    const [mutating, setMutating] = useState(false);
     const ignoreDirtyClose = useRef(false);
-    const submittingRef = useRef(false);
+    const mutatingRef = useRef(false);
     const page = usePage<{ errors?: Record<string, string | string[]> }>();
+
+    const releaseMutation = (): void => {
+        releaseExclusiveAction(mutatingRef);
+        setMutating(false);
+    };
 
     const dirty = !draftsEqual(draft, baseline);
     const canManage = capabilities.can_manage;
@@ -145,12 +151,11 @@ export default function WorkflowsIndex({
             return;
         }
 
-        if (submitting) {
+        if (!beginExclusiveAction(mutatingRef)) {
             return;
         }
 
-        submittingRef.current = true;
-        setSubmitting(true);
+        setMutating(true);
         const payload = workflowFormPayload(draft, {
             includeActive: !editing,
             active: false,
@@ -164,9 +169,12 @@ export default function WorkflowsIndex({
                 setEditingId(null);
                 setBaseline(draft);
             },
+            onError: () => {
+                ignoreDirtyClose.current = false;
+            },
             onFinish: () => {
-                submittingRef.current = false;
-                setSubmitting(false);
+                releaseExclusiveAction(mutatingRef);
+                setMutating(false);
             },
         };
 
@@ -180,19 +188,47 @@ export default function WorkflowsIndex({
     };
 
     const toggleWorkflow = (workflow: WorkflowRow) => {
-        if (togglingId !== null) {
+        if (!beginExclusiveAction(mutatingRef)) {
             return;
         }
 
-        setTogglingId(workflow.id);
+        setMutating(true);
         router.post(
             `/crm/workflows/${workflow.id}/toggle`,
             {},
             {
                 preserveScroll: true,
-                onFinish: () => setTogglingId(null),
+                onFinish: releaseMutation,
             },
         );
+    };
+
+    const applyTemplate = (templateKey: string) => {
+        if (!beginExclusiveAction(mutatingRef)) {
+            return;
+        }
+
+        setMutating(true);
+        router.post(
+            '/crm/workflows/templates',
+            { template_key: templateKey },
+            {
+                preserveScroll: true,
+                onFinish: releaseMutation,
+            },
+        );
+    };
+
+    const deleteWorkflow = (workflow: WorkflowRow) => {
+        if (!beginExclusiveAction(mutatingRef)) {
+            return;
+        }
+
+        setMutating(true);
+        router.delete(`/crm/workflows/${workflow.id}`, {
+            preserveScroll: true,
+            onFinish: releaseMutation,
+        });
     };
 
     useEffect(() => {
@@ -201,7 +237,7 @@ export default function WorkflowsIndex({
         }
 
         const onBefore = (event: { preventDefault: () => void }) => {
-            if (submittingRef.current) {
+            if (mutatingRef.current) {
                 return;
             }
 
@@ -243,7 +279,12 @@ export default function WorkflowsIndex({
                         description="Structured workflows the runner can execute: when, if, then, else."
                     >
                         {canManage ? (
-                            <Button size="sm" onClick={openCreate} data-workflow="create">
+                            <Button
+                                size="sm"
+                                onClick={openCreate}
+                                disabled={mutating}
+                                data-workflow="create"
+                            >
                                 Create workflow
                             </Button>
                         ) : null}
@@ -273,23 +314,16 @@ export default function WorkflowsIndex({
                                         </p>
                                     </div>
                                     {canManage ? (
-                                        <Form
-                                            action="/crm/workflows/templates"
-                                            method="post"
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            className="shrink-0"
+                                            disabled={mutating}
+                                            onClick={() => applyTemplate(template.key)}
                                         >
-                                            <input
-                                                type="hidden"
-                                                name="template_key"
-                                                value={template.key}
-                                            />
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="shrink-0"
-                                            >
-                                                Use template
-                                            </Button>
-                                        </Form>
+                                            Use template
+                                        </Button>
                                     ) : null}
                                 </li>
                             ))}
@@ -348,6 +382,7 @@ export default function WorkflowsIndex({
                                                     type="button"
                                                     variant="outline"
                                                     size="sm"
+                                                    disabled={mutating}
                                                     onClick={() => openEdit(workflow)}
                                                 >
                                                     Edit
@@ -356,23 +391,21 @@ export default function WorkflowsIndex({
                                                     type="button"
                                                     variant="outline"
                                                     size="sm"
-                                                    disabled={togglingId === workflow.id}
+                                                    disabled={mutating}
                                                     onClick={() => toggleWorkflow(workflow)}
                                                 >
                                                     {workflow.active ? 'Turn off' : 'Turn on'}
                                                 </Button>
-                                                <Form
-                                                    action={`/crm/workflows/${workflow.id}`}
-                                                    method="delete"
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-brand"
+                                                    disabled={mutating}
+                                                    onClick={() => deleteWorkflow(workflow)}
                                                 >
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-brand"
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </Form>
+                                                    Delete
+                                                </Button>
                                             </>
                                         ) : null}
                                     </div>
@@ -412,7 +445,7 @@ export default function WorkflowsIndex({
                         ticketStatuses={ticketStatuses}
                         capabilities={capabilities}
                         errors={errors}
-                        disabled={!canManage || submitting}
+                        disabled={!canManage || mutating}
                     />
                     <div className="flex justify-end gap-2 pt-2">
                         <Button
@@ -422,8 +455,8 @@ export default function WorkflowsIndex({
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={!canManage || submitting}>
-                            {submitting ? 'Saving…' : 'Save'}
+                        <Button type="submit" disabled={!canManage || mutating}>
+                            {mutating ? 'Saving…' : 'Save'}
                         </Button>
                     </div>
                 </form>
