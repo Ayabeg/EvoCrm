@@ -238,7 +238,7 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     expect($header)->not->toContain('Find or Ask');
     expect($header)->not->toContain('Find a record or page');
     expect($header)->not->toContain('unread');
-    expect($palette)->toContain('placeholder="Find a record or page"');
+    expect($palette)->toContain('placeholder="Search, navigate, create, or act"');
     expect($palette)->not->toContain('Search contacts, deals');
     expect($rail)->not->toContain('Bell');
     expect($header)->toContain('data-chrome="notify"');

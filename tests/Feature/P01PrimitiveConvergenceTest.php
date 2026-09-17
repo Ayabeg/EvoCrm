@@ -81,8 +81,9 @@ it('does not delete leftover header files or change Inertia contracts', function
     expect($header)->toContain('lucide-react');
 
     $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
-    expect($palette)->toContain("section: 'navigate'")
-        ->and($palette)->toContain("section: 'records'")
-        ->and($palette)->not->toContain("section: 'create'")
-        ->and($palette)->not->toContain("section: 'ask'");
+    expect($palette)->toContain("id: 'navigate'")
+        ->and($palette)->toContain("id: 'search'")
+        ->and($palette)->toContain("id: 'create'")
+        ->and($palette)->toContain("id: 'ask'")
+        ->and($palette)->not->toContain('lucide-react');
 });

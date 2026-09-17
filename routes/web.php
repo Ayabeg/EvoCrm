@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\MetaController;
 use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\AskEvoController;
 use App\Http\Controllers\Crm\BulkActionController;
+use App\Http\Controllers\Crm\CommandSearchController;
 use App\Http\Controllers\Crm\CompanyController;
 use App\Http\Controllers\Crm\ContactController;
 use App\Http\Controllers\Crm\ContactImportController;
@@ -160,6 +161,8 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::post('/crm/filters', [SavedFilterController::class, 'store'])->name('crm.filters.store');
     Route::patch('/crm/filters/{savedFilter}', [SavedFilterController::class, 'update'])->name('crm.filters.update');
     Route::delete('/crm/filters/{savedFilter}', [SavedFilterController::class, 'destroy'])->name('crm.filters.destroy');
+    Route::get('/crm/command/search', CommandSearchController::class)
+        ->name('crm.command.search');
     Route::get('/crm/records/{type}/{id}/peek', [QuickRecordController::class, 'peek'])
         ->whereIn('type', ['contact', 'company', 'lead', 'deal', 'quote'])
         ->whereNumber('id')

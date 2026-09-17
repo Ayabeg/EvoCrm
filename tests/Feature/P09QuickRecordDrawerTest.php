@@ -240,7 +240,8 @@ it('does not change production list rowHref board inbox or command surfaces', fu
         ->and($board)->toContain('DealPipelineBoard');
     expect($inbox)->not->toContain('QuickRecordDrawer');
     expect($palette)->not->toContain('QuickRecordDrawer')
-        ->and($palette)->not->toContain('openRecord');
+        ->and($palette)->not->toContain('CommandRecordDrawer')
+        ->and($palette)->toContain('openRecord');
 });
 
 it('registers one permission-aware peek endpoint and a local testing harness only', function () {

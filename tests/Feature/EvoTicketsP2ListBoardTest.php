@@ -203,7 +203,7 @@ it('keeps Tickets next to Leads and does not add a second Help Desk app', functi
     $list = file_get_contents(resource_path('js/pages/crm/tickets/index.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/tickets/board.tsx'));
     $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
-    $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = file_get_contents(resource_path('js/lib/command-os.ts'));
     $routes = file_get_contents(base_path('routes/web.php'));
 
     expect($rail)->toContain("label: 'Tickets'")

@@ -318,7 +318,8 @@ it('leaves leads redirect inbox command and peek URL decision B frozen', functio
     $keys = File::get(resource_path('js/lib/list-query/keys.ts'));
 
     expect($inbox)->not->toContain('DealPipelineBoard')
-        ->and($palette)->not->toContain('openRecord')
+        ->and($palette)->toContain('openRecord')
+        ->and($palette)->not->toContain('CommandRecordDrawer')
         ->and($home)->not->toContain('DealPipelineBoard')
         ->and($keys)->toContain("'peek'");
 });

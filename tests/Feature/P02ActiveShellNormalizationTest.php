@@ -5,14 +5,15 @@
  * Locks the leftover header out of AppLayout, one topbar entry per job,
  * and command/nav Home → /dashboard (deferred from P01).
  */
-
 it('resolves command and rail Home hrefs to /dashboard not /home', function () {
     $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
+    $catalog = file_get_contents(resource_path('js/lib/command-os.ts'));
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
 
-    expect($palette)->toContain("label: 'Home'")
-        ->and($palette)->toContain("href: '/dashboard'")
+    expect($catalog)->toContain("label: 'Home'")
+        ->and($catalog)->toContain("href: '/dashboard'")
+        ->and($catalog)->not->toContain("href: '/home'")
         ->and($palette)->not->toContain("href: '/home'")
         ->and($rail)->toContain("label: 'Home'")
         ->and($rail)->toContain("href: '/dashboard'")
@@ -47,7 +48,7 @@ it('documents one search, one Ask Evo, one create, and one tasks overlay entry',
         ->and($header)->toContain('useCommandPaletteShortcut')
         ->and($header)->toContain('data-chrome="ai"')
         ->and($header)->toContain("t('Ask Evo')")
-        ->and($header)->toContain("setPaletteOpen(true)")
+        ->and($header)->toContain('setPaletteOpen(true)')
         ->and($header)->not->toContain('AskEvoPanel')
         ->and($header)->toContain("t('Create')")
         ->and($header)->toContain('/crm/contacts?create=1')
