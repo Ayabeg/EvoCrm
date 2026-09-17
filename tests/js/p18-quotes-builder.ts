@@ -1,0 +1,53 @@
+/**
+ * Test-only P18 quote builder proofs. Never import from an Inertia page.
+ */
+import {
+    QUOTE_BUILDER_DESKTOP_GRID_CLASS,
+    QUOTE_BUILDER_SPLIT_CLASS,
+    QUOTE_DOCUMENT_PAPER_CLASS,
+    QUOTE_TIMEZONE,
+    formatQuoteWhen,
+    quoteCanEdit,
+    quoteDateInputValue,
+    quoteListHref,
+    quotePreviewHref,
+    quoteRevokeAction,
+    quoteSendAction,
+    quoteUnitDzd,
+    quoteUpdateAction,
+} from '../../resources/js/lib/quote-builder';
+
+function expectEqual<T>(actual: T, expected: T, label: string): void {
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new Error(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+}
+
+function expectTrue(value: boolean, label: string): void {
+    if (!value) {
+        throw new Error(label);
+    }
+}
+
+expectEqual(QUOTE_TIMEZONE, 'Africa/Algiers', 'timezone');
+expectEqual(quoteListHref(), '/crm/quotes', 'list href');
+expectEqual(quotePreviewHref(12), '/crm/quotes/12/preview', 'preview href');
+expectEqual(quoteSendAction(12), '/crm/quotes/12/send', 'send action');
+expectEqual(quoteRevokeAction(12), '/crm/quotes/12/revoke', 'revoke action');
+expectEqual(quoteUpdateAction(12), '/crm/quotes/12', 'update action');
+expectEqual(quoteCanEdit(false), true, 'draft is editable');
+expectEqual(quoteCanEdit(true), false, 'sent is immutable');
+expectEqual(quoteUnitDzd(18_000_000), '180000', 'cents to DZD input');
+expectEqual(quoteDateInputValue(null), '', 'empty date');
+expectTrue(!formatQuoteWhen('2026-09-17T09:00:00+01:00')?.includes('NaN') ?? false, 'formats Algiers date');
+expectTrue(QUOTE_BUILDER_SPLIT_CLASS.includes('flex-col'), 'stacked below lg');
+expectTrue(QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('lg:grid'), 'split from lg');
+expectTrue(
+    QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)]'),
+    'document + properties rail',
+);
+expectTrue(!QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('grid-cols-3'), 'not a 3-pane triad');
+expectTrue(QUOTE_DOCUMENT_PAPER_CLASS.includes('max-w-[40rem]'), 'paper is readable at 768');
+expectTrue(QUOTE_DOCUMENT_PAPER_CLASS.includes('bg-canvas'), 'paper uses canvas token');
+
+console.log('P18 quotes builder JS proofs passed');
