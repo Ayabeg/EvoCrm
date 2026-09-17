@@ -267,9 +267,9 @@ No widget waterfall. No `all()` deals. DB `GROUP BY` / `SUM` / `COUNT`. P12 queu
 |---|---|---|
 | 1440 / 1280 | Attention ‖ Today; KPI 4; Pipeline ‖ Recent | NONE |
 | 1024 | Same, tighter | NONE |
-| 768 | **Attention → Today → KPIs → Pipeline → Recent** | NONE |
+| 768 | **Attention → Today → KPIs → Pipeline → Recent**. KPI 4-col (`md+`) with wrapping / compact type so DZD values stay readable. Below `md`: **2×2 grid**, not a horizontal scroller. | NONE |
 
-Page `overflow-x-hidden`. Rows truncate.
+Page `overflow-x-hidden`. KPI values use `break-words` (no `whitespace-nowrap`). Rows truncate.
 
 ---
 
@@ -301,6 +301,16 @@ Need populated: P12 overdue, no-next-action, today/upcoming, won/open/lost, stag
 Walks: attention→QRD; today→P15; pipeline→P11; Cmd+K; complete overdue → attention gone; KPI proof; pipeline parity; today parity; permission; empty; 1440/1280/1024/768.
 
 Regressions: P16, P15, P14, P13, P12, P11, P09/P10, Reports, app shell.
+
+### Contabo (first populated pass)
+
+**PARTIAL / MERGE_BLOCKING.**
+
+PASS: Attention→QRD, attention resolution (6→5), Today parity, Pipeline, Command OS, 1440/1280/1024, regressions.
+
+FAIL Sev2: at **768px**, KPI strip values overlapped/truncated. Page H-overflow was NONE (`scrollWidth=768`), but the strip was unreadable. Root cause: `flex overflow-x-auto` + `min-w-[7.5rem]` cards + `whitespace-nowrap` `text-kpi` DZD strings. **Fix in this PR:** 2×2 grid below `md`, 4-col at `md+`, wrapping / slightly smaller type. KPI pipeline semantics unchanged.
+
+Note (not a product bug): Contabo P17SEED Won/Lost were on `pipeline_id=2` while Home KPIs scope **default pipeline id=1**. Seed for KPI proof must use the default pipeline. Do not change KPI pipeline semantics.
 
 ---
 
@@ -368,7 +378,7 @@ P18–P29. No AI. No dashboard builder. No new forecast/activity/attention engin
 
 - Complete-from-Home with explicit P15 identity  
 - Quota / weighted / period selector (if product wants them later — not on operating home)  
-- Contabo populated QA  
+- Contabo populated QA (re-walk 768 KPI strip after 2×2 / wrap fix)  
 
 ## P18 HANDOFF
 
@@ -408,8 +418,8 @@ Commands:
 
 ## LIVE VISUAL QA
 
-**NEEDS RESEARCH.** Agent did not walk Contabo populated Dashboard.
+**NEEDS RESEARCH.** Agent did not walk Contabo populated Dashboard after the 768 KPI strip fix. First Contabo pass was **PARTIAL** (Sev2 768 overlap). See Contabo note above.
 
 ## MERGE READY
 
-NO — Contabo populated QA pending Research. Do not merge. Do not start P18.
+NO — Contabo populated QA pending Research re-walk (768 KPI strip). Do not merge. Do not start P18.

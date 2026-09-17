@@ -83,6 +83,7 @@ it('locks one operating home and consumes P11 P12 P15 without a V2', function ()
     $attention = File::get(resource_path('js/components/dashboard/dashboard-attention.tsx'));
     $work = File::get(resource_path('js/components/dashboard/dashboard-work.tsx'));
     $lib = File::get(resource_path('js/lib/dashboard-operating-home.ts'));
+    $strip = File::get(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
     $queue = File::get(app_path('Services/Crm/ActivityWorkQueueQuery.php'));
     $evaluator = File::get(app_path('Services/Crm/DealAttentionEvaluator.php'));
 
@@ -114,6 +115,11 @@ it('locks one operating home and consumes P11 P12 P15 without a V2', function ()
         ->and($work)->not->toContain('/complete')
         ->and($lib)->toContain('activityQueueHref')
         ->and($lib)->toContain('Africa/Algiers')
+        ->and($lib)->toContain('grid-cols-2')
+        ->and($lib)->toContain('md:grid-cols-4')
+        ->and($lib)->not->toContain('whitespace-nowrap')
+        ->and($strip)->toContain('HOME_KPI_STRIP_TRACK_CLASS')
+        ->and($strip)->not->toContain('overflow-x-auto')
         ->and($queue)->toContain('function dashboardWork')
         ->and($evaluator)->toContain('class DealAttentionEvaluator');
 

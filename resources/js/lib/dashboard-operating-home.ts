@@ -6,6 +6,14 @@ import type { DealAttentionQueueItem } from '@/lib/deal-attention';
 
 export const DASHBOARD_TIMEZONE = 'Africa/Algiers';
 
+/** 2×2 below md; 4-col at md+. No horizontal strip scroll. */
+export const HOME_KPI_STRIP_TRACK_CLASS =
+    'grid grid-cols-2 divide-x divide-y divide-hairline border-y border-hairline md:grid-cols-4 md:divide-y-0';
+
+/** Compact values may wrap; Brand Book text-kpi from lg. */
+export const HOME_KPI_VALUE_CLASS =
+    'money min-w-0 text-[1.25rem] leading-tight tracking-tight break-words text-ink md:text-[1.375rem] lg:text-kpi';
+
 export type DashboardContext = {
     name: string;
     date: string;
