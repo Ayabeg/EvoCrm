@@ -19,11 +19,11 @@ export function SettingsPageHeader({
             className="mb-3 flex flex-wrap items-start justify-between gap-3"
         >
             <div className="min-w-0">
-                <h1 className="text-[20px] font-semibold tracking-tight text-ink">
+                <h1 className="text-[28px] leading-[34px] font-[650] tracking-tight text-ink">
                     {t(title)}
                 </h1>
                 {description ? (
-                    <p className="mt-0.5 max-w-[65ch] text-[13px] leading-5 text-mute">
+                    <p className="mt-1 max-w-[65ch] text-[14px] leading-5 text-mute">
                         {t(description)}
                     </p>
                 ) : null}
@@ -59,11 +59,11 @@ export function SettingsCard({
             {title ? (
                 <header className="flex items-start justify-between gap-3 border-b border-hairline px-4 py-2.5">
                     <div className="min-w-0">
-                        <h2 className="text-[15px] font-semibold text-ink">
+                        <h2 className="text-[18px] leading-[26px] font-semibold text-ink">
                             {t(title)}
                         </h2>
                         {description ? (
-                            <p className="mt-0.5 text-[12px] leading-4 text-mute">
+                            <p className="mt-0.5 text-[13px] leading-5 text-mute">
                                 {t(description)}
                             </p>
                         ) : null}
@@ -102,7 +102,7 @@ export function SettingsFormRow({
         <div className="grid gap-1 sm:grid-cols-[11rem_minmax(0,1fr)] sm:items-start sm:gap-x-4">
             <Label
                 htmlFor={htmlFor}
-                className="pt-1.5 text-[13px] font-medium text-ink"
+                className="pt-1.5 text-[13px] leading-[18px] font-medium text-ink"
             >
                 {t(label)}
                 {required ? (
@@ -112,7 +112,7 @@ export function SettingsFormRow({
             <div className="min-w-0">
                 {children}
                 {hint ? (
-                    <p className="mt-1 text-[11px] leading-4 text-mute">
+                    <p className="mt-1 text-[12px] leading-4 text-mute">
                         {t(hint)}
                     </p>
                 ) : null}

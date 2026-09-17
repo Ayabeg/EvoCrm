@@ -13,10 +13,10 @@ export default function WorkspaceSettings({
 }) {
     return (
         <>
-            <Head title="Workspace" />
+            <Head title="General" />
 
             <SettingsPageHeader
-                title="Workspace"
+                title="General"
                 description="Simple mode is the sellable launch surface. Turn it off to bring back tickets, ads, warmup, Ask Evo, and report builder."
             />
 
@@ -53,5 +53,5 @@ export default function WorkspaceSettings({
 }
 
 WorkspaceSettings.layout = {
-    breadcrumbs: [{ title: 'Workspace', href: '/settings/workspace' }],
+    breadcrumbs: [{ title: 'General', href: '/settings/workspace' }],
 };
