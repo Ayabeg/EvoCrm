@@ -1,9 +1,9 @@
 import { Link } from '@inertiajs/react';
+import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import type { DashboardAttention } from '@/lib/dashboard-operating-home';
 import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
-import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 
 export function DashboardAttention({
     attention,

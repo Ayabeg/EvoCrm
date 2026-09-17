@@ -1,8 +1,8 @@
+import type { KpiTile } from '@/components/crm/crm-kpi-strip';
+import type { RecordRef } from '@/ds/workspace/quick-record/types';
 import { activityQueueHref } from '@/lib/activity-work-queue';
 import type { ActivityQueueGroup, ActivityQueueItem } from '@/lib/activity-work-queue';
 import type { DealAttentionQueueItem } from '@/lib/deal-attention';
-import type { KpiTile } from '@/components/crm/crm-kpi-strip';
-import type { RecordRef } from '@/ds/workspace/quick-record/types';
 
 export const DASHBOARD_TIMEZONE = 'Africa/Algiers';
 

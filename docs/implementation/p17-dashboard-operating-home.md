@@ -388,10 +388,23 @@ Home facts are P12/P15/P11 aggregates. Do not add model answers to Home.
 
 ## TESTS
 
-- `tests/Feature/P17DashboardOperatingHomeTest.php`  
-- `tests/js/p17-dashboard-operating-home.ts` (`npx vite-node`)  
-- Updated Home / polish / Lead OS Home / ActivityCreate / P10 consumers  
+- `tests/Feature/P17DashboardOperatingHomeTest.php`
+- `tests/js/p17-dashboard-operating-home.ts` (`npx vite-node`)
+- Updated Home / polish / Lead OS Home / ActivityCreate / P10 consumers
 - P16 / P15 / P12 / P11 / P09 / P10 source locks remain
+
+Commands:
+
+| Command | Result |
+|---|---|
+| Focused Pest (P17 + Home consumers + polish) | **70 passed** |
+| `php artisan test` | **954 passed** (11819 assertions) |
+| `npx vite-node tests/js/p17-dashboard-operating-home.ts` | **pass** |
+| eslint on P17-touched JS | **pass** |
+| `php artisan wayfinder:generate --with-form && npm run types:check` | **pass** |
+| `composer types:check` | Repo-wide phpstan already red (~1585 errors on main-era files). Not a GitHub CI gate (`composer ci:check` = Pest only). |
+| `npm run build` | **pass** |
+| GitHub CI (`tests / ci`) | first run failed 6 Home consumer locks; fixes in this revision; re-run pending |
 
 ## LIVE VISUAL QA
 

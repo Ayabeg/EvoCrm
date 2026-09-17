@@ -4,14 +4,16 @@ use App\Models\Contact;
 use App\Models\Lead;
 use App\Models\User;
 
-it('§9.1 home is guided left and activity feed right', function () {
+it('§9.1 home is the operating composition not a guided feed', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
 
-    expect($home)->toContain('data-home-guided')
-        ->and($home)->toContain('GuidedActions')
-        ->and($home)->toContain('CaughtUpStrip')
-        ->and($home)->toContain('ActivityFeed')
-        ->and($home)->toContain('lg:grid-cols-12')
+    expect($home)->toContain('data-home="workspace"')
+        ->and($home)->toContain('DashboardAttention')
+        ->and($home)->toContain('DashboardWork')
+        ->and($home)->toContain('DashboardPipeline')
+        ->and($home)->toContain('DashboardRecent')
+        ->and($home)->not->toContain('GuidedActions')
+        ->and($home)->not->toContain('ActivityFeed')
         ->and($home)->not->toContain('Breeze')
         ->and($home)->not->toContain('Einstein');
 });

@@ -42,7 +42,7 @@ function p17DealFor(User $user, string $stageSlug, array $overrides = []): Deal
 
 function p17Activity(User $user, array $overrides = []): Activity
 {
-    return Activity::query()->create([
+    $activity = Activity::query()->create([
         'workspace_id' => $user->workspace_id,
         'type' => $overrides['type'] ?? 'task',
         'subject' => $overrides['subject'] ?? 'Follow up',
@@ -54,9 +54,17 @@ function p17Activity(User $user, array $overrides = []): Activity
         'actor_id' => $overrides['actor_id'] ?? $user->id,
         'contact_id' => $overrides['contact_id'] ?? null,
         'deal_id' => $overrides['deal_id'] ?? null,
-        'created_at' => $overrides['created_at'] ?? p17Now(),
-        'updated_at' => $overrides['updated_at'] ?? p17Now(),
     ]);
+
+    if (isset($overrides['created_at']) || isset($overrides['updated_at'])) {
+        $activity->timestamps = false;
+        $activity->forceFill([
+            'created_at' => $overrides['created_at'] ?? $activity->created_at,
+            'updated_at' => $overrides['updated_at'] ?? $activity->updated_at,
+        ])->save();
+    }
+
+    return $activity->fresh();
 }
 
 beforeEach(function () {
@@ -109,9 +117,9 @@ it('locks one operating home and consumes P11 P12 P15 without a V2', function ()
         ->and($queue)->toContain('function dashboardWork')
         ->and($evaluator)->toContain('class DealAttentionEvaluator');
 
-    expect(strpos($home, 'Needs attention'))->toBeLessThan(strpos($home, 'HomeKpiStrip'))
-        ->and(strpos($home, "t('Today')"))->toBeLessThan(strpos($home, 'HomeKpiStrip'))
-        ->and(strpos($home, 'HomeKpiStrip'))->toBeLessThan(strpos($home, 'Pipeline'));
+    expect(strpos($home, "title={t('Needs attention')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'))
+        ->and(strpos($home, "title={t('Today')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'))
+        ->and(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "title={t('Pipeline')}"));
 });
 
 it('serves a bounded operating payload without quota reports or updated_at events', function () {

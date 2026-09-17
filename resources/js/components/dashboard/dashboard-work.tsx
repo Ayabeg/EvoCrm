@@ -1,9 +1,9 @@
 import { Link } from '@inertiajs/react';
+import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 import { RecordLink } from '@/ds/workspace/quick-record/RecordLink';
 import type { DashboardWork } from '@/lib/dashboard-operating-home';
 import { formatDashboardWhen, relatedRecordRef } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
-import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 
 export function DashboardWork({ work }: { work: DashboardWork }) {
     const empty =

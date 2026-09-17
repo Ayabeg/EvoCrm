@@ -139,7 +139,7 @@ it('lists per-person quotas independently of the workspace target', function () 
         ->and($payload['owners'][0]['name'])->toBe('Amine')
         ->and($payload['owners'][0]['won_cents'])->toBe(1_000_000_00)
         ->and($payload['owners'][0]['target_cents'])->toBe(2_000_000_00)
-        ->and($payload['owners'][0]['attainment_pct'])->toBe(50)
+        ->and($payload['owners'][0]['attainment_pct'])->toEqual(50)
         ->and($payload['owners'][1]['name'])->toBe('Sara')
         ->and($payload['owners'][1]['target_cents'])->toBe(3_000_000_00)
         ->and($payload['owners'][1]['won_cents'])->toBe(500_000_00);
