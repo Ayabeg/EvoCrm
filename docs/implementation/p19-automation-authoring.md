@@ -463,7 +463,7 @@ Commands:
 | eslint on P19-touched JS | **pass** |
 | `php artisan wayfinder:generate --with-form && npm run types:check` | **pass** |
 | `npm run build` | **pass** |
-| GitHub CI (`tests / ci` on #229) | first run **failed** (`vite-node` HMR in CI); fixed in this tip |
+| GitHub CI (`tests / ci` on #229) | first run **failed** (`vite-node` HMR in CI); tip `9aa5984` **green** |
 | Contabo tip deploy | **NEEDS RESEARCH** |
 
 ---
