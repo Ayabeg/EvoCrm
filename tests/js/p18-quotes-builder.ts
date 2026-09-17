@@ -2,6 +2,10 @@
  * Test-only P18 quote builder proofs. Never import from an Inertia page.
  */
 import {
+    canCreateQuote,
+    commandCreateItems,
+} from '../../resources/js/lib/command-os';
+import {
     QUOTE_BUILDER_DESKTOP_GRID_CLASS,
     QUOTE_BUILDER_SPLIT_CLASS,
     QUOTE_DOCUMENT_PAPER_CLASS,
@@ -39,6 +43,18 @@ expectEqual(quoteCanEdit({ immutable: false, canUpdate: true }), true, 'authoriz
 expectEqual(quoteCanEdit({ immutable: true, canUpdate: true }), false, 'sent is immutable');
 expectEqual(quoteCanEdit({ immutable: false, canUpdate: false }), false, 'member cannot edit draft');
 expectEqual(quoteCanEdit({ immutable: true, canUpdate: false }), false, 'member cannot edit sent');
+expectEqual(canCreateQuote(['crm.view']), false, 'member cannot create quote');
+expectEqual(canCreateQuote(['crm.view', 'crm.edit']), true, 'editor can create quote');
+expectEqual(
+    commandCreateItems(['crm.view']).some((item) => item.id === 'create-quote'),
+    false,
+    'command OS hides create-quote without crm.edit',
+);
+expectEqual(
+    commandCreateItems(['crm.edit']).some((item) => item.id === 'create-quote'),
+    true,
+    'command OS shows create-quote with crm.edit',
+);
 expectEqual(quoteUnitDzd(18_000_000), '180000', 'cents to DZD input');
 expectEqual(quoteDateInputValue(null), '', 'empty date');
 const formattedWhen = formatQuoteWhen('2026-09-17T09:00:00+01:00');

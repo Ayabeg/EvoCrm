@@ -121,6 +121,18 @@ Exercise: draft edit + save lines; sent show (immutable, send/resend/revoke); Pr
 
 ---
 
+## P18.2 — GLOBAL CREATE QUOTE GATE
+
+P18.1 hid list/builder Save. Contabo still showed Global + → Quote and Command OS `create-quote` for members.
+
+`canCreateQuote(capabilities)` (same `crm.edit` as other Command OS creates / QuotePolicy create) now hides:
+
+- app-sidebar-header `/crm/quotes?create=1`
+- Command OS `create-quote`
+- deal-quotes Create quote disclose
+
+List `can.create` is unchanged. No Contabo deploy. No P20.
+
 ## P18.1 — MEMBER AUTHORING GATE
 
 Contabo: member saw Save/Create/send controls; PUT/POST 403. Root cause: `quoteCanEdit(immutable)` ignored QuotePolicy.

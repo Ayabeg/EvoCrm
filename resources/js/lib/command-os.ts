@@ -212,6 +212,10 @@ export function canCreateCrm(capabilities: readonly string[]): boolean {
     return capabilities.includes('crm.edit');
 }
 
+export function canCreateQuote(capabilities: readonly string[]): boolean {
+    return canCreateCrm(capabilities);
+}
+
 export function isAskEvoEnabled(features: CommandFeatures | null | undefined): boolean {
     return features?.ask_evo !== false;
 }
@@ -504,16 +508,20 @@ export function commandCreateItems(capabilities: readonly string[]): CommandResu
             keywords: 'new opportunity',
             description: 'Existing create drawer',
         },
-        {
-            id: 'create-quote',
-            kind: 'create',
-            label: 'Create quote',
-            section: 'create',
-            href: '/crm/quotes?create=1',
-            action: 'create-quote',
-            keywords: 'new proposal',
-            description: 'Existing create drawer',
-        },
+        ...(canCreateQuote(capabilities)
+            ? [
+                  {
+                      id: 'create-quote',
+                      kind: 'create' as const,
+                      label: 'Create quote',
+                      section: 'create' as const,
+                      href: '/crm/quotes?create=1',
+                      action: 'create-quote',
+                      keywords: 'new proposal',
+                      description: 'Existing create drawer',
+                  },
+              ]
+            : []),
         {
             id: 'create-activity',
             kind: 'create',

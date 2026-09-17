@@ -49,6 +49,9 @@ it('locks the quote show page as a split document/properties builder without a V
     $builder = File::get(resource_path('js/pages/crm/quotes/quote-split-builder.tsx'));
     $lib = File::get(resource_path('js/lib/quote-builder.ts'));
     $index = File::get(resource_path('js/pages/crm/quotes/index.tsx'));
+    $header = File::get(resource_path('js/components/app-sidebar-header.tsx'));
+    $dealQuotes = File::get(resource_path('js/components/crm/deal-quotes.tsx'));
+    $commandOs = File::get(resource_path('js/lib/command-os.ts'));
     $public = File::get(resource_path('js/pages/public/quote.tsx'));
     $controller = File::get(app_path('Http/Controllers/Crm/QuoteController.php'));
     $routes = File::get(base_path('routes/web.php'));
@@ -106,7 +109,14 @@ it('locks the quote show page as a split document/properties builder without a V
         ->and($index)->toContain('can.create')
         ->and($index)->toContain('canCreate={can.create}')
         ->and($index)->not->toContain('QuoteBuilder')
-        ->and($index)->not->toContain('QuoteSplitBuilder')
+        ->and($index)->not->toContain('QuoteSplitBuilder');
+
+    expect($header)->toContain('/crm/quotes?create=1')
+        ->and($header)->toContain('canCreateQuote(')
+        ->and($dealQuotes)->toContain('Create quote')
+        ->and($dealQuotes)->toContain('canCreateQuote(')
+        ->and($commandOs)->toContain("id: 'create-quote'")
+        ->and($commandOs)->toContain('canCreateQuote(capabilities)')
         ->and($public)->toContain('Accept quote')
         ->and($controller)->toContain("Inertia::render('crm/quotes/show'")
         ->and($controller)->toContain('function send')
@@ -227,11 +237,21 @@ it('hides quote authoring capabilities for a workspace member without crm.edit',
         ->and($owner->can('update', $quote))->toBeTrue();
 
     $this->actingAs($member)
+        ->get('/dashboard')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('auth.capabilities', fn ($caps) => ! collect($caps)->contains('crm.edit')));
+
+    $this->actingAs($member)
         ->get('/crm/quotes')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('crm/quotes/index')
             ->where('can.create', false));
+
+    $this->actingAs($member)
+        ->get("/crm/deals/{$quote->deal_id}")
+        ->assertOk();
 
     $this->actingAs($member)
         ->get("/crm/quotes/{$quote->id}")
