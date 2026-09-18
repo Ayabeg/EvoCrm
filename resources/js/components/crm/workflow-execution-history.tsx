@@ -12,8 +12,10 @@ import {
     executionRecordLabel,
     formatExecutionDuration,
     formatExecutionTimestamp,
-    type WorkflowExecutionPage,
-    type WorkflowExecutionRow,
+} from '@/lib/workflow-execution';
+import type {
+    WorkflowExecutionPage,
+    WorkflowExecutionRow,
 } from '@/lib/workflow-execution';
 
 function RecordLink({

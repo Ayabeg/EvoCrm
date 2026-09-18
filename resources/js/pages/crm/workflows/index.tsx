@@ -34,10 +34,8 @@ import type {
     WorkflowTemplate,
     WorkflowTicketStatus,
 } from '@/lib/workflow-authoring';
-import {
-    EMPTY_EXECUTION_PAGE,
-    type WorkflowExecutionPage,
-} from '@/lib/workflow-execution';
+import { EMPTY_EXECUTION_PAGE } from '@/lib/workflow-execution';
+import type { WorkflowExecutionPage } from '@/lib/workflow-execution';
 
 type Segment = { id: number; name: string };
 
@@ -352,6 +350,7 @@ export default function WorkflowsIndex({
                     ) : null}
 
                     {view === 'history' ? null : (
+                    <>
                     <HairlinePanel>
                         <div className="border-b border-hairline px-4 py-3">
                             <h2 className="aurora-text-ui font-medium text-ink">
@@ -486,6 +485,7 @@ export default function WorkflowsIndex({
                             ) : null}
                         </ul>
                     </HairlinePanel>
+                    </>
                     )}
                 </div>
             </div>

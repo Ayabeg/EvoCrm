@@ -30,10 +30,10 @@ it('keeps P19 authoring frozen and does not invent a second engine', function ()
 
     expect(class_exists('App\\Models\\WorkflowV2'))->toBeFalse()
         ->and(class_exists('App\\Models\\AutomationV2'))->toBeFalse()
-        ->and($src['builder'])->toContain("label=\"WHEN\"")
-        ->and($src['builder'])->toContain("label=\"IF\"")
-        ->and($src['builder'])->toContain("label=\"THEN\"")
-        ->and($src['builder'])->toContain("label=\"ELSE\"")
+        ->and($src['builder'])->toContain('label="WHEN"')
+        ->and($src['builder'])->toContain('label="IF"')
+        ->and($src['builder'])->toContain('label="THEN"')
+        ->and($src['builder'])->toContain('label="ELSE"')
         ->and($src['authoring'])->toContain('summarizeWorkflow')
         ->and($src['page'])->toContain('WorkflowBuilder')
         ->and($src['page'])->toContain('Review configuration')
@@ -151,7 +151,6 @@ it('marks a webhook HTTP failure as failed without breaking the trigger write', 
 
 it('cancels pending delayed runs when the workflow is turned off and keeps completed history', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
 
     $workflow = Workflow::factory()->create([
         'workspace_id' => $user->workspace_id,
@@ -161,6 +160,8 @@ it('cancels pending delayed runs when the workflow is turned off and keeps compl
         'delay_minutes' => 60,
         'active' => true,
     ]);
+
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
 
     $pending = WorkflowExecution::query()->where('workflow_id', $workflow->id)->first();
 
