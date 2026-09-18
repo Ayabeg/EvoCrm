@@ -550,7 +550,7 @@ export default function ActivityWorkQueue({
                 ) : openEmpty ? (
                     <p className="px-4 py-10 text-[13px] text-mute sm:px-6" role="status">
                         {current.scope === 'mine'
-                            ? t('Nothing assigned to you right now.')
+                            ? t('Log a call, task, or note to start this queue.')
                             : t('No open activities match this view.')}
                     </p>
                 ) : (

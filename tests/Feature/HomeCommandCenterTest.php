@@ -77,10 +77,11 @@ it('offers real create actions on an empty workspace', function () {
         ->get('/dashboard')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->has('activation', 3)
-            ->where('activation.0.href', '/crm/deals?create=1')
-            ->where('activation.1.href', '/crm/contacts?create=1')
-            ->where('activation.2.href', '/crm/activities?create=1'));
+            ->where('activation.activated', false)
+            ->has('activation.steps', 5)
+            ->where('activation.steps.2.href', '/crm/deals?create=1')
+            ->where('activation.steps.0.href', '/crm/contacts?create=1')
+            ->where('activation.steps.3.href', '/crm/activities?create=1'));
 });
 
 it('includes recently logged activity by created_at', function () {

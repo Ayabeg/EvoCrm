@@ -69,7 +69,7 @@ export function dealEmptyState(filtered: boolean): DataWorkspaceEmpty {
 
     return {
         title: 'No deals yet',
-        body: 'Create a deal to start working your pipeline from this list.',
+        body: 'Create a deal to start the sales pipeline. A contact plus this deal is the first useful loop.',
         actionLabel: 'Create deal',
     };
 }

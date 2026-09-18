@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import { ActivationChecklist } from '@/components/dashboard/activation-checklist';
 import { DashboardAttention } from '@/components/dashboard/dashboard-attention';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardPipeline } from '@/components/dashboard/dashboard-pipeline';
@@ -6,8 +7,8 @@ import { DashboardRecent } from '@/components/dashboard/dashboard-recent';
 import { DashboardWork } from '@/components/dashboard/dashboard-work';
 import { HomeKpiStrip } from '@/components/dashboard/home-kpi-strip';
 import { HomeWidget, HomeWidgetEmpty } from '@/components/dashboard/home-widget';
+import type { ActivationState } from '@/lib/activation';
 import type {
-    DashboardActivation,
     DashboardAttention as AttentionPayload,
     DashboardContext,
     DashboardMetrics,
@@ -26,7 +27,7 @@ type Props = {
     work: WorkPayload;
     pipeline: PipelinePayload;
     recent: RecentPayload;
-    activation?: DashboardActivation[];
+    activation?: ActivationState | null;
 };
 
 export default function Home({
@@ -36,7 +37,7 @@ export default function Home({
     work,
     pipeline,
     recent,
-    activation = [],
+    activation = null,
 }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const canCreate = auth.capabilities.includes('crm.edit');
@@ -54,19 +55,7 @@ export default function Home({
                     <DashboardHeader context={context} canCreate={canCreate} />
                 </div>
 
-                {activation.length > 0 ? (
-                    <div className="flex flex-wrap gap-3 px-4 pb-3 md:px-5">
-                        {activation.map((action) => (
-                            <Link
-                                key={action.href}
-                                href={action.href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {action.label}
-                            </Link>
-                        ))}
-                    </div>
-                ) : null}
+                {activation ? <ActivationChecklist activation={activation} /> : null}
 
                 <div className="grid gap-3 px-4 pb-3 md:px-5 lg:grid-cols-2">
                     <HomeWidget

@@ -83,10 +83,7 @@ export type DashboardRecent = {
     view_all_href: string;
 };
 
-export type DashboardActivation = {
-    label: string;
-    href: string;
-};
+export type { ActivationState as DashboardActivation } from '@/lib/activation';
 
 export function dashboardWorkHref(group: ActivityQueueGroup | null = null): string {
     return activityQueueHref({
