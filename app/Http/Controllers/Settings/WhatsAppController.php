@@ -42,6 +42,8 @@ class WhatsAppController extends Controller
 
     public function destroy(Request $request, WhatsAppConnector $whatsapp): RedirectResponse
     {
+        abort_unless($request->user()?->role->canManageSettings(), 403);
+
         $whatsapp->disconnectPhone($request->user()->workspace);
 
         Inertia::flash('toast', [
@@ -75,6 +77,8 @@ class WhatsAppController extends Controller
 
     public function destroyBusiness(Request $request, WhatsAppConnector $whatsapp): RedirectResponse
     {
+        abort_unless($request->user()?->role->canManageSettings(), 403);
+
         $whatsapp->disconnectBusiness($request->user()->workspace);
 
         Inertia::flash('toast', [

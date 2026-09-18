@@ -127,11 +127,12 @@ it('scopes Meta disconnect to the acting workspace', function () {
             ->exists())->toBeTrue();
 });
 
-it('forbids members from disconnecting Meta', function () {
+it('forbids members from disconnecting Meta', function (?array $permissions) {
     $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
     $member = User::factory()->create([
         'workspace_id' => $owner->workspace_id,
         'role' => WorkspaceRole::Member,
+        'permissions' => $permissions,
     ]);
     p22ConnectMeta($owner->workspace);
 
@@ -143,7 +144,43 @@ it('forbids members from disconnecting Meta', function () {
         ->where('workspace_id', $owner->workspace_id)
         ->where('provider', Integration::PROVIDER_META)
         ->exists())->toBeTrue();
-});
+})->with([
+    'default member' => [[]],
+    'member granted settings.integrations' => [['settings.integrations']],
+]);
+
+it('forbids members from disconnecting WhatsApp', function (string $path, string $provider, ?array $permissions) {
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    $member = User::factory()->create([
+        'workspace_id' => $owner->workspace_id,
+        'role' => WorkspaceRole::Member,
+        'permissions' => $permissions,
+    ]);
+    $owner->workspace->integrations()->create([
+        'provider' => $provider,
+        'status' => 'connected',
+        'access_token' => 'stored-token',
+        'meta' => [
+            'instance' => 'evo-ws'.$owner->workspace_id.'-wa',
+            'state' => 'open',
+        ],
+        'connected_at' => now(),
+    ]);
+
+    $this->actingAs($member)
+        ->delete($path)
+        ->assertForbidden();
+
+    expect(Integration::query()
+        ->where('workspace_id', $owner->workspace_id)
+        ->where('provider', $provider)
+        ->exists())->toBeTrue();
+})->with([
+    'whatsapp default member' => ['/settings/whatsapp', Integration::PROVIDER_WHATSAPP, []],
+    'whatsapp member granted settings.integrations' => ['/settings/whatsapp', Integration::PROVIDER_WHATSAPP, ['settings.integrations']],
+    'whatsapp business default member' => ['/settings/whatsapp-business', Integration::PROVIDER_WHATSAPP_BUSINESS, []],
+    'whatsapp business member granted settings.integrations' => ['/settings/whatsapp-business', Integration::PROVIDER_WHATSAPP_BUSINESS, ['settings.integrations']],
+]);
 
 it('reports truthful Apps status without collapsing WhatsApp providers', function () {
     $user = User::factory()->create();

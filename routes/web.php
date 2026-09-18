@@ -352,7 +352,6 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/settings/setup/{provider}', [OAuthSetupController::class, 'show'])->name('settings.setup.show');
     Route::post('/settings/setup/meta/page', [OAuthSetupController::class, 'updateMetaPage'])->name('settings.setup.meta.page');
     Route::get('/settings/apps/meta', [AppsController::class, 'meta'])->name('settings.apps.meta');
-    Route::delete('/settings/apps/meta', [AppsController::class, 'destroyMeta'])->name('settings.apps.meta.destroy');
 
     Route::get('/settings/connectors', [ConnectorController::class, 'index'])->name('settings.connectors');
     Route::post('/settings/connectors', [ConnectorController::class, 'store'])->name('settings.connectors.store');
@@ -365,10 +364,8 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/settings/whatsapp', [WhatsAppController::class, 'show'])->name('settings.whatsapp');
     Route::post('/settings/whatsapp/connect', [WhatsAppController::class, 'connect'])->name('settings.whatsapp.connect');
     Route::get('/settings/whatsapp/status', [WhatsAppController::class, 'status'])->name('settings.whatsapp.status');
-    Route::delete('/settings/whatsapp', [WhatsAppController::class, 'destroy'])->name('settings.whatsapp.destroy');
     Route::get('/settings/whatsapp-business', [WhatsAppController::class, 'showBusiness'])->name('settings.whatsapp-business');
     Route::post('/settings/whatsapp-business/connect', [WhatsAppController::class, 'connectBusiness'])->name('settings.whatsapp-business.connect');
-    Route::delete('/settings/whatsapp-business', [WhatsAppController::class, 'destroyBusiness'])->name('settings.whatsapp-business.destroy');
     Route::get('/settings/meta', [MetaSettingsController::class, 'edit'])->name('settings.meta');
     Route::get('/settings/channels', [ChannelSettingsController::class, 'edit'])->name('settings.channels');
     Route::post('/settings/channels', [ChannelSettingsController::class, 'update'])->name('settings.channels.update');
@@ -380,6 +377,9 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/settings/permissions', [PermissionsController::class, 'index'])->name('settings.permissions');
     Route::put('/settings/permissions/{user}', [PermissionsController::class, 'update'])->name('settings.permissions.update');
     Route::middleware('can-manage-settings')->group(function () {
+        Route::delete('/settings/apps/meta', [AppsController::class, 'destroyMeta'])->name('settings.apps.meta.destroy');
+        Route::delete('/settings/whatsapp', [WhatsAppController::class, 'destroy'])->name('settings.whatsapp.destroy');
+        Route::delete('/settings/whatsapp-business', [WhatsAppController::class, 'destroyBusiness'])->name('settings.whatsapp-business.destroy');
         Route::put('/settings/meta/ad-account', [MetaSettingsController::class, 'updateAdAccount'])->name('settings.meta.ad-account');
         Route::put('/settings/meta/mappings', [MetaSettingsController::class, 'updateMappings'])->name('settings.meta.mappings');
         Route::put('/settings/meta/conversions', [MetaSettingsController::class, 'updateConversions'])->name('settings.meta.conversions');

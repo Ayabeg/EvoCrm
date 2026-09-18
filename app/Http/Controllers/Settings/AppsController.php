@@ -166,6 +166,8 @@ class AppsController extends Controller
 
     public function destroyMeta(Request $request): RedirectResponse
     {
+        abort_unless($request->user()?->role->canManageSettings(), 403);
+
         $workspace = $request->user()->workspace;
         $workspace->integration(Integration::PROVIDER_META)?->delete();
         $workspace->integration(Integration::PROVIDER_INSTAGRAM)?->delete();
