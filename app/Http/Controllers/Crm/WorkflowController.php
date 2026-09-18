@@ -11,8 +11,10 @@ use App\Models\Stage;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workflow;
+use App\Models\WorkflowExecution;
 use App\Models\Workspace;
 use App\Services\Crm\EvoWorkflowTemplates;
+use App\Services\Crm\WorkflowExecutionPresenter;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +25,7 @@ use Inertia\Response;
 
 class WorkflowController extends Controller
 {
-    public function index(Request $request, EvoWorkflowTemplates $templates, CrmHub $hub): Response
+    public function index(Request $request, EvoWorkflowTemplates $templates, CrmHub $hub, WorkflowExecutionPresenter $executions): Response
     {
         $workspace = $request->user()->workspace;
         $user = $request->user();
@@ -103,6 +105,8 @@ class WorkflowController extends Controller
                 'has_mailbox' => $hasMailbox,
                 'has_sequences' => $sequences->isNotEmpty(),
             ],
+            'view' => $request->string('view')->toString() === 'history' ? 'history' : 'workflows',
+            'executions' => $executions->page($workspace, $user, $request),
         ]);
     }
 
@@ -203,6 +207,17 @@ class WorkflowController extends Controller
         abort_unless((int) $workflow->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workflow->forceFill(['active' => ! $workflow->active])->save();
+
+        if (! $workflow->active) {
+            WorkflowExecution::query()
+                ->where('workflow_id', $workflow->id)
+                ->where('status', WorkflowExecution::STATUS_PENDING)
+                ->update([
+                    'status' => WorkflowExecution::STATUS_CANCELLED,
+                    'finished_at' => now(),
+                    'error_summary' => 'Workflow was turned off before this delayed run executed.',
+                ]);
+        }
 
         return redirect()->route('crm.workflows.index');
     }

@@ -19,7 +19,9 @@ use App\Services\Analytics\ProductAnalytics;
 use App\Services\Outbound\QuietHoursGuard;
 use App\Services\Outbound\SequenceEnrollment;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use RuntimeException;
 use Throwable;
 
 class WorkflowRunner
@@ -30,6 +32,7 @@ class WorkflowRunner
         private CustomAttributes $attributes,
         private QuietHoursGuard $quietHours,
         private ProductAnalytics $analytics,
+        private WorkflowExecutionRedactor $redactor,
     ) {}
 
     public function handleContactCreated(Contact $contact): void
@@ -122,7 +125,14 @@ class WorkflowRunner
                 if ((int) ($workflow->delay_minutes ?? 0) > 0) {
                     $this->schedule($workspace, $workflow, $contact, null);
                 } else {
-                    $this->execute($workspace, $workflow, $contact, null);
+                    $this->recordImmediate(
+                        $workspace,
+                        $workflow,
+                        $contact,
+                        null,
+                        null,
+                        $this->execute($workspace, $workflow, $contact, null),
+                    );
                 }
             } catch (Throwable) {
             }
@@ -229,15 +239,27 @@ class WorkflowRunner
     /**
      * Execute a scheduled workflow action (called by workflow:run).
      */
-    public function executeScheduled(Workflow $workflow, ?Contact $contact, ?Deal $deal): void
+    public function executeScheduled(Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): WorkflowExecutionOutcome
     {
         $workspace = $workflow->workspace ?? Workspace::query()->find($workflow->workspace_id);
 
         if (! $workspace instanceof Workspace) {
-            return;
+            $now = now();
+
+            return new WorkflowExecutionOutcome(
+                status: WorkflowExecution::STATUS_FAILED,
+                branch: null,
+                action: null,
+                conditionPassed: null,
+                resultSummary: null,
+                errorSummary: 'Workspace was missing when the delayed run executed.',
+                actionParameters: null,
+                startedAt: $now,
+                finishedAt: $now,
+            );
         }
 
-        $this->execute($workspace, $workflow, $contact, $deal);
+        return $this->execute($workspace, $workflow, $contact, $deal, $ticket);
     }
 
     private function run(Workspace $workspace, string $trigger, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
@@ -263,19 +285,26 @@ class WorkflowRunner
 
             try {
                 if ((int) ($workflow->delay_minutes ?? 0) > 0) {
-                    $this->schedule($workspace, $workflow, $contact, $deal);
+                    $this->schedule($workspace, $workflow, $contact, $deal, $ticket);
 
                     continue;
                 }
 
-                $this->execute($workspace, $workflow, $contact, $deal, $ticket);
+                $this->recordImmediate(
+                    $workspace,
+                    $workflow,
+                    $contact,
+                    $deal,
+                    $ticket,
+                    $this->execute($workspace, $workflow, $contact, $deal, $ticket),
+                );
             } catch (Throwable) {
                 // Record writes must not fail because a workflow action could not run.
             }
         }
     }
 
-    private function schedule(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal): void
+    private function schedule(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
     {
         $runAt = now()->addMinutes((int) $workflow->delay_minutes);
 
@@ -290,44 +319,128 @@ class WorkflowRunner
         WorkflowExecution::query()->create([
             'workspace_id' => $workspace->id,
             'workflow_id' => $workflow->id,
+            'workflow_name' => $workflow->name,
             'contact_id' => $contact?->id,
             'deal_id' => $deal?->id,
+            'ticket_id' => $ticket?->id,
+            'trigger' => $workflow->trigger,
+            'delay_minutes' => (int) ($workflow->delay_minutes ?? 0),
             'run_at' => $runAt,
             'status' => WorkflowExecution::STATUS_PENDING,
         ]);
     }
 
-    private function execute(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
+    private function recordImmediate(
+        Workspace $workspace,
+        Workflow $workflow,
+        ?Contact $contact,
+        ?Deal $deal,
+        ?Ticket $ticket,
+        WorkflowExecutionOutcome $outcome,
+    ): void {
+        try {
+            WorkflowExecution::query()->create([
+                'workspace_id' => $workspace->id,
+                'workflow_id' => $workflow->id,
+                'workflow_name' => $workflow->name,
+                'contact_id' => $contact?->id,
+                'deal_id' => $deal?->id,
+                'ticket_id' => $ticket?->id,
+                'trigger' => $workflow->trigger,
+                'delay_minutes' => 0,
+                'run_at' => $outcome->startedAt,
+                ...$outcome->attributes($this->redactor),
+            ]);
+        } catch (Throwable $exception) {
+            Log::warning('workflow.execution.persist_failed', [
+                'workflow_id' => $workflow->id,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function execute(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): WorkflowExecutionOutcome
     {
-        $useThen = ! $workflow->hasCondition() || $this->conditionPasses($workspace, $workflow, $contact, $deal, $ticket);
+        $startedAt = now();
+        $hasCondition = $workflow->hasCondition();
+        $useThen = ! $hasCondition || $this->conditionPasses($workspace, $workflow, $contact, $deal, $ticket);
         $action = $useThen ? $workflow->action : $workflow->else_action;
         $config = $useThen ? $workflow->config() : $workflow->elseConfig();
+        $branch = $useThen ? 'then' : 'else';
 
         if (! filled($action)) {
-            return;
+            return new WorkflowExecutionOutcome(
+                status: WorkflowExecution::STATUS_COMPLETED,
+                branch: $branch,
+                action: null,
+                conditionPassed: $hasCondition ? $useThen : null,
+                resultSummary: [
+                    'outcome' => 'no_action',
+                    'summary' => 'No action configured on this branch.',
+                ],
+                errorSummary: null,
+                actionParameters: null,
+                startedAt: $startedAt,
+                finishedAt: now(),
+            );
         }
 
-        match ($action) {
-            Workflow::ACTION_CREATE_TASK => $this->createTask($workspace, $workflow, $contact, $deal, $config, $ticket),
-            Workflow::ACTION_ENROLL_SEQUENCE => $this->enrollSequence($workspace, $config, $contact),
-            Workflow::ACTION_SEND_WEBHOOK => $this->sendWebhook($workflow, $config, $contact, $deal, $ticket),
-            Workflow::ACTION_SET_PROPERTY => $this->setProperty($workspace, $config, $contact, $deal),
-            Workflow::ACTION_ASSIGN_OWNER => $this->assignOwner($config, $contact, $deal),
-            Workflow::ACTION_CREATE_DEAL => $this->createDeal($workspace, $config, $contact),
-            Workflow::ACTION_SEND_EMAIL => $this->sendEmail($workspace, $config, $contact),
-            Workflow::ACTION_NOTIFY_USER => $this->notifyUser($workspace, $config, $contact, $deal, $ticket),
-            default => null,
-        };
+        try {
+            $result = match ($action) {
+                Workflow::ACTION_CREATE_TASK => $this->createTask($workspace, $workflow, $contact, $deal, $config, $ticket),
+                Workflow::ACTION_ENROLL_SEQUENCE => $this->enrollSequence($workspace, $config, $contact),
+                Workflow::ACTION_SEND_WEBHOOK => $this->sendWebhook($workflow, $config, $contact, $deal, $ticket),
+                Workflow::ACTION_SET_PROPERTY => $this->setProperty($workspace, $config, $contact, $deal),
+                Workflow::ACTION_ASSIGN_OWNER => $this->assignOwner($config, $contact, $deal),
+                Workflow::ACTION_CREATE_DEAL => $this->createDeal($workspace, $config, $contact),
+                Workflow::ACTION_SEND_EMAIL => $this->sendEmail($workspace, $config, $contact),
+                Workflow::ACTION_NOTIFY_USER => $this->notifyUser($workspace, $config, $contact, $deal, $ticket),
+                default => [
+                    'outcome' => 'unknown_action',
+                    'summary' => 'Action is not registered on the runner.',
+                ],
+            };
 
-        $this->analytics->capture(ProductAnalytics::WORKFLOW_EXECUTED, [
-            'workflow_id' => $workflow->id,
-            'workflow_name' => $workflow->name,
-            'trigger' => $workflow->trigger,
-            'action' => $action,
-            'contact_id' => $contact?->id,
-            'deal_id' => $deal?->id,
-            'ticket_id' => $ticket?->id,
-        ], null, $workspace);
+            $this->analytics->capture(ProductAnalytics::WORKFLOW_EXECUTED, [
+                'workflow_id' => $workflow->id,
+                'workflow_name' => $workflow->name,
+                'trigger' => $workflow->trigger,
+                'action' => $action,
+                'contact_id' => $contact?->id,
+                'deal_id' => $deal?->id,
+                'ticket_id' => $ticket?->id,
+            ], null, $workspace);
+
+            return new WorkflowExecutionOutcome(
+                status: WorkflowExecution::STATUS_COMPLETED,
+                branch: $branch,
+                action: $action,
+                conditionPassed: $hasCondition ? $useThen : null,
+                resultSummary: $result,
+                errorSummary: null,
+                actionParameters: $config,
+                startedAt: $startedAt,
+                finishedAt: now(),
+            );
+        } catch (Throwable $exception) {
+            Log::warning('workflow.execution.failed', [
+                'workflow_id' => $workflow->id,
+                'action' => $action,
+                'branch' => $branch,
+            ]);
+
+            return new WorkflowExecutionOutcome(
+                status: WorkflowExecution::STATUS_FAILED,
+                branch: $branch,
+                action: $action,
+                conditionPassed: $hasCondition ? $useThen : null,
+                resultSummary: null,
+                errorSummary: $exception->getMessage(),
+                actionParameters: $config,
+                startedAt: $startedAt,
+                finishedAt: now(),
+            );
+        }
     }
 
     private function conditionPasses(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): bool
@@ -398,8 +511,9 @@ class WorkflowRunner
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function createTask(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, array $config, ?Ticket $ticket = null): void
+    private function createTask(Workspace $workspace, Workflow $workflow, ?Contact $contact, ?Deal $deal, array $config, ?Ticket $ticket = null): array
     {
         $dueInDays = (int) ($config['due_in_days'] ?? 1);
 
@@ -428,15 +542,24 @@ class WorkflowRunner
                 'ticket_id' => $ticket?->id,
             ]),
         ]);
+
+        return [
+            'outcome' => 'created_task',
+            'summary' => 'Created a task.',
+        ];
     }
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function enrollSequence(Workspace $workspace, array $config, ?Contact $contact): void
+    private function enrollSequence(Workspace $workspace, array $config, ?Contact $contact): array
     {
         if (! $contact) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'No contact was available to enroll.',
+            ];
         }
 
         $sequenceId = $config['sequence_id'] ?? null;
@@ -446,24 +569,36 @@ class WorkflowRunner
             : Sequence::query()->forWorkspace($workspace)->orderBy('id')->first();
 
         if (! $sequence) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'No sequence was available.',
+            ];
         }
 
         $this->enrollment->enroll($workspace, $sequence, $contact);
+
+        return [
+            'outcome' => 'enrolled_sequence',
+            'summary' => 'Enrolled the contact in a sequence.',
+        ];
     }
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function sendWebhook(Workflow $workflow, array $config, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
+    private function sendWebhook(Workflow $workflow, array $config, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): array
     {
         $url = trim((string) ($config['url'] ?? ''));
 
         if (! $this->webhookUrlAllowed($url)) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'Webhook URL was not allowed.',
+            ];
         }
 
-        Http::timeout(8)
+        $response = Http::timeout(8)
             ->acceptJson()
             ->asJson()
             ->post($url, [
@@ -494,6 +629,15 @@ class WorkflowRunner
                     'priority' => $ticket->priority,
                 ] : null,
             ]);
+
+        if (! $response->successful()) {
+            throw new RuntimeException('Webhook returned HTTP '.$response->status().'.');
+        }
+
+        return [
+            'outcome' => 'webhook_sent',
+            'summary' => 'Webhook accepted (HTTP '.$response->status().').',
+        ];
     }
 
     private function webhookUrlAllowed(string $url): bool
@@ -539,15 +683,19 @@ class WorkflowRunner
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function setProperty(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal): void
+    private function setProperty(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal): array
     {
         $entity = (string) ($config['entity'] ?? 'contact');
         $field = (string) ($config['field'] ?? '');
         $value = $config['value'] ?? null;
 
         if ($field === '' || $value === null) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'Property field or value was missing.',
+            ];
         }
 
         if (str_starts_with($field, 'attr.')) {
@@ -559,32 +707,57 @@ class WorkflowRunner
             };
 
             if (! $record) {
-                return;
+                return [
+                    'outcome' => 'action_did_not_apply',
+                    'summary' => 'Target record was missing.',
+                ];
             }
 
             $this->attributes->saveValues($workspace, $entity, $record->id, [$key => $value]);
 
-            return;
+            return [
+                'outcome' => 'set_property',
+                'summary' => 'Updated a custom property.',
+            ];
         }
 
         if ($entity === 'contact' && $contact && in_array($field, ['city', 'wilaya', 'source'], true)) {
             $contact->forceFill([$field => $value])->save();
+
+            return [
+                'outcome' => 'set_property',
+                'summary' => 'Updated the contact property.',
+            ];
         }
 
         if ($entity === 'deal' && $deal && $field === 'title') {
             $deal->forceFill(['title' => $value])->save();
+
+            return [
+                'outcome' => 'set_property',
+                'summary' => 'Updated the deal title.',
+            ];
         }
+
+        return [
+            'outcome' => 'action_did_not_apply',
+            'summary' => 'Property target was not writable.',
+        ];
     }
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function assignOwner(array $config, ?Contact $contact, ?Deal $deal): void
+    private function assignOwner(array $config, ?Contact $contact, ?Deal $deal): array
     {
         $ownerId = isset($config['owner_id']) ? (int) $config['owner_id'] : null;
 
         if (! $ownerId) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'No owner was configured.',
+            ];
         }
 
         $entity = (string) ($config['entity'] ?? 'contact');
@@ -592,21 +765,38 @@ class WorkflowRunner
         if ($entity === 'deal' && $deal) {
             $deal->forceFill(['owner_id' => $ownerId])->save();
 
-            return;
+            return [
+                'outcome' => 'assigned_owner',
+                'summary' => 'Assigned the deal owner.',
+            ];
         }
 
         if ($contact) {
             $contact->forceFill(['owner_id' => $ownerId])->save();
+
+            return [
+                'outcome' => 'assigned_owner',
+                'summary' => 'Assigned the contact owner.',
+            ];
         }
+
+        return [
+            'outcome' => 'action_did_not_apply',
+            'summary' => 'No record was available to assign.',
+        ];
     }
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function createDeal(Workspace $workspace, array $config, ?Contact $contact): void
+    private function createDeal(Workspace $workspace, array $config, ?Contact $contact): array
     {
         if (! $contact) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'No contact was available to create a deal.',
+            ];
         }
 
         $pipeline = $workspace->defaultPipeline();
@@ -623,15 +813,24 @@ class WorkflowRunner
             'amount_cents' => (int) ($config['amount_cents'] ?? 0),
             'currency' => 'DZD',
         ]);
+
+        return [
+            'outcome' => 'created_deal',
+            'summary' => 'Created a deal.',
+        ];
     }
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function sendEmail(Workspace $workspace, array $config, ?Contact $contact): void
+    private function sendEmail(Workspace $workspace, array $config, ?Contact $contact): array
     {
         if (! $contact?->email) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'Contact had no email address.',
+            ];
         }
 
         $mailbox = Mailbox::query()
@@ -641,7 +840,10 @@ class WorkflowRunner
             ->first();
 
         if (! $mailbox) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'No enabled mailbox was available.',
+            ];
         }
 
         Mail::raw(
@@ -651,17 +853,26 @@ class WorkflowRunner
                 ->subject((string) ($config['subject'] ?? 'EvoSales follow-up'))
                 ->from($mailbox->from_address, $mailbox->from_name ?? 'EvoSales'),
         );
+
+        return [
+            'outcome' => 'email_sent',
+            'summary' => 'Queued a follow-up email.',
+        ];
     }
 
     /**
      * @param  array<string, mixed>  $config
+     * @return array{outcome: string, summary: string}
      */
-    private function notifyUser(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
+    private function notifyUser(Workspace $workspace, array $config, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): array
     {
         $userId = isset($config['user_id']) ? (int) $config['user_id'] : ($ticket?->owner_id ?? $deal?->owner_id ?? $contact?->owner_id);
 
         if (! $userId) {
-            return;
+            return [
+                'outcome' => 'action_did_not_apply',
+                'summary' => 'No user was available to notify.',
+            ];
         }
 
         $this->activities->record($workspace, [
@@ -677,5 +888,10 @@ class WorkflowRunner
                 'ticket_id' => $ticket?->id,
             ]),
         ]);
+
+        return [
+            'outcome' => 'notified_user',
+            'summary' => 'Created a user notification.',
+        ];
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -211,6 +212,12 @@ class Workflow extends Model
     public function triggerStage(): BelongsTo
     {
         return $this->belongsTo(Stage::class, 'trigger_stage_id');
+    }
+
+    /** @return HasMany<WorkflowExecution, $this> */
+    public function executions(): HasMany
+    {
+        return $this->hasMany(WorkflowExecution::class);
     }
 
     /**
