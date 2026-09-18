@@ -25,6 +25,7 @@ import {
 import type { CommandItem } from '@/components/aurora/command-palette';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import { openAskEvo } from '@/lib/ask-evo';
 import {
     COMMAND_SEARCH_DEBOUNCE_MS,
     buildCommandCatalog,
@@ -300,6 +301,12 @@ export function CommandPalette({
         }
 
         handleOpenChange(false);
+
+        if (result.kind === 'ask') {
+            openAskEvo();
+
+            return;
+        }
 
         if (result.recordRef) {
             openRecord(result.recordRef);

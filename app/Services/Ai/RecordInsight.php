@@ -30,7 +30,7 @@ class RecordInsight
     ) {}
 
     /**
-     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool, context_label: string, scope_key: string, suggestions: list<array{id: string, label: string, question: string}>}
      */
     public function forContact(Contact $contact): array
     {
@@ -40,7 +40,7 @@ class RecordInsight
     }
 
     /**
-     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool, context_label: string, scope_key: string, suggestions: list<array{id: string, label: string, question: string}>}
      */
     public function forDeal(Deal $deal): array
     {
@@ -50,7 +50,7 @@ class RecordInsight
     }
 
     /**
-     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool, context_label: string, scope_key: string, suggestions: list<array{id: string, label: string, question: string}>}
      */
     public function forCompany(Company $company): array
     {
@@ -60,7 +60,7 @@ class RecordInsight
     }
 
     /**
-     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool, context_label: string, scope_key: string, suggestions: list<array{id: string, label: string, question: string}>}
      */
     public function forLead(Lead $lead): array
     {
@@ -70,7 +70,7 @@ class RecordInsight
     }
 
     /**
-     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool, context_label: string, scope_key: string, suggestions: list<array{id: string, label: string, question: string}>}
      */
     public function forTicket(Ticket $ticket): array
     {
@@ -376,44 +376,7 @@ class RecordInsight
      */
     public function ask(Contact|Deal|Company $record, string $question): array
     {
-        $question = trim($question);
-        $kind = match (true) {
-            $record instanceof Deal => 'deal',
-            $record instanceof Company => 'company',
-            default => 'contact',
-        };
-        $summary = match (true) {
-            $record instanceof Deal => $this->summarizeDeal($record->loadMissing(['stage', 'contact', 'company', 'owner'])),
-            $record instanceof Company => $this->summarizeCompany($record->loadMissing(['owner', 'contacts', 'deals.stage'])),
-            default => $this->summarizeContact($record->loadMissing(['company', 'owner', 'deals.stage'])),
-        };
-        $facts = match (true) {
-            $record instanceof Deal => $this->dealFacts($record),
-            $record instanceof Company => $this->companyFacts($record),
-            default => $this->contactFacts($record),
-        };
-        $activities = $this->retrieveRelevantActivities($record, $question);
-
-        $stub = $this->stubAnswer($question, $facts, $summary, $activities);
-        $live = $this->llm->complete($this->systemPrompt(), $this->userPrompt($kind, $facts, $activities, $question, $summary));
-
-        $answer = $live['text'] ?? $stub;
-        $source = $live['source'] ?? 'fields';
-
-        AiInsight::query()->create([
-            'workspace_id' => $record->workspace_id,
-            'subject_type' => $kind,
-            'subject_id' => $record->id,
-            'question' => $question,
-            'answer' => $answer,
-            'source' => $source,
-        ]);
-
-        return [
-            'answer' => $answer,
-            'source' => $source,
-            'summary' => $summary,
-        ];
+        return app(AskEvoCopilot::class)->askRecord($record, $question, auth()->user());
     }
 
     /**
@@ -593,7 +556,7 @@ class RecordInsight
     }
 
     /**
-     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool}
+     * @return array{label: string, summary: string, question: string|null, answer: string|null, source: string, live: bool, context_label: string, scope_key: string, suggestions: list<array{id: string, label: string, question: string}>}
      */
     protected function present(string $type, int $id, string $summary): array
     {
@@ -612,6 +575,11 @@ class RecordInsight
             'answer' => $insight?->answer,
             'source' => $insight instanceof AiInsight ? $insight->source : 'fields',
             'live' => $this->llm->available(),
+            'context_label' => $this->contextLabel($summary),
+            'scope_key' => $type.':'.$id,
+            'suggestions' => app(AskEvoSuggestions::class)->for(
+                AskEvoContextKind::tryFrom($type) ?? AskEvoContextKind::Workspace,
+            ),
         ];
     }
 
@@ -929,6 +897,13 @@ class RecordInsight
     protected function systemPrompt(): string
     {
         return 'You are Evo, Evotechly\'s record assistant on EvoSales. Answer only from the supplied record fields and recent activities. Never invent facts. Never mention HubSpot or Breeze. If the answer is not in the fields, say you only have this record\'s fields. Keep it to two short sentences.';
+    }
+
+    protected function contextLabel(string $summary): string
+    {
+        $first = trim(explode('·', $summary, 2)[0]);
+
+        return $first !== '' ? rtrim($first, '.') : 'This record';
     }
 
     protected function recencyScore(?int $days): int

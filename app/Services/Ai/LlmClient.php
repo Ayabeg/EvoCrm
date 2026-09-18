@@ -37,18 +37,48 @@ class LlmClient
      */
     public function complete(string $system, string $prompt): ?array
     {
-        $driver = $this->driver();
+        $detailed = $this->completeDetailed($system, $prompt);
 
-        if ($driver === null) {
+        if ($detailed['text'] === null || $detailed['source'] === null) {
             return null;
         }
 
+        return ['text' => $detailed['text'], 'source' => $detailed['source']];
+    }
+
+    /**
+     * @return array{text: string|null, source: 'openai'|'anthropic'|null, error: 'unavailable'|'timeout'|'rate_limit'|'empty'|null}
+     */
+    public function completeDetailed(string $system, string $prompt): array
+    {
+        $driver = $this->driver();
+
+        if ($driver === null) {
+            return ['text' => null, 'source' => null, 'error' => 'unavailable'];
+        }
+
         try {
-            return $driver === 'openai'
+            $result = $driver === 'openai'
                 ? $this->openAi($system, $prompt)
                 : $this->anthropic($system, $prompt);
-        } catch (Throwable) {
-            return null;
+
+            if ($result === null) {
+                return ['text' => null, 'source' => null, 'error' => 'unavailable'];
+            }
+
+            return ['text' => $result['text'], 'source' => $result['source'], 'error' => null];
+        } catch (Throwable $exception) {
+            $message = mb_strtolower($exception->getMessage());
+
+            if (str_contains($message, 'timed out') || str_contains($message, 'timeout') || $exception instanceof \Illuminate\Http\Client\ConnectionException) {
+                return ['text' => null, 'source' => null, 'error' => 'timeout'];
+            }
+
+            if (str_contains($message, '429') || str_contains($message, 'too many')) {
+                return ['text' => null, 'source' => null, 'error' => 'rate_limit'];
+            }
+
+            return ['text' => null, 'source' => null, 'error' => 'unavailable'];
         }
     }
 
@@ -69,6 +99,10 @@ class LlmClient
                     ['role' => 'user', 'content' => $prompt],
                 ],
             ]);
+
+        if ($response->status() === 429) {
+            throw new \RuntimeException('429 too many');
+        }
 
         if (! $response->successful()) {
             return null;
@@ -98,6 +132,10 @@ class LlmClient
                     ['role' => 'user', 'content' => $prompt],
                 ],
             ]);
+
+        if ($response->status() === 429) {
+            throw new \RuntimeException('429 too many');
+        }
 
         if (! $response->successful()) {
             return null;
