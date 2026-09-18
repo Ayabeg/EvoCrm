@@ -1,6 +1,6 @@
 import { router, usePage } from '@inertiajs/react';
 import { Sparkle } from '@phosphor-icons/react';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Drawer,
@@ -9,8 +9,8 @@ import {
     DrawerTitle,
 } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
-import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
+import { useSimpleMode } from '@/hooks/use-simple-mode';
 import {
     ASK_EVO_OPEN_EVENT,
     askEvoErrorMessage,
@@ -59,33 +59,7 @@ export function AskEvoDrawer() {
     );
     const scope = context?.scope_key ?? askEvoScopeKey(identity);
 
-    useEffect(() => {
-        if (shouldResetAskEvoScope(scopeRef.current, scope)) {
-            setTurns([]);
-            setError(null);
-            setQuestion('');
-        }
-
-        scopeRef.current = scope;
-    }, [scope]);
-
-    useEffect(() => {
-        const onOpen = (event: Event) => {
-            openerRef.current =
-                document.activeElement instanceof HTMLElement
-                    ? document.activeElement
-                    : null;
-            setOpen(true);
-            const detail = (event as CustomEvent<AskEvoIdentity | null>).detail;
-            void loadContext(detail ?? identity);
-        };
-
-        window.addEventListener(ASK_EVO_OPEN_EVENT, onOpen);
-
-        return () => window.removeEventListener(ASK_EVO_OPEN_EVENT, onOpen);
-    }, [identity]);
-
-    const loadContext = async (next: AskEvoIdentity) => {
+    const loadContext = useCallback(async (next: AskEvoIdentity) => {
         const params = new URLSearchParams();
         params.set('page', next.page);
 
@@ -120,7 +94,33 @@ export function AskEvoDrawer() {
         } catch {
             setError('Ask Evo is unavailable.');
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (shouldResetAskEvoScope(scopeRef.current, scope)) {
+            setTurns([]);
+            setError(null);
+            setQuestion('');
+        }
+
+        scopeRef.current = scope;
+    }, [scope]);
+
+    useEffect(() => {
+        const onOpen = (event: Event) => {
+            openerRef.current =
+                document.activeElement instanceof HTMLElement
+                    ? document.activeElement
+                    : null;
+            setOpen(true);
+            const detail = (event as CustomEvent<AskEvoIdentity | null>).detail;
+            void loadContext(detail ?? identity);
+        };
+
+        window.addEventListener(ASK_EVO_OPEN_EVENT, onOpen);
+
+        return () => window.removeEventListener(ASK_EVO_OPEN_EVENT, onOpen);
+    }, [identity, loadContext]);
 
     const ask = async (nextQuestion: string) => {
         const trimmed = nextQuestion.trim();

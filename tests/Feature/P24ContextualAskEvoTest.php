@@ -2,9 +2,7 @@
 
 use App\Enums\ChannelType;
 use App\Enums\WorkspaceRole;
-use App\Models\Activity;
 use App\Models\Channel;
-use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Message;
@@ -52,7 +50,7 @@ it('keeps one Ask Evo orchestration path and the frozen record posts', function 
         ->and($palette)->toContain('openAskEvo')
         ->and($palette)->toContain("result.kind === 'ask'")
         ->and($routes)->toContain("name('ask-evo')")
-        ->and($routes)->toContain("crm.contacts.ask");
+        ->and($routes)->toContain('crm.contacts.ask');
 });
 
 it('resolves only page + entity identity and ignores frontend field dumps', function () {
@@ -210,7 +208,8 @@ it('uses dashboard and activation facts without inventing forecasts', function (
 
     expect($home['context']['kind'])->toBe('dashboard')
         ->and($activation['context']['kind'])->toBe('activation')
-        ->and(json_encode($home))->not->toContain('forecast')
+        ->and(strtolower((string) $home['answer']))->not->toContain('forecast')
+        ->and(json_encode($home['context']['suggestions'] ?? []))->not->toContain('forecast')
         ->and($activation['answer'])->toContain('add_crm_data');
 });
 

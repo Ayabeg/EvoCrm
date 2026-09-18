@@ -98,9 +98,13 @@ final class AskEvoContextRequest
             return null;
         }
 
-        $kind = AskEvoContextKind::tryFrom(trim($type));
+        $value = strtolower(trim($type));
 
-        return $kind?->value;
+        if (! preg_match('/^[a-z][a-z0-9_]*$/', $value)) {
+            return null;
+        }
+
+        return $value;
     }
 
     private static function normalizeEntityId(mixed $id): ?int

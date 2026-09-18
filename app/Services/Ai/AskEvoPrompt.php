@@ -44,7 +44,7 @@ PROMPT;
             ]));
 
             foreach ($needles as $needle) {
-                if ($needle !== '' && str_contains($haystack, $needle)) {
+                if (str_contains($haystack, $needle)) {
                     $hits[] = $label.': '.$value;
                     break;
                 }

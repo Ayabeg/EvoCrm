@@ -19,6 +19,7 @@ use App\Services\Ai\AskEvoContextResolver;
 use App\Services\Ai\AskEvoPrompt;
 use App\Services\Ai\AskEvoRateLimiter;
 use App\Services\Ai\AskEvoSecretRedactor;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
@@ -327,13 +328,13 @@ it('H quote money is the stored total and LLM is told not to recalculate', funct
 it('I inbox credentials and channel config never enter context', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
-    $channel = Channel::query()->create([
-        'workspace_id' => $user->workspace_id,
-        'type' => ChannelType::WhatsAppCloud,
-        'name' => 'Cloud',
-        'status' => 'connected',
+    $channel = Channel::query()->firstOrCreate(
+        ['workspace_id' => $user->workspace_id, 'type' => ChannelType::WhatsAppCloud],
+        ['name' => 'Cloud', 'status' => 'connected'],
+    );
+    $channel->forceFill([
         'config' => ['access_token' => 'channel-access-token', 'webhook_secret' => 'channel-webhook'],
-    ]);
+    ])->save();
     $thread = Thread::query()->create([
         'workspace_id' => $user->workspace_id,
         'contact_id' => $contact->id,
@@ -483,7 +484,7 @@ it('P timeout is classified without leaking internals', function () {
     config(['services.openai.key' => 'sk-test']);
     Http::fake([
         'api.openai.com/*' => function () {
-            throw new Illuminate\Http\Client\ConnectionException('cURL error 28: timed out');
+            throw new ConnectionException('cURL error 28: timed out');
         },
     ]);
 

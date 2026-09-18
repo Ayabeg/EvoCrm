@@ -2,6 +2,7 @@
 
 namespace App\Services\Ai;
 
+use App\Enums\ChannelType;
 use App\Models\Activity;
 use App\Models\Company;
 use App\Models\Contact;
@@ -16,11 +17,13 @@ use App\Models\WorkflowExecution;
 use App\Models\Workspace;
 use App\Services\Activation\WorkspaceActivationService;
 use App\Services\Crm\ActivityWorkQueueQuery;
-use App\Services\Crm\CommandSearch;
 use App\Services\Crm\DealAttentionEvaluator;
 use App\Services\Crm\DealBoardForecast;
 use App\Services\Crm\WorkflowExecutionRedactor;
 use App\Support\Integrations;
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -48,7 +51,6 @@ class AskEvoContextResolver
         private WorkspaceActivationService $activation,
         private DealAttentionEvaluator $attention,
         private ActivityWorkQueueQuery $workQueue,
-        private CommandSearch $search,
         private WorkflowExecutionRedactor $workflowRedactor,
     ) {}
 
@@ -89,12 +91,12 @@ class AskEvoContextResolver
         $labels = [];
 
         foreach (array_slice($hits, 0, self::SEARCH_HITS) as $hit) {
-            $labels[] = ($hit['type'] ?? 'record').': '.($hit['label'] ?? '');
+            $labels[] = $hit['type'].': '.$hit['label'];
         }
 
         $facts[] = [
             'label' => 'Matching records',
-            'value' => implode('; ', array_filter($labels)),
+            'value' => implode('; ', $labels),
         ];
 
         return new AskEvoContext(
@@ -158,8 +160,8 @@ class AskEvoContextResolver
                 $this->fact('Phone', $contact->phone_e164 ?? $contact->phone),
                 $this->fact('City', $contact->city),
                 $this->fact('Wilaya', $contact->wilaya),
-                $this->fact('Company', $contact->company?->name),
-                $this->fact('Owner', $contact->owner?->name),
+                $this->fact('Company', $this->relatedString($contact->company, 'name')),
+                $this->fact('Owner', $this->relatedString($contact->owner, 'name')),
                 $this->fact('Open deals', (string) $openDeals),
                 $this->fact('Latest deal', is_string($latestDeal) ? $latestDeal : null),
                 $this->fact('Last activity', $lastActivity),
@@ -209,7 +211,7 @@ class AskEvoContextResolver
                 $this->fact('Phone', $company->phone),
                 $this->fact('City', $company->city),
                 $this->fact('Wilaya', $company->wilaya),
-                $this->fact('Owner', $company->owner?->name),
+                $this->fact('Owner', $this->relatedString($company->owner, 'name')),
                 $this->fact('Contacts', (string) $contactCount),
                 $this->fact('Open deals', (string) $openDeals),
                 $this->fact('Latest deal', is_string($latestDeal) ? $latestDeal : null),
@@ -258,10 +260,10 @@ class AskEvoContextResolver
                 $this->fact('Amount', $amount),
                 $this->fact('Probability', $stage ? DealBoardForecast::probabilityFor($stage).'%' : null),
                 $this->fact('Contact', $deal->contact instanceof Contact ? $deal->contact->displayName() : null),
-                $this->fact('Company', $deal->company?->name),
-                $this->fact('Owner', $deal->owner?->name),
+                $this->fact('Company', $this->relatedString($deal->company, 'name')),
+                $this->fact('Owner', $this->relatedString($deal->owner, 'name')),
                 $this->fact('Next step', $deal->next_step),
-                $this->fact('Close date', $deal->close_date?->toDateString()),
+                $this->fact('Close date', $this->carbonDate($deal->close_date)),
                 $this->fact('Last activity', $this->latestActivityLine($workspace, 'deal_id', (int) $deal->id)),
             ]),
             $this->recordActions('deal', (int) $deal->id, $user),
@@ -285,24 +287,25 @@ class AskEvoContextResolver
 
         $quote->load(['deal:id,workspace_id,title']);
         $itemCount = $quote->items()->count();
+        $dealTitle = $this->relatedString($quote->deal, 'title');
         $total = number_format(((int) $quote->total_cents) / 100, 0, ',', ' ').' '.($quote->currency ?: 'DZD');
 
         return $this->ok(
             $user,
             AskEvoContextKind::Quote,
-            $quote->deal?->title ? 'Quote · '.$quote->deal->title : 'Quote #'.$quote->id,
+            $dealTitle ? 'Quote · '.$dealTitle : 'Quote #'.$quote->id,
             (int) $quote->id,
-            array_filter([
+            [
                 $this->fact('Status', (string) $quote->status),
                 $this->fact('Total', $total),
                 $this->fact('Currency', (string) ($quote->currency ?: 'DZD')),
-                $this->fact('Deal', $quote->deal?->title),
+                $this->fact('Deal', $dealTitle),
                 $this->fact('Line items', (string) $itemCount),
-                $this->fact('Sent at', $quote->sent_at?->toDateString()),
-                $this->fact('Accepted at', $quote->accepted_at?->toDateString()),
-                $this->fact('Expires at', $quote->expires_at?->toDateString()),
+                $this->fact('Sent at', $this->carbonDate($quote->sent_at)),
+                $this->fact('Accepted at', $this->carbonDate($quote->accepted_at)),
+                $this->fact('Expires at', $this->carbonDate($quote->expires_at)),
                 $this->fact('Revoked', $quote->revoked_at ? 'yes' : 'no'),
-            ]),
+            ],
             [[
                 'id' => 'open-quote',
                 'label' => 'Open quote',
@@ -342,7 +345,8 @@ class AskEvoContextResolver
             'contact:id,workspace_id,first_name,last_name',
         ]);
 
-        if ($thread->channel && (int) $thread->channel->workspace_id !== (int) $workspace->id) {
+        if ($thread->channel instanceof Model
+            && (int) $thread->channel->getAttribute('workspace_id') !== (int) $workspace->id) {
             return $this->unavailable(AskEvoContextKind::InboxConversation, 'unauthorized', 'This conversation is not available.');
         }
 
@@ -365,13 +369,13 @@ class AskEvoContextResolver
             ->map(function (Message $message): string {
                 $body = $this->redactor->redactText(mb_substr(trim((string) $message->body), 0, self::MESSAGE_CHARS));
 
-                return trim(($message->created_at?->toDateTimeString() ?? '').' '.$message->direction.' '.$body);
+                return trim(($this->carbonDateTime($message->created_at) ?? '').' '.$message->direction.' '.$body);
             })
             ->filter()
             ->implode(' | ');
 
-        $channelType = $thread->channel?->type;
-        $channelName = $thread->channel?->name;
+        $channelType = $thread->channel instanceof Model ? $thread->channel->getAttribute('type') : null;
+        $channelName = $this->relatedString($thread->channel, 'name');
 
         return $this->ok(
             $user,
@@ -382,7 +386,7 @@ class AskEvoContextResolver
                 $this->fact('Subject', $thread->subject),
                 $this->fact('Status', $thread->status),
                 $this->fact('Channel', $channelName),
-                $this->fact('Channel type', $channelType instanceof \App\Enums\ChannelType
+                $this->fact('Channel type', $channelType instanceof ChannelType
                     ? $channelType->value
                     : (is_string($channelType) ? $channelType : null)),
                 $this->fact('Contact', $contactLabel),
@@ -429,12 +433,12 @@ class AskEvoContextResolver
             array_filter([
                 $this->fact('Type', (string) $activity->type),
                 $this->fact('Subject', $activity->subject),
-                $this->fact('Due', $activity->due_at?->toDateTimeString()),
+                $this->fact('Due', $this->carbonDateTime($activity->due_at)),
                 $this->fact('Done', $activity->done ? 'yes' : 'no'),
-                $this->fact('Owner', $activity->owner?->name),
+                $this->fact('Owner', $this->relatedString($activity->owner, 'name')),
                 $this->fact('Contact', $activity->contact instanceof Contact ? $activity->contact->displayName() : null),
-                $this->fact('Deal', $activity->deal?->title),
-                $this->fact('Company', $activity->company?->name),
+                $this->fact('Deal', $this->relatedString($activity->deal, 'title')),
+                $this->fact('Company', $this->relatedString($activity->company, 'name')),
             ]),
             [[
                 'id' => 'open-activity',
@@ -474,7 +478,7 @@ class AskEvoContextResolver
             $error = $this->workflowRedactor->redactError($execution->error_summary);
 
             return trim(
-                ($execution->run_at?->toDateTimeString() ?? '').
+                ($this->carbonDateTime($execution->run_at) ?? '').
                 ' '.$execution->status.
                 ($error ? ' '.$error : ''),
             );
@@ -496,7 +500,7 @@ class AskEvoContextResolver
                 $this->fact('Action', (string) $workflow->action),
                 $this->fact('Condition', $condition),
                 $this->fact('Else action', $workflow->else_action),
-                $this->fact('Delay minutes', $workflow->delay_minutes !== null ? (string) $workflow->delay_minutes : null),
+                $this->fact('Delay minutes', (string) $workflow->delay_minutes),
                 $this->fact('Recent runs', $history !== '' ? $history : 'none'),
             ]),
             $user->canPermission('automation.manage') ? [[
@@ -525,15 +529,9 @@ class AskEvoContextResolver
 
         $attentionLabels = collect($attention)
             ->take(self::ATTENTION_LIMIT)
-            ->map(function (mixed $item): string {
-                if (! is_array($item)) {
-                    return '';
-                }
-
-                $title = isset($item['title']) && is_string($item['title']) ? $item['title'] : '';
-                $label = is_array($item['primary'] ?? null) && isset($item['primary']['label'])
-                    ? (string) $item['primary']['label']
-                    : '';
+            ->map(function (array $item): string {
+                $title = $item['title'];
+                $label = isset($item['primary']['label']) ? (string) $item['primary']['label'] : '';
 
                 return trim($title.($label !== '' ? ' ('.$label.')' : ''));
             })
@@ -541,7 +539,7 @@ class AskEvoContextResolver
             ->implode('; ');
 
         $first = trim(explode(' ', (string) $user->name, 2)[0]);
-        $counts = is_array($work['counts'] ?? null) ? $work['counts'] : [];
+        $counts = $work['counts'];
 
         return $this->ok(
             $user,
@@ -552,9 +550,9 @@ class AskEvoContextResolver
                 $this->fact('Greeting name', $first !== '' ? $first : null),
                 $this->fact('Open deals', (string) $openDeals),
                 $this->fact('Attention', $attentionLabels !== '' ? $attentionLabels : 'none'),
-                $this->fact('Overdue activities', (string) ($counts['overdue'] ?? 0)),
-                $this->fact('Today activities', (string) ($counts['today'] ?? 0)),
-                $this->fact('Upcoming activities', (string) ($counts['upcoming'] ?? 0)),
+                $this->fact('Overdue activities', (string) $counts['overdue']),
+                $this->fact('Today activities', (string) $counts['today']),
+                $this->fact('Upcoming activities', (string) $counts['upcoming']),
                 $this->fact('Activation complete', ! empty($activation['activated']) ? 'yes' : 'no'),
                 $this->fact('Activation progress', $this->activationProgress($activation)),
             ]),
@@ -692,7 +690,7 @@ class AskEvoContextResolver
         return $actions;
     }
 
-    private function latestActivityLine(Workspace $workspace, string $column, int $id): ?string
+    private function latestActivityLine(Workspace $workspace, string $column, int $id): string
     {
         $activity = Activity::query()
             ->forWorkspace($workspace)
@@ -706,16 +704,20 @@ class AskEvoContextResolver
 
         $label = trim((string) ($activity->subject ?: $activity->type));
 
-        return trim(($activity->created_at?->diffForHumans() ?? '').' '.$activity->type.' '.$label);
+        $when = $activity->created_at instanceof CarbonInterface
+            ? $activity->created_at->diffForHumans()
+            : '';
+
+        return trim($when.' '.$activity->type.' '.$label);
     }
 
     /**
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @return TModel|null
      */
-    private function findAuthorized(\Illuminate\Database\Eloquent\Builder $query, ?int $id, User $user): mixed
+    private function findAuthorized(Builder $query, ?int $id, User $user): mixed
     {
         if (! $id) {
             return null;
@@ -756,8 +758,37 @@ class AskEvoContextResolver
         return ['label' => $label, 'value' => $text];
     }
 
+    private function relatedString(mixed $related, string $attribute): ?string
+    {
+        if (! $related instanceof Model) {
+            return null;
+        }
+
+        $value = $related->getAttribute($attribute);
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    private function carbonDate(mixed $value): ?string
+    {
+        if ($value instanceof CarbonInterface) {
+            return $value->toDateString();
+        }
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    private function carbonDateTime(mixed $value): ?string
+    {
+        if ($value instanceof CarbonInterface) {
+            return $value->toDateTimeString();
+        }
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
     /**
-     * @param  list<array{label: string, value: string}>  $facts
+     * @param  array<int, array{label: string, value: string}|null>  $facts
      * @param  list<array{id: string, label: string, href: string}>  $actions
      */
     private function ok(
@@ -771,10 +802,19 @@ class AskEvoContextResolver
         ?string $unavailable = null,
         ?string $note = null,
     ): AskEvoContext {
-        $capabilities = collect(array_keys(config('permissions.capabilities', [])))
-            ->filter(fn (string $permission): bool => $user->canPermission($permission))
-            ->values()
-            ->all();
+        $capabilities = [];
+        foreach (array_keys(config('permissions.capabilities', [])) as $permission) {
+            if (is_string($permission) && $user->canPermission($permission)) {
+                $capabilities[] = $permission;
+            }
+        }
+
+        $clean = [];
+        foreach ($facts as $fact) {
+            if ($fact !== null) {
+                $clean[] = $fact;
+            }
+        }
 
         return new AskEvoContext(
             $kind,
@@ -782,7 +822,7 @@ class AskEvoContextResolver
             $this->scopeKey($kind, $entityId),
             $kind->requiresEntityId() ? $kind->value : null,
             $entityId,
-            $this->redactor->facts(array_values($facts)),
+            $this->redactor->facts($clean),
             $this->suggestions->for($kind, $capabilities),
             $actions,
             $grounding,
