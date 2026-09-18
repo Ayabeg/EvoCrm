@@ -72,6 +72,7 @@ export function SecretCallbackField({
 
         if (!url) {
             setError('Could not reveal the callback. Ask a workspace admin.');
+
             return;
         }
 
@@ -91,6 +92,7 @@ export function SecretCallbackField({
 
         if (!url) {
             setError('Could not copy the callback. Ask a workspace admin.');
+
             return;
         }
 
