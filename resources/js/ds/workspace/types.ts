@@ -49,7 +49,7 @@ export type DataWorkspaceChromeProps = {
     object: DataWorkspaceEntity;
     title: string;
     description?: string;
-    primaryAction: { label: string; onClick: () => void };
+    primaryAction?: { label: string; onClick: () => void };
 
     views: SavedView[];
     activeViewId?: string;

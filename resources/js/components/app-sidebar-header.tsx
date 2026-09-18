@@ -19,7 +19,11 @@ import { Input } from '@/components/ui/input';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
-import { COMMAND_FOCUS_OPEN_SUPPRESS_MS, shouldOpenCommandFromSearchFocus } from '@/lib/command-os';
+import {
+    COMMAND_FOCUS_OPEN_SUPPRESS_MS,
+    canCreateQuote,
+    shouldOpenCommandFromSearchFocus,
+} from '@/lib/command-os';
 import { t } from '@/lib/i18n';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
@@ -31,6 +35,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     const taskCount = Number(page.props.evoOpenTaskCount ?? 0);
     const initials = useInitials();
     const user = auth.user;
+    const capabilities = Array.isArray(auth.capabilities) ? auth.capabilities : [];
     const [paletteOpen, setPaletteOpen] = useState(false);
     const [tasksOpen, setTasksOpen] = useState(false);
     const suppressSearchFocusOpenRef = useRef(false);
@@ -135,9 +140,11 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                             <DropdownMenuItem asChild>
                                 <Link href="/crm/deals?create=1">{t('Deal')}</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/crm/quotes?create=1">{t('Quote')}</Link>
-                            </DropdownMenuItem>
+                            {canCreateQuote(capabilities) ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/crm/quotes?create=1">{t('Quote')}</Link>
+                                </DropdownMenuItem>
+                            ) : null}
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <div className="hidden min-[390px]:block" data-chrome="notify">

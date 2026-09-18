@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Crm;
 use App\Http\Controllers\Controller;
 use App\Models\Deal;
 use App\Models\Quote;
+use App\Models\User;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\QuoteDocument;
 use App\Services\Crm\QuoteMailer;
@@ -21,7 +22,9 @@ class QuoteController extends Controller
 {
     public function index(Request $request, CrmFilter $filter, CrmHub $hub): InertiaResponse
     {
-        $workspace = $request->user()->workspace;
+        /** @var User $user */
+        $user = $request->user();
+        $workspace = $user->workspace;
 
         $query = Quote::query()
             ->forWorkspace($workspace)
@@ -50,6 +53,9 @@ class QuoteController extends Controller
             'recordCount' => $paginator['total'],
             'paginator' => $paginator,
             'createOpen' => $request->boolean('create'),
+            'can' => [
+                'create' => $user->can('create', Quote::class),
+            ],
         ]);
     }
 
@@ -60,8 +66,11 @@ class QuoteController extends Controller
 
         $quote->load(['items', 'deal.owner:id,name', 'deal.contact:id,first_name,last_name,email', 'deal.company:id,name']);
 
+        /** @var User $user */
+        $user = $request->user();
+
         return Inertia::render('crm/quotes/show', [
-            'quote' => $this->presentRecord($quote),
+            'quote' => $this->presentRecord($quote, $user),
         ]);
     }
 
@@ -228,7 +237,7 @@ class QuoteController extends Controller
     /**
      * @return array<string, mixed>
      */
-    protected function presentRecord(Quote $quote): array
+    protected function presentRecord(Quote $quote, User $user): array
     {
         return [
             'id' => $quote->id,
@@ -245,6 +254,9 @@ class QuoteController extends Controller
             'revoked_at' => $quote->revoked_at?->toIso8601String(),
             'public_url' => $quote->tokenIsUsable() ? url('/q/'.$quote->public_token) : null,
             'immutable' => $quote->isImmutable(),
+            'can' => [
+                'update' => $user->can('update', $quote),
+            ],
             'owner' => $quote->deal?->owner ? [
                 'id' => $quote->deal->owner->id,
                 'name' => $quote->deal->owner->name,
