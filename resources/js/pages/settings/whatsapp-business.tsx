@@ -21,9 +21,11 @@ type Channel = {
 export default function WhatsAppBusinessSettings({
     channel,
     facebook_url,
+    can_configure = true,
 }: {
     channel: Channel;
     facebook_url: string;
+    can_configure?: boolean;
 }) {
     return (
         <>
@@ -31,7 +33,7 @@ export default function WhatsAppBusinessSettings({
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="WhatsApp Business"
-                    description="Continue with Facebook. Evolution connects WhatsApp Business automatically. No phone-number ID to type."
+                    description="WhatsApp Cloud via Evolution. Separate from personal WhatsApp. Disconnect removes the Cloud instance. Meta login and inbox messages stay."
                 />
 
                 {!channel.connected ? (
@@ -60,13 +62,18 @@ export default function WhatsAppBusinessSettings({
                     <p className="text-sm">{channel.message}</p>
 
                     <div className="flex flex-wrap gap-2">
-                        {!channel.connected ? (
+                        {can_configure && !channel.connected ? (
                             <BrandConnectButtons facebookUrl={facebook_url} />
                         ) : null}
-                        {channel.connected ? (
+                        {can_configure && channel.connected ? (
                             <Form
                                 action="/settings/whatsapp-business"
                                 method="delete"
+                                onBefore={() =>
+                                    window.confirm(
+                                        'Disconnect WhatsApp Business from this workspace? The Cloud instance and stored credentials are removed. Existing inbox messages stay. Meta OAuth is not disconnected. You can reconnect later.',
+                                    )
+                                }
                             >
                                 {({ processing }) => (
                                     <Button

@@ -17,7 +17,11 @@ export default function ChannelSettings({
     inboxUrl,
 }: {
     channels: { id: number; name: string; type: string; status: string }[];
-    evolution: { connected: boolean };
+    evolution: {
+        connected: boolean;
+        last_webhook_at?: string | null;
+        last_event?: string | null;
+    };
     inboxUrl: string;
 }) {
     const { features } = useSimpleMode();
@@ -106,22 +110,31 @@ export default function ChannelSettings({
                                     </div>
                                     <Badge
                                         variant={
-                                            channel.status === 'connected' ||
-                                            evolution.connected
+                                            channel.status === 'connected'
                                                 ? 'default'
                                                 : 'secondary'
                                         }
                                     >
-                                        {channel.type === 'whatsapp_cloud' &&
-                                        evolution.connected
-                                            ? 'connected'
-                                            : channel.status}
+                                        {channel.status === 'connected'
+                                            ? 'Connected'
+                                            : channel.status === 'not_connected'
+                                              ? 'Not connected'
+                                              : channel.status}
                                     </Badge>
                                 </li>
                             ))}
                         </ul>
                     </SettingsCard>
                 )}
+                {evolution.last_webhook_at ? (
+                    <p className="min-w-0 truncate text-[12px] text-mute">
+                        Last Evolution event{' '}
+                        {evolution.last_event ?? 'received'} ·{' '}
+                        {new Date(evolution.last_webhook_at).toLocaleString(
+                            'en-GB',
+                        )}
+                    </p>
+                ) : null}
             </div>
         </>
     );

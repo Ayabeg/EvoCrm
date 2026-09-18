@@ -30,15 +30,27 @@ class AppsController extends Controller
         $mailboxes = Mailbox::query()->forWorkspace($workspace)->count();
         $phone = $whatsapp->phoneStatus($workspace);
         $business = $whatsapp->provisionBusinessIfReady($workspace);
+        $phoneIntegration = $workspace->integration(Integration::PROVIDER_WHATSAPP);
+        $businessIntegration = $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS);
+        $phoneConnected = ($phoneIntegration?->isConnected() ?? false) || (bool) ($phone['connected'] ?? false);
+        $businessConnected = ($businessIntegration?->isConnected() ?? false) || (bool) ($business['connected'] ?? false);
+        $metaConnected = ($meta?->isConnected() ?? false) || ($instagram?->isConnected() ?? false);
+        $gmail = $workspace->integration(Integration::PROVIDER_GMAIL);
+        $calendar = $workspace->integration(Integration::PROVIDER_GOOGLE_CALENDAR);
+        $googleWorkspaceConnected = ($gmail?->isConnected() ?? false) || ($calendar?->isConnected() ?? false);
+        $canConfigure = $request->user()->canPermission('settings.integrations');
 
         return Inertia::render('settings/apps/index', [
+            'can_configure' => $canConfigure,
             'apps' => [
                 [
                     'key' => Integration::PROVIDER_META,
                     'name' => 'Meta',
                     'tagline' => 'Log in with Facebook to connect Pages, Instagram, WhatsApp, and Ads.',
-                    'connected' => ($meta?->isConnected() ?? false) || ($instagram?->isConnected() ?? false),
+                    'connected' => $metaConnected,
+                    'status' => $metaConnected ? 'connected' : 'not_connected',
                     'configured' => MetaAuth::enabled(),
+                    'account_label' => $meta?->meta['name'] ?? $meta?->meta['email'] ?? null,
                     'connected_at' => $meta?->connected_at?->toIso8601String()
                         ?? $instagram?->connected_at?->toIso8601String(),
                     'connect_url' => '/auth/meta?popup=1',
@@ -55,13 +67,14 @@ class AppsController extends Controller
                 [
                     'key' => Integration::PROVIDER_WHATSAPP,
                     'name' => 'WhatsApp',
-                    'tagline' => 'Continue with Facebook. Evolution connects WhatsApp automatically — no QR or API key.',
-                    'connected' => (bool) (($business['connected'] ?? false) || ($phone['connected'] ?? false)),
+                    'tagline' => 'Personal WhatsApp via Evolution (Baileys). Separate from WhatsApp Business Cloud.',
+                    'connected' => $phoneConnected,
+                    'status' => $phoneConnected ? 'connected' : 'not_connected',
                     'configured' => MetaAuth::enabled(),
-                    'connected_at' => $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS)?->connected_at?->toIso8601String()
-                        ?? $workspace->integration(Integration::PROVIDER_WHATSAPP)?->connected_at?->toIso8601String(),
+                    'account_label' => $phone['display_phone'] ?? $phoneIntegration?->meta['display_phone'] ?? null,
+                    'connected_at' => $phoneIntegration?->connected_at?->toIso8601String(),
                     'connect_url' => '/auth/meta?popup=1',
-                    'manage_url' => '/settings/whatsapp-business',
+                    'manage_url' => '/settings/whatsapp',
                     'popup' => true,
                     'unlocks' => [],
                     'setup_url' => '/settings/setup/start?step=whatsapp',
@@ -69,10 +82,12 @@ class AppsController extends Controller
                 [
                     'key' => Integration::PROVIDER_WHATSAPP_BUSINESS,
                     'name' => 'WhatsApp Business',
-                    'tagline' => 'Continue with Facebook. Evolution creates the Cloud instance — no phone-number ID to type.',
-                    'connected' => (bool) ($business['connected'] ?? false),
+                    'tagline' => 'WhatsApp Cloud via Evolution. Requires Facebook login — no phone-number ID to type.',
+                    'connected' => $businessConnected,
+                    'status' => $businessConnected ? 'connected' : 'not_connected',
                     'configured' => MetaAuth::enabled(),
-                    'connected_at' => $workspace->integration(Integration::PROVIDER_WHATSAPP_BUSINESS)?->connected_at?->toIso8601String(),
+                    'account_label' => $business['display_phone'] ?? $business['verified_name'] ?? $businessIntegration?->meta['display_phone'] ?? null,
+                    'connected_at' => $businessIntegration?->connected_at?->toIso8601String(),
                     'connect_url' => '/auth/meta?popup=1',
                     'manage_url' => '/settings/whatsapp-business',
                     'popup' => true,
@@ -81,10 +96,13 @@ class AppsController extends Controller
                 [
                     'key' => 'google',
                     'name' => 'Google',
-                    'tagline' => 'Sign in with Google. Gmail and Calendar are official connectors on this same OAuth client.',
-                    'connected' => GoogleAuth::enabled(),
+                    'tagline' => 'Gmail and Calendar connectors on the existing Google OAuth client.',
+                    'connected' => $googleWorkspaceConnected,
+                    'status' => $googleWorkspaceConnected ? 'connected' : 'not_connected',
                     'configured' => GoogleAuth::enabled(),
-                    'connected_at' => null,
+                    'account_label' => $gmail?->meta['google_email'] ?? $calendar?->meta['google_email'] ?? null,
+                    'connected_at' => $gmail?->connected_at?->toIso8601String()
+                        ?? $calendar?->connected_at?->toIso8601String(),
                     'connect_url' => null,
                     'manage_url' => '/settings/connectors',
                     'setup_url' => '/settings/setup/start?step=google',
@@ -97,7 +115,9 @@ class AppsController extends Controller
                     'name' => 'Email / SMTP',
                     'tagline' => 'Official SMTP + IMAP mailboxes power the outbound department.',
                     'connected' => $mailboxes > 0,
+                    'status' => $mailboxes > 0 ? 'connected' : 'not_connected',
                     'configured' => true,
+                    'account_label' => $mailboxes > 0 ? $mailboxes.' mailbox'.($mailboxes === 1 ? '' : 'es') : null,
                     'connected_at' => null,
                     'connect_url' => null,
                     'manage_url' => '/outbound/mailboxes',
@@ -146,6 +166,8 @@ class AppsController extends Controller
 
     public function destroyMeta(Request $request): RedirectResponse
     {
+        abort_unless($request->user()?->role->canManageSettings(), 403);
+
         $workspace = $request->user()->workspace;
         $workspace->integration(Integration::PROVIDER_META)?->delete();
         $workspace->integration(Integration::PROVIDER_INSTAGRAM)?->delete();

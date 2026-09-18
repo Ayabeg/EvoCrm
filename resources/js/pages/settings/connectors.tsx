@@ -18,9 +18,11 @@ import type { GoogleWorkspaceConnector, OfficialDeskConnector } from '@/types';
 function GoogleConnectorCard({
     connector,
     googleEnabled,
+    canConfigure,
 }: {
     connector: GoogleWorkspaceConnector;
     googleEnabled: boolean;
+    canConfigure: boolean;
 }) {
     const Icon =
         connector.provider === 'gmail' ? EnvelopeSimple : CalendarBlank;
@@ -49,13 +51,13 @@ function GoogleConnectorCard({
                         title="Reconnect Google"
                         description="Add Calendar and Gmail scopes on the existing OAuth client."
                         action={
-                            connector.reconnect_url ? (
+                            canConfigure && connector.reconnect_url ? (
                                 <Button asChild size="sm">
                                     <a href={connector.reconnect_url}>
                                         Reconnect Google
                                     </a>
                                 </Button>
-                            ) : (
+                            ) : canConfigure ? (
                                 <Form
                                     action="/settings/connectors"
                                     method="post"
@@ -69,23 +71,30 @@ function GoogleConnectorCard({
                                             />
                                             <Button
                                                 size="sm"
-                                                disabled={processing}
+                                                disabled={
+                                                    processing || !canConfigure
+                                                }
                                             >
                                                 Save {connector.name} intent
                                             </Button>
                                         </>
                                     )}
                                 </Form>
-                            )
+                            ) : undefined
                         }
                     />
                 ) : null}
 
                 {connector.sync ? (
-                    <div className="aurora-text-caption rounded-[var(--radius-1)] border border-hairline bg-canvas-soft p-3 text-muted-foreground">
-                        <p className="font-medium text-foreground">
+                    <div className="rounded-[4px] border border-hairline bg-canvas-soft p-3 text-[12px] text-mute">
+                        <p className="font-medium text-ink">
                             Sync {connector.sync.status}
                         </p>
+                        {connector.account_label ? (
+                            <p className="min-w-0 truncate text-ink">
+                                {connector.account_label}
+                            </p>
+                        ) : null}
                         <p>
                             {connector.sync.last_synced_at
                                 ? `Last sync ${connector.sync.last_synced_at}`
@@ -104,7 +113,7 @@ function GoogleConnectorCard({
                     </div>
                 ) : null}
 
-                {!showReconnectEmpty ? (
+                {!showReconnectEmpty && canConfigure ? (
                     <div className="flex flex-wrap items-center gap-2">
                         <Form action="/settings/connectors" method="post">
                             {({ processing }) => (
@@ -176,12 +185,14 @@ export default function ConnectorsSettings({
     googleOrigin,
     deskConnectors,
     googleConnectors,
+    can_configure = true,
 }: {
     googleEnabled: boolean;
     googleCallback: string;
     googleOrigin: string;
     deskConnectors: OfficialDeskConnector[];
     googleConnectors: GoogleWorkspaceConnector[];
+    can_configure?: boolean;
 }) {
     const gmail = googleConnectors.find(
         (connector) => connector.provider === 'gmail',
@@ -193,12 +204,14 @@ export default function ConnectorsSettings({
             <div className="space-y-4">
                 <SettingsPageHeader
                     title="Connectors"
-                    description="Official Gmail and Calendar on the existing Google OAuth client. Desk channels stay official Meta Cloud only."
+                    description="Configured instances for this workspace. Apps are the products. Connectors are the accounts and sync jobs. Desk channels stay official Meta Cloud only."
                 />
 
                 <section className="space-y-3">
-                    <h2 className="aurora-text-section">Google</h2>
-                    <p className="aurora-text-caption text-muted-foreground">
+                    <h2 className="text-[13px] font-semibold tracking-wide text-ink uppercase">
+                        Google
+                    </h2>
+                    <p className="text-[12px] text-mute">
                         Authorized JavaScript origin{' '}
                         <code className="font-mono break-all text-brand">
                             {googleOrigin}
@@ -242,16 +255,17 @@ export default function ConnectorsSettings({
                                 key={connector.provider}
                                 connector={connector}
                                 googleEnabled={googleEnabled}
+                                canConfigure={can_configure}
                             />
                         ))
                     )}
                 </section>
 
                 <section className="space-y-3">
-                    <h2 className="aurora-text-section">
+                    <h2 className="text-[13px] font-semibold tracking-wide text-ink uppercase">
                         Official Desk channels
                     </h2>
-                    <p className="aurora-text-caption text-muted-foreground">
+                    <p className="text-[12px] text-mute">
                         Connect from{' '}
                         <Link href="/inbox" className="font-medium text-brand">
                             My Inbox
@@ -277,10 +291,10 @@ export default function ConnectorsSettings({
                                             )}
                                         </span>
                                         <div>
-                                            <p className="aurora-text-ui font-medium">
+                                            <p className="min-w-0 truncate text-[14px] font-medium text-ink">
                                                 {connector.name}
                                             </p>
-                                            <p className="aurora-text-caption text-muted-foreground">
+                                            <p className="min-w-0 text-[12px] text-mute">
                                                 {connector.tagline}
                                             </p>
                                         </div>

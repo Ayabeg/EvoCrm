@@ -7,9 +7,9 @@ import {
     SettingsEmptyState,
     SettingsPageHeader,
 } from '@/components/settings/chrome';
+import { SecretCallbackField } from '@/components/settings/secret-callback-field';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
 type Mapping = { meta_field: string; crm_property: string };
@@ -47,6 +47,8 @@ function metric(
 
 export default function MetaSettings({
     connected,
+    status,
+    account_label,
     ad_account_id_set,
     ad_accounts,
     selected_ad_account_id,
@@ -54,7 +56,8 @@ export default function MetaSettings({
     can_manage,
     graph_version,
     expires_at,
-    webhook_url,
+    last_sync_at,
+    webhook_callback,
     pages,
     instagram_accounts,
     forms,
@@ -68,6 +71,8 @@ export default function MetaSettings({
     connect_url,
 }: {
     connected: boolean;
+    status?: 'connected' | 'not_connected' | 'needs_attention';
+    account_label?: string | null;
     ad_account_id_set: boolean;
     ad_accounts: { id: string; name: string }[];
     selected_ad_account_id: string | null;
@@ -75,7 +80,14 @@ export default function MetaSettings({
     can_manage: boolean;
     graph_version: string;
     expires_at: string | null;
-    webhook_url: string;
+    last_sync_at?: string | null;
+    webhook_callback: {
+        configured: boolean;
+        masked_url: string;
+        can_reveal: boolean;
+        reveal_url: string;
+        last_received_at?: string | null;
+    };
     pages: { id: string; name: string }[];
     instagram_accounts: { id: string; name: string }[];
     forms: { id: number; name: string; status: string; external_id: string }[];
@@ -127,11 +139,28 @@ export default function MetaSettings({
 
                 <SettingsCard title="Connection">
                     <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant={connected ? 'default' : 'secondary'}>
-                            {connected ? 'Connected' : 'Needs setup'}
+                        <Badge
+                            variant={
+                                status === 'needs_attention'
+                                    ? 'destructive'
+                                    : connected
+                                      ? 'default'
+                                      : 'secondary'
+                            }
+                        >
+                            {status === 'needs_attention'
+                                ? 'Needs attention'
+                                : connected
+                                  ? 'Connected'
+                                  : 'Not connected'}
                         </Badge>
+                        {account_label ? (
+                            <span className="min-w-0 truncate text-[13px] text-mute">
+                                {account_label}
+                            </span>
+                        ) : null}
                         {expires_at ? (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-[12px] text-mute">
                                 Token expires{' '}
                                 {new Date(expires_at).toLocaleDateString(
                                     'en-GB',
@@ -139,12 +168,17 @@ export default function MetaSettings({
                             </span>
                         ) : null}
                     </div>
-                    <p>
+                    <p className="text-[13px] text-ink">
                         Ad account:{' '}
                         {ad_account_id_set ? 'selected' : 'choose after login'}
                     </p>
-                    <p>Graph version: {graph_version}</p>
-                    {reason ? <p className="text-brand">{reason}</p> : null}
+                    <p className="text-[13px] text-mute">
+                        Graph version: {graph_version}
+                        {last_sync_at
+                            ? ` · Last successful sync ${new Date(last_sync_at).toLocaleString('en-GB')}`
+                            : ' · No successful sync yet'}
+                    </p>
+                    {reason ? <p className="text-[13px] text-brand">{reason}</p> : null}
                     {!connected && can_manage ? (
                         <div className="pt-2">
                             <BrandConnectButtons
@@ -168,8 +202,7 @@ export default function MetaSettings({
                 </SettingsCard>
 
                 {ad_accounts.length > 0 ? (
-                    <Card className="space-y-4 p-4">
-                        <h2 className="text-sm font-semibold">Ad accounts</h2>
+                    <SettingsCard title="Ad accounts">
                         <Form action="/settings/meta/ad-account" method="put">
                             {({ processing, errors }) => (
                                 <div className="space-y-3">
@@ -217,12 +250,12 @@ export default function MetaSettings({
                         </Form>
                         <div className="grid gap-3 text-sm md:grid-cols-2">
                             <div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase">
+                                <p className="text-[11px] font-medium text-mute uppercase">
                                     Pages
                                 </p>
                                 <ul className="mt-1 list-inside list-disc">
                                     {pages.length === 0 ? (
-                                        <li className="text-muted-foreground">
+                                        <li className="text-mute">
                                             None
                                         </li>
                                     ) : null}
@@ -232,12 +265,12 @@ export default function MetaSettings({
                                 </ul>
                             </div>
                             <div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase">
+                                <p className="text-[11px] font-medium text-mute uppercase">
                                     Instagram
                                 </p>
                                 <ul className="mt-1 list-inside list-disc">
                                     {instagram_accounts.length === 0 ? (
-                                        <li className="text-muted-foreground">
+                                        <li className="text-mute">
                                             None
                                         </li>
                                     ) : null}
@@ -247,22 +280,16 @@ export default function MetaSettings({
                                 </ul>
                             </div>
                         </div>
-                    </Card>
+                    </SettingsCard>
                 ) : null}
 
-                <Card className="space-y-3 p-4">
-                    <h2 className="text-sm font-semibold">
-                        Lead forms & webhook
-                    </h2>
-                    <p className="text-xs text-muted-foreground">
-                        Subscribe the Meta app to <code>leadgen</code> on this
-                        callback. The workspace key is the tenant identity.
-                    </p>
-                    <code className="block rounded-md bg-canvas-soft px-3 py-2 text-xs break-all">
-                        {webhook_url}
-                    </code>
+                <SettingsCard
+                    title="Lead forms & webhook"
+                    description="Subscribe the Meta app to leadgen on this callback. The workspace key is a tenant routing secret."
+                >
+                    <SecretCallbackField callback={webhook_callback} />
                     {forms.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-[13px] text-mute">
                             No forms synced yet.
                         </p>
                     ) : (
@@ -280,14 +307,12 @@ export default function MetaSettings({
                             ))}
                         </ul>
                     )}
-                </Card>
+                </SettingsCard>
 
-                <Card className="space-y-4 p-4">
-                    <h2 className="text-sm font-semibold">Field mapping</h2>
-                    <p className="text-xs text-muted-foreground">
-                        Map Meta form fields to EvoSales properties. Unmapped
-                        custom fields stay on the lead payload.
-                    </p>
+                <SettingsCard
+                    title="Field mapping"
+                    description="Map Meta form fields to EvoSales properties. Unmapped custom fields stay on the lead payload."
+                >
                     <Form
                         action="/settings/meta/mappings"
                         method="put"
@@ -359,14 +384,12 @@ export default function MetaSettings({
                             </div>
                         )}
                     </Form>
-                </Card>
+                </SettingsCard>
 
-                <Card className="space-y-4 p-4">
-                    <h2 className="text-sm font-semibold">Conversions API</h2>
-                    <p className="text-xs text-muted-foreground">
-                        CRM lifecycle events map to Meta standard events. Email
-                        and phone are hashed before send.
-                    </p>
+                <SettingsCard
+                    title="Conversions API"
+                    description="CRM lifecycle events map to Meta standard events. Email and phone are hashed before send."
+                >
                     <Form action="/settings/meta/conversions" method="put">
                         {({ processing }) => (
                             <div className="space-y-3">
@@ -469,10 +492,9 @@ export default function MetaSettings({
                             </div>
                         )}
                     </Form>
-                </Card>
+                </SettingsCard>
 
-                <Card className="space-y-3 p-4">
-                    <h2 className="text-sm font-semibold">Sync</h2>
+                <SettingsCard title="Sync">
                     <div className="flex flex-wrap gap-2">
                         {[
                             { kind: 'ads', label: 'Ads hierarchy' },
@@ -505,7 +527,7 @@ export default function MetaSettings({
                             </Form>
                         ))}
                     </div>
-                    <ul className="space-y-1 text-xs text-muted-foreground">
+                    <ul className="space-y-1 text-[12px] text-mute">
                         {sync_runs.length === 0 ? (
                             <li>No sync runs yet.</li>
                         ) : null}
@@ -516,17 +538,15 @@ export default function MetaSettings({
                             </li>
                         ))}
                     </ul>
-                </Card>
+                </SettingsCard>
 
-                <Card className="space-y-3 p-4">
-                    <h2 className="text-sm font-semibold">Logs</h2>
-                    <p className="text-xs text-muted-foreground">
-                        Webhook and conversion outcomes. Payloads are stored
-                        without tokens.
-                    </p>
+                <SettingsCard
+                    title="Logs"
+                    description="Webhook and conversion outcomes. Payloads are stored without tokens."
+                >
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <p className="text-xs font-medium text-muted-foreground uppercase">
+                            <p className="text-[11px] font-medium text-mute uppercase">
                                 Webhooks
                             </p>
                             <ul className="mt-1 space-y-1 text-xs">
@@ -542,7 +562,7 @@ export default function MetaSettings({
                             </ul>
                         </div>
                         <div>
-                            <p className="text-xs font-medium text-muted-foreground uppercase">
+                            <p className="text-[11px] font-medium text-mute uppercase">
                                 Conversions
                             </p>
                             <ul className="mt-1 space-y-1 text-xs">
@@ -558,7 +578,7 @@ export default function MetaSettings({
                             </ul>
                         </div>
                     </div>
-                </Card>
+                </SettingsCard>
             </div>
         </>
     );

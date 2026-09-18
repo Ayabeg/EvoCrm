@@ -23,6 +23,7 @@ class SmsSettingsController extends Controller
 
         return Inertia::render('settings/sms', [
             'connected' => $integration?->isConnected() ?? false,
+            'status' => ($integration?->isConnected() ?? false) ? 'connected' : 'not_connected',
             'key_set' => filled($integration?->access_token),
             'driver' => $meta['driver'] ?? config('sms.driver', 'http'),
             'url' => $meta['url'] ?? config('sms.http.url'),

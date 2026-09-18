@@ -92,8 +92,8 @@ export default function MetaApp({
                     <p>
                         <span className="text-muted-foreground">Token:</span>{' '}
                         {integration.long_lived
-                            ? 'long-lived, stored encrypted'
-                            : 'short-lived, stored encrypted'}
+                            ? 'Configured · long-lived, stored encrypted'
+                            : 'Configured · short-lived, stored encrypted'}
                         {integration.expires_at
                             ? ` — expires ${formatDate(integration.expires_at)}`
                             : ''}

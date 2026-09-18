@@ -17,6 +17,7 @@ class WhatsAppController extends Controller
         return Inertia::render('settings/whatsapp', [
             'channel' => $whatsapp->phoneStatus($request->user()->workspace),
             'facebook_url' => '/auth/meta?popup=1',
+            'can_configure' => $request->user()->canPermission('settings.integrations'),
         ]);
     }
 
@@ -41,6 +42,8 @@ class WhatsAppController extends Controller
 
     public function destroy(Request $request, WhatsAppConnector $whatsapp): RedirectResponse
     {
+        abort_unless($request->user()?->role->canManageSettings(), 403);
+
         $whatsapp->disconnectPhone($request->user()->workspace);
 
         Inertia::flash('toast', [
@@ -56,6 +59,7 @@ class WhatsAppController extends Controller
         return Inertia::render('settings/whatsapp-business', [
             'channel' => $whatsapp->provisionBusinessIfReady($request->user()->workspace),
             'facebook_url' => '/auth/meta?popup=1',
+            'can_configure' => $request->user()->canPermission('settings.integrations'),
         ]);
     }
 
@@ -73,6 +77,8 @@ class WhatsAppController extends Controller
 
     public function destroyBusiness(Request $request, WhatsAppConnector $whatsapp): RedirectResponse
     {
+        abort_unless($request->user()?->role->canManageSettings(), 403);
+
         $whatsapp->disconnectBusiness($request->user()->workspace);
 
         Inertia::flash('toast', [
