@@ -82,23 +82,31 @@ it('rebuilds the quotes list as HubSpot-dense Wave 1 chrome on the locked triad'
         ->and($config)->toContain("'quote' =>");
 });
 
-it('rebuilds the quote record as a 3-pane triad hub', function () {
+it('rebuilds the quote record as a split document/properties builder', function () {
     $show = file_get_contents(resource_path('js/pages/crm/quotes/show.tsx'));
+    $builder = file_get_contents(resource_path('js/pages/crm/quotes/quote-split-builder.tsx'));
 
     expect($show)->toContain('data-crm="quotes-record"')
         ->and($show)->toContain('RecordPageFrame')
-        ->and($show)->toContain('RecordIdentity')
-        ->and($show)->toContain('RecordShell')
-        ->and($show)->toContain('leftLabel="About"')
-        ->and($show)->toContain('centerLabel="Lines"')
-        ->and($show)->toContain('rightLabel="Related"')
+        ->and($show)->toContain('QuoteSplitBuilder')
         ->and($show)->toContain('Preview PDF')
-        ->and($show)->toContain('No line items')
+        ->and($show)->not->toContain('RecordShell')
+        ->and($show)->not->toContain('leftLabel="About"')
         ->and($show)->not->toContain('HubSpot')
         ->and($show)->not->toContain('Breeze')
         ->and($show)->not->toContain('Copilot')
         ->and($show)->not->toContain('#00A4BD')
         ->and($show)->not->toContain('#0176D3');
+
+    expect($builder)->toContain('data-quote="split-builder"')
+        ->and($builder)->toContain('data-quote="document"')
+        ->and($builder)->toContain('data-quote="properties"')
+        ->and($builder)->toContain('No line items')
+        ->and($builder)->toContain('quoteSendAction')
+        ->and($builder)->toContain('quoteRevokeAction')
+        ->and($builder)->not->toContain('HubSpot')
+        ->and($builder)->not->toContain('#00A4BD')
+        ->and($builder)->not->toContain('#0176D3');
 });
 
 it('rebuilds the public accept page as a paper lockup without rewriting QuoteAcceptor', function () {
