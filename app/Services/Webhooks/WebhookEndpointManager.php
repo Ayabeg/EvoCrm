@@ -81,7 +81,14 @@ class WebhookEndpointManager
             return $url;
         }
 
-        $path = (string) preg_replace('#(/webhooks/[^/]+/)[^/]+$#', '$1••••••••', $parts['path']);
+        $segments = explode('/', $parts['path']);
+        $last = array_key_last($segments);
+
+        if ($last !== null && $segments[$last] !== '') {
+            $segments[$last] = '••••••••';
+        }
+
+        $path = implode('/', $segments);
         $port = isset($parts['port']) ? ':'.$parts['port'] : '';
 
         return $parts['scheme'].'://'.$parts['host'].$port.$path;
