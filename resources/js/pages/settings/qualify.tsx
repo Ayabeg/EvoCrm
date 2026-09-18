@@ -22,10 +22,10 @@ export default function QualifySettings({
 }) {
     return (
         <>
-            <Head title="Qualify" />
+            <Head title="Qualification" />
 
             <SettingsPageHeader
-                title="Qualify"
+                title="Qualification"
                 description="Formula lead score thresholds. Crossing qualify marks the lead. Crossing convert uses the existing convert path."
             />
 
