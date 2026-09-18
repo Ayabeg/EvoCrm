@@ -384,6 +384,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
         Route::put('/settings/meta/mappings', [MetaSettingsController::class, 'updateMappings'])->name('settings.meta.mappings');
         Route::put('/settings/meta/conversions', [MetaSettingsController::class, 'updateConversions'])->name('settings.meta.conversions');
         Route::post('/settings/meta/sync', [MetaSettingsController::class, 'sync'])->name('settings.meta.sync');
+        Route::post('/settings/meta/webhook-url', [MetaSettingsController::class, 'revealWebhook'])->name('settings.meta.webhook-url');
         Route::get('/settings/record-layouts', [RecordLayoutSettingsController::class, 'index'])->name('settings.record-layouts');
         Route::post('/settings/pipelines', [PipelineController::class, 'store'])->name('settings.pipelines.store');
         Route::patch('/settings/pipelines/{pipeline}', [PipelineController::class, 'update'])->name('settings.pipelines.update');

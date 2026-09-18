@@ -62,7 +62,13 @@ function AppLogo({ appKey }: { appKey: string }) {
     );
 }
 
-function AppCard({ app }: { app: MarketplaceApp }) {
+function AppCard({
+    app,
+    canConfigure,
+}: {
+    app: MarketplaceApp;
+    canConfigure: boolean;
+}) {
     return (
         <SettingsCard>
             <div className="flex items-start gap-3">
@@ -73,12 +79,27 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                             {app.name}
                         </h3>
                         <Badge
-                            variant={app.connected ? 'default' : 'secondary'}
+                            variant={
+                                app.status === 'needs_attention'
+                                    ? 'destructive'
+                                    : app.connected
+                                      ? 'default'
+                                      : 'secondary'
+                            }
                         >
-                            {app.connected ? 'Connected' : 'Not connected'}
+                            {app.status === 'needs_attention'
+                                ? 'Needs attention'
+                                : app.connected
+                                  ? 'Connected'
+                                  : 'Not connected'}
                         </Badge>
                     </div>
                     <p className="mt-1 text-[13px] text-mute">{app.tagline}</p>
+                    {app.account_label ? (
+                        <p className="mt-1 min-w-0 truncate text-[12px] text-ink">
+                            {app.account_label}
+                        </p>
+                    ) : null}
 
                     {!app.connected ? (
                         <p
@@ -152,9 +173,10 @@ function AppCard({ app }: { app: MarketplaceApp }) {
                     )}
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">
-                        {(app.key === 'meta' ||
-                            app.key === 'whatsapp' ||
-                            app.key === 'whatsapp_business') &&
+                        {canConfigure &&
+                            (app.key === 'meta' ||
+                                app.key === 'whatsapp' ||
+                                app.key === 'whatsapp_business') &&
                             !app.connected && (
                                 <BrandConnectButtons
                                     facebookUrl={app.connect_url}
@@ -198,7 +220,13 @@ function AppCard({ app }: { app: MarketplaceApp }) {
     );
 }
 
-export default function AppsMarketplace({ apps }: { apps: MarketplaceApp[] }) {
+export default function AppsMarketplace({
+    apps,
+    can_configure = true,
+}: {
+    apps: MarketplaceApp[];
+    can_configure?: boolean;
+}) {
     const connectedCount = apps.filter((app) => app.connected).length;
 
     return (
@@ -206,7 +234,7 @@ export default function AppsMarketplace({ apps }: { apps: MarketplaceApp[] }) {
             <Head title="Apps" />
             <SettingsPageHeader
                 title="Apps"
-                description="Continue with Facebook. WhatsApp connects automatically. You never enter an App ID, token, or API key."
+                description="Product connections for this workspace. Status is Connected when a configuration exists — not a live health probe."
             >
                 <Button
                     asChild
@@ -240,7 +268,11 @@ export default function AppsMarketplace({ apps }: { apps: MarketplaceApp[] }) {
                         />
                     ) : null}
                     {apps.map((app) => (
-                        <AppCard key={app.key} app={app} />
+                        <AppCard
+                            key={app.key}
+                            app={app}
+                            canConfigure={can_configure}
+                        />
                     ))}
                 </div>
             )}

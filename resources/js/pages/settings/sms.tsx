@@ -234,9 +234,22 @@ export default function SmsSettings({
                 </Form>
 
                 {connected ? (
-                    <Form action="/settings/sms" method="delete">
+                    <Form
+                        action="/settings/sms"
+                        method="delete"
+                        onBefore={() =>
+                            window.confirm(
+                                'Disconnect the SMS gateway? Stored API credentials are deleted. Sent messages stay. Sequences will not send SMS until you save a gateway again.',
+                            )
+                        }
+                    >
                         {({ processing }) => (
                             <SettingsCard title="Disconnect">
+                                <p className="text-[12px] text-mute">
+                                    Deletes the stored API key. Messages
+                                    already sent stay. This does not revoke
+                                    the aggregator account.
+                                </p>
                                 <Button
                                     type="submit"
                                     variant="outline"

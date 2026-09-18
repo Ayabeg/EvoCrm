@@ -15,6 +15,7 @@ use App\Services\Meta\MetaSyncService;
 use App\Services\Meta\WorkspaceMetaCredentials;
 use App\Services\Operations\AuditLogger;
 use App\Services\Webhooks\WebhookEndpointManager;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,19 +33,38 @@ class MetaSettingsController extends Controller
         $workspace = $request->user()->workspace;
         $resolved = $credentials->resolve($workspace);
         $integration = $resolved['integration'] ?? $workspace->integration('meta');
+        $connected = $integration?->isConnected() ?? false;
+        $canManage = $request->user()->role->canManageSettings();
+        $lastSync = MetaSyncRun::query()
+            ->forWorkspace($workspace)
+            ->where('status', MetaSyncRun::STATUS_COMPLETED)
+            ->latest('finished_at')
+            ->first();
 
         return Inertia::render('settings/meta', [
-            'connected' => $integration?->isConnected() ?? $resolved['ok'],
+            'connected' => $connected,
+            'status' => $connected
+                ? ($resolved['ok'] ? 'connected' : 'needs_attention')
+                : 'not_connected',
+            'account_label' => $integration?->meta['name'] ?? $integration?->meta['email'] ?? null,
             'app_id_set' => filled(config('meta.app_id')),
             'ad_account_id_set' => filled($resolved['ad_account_id']),
             'ad_accounts' => $credentials->accounts($integration),
             'selected_ad_account_id' => $resolved['ad_account_id'],
             'graph_version' => config('meta.graph_version'),
-            'reason' => $resolved['reason'] ?? ($integration?->isConnected() ? null : 'Meta is not connected for this workspace.'),
-            'can_manage' => $request->user()->role->canManageSettings(),
+            'reason' => $resolved['reason'] ?? ($connected ? null : 'Meta is not connected for this workspace.'),
+            'can_manage' => $canManage,
             'connect_url' => '/auth/meta?popup=1',
             'expires_at' => $integration?->expires_at?->toIso8601String(),
-            'webhook_url' => $endpoints->urlFor($workspace, WebhookEndpointManager::PROVIDER_META_LEADS),
+            'last_sync_at' => $lastSync?->finished_at?->toIso8601String(),
+            'webhook_callback' => [
+                'configured' => true,
+                'masked_url' => $endpoints->maskedUrlFor($workspace, WebhookEndpointManager::PROVIDER_META_LEADS),
+                'can_reveal' => $canManage,
+                'reveal_url' => route('settings.meta.webhook-url', absolute: false),
+                'last_received_at' => $endpoints->forWorkspace($workspace, WebhookEndpointManager::PROVIDER_META_LEADS)
+                    ->last_received_at?->toIso8601String(),
+            ],
             'verify_token_set' => filled(config('meta.webhook_verify_token')),
             'pages' => collect($integration?->meta['pages'] ?? [])
                 ->map(fn ($page) => [
@@ -150,5 +170,16 @@ class MetaSettingsController extends Controller
         ]);
 
         return back();
+    }
+
+    public function revealWebhook(Request $request, WebhookEndpointManager $endpoints): JsonResponse
+    {
+        abort_unless($request->user()?->role->canManageSettings(), 403);
+
+        $workspace = $request->user()->workspace;
+
+        return response()->json([
+            'url' => $endpoints->urlFor($workspace, WebhookEndpointManager::PROVIDER_META_LEADS),
+        ]);
     }
 }

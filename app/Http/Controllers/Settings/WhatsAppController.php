@@ -17,6 +17,7 @@ class WhatsAppController extends Controller
         return Inertia::render('settings/whatsapp', [
             'channel' => $whatsapp->phoneStatus($request->user()->workspace),
             'facebook_url' => '/auth/meta?popup=1',
+            'can_configure' => $request->user()->canPermission('settings.integrations'),
         ]);
     }
 
@@ -56,6 +57,7 @@ class WhatsAppController extends Controller
         return Inertia::render('settings/whatsapp-business', [
             'channel' => $whatsapp->provisionBusinessIfReady($request->user()->workspace),
             'facebook_url' => '/auth/meta?popup=1',
+            'can_configure' => $request->user()->canPermission('settings.integrations'),
         ]);
     }
 

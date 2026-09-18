@@ -68,6 +68,25 @@ class WebhookEndpointManager
         return route($route, ['webhookKey' => $endpoint->key]);
     }
 
+    public function maskedUrlFor(Workspace $workspace, string $provider): string
+    {
+        return $this->maskUrl($this->urlFor($workspace, $provider));
+    }
+
+    public function maskUrl(string $url): string
+    {
+        $parts = parse_url($url);
+
+        if (! is_array($parts) || ! isset($parts['scheme'], $parts['host'], $parts['path'])) {
+            return $url;
+        }
+
+        $path = (string) preg_replace('#(/webhooks/[^/]+/)[^/]+$#', '$1••••••••', $parts['path']);
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+
+        return $parts['scheme'].'://'.$parts['host'].$port.$path;
+    }
+
     public function markReceived(WebhookEndpoint $endpoint, ?string $event): void
     {
         $endpoint->forceFill([

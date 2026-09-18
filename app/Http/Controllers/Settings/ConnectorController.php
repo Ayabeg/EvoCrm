@@ -27,6 +27,7 @@ class ConnectorController extends Controller
             'googleOrigin' => GoogleAuth::javascriptOrigin(),
             'deskConnectors' => $registrar->deskCatalog($workspace),
             'googleConnectors' => $registrar->googleCatalog($workspace),
+            'can_configure' => $request->user()->canPermission('settings.integrations'),
         ]);
     }
 

@@ -22,9 +22,11 @@ type Channel = {
 export default function WhatsAppSettings({
     channel,
     facebook_url = '/auth/meta?popup=1',
+    can_configure = true,
 }: {
     channel: Channel;
     facebook_url?: string;
+    can_configure?: boolean;
 }) {
     useEffect(() => {
         if (!channel.available || channel.connected || !channel.qr) {
@@ -44,7 +46,7 @@ export default function WhatsAppSettings({
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="WhatsApp"
-                    description="Continue with Facebook. Evolution connects WhatsApp automatically. You never type a key."
+                    description="Personal WhatsApp via Evolution. This is not WhatsApp Business Cloud. Disconnect removes the instance and credentials. Inbox messages stay."
                 />
 
                 {!channel.connected ? (
@@ -67,11 +69,25 @@ export default function WhatsAppSettings({
                     </div>
                     <p className="text-sm">{channel.message}</p>
 
+                    {channel.display_phone ? (
+                        <p className="min-w-0 truncate text-[13px] text-ink">
+                            {channel.display_phone}
+                        </p>
+                    ) : null}
                     <div className="flex flex-wrap gap-2">
-                        {!channel.connected ? (
+                        {can_configure && !channel.connected ? (
                             <BrandConnectButtons facebookUrl={facebook_url} />
-                        ) : (
-                            <Form action="/settings/whatsapp" method="delete">
+                        ) : null}
+                        {can_configure && channel.connected ? (
+                            <Form
+                                action="/settings/whatsapp"
+                                method="delete"
+                                onBefore={() =>
+                                    window.confirm(
+                                        'Disconnect WhatsApp from this workspace? The Evolution instance and stored credentials are removed. Existing inbox messages stay. You can reconnect later.',
+                                    )
+                                }
+                            >
                                 {({ processing }) => (
                                     <Button
                                         variant="outline"
@@ -81,7 +97,7 @@ export default function WhatsAppSettings({
                                     </Button>
                                 )}
                             </Form>
-                        )}
+                        ) : null}
                     </div>
                 </SettingsCard>
 

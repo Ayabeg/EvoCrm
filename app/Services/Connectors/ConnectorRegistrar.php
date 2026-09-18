@@ -117,6 +117,7 @@ class ConnectorRegistrar
 
             return [
                 ...$row,
+                'account_label' => $integration?->meta['google_email'] ?? $integration?->meta['email'] ?? null,
                 'scopes_on_client' => GoogleAuth::hasConnectorScope($provider),
                 'reconnect_url' => GoogleAuth::enabled() && GoogleAuth::hasConnectorScope($provider)
                     ? '/settings/connectors/google/'.$provider->value

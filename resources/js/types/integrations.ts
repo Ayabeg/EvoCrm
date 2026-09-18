@@ -1,3 +1,9 @@
+export type IntegrationStatus =
+    | 'connected'
+    | 'not_connected'
+    | 'needs_attention'
+    | 'disabled';
+
 export type SharedIntegrations = {
     meta: {
         configured: boolean;
@@ -9,6 +15,13 @@ export type SharedIntegrations = {
     };
     smtp: {
         connected: boolean;
+        has_mailbox?: boolean;
+    };
+    activation?: {
+        has_connected_communication_channel: boolean;
+        has_configured_integration: boolean;
+        has_mailbox: boolean;
+        has_meta_configured: boolean;
     };
 };
 
@@ -45,6 +58,7 @@ export type GoogleWorkspaceConnector = {
     reason: string | null;
     scopes_on_client: boolean;
     reconnect_url: string | null;
+    account_label?: string | null;
     sync?: {
         status: 'idle' | 'running' | 'paused' | 'error';
         cursor?: string | null;
@@ -59,7 +73,9 @@ export type MarketplaceApp = {
     name: string;
     tagline: string;
     connected: boolean;
+    status?: IntegrationStatus;
     configured: boolean;
+    account_label?: string | null;
     connected_at: string | null;
     connect_url: string | null;
     instagram_connect_url?: string | null;
