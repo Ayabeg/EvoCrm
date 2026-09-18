@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Pipeline;
+use App\Models\Stage;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceActivationPreference;
@@ -68,6 +69,7 @@ class WorkspaceActivationService
     }
 
     /**
+     * @param  array<string, mixed>|null  $integrationFacts
      * @return array{
      *     has_contact: bool,
      *     has_company: bool,
@@ -113,55 +115,55 @@ class WorkspaceActivationService
         return [
             $this->step(
                 ActivationStepId::AddCrmData,
-                __('Add CRM data'),
-                __('Create or import a contact or company.'),
+                $this->copy('Add CRM data'),
+                $this->copy('Create or import a contact or company.'),
                 (bool) $facts['has_crm_data'],
                 $canViewCrm,
                 $canEdit,
                 $canEdit ? '/crm/contacts?create=1' : null,
-                $canEdit ? __('Add contact') : null,
+                $canEdit ? $this->copy('Add contact') : null,
                 $canImport ? '/crm/contacts/import' : null,
-                $canImport ? __('Import') : null,
+                $canImport ? $this->copy('Import') : null,
             ),
             $this->step(
                 ActivationStepId::ConfigurePipeline,
-                __('Configure pipeline'),
-                __('Adapt stages from the default Sales pipeline.'),
+                $this->copy('Configure pipeline'),
+                $this->copy('Adapt stages from the default Sales pipeline.'),
                 (bool) $facts['pipeline_customized'],
                 (bool) $user->workspace_id,
                 $canManagePipelines,
                 $canManagePipelines ? '/settings/pipelines' : null,
-                $canManagePipelines ? __('Open pipelines') : null,
+                $canManagePipelines ? $this->copy('Open pipelines') : null,
             ),
             $this->step(
                 ActivationStepId::FirstDeal,
-                __('Create a deal'),
-                __('Put the first opportunity on the pipeline.'),
+                $this->copy('Create a deal'),
+                $this->copy('Put the first opportunity on the pipeline.'),
                 (bool) $facts['has_deal'],
                 $canViewCrm,
                 $canEdit,
                 $canEdit ? '/crm/deals?create=1' : null,
-                $canEdit ? __('Create deal') : null,
+                $canEdit ? $this->copy('Create deal') : null,
             ),
             $this->step(
                 ActivationStepId::FirstActivity,
-                __('Log an activity'),
-                __('Record a task, call, or note.'),
+                $this->copy('Log an activity'),
+                $this->copy('Record a task, call, or note.'),
                 (bool) $facts['has_activity'],
                 $canViewCrm,
                 $canEdit,
                 $canEdit ? '/crm/activities?create=1' : null,
-                $canEdit ? __('Log activity') : null,
+                $canEdit ? $this->copy('Log activity') : null,
             ),
             $this->step(
                 ActivationStepId::ConnectIntegration,
-                __('Connect a channel'),
-                __('Connect mailbox, WhatsApp, SMS, or Meta from Apps.'),
+                $this->copy('Connect a channel'),
+                $this->copy('Connect mailbox, WhatsApp, SMS, or Meta from Apps.'),
                 (bool) $facts['has_configured_integration'],
                 (bool) $user->workspace_id,
                 $canConnect,
                 $canConnect ? '/settings/apps' : null,
-                $canConnect ? __('Open Apps') : null,
+                $canConnect ? $this->copy('Open Apps') : null,
             ),
         ];
     }
@@ -209,17 +211,25 @@ class WorkspaceActivationService
             return true;
         }
 
-        $defaults = collect(config('evosales.pipeline', []));
-        $stages = $pipeline->stages()
+        $defaults = config('evosales.pipeline', []);
+
+        if (! is_array($defaults)) {
+            return true;
+        }
+
+        $defaults = array_values($defaults);
+        $stages = Stage::query()
+            ->where('workspace_id', $workspace->id)
+            ->where('pipeline_id', $pipeline->id)
             ->orderBy('position')
             ->get(['name', 'slug', 'position', 'is_won', 'is_lost']);
 
-        if ($stages->count() !== $defaults->count()) {
+        if ($stages->count() !== count($defaults)) {
             return true;
         }
 
         foreach ($stages as $index => $stage) {
-            $default = $defaults->get($index);
+            $default = $defaults[$index] ?? null;
 
             if (! is_array($default)) {
                 return true;
@@ -276,6 +286,11 @@ class WorkspaceActivationService
             'secondary_href' => $secondaryHref,
             'secondary_cta_label' => $secondaryCtaLabel,
         ];
+    }
+
+    private function copy(string $key): string
+    {
+        return (string) __($key);
     }
 
     /**

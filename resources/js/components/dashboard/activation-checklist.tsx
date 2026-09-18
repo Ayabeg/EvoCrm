@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import {
     activationProgressLabel,
     activationProgressValue,
-    type ActivationState,
-    type ActivationStep,
 } from '@/lib/activation';
+import type { ActivationState, ActivationStep } from '@/lib/activation';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
