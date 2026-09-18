@@ -237,11 +237,11 @@ export default function AttributeSettings({
 
     return (
         <>
-            <Head title="Custom attributes" />
+            <Head title="Properties" />
 
             <div className="space-y-3">
                 <SettingsPageHeader
-                    title="Custom attributes"
+                    title="Properties"
                     description="Workspace-defined fields on Contact, Company, and Deal. Add a date or list, group them, then edit or delete the definition."
                 >
                     <Button size="sm" onClick={() => setCreateOpen(true)}>
@@ -424,5 +424,5 @@ export default function AttributeSettings({
 }
 
 AttributeSettings.layout = {
-    breadcrumbs: [{ title: 'Custom attributes', href: '/settings/attributes' }],
+    breadcrumbs: [{ title: 'Properties', href: '/settings/attributes' }],
 };

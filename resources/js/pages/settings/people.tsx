@@ -100,11 +100,11 @@ export default function People({
 
     return (
         <>
-            <Head title="People" />
+            <Head title="Members" />
 
             <div className="space-y-3">
                 <SettingsPageHeader
-                    title="People"
+                    title="Members"
                     description="Who can sign in to this Evotechly workspace, their role, and their first-login email."
                 >
                     <Button
@@ -385,7 +385,7 @@ export default function People({
 People.layout = {
     breadcrumbs: [
         {
-            title: 'People',
+            title: 'Members',
             href: '/settings/people',
         },
     ],

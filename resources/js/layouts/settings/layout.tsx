@@ -1,150 +1,91 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
+import { useMemo, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
-import { cn, toUrl } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/appearance';
-import { edit } from '@/routes/profile';
-import { edit as editSecurity } from '@/routes/security';
 import { t } from '@/lib/i18n';
+import {
+    filterSettingsDestinations,
+    groupSettingsDestinations,
+    isSettingsNavActive,
+    visibleSettingsDestinations,
+    WIDE_SETTINGS_COMPONENTS,
+} from '@/lib/settings/ia';
+import type { SettingsDestination } from '@/lib/settings/ia';
+import { cn } from '@/lib/utils';
 import type { Auth } from '@/types/auth';
 
-type SettingsNavItem = {
-    title: string;
-    href: string;
-};
+function SettingsNavLinks({
+    items,
+    currentUrl,
+}: {
+    items: SettingsDestination[];
+    currentUrl: string;
+}) {
+    return (
+        <ul className="flex flex-col">
+            {items.map((item) => {
+                const active = isSettingsNavActive(item.href, currentUrl);
 
-type SettingsNavGroup = {
-    title: string;
-    items: SettingsNavItem[];
-};
-
-const requiredPermissionByHref: Record<string, string> = {
-    '/settings/apps': 'settings.integrations',
-    '/settings/connectors': 'settings.integrations',
-    '/settings/evolution': 'settings.integrations',
-    '/settings/whatsapp': 'settings.integrations',
-    '/settings/whatsapp-business': 'settings.integrations',
-    '/settings/meta': 'settings.integrations',
-    '/settings/channels': 'settings.integrations',
-    '/settings/sms': 'settings.integrations',
-    '/settings/attributes': 'settings.attributes',
-    '/settings/pipelines': 'settings.pipelines',
-    '/settings/record-layouts': 'settings.attributes',
-};
-
-const adminOnlyHrefs = [
-    '/settings/permissions',
-    '/settings/system-health',
-    '/settings/audit',
-    '/settings/playbooks',
-    '/settings/qualify',
-    '/settings/quotas',
-];
-
-const wideComponents = new Set([
-    'settings/people',
-    'settings/attributes',
-    'settings/pipelines',
-    'settings/record-layouts',
-    'settings/connectors',
-    'settings/system-health',
-    'settings/audit',
-    'settings/playbooks',
-    'settings/quotas',
-    'settings/meta',
-    'settings/apps/meta',
-    'settings/sms',
-    'settings/permissions',
-]);
-
-function navGroups(
-    canManageSettings: boolean,
-    isOwner: boolean,
-): SettingsNavGroup[] {
-    return [
-        {
-            title: 'You',
-            items: [
-                { title: 'Profile', href: toUrl(edit()) },
-                { title: 'Security', href: toUrl(editSecurity()) },
-                { title: 'Appearance', href: toUrl(editAppearance()) },
-            ],
-        },
-        {
-            title: 'Workspace',
-            items: [
-                ...(isOwner
-                    ? [{ title: 'Workspace', href: '/settings/workspace' }]
-                    : []),
-                ...(canManageSettings
-                    ? [{ title: 'People', href: '/settings/people' }]
-                    : []),
-                { title: 'Meetings', href: '/settings/meetings' },
-                { title: 'Get started', href: '/settings/setup' },
-            ],
-        },
-        {
-            title: 'Integrations',
-            items: [
-                { title: 'Apps', href: '/settings/apps' },
-                { title: 'Connectors', href: '/settings/connectors' },
-                { title: 'WhatsApp', href: '/settings/evolution' },
-                { title: 'Meta', href: '/settings/meta' },
-                { title: 'Channels', href: '/settings/channels' },
-                { title: 'SMS', href: '/settings/sms' },
-            ],
-        },
-        {
-            title: 'CRM',
-            items: [
-                { title: 'Custom attributes', href: '/settings/attributes' },
-                { title: 'Pipelines', href: '/settings/pipelines' },
-                { title: 'Qualify', href: '/settings/qualify' },
-                { title: 'Quotas', href: '/settings/quotas' },
-                { title: 'Record layouts', href: '/settings/record-layouts' },
-                { title: 'Playbooks', href: '/settings/playbooks' },
-            ],
-        },
-        {
-            title: 'Admin',
-            items: [
-                { title: 'Permissions', href: '/settings/permissions' },
-                { title: 'Audit trail', href: '/settings/audit' },
-                { title: 'System health', href: '/settings/system-health' },
-            ],
-        },
-    ];
+                return (
+                    <li key={item.href}>
+                        <Link
+                            href={item.href}
+                            aria-current={active ? 'page' : undefined}
+                            className={cn(
+                                'flex h-8 items-center border-l-2 px-2 text-[13px] leading-[18px] transition-colors',
+                                active
+                                    ? 'border-brand bg-[var(--color-accent-soft)] font-medium text-ink'
+                                    : 'border-transparent text-mute hover:bg-white/70 hover:text-ink',
+                            )}
+                        >
+                            {t(item.title)}
+                        </Link>
+                    </li>
+                );
+            })}
+        </ul>
+    );
 }
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    const { isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
+    const { currentUrl } = useCurrentUrl();
     const page = usePage<{ auth: Auth }>();
     const { auth } = page.props;
     const { features } = useSimpleMode();
+    const [query, setQuery] = useState('');
 
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const isOwner = auth.user.role === 'owner';
-    const groups = navGroups(canManageSettings, isOwner)
-        .map((group) => ({
-            ...group,
-            items: group.items.filter((item) => {
-                if (item.href === '/settings/sms' && !features.sms) {
-                    return false;
-                }
 
-                if (adminOnlyHrefs.includes(item.href)) {
-                    return canManageSettings;
-                }
-
-                const permission = requiredPermissionByHref[item.href];
-
-                return !permission || auth.capabilities.includes(permission);
+    const authorized = useMemo(
+        () =>
+            visibleSettingsDestinations({
+                capabilities: auth.capabilities,
+                canManageSettings,
+                isOwner,
+                smsEnabled: features.sms,
             }),
-        }))
-        .filter((group) => group.items.length > 0);
+        [auth.capabilities, canManageSettings, isOwner, features.sms],
+    );
 
-    const wide = wideComponents.has(page.component);
+    const visible = useMemo(
+        () => filterSettingsDestinations(authorized, query),
+        [authorized, query],
+    );
+
+    const groups = useMemo(
+        () => groupSettingsDestinations(visible),
+        [visible],
+    );
+
+    const wide = WIDE_SETTINGS_COMPONENTS.has(page.component);
+    const selectValue =
+        authorized.find((item) => isSettingsNavActive(item.href, currentUrl))
+            ?.href ??
+        authorized.find((item) => item.href === currentUrl)?.href ??
+        '';
 
     return (
         <div
@@ -155,49 +96,92 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                 data-settings="nav"
                 className="shrink-0 border-b border-hairline bg-canvas lg:w-[15.5rem] lg:border-r lg:border-b-0"
             >
-                <div className="px-3 pt-3 pb-1">
+                <div className="px-3 pt-3 pb-2">
                     <p className="text-[11px] font-semibold tracking-wide text-mute uppercase">
                         {t('Settings')}
                     </p>
+                    <label className="mt-2 block">
+                        <span className="sr-only">{t('Filter settings')}</span>
+                        <span className="relative block">
+                            <MagnifyingGlass
+                                className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-mute"
+                                weight="regular"
+                                aria-hidden
+                            />
+                            <input
+                                type="search"
+                                value={query}
+                                onChange={(event) =>
+                                    setQuery(event.target.value)
+                                }
+                                placeholder={t('Filter settings')}
+                                autoComplete="off"
+                                data-settings="search"
+                                className="h-8 w-full rounded-[4px] border border-hairline bg-white pr-2 pl-7 text-[13px] leading-[18px] text-ink placeholder:text-mute focus-visible:border-brand focus-visible:outline-none"
+                            />
+                        </span>
+                    </label>
+                    <label className="mt-2 block lg:hidden">
+                        <span className="sr-only">{t('Open a setting')}</span>
+                        <select
+                            data-settings="mobile-select"
+                            value={selectValue}
+                            onChange={(event) => {
+                                if (event.target.value !== '') {
+                                    router.visit(event.target.value);
+                                }
+                            }}
+                            className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px] leading-[18px] text-ink focus-visible:border-brand focus-visible:outline-none"
+                        >
+                            {visible.length === 0 ? (
+                                <option value="">{t('No matching settings')}</option>
+                            ) : (
+                                groups.map((group) => (
+                                    <optgroup
+                                        key={group.title}
+                                        label={t(group.title)}
+                                    >
+                                        {group.items.map((item) => (
+                                            <option
+                                                key={item.href}
+                                                value={item.href}
+                                            >
+                                                {t(item.title)}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                ))
+                            )}
+                        </select>
+                    </label>
                 </div>
                 <nav
                     aria-label={t('Settings')}
-                    className="flex gap-4 overflow-x-auto px-2 pb-2 lg:flex-col lg:gap-3 lg:overflow-visible lg:px-2 lg:pb-4"
+                    className="hidden flex-col gap-3 px-2 pb-4 lg:flex"
                 >
-                    {groups.map((group) => (
-                        <div key={group.title} className="min-w-[10rem]">
-                            <p className="px-2 pt-1 pb-0.5 text-[11px] font-medium text-mute">
-                                {t(group.title)}
-                            </p>
-                            <ul className="flex flex-col">
-                                {group.items.map((item) => {
-                                    const active =
-                                        isCurrentUrl(item.href) ||
-                                        (item.href !== toUrl(edit()) &&
-                                            isCurrentOrParentUrl(item.href));
-
-                                    return (
-                                        <li key={item.href}>
-                                            <Link
-                                                href={item.href}
-                                                aria-current={
-                                                    active ? 'page' : undefined
-                                                }
-                                                className={cn(
-                                                    'flex h-7 items-center border-l-2 px-2 text-[13px] leading-none transition-colors',
-                                                    active
-                                                        ? 'border-brand bg-[var(--color-accent-soft)] font-medium text-ink'
-                                                        : 'border-transparent text-mute hover:bg-white/70 hover:text-ink',
-                                                )}
-                                            >
-                                                {t(item.title)}
-                                            </Link>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    ))}
+                    {groups.length === 0 ? (
+                        <p
+                            role="status"
+                            className="px-2 py-3 text-[13px] leading-5 text-mute"
+                        >
+                            {t('No matching settings')}
+                        </p>
+                    ) : (
+                        groups.map((group) => (
+                            <div
+                                key={group.title}
+                                data-settings-scope={group.scope}
+                            >
+                                <p className="px-2 pt-1 pb-0.5 text-[11px] font-medium text-mute">
+                                    {t(group.title)}
+                                </p>
+                                <SettingsNavLinks
+                                    items={group.items}
+                                    currentUrl={currentUrl}
+                                />
+                            </div>
+                        ))
+                    )}
                 </nav>
             </aside>
 
@@ -205,7 +189,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                 data-settings="pane"
                 className={cn(
                     'min-w-0 flex-1 px-4 py-4 lg:px-6 lg:py-5',
-                    wide ? '' : 'lg:max-w-3xl',
+                    wide ? '' : 'lg:max-w-[900px]',
                 )}
             >
                 {children}
