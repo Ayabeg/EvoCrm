@@ -36,6 +36,7 @@ use App\Http\Controllers\Crm\TicketController;
 use App\Http\Controllers\Crm\WorkflowController;
 use App\Http\Controllers\Desk\DeskConnectorController;
 use App\Http\Controllers\Desk\InboxController;
+use App\Http\Controllers\Activation\ActivationDismissalController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Outbound\CampaignController;
 use App\Http\Controllers\Outbound\DomainController;
@@ -119,6 +120,8 @@ Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::cla
 
 Route::middleware(['auth', 'verified', EnforceProductPermissions::class, EnforceSimpleMode::class])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
+    Route::post('/dashboard/activation/dismiss', [ActivationDismissalController::class, 'store'])
+        ->name('dashboard.activation.dismiss');
     Route::post('/lead-os/graph', [LeadOsController::class, 'runGraph'])->name('lead-os.graph');
     Route::post('/crm/lost-reviews/{suggestion}/confirm', [LeadOsController::class, 'confirmLost'])->name('crm.lost-reviews.confirm');
 

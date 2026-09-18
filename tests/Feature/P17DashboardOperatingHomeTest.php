@@ -100,6 +100,8 @@ it('locks one operating home and consumes P11 P12 P15 without a V2', function ()
         ->and($home)->toContain('HomeKpiStrip')
         ->and($home)->toContain('Pipeline')
         ->and($home)->toContain('Recent records')
+        ->and($home)->toContain('ActivationChecklist')
+        ->and($home)->not->toContain('confetti')
         ->and($home)->toContain('overflow-x-hidden')
         ->and($builder)->toContain('DealAttentionEvaluator')
         ->and($builder)->toContain('dashboardWork')
@@ -213,10 +215,12 @@ it('omits win rate and the KPI strip when there is no sample', function () {
         ->assertInertia(fn ($page) => $page
             ->where('metrics.kpis', [])
             ->where('pipeline.deal_count', 0)
-            ->has('activation', 3)
-            ->where('activation.0.href', '/crm/deals?create=1')
-            ->where('activation.1.href', '/crm/contacts?create=1')
-            ->where('activation.2.href', '/crm/activities?create=1'));
+            ->where('activation.activated', false)
+            ->where('activation.visible', true)
+            ->has('activation.steps', 5)
+            ->where('activation.steps.2.href', '/crm/deals?create=1')
+            ->where('activation.steps.0.href', '/crm/contacts?create=1')
+            ->where('activation.steps.3.href', '/crm/activities?create=1'));
 
     p17DealFor($user, 'new', ['amount_cents' => 1_500_000]);
 
@@ -228,7 +232,10 @@ it('omits win rate and the KPI strip when there is no sample', function () {
             ->where('metrics.kpis.0.change', null)
             ->where('metrics.kpis.2.value', null)
             ->where('metrics.kpis.2.hint', 'No closed deals this month')
-            ->where('activation', []));
+            ->where('activation.activated', false)
+            ->where('activation.steps.0.complete', true)
+            ->where('activation.steps.2.complete', true)
+            ->where('activation.steps.3.complete', false));
 });
 
 it('mirrors P12 attention order and clears after completing the overdue activity', function () {
@@ -376,7 +383,10 @@ it('does not leak other workspaces or offer create to view-only members', functi
         ->assertInertia(fn ($page) => $page
             ->where('pipeline.deal_count', 1)
             ->where('metrics.kpis.1.value', 9_900_000_00)
-            ->where('activation', [])
+            ->where('activation.activated', true)
+            ->where('activation.steps.2.href', null)
+            ->where('activation.steps.3.href', null)
+            ->where('activation.steps.4.href', null)
             ->where('recent.items', fn ($items) => collect($items)->pluck('subject')->doesntContain('Secret stranger'))
             ->where('attention.items', fn ($items) => collect($items)->pluck('title')->doesntContain('Theirs')));
 });

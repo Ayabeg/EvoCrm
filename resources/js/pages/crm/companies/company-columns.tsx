@@ -43,7 +43,7 @@ export function companyEmptyState(filtered: boolean): DataWorkspaceEmpty {
 
     return {
         title: 'No companies yet',
-        body: 'Create a company to keep accounts next to their contacts and deals.',
+        body: 'Create a company to keep accounts next to their contacts and deals. One company counts as CRM data.',
         actionLabel: 'Create company',
     };
 }

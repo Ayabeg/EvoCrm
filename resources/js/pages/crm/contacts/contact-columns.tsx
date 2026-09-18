@@ -55,7 +55,7 @@ export function contactEmptyState(filtered: boolean): DataWorkspaceEmpty {
 
     return {
         title: 'No contacts yet',
-        body: 'Add the first person you sell to. Name, phone, and company are enough to start.',
+        body: 'Add the first person you sell to, or import a list. Name, phone, and company are enough to start.',
         actionLabel: 'Create contact',
     };
 }

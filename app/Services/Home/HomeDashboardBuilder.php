@@ -10,8 +10,10 @@ use App\Models\Pipeline;
 use App\Models\Stage;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Activation\WorkspaceActivationService;
 use App\Services\Crm\ActivityWorkQueueQuery;
 use App\Services\Crm\DealAttentionEvaluator;
+use App\Support\Integrations;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Gate;
 
@@ -32,6 +34,7 @@ class HomeDashboardBuilder
     public function __construct(
         private DealAttentionEvaluator $attention,
         private ActivityWorkQueueQuery $workQueue,
+        private WorkspaceActivationService $activation,
     ) {}
 
     /**
@@ -42,13 +45,17 @@ class HomeDashboardBuilder
         $now = DealAttentionEvaluator::now();
         $workspace = $user->workspace;
         $pipeline = $workspace->defaultPipeline();
-        $canEdit = $user->canPermission('crm.edit');
 
         $metrics = $this->metrics($workspace, $pipeline, $now);
         $attention = $this->attention($workspace, $pipeline);
         $work = $this->work($user, $now);
         $pipelineOverview = $this->pipeline($workspace, $pipeline);
         $recent = $this->recent($user, $now);
+        $activation = $this->activation->getState(
+            $user,
+            $pipeline,
+            Integrations::forWorkspace($workspace),
+        );
 
         return [
             'context' => $this->context($user, $now),
@@ -57,7 +64,7 @@ class HomeDashboardBuilder
             'work' => $work,
             'pipeline' => $pipelineOverview,
             'recent' => $recent,
-            'activation' => $this->activation($workspace, $canEdit),
+            'activation' => $activation,
         ];
     }
 
@@ -256,29 +263,6 @@ class HomeDashboardBuilder
             'kind' => 'logged_activity',
             'items' => $items,
             'view_all_href' => '/crm/activities',
-        ];
-    }
-
-    /**
-     * @return list<array{label: string, href: string}>
-     */
-    private function activation(Workspace $workspace, bool $canEdit): array
-    {
-        if (! $canEdit) {
-            return [];
-        }
-
-        $hasDeals = Deal::query()->forWorkspace($workspace)->exists();
-        $hasActivities = Activity::query()->forWorkspace($workspace)->exists();
-
-        if ($hasDeals || $hasActivities) {
-            return [];
-        }
-
-        return [
-            ['label' => __('Create deal'), 'href' => '/crm/deals?create=1'],
-            ['label' => __('Create contact'), 'href' => '/crm/contacts?create=1'],
-            ['label' => __('Log activity'), 'href' => '/crm/activities?create=1'],
         ];
     }
 
