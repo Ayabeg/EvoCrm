@@ -1,9 +1,10 @@
-import { router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { WorkflowBuilder } from '@/components/crm/workflow-builder';
+import { WorkflowExecutionHistory } from '@/components/crm/workflow-execution-history';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
 import { SurfaceHeader } from '@/components/surface/surface-header';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,7 @@ import {
     emptyWorkflowDraft,
     formatWorkflowTimestamp,
     releaseExclusiveAction,
+    summarizeWorkflow,
     summarizeWorkflowRow,
     triggerLabel,
     validateWorkflowDraft,
@@ -32,6 +34,10 @@ import type {
     WorkflowTemplate,
     WorkflowTicketStatus,
 } from '@/lib/workflow-authoring';
+import {
+    EMPTY_EXECUTION_PAGE,
+    type WorkflowExecutionPage,
+} from '@/lib/workflow-execution';
 
 type Segment = { id: number; name: string };
 
@@ -60,6 +66,8 @@ export default function WorkflowsIndex({
     members = [],
     ticket_statuses = [],
     capabilities = DEFAULT_CAPABILITIES,
+    view = 'workflows',
+    executions = EMPTY_EXECUTION_PAGE,
 }: {
     workflows: WorkflowRow[];
     templates: WorkflowTemplate[];
@@ -70,6 +78,8 @@ export default function WorkflowsIndex({
     members?: WorkflowMember[];
     ticket_statuses?: WorkflowTicketStatus[];
     capabilities?: WorkflowCapabilities;
+    view?: 'workflows' | 'history';
+    executions?: WorkflowExecutionPage;
 }) {
     const [editorOpen, setEditorOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -188,6 +198,16 @@ export default function WorkflowsIndex({
     };
 
     const toggleWorkflow = (workflow: WorkflowRow) => {
+        const confirmed = window.confirm(
+            workflow.active
+                ? 'Turn off this workflow? Pending delayed runs will be cancelled and will not execute. Historical executions stay as they were.'
+                : 'Turn on this workflow? New matching events will run. Existing history is unchanged.',
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
         if (!beginExclusiveAction(mutatingRef)) {
             return;
         }
@@ -220,6 +240,14 @@ export default function WorkflowsIndex({
     };
 
     const deleteWorkflow = (workflow: WorkflowRow) => {
+        const confirmed = window.confirm(
+            'Delete this workflow? Its execution history is removed with it.',
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
         if (!beginExclusiveAction(mutatingRef)) {
             return;
         }
@@ -278,7 +306,7 @@ export default function WorkflowsIndex({
                         title="Automation"
                         description="Structured workflows the runner can execute: when, if, then, else."
                     >
-                        {canManage ? (
+                        {canManage && view !== 'history' ? (
                             <Button
                                 size="sm"
                                 onClick={openCreate}
@@ -290,6 +318,40 @@ export default function WorkflowsIndex({
                         ) : null}
                     </SurfaceHeader>
 
+                    <nav
+                        className="flex gap-4 border-b border-hairline text-[13px]"
+                        aria-label="Automation sections"
+                    >
+                        <Link
+                            href="/crm/workflows"
+                            className={
+                                view === 'history'
+                                    ? 'pb-2 text-mute'
+                                    : 'border-b-2 border-brand pb-2 font-medium text-ink'
+                            }
+                        >
+                            Workflows
+                        </Link>
+                        <Link
+                            href="/crm/workflows?view=history"
+                            className={
+                                view === 'history'
+                                    ? 'border-b-2 border-brand pb-2 font-medium text-ink'
+                                    : 'pb-2 text-mute'
+                            }
+                        >
+                            History
+                        </Link>
+                    </nav>
+
+                    {view === 'history' ? (
+                        <WorkflowExecutionHistory
+                            executions={executions}
+                            workflows={workflows}
+                        />
+                    ) : null}
+
+                    {view === 'history' ? null : (
                     <HairlinePanel>
                         <div className="border-b border-hairline px-4 py-3">
                             <h2 className="aurora-text-ui font-medium text-ink">
@@ -329,6 +391,12 @@ export default function WorkflowsIndex({
                             ))}
                         </ul>
                     </HairlinePanel>
+
+                    <p className="px-1 text-[12px] text-mute">
+                        History stays inspectable when a workflow is Draft. Turning a
+                        workflow off cancels pending delayed runs and does not rewrite
+                        completed or failed history.
+                    </p>
 
                     <HairlinePanel data-workflow="list">
                         <div className="hidden border-b border-hairline px-4 py-2 text-[12px] text-mute md:grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_7rem_7rem_auto] md:gap-3">
@@ -418,6 +486,7 @@ export default function WorkflowsIndex({
                             ) : null}
                         </ul>
                     </HairlinePanel>
+                    )}
                 </div>
             </div>
 
@@ -447,6 +516,20 @@ export default function WorkflowsIndex({
                         errors={errors}
                         disabled={!canManage || mutating}
                     />
+                    <div
+                        className="rounded-md border border-hairline bg-canvas-soft px-3 py-2"
+                        data-workflow="review-configuration"
+                    >
+                        <p className="text-[12px] font-medium text-ink">
+                            Review configuration
+                        </p>
+                        <p className="mt-1 text-[13px] text-ink">
+                            {summarizeWorkflow(draft, condition_fields, stages)}
+                        </p>
+                        <p className="mt-1 text-[12px] text-mute">
+                            This reviews the structure. It does not run the workflow.
+                        </p>
+                    </div>
                     <div className="flex justify-end gap-2 pt-2">
                         <Button
                             type="button"
