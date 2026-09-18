@@ -4,27 +4,40 @@ use App\Models\User;
 
 it('rebuilds the settings shell as a Salesforce-density workspace on P02 tokens', function () {
     $layout = file_get_contents(resource_path('js/layouts/settings/layout.tsx'));
+    $ia = file_get_contents(resource_path('js/lib/settings/ia.ts'));
     $chrome = file_get_contents(resource_path('js/components/settings/chrome.tsx'));
 
     expect($layout)->toContain('data-settings="workspace"')
         ->and($layout)->toContain('data-settings="nav"')
         ->and($layout)->toContain('data-settings="pane"')
-        ->and($layout)->toContain("title: 'You'")
-        ->and($layout)->toContain("title: 'Workspace'")
-        ->and($layout)->toContain("title: 'Integrations'")
-        ->and($layout)->toContain("title: 'CRM'")
-        ->and($layout)->toContain("title: 'Admin'")
-        ->and($layout)->toContain("title: 'Profile'")
-        ->and($layout)->toContain("title: 'People'")
-        ->and($layout)->toContain("href: '/settings/workspace'")
-        ->and($layout)->toContain("href: '/settings/apps'")
-        ->and($layout)->toContain("href: '/settings/channels'")
+        ->and($layout)->toContain('data-settings="search"')
+        ->and($layout)->toContain("from '@/lib/settings/ia'")
         ->and($layout)->toContain('bg-canvas')
         ->and($layout)->toContain('border-brand')
         ->and($layout)->not->toContain('lucide-react')
         ->and($layout)->not->toContain('#0176D3')
         ->and($layout)->not->toContain('#00A4BD')
-        ->and($layout)->not->toContain('Salesforce');
+        ->and($layout)->not->toContain('Salesforce')
+        ->and($layout)->not->toContain('SettingsV2')
+        ->and($layout)->not->toContain('NewSettings')
+        ->and($layout)->not->toContain('SettingsShell2');
+
+    expect($ia)->toContain("'Personal'")
+        ->and($ia)->toContain("'Workspace'")
+        ->and($ia)->toContain("'Integrations'")
+        ->and($ia)->toContain("'CRM'")
+        ->and($ia)->toContain("'Communication'")
+        ->and($ia)->toContain("'Developer'")
+        ->and($ia)->toContain("title: 'Profile'")
+        ->and($ia)->toContain("title: 'Members'")
+        ->and($ia)->toContain("href: '/settings/workspace'")
+        ->and($ia)->toContain("href: '/settings/people'")
+        ->and($ia)->toContain("href: '/settings/apps'")
+        ->and($ia)->toContain("href: '/settings/channels'")
+        ->and($ia)->not->toContain("title: 'You'")
+        ->and($ia)->not->toContain("title: 'Admin'")
+        ->and($ia)->not->toContain('/settings/billing')
+        ->and($ia)->not->toContain('/settings/workflows');
 
     expect($chrome)->toContain('data-settings="card"')
         ->and($chrome)->toContain('data-settings="save"')
