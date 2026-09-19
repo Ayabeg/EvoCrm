@@ -10,6 +10,7 @@ import {
   offlineError,
   parseFailureError,
   timeoutError,
+  unreachableError,
   type ApiError,
 } from '@/lib/api/errors';
 
@@ -133,6 +134,9 @@ export class ApiClient {
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         return { ok: false, error: timeoutError() };
+      }
+      if (error instanceof TypeError) {
+        return { ok: false, error: unreachableError() };
       }
       return { ok: false, error: parseFailureError() };
     } finally {

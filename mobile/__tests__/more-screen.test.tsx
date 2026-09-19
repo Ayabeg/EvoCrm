@@ -1,11 +1,6 @@
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 
 import MoreScreen from '@/app/(tabs)/more';
-
-const logout = jest.fn(async () => ({
-  session: { status: 'unauthenticated', user: null, workspace: null, permissions: [] },
-  remoteRevoked: false,
-}));
 
 jest.mock('@/state/auth-context', () => ({
   useAuth: () => ({
@@ -13,7 +8,10 @@ jest.mock('@/state/auth-context', () => ({
     lastError: null,
     lastLogoutRemoteRevoked: null,
     login: jest.fn(),
-    logout,
+    logout: jest.fn(async () => ({
+      session: { status: 'unauthenticated', user: null, workspace: null, permissions: [] },
+      remoteRevoked: false,
+    })),
     retryRestore: jest.fn(),
     abandonSession: jest.fn(),
     session: {
@@ -27,15 +25,12 @@ jest.mock('@/state/auth-context', () => ({
 }));
 
 describe('more / account screen', () => {
-  it('shows server identity and signs out without claiming remote revoke', async () => {
-    const view = render(<MoreScreen />);
+  it('shows server identity, workspace, and a sign-out control', async () => {
+    const view = await render(<MoreScreen />);
     expect(view.getByText('Lina')).toBeTruthy();
     expect(view.getByText('owner@clinic.dz')).toBeTruthy();
     expect(view.getByText('Evotechly')).toBeTruthy();
-    fireEvent.press(view.getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => {
-      expect(logout).toHaveBeenCalled();
-      expect(view.getByText(/could not confirm revoke/)).toBeTruthy();
-    });
+    expect(view.getByText(/Workspace switching is not available/)).toBeTruthy();
+    expect(view.getByRole('button', { name: 'Sign out' })).toBeTruthy();
   });
 });

@@ -1,3 +1,4 @@
+import type { ApiError } from '@/lib/api/errors';
 import type { ApiUser, ApiWorkspace } from '@/types/api';
 
 /**
@@ -32,7 +33,7 @@ export const EMPTY_SESSION: AuthSession = {
 
 export type SessionResult = {
   session: AuthSession;
-  error: ApiErrorLike | null;
+  error: ApiError | null;
 };
 
 export type LogoutResult = {
@@ -41,9 +42,3 @@ export type LogoutResult = {
   remoteRevoked: boolean;
 };
 
-export type ApiErrorLike = {
-  kind: string;
-  status: number | null;
-  message: string;
-  fieldErrors: Record<string, string[]>;
-};

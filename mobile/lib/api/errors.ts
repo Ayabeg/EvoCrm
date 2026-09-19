@@ -66,6 +66,15 @@ export function offlineError(): ApiError {
   };
 }
 
+export function unreachableError(): ApiError {
+  return {
+    kind: 'offline',
+    status: null,
+    message: 'Could not reach the server.',
+    fieldErrors: {},
+  };
+}
+
 export function parseFailureError(): ApiError {
   return {
     kind: 'parse_failure',

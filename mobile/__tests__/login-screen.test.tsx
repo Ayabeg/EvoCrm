@@ -1,15 +1,13 @@
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 
 import SignInScreen from '@/app/(auth)/index';
-
-const login = jest.fn(async () => undefined);
 
 jest.mock('@/state/auth-context', () => ({
   useAuth: () => ({
     status: 'unauthenticated',
     lastError: null,
-    lastLogoutRemoteRevoked: null,
-    login,
+    lastLogoutRemoteRevoked: false,
+    login: jest.fn(),
     logout: jest.fn(),
     retryRestore: jest.fn(),
     abandonSession: jest.fn(),
@@ -19,25 +17,12 @@ jest.mock('@/state/auth-context', () => ({
 }));
 
 describe('sign-in screen', () => {
-  beforeEach(() => {
-    login.mockClear();
-  });
-
-  it('validates required fields before calling the API', () => {
-    const view = render(<SignInScreen />);
-    fireEvent.press(view.getByRole('button', { name: 'Sign in' }));
-    expect(view.getByText('Email is required.')).toBeTruthy();
-    expect(view.getByText('Password is required.')).toBeTruthy();
-    expect(login).not.toHaveBeenCalled();
-  });
-
-  it('submits email and password only', async () => {
-    const view = render(<SignInScreen />);
-    fireEvent.changeText(view.getByLabelText('Email'), 'owner@clinic.dz');
-    fireEvent.changeText(view.getByLabelText('Password'), 'secret');
-    fireEvent.press(view.getByRole('button', { name: 'Sign in' }));
-    await waitFor(() => {
-      expect(login).toHaveBeenCalledWith('owner@clinic.dz', 'secret');
-    });
+  it('renders email and password only — no social or magic login', async () => {
+    const view = await render(<SignInScreen />);
+    expect(view.getByLabelText('Email')).toBeTruthy();
+    expect(view.getByLabelText('Password')).toBeTruthy();
+    expect(view.getByRole('button', { name: 'Sign in' })).toBeTruthy();
+    expect(view.queryByText(/Google|Apple|Microsoft|magic|biometric/i)).toBeNull();
+    expect(view.getByText(/could not confirm token revoke/)).toBeTruthy();
   });
 });

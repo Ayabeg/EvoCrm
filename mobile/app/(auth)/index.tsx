@@ -158,6 +158,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.xl,
     paddingVertical: space.xxl,
     gap: space.lg,
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
   },
   brand: {
     ...type.page,
