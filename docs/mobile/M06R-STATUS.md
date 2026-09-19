@@ -6,6 +6,7 @@ Executed 2026-09-19 against branch `feat/mobile-m06r-expo-foundation`.
 EVOCRM MOBILE — M06R STATUS
 
 BASE SHA: fa13a64e507b90b25008e0274d42615b84ac9678
+TIP SHA: 07d95fac23e72187f6463c3042ce11151aac6f95
 PR: https://github.com/Mohamedbeghanem/EvoCrm/pull/237
 EXPO SDK: 57.0.24 (sdkVersion 57.0.0)
 REACT NATIVE: 0.86.3
