@@ -10,8 +10,8 @@
 |---|---|
 | M00–M05 | Research complete (#233 planning, #234 native review, Mobbin, API gaps, security) |
 | M06 | Native Swift + Kotlin foundation attempt — **superseded**. PR #235 remains historical |
-| **M06R** | Expo foundation (current). One client codebase |
-| **M07** | Auth + Workspace product UX (next; not started) |
+| **M06R** | Expo foundation. Merged PR #237 |
+| **M07** | Auth + Workspace product UX (this program) |
 
 ## Forward phases (single client)
 
@@ -19,7 +19,7 @@ Future work is **one TypeScript implementation**. Keep platform-specific QA wher
 
 | Phase | Goal | Notes |
 |---|---|---|
-| M07 | Auth + Workspace UX | Replace foundation seam; still `/api/v1/auth/token` + `/me` |
+| M07 | Auth + Workspace UX | `/api/v1/auth/token` + `/me`; switching deferred |
 | M08 | Contacts loop | READY endpoints |
 | M09 | Inbox thread show | **Blocked on G04** |
 | M10 | Activities complete | **Blocked on G03** |
@@ -33,4 +33,4 @@ Original #233 M1–M9 numbering is historical planning. Do not reopen M00–M05 
 
 ## Stop
 
-M07 has not started. Do not implement product login chrome, workspace switcher UX, or CRM screens on this foundation PR.
+M08 has not started. Do not implement CRM contact screens on the M07 PR.

@@ -1,3 +1,4 @@
+import { shouldOpenDeepLink } from '@/lib/deeplink/auth';
 import { buildDeepLink, parseDeepLink } from '@/lib/deeplink/routes';
 
 describe('deep links', () => {
@@ -16,5 +17,10 @@ describe('deep links', () => {
 
   it('builds the custom scheme', () => {
     expect(buildDeepLink('deal', 44)).toBe('evocrm://deal/44');
+  });
+
+  it('does not open Deal UI without an authenticated session', () => {
+    expect(shouldOpenDeepLink('unauthenticated', 'evocrm://deal/44')).toBe(false);
+    expect(shouldOpenDeepLink('authenticated', 'evocrm://deal/44')).toBe(true);
   });
 });

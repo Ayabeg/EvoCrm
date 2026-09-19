@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   foundation:
-    name: Expo foundation checks
+    name: Expo M07 checks
     runs-on: ubuntu-latest
     defaults:
       run:
