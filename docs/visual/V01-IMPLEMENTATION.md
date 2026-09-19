@@ -77,19 +77,19 @@ Paper rail `#F7F7F5`. Centered 20px Phosphor icons when collapsed, tooltips unch
 
 ## Topbar
 
-Quiet utility bar: sidebar trigger, restrained search (`Search EvoCRM…` + ⌘K, max-width `md`), then Ask Evo / Create / Tasks / profile. Search is no longer a giant centered field. Create is a 36×8 primary with Plus + label from `sm`. Utility actions are ghost 36 icon buttons with tooltips. Profile stays a circular initials control. Sparkle still opens Command OS (P16).
+Quiet utility bar: sidebar trigger, restrained search (`Search EvoCRM…` + ⌘K, 200 / 240 / 280px — not `flex-1`), then Ask Evo / Create / Tasks / profile. Search uses radius 8 and a surface fill, not a landing-page pill. Create is a 36×8 primary with Plus + label from `sm`. Utility actions are ghost 36 icon buttons with tooltips. Profile stays a circular initials control. Sparkle still opens Command OS (P16).
 
 ---
 
 ## Command palette
 
-Product wrapper (`crm/command-palette.tsx`) untouched in orchestration. Aurora presentation: 560 width, radius 12, 36px rows, 12px section labels (not 10 uppercase), 12px descriptions, selected accent-soft wash without an orange rule, 12px kbd/footer. P16 sections and actions unchanged.
+Product wrapper (`crm/command-palette.tsx`) untouched in orchestration. Aurora presentation: 560 width, radius 12, 36px rows, unstyled search input (no nested field chrome), 12px section labels (not 10 uppercase), 12px descriptions, selected accent-soft wash without an orange rule, 12px kbd/footer. P16 sections and actions unchanged.
 
 ---
 
 ## Double-chrome
 
-RoomShell is compatibility architecture and stays mounted. Visual policy: `data-chrome="contextual"`. The Room title is `sr-only`. Tabs remain and keep hrefs. The strip is a line nav, not a second app header. Sticky heavy canvas bar removed. Ads / Reports / Outbound still use RoomShell.
+RoomShell is compatibility architecture and stays mounted. Visual policy: `data-chrome="contextual"`. The Room title is `sr-only`. Tabs remain and keep hrefs as quiet 13px text links (no orange underline bar, no second header surface). Sticky heavy canvas bar removed. Ads / Reports / Outbound still use RoomShell.
 
 ---
 
@@ -101,7 +101,35 @@ P25 / P26 / P27 preserved. Focus remains orange. Collapse cookie, keyboard rail,
 
 ## Visual QA
 
-First paint is source-complete. Populated 1440 critique/revision and 1280/1024/768 overflow must run after CI on a seeded host. See the QA section appended after that pass.
+Populated local seed (`owner@evosales.local`) against the production Vite build. Two passes: first paint, then one critique/revision.
+
+### First paint (1440)
+
+- Rail 239 / paper `#F7F7F5`, topbar 48 / solid white, titles 28/34/650, canvas `#F7F7F5`, accent `#E8530E`.
+- Search measured 448px (`flex-1 sm:max-w-md`) and read as a landing-page field.
+- Command OS 560 / radius 12 / selected `#FFF1EA`, but the query row used a nested Input pill.
+- Inbox RoomShell tabs still looked like a second chrome row (orange underline).
+- Page-level orange Creates (`Nouvelle affaire`, `Créer un contact`) still compete with global `+ Créer`. Left for V02–V14 — changing them would restyle screen content.
+- H-overflow none at 1440 / 1280 / 1024 / 768.
+
+### Revision
+
+- Search: 200 / 240 / 280, radius 8, surface (not subtle pill), no `flex-1`.
+- Command query: `unstyled` Input.
+- RoomShell tabs: contextual text links, no `border-b-2` mark.
+
+### Second paint
+
+| Viewport | Search | Sidebar (default expanded) | H-overflow |
+|---|---|---|---|
+| 1440 | 280 × 36 | 239 paper | none |
+| 1280 | 280 × 36 | 239 paper | none |
+| 1024 | 280 × 36 | 239 paper | none |
+| 768 | 240 × 36 | 239 labeled rail (existing P25 `md` desktop rail) | none |
+
+Collapsed rail measured 63. Command OS 560 × 12, transparent query field, selected `#FFF1EA`. Create menu: white surface, Contact / Company / Deal / Quote. Screenshots: `/opt/cursor/artifacts/screenshots/v01-*-{1440,1280,1024,768}.png` plus `v01-command-1440.png` and `v01-create-menu-1440.png`.
+
+Expected leftover: new shell + old page widgets/tables (Home cards, list pills, pipeline board, inbox desk, settings form). That is V02–V15 work.
 
 ---
 
@@ -113,6 +141,7 @@ Use these tokens and chrome. Do not reimplement Button, Input, Badge, dialog rad
 
 ## Intentional deferrals
 
+- Page-level primary Creates remaining orange (Home / list / pipeline). Global `+ Créer` is the chrome primary.
 - Dashboard / CRM list / pipeline / inbox / quotes / automation / settings **content**
 - QRD private hex theme (V08)
 - Home widget shadow (V02)

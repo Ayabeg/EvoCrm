@@ -2,7 +2,7 @@
 
 **Status:** Recorded before V01 paint.  
 **Base:** merged V00 `main` `037918794347db944e27d47547ecdaaaed0bf7e8`  
-**Method:** Source-true audit of the live shell. This environment still has no PHP runtime / vendor / seeded app, so a populated 1440 screenshot pass was not available at baseline time. Geometry below is from the authoritative implementation, not empty-state judgment. Visual QA after paint must photograph populated Contabo (or a seeded local) at 1440 / 1280 / 1024 / 768.
+**Method:** Source-true audit of the live shell recorded before V01 paint. Populated 1440 / 1280 / 1024 / 768 photography ran after implementation (seeded local `owner@evosales.local`) and is recorded in `V01-IMPLEMENTATION.md`.
 
 **Taste read:** authenticated B2B CRM chrome redesign for all-day operators, Apple restraint + HubSpot list usability + EvoCRM orange, restyling Aurora + `ds` only. Dials 4 / 3 / 7. No landing-page Taste.
 
