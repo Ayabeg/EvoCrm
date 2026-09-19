@@ -11,13 +11,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { conversationA11yName } from '@/lib/a11y';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
 import { dateLocale, t } from '@/lib/i18n';
 import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
 import { shouldRenderInboxCrmContext } from '@/lib/inbox-crm-context';
 import { formatInboxDay, groupInboxMessages } from '@/lib/inbox-workspace';
 import type { InboxMessage } from '@/lib/inbox-workspace';
-import { conversationA11yName } from '@/lib/a11y';
 import { cn } from '@/lib/utils';
 
 export type InboxEmbedState = 'ok' | 'blocked' | 'unreachable' | 'no-url';

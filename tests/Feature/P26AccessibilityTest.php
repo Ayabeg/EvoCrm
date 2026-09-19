@@ -125,7 +125,7 @@ it('does not claim WCAG certification or start P27 motion tokens', function () {
         ->and($audit)->toContain('DEFER-VISUAL')
         ->and($contract)->toContain('MERGE READY: NO')
         ->and($contract)->toContain('READY_FOR_CONTABO')
-        ->and($handoff)->toContain('P27 is not started')
+        ->and($handoff)->toContain('P27 is **not started**')
         ->and($motion)->not->toContain('--motion-bounce')
         ->and($motion)->not->toContain('lottie');
 });
