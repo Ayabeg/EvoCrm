@@ -1,7 +1,8 @@
 # EvoCRM design system
 
-**Status:** Locked for the product UI rebuild.  
-**Companion:** [`ui-audit.md`](./ui-audit.md) (current), [`ui-migration-plan.md`](./ui-migration-plan.md) (how).  
+**Status:** Locked for the P00–P29 product UI rebuild.  
+**V-series:** Visual work from V01 onward follows [`docs/visual/EVOCRM-VISUAL-LAW.md`](./visual/EVOCRM-VISUAL-LAW.md). V00 index: [`docs/visual/README.md`](./visual/README.md).  
+**Companion:** [`ui-audit.md`](./ui-audit.md) (P-series inventory), [`ui-migration-plan.md`](./ui-migration-plan.md) (P-series how).  
 **Rule:** one design system. No per-object visual forks. No HubSpot teal. No Salesforce blue.
 
 ## Preserve forever
