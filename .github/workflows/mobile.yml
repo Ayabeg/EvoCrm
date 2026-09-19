@@ -1,0 +1,57 @@
+name: mobile
+
+on:
+  pull_request:
+    paths:
+      - 'mobile/**'
+      - 'docs/mobile/**'
+      - '.github/workflows/mobile.yml'
+  push:
+    paths:
+      - 'mobile/**'
+      - 'docs/mobile/**'
+      - '.github/workflows/mobile.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  foundation:
+    name: Expo foundation checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Expo config validation
+        run: npm run config:check
+
+      - name: Expo doctor
+        run: npm run doctor
+
+      - name: Android JS bundle export
+        run: npm run export:android

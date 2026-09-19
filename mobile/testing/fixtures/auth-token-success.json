@@ -1,0 +1,18 @@
+{
+  "data": {
+    "token": "1|fixture-token-not-a-secret",
+    "token_type": "Bearer",
+    "user": {
+      "id": 1,
+      "name": "Lina",
+      "email": "owner@clinic.dz",
+      "role": "owner"
+    },
+    "workspace": {
+      "id": 1,
+      "name": "Evotechly",
+      "slug": "evotechly-ab12c",
+      "timezone": "Africa/Algiers"
+    }
+  }
+}
