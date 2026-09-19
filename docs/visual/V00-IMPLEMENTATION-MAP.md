@@ -120,7 +120,7 @@ V01 starts by photographing Dashboard, Contacts, Pipeline, a Contact record, Inb
 
 | Item | Severity | Notes |
 |---|---|---|
-| P29 draft PR `#245` not merged | Process | V00 based on latest merged main (`fc57d94`). Rebase V01 if P29 lands. |
+| P29 #245 merged | Closed | Post-P29 main is `7ca960b`. V00 rebased onto that SHA. |
 | No local PHP / vendor / seed | Audit | 1440 populated pass deferred to V01 start. |
 | QRD hex private theme | Visual | Restyle in V08, tokenize earlier if V01 token pass can absorb it without behavior change. |
 | Badge `cyan` default | Visual | Fix in V01 bridge. |

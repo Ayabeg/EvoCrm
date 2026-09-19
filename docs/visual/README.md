@@ -2,8 +2,8 @@
 
 **Status:** Authoritative for V01–V15.  
 **Lane:** Audit + design law only. **No production UI change.**  
-**Base:** latest merged `main` at `fc57d94c379968f5a987075aeb426acf0b152180` (P27 Motion, after P28 cleanup).  
-**P00–P29:** Frozen. P29 Final Functional Convergence is still a draft PR (`#245`) and is **not** on this base. Rebase V01 if P29 merges.
+**Base:** post-P29 `main` at `7ca960b525864fc5a0b568e22af2f2b64e05c63e` (merge of P29 #245).  
+**P00–P29:** Frozen. P29 Final Functional Convergence is merged and is the authoritative functional freeze.
 
 ---
 

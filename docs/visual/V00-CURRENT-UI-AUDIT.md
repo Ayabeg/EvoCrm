@@ -1,6 +1,6 @@
 # V00 — Current UI audit
 
-**Method:** Taste redesign protocol (§11) against live source, CSS tokens, and P25/P26/P27 contracts at `fc57d94`.  
+**Method:** Taste redesign protocol (§11) against live source, CSS tokens, and P25/P26/P27 contracts. Rebased onto post-P29 `main` `7ca960b` (P29 adds freeze docs + convergence test only; no visual-source change).  
 **Viewport intent:** 1440 first.  
 **Browser:** This environment has no PHP runtime, no `vendor/`, and no seeded app. A populated 1440 screenshot pass was **not** possible here. The audit is source-true. V01 opens with a 1440 screenshot verification against this file before paint.
 
