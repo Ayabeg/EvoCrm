@@ -56,7 +56,7 @@ it('keeps one-product wiring frozen across list, peek, command, inbox, activatio
     $workspace = File::get(resource_path('js/ds/workspace/DataWorkspace.tsx'));
     $qrd = File::get(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
     $command = File::get(resource_path('js/components/crm/command-palette.tsx'));
-    $inbox = File::get(resource_path('js/pages/crm/desk/inbox.tsx'));
+    $inbox = File::get(resource_path('js/pages/desk/inbox.tsx'));
     $activation = File::get(app_path('Enums/ActivationStepId.php'));
     $ask = File::get(app_path('Services/Ai/AskEvoContextResolver.php'));
     $logger = File::get(app_path('Services/Ai/AskEvoLogger.php'));
