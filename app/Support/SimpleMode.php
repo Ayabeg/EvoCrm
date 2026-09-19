@@ -105,6 +105,9 @@ class SimpleMode
             return true;
         }
 
-        return str_ends_with($name, '.ask') || str_contains($name, 'draft-email');
+        return str_ends_with($name, '.ask')
+            || str_contains($name, 'draft-email')
+            || $name === 'ask-evo'
+            || $name === 'ask-evo.context';
     }
 }

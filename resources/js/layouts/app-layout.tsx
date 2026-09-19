@@ -1,3 +1,4 @@
+import { AskEvoDrawer } from '@/components/crm/ask-evo-drawer';
 import { HydrateI18n } from '@/components/i18n-provider';
 import { PosthogIdentity } from '@/components/posthog-identity';
 import { QuickRecordProvider } from '@/ds/workspace/quick-record';
@@ -21,6 +22,7 @@ export default function AppLayout({
                 {children}
             </AppLayoutTemplate>
             <QuickRecordDrawer />
+            <AskEvoDrawer />
         </QuickRecordProvider>
     );
 }

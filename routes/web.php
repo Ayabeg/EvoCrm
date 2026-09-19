@@ -166,6 +166,8 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::delete('/crm/filters/{savedFilter}', [SavedFilterController::class, 'destroy'])->name('crm.filters.destroy');
     Route::get('/crm/command/search', CommandSearchController::class)
         ->name('crm.command.search');
+    Route::get('/ask-evo/context', [AskEvoController::class, 'context'])->name('ask-evo.context');
+    Route::post('/ask-evo', [AskEvoController::class, 'ask'])->name('ask-evo');
     Route::get('/crm/records/{type}/{id}/peek', [QuickRecordController::class, 'peek'])
         ->whereIn('type', ['contact', 'company', 'lead', 'deal', 'quote'])
         ->whereNumber('id')

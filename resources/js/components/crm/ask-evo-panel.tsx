@@ -1,6 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { CaretDown, CaretUp, Sparkle } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Drawer,
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import type { AskEvoSuggestion } from '@/lib/ask-evo';
 
 export type AskEvoPayload = {
     label?: string;
@@ -20,7 +21,38 @@ export type AskEvoPayload = {
     source?: string;
     live?: boolean;
     generated_at?: string | null;
+    context_label?: string | null;
+    scope_key?: string | null;
+    suggestions?: AskEvoSuggestion[];
 };
+
+function SuggestionChips({
+    suggestions,
+    onPick,
+}: {
+    suggestions?: AskEvoSuggestion[];
+    onPick: (question: string) => void;
+}) {
+    if (!suggestions?.length) {
+        return null;
+    }
+
+    return (
+        <div className="flex flex-wrap gap-1.5" role="list" aria-label="Suggested questions">
+            {suggestions.map((chip) => (
+                <button
+                    key={chip.id}
+                    type="button"
+                    role="listitem"
+                    className="rounded-full border border-hairline px-2 py-1 text-[11px] text-mute hover:text-ink"
+                    onClick={() => onPick(chip.question)}
+                >
+                    {chip.label}
+                </button>
+            ))}
+        </div>
+    );
+}
 
 function AskEvoBody({
     action,
@@ -29,15 +61,24 @@ function AskEvoBody({
     action: string;
     insight?: AskEvoPayload | null;
 }) {
+    const inputId = useId();
+    const statusId = useId();
+    const [question, setQuestion] = useState('');
     const summary =
         insight?.summary ??
-        'Ask Evo about this record — answers use fields, recent activity, and WhatsApp on this workspace.';
+        'Ask Evo about this record — answers use authorized fields on this workspace.';
+    const contextLabel = insight?.context_label ?? 'This record';
 
     return (
         <>
-            <p className="line-clamp-4 text-[12px] leading-5 text-mute">
-                {summary}
+            <p
+                data-testid="ask-evo-context"
+                className="text-[11px] text-mute"
+                aria-live="polite"
+            >
+                Context: {contextLabel}
             </p>
+            <p className="line-clamp-4 text-[12px] leading-5 text-mute">{summary}</p>
             {insight?.answer ? (
                 <p className="border-l-2 border-brand/40 pl-2 text-[12px] leading-5">
                     {insight.question ? (
@@ -46,6 +87,10 @@ function AskEvoBody({
                     {insight.answer}
                 </p>
             ) : null}
+            <SuggestionChips
+                suggestions={insight?.suggestions}
+                onPick={setQuestion}
+            />
             <Form
                 action={action}
                 method="post"
@@ -53,21 +98,41 @@ function AskEvoBody({
                 resetOnSuccess
                 options={{ preserveScroll: true }}
             >
-                <Input
-                    name="question"
-                    placeholder="Ask a question…"
-                    required
-                    size="sm"
-                    className="text-ui"
-                />
-                <Button
-                    type="submit"
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                >
-                    Ask Evo
-                </Button>
+                {({ processing, errors }) => (
+                    <>
+                        <Input
+                            id={inputId}
+                            name="question"
+                            value={question}
+                            onChange={(event) => setQuestion(event.target.value)}
+                            placeholder="Ask a question…"
+                            required
+                            size="sm"
+                            className="text-ui"
+                            aria-label="Ask Evo question"
+                            aria-describedby={statusId}
+                            aria-busy={processing}
+                            disabled={processing}
+                        />
+                        <p id={statusId} className="sr-only" aria-live="polite">
+                            {processing ? 'Ask Evo is thinking' : ''}
+                        </p>
+                        {errors.question ? (
+                            <p role="alert" className="text-[11px] text-destructive">
+                                {errors.question}
+                            </p>
+                        ) : null}
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            disabled={processing}
+                        >
+                            {processing ? 'Asking…' : 'Ask Evo'}
+                        </Button>
+                    </>
+                )}
             </Form>
         </>
     );
@@ -97,6 +162,8 @@ export function AskEvoTrigger({
                     variant="ghost"
                     size="sm"
                     className={className}
+                    aria-haspopup="dialog"
+                    aria-label="Ask Evo about this record"
                 >
                     <Sparkle className="size-3.5 text-mute" aria-hidden />
                     Ask Evo
@@ -104,7 +171,7 @@ export function AskEvoTrigger({
             </DrawerTrigger>
             <DrawerContent
                 side="bottom"
-                className="max-h-[85dvh] overflow-y-auto"
+                className="max-h-[85dvh] overflow-y-auto overflow-x-hidden"
             >
                 <DrawerHeader className="border-b border-hairline pb-3">
                     <DrawerTitle className="flex items-center gap-1.5 text-[13px] font-semibold">
@@ -146,7 +213,7 @@ export default function AskEvoPanel({
     return (
         <section
             data-testid="ask-evo-rail"
-            className="space-y-2 rounded-[var(--radius-1)] border border-hairline bg-canvas p-3"
+            className="space-y-2 overflow-x-hidden rounded-[var(--radius-1)] border border-hairline bg-canvas p-3"
         >
             <div className="flex items-center justify-between gap-2">
                 <h3 className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-mute uppercase">
@@ -181,9 +248,7 @@ export default function AskEvoPanel({
                 <div className="space-y-3">
                     <AskEvoBody action={action} insight={insight} />
                     {generated ? (
-                        <p className="text-[10px] text-mute">
-                            Generated {generated}
-                        </p>
+                        <p className="text-[10px] text-mute">Generated {generated}</p>
                     ) : null}
                 </div>
             ) : null}

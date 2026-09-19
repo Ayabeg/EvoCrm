@@ -51,6 +51,10 @@ class EnforceProductPermissions
             return null;
         }
 
+        if (in_array($name, ['ask-evo', 'ask-evo.context'], true)) {
+            return null;
+        }
+
         if (str_starts_with($name, 'crm.workflows') || $name === 'automation') {
             return 'automation.manage';
         }

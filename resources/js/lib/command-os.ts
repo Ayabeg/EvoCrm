@@ -572,7 +572,7 @@ export function commandAskItems(features: CommandFeatures | null | undefined): C
             section: 'ask',
             action: 'ask-evo-seam',
             keywords: 'ai sparkle assistant',
-            description: 'Open from a record — no answer here',
+            description: 'Open Ask Evo with this page',
         },
     ];
 }
