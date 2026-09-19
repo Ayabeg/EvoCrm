@@ -56,5 +56,9 @@ expectTrue(HOME_KPI_STRIP_TRACK_CLASS.includes('md:grid-cols-4'), 'P17 KPI 4-col
 expectTrue(!HOME_KPI_STRIP_TRACK_CLASS.includes('overflow-x-auto'), 'P17 KPI is not a scroller');
 expectTrue(HOME_KPI_VALUE_CLASS.includes('break-words'), 'P17 KPI values wrap');
 expectTrue(QUOTE_MONEY_CLASS.includes('break-words'), 'quote builder money wraps');
+expectTrue(
+    LOCAL_SCROLL_X_CLASS === 'min-w-0 overflow-x-auto',
+    'local scroll is min-w-0 overflow-x-auto',
+);
 
 console.log('P25 responsive hardening JS proofs passed');

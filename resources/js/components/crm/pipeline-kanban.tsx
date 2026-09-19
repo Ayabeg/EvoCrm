@@ -29,7 +29,7 @@ export function PipelineKanban({
     return (
         <div
             className={cn(
-                'flex min-h-[22rem] items-stretch overflow-x-auto overflow-y-hidden',
+                'flex min-h-[22rem] min-w-0 items-stretch overflow-x-auto overflow-y-hidden',
                 className,
             )}
             data-testid="pipeline-kanban"

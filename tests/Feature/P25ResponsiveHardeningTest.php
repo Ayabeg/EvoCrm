@@ -32,6 +32,8 @@ it('contains DataWorkspace, FilterBar, and list money so wide tables cannot H-ov
         ->and($filterBar)->toContain('flex min-w-0 flex-wrap items-center gap-2')
         ->and($filterBar)->not->toContain('min-w-[12rem]')
         ->and($table)->toContain("column.id !== 'amount'")
+        ->and($table)->toContain('LOCAL_SCROLL_X_CLASS')
+        ->and($table)->toContain("'table-fixed min-w-[52rem]'")
         ->and($quotes)->toContain('break-words tabular-nums')
         ->and($quotes)->not->toContain('money block truncate');
 });
@@ -71,7 +73,8 @@ it('keeps P17 KPI 2×2, inbox native/embed, and quote money unclipped', function
         ->and($builder)->toContain('QUOTE_MONEY_CLASS')
         ->and($builder)->toContain('break-words')
         ->and($split)->toContain('QUOTE_MONEY_CLASS')
-        ->and($split)->toContain('min-w-0 overflow-x-auto')
+        ->and($split)->toContain('LOCAL_SCROLL_X_CLASS')
+        ->and($split)->not->toContain('min-w-[12rem]')
         ->and($fact)->toContain('MONEY_NEVER_CLIP_CLASS')
         ->and($fact)->toContain('PAGE_OVERFLOW_CLASS');
 });
@@ -111,6 +114,7 @@ it('keeps activation, Ask Evo, and shell overflow without a visual redesign', fu
         ->and($shell)->toContain('min-w-0 overflow-x-clip')
         ->and($header)->toContain('LONG_TEXT_CLASS')
         ->and($room)->toContain('PAGE_OVERFLOW_CLASS')
+        ->and($room)->toContain('LONG_TEXT_CLASS')
         ->and($queue)->toContain('overflow-x-hidden')
         ->and($workflows)->toContain('overflow-x-hidden');
 });

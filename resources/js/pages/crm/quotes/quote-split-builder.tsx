@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
+import { LOCAL_SCROLL_X_CLASS } from '@/lib/responsive';
 import {
     QUOTE_BUILDER_DESKTOP_GRID_CLASS,
     QUOTE_BUILDER_SPLIT_CLASS,
@@ -235,7 +236,7 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                             >
                                 {({ processing }) => (
                                     <>
-                                        <div className="min-w-[12rem] flex-1">
+                                        <div className="min-w-0 flex-1">
                                             <label
                                                 htmlFor="quote-send-to"
                                                 className="mb-1 block text-[11px] text-mute"
@@ -387,7 +388,7 @@ function LineTable({
     }
 
     return (
-        <div className="min-w-0 overflow-x-auto">
+        <div className={LOCAL_SCROLL_X_CLASS}>
             <table className="w-full min-w-[28rem] border-collapse text-[13px]">
             <thead>
                 <tr className="border-b border-hairline text-left text-[11px] text-mute">

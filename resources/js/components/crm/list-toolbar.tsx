@@ -174,7 +174,7 @@ export default function ListToolbar({
                     </div>
                 )}
                 <form
-                    className="ms-auto flex min-w-[12rem] max-w-xs flex-1 items-center"
+                    className="ms-auto flex min-w-0 max-w-xs flex-1 items-center"
                     onSubmit={(event) => {
                         event.preventDefault();
                         const q = String(new FormData(event.currentTarget).get('q') ?? '');

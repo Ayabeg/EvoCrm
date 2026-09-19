@@ -26,14 +26,14 @@
 | `OVERLAY_VIEWPORT_CLASS` / `DROPDOWN_VIEWPORT_CLASS` | same | Overlay caps |
 | `.overflow-page` / `.overflow-local-x` | `resources/css/app.css` | CSS twins |
 
-Prefer these over local hacks.
+Prefer these over local hacks. Do not run Tailwind class-sort on frozen source-lock strings (`table-fixed min-w-[52rem]`, `min-w-0 break-words`).
 
 ## Surface contract
 
 | Surface | Must | Must not |
 |---|---|---|
 | **Shell** | 64/240 rail; topbar `min-w-0`; content `overflow-x-clip` | New chrome, header layout |
-| **DataWorkspace** | Page overflow + `min-w-0` result column; FilterBar always wraps; table local scroll | New columns, query, selection |
+| **DataWorkspace** | Page overflow + `min-w-0` result column; FilterBar always wraps; `LOCAL_SCROLL_X_CLASS` on list tables | New columns, query, selection |
 | **QRD** | Viewport-capped drawer; title truncate; page overflow on content | Change peek / hydrate / Escape |
 | **Pipeline** | Page overflow; column local H-scroll | Change board movement / attention |
 | **Inbox** | Native **and** embed stay; both `overflow-x-hidden` | Restyle iframe, eject Desk |

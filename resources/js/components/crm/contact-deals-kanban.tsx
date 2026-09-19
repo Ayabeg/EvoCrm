@@ -48,7 +48,7 @@ export default function ContactDealsKanban({
             </div>
 
             {layout === 'board' ? (
-                <div className="overflow-x-auto p-4">
+                <div className="min-w-0 overflow-x-auto p-4">
                     <div className="flex min-w-max gap-3">
                         {stages.map((stage) => (
                             <StageColumn

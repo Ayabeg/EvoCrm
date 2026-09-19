@@ -10,6 +10,7 @@ import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
+import { LOCAL_SCROLL_X_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 import {
     applyCompanyColumnContract,
@@ -506,7 +507,8 @@ export default function ListViewTable({
             {/* Desktop / tablet: Aurora-styled table in controlled scroll region */}
             <div
                 className={cn(
-                    'hidden overflow-x-auto overflow-y-visible @[480px]/list:block',
+                    'hidden overflow-y-visible @[480px]/list:block',
+                    LOCAL_SCROLL_X_CLASS,
                     entity === 'contact' ||
                     entity === 'company' ||
                     entity === 'deal' ||

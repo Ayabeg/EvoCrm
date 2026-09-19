@@ -6,6 +6,7 @@ P26 is **not** started in this PR. Do not treat P25 as a visual rewrite or a Con
 
 - Overflow law + shared classes in `resources/js/lib/responsive.ts` and `.overflow-page` / `.overflow-local-x`.
 - DataWorkspace / FilterBar wrap + `min-w-0` column chain (lists no longer grow the page).
+- `LOCAL_SCROLL_X_CLASS` on list tables, quote line items, and board inner scroll (`min-w-0` on `PipelineKanban`).
 - Overlay viewport caps (Dialog, dropdown, popover). QRD still `min(92vw, 520px)`.
 - Quote money wrap (`QUOTE_MONEY_CLASS` / `MONEY_NEVER_CLIP_CLASS`).
 - Inbox embed now shares `overflow-x-hidden` with native. Native/embed switch unchanged.
