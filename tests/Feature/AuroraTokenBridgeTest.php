@@ -258,8 +258,7 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     expect($header)->toContain('data-chrome="ai"');
     expect($header)->toContain('hidden min-[390px]:block');
     expect($header)->toContain('data-chrome="menu"');
-    expect($css)->toContain('--app-chrome-height: 44px');
-    expect($css)->toContain('--app-chrome-height: 52px');
+    expect($css)->toContain('--app-chrome-height: 48px');
     expect($css)->toContain(".app-topbar [data-chrome='notify']");
     expect($css)->toContain('@media (max-width: 389px)');
 });
@@ -293,11 +292,9 @@ it('keeps remaining application chrome off raw Aurora radius and muted-text toke
 it('paints the More panel with Brand Book surfaces instead of raw Aurora identity tokens', function () {
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
-    expect($rail)->toContain("borderColor: 'var(--evosales-hairline)'");
-    expect($rail)->toContain("background: 'var(--evosales-canvas-soft)'");
-    expect($rail)->toContain("background: 'var(--evosales-canvas)'");
-    expect($rail)->toContain("color: 'var(--evosales-ink)'");
-    expect($rail)->toContain('text-[var(--evosales-mute)]');
+    expect($rail)->toContain('border-hairline bg-surface text-ink')
+        ->and($rail)->toContain('bg-subtle')
+        ->and($rail)->toContain('text-mute');
     expect($rail)->not->toContain("borderColor: 'var(--aurora-border-default)'");
     expect($rail)->not->toContain("background: 'var(--aurora-control-surface)'");
     expect($rail)->not->toContain("background: 'var(--aurora-panel-strong)'");

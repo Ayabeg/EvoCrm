@@ -508,19 +508,17 @@ return null
                       {/* Icon */}
                       <span
                         style={{
-                          width: "28px",
-                          height: "28px",
+                          width: "24px",
+                          height: "24px",
                           borderRadius: "8px",
-                          background: isActive
-                            ? "color-mix(in srgb, var(--aurora-accent-primary) 14%, transparent)"
-                            : "var(--aurora-control-surface)",
-                          border: "1px solid var(--aurora-border-default)",
+                          background: "transparent",
+                          border: "none",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           flexShrink: 0,
                           color: isActive ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)",
-                          transition: "background var(--motion-duration-hover) var(--motion-ease-out), color var(--motion-duration-hover) var(--motion-ease-out)",
+                          transition: "color var(--motion-duration-hover) var(--motion-ease-out)",
                         }}
                       >
                         {item.icon}
