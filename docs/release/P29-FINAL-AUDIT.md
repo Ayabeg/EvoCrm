@@ -1,6 +1,6 @@
 # P29 — Final functional convergence & release hardening
 
-**Status:** Audit + compact proof in progress. Not a feature, redesign, architecture, cleanup, dep-upgrade, or perf rewrite.  
+**Status:** Compact proof complete. Zero BLOCKER code changes. Not a feature, redesign, architecture, cleanup, dep-upgrade, or perf rewrite.  
 **Repo:** `Mohamedbeghanem/EvoCrm`  
 **AUTHORITATIVE BASE (`starting_ref` / `origin/main`):** `fc57d94c379968f5a987075aeb426acf0b152180`  
 **P00–P28:** Frozen. This phase does not reopen them.  
@@ -77,7 +77,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | Fortify auth · `EnforceProductPermissions` · G4 policies · `forWorkspace` |
 | Proof | Login → dashboard. Guest `/dashboard` unauthenticated. Foreign contact show/peek 404. Member cannot `PUT /settings/workspace`. Command search and Ask Evo omit other-workspace rows |
 | Existing | `Auth/AuthenticationTest`, `CrmPermissionsTest`, `CrmPolicyTest`, `WebhookTenantIsolationTest`, `Api/V1/ContactWorkspaceTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** (owner Pest + P29 loop) |
 
 ### 2. Shell / nav / Command OS / deep links
 
@@ -86,7 +86,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P02 / P16 · Home href `/dashboard` · one palette |
 | Proof | `data-command="os"` · search hits workspace records · `evoSearchIndex` empty · no `/home` |
 | Existing | `Wave0ShellChromeTest`, `P16CommandOsTest`, `SimpleModeNavTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ### 3. CRM E2E Contacts / Companies / Leads / Deals / Pipeline / Quotes
 
@@ -95,7 +95,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P04–P08 · create POSTs · `LeadConverter` · `Deal::moveTo` · quote on deal |
 | Proof | One HTTP loop: company → contact → lead → deal → move → quote (Mail::fake send) |
 | Existing | `CreateContactTest`, `CrmCreateDrawerTest`, `LeadConversionTest`, `MoveDealTest`, `QuoteAcceptanceTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — P29 HTTP loop: company → contact → lead → deal → move → qualify-link → activity → quote send (`Mail::fake`) |
 
 ### 4. DataWorkspace contract
 
@@ -104,7 +104,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P03A–D · `CrmListShell` `resultMode="shared-table"` |
 | Proof | Contacts/Companies/Leads/Deals/Quotes still mount `CrmListShell` + `DataWorkspace`. No `rows={[]}` stub. Tickets stay off this wave |
 | Existing | `CrmListWorkspaceTest`, `P03A`–`P03D`, `P04`–`P08` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ### 5. QRD Contact / Company / Deal / Quote
 
@@ -113,7 +113,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P09 / P10 · `GET /crm/records/{type}/{id}/peek` · `?peek=` |
 | Proof | Peek JSON 200 for contact/company/lead/deal/quote. Foreign 404. No writes |
 | Existing | `P09QuickRecordDrawerTest`, `P10QuickRecordDrawerIntegrationTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — P29 peek 200 for contact/company/lead/deal/quote |
 
 ### 6. Pipeline persistence / permissions
 
@@ -122,7 +122,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P11 / P12 · `POST /crm/deals/{deal}/move` · `PipelinePolicy` |
 | Proof | Move persists after follow-up GET. Member cannot create pipelines |
 | Existing | `MoveDealTest`, `P12PipelineAttentionTest`, `PipelineSettingsTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — move persists after logout/login; member pipeline POST 403 |
 
 ### 7. Inbox native (+ embed compatibility only)
 
@@ -131,7 +131,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P13 / P14 · `data-inbox="native"` + `data-inbox="embed"` · CSP |
 | Proof | Native four-pane lock + embed flag + `InboxCspHeadersTest`. No third inbox |
 | Existing | `P13InboxWorkspaceTest`, `P14InboxCrmContextTest`, `InboxCspHeadersTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ### 8. Activities
 
@@ -140,7 +140,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P15 · `POST /crm/activities` · work queue |
 | Proof | Task create appears on `/crm/activities` and Home work |
 | Existing | `ActivityCreateTest`, `P15ActivitiesWorkQueueTest`, `ActivitiesIndexTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ### 9. Dashboard composition → record navigation
 
@@ -149,7 +149,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P17 · attention / work / recent / pipeline hrefs |
 | Proof | Recent item `recordRef` points at a live record GET 200. KPI 2×2 frozen (do not restyle) |
 | Existing | `P17DashboardOperatingHomeTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — Home work/recent contain the created task |
 
 ### 10. Quotes lifecycle (no live external email)
 
@@ -158,7 +158,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P18 · `QuoteMailer` / `QuoteAcceptor` |
 | Proof | Create + `Mail::fake()` send + public accept. Snapshot immutable after send |
 | Existing | `P18QuotesBuilderTest`, `QuoteDeliveryTest`, `QuoteAcceptanceTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — send uses `Mail::fake()` only |
 
 ### 11. Automation authoring / history / safety
 
@@ -167,7 +167,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P19 / P20 · structured builder · `WorkflowExecutionRedactor` |
 | Proof | No canvas. History redacts tokens/URLs. No unsafe outbound side effects in this phase |
 | Existing | `P19AutomationAuthoringTest`, `P20AutomationHistoryTest`, `WorkflowExecutionRedactorTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ### 12. Settings IA sample saves
 
@@ -176,7 +176,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P21 · existing hrefs · `PUT /settings/workspace` |
 | Proof | Owner toggles `simple_mode`; value persists on GET. Member 403 |
 | Existing | `SimpleModeToggleTest`, `EvoCrmWave5SettingsChromeTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ### 13. Integrations status / mask / reveal / isolation
 
@@ -185,7 +185,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P22 · `masked_url` + reveal POST · never print secrets |
 | Proof | GET `/settings/meta` has no workspace webhook key. Reveal returns this workspace only |
 | Existing | `Settings/P22IntegrationsTest`, `WorkspaceMetaCredentialsTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — GET `/settings/meta` never embeds the webhook key |
 
 ### 14. Activation CORE contract
 
@@ -194,7 +194,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P23 · `WorkspaceActivationService` |
 | Proof | Empty workspace `activated=false`. After contact + deal + activity → `activated=true`. Optional steps do not block. Dismiss ≠ complete |
 | Existing | `P23ActivationTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — empty `activated=false`; after CORE writes `activated=true` |
 
 ### 15. Ask Evo (read / explain only)
 
@@ -203,7 +203,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P24 · authorize-before-build · secret redactor |
 | Proof | Foreign entity → `unauthorized` + empty facts. Logger allowlist only. No write tools |
 | Existing | `P24ContextualAskEvoTest`, `P24AskEvoSecurityTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — foreign contact `unauthorized` + empty facts |
 
 ### 16. Responsive / a11y / motion samples
 
@@ -212,7 +212,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | P25 / P26 / P27 |
 | Proof | Reuse source locks: `PAGE_OVERFLOW_CLASS`, focus/names, P27 tokens, reduced-motion kill. Viewports 1440 / 1024 / 768. 1280 only if needed. No H-overflow class regressions |
 | Existing | `P25ResponsiveHardeningTest`, `P26AccessibilityTest`, `P27MotionTest` |
-| Verdict | Pending focused Pest. Live Contabo walk is Research-owned |
+| Verdict | **PASS** (source locks). Live Contabo walk is Research-owned. No product UI diff in this PR |
 
 ### 17. Error / empty / loading samples
 
@@ -221,7 +221,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | Wave6 · DataWorkspace skeleton · inbox empty |
 | Proof | Empty titles locked. Loading is immediate skeleton (no fake delay) |
 | Existing | `EvoCrmWave6EmptyMotionTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ### 18. Persistence after refresh / logout
 
@@ -230,7 +230,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | Session + Eloquent writes |
 | Proof | After logout + login, created contact and deal still GET 200. Pipeline move still on the new stage |
 | Existing | Auth tests + P29 loop |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** — logout then login; contact GET 200; deal still on qualified |
 
 ### 19. Migrations / deploy sanity
 
@@ -247,13 +247,13 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Owner | `AskEvoLogger` allowlist · `WorkflowExecutionRedactor` · P22 mask |
 | Proof | Ask Evo logs operational keys only. Workflow errors redact tokens. Integration GET never embeds raw webhook keys |
 | Existing | `P24AskEvoSecurityTest`, `WorkflowExecutionRedactorTest`, `P22IntegrationsTest` |
-| Verdict | Pending focused Pest |
+| Verdict | **PASS** |
 
 ---
 
 ## BLOCKERS found / fixed
 
-None yet. Code expansion remains **zero** until a journey fails as a functional regression.
+**None.** No product/runtime file was changed. The only test fix was the P29 inbox source path (`pages/desk/inbox.tsx`, not `pages/crm/desk/inbox.tsx`) — test harness, not a product regression.
 
 ---
 
@@ -289,12 +289,12 @@ None yet. Code expansion remains **zero** until a journey fails as a functional 
 
 | Gate | Result |
 |---|---|
-| Focused P29 + owner Pest | Pending |
-| Full Pest | Pending |
+| Focused P29 + owner Pest | **PASS** — P29 4; auth/CRM 55; workspace/QRD/inbox/home 91; quotes/automation/settings/AI 111; P25–P27/empty/product-ready 19 |
+| Full Pest | **PASS** — 1071 tests, 13611 assertions |
 | `tsc --noEmit` (after Vite Wayfinder) | PASS |
 | `vite build` | PASS |
 | ESLint | Pre-existing red — not a CI gate |
-| CI (`composer ci:check`) | Pending |
+| CI (`composer ci:check`) | Pending GitHub Actions on #245 |
 
 ---
 
@@ -303,13 +303,13 @@ None yet. Code expansion remains **zero** until a journey fails as a functional 
 | Field | Value |
 |---|---|
 | BASE | `fc57d94c379968f5a987075aeb426acf0b152180` |
-| TIP | This branch (update at stop) |
-| PR URL | Pending |
+| TIP | `19a4bbb` (update if a later commit lands) |
+| PR URL | https://github.com/Mohamedbeghanem/EvoCrm/pull/245 |
 | AUDIT | `docs/release/P29-FINAL-AUDIT.md` |
-| BLOCKERS found/fixed | None yet |
+| BLOCKERS found/fixed | None |
 | NON-BLOCKING DEBT | N1–N10 |
 | DEFERRED | V00–V15 visual · POST-V1 lint/stan · Contabo |
-| CI | Pending |
+| CI | Pending on #245 at audit write |
 | READY_FOR_CONTABO | NO |
 | MERGE READY | NO |
 | P00–P29 FROZEN | NO until Contabo |
