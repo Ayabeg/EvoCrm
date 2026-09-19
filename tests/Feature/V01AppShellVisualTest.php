@@ -14,6 +14,9 @@ it('locks V01 Visual Law tokens for chrome inheritance', function () {
         ->and($app)->toContain('--app-chrome-height: 48px')
         ->and($app)->toContain('.text-page')
         ->and($app)->toContain('.text-meta')
+        ->and($app)->toContain('.app-search-trigger')
+        ->and($app)->toContain('border-radius: 8px')
+        ->and($app)->not->toContain('border-radius: 999px')
         ->and($app)->not->toContain('--color-accent-hover: #cf4a0c')
         ->and($app)->not->toContain('--color-accent-soft: rgba(232, 83, 14, 0.1)');
 });
@@ -44,10 +47,12 @@ it('keeps the topbar as quiet utility chrome with a labeled Create control', fun
     expect($header)->toContain('app-search-trigger')
         ->and($header)->toContain("t('Search EvoCRM…')")
         ->and($header)->toContain('⌘K')
+        ->and($header)->toContain('lg:w-[280px]')
         ->and($header)->toContain("t('Create')")
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Tasks')")
         ->and($header)->toContain('className="h-9 gap-1.5 px-3"')
+        ->and($header)->not->toContain('sm:max-w-md')
         ->and($header)->not->toContain('size="sm"')
         ->and($header)->not->toContain('className="rounded-full"');
 });
@@ -60,6 +65,7 @@ it('restyles Command OS presentation without a second palette', function () {
         ->and($aurora)->toContain('var(--aurora-radius-3)')
         ->and($aurora)->toContain('minHeight: "36px"')
         ->and($aurora)->toContain('var(--color-accent-soft)')
+        ->and($aurora)->toContain('unstyled')
         ->and($aurora)->not->toContain('fontSize: "10px"')
         ->and($product)->toContain('buildCommandCatalog')
         ->and($product)->toContain('composeCommandResults');
@@ -83,5 +89,7 @@ it('demotes RoomShell to contextual navigation without dropping tabs', function 
         ->and($room)->toContain('tabs.map')
         ->and($crm)->toContain('crmTabs')
         ->and($desk)->toContain('deskTabs')
-        ->and($room)->not->toContain('text-page-title');
+        ->and($room)->not->toContain('text-page-title')
+        ->and($room)->not->toContain('border-b-2')
+        ->and($room)->not->toContain('border-[var(--evosales-mark)]');
 });

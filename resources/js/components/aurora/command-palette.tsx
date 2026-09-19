@@ -406,6 +406,7 @@ return null
           </span>
           <Input
             ref={inputRef}
+            unstyled
             type="text"
             role="combobox"
             aria-expanded={true}
@@ -419,13 +420,8 @@ return null
             }}
             placeholder={placeholder}
             aria-label="Search commands"
-            className="h-auto border-none px-0 py-0 focus-visible:outline-none"
+            className="min-w-0 flex-1 bg-transparent p-0 text-[14px] leading-5 outline-none"
             style={{
-              flex: 1,
-              background: "transparent",
-              border: "none",
-              outline: "none",
-              fontSize: "14px",
               color: "var(--aurora-text-primary)",
               fontFamily: "var(--aurora-font-sans)",
               caretColor: "var(--aurora-accent-primary)",
@@ -494,7 +490,7 @@ return null
                         gap: "10px",
                         width: "100%",
                         minHeight: "36px",
-                        padding: "8px 16px",
+                        padding: "6px 12px",
                         background: isActive ? "var(--color-accent-soft)" : "transparent",
                         border: "none",
                         borderRadius: "8px",

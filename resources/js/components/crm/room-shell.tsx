@@ -59,19 +59,19 @@ export function RoomShell({
             className={cn('flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink', PAGE_OVERFLOW_CLASS)}
             data-chrome="contextual"
         >
-            <div className="border-b border-hairline bg-transparent px-4 md:px-8">
+            <div className="px-4 md:px-8">
                 <h1 className={cn('sr-only', LONG_TEXT_CLASS)}>{t(title)}</h1>
                 {actions ? <div className="flex items-center justify-end gap-2 py-1">{actions}</div> : null}
-                <nav className="-mb-px flex gap-0 overflow-x-auto" aria-label={`${t(title)} sections`}>
+                <nav className="flex gap-3 overflow-x-auto py-1.5" aria-label={`${t(title)} sections`}>
                     {tabs.map((tab) => (
                         <Link
                             key={tab.href}
                             href={tab.href}
                             className={cn(
-                                'border-b-2 px-3 py-2 text-[13px] leading-[18px] whitespace-nowrap',
+                                'py-1 text-[13px] leading-[18px] whitespace-nowrap',
                                 tab.active
-                                    ? 'border-[var(--evosales-mark)] font-medium text-ink'
-                                    : 'border-transparent text-mute hover:text-ink',
+                                    ? 'font-medium text-ink'
+                                    : 'text-mute hover:text-ink',
                             )}
                         >
                             {t(tab.label)}

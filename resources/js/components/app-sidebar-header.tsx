@@ -95,7 +95,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         <span className="sr-only">EvoCrm</span>
                     </Link>
                 ) : null}
-                <div className="relative min-w-0 flex-1 sm:max-w-md" data-chrome="search">
+                <div className="relative w-[min(100%,200px)] shrink-0 sm:w-[240px] lg:w-[280px]" data-chrome="search">
                     <Input
                         readOnly
                         value=""
@@ -107,7 +107,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         startAdornment={
                             <MagnifyingGlass className="size-4" weight="regular" aria-hidden />
                         }
-                        className="app-search-trigger cursor-pointer pr-3 sm:pr-14"
+                        className="app-search-trigger cursor-pointer pr-3 sm:pr-12"
                     />
                     <span className="text-meta pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 font-sans text-mute sm:inline">
                         ⌘K
