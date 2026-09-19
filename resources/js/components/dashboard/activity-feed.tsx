@@ -1,4 +1,6 @@
 import { Link } from '@inertiajs/react';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 export type ActivityFeedItem = {
     id: number;
@@ -67,7 +69,10 @@ export function ActivityFeed({ items }: { items: ActivityFeedItem[] }) {
                 <li key={item.id}>
                     <Link
                         href={item.href}
-                        className="-mx-1 flex items-baseline justify-between gap-3 rounded-md px-1 py-2 transition-colors duration-150 hover:bg-canvas-soft"
+                        className={cn(
+                            '-mx-1 flex items-baseline justify-between gap-3 rounded-md px-1 py-2 hover:bg-canvas-soft',
+                            MOTION_HOVER_CLASS,
+                        )}
                     >
                         <p className="min-w-0 truncate text-[13px] text-ink">
                             <span className="font-medium">

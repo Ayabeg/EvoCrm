@@ -3,8 +3,9 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
 import { usePortalContainer } from "@/lib/aurora/portal-container"
+import { MOTION_DRAWER_CLASS, MOTION_HOVER_CLASS } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 
 const Sheet = DialogPrimitive.Root
 const SheetTrigger = DialogPrimitive.Trigger
@@ -37,6 +38,7 @@ function SheetContent({ ref, className, children, side = "right", style, hideClo
       <DialogPrimitive.Overlay
         className={cn(
           "fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          MOTION_DRAWER_CLASS,
           "motion-reduce:animate-none motion-reduce:transition-none",
           overlayClassName,
         )}
@@ -45,8 +47,9 @@ function SheetContent({ ref, className, children, side = "right", style, hideClo
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed z-50 flex flex-col overflow-hidden border transition ease-in-out focus-visible:outline-none",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300",
+          "fixed z-50 flex flex-col overflow-hidden border transition focus-visible:outline-none",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          MOTION_DRAWER_CLASS,
           "motion-reduce:animate-none motion-reduce:transition-none motion-reduce:duration-0",
           sideClass[side],
           className,
@@ -63,7 +66,10 @@ function SheetContent({ ref, className, children, side = "right", style, hideClo
         {children}
         {!hideClose ? (
           <SheetClose
-            className="absolute right-5 top-5 rounded-full border p-1.5 text-[var(--aurora-text-muted)] transition-colors hover:text-[var(--aurora-text-primary)] focus-visible:outline-none focus-visible:ring-2 [&:focus-visible]:ring-[var(--aurora-focus-ring)]"
+            className={cn(
+              "absolute right-5 top-5 rounded-full border p-1.5 text-[var(--aurora-text-muted)] hover:text-[var(--aurora-text-primary)] focus-visible:outline-none focus-visible:ring-2 [&:focus-visible]:ring-[var(--aurora-focus-ring)]",
+              MOTION_HOVER_CLASS,
+            )}
             style={{
               borderColor: "var(--aurora-border-default)",
               background: "var(--aurora-control-surface)",

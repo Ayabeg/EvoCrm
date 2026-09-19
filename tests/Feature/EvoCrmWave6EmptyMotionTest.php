@@ -69,8 +69,9 @@ it('applies MOTION 3 press, rail, drawer, and toast without page hijacks', funct
         ->and($motion)->not->toContain('spring')
         ->and($motion)->not->toContain('framer');
 
-    expect($sheet)->toContain('data-[state=open]:duration-300')
-        ->and($sheet)->toContain('data-[state=closed]:duration-200')
+    expect($sheet)->toContain('MOTION_DRAWER_CLASS')
+        ->and($sheet)->toContain('motion-reduce:animate-none')
+        ->and($sheet)->not->toContain('data-[state=open]:duration-300')
         ->and($sheet)->not->toContain('data-[state=open]:duration-500');
 
     expect($drawer)->toContain('data-aurora="drawer"');

@@ -19,6 +19,7 @@ import { EMPTY_VALUE } from '@/ds/workspace/record-adapters/present';
 import { handleQuickRecordEscapeKeyDown } from '@/lib/command-os';
 import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
+import { MOTION_DRAWER_CLASS } from '@/lib/motion';
 import { PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
@@ -257,15 +258,15 @@ export function QuickRecordDrawer() {
                     borderColor: '#E3E3DF',
                     boxShadow: 'none',
                     color: '#161616',
-                    transitionTimingFunction: 'cubic-bezier(.2,.8,.2,1)',
-                    transitionDuration: '200ms',
+                    transitionTimingFunction: 'var(--motion-ease-out, cubic-bezier(.2,.8,.2,1))',
+                    transitionDuration: 'var(--motion-duration-drawer, 200ms)',
                 }}
                 className={cn(
                     'w-full max-sm:w-full sm:w-[min(92vw,520px)] lg:w-[480px]',
                     'gap-0 border-l bg-white p-0',
                     PAGE_OVERFLOW_CLASS,
-                    'data-[state=open]:duration-200 data-[state=closed]:duration-200',
-                    'motion-reduce:transition-none motion-reduce:data-[state=open]:duration-0 motion-reduce:data-[state=closed]:duration-0',
+                    MOTION_DRAWER_CLASS,
+                    'motion-reduce:transition-none',
                 )}
             >
                 <header className="sticky top-0 z-10 shrink-0 border-b border-[#E3E3DF] bg-[#FFFFFF] px-4 py-3">

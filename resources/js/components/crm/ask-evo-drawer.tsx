@@ -27,6 +27,8 @@ import type {
     AskEvoIdentity,
     AskEvoSuggestion,
 } from '@/lib/ask-evo';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 type Turn = {
     question: string;
@@ -224,7 +226,10 @@ export function AskEvoDrawer() {
                                 <button
                                     key={chip.id}
                                     type="button"
-                                    className="rounded-full border border-hairline px-2 py-1 text-[11px] text-mute hover:text-ink"
+                                    className={cn(
+                                        'rounded-full border border-hairline px-2 py-1 text-[11px] text-mute hover:text-ink',
+                                        MOTION_HOVER_CLASS,
+                                    )}
                                     onClick={() => {
                                         setQuestion(chip.question);
                                         void ask(chip.question);

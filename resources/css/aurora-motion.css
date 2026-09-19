@@ -1,21 +1,21 @@
 /*
- * Aurora MOTION 3 (calm) — EvoCrm product overlay.
- * Transform and opacity only. 200–300ms. No bounce, no page fades,
+ * P27 product motion — restrained, one language.
+ * Transform / opacity / color only. No bounce, no page fades,
  * no scroll hijacks. Unlayered so press/rail beats @layer aurora-components.
- * See docs/visual-system/aurora-motion.md
+ * See docs/motion/P27-CONTRACT.md
  */
 
 .aurora-btn {
     transition:
-        transform var(--motion-duration-medium, 240ms)
+        transform var(--motion-duration-page, 150ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        opacity var(--motion-duration-medium, 240ms)
+        opacity var(--motion-duration-page, 150ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        background-color var(--motion-duration-fast, 160ms)
+        background-color var(--motion-duration-hover, 120ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        border-color var(--motion-duration-fast, 160ms)
+        border-color var(--motion-duration-hover, 120ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        color var(--motion-duration-fast, 160ms)
+        color var(--motion-duration-hover, 120ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
 }
 
@@ -25,13 +25,13 @@
 
 .app-rail-item {
     transition:
-        background-color var(--motion-duration-medium, 240ms)
+        background-color var(--motion-duration-hover, 120ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        color var(--motion-duration-medium, 240ms)
+        color var(--motion-duration-hover, 120ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        opacity var(--motion-duration-medium, 240ms)
+        opacity var(--motion-duration-hover, 120ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        transform var(--motion-duration-fast, 160ms)
+        transform var(--motion-duration-page, 150ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
 }
 
@@ -41,15 +41,15 @@
 
 [data-aurora='drawer'] {
     transition:
-        transform var(--motion-duration-medium, 240ms)
+        transform var(--motion-duration-drawer, 200ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        opacity var(--motion-duration-medium, 240ms)
+        opacity var(--motion-duration-drawer, 200ms)
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
 }
 
 .toaster [data-sonner-toast],
 .aurora-toast-enter {
-    animation: evocrm-toast-in var(--motion-duration-medium, 240ms)
+    animation: evocrm-toast-in var(--motion-duration-page, 150ms)
         var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
 }
 
@@ -65,16 +65,45 @@
     }
 }
 
+[data-command='backdrop'] {
+    animation: aurora-backdrop-in var(--motion-duration-page, 150ms)
+        var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+}
+
+[data-command='os'] {
+    animation: evocrm-command-in var(--motion-duration-modal, 180ms)
+        var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+}
+
+@keyframes evocrm-command-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .aurora-btn,
-    .app-rail-item,
+    .app-rail-item {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+
     [data-aurora='drawer'],
     .toaster [data-sonner-toast],
     .aurora-toast-enter,
     [data-command='os'],
-    [data-command='backdrop'] {
+    [data-command='backdrop'],
+    [data-p27-motion],
+    .animate-pulse,
+    .animate-in,
+    .animate-out,
+    .aurora-shimmer {
         transition: none !important;
         animation: none !important;
-        transform: none !important;
     }
 }

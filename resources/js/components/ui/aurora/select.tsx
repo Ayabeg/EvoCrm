@@ -3,8 +3,9 @@
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { CaretDown, CaretUp, Check } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
 import { usePortalContainer } from "@/lib/aurora/portal-container"
+import { MOTION_DROPDOWN_CLASS, MOTION_HOVER_CLASS } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 
 // ─── Root ───────────────────────────────────────────────────────────────────
 
@@ -23,7 +24,7 @@ function SelectTrigger({ ref, className, children, ...props }: React.ComponentPr
         "text-[var(--aurora-text-primary)]",
         "border border-[var(--aurora-border-strong)]",
         "rounded-[var(--aurora-radius-1)]",
-        "transition-all duration-150 ease-out",
+        MOTION_HOVER_CLASS,
         "focus:outline-none",
         "disabled:pointer-events-none disabled:opacity-45",
         "data-[placeholder]:text-[var(--aurora-text-muted)]",
@@ -103,6 +104,7 @@ function SelectContent({ ref, className, children, position = "popper", ...props
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2",
+          MOTION_DROPDOWN_CLASS,
           position === "popper" && [
             "data-[side=bottom]:translate-y-1",
             "data-[side=top]:-translate-y-1",
@@ -161,7 +163,8 @@ function SelectItem({ ref, className, children, ...props }: React.ComponentProps
         "relative flex w-full cursor-default select-none items-center",
         "rounded-[10px] py-1.5 pl-2.5 pr-8",
         "border border-transparent",
-        "outline-none transition-colors duration-100",
+        "outline-none",
+        MOTION_HOVER_CLASS,
         "data-[highlighted]:bg-[var(--aurora-hover-bg)] data-[highlighted]:text-[var(--aurora-accent-strong)]",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-45",
         "text-[var(--aurora-text-primary)]",

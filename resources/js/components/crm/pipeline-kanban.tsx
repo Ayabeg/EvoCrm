@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 const cardRadius = 'rounded-[10px]';
 const motion =
-    'duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-out)]';
+    'duration-[var(--motion-duration-hover)] ease-[var(--motion-ease-out)]';
 
 export function PipelineKanban({
     children,

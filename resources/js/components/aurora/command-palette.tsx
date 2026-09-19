@@ -356,7 +356,7 @@ return null
           inset: 0,
           zIndex: 200,
           background: "var(--aurora-overlay)",
-          animation: "aurora-backdrop-in 0.12s ease-out",
+          animation: "aurora-backdrop-in var(--motion-duration-page) var(--motion-ease-out)",
         }}
       />
 
@@ -386,7 +386,7 @@ return null
           boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)",
           overflow: "hidden",
           overflowX: "hidden",
-          animation: "aurora-cmd-in 0.15s cubic-bezier(0.16, 1, 0.3, 1)",
+          animation: "evocrm-command-in var(--motion-duration-modal) var(--motion-ease-out)",
         }}
       >
         {/* Search row */}
@@ -398,7 +398,7 @@ return null
             gap: "10px",
             padding: "12px 16px",
             borderBottom: "1px solid var(--aurora-border-default)",
-            transition: "border-bottom-color 0.15s, box-shadow 0.15s",
+            transition: "border-bottom-color var(--motion-duration-hover) var(--motion-ease-out), box-shadow var(--motion-duration-hover) var(--motion-ease-out)",
           }}
         >
           <span style={{ color: "var(--aurora-text-muted)", flexShrink: 0 }}>
@@ -503,7 +503,7 @@ return null
                         cursor: "pointer",
                         textAlign: "left",
                         overflow: "hidden",
-                        transition: "background 0.08s",
+                        transition: "background var(--motion-duration-hover) var(--motion-ease-out)",
                       }}
                     >
                       {/* Icon */}
@@ -521,7 +521,7 @@ return null
                           justifyContent: "center",
                           flexShrink: 0,
                           color: isActive ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)",
-                          transition: "background 0.08s, color 0.08s",
+                          transition: "background var(--motion-duration-hover) var(--motion-ease-out), color var(--motion-duration-hover) var(--motion-ease-out)",
                         }}
                       >
                         {item.icon}

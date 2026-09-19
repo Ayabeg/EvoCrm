@@ -37,7 +37,7 @@ function renderSharedTableSurface<Row extends { id: RowId }>(
 
     if (props.loading) {
         return (
-            <div className="space-y-2 px-4 py-4 md:px-8" aria-busy="true">
+            <div className="space-y-2 px-4 py-4 md:px-8" aria-busy="true" data-p27="loading">
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />

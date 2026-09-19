@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { t } from '@/lib/i18n';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 type Contact = InboxContact & {
     deals?: { id: number; title: string; stage?: { name: string } }[];
@@ -93,11 +95,13 @@ export default function ConversationHistory({ threads, selected }: Props) {
                                     <li key={thread.id}>
                                         <button
                                             type="button"
-                                            className={`flex w-full items-start gap-2.5 border-b border-hairline px-3 py-2 text-left transition-colors duration-150 ${
+                                            className={cn(
+                                                'flex w-full items-start gap-2.5 border-b border-hairline px-3 py-2 text-left',
+                                                MOTION_HOVER_CLASS,
                                                 selected?.id === thread.id
                                                     ? 'bg-canvas-soft'
-                                                    : 'hover:bg-canvas-soft'
-                                            }`}
+                                                    : 'hover:bg-canvas-soft',
+                                            )}
                                             onClick={() =>
                                                 router.get(
                                                     '/conversations',

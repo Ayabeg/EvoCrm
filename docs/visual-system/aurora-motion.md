@@ -1,6 +1,8 @@
-# Aurora motion (MOTION 3)
+# Aurora motion (MOTION 3) → P27
 
-Calm product motion for EvoCrm. Tokens live in `resources/js/components/aurora.css`. Product overrides live in `resources/css/aurora-motion.css` (imported last from `app.css`).
+Calm product motion for EvoCrm. **P27 is authoritative** for product chrome: [`docs/motion/P27-CONTRACT.md`](../motion/P27-CONTRACT.md).
+
+Tokens live in `resources/css/app.css` (P27 roles) and `resources/js/components/aurora.css` (easing). Product overrides live in `resources/css/aurora-motion.css` (imported last from `app.css`).
 
 **Dials:** MOTION 3 · VARIANCE 4 · DENSITY 8  
 **Palette:** paper `#eaeaea` · ink `#000000` · accent `#d9500f`
@@ -10,13 +12,13 @@ Calm product motion for EvoCrm. Tokens live in `resources/js/components/aurora.c
 | Rule | Value |
 |------|--------|
 | Properties | `transform` and `opacity` only (color/background may fade with the same timing) |
-| Duration | 200–300ms (`--motion-duration-fast` 160ms / `--motion-duration-medium` 240ms) |
+| Duration | Hover 120ms · dropdown/page 150ms · modal 180ms · drawer 200ms |
 | Easing | `--motion-ease-out` `cubic-bezier(0.2, 0.8, 0.2, 1)` — no bounce |
 | CTA press | `scale(0.98)` on `.aurora-btn:active` |
 | Rail press | `scale(0.97)` on `.app-rail-item:active` |
-| Drawer | Sheet open 300ms / close 200ms; `[data-aurora=drawer]` |
-| Toast | Sonner enter 240ms `translateY(8px) → 0` + opacity (`.aurora-toast-enter`) |
-| Reduced motion | `prefers-reduced-motion: reduce` kills transition/animation/transform |
+| Drawer | Sheet open/close 200ms; `[data-aurora=drawer]` |
+| Toast | Sonner enter 150ms `translateY(8px) → 0` + opacity (`.aurora-toast-enter`) |
+| Reduced motion | `prefers-reduced-motion: reduce` kills decorative transition/animation |
 
 ## Out of scope
 
