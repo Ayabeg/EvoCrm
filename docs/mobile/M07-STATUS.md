@@ -11,7 +11,7 @@ M06R: MERGED (PR #237)
 M06R MERGE SHA: a9b3095fa449d4ee0ce5a64880d8c6476d761f31
 
 BASE SHA: a9b3095fa449d4ee0ce5a64880d8c6476d761f31
-TIP SHA: (updated on each commit; see git)
+TIP SHA: c308aaefae7e88d1d74adabd4480926f8ab94cd5
 PR: https://github.com/Mohamedbeghanem/EvoCrm/pull/241
 
 EXPO SDK: 57.0.24 (sdkVersion 57.0.0)
