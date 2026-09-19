@@ -9,8 +9,8 @@ import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
-import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { formatDzd } from '@/lib/money';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { LOCAL_SCROLL_X_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 import {

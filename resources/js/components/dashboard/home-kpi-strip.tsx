@@ -4,8 +4,8 @@ import {
     HOME_KPI_STRIP_TRACK_CLASS,
     HOME_KPI_VALUE_CLASS,
 } from '@/lib/dashboard-operating-home';
-import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { formatCompactDzd } from '@/lib/money';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 function formatKpiValue(kpi: KpiTile): string {
