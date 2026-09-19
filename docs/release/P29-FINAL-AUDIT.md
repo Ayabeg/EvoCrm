@@ -294,7 +294,7 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | `tsc --noEmit` (after Vite Wayfinder) | PASS |
 | `vite build` | PASS |
 | ESLint | Pre-existing red — not a CI gate |
-| CI (`composer ci:check`) | Pending GitHub Actions on #245 |
+| CI (`composer ci:check`) | **GREEN** — https://github.com/Mohamedbeghanem/EvoCrm/actions/runs/35447848001 |
 
 ---
 
@@ -303,13 +303,13 @@ Evidence is filled as gates run. “Owner” is the frozen contract, not a new o
 | Field | Value |
 |---|---|
 | BASE | `fc57d94c379968f5a987075aeb426acf0b152180` |
-| TIP | `19a4bbb` (update if a later commit lands) |
+| TIP | branch `cursor/p29-final-functional-convergence-22ad` (see git) |
 | PR URL | https://github.com/Mohamedbeghanem/EvoCrm/pull/245 |
 | AUDIT | `docs/release/P29-FINAL-AUDIT.md` |
 | BLOCKERS found/fixed | None |
 | NON-BLOCKING DEBT | N1–N10 |
 | DEFERRED | V00–V15 visual · POST-V1 lint/stan · Contabo |
-| CI | Pending on #245 at audit write |
+| CI | **GREEN** (`tests / ci` on #245) |
 | READY_FOR_CONTABO | NO |
 | MERGE READY | NO |
 | P00–P29 FROZEN | NO until Contabo |
