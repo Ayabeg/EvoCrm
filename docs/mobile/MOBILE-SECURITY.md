@@ -27,8 +27,8 @@ Sources: https://docs.expo.dev/versions/latest/sdk/securestore/ · `docs/api-v1.
 
 | Data | Store |
 |---|---|
-| Sanctum token | Secure (`auth.sanctum_token`) |
-| Session meta (user/workspace/permissions) | Secure |
+| Sanctum token | Secure (`auth.sanctum_token`) only |
+| Last `/me` snapshot | Non-sensitive `ws:{id}:identity` — not a token |
 | `ws:{workspaceId}:*` caches | Non-sensitive prefs, evictable; never tokens |
 | Push device token | Sent to `POST /api/v1/devices`; do not persist in AsyncStorage |
 | Logs | No tokens, no message bodies |

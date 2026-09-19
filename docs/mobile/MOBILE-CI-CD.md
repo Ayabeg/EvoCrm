@@ -18,7 +18,9 @@ Linux CI is the required gate. Local Xcode is **not** required for normal develo
 
 The existing Laravel [`.github/workflows/tests.yml`](../../.github/workflows/tests.yml) remains the API source of truth.
 
-## EAS (prepared, not executed in M06R)
+M07 uses the same Linux job (`Expo M07 checks`). EAS binaries remain **NOT EXECUTED** without `EXPO_TOKEN`.
+
+## EAS (prepared, not executed in M06R or M07)
 
 [`mobile/eas.json`](../../mobile/eas.json) defines:
 

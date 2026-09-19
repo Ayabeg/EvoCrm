@@ -1,5 +1,17 @@
 # Changelog
 
+## Mobile M07 Auth + Workspace (2026-09-19)
+
+### Added
+- Expo product login against `POST /api/v1/auth/token` and `GET /api/v1/me`
+- Session restore, SecureStore token isolation, workspace `ws:{id}:` wipe, honest logout revoke
+
+### Notes
+- Workspace switching deferred — no backend contract
+- G01–G04 remain backend handoffs; no CRM screens
+
+---
+
 ## Transactional mail via Resend (2026-09-14)
 
 ### Added

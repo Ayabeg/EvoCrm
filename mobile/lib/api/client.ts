@@ -10,6 +10,7 @@ import {
   offlineError,
   parseFailureError,
   timeoutError,
+  unreachableError,
   type ApiError,
 } from '@/lib/api/errors';
 
@@ -21,6 +22,7 @@ export type ApiClientOptions = {
   isOnline?: () => Promise<boolean> | boolean;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
+  onUnauthorized?: (error: ApiError) => void | Promise<void>;
 };
 
 export type ApiSuccess<T> = {
@@ -43,7 +45,20 @@ export type RequestInitWithoutAuth = {
 };
 
 export class ApiClient {
-  constructor(private readonly options: ApiClientOptions) {}
+  private onUnauthorized: ApiClientOptions['onUnauthorized'];
+
+  constructor(private readonly options: ApiClientOptions) {
+    this.onUnauthorized = options.onUnauthorized;
+  }
+
+  setOnUnauthorized(handler: ApiClientOptions['onUnauthorized']): () => void {
+    this.onUnauthorized = handler;
+    return () => {
+      if (this.onUnauthorized === handler) {
+        this.onUnauthorized = undefined;
+      }
+    };
+  }
 
   async call<T>(
     name: KnownEndpointName,
@@ -108,13 +123,20 @@ export class ApiClient {
       }
 
       if (!response.ok) {
-        return { ok: false, error: mapHttpError(response.status, parsed) };
+        const error = mapHttpError(response.status, parsed);
+        if (error.kind === 'unauthorized' && init.auth !== false) {
+          void this.onUnauthorized?.(error);
+        }
+        return { ok: false, error };
       }
 
       return { ok: true, status: response.status, data: parsed as T };
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         return { ok: false, error: timeoutError() };
+      }
+      if (error instanceof TypeError) {
+        return { ok: false, error: unreachableError() };
       }
       return { ok: false, error: parseFailureError() };
     } finally {

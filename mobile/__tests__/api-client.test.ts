@@ -63,6 +63,18 @@ describe('API client', () => {
     }
   });
 
+  it('maps fetch TypeError to an unreachable network error, not parse failure', async () => {
+    const api = client(async () => {
+      throw new TypeError('Failed to fetch');
+    });
+    const result = await api.call('me');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.kind).toBe('offline');
+      expect(result.error.message).toBe('Could not reach the server.');
+    }
+  });
+
   it('returns parse_failure on HTML bodies', async () => {
     const api = client(async () => new Response('<html>nope</html>', { status: 200 }));
     const result = await api.call('me');

@@ -40,7 +40,7 @@ Web Inertia remains the system of record for admin surfaces. Mobile never talks 
 mobile/
   app/            Expo Router screens (placeholders + deep-link seams)
   components/
-  features/       empty until after M07
+  features/       CRM modules start at M08; auth lives in lib/ + app/(auth)
   lib/api         catalog, client, error mapping
   lib/auth        session state machine
   lib/storage     SECURE vs NON-SENSITIVE
@@ -62,16 +62,17 @@ mobile/
 4. Unknown or P0-blocked paths throw — no silent mocks
 5. Never call Inertia routes or Desk iframe URLs
 
-## Auth sequence (foundation)
+## Auth sequence (M07)
 
-1. `POST /api/v1/auth/token` (`email`, `password`, `device_name`)
-2. Store plaintext token in SecureStore
-3. `GET /api/v1/me` → user, workspace, permissions
-4. `DELETE /api/v1/auth/token` on logout + wipe secure + workspace caches
+1. Boot screen while `booting` / `unknown`
+2. `POST /api/v1/auth/token` (`email`, `password`, `device_name`)
+3. Store plaintext token in SecureStore **only**
+4. `GET /api/v1/me` → user, workspace, permissions (required to enter the shell)
+5. `DELETE /api/v1/auth/token` on logout + wipe secure + workspace caches
 
-States: `unknown` → `unauthenticated` | `authenticating` | `authenticated` | `expired`
+States: `booting` | `unknown` | `unauthenticated` | `authenticating` | `authenticated` | `expired`
 
-M07 owns product login / workspace-switch UX. The current sign-in route is a development seam.
+Workspace switching is **deferred** — no backend contract. See `M07-AUTH-STATE-MACHINE.md`.
 
 ## Shared truth with backend
 

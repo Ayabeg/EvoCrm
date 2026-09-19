@@ -5,7 +5,7 @@ One TypeScript codebase for iOS and Android.
 **AUTHORITATIVE CLIENT STACK:** Expo + React Native + TypeScript + Expo Router  
 **SUPERSEDED:** Swift + SwiftUI / Kotlin + Jetpack Compose dual-client (PR #235 — historical, do not merge)
 
-This workspace is the **M06R foundation only**. There are no CRM feature screens. M07 (Auth + Workspace UX) has not started.
+This workspace is the Expo client (M06R foundation + **M07 Auth + Workspace**). There are no CRM feature screens yet. M08 (Contacts) has not started.
 
 ## Layout
 

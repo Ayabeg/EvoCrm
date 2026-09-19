@@ -18,6 +18,14 @@ export function hasServerPermission(permissions: string[], permission: string): 
   return permissions.includes(permission);
 }
 
-export function canHint(permissions: string[], permission: KnownPermission): boolean {
+/** UX hint only. Unknown or missing permissions deny. Server still enforces. */
+export function can(permissions: string[], permission: string): boolean {
+  if (!permission) {
+    return false;
+  }
   return hasServerPermission(permissions, permission);
+}
+
+export function canHint(permissions: string[], permission: KnownPermission): boolean {
+  return can(permissions, permission);
 }
