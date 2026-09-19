@@ -596,7 +596,8 @@ export default function ListViewTable({
                                         ? 'min-h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft'
                                         : 'h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft',
                                     selected && 'bg-canvas-soft',
-                                    onRowPeek && 'focus-visible:outline-none focus-visible:bg-canvas-soft',
+                                    onRowPeek &&
+                                        'focus-visible:bg-canvas-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--color-accent)]',
                                 )}
                                 onClick={(event) => {
                                     activateListRow(
@@ -617,12 +618,16 @@ export default function ListViewTable({
                                     );
                                 }}
                                 onKeyDown={(event) => {
-                                    if (event.key !== 'Enter') {
+                                    if (event.key !== 'Enter' && event.key !== ' ') {
                                         return;
                                     }
 
                                     if (event.target !== event.currentTarget) {
                                         return;
+                                    }
+
+                                    if (event.key === ' ') {
+                                        event.preventDefault();
                                     }
 
                                     activateListRow(

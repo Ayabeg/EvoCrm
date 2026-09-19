@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
     Drawer,
     DrawerContent,
+    DrawerDescription,
     DrawerHeader,
     DrawerTitle,
 } from '@/components/ui/drawer';
@@ -186,6 +187,7 @@ export function AskEvoDrawer() {
                 side="bottom"
                 className="max-h-[85dvh] overflow-y-auto overflow-x-hidden"
                 aria-labelledby="ask-evo-drawer-title"
+                aria-describedby="ask-evo-drawer-description"
             >
                 <DrawerHeader className="border-b border-hairline pb-3">
                     <DrawerTitle
@@ -195,6 +197,9 @@ export function AskEvoDrawer() {
                         <Sparkle className="size-3.5 text-mute" aria-hidden />
                         Ask Evo
                     </DrawerTitle>
+                    <DrawerDescription id="ask-evo-drawer-description" className="sr-only">
+                        Ask a question about the current page. Answers use authorized workspace fields.
+                    </DrawerDescription>
                     <p
                         data-testid="ask-evo-context"
                         className="min-w-0 break-words text-[11px] text-mute"
@@ -214,12 +219,11 @@ export function AskEvoDrawer() {
                         </p>
                     ))}
                     {context?.suggestions?.length ? (
-                        <div className="flex flex-wrap gap-1.5" role="list" aria-label="Suggested questions">
+                        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Suggested questions">
                             {context.suggestions.map((chip: AskEvoSuggestion) => (
                                 <button
                                     key={chip.id}
                                     type="button"
-                                    role="listitem"
                                     className="rounded-full border border-hairline px-2 py-1 text-[11px] text-mute hover:text-ink"
                                     onClick={() => {
                                         setQuestion(chip.question);

@@ -17,6 +17,7 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
     const { progress, collapsed, activated } = activation;
     const label = activationProgressLabel(progress);
     const percent = activationProgressValue(progress);
+    const currentStepId = activation.steps.find((step) => !step.complete)?.id;
 
     return (
         <section
@@ -88,7 +89,11 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
             ) : (
                 <ol className="divide-y divide-hairline border-t border-hairline">
                     {activation.steps.map((step) => (
-                        <ActivationStepRow key={step.id} step={step} />
+                        <ActivationStepRow
+                            key={step.id}
+                            step={step}
+                            current={step.id === currentStepId}
+                        />
                     ))}
                 </ol>
             )}
@@ -96,11 +101,20 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
     );
 }
 
-function ActivationStepRow({ step }: { step: ActivationStep }) {
+function ActivationStepRow({
+    step,
+    current = false,
+}: {
+    step: ActivationStep;
+    current?: boolean;
+}) {
     const kindLabel = step.kind === 'core' ? t('Required') : t('Optional');
 
     return (
-        <li className="flex flex-wrap items-start gap-3 px-3 py-2.5">
+        <li
+            className="flex flex-wrap items-start gap-3 px-3 py-2.5"
+            aria-current={current ? 'step' : undefined}
+        >
             <span
                 className={cn(
                     'mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border',

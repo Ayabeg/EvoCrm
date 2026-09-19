@@ -99,6 +99,7 @@ export function DataTable<Row extends { id: RowId }>({
                         return (
                             <tr
                                 key={row.id}
+                                aria-selected={onToggle ? selected : undefined}
                                 className={cn(
                                     'h-12 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
                                     selected && 'bg-canvas-soft',

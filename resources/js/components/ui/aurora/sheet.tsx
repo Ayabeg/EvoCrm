@@ -37,6 +37,7 @@ function SheetContent({ ref, className, children, side = "right", style, hideClo
       <DialogPrimitive.Overlay
         className={cn(
           "fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "motion-reduce:animate-none motion-reduce:transition-none",
           overlayClassName,
         )}
         style={{ backgroundColor: "var(--aurora-overlay)", ...overlayStyle }}
@@ -46,6 +47,7 @@ function SheetContent({ ref, className, children, side = "right", style, hideClo
         className={cn(
           "fixed z-50 flex flex-col overflow-hidden border transition ease-in-out focus-visible:outline-none",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300",
+          "motion-reduce:animate-none motion-reduce:transition-none motion-reduce:duration-0",
           sideClass[side],
           className,
         )}

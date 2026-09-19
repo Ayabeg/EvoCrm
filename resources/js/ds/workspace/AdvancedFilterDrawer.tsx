@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import {
     Drawer,
     DrawerContent,
+    DrawerDescription,
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
@@ -59,6 +60,9 @@ export function AdvancedFilterDrawer({
             >
                 <DrawerHeader>
                     <DrawerTitle>Advanced filters</DrawerTitle>
+                    <DrawerDescription className="sr-only">
+                        Narrow this list with field conditions. Apply writes the current URL.
+                    </DrawerDescription>
                 </DrawerHeader>
                 <Form
                     action={basePath}

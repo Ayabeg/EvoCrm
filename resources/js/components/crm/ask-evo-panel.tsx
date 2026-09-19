@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
     Drawer,
     DrawerContent,
+    DrawerDescription,
     DrawerHeader,
     DrawerTitle,
     DrawerTrigger,
@@ -38,12 +39,11 @@ function SuggestionChips({
     }
 
     return (
-        <div className="flex flex-wrap gap-1.5" role="list" aria-label="Suggested questions">
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Suggested questions">
             {suggestions.map((chip) => (
                 <button
                     key={chip.id}
                     type="button"
-                    role="listitem"
                     className="rounded-full border border-hairline px-2 py-1 text-[11px] text-mute hover:text-ink"
                     onClick={() => onPick(chip.question)}
                 >
@@ -172,12 +172,16 @@ export function AskEvoTrigger({
             <DrawerContent
                 side="bottom"
                 className="max-h-[85dvh] overflow-y-auto overflow-x-hidden"
+                aria-describedby="ask-evo-record-description"
             >
                 <DrawerHeader className="border-b border-hairline pb-3">
                     <DrawerTitle className="flex items-center gap-1.5 text-[13px] font-semibold">
                         <Sparkle className="size-3.5 text-mute" aria-hidden />
                         Ask Evo
                     </DrawerTitle>
+                    <DrawerDescription id="ask-evo-record-description" className="sr-only">
+                        Ask a question about this record. Answers use authorized workspace fields.
+                    </DrawerDescription>
                     <p className="text-[10px] text-mute">
                         {insight?.live ? 'Evo + model' : 'This record'}
                     </p>
