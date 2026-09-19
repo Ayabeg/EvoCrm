@@ -120,11 +120,20 @@ P00–P26 implementation docs stay. Historical `docs/ui-audit.md` / `docs/ui-mig
 
 ---
 
-## 6. Validation plan
+## 6. Validation (executed)
 
-1. `rg` deleted paths — zero TS/TSX/PHP imports (comments + “must not contain” tests OK).
-2. Routes: `/leads` redirect, `/crm/leads`, `/outbound/reports` redirect, API `leads/board` unchanged.
-3. Focused Pest: Wave0, P01–P05, P25, P26, CrmListWorkspace, OutboundPages, EvoCrmP9, LeadCapture, LeadOsGraph, AuroraTokenBridge.
-4. Full Pest via CI.
-5. `npm run types:check`, `npm run lint:check`, `npm run build`.
-6. P25 + P26 source locks preserved (no edits to those files).
+| Gate | Result |
+|---|---|
+| `rg` deleted paths | Zero live imports. Remaining hits are keep-redirects, Sonner comments, and Pest “must not contain” locks. |
+| Routes | `/leads` → `/crm/deals/board` kept. `/crm/leads` kept. `/outbound/reports` → `/reports/outbound` kept. API `GET /api/v1/leads/board` kept. Meta lead webhooks kept. |
+| Focused Pest | 83 passed (Wave0, P01–P03, P04 shell, P05, P25, P26, CrmListWorkspace, OutboundPages, EvoCrmP9, AuroraTokenBridge, LeadCapture, LeadOsGraph). |
+| Additional Pest | 60 passed (Wave6, P03A–D, P04 contacts, P06–P08, ProductPolish, ScheduledCommandHealth). |
+| Full Pest | **1062 passed**, 13353 assertions. |
+| `tsc --noEmit` | Pass after Wayfinder generate (same as `vite build`). |
+| ESLint on edited `list-chrome.tsx` | Clean. Repo-wide `eslint .` is pre-existing noise (mobile + Wayfinder import order); not introduced by P28. |
+| Pint `routes/console.php` | Pass. |
+| `vite build` | Pass (7120 modules). |
+| PHPStan | Pre-existing ~1574 errors on untouched files. No deleted-class references. |
+| P25 + P26 | Source files untouched. Both Pest files green. |
+
+**Behavior changes:** NONE.
