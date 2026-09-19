@@ -17,6 +17,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import {
@@ -71,9 +76,14 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
 
     return (
         <>
-            <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-1.5 px-2 sm:gap-3 sm:px-4">
+            <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-1.5 px-3 sm:gap-3 sm:px-4">
                 <div data-chrome="menu">
-                    <SidebarTrigger className="-ml-0.5 shrink-0 text-ink" />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <SidebarTrigger className="-ml-0.5 h-9 w-9 shrink-0 text-ink" />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">Toggle sidebar</TooltipContent>
+                    </Tooltip>
                 </div>
                 {collapsed ? (
                     <Link
@@ -81,14 +91,13 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         title="EvoCrm"
                         className="hidden shrink-0 items-center gap-2 md:flex"
                     >
-                        <AppLogoIcon className="size-7" />
+                        <AppLogoIcon className="size-6" />
                         <span className="sr-only">EvoCrm</span>
                     </Link>
                 ) : null}
-                <div className="relative mx-auto min-w-0 flex-1 sm:max-w-2xl" data-chrome="search">
+                <div className="relative min-w-0 flex-1 sm:max-w-md" data-chrome="search">
                     <Input
                         readOnly
-                        size="sm"
                         value=""
                         placeholder={t('Search EvoCRM…')}
                         aria-label={t('Search EvoCRM…')}
@@ -98,36 +107,40 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         startAdornment={
                             <MagnifyingGlass className="size-4" weight="regular" aria-hidden />
                         }
-                        className="cursor-pointer rounded-full pr-3 sm:pr-16"
+                        className="app-search-trigger cursor-pointer pr-3 sm:pr-14"
                     />
-                    <span className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 font-sans text-[var(--text-section-label)] text-mute sm:inline">
+                    <span className="text-meta pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 font-sans text-mute sm:inline">
                         ⌘K
                     </span>
                 </div>
-                <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        title={t('Ask Evo')}
-                        aria-label={t('Ask Evo')}
-                        data-chrome="ai"
-                        className="rounded-full"
-                        onClick={() => setPaletteOpen(true)}
-                    >
-                        <Sparkle className="size-4" weight="regular" aria-hidden />
-                    </Button>
+                <div className="ml-auto flex shrink-0 items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                title={t('Ask Evo')}
+                                aria-label={t('Ask Evo')}
+                                data-chrome="ai"
+                                onClick={() => setPaletteOpen(true)}
+                            >
+                                <Sparkle className="size-4" weight="regular" aria-hidden />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">{t('Ask Evo')}</TooltipContent>
+                    </Tooltip>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
                                 type="button"
                                 variant="default"
-                                size="icon"
                                 title={t('Create')}
                                 aria-label={t('Create')}
-                                className="rounded-full"
+                                className="h-9 gap-1.5 px-3"
                             >
                                 <Plus className="size-4" weight="bold" aria-hidden />
+                                <span className="hidden sm:inline">{t('Create')}</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44">
@@ -148,20 +161,25 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <div className="hidden min-[390px]:block" data-chrome="notify">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            title={t('Tasks')}
-                            aria-label={
-                                taskCount > 0
-                                    ? `${t('Tasks')} (${taskCount})`
-                                    : t('Tasks')
-                            }
-                            onClick={() => setTasksOpen(true)}
-                        >
-                            <Bell className="size-4" weight="regular" aria-hidden />
-                        </Button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    title={t('Tasks')}
+                                    aria-label={
+                                        taskCount > 0
+                                            ? `${t('Tasks')} (${taskCount})`
+                                            : t('Tasks')
+                                    }
+                                    onClick={() => setTasksOpen(true)}
+                                >
+                                    <Bell className="size-4" weight="regular" aria-hidden />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">{t('Tasks')}</TooltipContent>
+                        </Tooltip>
                     </div>
                     {user ? (
                         <DropdownMenu>
@@ -170,7 +188,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                     type="button"
                                     variant="secondary"
                                     size="icon"
-                                    className="rounded-full bg-ink text-[11px] font-medium text-canvas"
+                                    className="text-meta rounded-full bg-ink font-medium text-canvas"
                                     title={user.name}
                                     aria-label={t(':name account menu', { name: user.name })}
                                 >

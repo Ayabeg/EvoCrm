@@ -24,7 +24,7 @@ const menuContentStyle: React.CSSProperties = {
 
 const menuItemBase = [
   "relative flex cursor-pointer select-none items-center gap-2",
-  "rounded-[6px] px-2 py-2 outline-none",
+  "min-h-9 rounded-[8px] px-2 py-2 outline-none",
   MOTION_HOVER_CLASS,
 ].join(" ")
 

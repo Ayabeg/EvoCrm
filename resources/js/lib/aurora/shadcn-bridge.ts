@@ -81,6 +81,6 @@ export function mapBadgeVariant(variant?: ShadcnBadgeVariant): {
             return { tone: 'neutral', fill: 'outline' };
         case 'default':
         default:
-            return { tone: 'cyan', fill: 'solid' };
+            return { tone: 'neutral', fill: 'soft' };
     }
 }

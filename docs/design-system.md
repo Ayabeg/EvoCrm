@@ -39,9 +39,9 @@ Map these onto CSS variables in P02. Do not invent extra brand hues.
 | Token | Hex | CSS variable (target) | Use |
 |---|---|---|---|
 | Accent | `#E8530E` | `--color-accent` | Primary CTA, active/focus/selected, key highlights, chart series 1. **Not** page wash, **not** every link, **not** every pill. |
-| Accent hover | `#CF4A0C` | `--color-accent-hover` | Derived; keep ~8% darker. |
+| Accent hover | `#D74908` | `--color-accent-hover` | Derived; keep ~8% darker. |
 | Accent pressed | `#B8410B` | `--color-accent-pressed` | |
-| Accent wash | `rgba(232, 83, 14, 0.10)` | `--color-accent-wash` | Selected row, active nav, focus fill. |
+| Accent wash | `#FFF1EA` | `--color-accent-wash` | Selected row, active nav, focus fill. |
 | Background | `#F7F7F5` | `--color-bg` | App canvas |
 | Surface | `#FFFFFF` | `--color-surface` | Cards, tables, drawers, popovers |
 | Subtle | `#F1F1EF` | `--color-subtle` | Table header, zebra optional, filter band, skeleton |
@@ -67,14 +67,14 @@ Stable names → hex / CSS variables / Tailwind. P03 primitives should consume t
 | Secondary text | `#666666` | `--color-text-secondary` | `--evosales-mute` | `text-mute` |
 | Muted text | `#929292` | `--color-text-muted` | `--muted-foreground` | `text-muted-foreground` |
 | Border default | `#E3E3DF` | `--color-border` | `--evosales-hairline`, `--border`, `--input` | `border-hairline`, `border-border` |
-| Border strong | mix of text on border | `--color-border-strong` | `--aurora-border-strong` | `border-border-strong` |
+| Border strong | `#D6D6D1` | `--color-border-strong` | `--aurora-border-strong` | `border-border-strong` |
 | Accent | `#E8530E` | `--color-accent` | `--evosales-mark`, `--primary` | `bg-brand`, `bg-primary`, `text-brand` |
-| Accent hover | `#CF4A0C` | `--color-accent-hover` | `--evosales-mark-hover` | `bg-brand-hover` |
+| Accent hover | `#D74908` | `--color-accent-hover` | `--evosales-mark-hover` | `bg-brand-hover` |
 | Accent pressed | `#B8410B` | `--color-accent-pressed` | `--evosales-mark-pressed` | — |
-| Accent soft / wash | `rgba(232, 83, 14, 0.10)` | `--color-accent-soft`, `--color-accent-wash` | — | `bg-accent-soft` |
-| Success | `#16A34A` | `--color-success` | — | `text-success`, `bg-success` |
-| Warning | `#D97706` | `--color-warning` | — | `text-warning`, `bg-warning` |
-| Danger | destructive oklch | `--color-danger` | `--destructive` | `text-danger`, `text-destructive` |
+| Accent soft / wash | `#FFF1EA` | `--color-accent-soft`, `--color-accent-wash` | — | `bg-accent-soft` |
+| Success | `#24845B` | `--color-success` | — | `text-success`, `bg-success` |
+| Warning | `#C77A11` | `--color-warning` | — | `text-warning`, `bg-warning` |
+| Danger | `#D92D20` | `--color-danger` | `--destructive` | `text-danger`, `text-destructive` |
 | Focus ring | accent | `--color-focus-ring` | `--ring` | `ring-ring`, `ring-focus-ring` |
 | Sidebar surface | `#F7F7F5` | `--color-sidebar` | `--sidebar` (literal in Aurora bridge) | `bg-sidebar` |
 | Sidebar text | `#161616` | `--color-sidebar-text` | `--sidebar-ink`, `--sidebar-foreground` | `text-sidebar-ink` |

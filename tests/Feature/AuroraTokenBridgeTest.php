@@ -110,7 +110,7 @@ it('locks the P02 semantic tokens and retires Slate and antique orange', functio
     expect($app)->toContain('--color-bg: #f7f7f5');
     expect($app)->toContain('--color-text: #161616');
     expect($app)->toContain('--color-accent: #e8530e');
-    expect($app)->toContain('--color-accent-hover: #cf4a0c');
+    expect($app)->toContain('--color-accent-hover: #d74908');
     expect($app)->toContain('--color-accent-pressed: #b8410b');
     expect($app)->toContain('--evosales-canvas: var(--color-bg)');
     expect($app)->toContain('--evosales-canvas-soft: var(--color-bg)');
@@ -219,15 +219,16 @@ it('keeps the page shell as a flat Brand canvas with no mesh radials', function 
     expect($shell)->toContain('bg-[var(--aurora-shell-bg)]');
 });
 
-it('paints the topbar as a frosted hairline instead of an Aurora panel gradient', function () {
+it('paints the topbar as a solid hairline instead of an Aurora panel gradient', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
     expect($header)->toContain('app-topbar');
     expect($header)->not->toContain('linear-gradient(180deg, var(--aurora-panel-strong-top)');
     expect($css)->toContain('.app-topbar');
-    expect($css)->toContain('backdrop-filter: blur(20px)');
-    expect($css)->toContain('rgb(247 247 245 / 0.86)');
+    expect($css)->toContain('background: var(--color-surface)');
+    expect($css)->toContain('backdrop-filter: none');
+    expect($css)->not->toContain('rgb(247 247 245 / 0.86)');
     expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
 });
 

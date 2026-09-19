@@ -198,14 +198,17 @@ function RailLink({
             className={cn(
                 'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                 labeled
-                    ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px]'
+                    ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px] leading-[18px]'
                     : 'flex h-12 w-full items-center justify-center',
                 active
-                    ? 'bg-sidebar-accent font-medium text-sidebar-ink'
+                    ? 'bg-sidebar-accent font-medium text-[var(--evosales-mark)]'
                     : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
             )}
         >
-            <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
+            <Icon
+                className={cn('size-5 shrink-0', active && 'text-[var(--evosales-mark)]')}
+                weight={active ? 'fill' : 'regular'}
+            />
             {labeled ? <span className="truncate">{t(item.label)}</span> : null}
         </Link>
     );
@@ -315,7 +318,7 @@ export function AppSidebar() {
             >
                 <AppLogoIcon className="size-7" />
                 {labeled ? (
-                    <span className="truncate text-[13px] font-medium text-sidebar-ink">
+                    <span className="truncate text-[13px] leading-[18px] font-medium text-sidebar-ink">
                         EvoCRM
                     </span>
                 ) : (
@@ -334,7 +337,7 @@ export function AppSidebar() {
                     {visibleGroups.map((group) => (
                         <li key={group.id} className="w-full">
                             {group.label && labeled ? (
-                                <p className="px-3 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-sidebar-mute">
+                                <p className="text-meta px-3 pt-3 pb-1 font-medium text-sidebar-mute">
                                     {t(group.label)}
                                 </p>
                             ) : null}
@@ -371,7 +374,7 @@ export function AppSidebar() {
                     {showMore ? (
                         <li ref={moreRef} className="relative w-full">
                             {labeled ? (
-                                <p className="px-3 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-sidebar-mute">
+                                <p className="text-meta px-3 pt-3 pb-1 font-medium text-sidebar-mute">
                                     {t('More')}
                                 </p>
                             ) : null}
@@ -385,10 +388,10 @@ export function AppSidebar() {
                                 className={cn(
                                     'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                                     labeled
-                                        ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px]'
+                                        ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px] leading-[18px]'
                                         : 'flex h-12 w-full items-center justify-center',
                                     moreOpen
-                                        ? 'bg-sidebar-accent font-medium text-sidebar-ink'
+                                        ? 'bg-sidebar-accent font-medium text-[var(--evosales-mark)]'
                                         : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                                 )}
                             >
@@ -400,24 +403,13 @@ export function AppSidebar() {
                                     id="sidebar-more-panel"
                                     role="menu"
                                     className={cn(
-                                        'z-[100] overflow-hidden rounded-md border',
+                                        'z-[100] overflow-hidden rounded-[10px] border border-hairline bg-surface text-ink shadow-[var(--aurora-shadow-medium)]',
                                         labeled
                                             ? 'relative mt-1 w-full'
                                             : 'absolute top-0 left-[calc(100%+8px)] w-56',
                                     )}
-                                    style={{
-                                        borderColor: 'var(--evosales-hairline)',
-                                        background: 'var(--evosales-canvas)',
-                                        color: 'var(--evosales-ink)',
-                                    }}
                                 >
-                                    <p
-                                        className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wide uppercase"
-                                        style={{
-                                            background: 'var(--evosales-canvas-soft)',
-                                            color: 'var(--evosales-mute)',
-                                        }}
-                                    >
+                                    <p className="text-meta bg-subtle px-3 pt-2 pb-1 font-medium text-mute">
                                         {t('More')}
                                     </p>
                                     <ul className="m-0 list-none p-1" data-nav="crm-objects">
@@ -429,8 +421,7 @@ export function AppSidebar() {
                                                     <Link
                                                         href={item.href}
                                                         role="menuitem"
-                                                        className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-[13px] text-[var(--evosales-mute)] hover:text-[var(--evosales-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
-                                                        style={{ color: 'var(--evosales-ink)' }}
+                                                        className="flex h-9 items-center gap-2.5 rounded-lg px-2 text-[13px] leading-[18px] text-ink hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                                                         onClick={() => {
                                                             setMoreOpen(false);
                                                             closeMobile();

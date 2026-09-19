@@ -170,9 +170,9 @@ function KbdBadge({ keys }: { keys: string[] }) {
             background: "var(--aurora-control-surface)",
             border: "1px solid var(--aurora-border-strong)",
             borderRadius: "5px",
-            fontSize: "10px",
+            fontSize: "12px",
             fontFamily: "var(--aurora-font-mono)",
-            fontWeight: 600,
+            fontWeight: 500,
             color: "var(--aurora-text-muted)",
             lineHeight: "16px",
           }}
@@ -375,14 +375,14 @@ return null
           left: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 201,
-          width: "640px",
+          width: "560px",
           maxWidth: "calc(100vw - 32px)",
           maxHeight: "70vh",
           display: "flex",
           flexDirection: "column",
-          background: "var(--aurora-panel-strong)",
-          border: "1px solid var(--aurora-border-strong)",
-          borderRadius: "var(--aurora-radius-2)",
+          background: "var(--color-surface)",
+          border: "1px solid var(--color-border)",
+          borderRadius: "var(--aurora-radius-3)",
           boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)",
           overflow: "hidden",
           overflowX: "hidden",
@@ -444,7 +444,7 @@ return null
             overflowY: "auto",
             overflowX: "hidden",
             flex: 1,
-            padding: "6px 0",
+            padding: "8px",
           }}
         >
           {grouped.length === 0 ? (
@@ -464,11 +464,11 @@ return null
                 {/* Section header */}
                 <div
                   style={{
-                    padding: "6px 16px 3px",
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    letterSpacing: "0.09em",
-                    textTransform: "uppercase",
+                    padding: "8px 16px 4px",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    letterSpacing: "0.02em",
+                    textTransform: "none",
                     color: "var(--aurora-text-muted)",
                   }}
                 >
@@ -493,13 +493,12 @@ return null
                         alignItems: "center",
                         gap: "10px",
                         width: "100%",
-                        minHeight: "44px",
-                        padding: "10px 16px",
-                        background: isActive ? "var(--aurora-hover-bg)" : "transparent",
+                        minHeight: "36px",
+                        padding: "8px 16px",
+                        background: isActive ? "var(--color-accent-soft)" : "transparent",
                         border: "none",
-                        borderLeft: isActive
-                          ? "2px solid var(--aurora-accent-primary)"
-                          : "2px solid transparent",
+                        borderRadius: "8px",
+                        borderLeft: "none",
                         cursor: "pointer",
                         textAlign: "left",
                         overflow: "hidden",
@@ -545,8 +544,8 @@ return null
                         {item.description && (
                           <div
                             style={{
-                              fontSize: "11px",
-                              color: "var(--aurora-text-muted)",
+                          fontSize: "12px",
+                          color: "var(--aurora-text-muted)",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               whiteSpace: "nowrap",
@@ -579,7 +578,7 @@ return null
           }}
         >
           {statusText ? (
-            <span style={{ fontSize: "11px", color: "var(--aurora-text-muted)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: "12px", color: "var(--aurora-text-muted)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {statusText}
             </span>
           ) : null}
@@ -590,7 +589,7 @@ return null
           ].map(({ keys, label }) => (
             <div key={label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
               <KbdBadge keys={keys} />
-              <span style={{ fontSize: "11px", color: "var(--aurora-text-muted)" }}>{label}</span>
+              <span style={{ fontSize: "12px", color: "var(--aurora-text-muted)" }}>{label}</span>
             </div>
           ))}
         </div>

@@ -31,8 +31,9 @@ it('keeps shared KPI and page chrome on hairlines instead of dashboard cards', f
         ->and($page)->toContain('mb-4')
         ->and($page)->toContain('text-page-title')
         ->and($object)->toContain('py-2.5')
-        ->and($room)->toContain('text-page-title')
-        ->and($room)->toContain('pt-3');
+        ->and($room)->toContain('data-chrome="contextual"')
+        ->and($room)->toContain('sr-only')
+        ->and($room)->not->toContain('text-page-title');
 });
 
 it('tightens record and Desk work surfaces without changing IA', function () {
