@@ -14,6 +14,8 @@ Executed 2026-09-19 on `feat/mobile-m07-auth-workspace`. Production API was **no
 | `npx expo-doctor` | PASS | 21/21 |
 | Expo web boot | **WEB BOOT VERIFIED** | `http://127.0.0.1:8081` — product login, validation, network stay-on-login |
 | EAS Android | **NOT EXECUTED AUTH REQUIRED** | `eas` CLI not installed / not logged in |
+| GitHub Actions `mobile / Expo M07 checks` | PASS | PR #241 |
+| GitHub Actions `tests / ci` | PASS | No backend changes |
 | EAS iOS | **NOT EXECUTED AUTH REQUIRED** | No Mac; EAS not logged in |
 
 Do not write PASS for unexecuted native/EAS gates.
