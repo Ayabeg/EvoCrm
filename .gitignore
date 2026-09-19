@@ -33,3 +33,11 @@ yarn-error.log
 # Local verification artifacts
 screenshots/
 /.next
+
+# Expo / mobile workspace (also ignored inside mobile/)
+/mobile/node_modules
+/mobile/.expo
+/mobile/dist
+/mobile/coverage
+/mobile/.env
+/mobile/.env*.local
