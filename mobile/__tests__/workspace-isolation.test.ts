@@ -1,7 +1,9 @@
 import { createMemoryPrefsStore } from '@/lib/storage/prefs';
 import {
   assertNoCrossWorkspaceLeak,
+  belongsToWorkspace,
   clearWorkspaceState,
+  parseWorkspaceKey,
   readWorkspaceCache,
   workspaceKey,
   writeWorkspaceCache,
@@ -19,10 +21,19 @@ describe('workspace isolation', () => {
 
     expect(await readWorkspaceCache(store, 1, 'contacts')).toBe('a');
     expect(await readWorkspaceCache(store, 2, 'contacts')).toBe('b');
-    assertNoCrossWorkspaceLeak(await store.getAllKeys(), 1);
+
+    const keysForOne = (await store.getAllKeys()).filter((key) => belongsToWorkspace(key, 1));
+    expect(keysForOne).toEqual(['ws:1:contacts']);
+    expect(keysForOne.every((key) => parseWorkspaceKey(key)?.workspaceId === '1')).toBe(true);
 
     await clearWorkspaceState(store, 1);
     expect(await readWorkspaceCache(store, 1, 'contacts')).toBeNull();
     expect(await readWorkspaceCache(store, 2, 'contacts')).toBe('b');
+  });
+
+  it('rejects a mixed payload handed to one workspace', () => {
+    expect(() => assertNoCrossWorkspaceLeak(['ws:1:contacts', 'ws:2:contacts'], 1)).toThrow(
+      /Workspace cache leak/,
+    );
   });
 });

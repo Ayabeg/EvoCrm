@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = join(__dirname, '..');
-const SKIP = new Set(['node_modules', '.expo', 'dist', 'coverage']);
+const SKIP = new Set(['node_modules', '.expo', 'dist', 'coverage', '__tests__']);
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
