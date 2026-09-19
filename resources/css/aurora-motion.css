@@ -70,7 +70,9 @@
     .app-rail-item,
     [data-aurora='drawer'],
     .toaster [data-sonner-toast],
-    .aurora-toast-enter {
+    .aurora-toast-enter,
+    [data-command='os'],
+    [data-command='backdrop'] {
         transition: none !important;
         animation: none !important;
         transform: none !important;

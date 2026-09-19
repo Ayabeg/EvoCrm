@@ -74,11 +74,14 @@ export function BulkActionBar({
             data-crm="bulk-actions"
             data-ds="bulk-action-bar"
         >
-            <p className="text-[13px] font-medium text-ink">{selectedIds.length} selected</p>
+            <p className="text-[13px] font-medium text-ink" aria-live="polite">
+                {selectedIds.length} selected
+            </p>
             <select
                 value={action}
                 onChange={(event) => setAction(event.target.value as BulkAction)}
                 className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                aria-label="Bulk action"
             >
                 {actions.map((item) => (
                     <option key={item} value={item}>
@@ -91,6 +94,7 @@ export function BulkActionBar({
                     value={ownerId}
                     onChange={(event) => setOwnerId(event.target.value)}
                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                    aria-label="Owner"
                 >
                     <option value="">Owner</option>
                     {members.map((member) => (
@@ -105,6 +109,7 @@ export function BulkActionBar({
                     value={sequenceId}
                     onChange={(event) => setSequenceId(event.target.value)}
                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                    aria-label="Sequence"
                 >
                     <option value="">Sequence</option>
                     {sequences.map((sequence) => (
@@ -119,6 +124,7 @@ export function BulkActionBar({
                     value={stageId}
                     onChange={(event) => setStageId(event.target.value)}
                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                    aria-label="Stage"
                 >
                     <option value="">Stage</option>
                     {stages.map((stage) => (

@@ -33,8 +33,9 @@ export function PipelineKanban({
                 className,
             )}
             data-testid="pipeline-kanban"
+            role="region"
+            aria-label="Pipeline board"
             aria-busy={busy || undefined}
-            aria-hidden={busy || undefined}
         >
             {children}
         </div>
@@ -228,8 +229,12 @@ export function PipelineKanbanCard({
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-        if (event.key !== 'Enter') {
+        if (event.key !== 'Enter' && event.key !== ' ') {
             return;
+        }
+
+        if (event.key === ' ') {
+            event.preventDefault();
         }
 
         activate(event, event.currentTarget);

@@ -2,6 +2,7 @@ import { Clock, Compass, Lightning, MagnifyingGlass, Sparkle, Star } from "@phos
 import * as React from "react"
 import { Button } from "@/components/ui/aurora/button"
 import { Input } from "@/components/ui/input"
+import { restoreFocus, trapTabKey } from "@/lib/a11y"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -225,6 +226,8 @@ export function CommandPalette({
   const [activeIdx, setActiveIdx] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const listRef = React.useRef<HTMLDivElement>(null)
+  const dialogRef = React.useRef<HTMLDivElement>(null)
+  const openerRef = React.useRef<HTMLElement | null>(null)
   const reactId = React.useId()
   const listboxId = `${reactId}-cmd-palette-listbox`
 
@@ -258,11 +261,18 @@ return []
   const activeItem = flatItems[activeIdx]
   const activeOptionId = activeItem ? `${reactId}-cmd-option-${activeItem.id}` : undefined
 
-  // Focus input when open
+  // Focus input when open; restore the opener when closed
   React.useEffect(() => {
     if (open) {
+      openerRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null
       setTimeout(() => inputRef.current?.focus(), 0)
+
+      return
     }
+
+    restoreFocus(openerRef.current)
+    openerRef.current = null
   }, [open])
 
   // Escape key
@@ -286,6 +296,10 @@ return
   }, [open, onOpenChange])
 
   function handleKeyDown(e: React.KeyboardEvent) {
+    if (dialogRef.current) {
+      trapTabKey(e, dialogRef.current)
+    }
+
     if (e.key === "ArrowDown") {
       e.preventDefault()
       setActiveIdx((i) => (i + 1) % Math.max(flatItems.length, 1))
@@ -331,6 +345,7 @@ return null
       {/* Backdrop */}
       <div
         role="presentation"
+        data-command="backdrop"
         onClick={() => {
           setQuery("")
           setActiveIdx(0)
@@ -347,10 +362,12 @@ return null
 
       {/* Panel */}
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
         data-command="os"
+        data-a11y="focus-trap"
         onKeyDown={handleKeyDown}
         style={{
           position: "fixed",

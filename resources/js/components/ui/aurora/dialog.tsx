@@ -20,6 +20,7 @@ function DialogOverlay({ ref, className, ...props }: React.ComponentProps<typeof
         "fixed inset-0 z-50 backdrop-blur-[2px]",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "motion-reduce:animate-none motion-reduce:transition-none",
         className
       )}
       style={{ backgroundColor: "var(--aurora-overlay)" }}
@@ -66,6 +67,7 @@ function DialogContent({ ref, className, hideClose = false, size = "default", ch
           "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
           "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
           "duration-200",
+          "motion-reduce:animate-none motion-reduce:transition-none motion-reduce:duration-0",
           className
         )}
         style={{

@@ -201,6 +201,7 @@ export function FilterBar({
                         <MagnifyingGlass
                             className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-mute"
                             weight="bold"
+                            aria-hidden
                         />
                         <Input
                             key={`q:${searchKey}`}
@@ -229,6 +230,7 @@ export function FilterBar({
                             onClick={chip.onRemove}
                             className="inline-flex max-w-full items-center gap-1 rounded-md border border-hairline bg-canvas-soft px-2 py-0.5 text-[12px] text-ink"
                             title={t('Clear :label', { label: t(chip.label) })}
+                            aria-label={t('Clear :label', { label: t(chip.label) })}
                         >
                             <span className="truncate">{t(chip.label)}</span>
                             <span aria-hidden className="text-mute">

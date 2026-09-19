@@ -157,9 +157,9 @@ function DealCard({
                         <button
                             type="button"
                             aria-label={`Move ${deal.title}`}
-                            className="grid size-6 shrink-0 place-content-center rounded text-mute opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted"
+                            className="grid size-6 shrink-0 place-content-center rounded text-mute opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 hover:bg-muted"
                         >
-                            <Ellipsis className="size-4" />
+                            <Ellipsis className="size-4" aria-hidden />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">

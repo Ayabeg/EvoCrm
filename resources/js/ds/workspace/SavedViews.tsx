@@ -144,6 +144,7 @@ export function SavedViews({
                         <Link
                             key={view.id}
                             href={view.href}
+                            aria-current={active ? 'page' : undefined}
                             className={pillClass(active)}
                         >
                             {view.label}
@@ -154,6 +155,7 @@ export function SavedViews({
                     <Link
                         key={view.id}
                         href={savedHref(view.id)}
+                        aria-current={String(view.id) === activeViewId ? 'page' : undefined}
                         className={pillClass(String(view.id) === activeViewId)}
                         title={
                             view.visibility === 'workspace'

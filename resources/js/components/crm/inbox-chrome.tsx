@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { conversationA11yName } from '@/lib/a11y';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
 import { dateLocale, t } from '@/lib/i18n';
 import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
@@ -157,8 +158,10 @@ export function InboxFolderRail({
                             <button
                                 type="button"
                                 onClick={() => onSelect(item.key)}
+                                aria-current={active ? 'true' : undefined}
                                 className={cn(
                                     'flex w-full items-center justify-between gap-2 px-2 py-1 text-left text-[12px] transition-colors duration-150',
+                                    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent)]',
                                     active
                                         ? 'bg-canvas-soft font-medium text-ink'
                                         : 'text-mute hover:bg-canvas-soft hover:text-ink',
@@ -371,7 +374,10 @@ export function InboxListHeader({
         >
             <div className="flex items-center justify-between gap-2">
                 <p className="text-[12px] font-medium text-ink">{t('Inbox')}</p>
-                <p className="font-mono text-[11px] tabular-nums text-mute">
+                <p
+                    className="font-mono text-[11px] tabular-nums text-mute"
+                    aria-label={t(':count conversations', { count })}
+                >
                     {count}
                 </p>
             </div>
@@ -415,8 +421,10 @@ export function InboxConversationRow({
             onClick={onSelect}
             data-inbox="conversation-row"
             aria-current={selected ? 'true' : undefined}
+            aria-label={conversationA11yName({ name, unread, selected })}
             className={cn(
                 'flex w-full items-start gap-2.5 border-b border-hairline px-3 py-1.5 text-left transition-colors duration-150',
+                'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--color-accent)]',
                 selected ? 'bg-canvas-soft' : 'hover:bg-canvas-soft',
             )}
         >
@@ -444,6 +452,7 @@ export function InboxConversationRow({
                             className="h-4 min-w-4 rounded-none px-1 font-mono text-[10px]"
                         >
                             {unread}
+                            <span className="sr-only"> unread</span>
                         </Badge>
                     ) : null}
                 </div>
@@ -556,10 +565,11 @@ export function InboxComposer({
         >
             {({ processing, errors }) => (
                 <div className="border-t border-hairline bg-white p-3">
-                    <div className="mb-2 flex gap-3">
+                    <div className="mb-2 flex gap-3" role="group" aria-label={t('Compose')}>
                         <button
                             type="button"
                             onClick={() => onModeChange('reply')}
+                            aria-pressed={mode === 'reply'}
                             className={
                                 mode === 'reply'
                                     ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
@@ -571,6 +581,7 @@ export function InboxComposer({
                         <button
                             type="button"
                             onClick={() => onModeChange('note')}
+                            aria-pressed={mode === 'note'}
                             className={
                                 mode === 'note'
                                     ? 'border-b-2 border-brand pb-0.5 text-[12px] font-medium text-ink'
@@ -586,6 +597,11 @@ export function InboxComposer({
                     <Textarea
                         name="body"
                         required
+                        aria-label={
+                            mode === 'note'
+                                ? t('Private note')
+                                : t('Type your message')
+                        }
                         placeholder={
                             mode === 'note'
                                 ? t('Private note')
