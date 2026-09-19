@@ -39,10 +39,10 @@ export interface DialogContentProps
 }
 
 const sizeClasses: Record<NonNullable<DialogContentProps["size"]>, string> = {
-  sm: "max-w-sm",
-  default: "max-w-lg",
-  lg: "max-w-2xl",
-  xl: "max-w-4xl",
+  sm: "max-w-[min(24rem,calc(100vw-2rem))]",
+  default: "max-w-[min(32rem,calc(100vw-2rem))]",
+  lg: "max-w-[min(42rem,calc(100vw-2rem))]",
+  xl: "max-w-[min(56rem,calc(100vw-2rem))]",
   full: "max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]",
 }
 

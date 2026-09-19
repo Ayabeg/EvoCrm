@@ -14,6 +14,10 @@ export const QUOTE_BUILDER_DESKTOP_GRID_CLASS =
 export const QUOTE_DOCUMENT_PAPER_CLASS =
     'mx-auto w-full max-w-[40rem] border border-hairline bg-canvas px-5 py-6 sm:px-8 sm:py-8';
 
+/** Builder totals and line money. Never truncate / overflow-hidden. */
+export const QUOTE_MONEY_CLASS =
+    'money min-w-0 max-w-full break-words tabular-nums';
+
 export function formatQuoteWhen(iso?: string | null): string | null {
     if (!iso) {
         return null;

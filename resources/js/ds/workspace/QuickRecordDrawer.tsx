@@ -19,6 +19,7 @@ import { EMPTY_VALUE } from '@/ds/workspace/record-adapters/present';
 import { handleQuickRecordEscapeKeyDown } from '@/lib/command-os';
 import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
+import { PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
 type SectionId = 'overview' | 'activity' | 'notes' | 'tasks' | 'associations';
@@ -262,6 +263,7 @@ export function QuickRecordDrawer() {
                 className={cn(
                     'w-full max-sm:w-full sm:w-[min(92vw,520px)] lg:w-[480px]',
                     'gap-0 border-l bg-white p-0',
+                    PAGE_OVERFLOW_CLASS,
                     'data-[state=open]:duration-200 data-[state=closed]:duration-200',
                     'motion-reduce:transition-none motion-reduce:data-[state=open]:duration-0 motion-reduce:data-[state=closed]:duration-0',
                 )}

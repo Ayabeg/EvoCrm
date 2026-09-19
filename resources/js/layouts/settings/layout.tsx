@@ -5,6 +5,7 @@ import type { PropsWithChildren } from 'react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
+import { LONG_TEXT_CLASS, PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import {
     filterSettingsDestinations,
     groupSettingsDestinations,
@@ -34,13 +35,13 @@ function SettingsNavLinks({
                             href={item.href}
                             aria-current={active ? 'page' : undefined}
                             className={cn(
-                                'flex h-8 items-center border-l-2 px-2 text-[13px] leading-[18px] transition-colors',
+                                'flex h-8 min-w-0 items-center border-l-2 px-2 text-[13px] leading-[18px] transition-colors',
                                 active
                                     ? 'border-brand bg-[var(--color-accent-soft)] font-medium text-ink'
                                     : 'border-transparent text-mute hover:bg-white/70 hover:text-ink',
                             )}
                         >
-                            {t(item.title)}
+                            <span className={LONG_TEXT_CLASS}>{t(item.title)}</span>
                         </Link>
                     </li>
                 );
@@ -90,7 +91,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     return (
         <div
             data-settings="workspace"
-            className="flex min-h-full flex-col bg-canvas lg:flex-row"
+            className={cn('flex min-h-full flex-col bg-canvas lg:flex-row', PAGE_OVERFLOW_CLASS)}
         >
             <aside
                 data-settings="nav"
@@ -188,7 +189,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             <div
                 data-settings="pane"
                 className={cn(
-                    'min-w-0 flex-1 px-4 py-4 lg:px-6 lg:py-5',
+                    'min-w-0 flex-1 overflow-x-hidden px-4 py-4 lg:px-6 lg:py-5',
                     wide ? '' : 'lg:max-w-[900px]',
                 )}
             >

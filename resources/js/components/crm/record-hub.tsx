@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { t } from '@/lib/i18n';
+import { MONEY_NEVER_CLIP_CLASS, PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
 /** Brand Book + Aurora surface radius for CRM record hubs. */
@@ -134,7 +135,7 @@ export function RecordPageFrame({
     children: ReactNode;
 }) {
     return (
-        <div className="h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink">
+        <div className={cn('h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink', PAGE_OVERFLOW_CLASS)}>
             <div className="relative shrink-0 border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6">
                 <span
                     className="absolute inset-y-0 left-0 w-[3px] bg-brand"
@@ -227,8 +228,9 @@ export function RecordFact({
             <p className="text-[11px] text-mute">{label}</p>
             <p
                 className={cn(
-                    'truncate text-[13px] text-ink',
-                    money && 'money font-medium',
+                    'text-[13px] text-ink',
+                    money ? MONEY_NEVER_CLIP_CLASS : 'truncate',
+                    money && 'font-medium',
                 )}
             >
                 {isEmptyFact(value) ? '—' : value}

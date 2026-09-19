@@ -175,7 +175,7 @@ export function DealAmountCell({ cents }: { cents?: number | null }) {
 
     return (
         <span
-            className="money block truncate tabular-nums text-[13px] leading-[18px] text-ink"
+            className="money block min-w-0 max-w-full break-words tabular-nums text-[13px] leading-[18px] text-ink"
             title={label}
         >
             {label}

@@ -9,6 +9,7 @@ import {
     QUOTE_BUILDER_DESKTOP_GRID_CLASS,
     QUOTE_BUILDER_SPLIT_CLASS,
     QUOTE_DOCUMENT_PAPER_CLASS,
+    QUOTE_MONEY_CLASS,
     QUOTE_TIMEZONE,
     formatQuoteWhen,
     quoteCanEdit,
@@ -70,5 +71,8 @@ expectTrue(!QUOTE_BUILDER_DESKTOP_GRID_CLASS.includes('grid-cols-3'), 'not a 3-p
 expectTrue(!QUOTE_BUILDER_DESKTOP_GRID_CLASS.startsWith('hidden'), 'builder is not display-none below lg');
 expectTrue(QUOTE_DOCUMENT_PAPER_CLASS.includes('max-w-[40rem]'), 'paper is readable at 768');
 expectTrue(QUOTE_DOCUMENT_PAPER_CLASS.includes('bg-canvas'), 'paper uses canvas token');
+expectTrue(QUOTE_MONEY_CLASS.includes('break-words'), 'quote money may wrap');
+expectTrue(!QUOTE_MONEY_CLASS.includes('truncate'), 'quote money is never truncated');
+expectTrue(!QUOTE_MONEY_CLASS.includes('overflow-hidden'), 'quote money is never clipped');
 
 console.log('P18 quotes builder JS proofs passed');

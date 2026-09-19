@@ -13,6 +13,7 @@ import {
 } from '@/lib/list-query';
 import type { ListQueryFilterKey, ListQueryObject } from '@/lib/list-query';
 import type { ListColumnDef, ListFieldDef, ListViewColumn } from '@/lib/list-view-config';
+import { FILTER_SEARCH_CLASS, PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
 const QUICK_FIELD_IDS = ['owner', 'created', 'status', 'priority'] as const;
@@ -105,9 +106,6 @@ export function FilterBar({
               : object === 'quote'
                 ? t('Search quotes')
                 : t('Search list');
-    const wrapQuickFilters =
-        object === 'company' || object === 'lead' || object === 'deal' || object === 'quote';
-
     const applyFilter = (key: ListQueryFilterKey, value: string | null) => {
         navigateListQuery(basePath, current, { filters: { [key]: value } }, object);
     };
@@ -185,13 +183,13 @@ export function FilterBar({
     );
 
     return (
-        <div className="border-b border-hairline bg-canvas" data-crm="list-toolbar" data-ds="filter-bar">
-            <div className="flex flex-wrap items-center gap-2 px-4 py-3 md:px-8">
+        <div className={cn('border-b border-hairline bg-canvas', PAGE_OVERFLOW_CLASS)} data-crm="list-toolbar" data-ds="filter-bar">
+            <div className="flex min-w-0 flex-wrap items-center gap-2 px-4 py-3 md:px-8">
                 {extra}
                 {queryEnabled ? (
                     <form
                         className={cn(
-                            'relative min-w-[12rem] flex-1',
+                            FILTER_SEARCH_CLASS,
                             (object === 'company' || object === 'deal') && 'max-w-md basis-[16rem]',
                         )}
                         onSubmit={(event) => {
@@ -214,17 +212,10 @@ export function FilterBar({
                         />
                     </form>
                 ) : null}
-                {wrapQuickFilters ? (
-                    <div className="flex min-w-0 flex-wrap items-center gap-2">
-                        {quickFilters}
-                        {columnChooser}
-                    </div>
-                ) : (
-                    <>
-                        {quickFilters}
-                        {columnChooser}
-                    </>
-                )}
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    {quickFilters}
+                    {columnChooser}
+                </div>
             </div>
             {queryEnabled && chips.length > 0 ? (
                 <div

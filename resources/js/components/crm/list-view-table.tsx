@@ -699,7 +699,9 @@ export default function ListViewTable({
                                                     : 'text-mute',
                                                 column.id === 'amount' &&
                                                     'money tabular-nums text-ink',
-                                                fixedTable && 'overflow-hidden',
+                                                fixedTable &&
+                                                    column.id !== 'amount' &&
+                                                    'overflow-hidden',
                                                 companyTable && companyColumnWidth(column.id),
                                                 leadTable && leadColumnWidth(column.id),
                                                 dealTable && dealColumnWidth(column.id),
