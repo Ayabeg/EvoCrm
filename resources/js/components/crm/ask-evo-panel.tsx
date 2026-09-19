@@ -13,6 +13,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import type { AskEvoSuggestion } from '@/lib/ask-evo';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 export type AskEvoPayload = {
     label?: string;
@@ -44,7 +46,10 @@ function SuggestionChips({
                 <button
                     key={chip.id}
                     type="button"
-                    className="rounded-full border border-hairline px-2 py-1 text-[11px] text-mute hover:text-ink"
+                    className={cn(
+                        'rounded-full border border-hairline px-2 py-1 text-[11px] text-mute hover:text-ink',
+                        MOTION_HOVER_CLASS,
+                    )}
                     onClick={() => onPick(chip.question)}
                 >
                     {chip.label}

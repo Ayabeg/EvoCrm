@@ -8,8 +8,9 @@
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { CaretRight, Check, Circle } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
 import { usePortalContainer } from "@/lib/aurora/portal-container"
+import { MOTION_DROPDOWN_CLASS, MOTION_HOVER_CLASS } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 
 // ─── Shared menu content styles ───────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ const menuContentStyle: React.CSSProperties = {
 const menuItemBase = [
   "relative flex cursor-pointer select-none items-center gap-2",
   "rounded-[6px] px-2 py-2 outline-none",
-  "transition-colors duration-100",
+  MOTION_HOVER_CLASS,
 ].join(" ")
 
 const menuTextStyle: React.CSSProperties = {
@@ -66,7 +67,7 @@ function DropdownMenuContent({ ref, className, sideOffset = 6, style, ...props }
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
           "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          "duration-150",
+          MOTION_DROPDOWN_CLASS,
           className
         )}
         style={{ ...menuContentStyle, ...style }}
@@ -110,7 +111,7 @@ function DropdownMenuSubContent({ ref, className, style, ...props }: React.Compo
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
         "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        "duration-150",
+        MOTION_DROPDOWN_CLASS,
         className
       )}
       style={{ ...menuContentStyle, ...style }}

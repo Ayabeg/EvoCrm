@@ -4,6 +4,7 @@ import {
     HOME_KPI_STRIP_TRACK_CLASS,
     HOME_KPI_VALUE_CLASS,
 } from '@/lib/dashboard-operating-home';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { formatCompactDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -63,7 +64,8 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                                 key={kpi.key}
                                 href={kpi.href}
                                 className={cn(
-                                    'min-w-0 no-underline transition-colors duration-150',
+                                    'min-w-0 no-underline',
+                                    MOTION_HOVER_CLASS,
                                     'hover:bg-canvas-soft focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
                                 )}
                                 aria-label={`${kpi.label} ${value}`}

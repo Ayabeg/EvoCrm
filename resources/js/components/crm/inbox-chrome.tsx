@@ -18,6 +18,7 @@ import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
 import { shouldRenderInboxCrmContext } from '@/lib/inbox-crm-context';
 import { formatInboxDay, groupInboxMessages } from '@/lib/inbox-workspace';
 import type { InboxMessage } from '@/lib/inbox-workspace';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export type InboxEmbedState = 'ok' | 'blocked' | 'unreachable' | 'no-url';
@@ -160,7 +161,8 @@ export function InboxFolderRail({
                                 onClick={() => onSelect(item.key)}
                                 aria-current={active ? 'true' : undefined}
                                 className={cn(
-                                    'flex w-full items-center justify-between gap-2 px-2 py-1 text-left text-[12px] transition-colors duration-150',
+                                    'flex w-full items-center justify-between gap-2 px-2 py-1 text-left text-[12px]',
+                                    MOTION_HOVER_CLASS,
                                     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent)]',
                                     active
                                         ? 'bg-canvas-soft font-medium text-ink'
@@ -423,7 +425,8 @@ export function InboxConversationRow({
             aria-current={selected ? 'true' : undefined}
             aria-label={conversationA11yName({ name, unread, selected })}
             className={cn(
-                'flex w-full items-start gap-2.5 border-b border-hairline px-3 py-1.5 text-left transition-colors duration-150',
+                'flex w-full items-start gap-2.5 border-b border-hairline px-3 py-1.5 text-left',
+                MOTION_HOVER_CLASS,
                 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--color-accent)]',
                 selected ? 'bg-canvas-soft' : 'hover:bg-canvas-soft',
             )}

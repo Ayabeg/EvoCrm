@@ -5,6 +5,7 @@ import type { PropsWithChildren } from 'react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { LONG_TEXT_CLASS, PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import {
     filterSettingsDestinations,
@@ -35,7 +36,8 @@ function SettingsNavLinks({
                             href={item.href}
                             aria-current={active ? 'page' : undefined}
                             className={cn(
-                                'flex h-8 min-w-0 items-center border-l-2 px-2 text-[13px] leading-[18px] transition-colors',
+                                'flex h-8 min-w-0 items-center border-l-2 px-2 text-[13px] leading-[18px]',
+                                MOTION_HOVER_CLASS,
                                 active
                                     ? 'border-brand bg-[var(--color-accent-soft)] font-medium text-ink'
                                     : 'border-transparent text-mute hover:bg-white/70 hover:text-ink',

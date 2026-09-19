@@ -60,6 +60,17 @@
     /* Focus */
     --color-focus-ring: var(--color-accent);
 
+    /*
+     * P27 product motion — one restrained language.
+     * Hover 120 / dropdown+page 150 / modal 180 / drawer 200.
+     * Easing lives on --motion-ease-out (Aurora). No bounce.
+     */
+    --motion-duration-hover: 120ms;
+    --motion-duration-dropdown: 150ms;
+    --motion-duration-page: 150ms;
+    --motion-duration-modal: 180ms;
+    --motion-duration-drawer: 200ms;
+
     /* Sidebar surfaces / states — paper rail, not a second black product */
     --color-sidebar: #f7f7f5;
     --color-sidebar-text: var(--color-text);

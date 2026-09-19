@@ -74,7 +74,7 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
                     className="h-1 overflow-hidden rounded-full bg-canvas-soft"
                 >
                     <div
-                        className="h-full bg-brand motion-safe:transition-[width] motion-reduce:transition-none"
+                        className="h-full bg-brand motion-safe:transition-[width] motion-safe:duration-[var(--motion-duration-hover)] motion-safe:ease-[var(--motion-ease-out)] motion-reduce:transition-none"
                         style={{ width: `${percent}%` }}
                     />
                 </div>

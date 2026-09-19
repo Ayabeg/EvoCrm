@@ -5,6 +5,7 @@ import type { RowId } from '@/ds/workspace/selection';
 import type { DataTableProps } from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export function DataTable<Row extends { id: RowId }>({
@@ -102,6 +103,7 @@ export function DataTable<Row extends { id: RowId }>({
                                 aria-selected={onToggle ? selected : undefined}
                                 className={cn(
                                     'h-12 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
+                                    MOTION_HOVER_CLASS,
                                     selected && 'bg-canvas-soft',
                                 )}
                                 style={{ height: rowHeight }}

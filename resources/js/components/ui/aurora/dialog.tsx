@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "@phosphor-icons/react"
+import { MOTION_HOVER_CLASS, MOTION_MODAL_CLASS } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 // ─── Re-exports ───────────────────────────────────────────────────────────────
@@ -20,6 +21,7 @@ function DialogOverlay({ ref, className, ...props }: React.ComponentProps<typeof
         "fixed inset-0 z-50 backdrop-blur-[2px]",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        MOTION_MODAL_CLASS,
         "motion-reduce:animate-none motion-reduce:transition-none",
         className
       )}
@@ -66,7 +68,7 @@ function DialogContent({ ref, className, hideClose = false, size = "default", ch
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
           "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
-          "duration-200",
+          MOTION_MODAL_CLASS,
           "motion-reduce:animate-none motion-reduce:transition-none motion-reduce:duration-0",
           className
         )}
@@ -87,7 +89,7 @@ function DialogContent({ ref, className, hideClose = false, size = "default", ch
             className={cn(
               "absolute right-4 top-4 z-10",
               "rounded-[8px] p-1",
-              "transition-colors duration-150",
+              MOTION_HOVER_CLASS,
               "hover:bg-[var(--aurora-hover-bg)] hover:text-[var(--aurora-text-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 [&:focus-visible]:ring-[var(--aurora-focus-ring)]",
               "disabled:pointer-events-none",

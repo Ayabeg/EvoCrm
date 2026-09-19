@@ -9,6 +9,7 @@ import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { columnLabel, visibleColumns } from '@/lib/list-view-config';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { formatDzd } from '@/lib/money';
 import { LOCAL_SCROLL_X_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
@@ -593,8 +594,14 @@ export default function ListViewTable({
                                 data-row-peek={onRowPeek ? 'true' : undefined}
                                 className={cn(
                                     identityRow
-                                        ? 'min-h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft'
-                                        : 'h-12 cursor-pointer border-b border-hairline transition-colors hover:bg-canvas-soft',
+                                        ? cn(
+                                              'min-h-12 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
+                                              MOTION_HOVER_CLASS,
+                                          )
+                                        : cn(
+                                              'h-12 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
+                                              MOTION_HOVER_CLASS,
+                                          ),
                                     selected && 'bg-canvas-soft',
                                     onRowPeek &&
                                         'focus-visible:bg-canvas-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--color-accent)]',
