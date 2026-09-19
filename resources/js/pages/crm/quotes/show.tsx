@@ -37,7 +37,7 @@ export default function QuoteShow({ quote }: { quote: QuoteRecord }) {
                                     label="Back to Quotes"
                                 />
                                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <h1 className="text-record-title leading-snug font-semibold tracking-tight">
+                                    <h1 className="min-w-0 truncate text-record-title leading-snug font-semibold tracking-tight">
                                         {quote.title}
                                     </h1>
                                     <RecordStatusBadge>

@@ -114,7 +114,7 @@ function ActivationStepRow({ step }: { step: ActivationStep }) {
             </span>
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                    <p className="text-[13px] font-medium text-ink">{step.label}</p>
+                    <p className="min-w-0 break-words text-[13px] font-medium text-ink">{step.label}</p>
                     <p className="text-[11px] text-mute">
                         {step.complete ? t('Done') : kindLabel}
                     </p>

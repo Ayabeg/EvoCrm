@@ -386,6 +386,20 @@
     }
 
     /*
+     * P25 overflow law — page H-overflow is a defect; table/board local
+     * scroll is intentional. Prefer these utilities over ad-hoc clips.
+     */
+    .overflow-page {
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    .overflow-local-x {
+        min-width: 0;
+        overflow-x: auto;
+    }
+
+    /*
      * Frosted / minimal topbar — web glass approximation, not Apple Liquid Glass.
      * Do not color-mix with `transparent` (that interpolates toward black).
      * Hairline only. No product-shadow on chrome.

@@ -197,7 +197,7 @@ export function AskEvoDrawer() {
                     </DrawerTitle>
                     <p
                         data-testid="ask-evo-context"
-                        className="text-[11px] text-mute"
+                        className="min-w-0 break-words text-[11px] text-mute"
                         aria-live="polite"
                     >
                         Context: {contextIndicatorLabel(context, identity.page)}

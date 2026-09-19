@@ -26,6 +26,7 @@ import {
 } from '@/lib/list-query';
 import type { ListQueryObject } from '@/lib/list-query';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
+import { PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
 function renderSharedTableSurface<Row extends { id: RowId }>(
@@ -142,6 +143,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
         <div
             className={cn(
                 'flex h-full min-h-0 flex-col bg-canvas text-ui text-ink',
+                PAGE_OVERFLOW_CLASS,
                 className,
             )}
             data-crm="list-workspace"
@@ -245,7 +247,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
                     ? bulk(selection)
                     : bulk
                 : null}
-            <div className={cn('flex min-h-0 flex-1 flex-col bg-canvas', contentClassName)}>
+            <div className={cn('flex min-h-0 min-w-0 flex-1 flex-col bg-canvas', contentClassName)}>
                 {resultSurface}
                 {resultMode === 'shared-table' && paginator && !boardSurface ? (
                     <WorkspacePaginator

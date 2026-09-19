@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { t } from '@/lib/i18n';
+import { LONG_TEXT_CLASS, LONG_TEXT_WRAP_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
 export type PageHeaderProps = {
@@ -23,11 +24,13 @@ export function PageHeader({
             data-ds="page-header"
         >
             <div className="min-w-0">
-                <h1 className="text-[28px] leading-[34px] font-semibold tracking-tight text-ink">
+                <h1 className={cn('text-[28px] leading-[34px] font-semibold tracking-tight text-ink', LONG_TEXT_CLASS)}>
                     {t(title)}
                 </h1>
                 {description ? (
-                    <p className="mt-1 text-[14px] leading-5 text-mute">{t(description)}</p>
+                    <p className={cn('mt-1 text-[14px] leading-5 text-mute', LONG_TEXT_WRAP_CLASS)}>
+                        {t(description)}
+                    </p>
                 ) : null}
             </div>
             {secondaryActions || primaryAction ? (

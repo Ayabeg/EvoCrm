@@ -2,6 +2,8 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { BulkAction, BulkActionBarProps, DataWorkspaceEntity } from '@/ds/workspace/types';
+import { PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
+import { cn } from '@/lib/utils';
 
 function actionPathFor(object: DataWorkspaceEntity): string | null {
     if (object === 'contact') {
@@ -65,7 +67,10 @@ export function BulkActionBar({
 
     return (
         <div
-            className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-hairline bg-white px-4 py-2 md:px-8"
+            className={cn(
+                'sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-hairline bg-white px-4 py-2 md:px-8',
+                PAGE_OVERFLOW_CLASS,
+            )}
             data-crm="bulk-actions"
             data-ds="bulk-action-bar"
         >

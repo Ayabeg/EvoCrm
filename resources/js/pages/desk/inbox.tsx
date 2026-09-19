@@ -182,7 +182,7 @@ function DeskEmbedWorkspace({
 
     return (
         <div
-            className="flex h-full min-h-0 flex-col bg-canvas-soft text-[13px] text-ink"
+            className="flex h-full min-h-0 flex-col overflow-x-hidden bg-canvas-soft text-[13px] text-ink"
             data-crm="inbox-workspace"
             data-inbox="embed"
         >

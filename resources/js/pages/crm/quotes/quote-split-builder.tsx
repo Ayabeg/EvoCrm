@@ -21,6 +21,7 @@ import {
     QUOTE_BUILDER_DESKTOP_GRID_CLASS,
     QUOTE_BUILDER_SPLIT_CLASS,
     QUOTE_DOCUMENT_PAPER_CLASS,
+    QUOTE_MONEY_CLASS,
     formatQuoteWhen,
     quoteCanEdit,
     quoteDateInputValue,
@@ -29,6 +30,7 @@ import {
     quoteUnitDzd,
     quoteUpdateAction,
 } from '@/lib/quote-builder';
+import { LOCAL_SCROLL_X_CLASS } from '@/lib/responsive';
 import type { QuoteRecord } from '@/pages/crm/quotes/quote-record';
 
 export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
@@ -110,7 +112,7 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                     <p className="mt-6 text-[12px] text-mute">{t('No notes.')}</p>
                 )}
 
-                <p className="money mt-6 text-right text-[20px] font-semibold tracking-tight text-ink">
+                <p className={`${QUOTE_MONEY_CLASS} mt-6 text-right text-[20px] font-semibold tracking-tight text-ink`}>
                     {formatDzd(quote.total_cents)}
                 </p>
             </div>
@@ -234,7 +236,7 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                             >
                                 {({ processing }) => (
                                     <>
-                                        <div className="min-w-[12rem] flex-1">
+                                        <div className="min-w-0 flex-1">
                                             <label
                                                 htmlFor="quote-send-to"
                                                 className="mb-1 block text-[11px] text-mute"
@@ -386,7 +388,8 @@ function LineTable({
     }
 
     return (
-        <table className="w-full border-collapse text-[13px]">
+        <div className={LOCAL_SCROLL_X_CLASS}>
+            <table className="w-full min-w-[28rem] border-collapse text-[13px]">
             <thead>
                 <tr className="border-b border-hairline text-left text-[11px] text-mute">
                     <th className="py-1.5 font-medium">{t('Item')}</th>
@@ -412,7 +415,7 @@ function LineTable({
                                 item.name
                             )}
                         </td>
-                        <td className="money py-1.5 text-mute">
+                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-mute`}>
                             {editable ? (
                                 <Input
                                     name={`items[${index}][quantity]`}
@@ -426,7 +429,7 @@ function LineTable({
                                 item.quantity
                             )}
                         </td>
-                        <td className="money py-1.5 text-right text-mute">
+                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-right text-mute`}>
                             {editable ? (
                                 <Input
                                     name={`items[${index}][unit_dzd]`}
@@ -442,7 +445,7 @@ function LineTable({
                                 formatDzd(item.unit_cents)
                             )}
                         </td>
-                        <td className="money py-1.5 text-right text-ink">
+                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-right text-ink`}>
                             {formatDzd(
                                 item.total_cents ??
                                     item.quantity * item.unit_cents,
@@ -451,6 +454,7 @@ function LineTable({
                     </tr>
                 ))}
             </tbody>
-        </table>
+            </table>
+        </div>
     );
 }
