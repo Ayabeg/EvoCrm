@@ -10,9 +10,9 @@ export const DASHBOARD_TIMEZONE = 'Africa/Algiers';
 export const HOME_KPI_STRIP_TRACK_CLASS =
     'grid grid-cols-2 divide-x divide-y divide-hairline border-y border-hairline md:grid-cols-4 md:divide-y-0';
 
-/** Compact values may wrap; smaller at md (4-col + rail); Brand Book text-kpi from lg. */
+/** Compact values may wrap. V02 keeps Home snapshot at 20/26 — not Brand Book text-kpi. */
 export const HOME_KPI_VALUE_CLASS =
-    'money min-w-0 max-w-full text-[1.25rem] leading-tight tracking-tight break-words text-ink md:text-[1.125rem] lg:text-kpi';
+    'money min-w-0 max-w-full text-[20px] leading-[26px] font-semibold tracking-tight break-words text-ink';
 
 export type DashboardContext = {
     name: string;

@@ -20,27 +20,18 @@ export function HomeWidget({
 }) {
     return (
         <section className={cn('home-widget flex min-h-0 flex-col', className)}>
-            <header className="flex items-start justify-between gap-3 border-b border-hairline px-3 py-2">
+            <header className="mb-3 flex items-end justify-between gap-4">
                 <div className="min-w-0">
-                    <h2 className="text-[13px] font-semibold tracking-tight text-ink">
+                    <h2 className="text-[18px] leading-[26px] font-semibold tracking-tight text-ink">
                         {title}
                     </h2>
                     {description ? (
-                        <p className="mt-0.5 text-[11px] leading-4 text-mute">
-                            {description}
-                        </p>
+                        <p className="mt-0.5 text-[12px] leading-4 text-mute">{description}</p>
                     ) : null}
                 </div>
                 {action ? <div className="shrink-0">{action}</div> : null}
             </header>
-            <div
-                className={cn(
-                    'min-h-[168px] flex-1 px-3 py-3',
-                    empty && 'grid place-items-center',
-                )}
-            >
-                {children}
-            </div>
+            <div className={cn('min-h-0', empty && 'py-2')}>{children}</div>
         </section>
     );
 }

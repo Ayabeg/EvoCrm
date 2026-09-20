@@ -30,6 +30,17 @@ type Props = {
     activation?: ActivationState | null;
 };
 
+function ViewAllLink({ href, children }: { href: string; children: string }) {
+    return (
+        <Link
+            href={href}
+            className="text-[13px] leading-[18px] text-mute hover:text-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+        >
+            {children}
+        </Link>
+    );
+}
+
 export default function Home({
     context,
     metrics,
@@ -51,24 +62,16 @@ export default function Home({
         <>
             <Head title={t('Home')} />
             <div className="flex-1 overflow-x-hidden bg-canvas-soft" data-home="workspace">
-                <div className="px-4 py-3 md:px-5 md:py-4">
+                <div className="px-4 pt-5 md:px-8">
                     <DashboardHeader context={context} canCreate={canCreate} />
                 </div>
 
                 {activation ? <ActivationChecklist activation={activation} /> : null}
 
-                <div className="grid gap-3 px-4 pb-3 md:px-5 lg:grid-cols-2">
+                <div className="grid gap-8 px-4 md:px-8 lg:grid-cols-2">
                     <HomeWidget
                         title={t('Needs attention')}
-                        description={t('Deal exceptions')}
-                        action={
-                            <Link
-                                href={attention.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('View all')}
-                            </Link>
-                        }
+                        action={<ViewAllLink href={attention.view_all_href}>{t('View all')}</ViewAllLink>}
                         empty={attentionEmpty}
                     >
                         <DashboardAttention attention={attention} />
@@ -76,58 +79,41 @@ export default function Home({
 
                     <HomeWidget
                         title={t('Today')}
-                        description={t('Your schedule')}
-                        action={
-                            <Link
-                                href={work.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('View all')}
-                            </Link>
-                        }
+                        action={<ViewAllLink href={work.view_all_href}>{t('View all')}</ViewAllLink>}
                         empty={workEmpty}
                     >
                         <DashboardWork work={work} />
                     </HomeWidget>
                 </div>
 
-                {metrics.kpis.length > 0 ? <HomeKpiStrip kpis={metrics.kpis} /> : null}
+                {metrics.kpis.length > 0 ? (
+                    <div className="mt-8">
+                        <HomeKpiStrip kpis={metrics.kpis} />
+                    </div>
+                ) : null}
 
-                <div className="grid gap-3 px-4 py-3 md:px-5 lg:grid-cols-2">
+                <div className="mt-8 px-4 md:px-8">
                     <HomeWidget
                         title={t('Pipeline')}
                         description={
                             pipelineEmpty
-                                ? t('Open opportunity value by stage')
+                                ? undefined
                                 : t(':amount open · :count deals', {
                                       amount: formatCompactDzd(pipeline.amount_cents),
                                       count: pipeline.deal_count,
                                   })
                         }
-                        action={
-                            <Link
-                                href={pipeline.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('Open board')}
-                            </Link>
-                        }
+                        action={<ViewAllLink href={pipeline.view_all_href}>{t('Open board')}</ViewAllLink>}
                         empty={pipelineEmpty}
                     >
                         <DashboardPipeline pipeline={pipeline} />
                     </HomeWidget>
+                </div>
 
+                <div className="mt-8 px-4 pb-10 md:px-8">
                     <HomeWidget
                         title={t('Recent records')}
-                        description={t('Recently logged activity')}
-                        action={
-                            <Link
-                                href={recent.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('View all')}
-                            </Link>
-                        }
+                        action={<ViewAllLink href={recent.view_all_href}>{t('View all')}</ViewAllLink>}
                         empty={recentEmpty}
                     >
                         {recentEmpty ? (
@@ -138,7 +124,7 @@ export default function Home({
                                     canCreate ? (
                                         <Link
                                             href="/crm/contacts?create=1"
-                                            className="text-[12px] font-medium text-brand hover:underline"
+                                            className="text-[13px] leading-[18px] text-mute hover:text-ink"
                                         >
                                             {t('Create contact')}
                                         </Link>

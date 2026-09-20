@@ -55,6 +55,6 @@ expectTrue(HOME_KPI_STRIP_TRACK_CLASS.includes('md:grid-cols-4'), 'KPI 4-col at 
 expectTrue(!HOME_KPI_STRIP_TRACK_CLASS.includes('overflow-x-auto'), 'KPI strip is not a horizontal scroller');
 expectTrue(HOME_KPI_VALUE_CLASS.includes('break-words'), 'KPI values may wrap');
 expectTrue(!HOME_KPI_VALUE_CLASS.includes('whitespace-nowrap'), 'KPI values must not nowrap-collide');
-expectTrue(HOME_KPI_VALUE_CLASS.includes('text-kpi'), 'KPI values keep Brand Book text-kpi at lg');
+expectTrue(HOME_KPI_VALUE_CLASS.includes('text-[20px]'), 'KPI values stay restrained at 20/26');
 
 console.log('P17 dashboard operating home JS proofs passed');

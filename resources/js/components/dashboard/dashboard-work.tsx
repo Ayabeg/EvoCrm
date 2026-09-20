@@ -4,6 +4,8 @@ import { RecordLink } from '@/ds/workspace/quick-record/RecordLink';
 import type { DashboardWork } from '@/lib/dashboard-operating-home';
 import { formatDashboardWhen, relatedRecordRef } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 export function DashboardWork({ work }: { work: DashboardWork }) {
     const empty =
@@ -19,7 +21,7 @@ export function DashboardWork({ work }: { work: DashboardWork }) {
                 action={
                     <Link
                         href={work.view_all_href}
-                        className="text-[12px] font-medium text-brand hover:underline"
+                        className="text-[13px] leading-[18px] text-mute hover:text-ink"
                     >
                         {t('Open activities')}
                     </Link>
@@ -29,17 +31,26 @@ export function DashboardWork({ work }: { work: DashboardWork }) {
     }
 
     return (
-        <div className="space-y-3">
-            <p className="text-[12px] text-mute">
-                <Link href={work.overdue_href} className="hover:underline">
+        <div>
+            <p className="mb-2 text-[12px] leading-4 text-mute">
+                <Link
+                    href={work.overdue_href}
+                    className="hover:text-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                >
                     {work.counts.overdue} {t('overdue')}
                 </Link>
                 {' · '}
-                <Link href={work.today_href} className="hover:underline">
+                <Link
+                    href={work.today_href}
+                    className="hover:text-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                >
                     {work.counts.today} {t('today')}
                 </Link>
                 {' · '}
-                <Link href={work.upcoming_href} className="hover:underline">
+                <Link
+                    href={work.upcoming_href}
+                    className="hover:text-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                >
                     {work.counts.upcoming} {t('upcoming')}
                 </Link>
             </p>
@@ -49,15 +60,22 @@ export function DashboardWork({ work }: { work: DashboardWork }) {
                     const record = relatedRecordRef(related);
 
                     return (
-                        <li key={item.id} className="flex items-start justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                        <li
+                            key={item.id}
+                            className={cn(
+                                'flex items-start justify-between gap-4 rounded-[10px] px-2 py-3',
+                                '-mx-2 hover:bg-subtle',
+                                MOTION_HOVER_CLASS,
+                            )}
+                        >
                             <div className="min-w-0">
                                 <Link
                                     href={work.view_all_href}
-                                    className="block truncate text-[13px] font-medium text-ink hover:underline"
+                                    className="block truncate text-[15px] leading-[22px] font-semibold text-ink hover:underline focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
                                 >
                                     {item.subject}
                                 </Link>
-                                <p className="truncate text-[12px] text-mute">
+                                <p className="mt-0.5 truncate text-[12px] leading-4 text-mute">
                                     {item.group === 'overdue' ? t('Overdue') : item.type}
                                     {item.due_at ? ` · ${formatDashboardWhen(item.due_at)}` : ''}
                                 </p>
@@ -66,7 +84,7 @@ export function DashboardWork({ work }: { work: DashboardWork }) {
                                 <RecordLink
                                     record={record}
                                     mode="drawer"
-                                    className="max-w-[9rem] shrink-0 truncate text-left text-[12px] text-mute hover:text-ink hover:underline"
+                                    className="max-w-[9rem] shrink-0 truncate pt-0.5 text-left text-[12px] leading-4 text-mute hover:text-ink hover:underline"
                                 >
                                     {related.label}
                                 </RecordLink>

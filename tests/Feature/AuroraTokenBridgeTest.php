@@ -146,7 +146,7 @@ it('keeps the P04 rail at 240px expanded, 64px collapsed, and a 240px mobile She
     expect($sidebar)->not->toContain('w-[min(396px,92vw)]');
 });
 
-it('keeps Home KPI values on the Brand Book --text-kpi scale', function () {
+it('keeps Home KPI values restrained at 20/26 and CRM cards on Brand Book text-kpi', function () {
     $card = file_get_contents(resource_path('js/components/crm/evo-kpi-card.tsx'));
     $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
     $helpers = file_get_contents(resource_path('js/lib/dashboard-operating-home.ts'));
@@ -158,23 +158,26 @@ it('keeps Home KPI values on the Brand Book --text-kpi scale', function () {
     expect($strip)->toContain('HOME_KPI_VALUE_CLASS');
     expect($strip)->toContain('formatCompactDzd');
     expect($strip)->not->toContain('whitespace-nowrap');
-    expect($helpers)->toContain('text-kpi');
+    expect($helpers)->toContain('text-[20px]');
+    expect($helpers)->toContain('leading-[26px]');
     expect($helpers)->toContain('break-words');
+    expect($helpers)->not->toContain('lg:text-kpi');
     expect($helpers)->not->toContain('whitespace-nowrap');
 });
 
-it('uses compact mobile spacing tokens on Home chrome', function () {
+it('uses V01 page-header geometry on Home chrome', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
     $header = file_get_contents(resource_path('js/components/dashboard/dashboard-header.tsx'));
     $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
     $helpers = file_get_contents(resource_path('js/lib/dashboard-operating-home.ts'));
 
-    expect($home)->toContain('px-4 py-3 md:px-5 md:py-4');
+    expect($home)->toContain('px-4 pt-5 md:px-8');
     expect($home)->toContain('data-home="workspace"');
     expect($home)->not->toContain('max-w-6xl');
-    expect($header)->toContain('text-page-title');
-    expect($header)->toContain('flex flex-col gap-2');
+    expect($header)->toContain('text-[28px] leading-[34px] font-[650]');
+    expect($header)->toContain('flex flex-col gap-3');
     expect($header)->toContain('create=1');
+    expect($header)->toContain('variant="secondary"');
     expect($strip)->toContain('HOME_KPI_STRIP_TRACK_CLASS');
     expect($strip)->not->toContain('overflow-x-auto');
     expect($strip)->not->toContain('min-w-[7.5rem]');

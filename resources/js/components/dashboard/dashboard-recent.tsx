@@ -4,6 +4,8 @@ import { RecordLink } from '@/ds/workspace/quick-record/RecordLink';
 import type { DashboardRecent } from '@/lib/dashboard-operating-home';
 import { formatDashboardWhen } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 export function DashboardRecent({
     recent,
@@ -21,7 +23,7 @@ export function DashboardRecent({
                     canCreate ? (
                         <Link
                             href="/crm/contacts?create=1"
-                            className="text-[12px] font-medium text-brand hover:underline"
+                            className="text-[13px] leading-[18px] text-mute hover:text-ink"
                         >
                             {t('Create contact')}
                         </Link>
@@ -34,30 +36,40 @@ export function DashboardRecent({
     return (
         <ul className="divide-y divide-hairline">
             {recent.items.map((item) => (
-                <li key={item.id} className="flex items-baseline justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                <li
+                    key={item.id}
+                    className={cn(
+                        'flex items-baseline justify-between gap-4 rounded-[10px] px-2 py-2.5',
+                        '-mx-2 hover:bg-subtle',
+                        MOTION_HOVER_CLASS,
+                    )}
+                >
                     <div className="min-w-0">
                         {item.recordRef ? (
                             <RecordLink
                                 record={item.recordRef}
                                 mode="drawer"
-                                className="block truncate text-left text-[13px] font-medium text-ink hover:underline"
+                                className="block truncate text-left text-[14px] leading-5 font-medium text-ink hover:underline"
                             >
                                 {item.subject}
                             </RecordLink>
                         ) : (
                             <Link
                                 href={recent.view_all_href}
-                                className="block truncate text-[13px] font-medium text-ink hover:underline"
+                                className="block truncate text-[14px] leading-5 font-medium text-ink hover:underline focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
                             >
                                 {item.subject}
                             </Link>
                         )}
-                        <p className="truncate text-[12px] text-mute">
+                        <p className="mt-0.5 truncate text-[12px] leading-4 text-mute">
                             {item.type}
                             {item.related[0] ? ` · ${item.related[0].label}` : ''}
                         </p>
                     </div>
-                    <time className="shrink-0 text-[11px] text-mute" dateTime={item.at ?? undefined}>
+                    <time
+                        className="shrink-0 text-[12px] leading-4 text-mute"
+                        dateTime={item.at ?? undefined}
+                    >
                         {formatDashboardWhen(item.at)}
                     </time>
                 </li>

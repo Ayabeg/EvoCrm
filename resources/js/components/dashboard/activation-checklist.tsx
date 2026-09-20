@@ -21,26 +21,26 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
 
     return (
         <section
-            className="mx-4 mb-3 overflow-hidden rounded-[4px] border border-hairline bg-white md:mx-5"
+            className="mx-4 mb-8 overflow-hidden border-y border-hairline bg-transparent md:mx-8"
             aria-labelledby="activation-title"
             data-activation="checklist"
         >
-            <header className="flex flex-wrap items-start justify-between gap-2 px-3 py-2">
+            <header className="flex flex-wrap items-start justify-between gap-2 px-0 py-3">
                 <div className="min-w-0">
                     <h2
                         id="activation-title"
-                        className="text-[13px] font-semibold tracking-tight text-ink"
+                        className="text-[15px] leading-[22px] font-semibold tracking-tight text-ink"
                     >
                         {activated ? t('Workspace ready') : t('Get started')}
                     </h2>
-                    <p className="mt-0.5 text-[11px] leading-4 text-mute">
+                    <p className="mt-0.5 text-[12px] leading-4 text-mute">
                         {activated
                             ? t('Core sales setup is in place.')
                             : t('Finish the first sales loop in this workspace.')}
                     </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                    <p className="text-[11px] tabular-nums text-mute" aria-hidden>
+                    <p className="text-[12px] leading-4 tabular-nums text-mute" aria-hidden>
                         {label}
                     </p>
                     <Button
@@ -61,7 +61,7 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
                 </div>
             </header>
 
-            <div className="px-3 pb-2">
+            <div className="px-0 pb-2">
                 <div
                     role="progressbar"
                     aria-valuemin={0}
@@ -129,7 +129,7 @@ function ActivationStepRow({
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                     <p className="min-w-0 break-words text-[13px] font-medium text-ink">{step.label}</p>
-                    <p className="text-[11px] text-mute">
+                    <p className="text-[12px] leading-4 text-mute">
                         {step.complete ? t('Done') : kindLabel}
                     </p>
                 </div>
