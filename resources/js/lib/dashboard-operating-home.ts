@@ -6,13 +6,13 @@ import type { DealAttentionQueueItem } from '@/lib/deal-attention';
 
 export const DASHBOARD_TIMEZONE = 'Africa/Algiers';
 
-/** 2×2 below md; 4-col at md+. No horizontal strip scroll. */
+/** 2×2 through 768; 4-col from lg (1024). Typographic columns, not spreadsheet cells. */
 export const HOME_KPI_STRIP_TRACK_CLASS =
-    'grid grid-cols-2 divide-x divide-y divide-hairline border-y border-hairline md:grid-cols-4 md:divide-y-0';
+    'grid grid-cols-2 gap-x-8 gap-y-5 lg:grid-cols-4 lg:gap-y-0';
 
-/** Compact values may wrap; smaller at md (4-col + rail); Brand Book text-kpi from lg. */
+/** Compact values may wrap. V02 keeps Home snapshot at 20/26 — not Brand Book text-kpi. */
 export const HOME_KPI_VALUE_CLASS =
-    'money min-w-0 max-w-full text-[1.25rem] leading-tight tracking-tight break-words text-ink md:text-[1.125rem] lg:text-kpi';
+    'money min-w-0 max-w-full text-[20px] leading-[26px] font-semibold tracking-tight break-words text-ink';
 
 export type DashboardContext = {
     name: string;
@@ -119,6 +119,24 @@ export function formatDashboardWhen(iso: string | null | undefined): string {
         }).format(new Date(iso));
     } catch {
         return iso.slice(0, 16);
+    }
+}
+
+/** Time-first Today column. Existing due_at only. No Date.now. */
+export function formatDashboardTime(iso: string | null | undefined): string {
+    if (!iso) {
+        return '';
+    }
+
+    try {
+        return new Intl.DateTimeFormat('en-GB', {
+            timeZone: DASHBOARD_TIMEZONE,
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        }).format(new Date(iso));
+    } catch {
+        return iso.slice(11, 16);
     }
 }
 

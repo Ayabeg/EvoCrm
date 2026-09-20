@@ -43,13 +43,13 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             ? null
                             : `${kpi.change > 0 ? '+' : ''}${kpi.change}%`;
                     const body = (
-                        <article className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2 md:gap-1 md:px-3 md:py-2.5">
-                            <p className="text-[11px] font-medium leading-4 text-mute">
+                        <article className="flex min-w-0 flex-col gap-1 py-0.5">
+                            <p className="text-[12px] leading-4 font-medium text-mute">
                                 {kpi.label}
                             </p>
                             <p className={HOME_KPI_VALUE_CLASS}>{value}</p>
                             {change || kpi.hint ? (
-                                <p className="hidden truncate text-[11px] leading-4 text-mute sm:block">
+                                <p className="hidden truncate text-[12px] leading-4 text-mute sm:block">
                                     {[change, kpi.changeLabel, kpi.hint]
                                         .filter(Boolean)
                                         .join(' · ')}
@@ -64,9 +64,9 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                                 key={kpi.key}
                                 href={kpi.href}
                                 className={cn(
-                                    'min-w-0 no-underline',
+                                    'min-w-0 rounded-[10px] no-underline',
                                     MOTION_HOVER_CLASS,
-                                    'hover:bg-canvas-soft focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
+                                    'hover:bg-subtle focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
                                 )}
                                 aria-label={`${kpi.label} ${value}`}
                             >

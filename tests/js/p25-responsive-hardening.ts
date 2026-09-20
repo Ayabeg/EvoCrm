@@ -52,7 +52,7 @@ expectTrue(!FILTER_SEARCH_CLASS.includes('min-w-[12rem]'), 'filter search has no
 
 expectEqual(DASHBOARD_TIMEZONE, 'Africa/Algiers', 'P17 timezone frozen');
 expectTrue(HOME_KPI_STRIP_TRACK_CLASS.includes('grid-cols-2'), 'P17 KPI 2×2 at 768');
-expectTrue(HOME_KPI_STRIP_TRACK_CLASS.includes('md:grid-cols-4'), 'P17 KPI 4-col at md+');
+expectTrue(HOME_KPI_STRIP_TRACK_CLASS.includes('lg:grid-cols-4'), 'P17 KPI 4-col at lg+');
 expectTrue(!HOME_KPI_STRIP_TRACK_CLASS.includes('overflow-x-auto'), 'P17 KPI is not a scroller');
 expectTrue(HOME_KPI_VALUE_CLASS.includes('break-words'), 'P17 KPI values wrap');
 expectTrue(QUOTE_MONEY_CLASS.includes('break-words'), 'quote builder money wraps');

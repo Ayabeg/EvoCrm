@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ActivationChecklist } from '@/components/dashboard/activation-checklist';
 import { DashboardAttention } from '@/components/dashboard/dashboard-attention';
@@ -18,6 +19,7 @@ import type {
 } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
 import { formatCompactDzd } from '@/lib/money';
+import { cn } from '@/lib/utils';
 import type { Auth } from '@/types';
 
 type Props = {
@@ -29,6 +31,27 @@ type Props = {
     recent: RecentPayload;
     activation?: ActivationState | null;
 };
+
+function ViewAllLink({ href, children }: { href: string; children: string }) {
+    return (
+        <Link
+            href={href}
+            className="text-[13px] leading-[18px] text-mute hover:text-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+        >
+            {children}
+        </Link>
+    );
+}
+
+function HomeModule({
+    children,
+    className,
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
+    return <div className={cn('home-module', className)}>{children}</div>;
+}
 
 export default function Home({
     context,
@@ -51,104 +74,93 @@ export default function Home({
         <>
             <Head title={t('Home')} />
             <div className="flex-1 overflow-x-hidden bg-canvas-soft" data-home="workspace">
-                <div className="px-4 py-3 md:px-5 md:py-4">
+                <div className="mx-auto w-full max-w-[72rem] px-4 pt-5 md:px-8">
                     <DashboardHeader context={context} canCreate={canCreate} />
-                </div>
 
-                {activation ? <ActivationChecklist activation={activation} /> : null}
+                    {activation ? <ActivationChecklist activation={activation} /> : null}
 
-                <div className="grid gap-3 px-4 pb-3 md:px-5 lg:grid-cols-2">
-                    <HomeWidget
-                        title={t('Needs attention')}
-                        description={t('Deal exceptions')}
-                        action={
-                            <Link
-                                href={attention.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('View all')}
-                            </Link>
-                        }
-                        empty={attentionEmpty}
-                    >
-                        <DashboardAttention attention={attention} />
-                    </HomeWidget>
-
-                    <HomeWidget
-                        title={t('Today')}
-                        description={t('Your schedule')}
-                        action={
-                            <Link
-                                href={work.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('View all')}
-                            </Link>
-                        }
-                        empty={workEmpty}
-                    >
-                        <DashboardWork work={work} />
-                    </HomeWidget>
-                </div>
-
-                {metrics.kpis.length > 0 ? <HomeKpiStrip kpis={metrics.kpis} /> : null}
-
-                <div className="grid gap-3 px-4 py-3 md:px-5 lg:grid-cols-2">
-                    <HomeWidget
-                        title={t('Pipeline')}
-                        description={
-                            pipelineEmpty
-                                ? t('Open opportunity value by stage')
-                                : t(':amount open · :count deals', {
-                                      amount: formatCompactDzd(pipeline.amount_cents),
-                                      count: pipeline.deal_count,
-                                  })
-                        }
-                        action={
-                            <Link
-                                href={pipeline.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('Open board')}
-                            </Link>
-                        }
-                        empty={pipelineEmpty}
-                    >
-                        <DashboardPipeline pipeline={pipeline} />
-                    </HomeWidget>
-
-                    <HomeWidget
-                        title={t('Recent records')}
-                        description={t('Recently logged activity')}
-                        action={
-                            <Link
-                                href={recent.view_all_href}
-                                className="text-[12px] font-medium text-brand hover:underline"
-                            >
-                                {t('View all')}
-                            </Link>
-                        }
-                        empty={recentEmpty}
-                    >
-                        {recentEmpty ? (
-                            <HomeWidgetEmpty
-                                title={t('Nothing logged yet')}
-                                body={t('Newly logged notes, calls, and tasks appear here.')}
+                    <HomeModule>
+                        <div className="grid lg:grid-cols-2">
+                            <HomeWidget
+                                title={t('Needs attention')}
+                                className="px-5 py-5 md:px-6 md:py-6"
                                 action={
-                                    canCreate ? (
-                                        <Link
-                                            href="/crm/contacts?create=1"
-                                            className="text-[12px] font-medium text-brand hover:underline"
-                                        >
-                                            {t('Create contact')}
-                                        </Link>
-                                    ) : undefined
+                                    <ViewAllLink href={attention.view_all_href}>
+                                        {t('View all')}
+                                    </ViewAllLink>
                                 }
-                            />
-                        ) : (
-                            <DashboardRecent recent={recent} canCreate={canCreate} />
-                        )}
-                    </HomeWidget>
+                                empty={attentionEmpty}
+                            >
+                                <DashboardAttention attention={attention} />
+                            </HomeWidget>
+
+                            <HomeWidget
+                                title={t('Today')}
+                                className="border-t border-hairline px-5 py-5 md:px-6 md:py-6 lg:border-t-0 lg:border-l lg:border-hairline lg:pl-8"
+                                action={
+                                    <ViewAllLink href={work.view_all_href}>{t('View all')}</ViewAllLink>
+                                }
+                                empty={workEmpty}
+                            >
+                                <DashboardWork work={work} />
+                            </HomeWidget>
+                        </div>
+                    </HomeModule>
+
+                    {metrics.kpis.length > 0 ? (
+                        <HomeModule className="mt-6 px-5 py-5 md:px-6 md:py-6">
+                            <HomeKpiStrip kpis={metrics.kpis} />
+                        </HomeModule>
+                    ) : null}
+
+                    <HomeModule className="mt-6 px-5 py-5 md:px-6 md:py-6">
+                        <HomeWidget
+                            title={t('Pipeline')}
+                            description={
+                                pipelineEmpty
+                                    ? undefined
+                                    : t(':amount open · :count deals', {
+                                          amount: formatCompactDzd(pipeline.amount_cents),
+                                          count: pipeline.deal_count,
+                                      })
+                            }
+                            action={
+                                <ViewAllLink href={pipeline.view_all_href}>{t('Open board')}</ViewAllLink>
+                            }
+                            empty={pipelineEmpty}
+                        >
+                            <DashboardPipeline pipeline={pipeline} />
+                        </HomeWidget>
+                    </HomeModule>
+
+                    <HomeModule className="mt-6 mb-10 px-5 py-5 md:px-6 md:py-6">
+                        <HomeWidget
+                            title={t('Recent records')}
+                            action={
+                                <ViewAllLink href={recent.view_all_href}>{t('View all')}</ViewAllLink>
+                            }
+                            empty={recentEmpty}
+                        >
+                            {recentEmpty ? (
+                                <HomeWidgetEmpty
+                                    title={t('Nothing logged yet')}
+                                    body={t('Newly logged notes, calls, and tasks appear here.')}
+                                    action={
+                                        canCreate ? (
+                                            <Link
+                                                href="/crm/contacts?create=1"
+                                                className="text-[13px] leading-[18px] text-mute hover:text-ink"
+                                            >
+                                                {t('Create contact')}
+                                            </Link>
+                                        ) : undefined
+                                    }
+                                />
+                            ) : (
+                                <DashboardRecent recent={recent} canCreate={canCreate} />
+                            )}
+                        </HomeWidget>
+                    </HomeModule>
                 </div>
             </div>
         </>
