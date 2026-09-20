@@ -6,9 +6,26 @@ import { formatCompactDzd } from '@/lib/money';
 import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
+function stageShare(amount: number, total: number): number {
+    if (total <= 0 || amount <= 0) {
+        return 0;
+    }
+
+    return Math.round((amount / total) * 100);
+}
+
 export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline }) {
-    const max = Math.max(...pipeline.stages.map((stage) => stage.amount_cents), 1);
     const empty = pipeline.deal_count === 0;
+    const total = Math.max(pipeline.amount_cents, 1);
+    let largestId = pipeline.stages[0]?.id ?? 0;
+    let largestAmount = pipeline.stages[0]?.amount_cents ?? 0;
+    for (const stage of pipeline.stages) {
+        if (stage.amount_cents > largestAmount) {
+            largestId = stage.id;
+            largestAmount = stage.amount_cents;
+        }
+    }
+    const distributed = pipeline.stages.filter((stage) => stage.amount_cents > 0);
 
     if (empty) {
         return (
@@ -28,39 +45,71 @@ export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline })
     }
 
     return (
-        <ul className="space-y-3">
-            {pipeline.stages.map((stage) => {
-                const width = Math.max(
-                    (stage.amount_cents / max) * 100,
-                    stage.count > 0 ? 6 : 0,
-                );
+        <div>
+            <div
+                className="flex h-2.5 overflow-hidden rounded-[4px] bg-subtle"
+                role="img"
+                aria-label={t(':amount open · :count deals', {
+                    amount: formatCompactDzd(pipeline.amount_cents),
+                    count: pipeline.deal_count,
+                })}
+            >
+                {distributed.map((stage, index) => {
+                    const width = Math.max((stage.amount_cents / total) * 100, 3);
+                    const lead = stage.id === largestId;
 
-                return (
-                    <li key={stage.id} className="min-w-0">
-                        <Link
-                            href={stage.href}
+                    return (
+                        <div
+                            key={stage.id}
                             className={cn(
-                                'block min-w-0 rounded-[10px] px-2 py-1.5 no-underline',
-                                '-mx-2 hover:bg-subtle',
-                                MOTION_HOVER_CLASS,
-                                'focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
+                                'h-full min-w-0',
+                                lead ? 'bg-brand' : index % 2 === 0 ? 'bg-ink/30' : 'bg-ink/15',
                             )}
-                        >
-                            <div className="flex items-baseline justify-between gap-4">
-                                <span className="truncate text-[13px] leading-[18px] font-medium text-ink">
-                                    {stage.name}
+                            style={{ width: `${width}%` }}
+                            title={`${stage.name} · ${formatCompactDzd(stage.amount_cents)}`}
+                        />
+                    );
+                })}
+            </div>
+
+            <ul className="mt-4 divide-y divide-hairline">
+                {pipeline.stages.map((stage) => {
+                    const share = stageShare(stage.amount_cents, pipeline.amount_cents);
+
+                    return (
+                        <li key={stage.id} className="min-w-0">
+                            <Link
+                                href={stage.href}
+                                className={cn(
+                                    'flex items-baseline justify-between gap-4 rounded-[10px] px-2 py-2.5 no-underline',
+                                    '-mx-2 hover:bg-subtle',
+                                    MOTION_HOVER_CLASS,
+                                    'focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
+                                )}
+                            >
+                                <span className="flex min-w-0 items-baseline gap-2">
+                                    <span
+                                        className={cn(
+                                            'mt-px size-1.5 shrink-0 rounded-full',
+                                            stage.id === largestId ? 'bg-brand' : 'bg-ink/30',
+                                        )}
+                                        aria-hidden
+                                    />
+                                    <span className="truncate text-[13px] leading-[18px] font-medium text-ink">
+                                        {stage.name}
+                                    </span>
                                 </span>
                                 <span className="money shrink-0 text-[12px] leading-4 text-mute">
-                                    {stage.count} · {formatCompactDzd(stage.amount_cents)}
+                                    {stage.count}
+                                    {' · '}
+                                    {formatCompactDzd(stage.amount_cents)}
+                                    {share > 0 ? ` · ${share}%` : ''}
                                 </span>
-                            </div>
-                            <div className="mt-1.5 h-1 overflow-hidden bg-subtle" aria-hidden>
-                                <div className="h-full bg-ink/35" style={{ width: `${width}%` }} />
-                            </div>
-                        </Link>
-                    </li>
-                );
-            })}
-        </ul>
+                            </Link>
+                        </li>
+                    );
+                })}
+            </ul>
+        </div>
     );
 }

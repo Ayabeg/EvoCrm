@@ -28,13 +28,22 @@ function formatKpiValue(kpi: KpiTile): string {
     return kpi.value;
 }
 
-export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
+export function HomeKpiStrip({
+    kpis,
+    windowLabel,
+}: {
+    kpis: KpiTile[];
+    windowLabel?: string;
+}) {
     if (kpis.length === 0) {
         return null;
     }
 
     return (
         <section aria-label="Sales snapshot">
+            {windowLabel ? (
+                <p className="mb-4 text-[12px] leading-4 text-mute">{windowLabel}</p>
+            ) : null}
             <div className={HOME_KPI_STRIP_TRACK_CLASS}>
                 {kpis.map((kpi) => {
                     const value = formatKpiValue(kpi);
@@ -43,7 +52,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             ? null
                             : `${kpi.change > 0 ? '+' : ''}${kpi.change}%`;
                     const body = (
-                        <article className="flex min-w-0 flex-col gap-1 px-4 py-3 md:px-6">
+                        <article className="flex min-w-0 flex-col gap-1 py-0.5">
                             <p className="text-[12px] leading-4 font-medium text-mute">
                                 {kpi.label}
                             </p>
@@ -64,9 +73,9 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                                 key={kpi.key}
                                 href={kpi.href}
                                 className={cn(
-                                    'min-w-0 no-underline',
+                                    'min-w-0 rounded-[10px] no-underline',
                                     MOTION_HOVER_CLASS,
-                                    'hover:bg-canvas-soft focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
+                                    'hover:bg-subtle focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
                                 )}
                                 aria-label={`${kpi.label} ${value}`}
                             >

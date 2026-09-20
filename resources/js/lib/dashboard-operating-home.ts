@@ -6,9 +6,9 @@ import type { DealAttentionQueueItem } from '@/lib/deal-attention';
 
 export const DASHBOARD_TIMEZONE = 'Africa/Algiers';
 
-/** 2×2 through 768; 4-col from lg (1024). No horizontal strip scroll. */
+/** 2×2 through 768; 4-col from lg (1024). Typographic columns, not spreadsheet cells. */
 export const HOME_KPI_STRIP_TRACK_CLASS =
-    'grid grid-cols-2 divide-x divide-y divide-hairline border-y border-hairline lg:grid-cols-4 lg:divide-y-0';
+    'grid grid-cols-2 gap-x-8 gap-y-5 lg:grid-cols-4 lg:gap-y-0';
 
 /** Compact values may wrap. V02 keeps Home snapshot at 20/26 — not Brand Book text-kpi. */
 export const HOME_KPI_VALUE_CLASS =
@@ -119,6 +119,24 @@ export function formatDashboardWhen(iso: string | null | undefined): string {
         }).format(new Date(iso));
     } catch {
         return iso.slice(0, 16);
+    }
+}
+
+/** Time-first Today column. Existing due_at only. No Date.now. */
+export function formatDashboardTime(iso: string | null | undefined): string {
+    if (!iso) {
+        return '';
+    }
+
+    try {
+        return new Intl.DateTimeFormat('en-GB', {
+            timeZone: DASHBOARD_TIMEZONE,
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        }).format(new Date(iso));
+    } catch {
+        return iso.slice(11, 16);
     }
 }
 

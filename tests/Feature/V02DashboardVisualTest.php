@@ -14,6 +14,7 @@ it('composes Home as an attention-first operating workspace', function () {
         ->and($home)->toContain("title={t('Recent records')}")
         ->and($home)->toContain('lg:grid-cols-2')
         ->and($home)->toContain('lg:border-l lg:border-hairline')
+        ->and($home)->toContain('home-module')
         ->and($home)->toContain('overflow-x-hidden')
         ->and($home)->not->toContain('max-w-6xl')
         ->and($home)->not->toContain('Deal exceptions')
@@ -38,7 +39,8 @@ it('composes Home as an attention-first operating workspace', function () {
         ->and($widget)->not->toContain('rounded-xl');
 
     expect($css)->toContain('.home-widget')
-        ->and($css)->toContain('box-shadow: none');
+        ->and($css)->toContain('box-shadow: none')
+        ->and($css)->toContain('.home-module');
 });
 
 it('keeps Home queues, snapshot, and feed on the 12px type floor', function () {
@@ -61,7 +63,7 @@ it('keeps Home queues, snapshot, and feed on the 12px type floor', function () {
         ->and($work)->not->toContain('/complete')
         ->and($pipeline)->toContain('formatCompactDzd')
         ->and($pipeline)->toContain('amount_cents')
-        ->and($pipeline)->not->toContain('bg-brand')
+        ->and($pipeline)->toContain('bg-brand')
         ->and($recent)->toContain('text-[12px] leading-4')
         ->and($strip)->toContain('HOME_KPI_STRIP_TRACK_CLASS')
         ->and($helpers)->toContain('text-[20px]')

@@ -2,10 +2,13 @@ import { Link } from '@inertiajs/react';
 import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import type { DashboardAttention } from '@/lib/dashboard-operating-home';
-import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
+
+function stateClass(severity: string): string {
+    return severity === 'critical' ? 'text-destructive' : 'text-mute';
+}
 
 export function DashboardAttention({
     attention,
@@ -33,42 +36,48 @@ export function DashboardAttention({
 
     return (
         <ul className="divide-y divide-hairline">
-            {attention.items.map((item) => (
-                <li key={item.id}>
-                    <button
-                        type="button"
-                        className={cn(
-                            'flex w-full items-start justify-between gap-4 rounded-[10px] px-2 py-3 text-left',
-                            '-mx-2 hover:bg-subtle',
-                            MOTION_HOVER_CLASS,
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
-                        )}
-                        onClick={() =>
-                            openRecord({ type: 'deal', id: item.id }, { opener: null })
-                        }
-                    >
-                        <span className="min-w-0">
-                            <a
-                                href={item.href}
-                                className="block truncate text-[15px] leading-[22px] font-semibold text-ink hover:underline"
-                                onClick={(event) => event.stopPropagation()}
-                            >
-                                {item.title}
-                            </a>
-                            <span
-                                className={`mt-0.5 block truncate text-[12px] leading-4 ${attentionToneClass(item.primary.severity)}`}
-                            >
-                                {item.primary.reason || item.primary.label}
-                            </span>
-                        </span>
-                        <span
-                            className={`shrink-0 pt-0.5 text-[12px] leading-4 ${attentionToneClass(item.primary.severity)}`}
+            {attention.items.map((item) => {
+                const overdue = item.primary.severity === 'critical';
+                const reason = item.primary.reason?.trim() ?? '';
+                const showReason = overdue && reason !== '';
+
+                return (
+                    <li key={item.id}>
+                        <button
+                            type="button"
+                            className={cn(
+                                'flex w-full items-start justify-between gap-4 rounded-[10px] px-2 py-3 text-left',
+                                '-mx-2 hover:bg-subtle',
+                                MOTION_HOVER_CLASS,
+                                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+                            )}
+                            onClick={() =>
+                                openRecord({ type: 'deal', id: item.id }, { opener: null })
+                            }
                         >
-                            {item.primary.label}
-                        </span>
-                    </button>
-                </li>
-            ))}
+                            <span className="min-w-0">
+                                <a
+                                    href={item.href}
+                                    className="block truncate text-[15px] leading-[22px] font-semibold text-ink hover:underline"
+                                    onClick={(event) => event.stopPropagation()}
+                                >
+                                    {item.title}
+                                </a>
+                                {showReason ? (
+                                    <span className="mt-0.5 block truncate text-[13px] leading-[18px] text-ink/80">
+                                        {reason}
+                                    </span>
+                                ) : null}
+                                <span
+                                    className={`mt-0.5 block truncate text-[12px] leading-4 ${stateClass(item.primary.severity)}`}
+                                >
+                                    {item.primary.label}
+                                </span>
+                            </span>
+                        </button>
+                    </li>
+                );
+            })}
         </ul>
     );
 }

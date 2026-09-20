@@ -511,6 +511,20 @@
     .dark .home-widget {
         background: transparent;
     }
+
+    /* Shopify-style information module: white on paper, hairline, radius 10.
+       Depth comes from canvas contrast, not float. Not a card-in-card. */
+    .home-module {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        box-shadow: none;
+    }
+
+    .dark .home-module {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+    }
 }
 
 @media (prefers-reduced-transparency: reduce) {
