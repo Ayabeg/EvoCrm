@@ -1,20 +1,26 @@
 # M07 → M08 Handoff
 
-M07 shipped **Authentication + Workspace**. M08 is the **Contacts loop**. Do not restart auth. Do not start M08 in the M07 PR.
+M07 shipped **Authentication + Workspace**. M08 is the **Contacts loop** and is implemented on `feat/m08-contacts` (see `docs/mobile/M08-STATUS.md`). Do not restart auth.
 
-## Ready for M08
+## Ready for M08 (consumed)
 
 - Session states: `booting`, `unknown`, `unauthenticated`, `authenticating`, `authenticated`, `expired`
 - Real login: email + password against `POST /api/v1/auth/token` then `GET /api/v1/me`
 - SecureStore holds the Sanctum token only
 - Workspace from `/me` only; switching deferred
 - `can()` from `/me` permissions (deny unknown)
-- Expo Router guards + authenticated tab shell (HOME / CRM / INBOX / ACTIVITIES / MORE)
+- Expo Router guards + authenticated tab shell
 - MORE: account + session + honest logout
 - Centralized 401; 403 ≠ logout
-- Contacts API already in the catalog: `GET/POST /contacts`, `GET/PUT /contacts/{id}`
+- Contacts API in the catalog: `GET/POST /contacts`, `GET/PUT /contacts/{id}`
 
-## Do not do in M08
+## M08 delivered
+
+- CRM tab list + search + pagination
+- Contact show / create / update
+- `crm.edit` gates write actions
+
+## Still do not do
 
 - Re-implement login, token storage, or workspace switching
 - Invent `/api/v2` or GraphQL
@@ -30,12 +36,4 @@ M07 shipped **Authentication + Workspace**. M08 is the **Contacts loop**. Do not
 3. `POST /api/v1/activities/{id}/complete` — G03 Activities done state
 4. `GET /api/v1/threads/{id}` — G04 Inbox detail
 
-Contacts show/list/create/update are **READY** on current `/api/v1`. Companies show is **not** in v1.
-
-## Platform QA in M08
-
-Verify contact list/show after a restored SecureStore session on both iOS and Android. That is QA, not a second app.
-
-## Stop
-
-Do not start M08 until this PR is reviewed. Do not merge M07 from the agent.
+Companies show is **not** in v1.

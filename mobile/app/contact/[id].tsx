@@ -1,5 +1,5 @@
-import { RecordPlaceholder } from '@/components/RecordPlaceholder';
+import { ContactDetailScreen } from '@/features/contacts/ContactDetailScreen';
 
 export default function ContactRecordScreen() {
-  return <RecordPlaceholder object="contact" title="Contact" />;
+  return <ContactDetailScreen />;
 }

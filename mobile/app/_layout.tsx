@@ -35,7 +35,9 @@ function RootNavigator() {
       }}>
       <Stack.Protected guard={canAccessProtectedApp(status)}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="contact/new" options={{ title: 'New contact' }} />
         <Stack.Screen name="contact/[id]" options={{ title: 'Contact' }} />
+        <Stack.Screen name="contact/[id]/edit" options={{ title: 'Edit contact' }} />
         <Stack.Screen name="company/[id]" options={{ title: 'Company' }} />
         <Stack.Screen name="lead/[id]" options={{ title: 'Lead' }} />
         <Stack.Screen name="deal/[id]" options={{ title: 'Deal' }} />
