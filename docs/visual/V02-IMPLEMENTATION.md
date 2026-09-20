@@ -143,7 +143,7 @@ Recorded after final 1440.
 | 1440 | Attention ‖ Today; KPI 4; Pipeline then Recent | NONE (local 1440: sw=cw) |
 | 1280 | Same, tighter | NONE |
 | 1024 | `lg` 2-col queues still; KPI 4 | NONE |
-| 768 | Stacked queues; KPI 2×2; labeled 240 rail | NONE |
+| 768 | Stacked queues; KPI 2×2 (`lg:grid-cols-4`); labeled 240 rail | NONE (Playwright: sw=cw=768) |
 
 ---
 
@@ -167,3 +167,11 @@ P27 hover class on queue/KPI/stage rows (~120ms). No Home entrance spectacle. Re
 - Unused `activity-feed.tsx` 11px (not mounted on Home)
 - Repo-wide Lucide / official Aurora Sidebar / DataTable
 - Dark cabinet
+
+---
+
+## Contabo exact-tip
+
+**PR tip / expected / host / container / marker:** `19d8d479d714a4f402c4b94769fa5d79063670ed`  
+Container recreated (not restarted). Running fingerprint `home-BXzjbopD.js` / `app-Cc4jHQfr.js`.  
+Authenticated Contabo login with the local seed user is rejected (pre-existing). Local populated QA at 1440/1280/1024/768 stands in for visual proof. Do not reset production passwords.
