@@ -1,6 +1,6 @@
 # M08 → M09 handoff
 
-**Do not start M09 until M08 PR #249 is reviewed/merged per roadmap.** This file only records what M09 inherits.
+M08 Contacts is **merged and frozen** on `main` (PR #249 → `d2809ab7e81cc923a8d1ad13de420f7591faa80c`).
 
 ## Stable after M08
 
@@ -14,11 +14,11 @@
 
 | Gap | Suggested owner |
 |---|---|
-| Companies list/show | M09+ CRM records |
+| Companies list/show | **M09 candidate** (READY `/api/v1` company endpoints) |
+| Inbox thread show | Roadmap M09 historically — **blocked on G04** |
 | Home attention / next tasks | G01 |
 | Deals list / pipeline move | G02 |
 | Activity complete | G03 |
-| Thread show / reply | G04 |
 | Contact delete | Only if `/api/v1` gains delete |
 | WhatsApp actions on contact | Product decision; not M08 |
 
@@ -28,6 +28,6 @@
 2. Custom `attributes` on update exist server-side but are **not** edited in M08 UI.
 3. Device visual QA still owed (`M08-VISUAL-QA.md`).
 
-## Suggested M09 first slice
+## Suggested M09 first slice (READY path)
 
-Companies list + show against existing `/api/v1` company endpoints only — mirror Contacts patterns (search race, permissions, errors, Mobbin map row).
+Companies list + show against existing `/api/v1` company endpoints only — mirror Contacts patterns (search race, permissions, errors, Mobbin map row). Do not invent endpoints. If product prefers Inbox instead, unblock G04 first.
