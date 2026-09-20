@@ -74,7 +74,7 @@ export default function Home({
         <>
             <Head title={t('Home')} />
             <div className="flex-1 overflow-x-hidden bg-canvas-soft" data-home="workspace">
-                <div className="mx-auto w-full max-w-[72rem] px-4 pt-6 md:px-8">
+                <div className="mx-auto w-full max-w-[72rem] px-4 pt-5 md:px-8">
                     <DashboardHeader context={context} canCreate={canCreate} />
 
                     {activation ? <ActivationChecklist activation={activation} /> : null}
@@ -109,7 +109,7 @@ export default function Home({
 
                     {metrics.kpis.length > 0 ? (
                         <HomeModule className="mt-6 px-5 py-5 md:px-6 md:py-6">
-                            <HomeKpiStrip kpis={metrics.kpis} windowLabel={metrics.window.label} />
+                            <HomeKpiStrip kpis={metrics.kpis} />
                         </HomeModule>
                     ) : null}
 

@@ -28,22 +28,13 @@ function formatKpiValue(kpi: KpiTile): string {
     return kpi.value;
 }
 
-export function HomeKpiStrip({
-    kpis,
-    windowLabel,
-}: {
-    kpis: KpiTile[];
-    windowLabel?: string;
-}) {
+export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
     if (kpis.length === 0) {
         return null;
     }
 
     return (
         <section aria-label="Sales snapshot">
-            {windowLabel ? (
-                <p className="mb-4 text-[12px] leading-4 text-mute">{windowLabel}</p>
-            ) : null}
             <div className={HOME_KPI_STRIP_TRACK_CLASS}>
                 {kpis.map((kpi) => {
                     const value = formatKpiValue(kpi);

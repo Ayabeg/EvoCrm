@@ -47,7 +47,7 @@ export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline })
     return (
         <div>
             <div
-                className="flex h-2.5 overflow-hidden rounded-[4px] bg-subtle"
+                className="flex h-3 gap-px overflow-hidden rounded-[4px] bg-white"
                 role="img"
                 aria-label={t(':amount open · :count deals', {
                     amount: formatCompactDzd(pipeline.amount_cents),
@@ -63,7 +63,7 @@ export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline })
                             key={stage.id}
                             className={cn(
                                 'h-full min-w-0',
-                                lead ? 'bg-brand' : index % 2 === 0 ? 'bg-ink/30' : 'bg-ink/15',
+                                lead ? 'bg-brand' : index % 2 === 0 ? 'bg-ink/35' : 'bg-ink/18',
                             )}
                             style={{ width: `${width}%` }}
                             title={`${stage.name} · ${formatCompactDzd(stage.amount_cents)}`}

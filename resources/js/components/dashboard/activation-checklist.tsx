@@ -61,6 +61,7 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
                 </div>
             </header>
 
+            {activated ? null : (
             <div className="px-0 pb-2">
                 <div
                     role="progressbar"
@@ -79,6 +80,7 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
                     />
                 </div>
             </div>
+            )}
 
             {collapsed ? null : (
                 <ol className="divide-y divide-hairline border-t border-hairline">
