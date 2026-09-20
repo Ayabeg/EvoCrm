@@ -49,7 +49,7 @@ The client talks to existing Laravel `/api/v1` only. Workspace, permissions, and
 
 ## M08 Contacts
 
-**Status:** IMPLEMENTED / PR OPEN ([#249](https://github.com/Mohamedbeghanem/EvoCrm/pull/249)) — not shipped.
+**Status:** MERGED / FROZEN ([#249](https://github.com/Mohamedbeghanem/EvoCrm/pull/249) → `d2809ab7e81cc923a8d1ad13de420f7591faa80c`) — see `docs/mobile/M08-STATUS.md`.
 
 - CRM tab → contact list + search + pagination (race-safe + page locks)
 - `/contact/new` create (requires `crm.edit`; denial if missing)
@@ -57,3 +57,4 @@ The client talks to existing Laravel `/api/v1` only. Workspace, permissions, and
 - `/contact/[id]/edit` update (requires `crm.edit`)
 - Uses catalog endpoints only: `contactsIndex` / `contactsStore` / `contactsShow` / `contactsUpdate`
 - Docs: `docs/mobile/M08-*.md` + `docs/mobile/research/M08-CONTACTS-MOBBIN.md`
+- Device Android/iOS visual QA still owed (`M08-VISUAL-QA.md`)
