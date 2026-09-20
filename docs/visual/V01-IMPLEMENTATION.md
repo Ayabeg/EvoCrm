@@ -25,7 +25,10 @@ P00–P29 behavior is unchanged. Navigation hrefs, Command OS orchestration, Cre
 - `resources/js/components/crm/room-shell.tsx`
 - `resources/js/components/aurora/command-palette.tsx` — presentation only
 - `resources/js/ds/chrome/PageHeader.tsx` — 32 / 24 geometry, Page 28/34/650
-- `resources/js/components/ui/aurora/dropdown-menu.tsx` — 36px rows, radius 8
+- `resources/js/components/ui/aurora/dropdown-menu.tsx` — 36px rows, radius 10
+- `resources/js/components/ui/aurora/select.tsx` — menu panel radius 10
+- `resources/js/components/user-menu-content.tsx` — profile menu spacing
+- `docs/visual/V01-IMPECCABLE.md` — clarify / distill / polish record
 
 ### Tests / docs
 
@@ -35,6 +38,7 @@ P00–P29 behavior is unchanged. Navigation hrefs, Command OS orchestration, Cre
 - `tests/Feature/P16CommandOsTest.php` (container width 560)
 - `tests/Feature/ProductPolishWorkspaceTest.php`
 - `docs/visual/V01-BASELINE.md`
+- `docs/visual/V01-IMPECCABLE.md`
 - this file
 
 Not changed: routes, models, APIs, Command OS catalog, page contents (Dashboard through Settings).
@@ -49,7 +53,7 @@ Not changed: routes, models, APIs, Command OS catalog, page contents (Dashboard 
 | Buttons | Already 36 / 8. Primary hover `#D74908`. Global Create is the orange CTA |
 | Inputs / search / select | Default 36 / radius 8. Topbar search no longer `sm` |
 | Surfaces | Canvas `#F7F7F5`. Surface `#FFFFFF`. Subtle `#F1F1EF`. Border `#E3E3DF`. Strong `#D6D6D1` |
-| Popovers / menus | White surface, hairline, radius 10 (token), 36px items, elevation allowed |
+| Popovers / menus | White surface, hairline, radius 10 (`--aurora-radius-2`), 36px items, elevation allowed |
 | Badges | Shared default no longer cyan. Orange is not a badge color |
 | Dialog | Radius 12 via `--aurora-radius-3` |
 | Drawer | Radius 0 unchanged |
@@ -71,7 +75,7 @@ Not changed: routes, models, APIs, Command OS catalog, page contents (Dashboard 
 
 ## Sidebar
 
-Paper rail `#F7F7F5`. Centered 20px Phosphor icons when collapsed, tooltips unchanged. Expanded 36px rows, 13px labels, 12px group labels (CRM, Communication, Sales, More). Active: accent-soft wash + orange icon/text. No solid orange blocks. Settings stays at the bottom. More panel uses surface + hairline + 10 radius instead of evosales literals. Existing hrefs and simple-mode filtering unchanged. Existing compact mark + EvoCRM wordmark. No new logo.
+Paper rail `#F7F7F5`. Centered 20px Phosphor icons when collapsed, tooltips unchanged. Expanded 36px rows, 13px labels, 12px group labels (CRM, Communication, Sales, More). Active: accent-soft wash + ink text + filled icon (Visual Law §12 / §13 — Create keeps the orange). No solid orange blocks. Settings stays at the bottom. More panel uses surface + hairline + 10 radius, no restated More heading. Existing hrefs and simple-mode filtering unchanged. Existing compact mark + EvoCrm wordmark. No new logo.
 
 ---
 
@@ -130,6 +134,10 @@ Populated local seed (`owner@evosales.local`) against the production Vite build.
 Collapsed rail measured 63. Command OS 560 × 12, transparent query field, selected `#FFF1EA`. Create menu: white surface, Contact / Company / Deal / Quote. Screenshots: `/opt/cursor/artifacts/screenshots/v01-*-{1440,1280,1024,768}.png` plus `v01-command-1440.png` and `v01-create-menu-1440.png`.
 
 Expected leftover: new shell + old page widgets/tables (Home cards, list pills, pipeline board, inbox desk, settings form). That is V02–V15 work.
+
+### Impeccable (PR #247, same branch)
+
+Clarify / distill / polish on chrome only. See `V01-IMPECCABLE.md`. Shell fixes: EvoCrm wordmark, active rail recedes to wash + ink, More panel heading removed, chrome spacing on 4 / 8 / 12, menus at radius 10. Page-content findings documented, not painted.
 
 ---
 

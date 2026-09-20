@@ -62,7 +62,7 @@ export function RoomShell({
             <div className="px-4 md:px-8">
                 <h1 className={cn('sr-only', LONG_TEXT_CLASS)}>{t(title)}</h1>
                 {actions ? <div className="flex items-center justify-end gap-2 py-1">{actions}</div> : null}
-                <nav className="flex gap-3 overflow-x-auto py-1.5" aria-label={`${t(title)} sections`}>
+                <nav className="flex gap-3 overflow-x-auto py-2" aria-label={`${t(title)} sections`}>
                     {tabs.map((tab) => (
                         <Link
                             key={tab.href}
@@ -85,7 +85,7 @@ export function RoomShell({
                                 key={tab.href}
                                 href={tab.href}
                                 className={cn(
-                                    'rounded-full px-2.5 py-1 text-[12px] leading-4 whitespace-nowrap',
+                                    'rounded-full px-2 py-1 text-[12px] leading-4 whitespace-nowrap',
                                     tab.active
                                         ? 'bg-subtle font-medium text-ink'
                                         : 'text-mute hover:bg-subtle hover:text-ink',

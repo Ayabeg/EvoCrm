@@ -33,12 +33,16 @@ it('keeps Aurora radii on the V00 control / menu / modal steps', function () {
 it('paints the rail with restrained orange active state and 12px group labels', function () {
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
-    expect($rail)->toContain('bg-sidebar-accent font-medium text-[var(--evosales-mark)]')
+    expect($rail)->toContain('bg-sidebar-accent font-medium text-sidebar-ink')
         ->and($rail)->toContain('text-meta')
         ->and($rail)->toContain('h-9')
         ->and($rail)->toContain('h-12')
+        ->and($rail)->toContain('EvoCrm')
         ->and($rail)->not->toContain('text-[11px] font-semibold tracking-wide uppercase')
-        ->and($rail)->not->toContain('bg-[var(--evosales-mark)]');
+        ->and($rail)->not->toContain('bg-[var(--evosales-mark)]')
+        ->and($rail)->not->toContain('text-[var(--evosales-mark)]')
+        ->and($rail)->not->toContain('>EvoCRM<')
+        ->and($rail)->not->toContain('text-meta bg-subtle');
 });
 
 it('keeps the topbar as quiet utility chrome with a labeled Create control', function () {
@@ -51,7 +55,7 @@ it('keeps the topbar as quiet utility chrome with a labeled Create control', fun
         ->and($header)->toContain("t('Create')")
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Tasks')")
-        ->and($header)->toContain('className="h-9 gap-1.5 px-3"')
+        ->and($header)->toContain('className="h-9 gap-2 px-3"')
         ->and($header)->not->toContain('sm:max-w-md')
         ->and($header)->not->toContain('size="sm"')
         ->and($header)->not->toContain('className="rounded-full"');
@@ -77,6 +81,15 @@ it('maps shared Badge default away from Aurora cyan', function () {
     expect($bridge)->toContain("tone: 'neutral'")
         ->and($bridge)->toContain("fill: 'soft'")
         ->and($bridge)->not->toContain("tone: 'cyan'");
+});
+
+it('paints elevated menus at radius 10', function () {
+    $dropdown = file_get_contents(resource_path('js/components/ui/aurora/dropdown-menu.tsx'));
+    $select = file_get_contents(resource_path('js/components/ui/aurora/select.tsx'));
+
+    expect($dropdown)->toContain('rounded-[var(--aurora-radius-2)]')
+        ->and($dropdown)->toContain('sideOffset = 8')
+        ->and($select)->toContain('rounded-[var(--aurora-radius-2)]');
 });
 
 it('demotes RoomShell to contextual navigation without dropping tabs', function () {

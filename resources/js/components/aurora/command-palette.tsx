@@ -395,7 +395,7 @@ return null
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "10px",
+            gap: "8px",
             padding: "12px 16px",
             borderBottom: "1px solid var(--aurora-border-default)",
             transition: "border-bottom-color var(--motion-duration-hover) var(--motion-ease-out), box-shadow var(--motion-duration-hover) var(--motion-ease-out)",
@@ -487,7 +487,7 @@ return null
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "10px",
+                        gap: "8px",
                         width: "100%",
                         minHeight: "36px",
                         padding: "6px 12px",
@@ -566,7 +566,7 @@ return null
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            padding: "7px 16px",
+            padding: "8px 16px",
             borderTop: "1px solid var(--aurora-border-default)",
             background: "var(--aurora-panel-medium)",
           }}

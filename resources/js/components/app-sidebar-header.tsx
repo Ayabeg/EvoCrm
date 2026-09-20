@@ -76,7 +76,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
 
     return (
         <>
-            <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-1.5 px-3 sm:gap-3 sm:px-4">
+            <header className="app-topbar sticky top-0 z-20 flex min-w-0 shrink-0 items-center gap-2 px-3 sm:gap-3 sm:px-4">
                 <div data-chrome="menu">
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -137,7 +137,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                 variant="default"
                                 title={t('Create')}
                                 aria-label={t('Create')}
-                                className="h-9 gap-1.5 px-3"
+                                className="h-9 gap-2 px-3"
                             >
                                 <Plus className="size-4" weight="bold" aria-hidden />
                                 <span className="hidden sm:inline">{t('Create')}</span>

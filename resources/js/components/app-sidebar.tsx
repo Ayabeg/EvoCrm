@@ -198,15 +198,15 @@ function RailLink({
             className={cn(
                 'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                 labeled
-                    ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px] leading-[18px]'
+                    ? 'flex h-9 w-full items-center gap-2 px-3 text-[13px] leading-[18px]'
                     : 'flex h-12 w-full items-center justify-center',
                 active
-                    ? 'bg-sidebar-accent font-medium text-[var(--evosales-mark)]'
+                    ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                     : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
             )}
         >
             <Icon
-                className={cn('size-5 shrink-0', active && 'text-[var(--evosales-mark)]')}
+                className="size-5 shrink-0"
                 weight={active ? 'fill' : 'regular'}
             />
             {labeled ? <span className="truncate">{t(item.label)}</span> : null}
@@ -319,15 +319,15 @@ export function AppSidebar() {
                 <AppLogoIcon className="size-7" />
                 {labeled ? (
                     <span className="truncate text-[13px] leading-[18px] font-medium text-sidebar-ink">
-                        EvoCRM
+                        EvoCrm
                     </span>
                 ) : (
-                    <span className="sr-only">EvoCRM</span>
+                    <span className="sr-only">EvoCrm</span>
                 )}
             </div>
 
             <nav
-                aria-label="EvoCRM"
+                aria-label="EvoCrm"
                 className={cn(
                     'no-scrollbar min-h-0 flex-grow overflow-y-auto py-1',
                     labeled ? 'px-2' : 'px-1',
@@ -388,10 +388,10 @@ export function AppSidebar() {
                                 className={cn(
                                     'app-rail-item font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                                     labeled
-                                        ? 'flex h-9 w-full items-center gap-2.5 px-3 text-[13px] leading-[18px]'
+                                        ? 'flex h-9 w-full items-center gap-2 px-3 text-[13px] leading-[18px]'
                                         : 'flex h-12 w-full items-center justify-center',
                                     moreOpen
-                                        ? 'bg-sidebar-accent font-medium text-[var(--evosales-mark)]'
+                                        ? 'bg-sidebar-accent font-medium text-sidebar-ink'
                                         : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                                 )}
                             >
@@ -409,9 +409,6 @@ export function AppSidebar() {
                                             : 'absolute top-0 left-[calc(100%+8px)] w-56',
                                     )}
                                 >
-                                    <p className="text-meta bg-subtle px-3 pt-2 pb-1 font-medium text-mute">
-                                        {t('More')}
-                                    </p>
                                     <ul className="m-0 list-none p-1" data-nav="crm-objects">
                                         {MORE_ITEMS.map((item) => {
                                             const Icon = item.icon;
@@ -421,7 +418,7 @@ export function AppSidebar() {
                                                     <Link
                                                         href={item.href}
                                                         role="menuitem"
-                                                        className="flex h-9 items-center gap-2.5 rounded-lg px-2 text-[13px] leading-[18px] text-ink hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                                                        className="flex h-9 items-center gap-2 rounded-lg px-2 text-[13px] leading-[18px] text-ink hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                                                         onClick={() => {
                                                             setMoreOpen(false);
                                                             closeMobile();

@@ -293,8 +293,7 @@ it('paints the More panel with Brand Book surfaces instead of raw Aurora identit
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
     expect($rail)->toContain('border-hairline bg-surface text-ink')
-        ->and($rail)->toContain('bg-subtle')
-        ->and($rail)->toContain('text-mute');
+        ->and($rail)->toContain('hover:bg-subtle');
     expect($rail)->not->toContain("borderColor: 'var(--aurora-border-default)'");
     expect($rail)->not->toContain("background: 'var(--aurora-control-surface)'");
     expect($rail)->not->toContain("background: 'var(--aurora-panel-strong)'");

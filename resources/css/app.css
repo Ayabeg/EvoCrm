@@ -463,7 +463,8 @@
      */
     /*
      * Accent discipline on chrome: the bar itself is paper/hairline.
-     * Filled primary CTAs, focus, and active rail use mark orange.
+     * Filled primary CTAs and focus use mark orange. Active rail recedes
+     * to accent-soft wash + ink so Create remains the one orange CTA.
      */
     .app-topbar {
         height: var(--app-chrome-height);
