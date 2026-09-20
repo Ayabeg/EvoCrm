@@ -97,7 +97,7 @@ it('extends the one existing command surface without a second palette', function
         ->and($palette)->not->toContain('from \'lucide-react\'')
         ->and($aurora)->toContain('isComposing')
         ->and($aurora)->toContain('data-command="os"')
-        ->and($aurora)->toContain('640px')
+        ->and($aurora)->toContain('560px')
         ->and($aurora)->toContain('overflowX')
         ->and($header)->toContain('from \'@/components/crm/command-palette\'')
         ->and($header)->toContain('setPaletteOpen((current) => !current)')

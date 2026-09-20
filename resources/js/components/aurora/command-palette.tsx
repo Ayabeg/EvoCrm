@@ -170,9 +170,9 @@ function KbdBadge({ keys }: { keys: string[] }) {
             background: "var(--aurora-control-surface)",
             border: "1px solid var(--aurora-border-strong)",
             borderRadius: "5px",
-            fontSize: "10px",
+            fontSize: "12px",
             fontFamily: "var(--aurora-font-mono)",
-            fontWeight: 600,
+            fontWeight: 500,
             color: "var(--aurora-text-muted)",
             lineHeight: "16px",
           }}
@@ -375,14 +375,14 @@ return null
           left: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 201,
-          width: "640px",
+          width: "560px",
           maxWidth: "calc(100vw - 32px)",
           maxHeight: "70vh",
           display: "flex",
           flexDirection: "column",
-          background: "var(--aurora-panel-strong)",
-          border: "1px solid var(--aurora-border-strong)",
-          borderRadius: "var(--aurora-radius-2)",
+          background: "var(--color-surface)",
+          border: "1px solid var(--color-border)",
+          borderRadius: "var(--aurora-radius-3)",
           boxShadow: "var(--aurora-shadow-strong), var(--aurora-highlight-strong)",
           overflow: "hidden",
           overflowX: "hidden",
@@ -395,7 +395,7 @@ return null
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "10px",
+            gap: "8px",
             padding: "12px 16px",
             borderBottom: "1px solid var(--aurora-border-default)",
             transition: "border-bottom-color var(--motion-duration-hover) var(--motion-ease-out), box-shadow var(--motion-duration-hover) var(--motion-ease-out)",
@@ -406,6 +406,7 @@ return null
           </span>
           <Input
             ref={inputRef}
+            unstyled
             type="text"
             role="combobox"
             aria-expanded={true}
@@ -419,13 +420,8 @@ return null
             }}
             placeholder={placeholder}
             aria-label="Search commands"
-            className="h-auto border-none px-0 py-0 focus-visible:outline-none"
+            className="min-w-0 flex-1 bg-transparent p-0 text-[14px] leading-5 outline-none"
             style={{
-              flex: 1,
-              background: "transparent",
-              border: "none",
-              outline: "none",
-              fontSize: "14px",
               color: "var(--aurora-text-primary)",
               fontFamily: "var(--aurora-font-sans)",
               caretColor: "var(--aurora-accent-primary)",
@@ -444,7 +440,7 @@ return null
             overflowY: "auto",
             overflowX: "hidden",
             flex: 1,
-            padding: "6px 0",
+            padding: "8px",
           }}
         >
           {grouped.length === 0 ? (
@@ -464,11 +460,11 @@ return null
                 {/* Section header */}
                 <div
                   style={{
-                    padding: "6px 16px 3px",
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    letterSpacing: "0.09em",
-                    textTransform: "uppercase",
+                    padding: "8px 16px 4px",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    letterSpacing: "0.02em",
+                    textTransform: "none",
                     color: "var(--aurora-text-muted)",
                   }}
                 >
@@ -491,15 +487,14 @@ return null
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "10px",
+                        gap: "8px",
                         width: "100%",
-                        minHeight: "44px",
-                        padding: "10px 16px",
-                        background: isActive ? "var(--aurora-hover-bg)" : "transparent",
+                        minHeight: "36px",
+                        padding: "6px 12px",
+                        background: isActive ? "var(--color-accent-soft)" : "transparent",
                         border: "none",
-                        borderLeft: isActive
-                          ? "2px solid var(--aurora-accent-primary)"
-                          : "2px solid transparent",
+                        borderRadius: "8px",
+                        borderLeft: "none",
                         cursor: "pointer",
                         textAlign: "left",
                         overflow: "hidden",
@@ -509,19 +504,17 @@ return null
                       {/* Icon */}
                       <span
                         style={{
-                          width: "28px",
-                          height: "28px",
+                          width: "24px",
+                          height: "24px",
                           borderRadius: "8px",
-                          background: isActive
-                            ? "color-mix(in srgb, var(--aurora-accent-primary) 14%, transparent)"
-                            : "var(--aurora-control-surface)",
-                          border: "1px solid var(--aurora-border-default)",
+                          background: "transparent",
+                          border: "none",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           flexShrink: 0,
                           color: isActive ? "var(--aurora-accent-primary)" : "var(--aurora-text-muted)",
-                          transition: "background var(--motion-duration-hover) var(--motion-ease-out), color var(--motion-duration-hover) var(--motion-ease-out)",
+                          transition: "color var(--motion-duration-hover) var(--motion-ease-out)",
                         }}
                       >
                         {item.icon}
@@ -545,8 +538,8 @@ return null
                         {item.description && (
                           <div
                             style={{
-                              fontSize: "11px",
-                              color: "var(--aurora-text-muted)",
+                          fontSize: "12px",
+                          color: "var(--aurora-text-muted)",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               whiteSpace: "nowrap",
@@ -573,13 +566,13 @@ return null
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            padding: "7px 16px",
+            padding: "8px 16px",
             borderTop: "1px solid var(--aurora-border-default)",
             background: "var(--aurora-panel-medium)",
           }}
         >
           {statusText ? (
-            <span style={{ fontSize: "11px", color: "var(--aurora-text-muted)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: "12px", color: "var(--aurora-text-muted)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {statusText}
             </span>
           ) : null}
@@ -590,7 +583,7 @@ return null
           ].map(({ keys, label }) => (
             <div key={label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
               <KbdBadge keys={keys} />
-              <span style={{ fontSize: "11px", color: "var(--aurora-text-muted)" }}>{label}</span>
+              <span style={{ fontSize: "12px", color: "var(--aurora-text-muted)" }}>{label}</span>
             </div>
           ))}
         </div>

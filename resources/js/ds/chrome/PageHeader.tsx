@@ -19,12 +19,12 @@ export function PageHeader({
 }: PageHeaderProps) {
     return (
         <header
-            className="flex flex-col gap-3 border-b border-hairline bg-canvas px-4 py-4 md:flex-row md:items-center md:justify-between md:px-8"
+            className="flex flex-col gap-3 border-b border-hairline bg-canvas px-4 pb-6 pt-5 md:flex-row md:items-center md:justify-between md:px-8"
             data-crm="object-header"
             data-ds="page-header"
         >
             <div className="min-w-0">
-                <h1 className={cn('text-[28px] leading-[34px] font-semibold tracking-tight text-ink', LONG_TEXT_CLASS)}>
+                <h1 className={cn('text-[28px] leading-[34px] font-[650] tracking-tight text-ink', LONG_TEXT_CLASS)}>
                     {t(title)}
                 </h1>
                 {description ? (

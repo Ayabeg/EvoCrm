@@ -97,7 +97,7 @@ function SelectContent({ ref, className, children, position = "popper", ...props
         className={cn(
           "relative z-50 min-w-[8rem] overflow-hidden",
           "border border-[var(--aurora-border-strong)]",
-          "rounded-[var(--aurora-radius-1)]",
+          "rounded-[var(--aurora-radius-2)]",
           "text-[var(--aurora-text-primary)]",
           // Animations
           "data-[state=open]:animate-in data-[state=closed]:animate-out",

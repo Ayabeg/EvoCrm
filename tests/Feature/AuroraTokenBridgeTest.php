@@ -110,7 +110,7 @@ it('locks the P02 semantic tokens and retires Slate and antique orange', functio
     expect($app)->toContain('--color-bg: #f7f7f5');
     expect($app)->toContain('--color-text: #161616');
     expect($app)->toContain('--color-accent: #e8530e');
-    expect($app)->toContain('--color-accent-hover: #cf4a0c');
+    expect($app)->toContain('--color-accent-hover: #d74908');
     expect($app)->toContain('--color-accent-pressed: #b8410b');
     expect($app)->toContain('--evosales-canvas: var(--color-bg)');
     expect($app)->toContain('--evosales-canvas-soft: var(--color-bg)');
@@ -219,15 +219,16 @@ it('keeps the page shell as a flat Brand canvas with no mesh radials', function 
     expect($shell)->toContain('bg-[var(--aurora-shell-bg)]');
 });
 
-it('paints the topbar as a frosted hairline instead of an Aurora panel gradient', function () {
+it('paints the topbar as a solid hairline instead of an Aurora panel gradient', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
     expect($header)->toContain('app-topbar');
     expect($header)->not->toContain('linear-gradient(180deg, var(--aurora-panel-strong-top)');
     expect($css)->toContain('.app-topbar');
-    expect($css)->toContain('backdrop-filter: blur(20px)');
-    expect($css)->toContain('rgb(247 247 245 / 0.86)');
+    expect($css)->toContain('background: var(--color-surface)');
+    expect($css)->toContain('backdrop-filter: none');
+    expect($css)->not->toContain('rgb(247 247 245 / 0.86)');
     expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
 });
 
@@ -257,8 +258,7 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     expect($header)->toContain('data-chrome="ai"');
     expect($header)->toContain('hidden min-[390px]:block');
     expect($header)->toContain('data-chrome="menu"');
-    expect($css)->toContain('--app-chrome-height: 44px');
-    expect($css)->toContain('--app-chrome-height: 52px');
+    expect($css)->toContain('--app-chrome-height: 48px');
     expect($css)->toContain(".app-topbar [data-chrome='notify']");
     expect($css)->toContain('@media (max-width: 389px)');
 });
@@ -292,11 +292,8 @@ it('keeps remaining application chrome off raw Aurora radius and muted-text toke
 it('paints the More panel with Brand Book surfaces instead of raw Aurora identity tokens', function () {
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
-    expect($rail)->toContain("borderColor: 'var(--evosales-hairline)'");
-    expect($rail)->toContain("background: 'var(--evosales-canvas-soft)'");
-    expect($rail)->toContain("background: 'var(--evosales-canvas)'");
-    expect($rail)->toContain("color: 'var(--evosales-ink)'");
-    expect($rail)->toContain('text-[var(--evosales-mute)]');
+    expect($rail)->toContain('border-hairline bg-surface text-ink')
+        ->and($rail)->toContain('hover:bg-subtle');
     expect($rail)->not->toContain("borderColor: 'var(--aurora-border-default)'");
     expect($rail)->not->toContain("background: 'var(--aurora-control-surface)'");
     expect($rail)->not->toContain("background: 'var(--aurora-panel-strong)'");

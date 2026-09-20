@@ -52,6 +52,9 @@ Reading this as: an authenticated B2B CRM product redesign for operators who liv
 | [V00-SCREEN-SIGNATURES.md](./V00-SCREEN-SIGNATURES.md) | Composition identity per product area |
 | [V00-REFERENCE-RESEARCH.md](./V00-REFERENCE-RESEARCH.md) | Structural research (not clones) |
 | [V00-IMPLEMENTATION-MAP.md](./V00-IMPLEMENTATION-MAP.md) | V01–V15 sequence + leverage ranking |
+| [V01-BASELINE.md](./V01-BASELINE.md) | Source-true shell baseline before V01 paint |
+| [V01-IMPLEMENTATION.md](./V01-IMPLEMENTATION.md) | V01 chrome implementation + populated QA |
+| [V01-IMPECCABLE.md](./V01-IMPECCABLE.md) | Clarify / distill / polish on V01 chrome; V02+ deferrals |
 
 ---
 

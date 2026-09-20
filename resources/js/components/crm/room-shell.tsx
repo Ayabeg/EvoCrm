@@ -55,29 +55,23 @@ export function RoomShell({
     actions?: ReactNode;
 }) {
     return (
-        <div className={cn('flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink', PAGE_OVERFLOW_CLASS)}>
-            <div className="sticky top-0 z-10 border-b border-hairline bg-canvas px-4 pt-3 sm:px-6">
-                <div className="flex items-end justify-between gap-3">
-                    <h1
-                        className={cn(
-                            'text-page-title text-[15px] font-semibold tracking-tight text-ink',
-                            LONG_TEXT_CLASS,
-                        )}
-                    >
-                        {t(title)}
-                    </h1>
-                    {actions}
-                </div>
-                <nav className="mt-2 flex gap-0 overflow-x-auto" aria-label={`${t(title)} sections`}>
+        <div
+            className={cn('flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink', PAGE_OVERFLOW_CLASS)}
+            data-chrome="contextual"
+        >
+            <div className="px-4 md:px-8">
+                <h1 className={cn('sr-only', LONG_TEXT_CLASS)}>{t(title)}</h1>
+                {actions ? <div className="flex items-center justify-end gap-2 py-1">{actions}</div> : null}
+                <nav className="flex gap-3 overflow-x-auto py-2" aria-label={`${t(title)} sections`}>
                     {tabs.map((tab) => (
                         <Link
                             key={tab.href}
                             href={tab.href}
                             className={cn(
-                                'border-b-2 px-3 pb-2 text-[13px] whitespace-nowrap transition-colors',
+                                'py-1 text-[13px] leading-[18px] whitespace-nowrap',
                                 tab.active
-                                    ? 'border-[var(--evosales-mark)] font-medium text-ink'
-                                    : 'border-transparent text-mute hover:text-ink',
+                                    ? 'font-medium text-ink'
+                                    : 'text-mute hover:text-ink',
                             )}
                         >
                             {t(tab.label)}
@@ -85,16 +79,16 @@ export function RoomShell({
                     ))}
                 </nav>
                 {subTabs && subTabs.length > 0 ? (
-                    <nav className="mt-0 flex gap-1 overflow-x-auto border-t border-hairline pt-2 pb-2">
+                    <nav className="flex gap-1 overflow-x-auto border-t border-hairline py-2">
                         {subTabs.map((tab) => (
                             <Link
                                 key={tab.href}
                                 href={tab.href}
                                 className={cn(
-                                    'rounded-full px-2.5 py-1 text-[12px] whitespace-nowrap',
+                                    'rounded-full px-2 py-1 text-[12px] leading-4 whitespace-nowrap',
                                     tab.active
-                                        ? 'bg-ink font-medium text-canvas'
-                                        : 'text-mute hover:bg-canvas-soft hover:text-ink',
+                                        ? 'bg-subtle font-medium text-ink'
+                                        : 'text-mute hover:bg-subtle hover:text-ink',
                                 )}
                             >
                                 {t(tab.label)}
