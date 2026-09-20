@@ -64,7 +64,7 @@ it('keeps P17 KPI 2×2, inbox native/embed, and quote money unclipped', function
 
     expect($home)->toContain('overflow-x-hidden')
         ->and($lib)->toContain('grid-cols-2')
-        ->and($lib)->toContain('md:grid-cols-4')
+        ->and($lib)->toContain('lg:grid-cols-4')
         ->and($lib)->not->toContain('whitespace-nowrap')
         ->and($inbox)->toContain('data-inbox="embed"')
         ->and($inbox)->toContain('data-inbox="native"')

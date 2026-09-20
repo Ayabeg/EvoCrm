@@ -182,7 +182,7 @@ it('uses V01 page-header geometry on Home chrome', function () {
     expect($strip)->not->toContain('overflow-x-auto');
     expect($strip)->not->toContain('min-w-[7.5rem]');
     expect($helpers)->toContain('grid-cols-2');
-    expect($helpers)->toContain('md:grid-cols-4');
+    expect($helpers)->toContain('lg:grid-cols-4');
     expect($helpers)->not->toContain('overflow-x-auto');
 });
 

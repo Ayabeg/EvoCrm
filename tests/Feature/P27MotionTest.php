@@ -156,7 +156,7 @@ it('normalizes listed surfaces without KPI counting, money tween, confetti, or f
 
     expect($workflows)->toContain('overflow-x-hidden')
         ->and($home)->toContain('grid-cols-2')
-        ->and($home)->toContain('md:grid-cols-4')
+        ->and($home)->toContain('lg:grid-cols-4')
         ->and($feed)->toContain('MOTION_HOVER_CLASS');
 });
 

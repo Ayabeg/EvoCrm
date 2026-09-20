@@ -66,5 +66,5 @@ it('keeps Home queues, snapshot, and feed on the 12px type floor', function () {
         ->and($strip)->toContain('HOME_KPI_STRIP_TRACK_CLASS')
         ->and($helpers)->toContain('text-[20px]')
         ->and($helpers)->toContain('grid-cols-2')
-        ->and($helpers)->toContain('md:grid-cols-4');
+        ->and($helpers)->toContain('lg:grid-cols-4');
 });
