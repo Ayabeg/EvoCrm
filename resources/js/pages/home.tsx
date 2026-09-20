@@ -68,9 +68,10 @@ export default function Home({
 
                 {activation ? <ActivationChecklist activation={activation} /> : null}
 
-                <div className="grid gap-8 px-4 md:px-8 lg:grid-cols-2">
+                <div className="grid gap-8 px-4 md:px-8 lg:grid-cols-2 lg:gap-0">
                     <HomeWidget
                         title={t('Needs attention')}
+                        className="lg:pr-8"
                         action={<ViewAllLink href={attention.view_all_href}>{t('View all')}</ViewAllLink>}
                         empty={attentionEmpty}
                     >
@@ -79,6 +80,7 @@ export default function Home({
 
                     <HomeWidget
                         title={t('Today')}
+                        className="lg:border-l lg:border-hairline lg:pl-8"
                         action={<ViewAllLink href={work.view_all_href}>{t('View all')}</ViewAllLink>}
                         empty={workEmpty}
                     >

@@ -7,7 +7,7 @@ import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline }) {
-    const max = Math.max(...pipeline.stages.map((stage) => stage.count), 1);
+    const max = Math.max(...pipeline.stages.map((stage) => stage.amount_cents), 1);
     const empty = pipeline.deal_count === 0;
 
     if (empty) {
@@ -30,7 +30,10 @@ export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline })
     return (
         <ul className="space-y-3">
             {pipeline.stages.map((stage) => {
-                const width = Math.max((stage.count / max) * 100, stage.count > 0 ? 6 : 0);
+                const width = Math.max(
+                    (stage.amount_cents / max) * 100,
+                    stage.count > 0 ? 6 : 0,
+                );
 
                 return (
                     <li key={stage.id} className="min-w-0">
@@ -51,8 +54,8 @@ export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline })
                                     {stage.count} · {formatCompactDzd(stage.amount_cents)}
                                 </span>
                             </div>
-                            <div className="mt-1.5 h-1.5 overflow-hidden bg-subtle" aria-hidden>
-                                <div className="h-full bg-ink/55" style={{ width: `${width}%` }} />
+                            <div className="mt-1.5 h-1 overflow-hidden bg-subtle" aria-hidden>
+                                <div className="h-full bg-ink/35" style={{ width: `${width}%` }} />
                             </div>
                         </Link>
                     </li>

@@ -51,7 +51,7 @@ Not: page title → 4 KPI cards → chart → more cards.
 - KPI is a snapshot strip, not a hero metric row.
 - Pipeline is a commercial overview (name · count · amount · ink bar). No decorative chart.
 - Recent is a feed. No avatars, no timeline graphics, no card-per-event.
-- Orange reserved for V01 global Create, focus rings, and truthful activation progress. Page `New deal` is secondary.
+- Orange reserved for V01 global Create and focus rings. Page `New deal` is secondary. Activation progress is ink.
 - Floor 12px. No 10/11 Dashboard copy.
 - No invented trends, forecasts, health scores, or AI copy.
 
@@ -102,31 +102,48 @@ Not touched: V01 shell, Command OS, Contacts/Deals/Inbox/Settings page contents,
 
 ## Impeccable findings
 
-Recorded after first populated 1440 review. See later sections in this file once the review pass lands.
+See `docs/visual/V02-IMPECCABLE.md`. Order: /clarify → /distill → /polish.
 
 ### /clarify
 
-Pending first populated 1440 capture.
+PASS. Attention | Today joint; pipeline bars sized by amount; activation progress no longer orange.
 
 ### /distill
 
-Pending first populated 1440 capture.
+PASS. Collapsed activation helper removed; orange ticks/links demoted; pipeline bars thinned.
 
 ### /polish
 
-Pending first populated 1440 capture.
+PASS. Hover wash, 20/26 KPI, 12px floor, V01 page-header geometry.
 
 ---
 
 ## Anti-slop results
 
-Pending stop-slop gate after Impeccable.
+PASS after Impeccable. Verified against the V02 gate:
+
+- No generic AI dashboard / hero / giant KPI / landing-page composition
+- No nested-card proliferation (`.home-widget` transparent, no shadow)
+- No pills/badges/icon circles added
+- No gradients, glass, decorative charts, fake intelligence
+- Orange reserved for V01 Create + focus
+- No functionality removed (New deal, View all, QRD, dismiss remain)
+- 12px floor held
+
+Rejected: any stop-slop urge to delete activation or Today counts.
 
 ---
 
 ## Responsive results
 
-Pending 1280 / 1024 / 768 after final 1440.
+Recorded after final 1440.
+
+| Viewport | Layout | H-overflow |
+|---|---|---|
+| 1440 | Attention ‖ Today; KPI 4; Pipeline then Recent | NONE (local 1440: sw=cw) |
+| 1280 | Same, tighter | NONE |
+| 1024 | `lg` 2-col queues still; KPI 4 | NONE |
+| 768 | Stacked queues; KPI 2×2; labeled 240 rail | NONE |
 
 ---
 

@@ -71,22 +71,16 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
                         done: progress.completed,
                         total: progress.total,
                     })}
-                    className="h-1 overflow-hidden rounded-full bg-canvas-soft"
+                    className="h-1 overflow-hidden bg-subtle"
                 >
                     <div
-                        className="h-full bg-brand motion-safe:transition-[width] motion-safe:duration-[var(--motion-duration-hover)] motion-safe:ease-[var(--motion-ease-out)] motion-reduce:transition-none"
+                        className="h-full bg-ink/40 motion-safe:transition-[width] motion-safe:duration-[var(--motion-duration-hover)] motion-safe:ease-[var(--motion-ease-out)] motion-reduce:transition-none"
                         style={{ width: `${percent}%` }}
                     />
                 </div>
             </div>
 
-            {collapsed ? (
-                <p className="px-3 pb-3 text-[12px] text-mute">
-                    {progress.completed < progress.total
-                        ? t('Optional steps can wait.')
-                        : t('All listed setup steps are done.')}
-                </p>
-            ) : (
+            {collapsed ? null : (
                 <ol className="divide-y divide-hairline border-t border-hairline">
                     {activation.steps.map((step) => (
                         <ActivationStepRow
@@ -119,7 +113,7 @@ function ActivationStepRow({
                 className={cn(
                     'mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border',
                     step.complete
-                        ? 'border-brand bg-brand text-white'
+                        ? 'border-ink bg-ink text-white'
                         : 'border-hairline bg-white',
                 )}
                 aria-hidden
@@ -145,7 +139,7 @@ function ActivationStepRow({
                     {step.secondary_href && step.secondary_cta_label ? (
                         <Link
                             href={step.secondary_href}
-                            className="text-[12px] font-medium text-brand hover:underline"
+                            className="text-[12px] font-medium text-mute hover:text-ink hover:underline"
                         >
                             {step.secondary_cta_label}
                         </Link>
