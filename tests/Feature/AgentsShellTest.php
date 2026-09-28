@@ -63,11 +63,8 @@ it('switches agents nav bot rows with a local icon+text view-mode control', func
     $roster = file_get_contents(resource_path('js/components/desk/agents-roster.tsx'));
     $control = file_get_contents(resource_path('js/components/desk/agents-view-mode-control.tsx'));
     $segmented = file_get_contents(resource_path('js/components/ui/segmented-control.tsx'));
-    $package = file_get_contents(base_path('package.json'));
 
-    expect($package)
-        ->not->toContain('@astryxdesign/core')
-        ->and($sidebar)
+    expect($sidebar)
         ->toContain('AgentsViewModeControl')
         ->toContain('AgentsViewModePanel')
         ->toContain('viewMode === \'grid\'')

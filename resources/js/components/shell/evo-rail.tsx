@@ -3,6 +3,7 @@
     SegmentedControlItem,
 } from '@astryxdesign/core/SegmentedControl';
 import { Theme } from '@astryxdesign/core/theme';
+import { neutralTheme } from '@astryxdesign/theme-neutral/built';
 import { Link, router, usePage } from '@inertiajs/react';
 import type { Icon } from '@phosphor-icons/react';
 import {
@@ -13,7 +14,6 @@ import {
     MagnifyingGlass,
     Robot,
 } from '@phosphor-icons/react';
-import { neutralTheme } from '@astryxdesign/theme-neutral/built';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { useCommandPaletteShortcut } from '@/components/crm/command-palette';
