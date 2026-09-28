@@ -2,8 +2,12 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChatCircle, House, Plus, Robot } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
+import { AgentsViewModeControl } from '@/components/desk/agents-view-mode-control';
+import { AgentsViewModePanel } from '@/components/desk/agents-view-mode-panel';
 import { BloubAvatar } from '@/components/desk/bloub-avatar';
-import { useBotDeskStore } from '@/lib/desk/bot-catalog';
+import type { AgentsViewMode } from '@/lib/desk/agents-view-mode';
+import { getBotById, useBotDeskStore } from '@/lib/desk/bot-catalog';
+import { useAgentsViewMode } from '@/lib/desk/use-agents-view-mode';
 import { cn } from '@/lib/utils';
 
 type ChatSummary = {
@@ -14,6 +18,7 @@ type ChatSummary = {
 
 type BotSummary = {
     id: string;
+    job?: string;
     label: string;
 };
 
@@ -54,11 +59,13 @@ export function AgentsSidebar({
     const store = useBotDeskStore();
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
     const visibleChats = chats.length > 0 ? chats : store.chats;
+    const [viewMode] = useAgentsViewMode();
     const visibleCustomBots: BotSummary[] =
         customBots.length > 0
             ? customBots
             : store.customBots.map((bot) => ({
                   id: bot.id,
+                  job: bot.job,
                   label: bot.name,
               }));
 
@@ -126,6 +133,10 @@ export function AgentsSidebar({
                 />
             </nav>
 
+            <div className="px-3 pb-2">
+                <AgentsViewModeControl />
+            </div>
+
             <div className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pb-3">
                 <SidebarSection title="CHATS">
                     {visibleChats.length > 0 ? (
@@ -182,39 +193,54 @@ export function AgentsSidebar({
                         <span>Create a new Bot</span>
                     </Link>
 
-                    <BotList bots={SALES_BOTS} onNavigate={onNavigate} />
-
-                    <div
-                        className="my-3 flex items-center gap-2 px-2"
-                        role="separator"
-                    >
-                        <span className="h-px flex-1 bg-shell-hairline" />
-                        <span className="text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                            Internal
-                        </span>
-                        <span className="h-px flex-1 bg-shell-hairline" />
-                    </div>
-
-                    <BotList bots={INTERNAL_BOTS} onNavigate={onNavigate} />
-
-                    <h3 className="mt-4 px-2 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                        EvoPulse
-                    </h3>
-                    <BotList bots={EVOPULSE_BOTS} onNavigate={onNavigate} />
-
-                    <h3 className="mt-4 px-2 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                        Custom
-                    </h3>
-                    {visibleCustomBots.length > 0 ? (
+                    <AgentsViewModePanel mode={viewMode}>
                         <BotList
-                            bots={visibleCustomBots}
+                            bots={SALES_BOTS}
                             onNavigate={onNavigate}
+                            viewMode={viewMode}
                         />
-                    ) : (
-                        <p className="px-2 py-2 text-[12px] text-shell-muted">
-                            No custom bots yet.
-                        </p>
-                    )}
+
+                        <div
+                            className="my-3 flex items-center gap-2 px-2"
+                            role="separator"
+                        >
+                            <span className="h-px flex-1 bg-shell-hairline" />
+                            <span className="text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
+                                Internal
+                            </span>
+                            <span className="h-px flex-1 bg-shell-hairline" />
+                        </div>
+
+                        <BotList
+                            bots={INTERNAL_BOTS}
+                            onNavigate={onNavigate}
+                            viewMode={viewMode}
+                        />
+
+                        <h3 className="mt-4 px-2 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
+                            EvoPulse
+                        </h3>
+                        <BotList
+                            bots={EVOPULSE_BOTS}
+                            onNavigate={onNavigate}
+                            viewMode={viewMode}
+                        />
+
+                        <h3 className="mt-4 px-2 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
+                            Custom
+                        </h3>
+                        {visibleCustomBots.length > 0 ? (
+                            <BotList
+                                bots={visibleCustomBots}
+                                onNavigate={onNavigate}
+                                viewMode={viewMode}
+                            />
+                        ) : (
+                            <p className="px-2 py-2 text-[12px] text-shell-muted">
+                                No custom bots yet.
+                            </p>
+                        )}
+                    </AgentsViewModePanel>
                 </SidebarSection>
             </div>
 
@@ -250,13 +276,71 @@ function SidebarSection({
     );
 }
 
+function botJob(bot: BotSummary): string {
+    return bot.job ?? getBotById(bot.id)?.job ?? '';
+}
+
 function BotList({
     bots,
     onNavigate,
+    viewMode,
 }: {
     bots: BotSummary[];
     onNavigate?: () => void;
+    viewMode: AgentsViewMode;
 }) {
+    if (viewMode === 'grid') {
+        return (
+            <ul className="grid grid-cols-3 gap-1">
+                {bots.map((bot) => (
+                    <li key={bot.id}>
+                        <Link
+                            href={`/agents/bots/${bot.id}`}
+                            className="flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-center text-[11px] text-shell-ink-2 transition-colors hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange motion-reduce:transition-none"
+                            onClick={onNavigate}
+                            title={bot.label}
+                        >
+                            <BloubAvatar
+                                botId={bot.id}
+                                label={`${bot.label} avatar`}
+                                size={16}
+                                state="idle"
+                            />
+                            <span className="w-full truncate">{bot.label}</span>
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+
+    if (viewMode === 'table') {
+        return (
+            <ul className="space-y-0.5">
+                {bots.map((bot) => {
+                    const job = botJob(bot);
+
+                    return (
+                        <li key={bot.id}>
+                            <Link
+                                href={`/agents/bots/${bot.id}`}
+                                className="grid min-h-8 w-full grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-center gap-2 rounded-lg px-2 text-left transition-colors hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange motion-reduce:transition-none"
+                                onClick={onNavigate}
+                            >
+                                <span className="truncate text-[12px] text-shell-ink">
+                                    {bot.label}
+                                </span>
+                                <span className="truncate text-[11px] text-shell-muted">
+                                    {job}
+                                </span>
+                            </Link>
+                        </li>
+                    );
+                })}
+            </ul>
+        );
+    }
+
     return (
         <ul className="space-y-0.5">
             {bots.map((bot) => (

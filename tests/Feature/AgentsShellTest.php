@@ -57,3 +57,54 @@ it('adapts Astryx ChatLayout regions on the agents chat surface', function () {
         ->toContain('BloubAvatar')
         ->not->toContain('SegmentedControl');
 });
+
+it('switches agents nav bot rows with a local icon+text view-mode control', function () {
+    $sidebar = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
+    $roster = file_get_contents(resource_path('js/components/desk/agents-roster.tsx'));
+    $control = file_get_contents(resource_path('js/components/desk/agents-view-mode-control.tsx'));
+    $segmented = file_get_contents(resource_path('js/components/ui/segmented-control.tsx'));
+    $package = file_get_contents(base_path('package.json'));
+
+    expect($package)
+        ->not->toContain('@astryxdesign/core')
+        ->and($sidebar)
+        ->toContain('AgentsViewModeControl')
+        ->toContain('AgentsViewModePanel')
+        ->toContain('viewMode === \'grid\'')
+        ->toContain('viewMode === \'table\'')
+        ->not->toContain('@astryxdesign/core')
+        ->and($roster)
+        ->toContain('AgentsViewModeControl')
+        ->toContain('data-agents-roster')
+        ->toContain('viewMode === \'grid\'')
+        ->toContain('viewMode === \'table\'')
+        ->and($control)
+        ->toContain('label="View mode"')
+        ->toContain('label="Grid"')
+        ->toContain('label="List"')
+        ->toContain('label="Table"')
+        ->toContain('icon={<GridIcon />}')
+        ->toContain('icon={<ListIcon />}')
+        ->toContain('icon={<TableIcon />}')
+        ->toContain('@/components/ui/segmented-control')
+        ->not->toContain('@astryxdesign/core')
+        ->and($segmented)
+        ->toContain('role="radiogroup"')
+        ->toContain('role="radio"')
+        ->toContain('layoutId')
+        ->toContain('useReducedMotion')
+        ->toContain('motion-reduce:transition-none')
+        ->toContain('Local Astryx SegmentedControl fallback');
+});
+
+it('keeps agents view-mode parsing on the list/grid/table contract', function () {
+    $js = file_get_contents(base_path('tests/js/agents-view-mode.ts'));
+
+    expect($js)
+        ->toContain("DEFAULT_AGENTS_VIEW_MODE")
+        ->toContain("'list'")
+        ->toContain("isAgentsViewMode('grid')")
+        ->toContain("isAgentsViewMode('list')")
+        ->toContain("isAgentsViewMode('table')")
+        ->toContain("parseAgentsViewMode('nope')");
+});
