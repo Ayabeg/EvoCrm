@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChatCircle, House, Plus, Robot } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
+import { BloubAvatar } from '@/components/desk/bloub-avatar';
 import { useBotDeskStore } from '@/lib/desk/bot-catalog';
 import { cn } from '@/lib/utils';
 
@@ -136,10 +137,16 @@ export function AgentsSidebar({
                                         className={rowClass}
                                         onClick={onNavigate}
                                     >
-                                        <ChatCircle
-                                            className="size-4 shrink-0 text-shell-muted"
-                                            weight="regular"
-                                            aria-hidden
+                                        <BloubAvatar
+                                            botId={
+                                                store.chats.find(
+                                                    (item) =>
+                                                        item.id === chat.id,
+                                                )?.botId
+                                            }
+                                            label={`${chat.title} avatar`}
+                                            size={16}
+                                            state="idle"
                                         />
                                         <span className="min-w-0 flex-1 truncate">
                                             {chat.title}
@@ -259,10 +266,11 @@ function BotList({
                         className={rowClass}
                         onClick={onNavigate}
                     >
-                        <Robot
-                            className="size-4 shrink-0 text-shell-muted"
-                            weight="regular"
-                            aria-hidden
+                        <BloubAvatar
+                            botId={bot.id}
+                            label={`${bot.label} avatar`}
+                            size={16}
+                            state="idle"
                         />
                         <span className="min-w-0 truncate">{bot.label}</span>
                     </Link>
