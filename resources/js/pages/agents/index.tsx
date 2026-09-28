@@ -205,7 +205,12 @@ export default function AgentsIndex() {
                 data-agents-page
                 data-agents-route={path}
             >
-                <header className="flex shrink-0 items-center justify-between gap-4 border-b border-black/8 bg-white px-5 py-4 sm:px-7">
+                <header
+                    className={cn(
+                        'flex shrink-0 items-center justify-between gap-4 border-b border-black/8 bg-white px-5 py-4 sm:px-7',
+                        isChatsRoute && 'sr-only',
+                    )}
+                >
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.12em] text-[#E8530E] uppercase">
                             <Sparkle className="size-3.5" weight="fill" />

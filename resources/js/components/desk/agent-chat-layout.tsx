@@ -119,7 +119,7 @@ export function AgentChatLayout({
                     data-agent-chat-thread
                     onScroll={updateJumpVisibility}
                 >
-                    <div className="mx-auto flex min-h-full w-full max-w-[760px] flex-col px-5 py-5 sm:px-7">
+                    <div className="mx-auto flex h-full min-h-full w-full max-w-[760px] flex-col px-5 py-5 sm:px-7">
                         {hasMessages ? (
                             <div className="flex min-h-0 flex-1 flex-col">
                                 <div
