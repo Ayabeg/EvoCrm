@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/theme-neutral/theme.css';
+
 @import 'tw-animate-css';
 
 @import '@fontsource/geist-sans/400.css';
@@ -19,7 +23,7 @@
  * Aurora layer order — required by aurora-components registry item.
  * See docs/visual-system/aurora-adoption.md
  */
-@layer theme, base, components, aurora-components, utilities;
+@layer reset, theme, base, astryx-base, astryx-theme, components, aurora-components, utilities;
 
 /*
  * P02 semantic tokens — one source of truth for product UI.
@@ -84,7 +88,11 @@
     --color-sidebar-text: var(--color-text);
     --color-sidebar-text-mute: var(--color-text-secondary);
     --color-sidebar-border: var(--color-border);
-    --color-sidebar-hover: color-mix(in srgb, var(--color-text) 6%, var(--color-sidebar));
+    --color-sidebar-hover: color-mix(
+        in srgb,
+        var(--color-text) 6%,
+        var(--color-sidebar)
+    );
     --color-sidebar-active: var(--color-accent-soft);
     --color-sidebar-well: var(--color-surface);
 
@@ -100,7 +108,11 @@
     --evosales-mark: var(--color-accent);
     --evosales-mark-hover: var(--color-accent-hover);
     --evosales-mark-pressed: var(--color-accent-pressed);
-    --evosales-ink-hover: color-mix(in srgb, var(--color-text) 8%, var(--color-surface));
+    --evosales-ink-hover: color-mix(
+        in srgb,
+        var(--color-text) 8%,
+        var(--color-surface)
+    );
 }
 
 @media (min-width: 640px) {

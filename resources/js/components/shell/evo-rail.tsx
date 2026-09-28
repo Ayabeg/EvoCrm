@@ -1,4 +1,9 @@
-﻿import { Link, router, usePage } from '@inertiajs/react';
+﻿import {
+    SegmentedControl,
+    SegmentedControlItem,
+} from '@astryxdesign/core/SegmentedControl';
+import { Theme } from '@astryxdesign/core/theme';
+import { Link, router, usePage } from '@inertiajs/react';
 import type { Icon } from '@phosphor-icons/react';
 import {
     CaretDown,
@@ -8,14 +13,8 @@ import {
     MagnifyingGlass,
     Robot,
 } from '@phosphor-icons/react';
-import {
-    useEffect,
-    useId,
-    useLayoutEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import { neutralTheme } from '@astryxdesign/theme-neutral/built';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { useCommandPaletteShortcut } from '@/components/crm/command-palette';
 import {
@@ -114,17 +113,9 @@ export function EvoRail({
     );
     const searchRef = useRef<HTMLInputElement>(null);
     const railRef = useRef<HTMLDivElement>(null);
-    const switchRef = useRef<HTMLDivElement>(null);
-    const tabRefs = useRef<Partial<Record<RailMode, HTMLButtonElement>>>({});
     const requestIdRef = useRef(0);
     const abortRef = useRef<AbortController | null>(null);
     const searchId = useId();
-    const [capsule, setCapsule] = useState<{
-        x: number;
-        y: number;
-        w: number;
-        h: number;
-    } | null>(null);
 
     const allowed = simpleMode ? new Set(nav.map((item) => item.id)) : null;
     const sections = visibleSections(simpleMode, allowed, features);
@@ -278,40 +269,19 @@ export function EvoRail({
     const cursorIndex =
         results.length === 0 ? 0 : Math.min(cursor, results.length - 1);
 
-    useLayoutEffect(() => {
-        const list = switchRef.current;
-        const tab = tabRefs.current[mode];
-
-        if (!list || !tab) {
-            return;
-        }
-
-        const measure = () => {
-            const listBox = list.getBoundingClientRect();
-            const tabBox = tab.getBoundingClientRect();
-            setCapsule({
-                x: tabBox.left - listBox.left,
-                y: tabBox.top - listBox.top,
-                w: tabBox.width,
-                h: tabBox.height,
-            });
-        };
-
-        measure();
-        const timer = window.setTimeout(measure, 170);
-
-        return () => window.clearTimeout(timer);
-    }, [mode]);
-
     function selectMode(next: RailMode) {
+        setMode(next);
+
         if (next === 'agents') {
             onNavigate?.();
             router.visit('/agents');
-
-            return;
         }
+    }
 
-        setMode(next);
+    function handleModeChange(value: string) {
+        if (value === 'menu' || value === 'agents' || value === 'search') {
+            selectMode(value);
+        }
     }
 
     function selectResult(result: CommandResult) {
@@ -350,81 +320,35 @@ export function EvoRail({
             className="relative flex h-full min-h-0 w-full min-w-0 flex-col bg-shell-paper"
         >
             <div className="shrink-0 px-3 pt-3">
-                <div
-                    ref={switchRef}
-                    role="tablist"
-                    aria-label="Sidebar"
-                    className="relative flex h-10 w-full items-center gap-2 rounded-full bg-shell-track p-1"
-                    onKeyDown={(event) => {
-                        const index = MODES.findIndex(
-                            (item) => item.id === mode,
-                        );
-                        const next =
-                            event.key === 'ArrowRight'
-                                ? MODES[(index + 1) % MODES.length]
-                                : event.key === 'ArrowLeft'
-                                  ? MODES[
-                                        (index + MODES.length - 1) %
-                                            MODES.length
-                                    ]
-                                  : null;
+                <Theme mode="dark" theme={neutralTheme}>
+                    <SegmentedControl
+                        label="Sidebar"
+                        layout="fill"
+                        onChange={handleModeChange}
+                        size="md"
+                        value={mode}
+                    >
+                        {MODES.map((item) => {
+                            const Icon = item.icon;
 
-                        if (!next) {
-                            return;
-                        }
-
-                        event.preventDefault();
-                        selectMode(next.id);
-                        tabRefs.current[next.id]?.focus();
-                    }}
-                >
-                    {capsule ? (
-                        <span
-                            aria-hidden
-                            className="evo-mode-capsule pointer-events-none absolute top-0 left-0 rounded-full bg-shell-pill"
-                            style={{
-                                width: capsule.w,
-                                height: capsule.h,
-                                transform: `translate3d(${capsule.x}px, ${capsule.y}px, 0)`,
-                            }}
-                        />
-                    ) : null}
-                    {MODES.map((item) => {
-                        const active = mode === item.id;
-                        const Icon = item.icon;
-
-                        return (
-                            <button
-                                key={item.id}
-                                ref={(node) => {
-                                    tabRefs.current[item.id] =
-                                        node ?? undefined;
-                                }}
-                                type="button"
-                                role="tab"
-                                aria-selected={active}
-                                tabIndex={active ? 0 : -1}
-                                className={cn(
-                                    'relative z-[1] flex h-8 shrink-0 items-center justify-center text-[14px] font-semibold text-shell-muted transition-colors duration-150 hover:text-shell-ink motion-reduce:transition-none',
-                                    active ? 'px-3.5 text-shell-ink' : 'w-10',
-                                )}
-                                onClick={() => selectMode(item.id)}
-                            >
-                                <Icon className="size-5" weight="regular" />
-                                <span
-                                    className={cn(
-                                        'overflow-hidden whitespace-nowrap transition-[max-width,opacity,margin,transform] duration-150 motion-reduce:transition-none',
-                                        active
-                                            ? 'ml-2 max-w-24 translate-x-0 opacity-100'
-                                            : 'ml-0 max-w-0 -translate-x-[3px] opacity-0',
-                                    )}
-                                >
-                                    {item.label}
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
+                            return (
+                                <SegmentedControlItem
+                                    icon={
+                                        <Icon
+                                            aria-hidden
+                                            className="size-4"
+                                            weight="regular"
+                                        />
+                                    }
+                                    isLabelHidden={item.id !== 'menu'}
+                                    key={item.id}
+                                    label={item.label}
+                                    value={item.id}
+                                />
+                            );
+                        })}
+                    </SegmentedControl>
+                </Theme>
             </div>
 
             <div className="relative min-h-0 flex-1">
