@@ -7,7 +7,6 @@ import {
     CheckCircle,
     Lightning,
     Plus,
-    Robot,
     Sparkle,
 } from '@phosphor-icons/react';
 import { useState } from 'react';
@@ -319,7 +318,12 @@ function PulseLanding({
     return (
         <section className="min-h-0 flex-1 overflow-y-auto" data-pulse-landing>
             <div className="mx-auto flex min-h-full w-full max-w-[640px] flex-col items-center px-5 py-12 text-center sm:py-16">
-                <BloubAvatar size={72} state="idle" />
+                <BloubAvatar
+                    bot={selectedBot}
+                    label={`${selectedBot.name} avatar`}
+                    size={72}
+                    state="idle"
+                />
                 <h1 className="mt-6 text-[34px] font-semibold tracking-[-0.05em] text-[#0D1B24] sm:text-[42px]">
                     What should we do next?
                 </h1>
@@ -398,20 +402,28 @@ function ChatView({
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-7 sm:px-7">
                 <div className="mx-auto flex w-full max-w-[760px] flex-1 flex-col">
                     <div className="mb-8 flex items-start justify-between gap-4">
-                        <div>
-                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
-                                {chat
-                                    ? 'Active conversation'
-                                    : 'Command surface'}
-                            </p>
-                            <h2 className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-[#0D1B24] sm:text-[34px]">
-                                {chat ? chat.title : 'Ask the desk.'}
-                            </h2>
-                            <p className="mt-2 max-w-[520px] text-[13px] leading-6 text-[#0D1B24]/58">
-                                {chat
-                                    ? `${selectedBot.name} is ready to keep the next step moving.`
-                                    : 'Grounded help for deals, leads, quotes, and the conversations behind them.'}
-                            </p>
+                        <div className="flex min-w-0 items-start gap-3">
+                            <BloubAvatar
+                                bot={selectedBot}
+                                label={`${selectedBot.name} avatar`}
+                                size={28}
+                                state={chat ? 'listen' : 'idle'}
+                            />
+                            <div className="min-w-0">
+                                <p className="text-[10px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
+                                    {chat
+                                        ? 'Active conversation'
+                                        : 'Command surface'}
+                                </p>
+                                <h2 className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-[#0D1B24] sm:text-[34px]">
+                                    {chat ? chat.title : 'Ask the desk.'}
+                                </h2>
+                                <p className="mt-2 max-w-[520px] text-[13px] leading-6 text-[#0D1B24]/58">
+                                    {chat
+                                        ? `${selectedBot.name} is ready to keep the next step moving.`
+                                        : 'Grounded help for deals, leads, quotes, and the conversations behind them.'}
+                                </p>
+                            </div>
                         </div>
                         <div className="hidden shrink-0 rounded-lg border border-[#E8530E]/15 bg-[#E8530E]/[0.05] px-3 py-2 text-right sm:block">
                             <p className="text-[10px] font-semibold tracking-[0.1em] text-[#E8530E] uppercase">
@@ -767,22 +779,11 @@ function BotBadge({
     size?: 'sm' | 'lg';
 }) {
     return (
-        <span
-            className={cn(
-                'grid shrink-0 place-items-center rounded-lg',
-                size === 'lg' ? 'size-12' : 'size-9',
-                bot.avatarTone === 'orange' && 'bg-[#E8530E]/12 text-[#E8530E]',
-                bot.avatarTone === 'teal' && 'bg-[#0F4C5C]/12 text-[#0F4C5C]',
-                bot.avatarTone === 'night' && 'bg-[#0D1B24] text-white',
-                bot.avatarTone === 'ink' && 'bg-[#0D1B24]/8 text-[#0D1B24]',
-            )}
-            aria-hidden="true"
-        >
-            {size === 'lg' ? (
-                <Robot className="size-6" weight="regular" />
-            ) : (
-                <Robot className="size-4" weight="regular" />
-            )}
-        </span>
+        <BloubAvatar
+            bot={bot}
+            label={`${bot.name} avatar`}
+            size={size === 'lg' ? 72 : 28}
+            state="idle"
+        />
     );
 }

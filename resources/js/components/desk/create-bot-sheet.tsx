@@ -1,6 +1,7 @@
 import { X } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
+import { BloubAvatar } from '@/components/desk/bloub-avatar';
 import { createCustomBot } from '@/lib/desk/bot-catalog';
 import type { AvatarTone, BotDefinition } from '@/lib/desk/bot-catalog';
 import { cn } from '@/lib/utils';
@@ -232,25 +233,41 @@ export function CreateBotSheet({
                             htmlFor="create-bot-avatar-tone"
                             className="text-[11px] font-semibold text-[#0D1B24]"
                         >
-                            Avatar tone
+                            Avatar
                         </label>
-                        <select
-                            id="create-bot-avatar-tone"
-                            value={avatarTone}
-                            onChange={(event) =>
-                                setAvatarTone(event.target.value as AvatarTone)
-                            }
-                            className={cn(
-                                'mt-1.5 h-9 w-full rounded-md border border-black/12 bg-[#F7F8F5] px-3 text-[13px] text-[#0D1B24] outline-none',
-                                focusRing,
-                            )}
-                        >
-                            {TONES.map((tone) => (
-                                <option key={tone} value={tone}>
-                                    {tone}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="mt-1.5 flex items-center gap-3">
+                            <BloubAvatar
+                                bot={{
+                                    id: `custom-preview-${name.trim() || 'draft'}`,
+                                    name: name.trim() || 'Custom bot',
+                                    avatarTone,
+                                    avatarType: undefined,
+                                    custom: true,
+                                }}
+                                label="Custom bot avatar preview"
+                                size={28}
+                                state="idle"
+                            />
+                            <select
+                                id="create-bot-avatar-tone"
+                                value={avatarTone}
+                                onChange={(event) =>
+                                    setAvatarTone(
+                                        event.target.value as AvatarTone,
+                                    )
+                                }
+                                className={cn(
+                                    'h-9 min-w-0 flex-1 rounded-md border border-black/12 bg-[#F7F8F5] px-3 text-[13px] text-[#0D1B24] outline-none',
+                                    focusRing,
+                                )}
+                            >
+                                {TONES.map((tone) => (
+                                    <option key={tone} value={tone}>
+                                        {tone}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-2 border-t border-black/8 pt-4">

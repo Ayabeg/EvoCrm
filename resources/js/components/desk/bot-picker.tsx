@@ -5,9 +5,9 @@ import {
     Check,
     LinkSimple,
     Plus,
-    Robot,
 } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { BloubAvatar } from '@/components/desk/bloub-avatar';
 import {
     BOT_CATALOG,
     BOT_GROUPS,
@@ -120,22 +120,12 @@ export function BotPicker({
                     setOpen((current) => !current);
                 }}
             >
-                <span
-                    className={cn(
-                        'grid size-5 shrink-0 place-items-center rounded-sm text-[10px] font-semibold',
-                        selectedBot.avatarTone === 'orange' &&
-                            'bg-[#E8530E]/12 text-[#E8530E]',
-                        selectedBot.avatarTone === 'teal' &&
-                            'bg-[#0F4C5C]/12 text-[#0F4C5C]',
-                        selectedBot.avatarTone === 'night' &&
-                            'bg-[#0D1B24] text-white',
-                        selectedBot.avatarTone === 'ink' &&
-                            'bg-[#0D1B24]/8 text-[#0D1B24]',
-                    )}
-                    aria-hidden="true"
-                >
-                    <Robot weight="regular" className="size-3.5" />
-                </span>
+                <BloubAvatar
+                    bot={selectedBot}
+                    label={`${selectedBot.name} avatar`}
+                    size={18}
+                    state="idle"
+                />
                 <span className="truncate">{selectedBot.name}</span>
                 <CaretDown
                     className={cn(
@@ -376,7 +366,12 @@ function BotOption({
             onFocus={() => onFocus(optionIndex)}
             onClick={onSelect}
         >
-            <BotMark tone={bot.avatarTone} />
+            <BloubAvatar
+                bot={bot}
+                label={`${bot.name} avatar`}
+                size={16}
+                state="idle"
+            />
             <span className="min-w-0 flex-1 truncate">{bot.name}</span>
             {selected ? (
                 <Check
@@ -453,22 +448,5 @@ function ConnectorOption({
                 </Link>
             ) : null}
         </div>
-    );
-}
-
-function BotMark({ tone }: { tone: BotDefinition['avatarTone'] }) {
-    return (
-        <span
-            className={cn(
-                'grid size-5 shrink-0 place-items-center rounded-sm text-[10px]',
-                tone === 'orange' && 'bg-[#E8530E]/12 text-[#E8530E]',
-                tone === 'teal' && 'bg-[#0F4C5C]/12 text-[#0F4C5C]',
-                tone === 'night' && 'bg-[#0D1B24] text-white',
-                tone === 'ink' && 'bg-[#0D1B24]/8 text-[#0D1B24]',
-            )}
-            aria-hidden="true"
-        >
-            <Robot className="size-3.5" weight="regular" />
-        </span>
     );
 }

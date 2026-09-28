@@ -1,3 +1,4 @@
+import type { BotAvatarType } from 'bot-avatars';
 import { useSyncExternalStore } from 'react';
 
 export type AvatarTone = 'ink' | 'teal' | 'orange' | 'night';
@@ -11,10 +12,83 @@ export type BotDefinition = {
     description: string;
     group: BotGroup;
     avatarTone: AvatarTone;
+    avatarType?: BotAvatarType;
     instructions?: string;
     tools?: string[];
     custom?: boolean;
 };
+
+const CATALOG_AVATAR_TYPES: Record<string, BotAvatarType> = {
+    closer: 'hexagon',
+    qualifier: 'drop',
+    'quote-desk': 'square',
+    'after-sale': 'flower',
+    desk: 'droid',
+    'evopulse-shell-ia': 'mech',
+    'evopulse-pulse-ui': 'cloud',
+    'evopulse-command-ui': 'star',
+    'night-shift': 'ghost',
+};
+
+const CUSTOM_AVATAR_TYPES: BotAvatarType[] = [
+    'clover',
+    'triangle',
+    'blob',
+    'circle',
+    'cat',
+    'pill',
+    'alien',
+    'pebble',
+    'puddle',
+];
+
+export function seedFromBotId(id?: string | null): number {
+    if (!id) {
+        return 0.37;
+    }
+
+    let hash = 2166136261;
+
+    for (let i = 0; i < id.length; i += 1) {
+        hash ^= id.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+
+    return (hash >>> 0) / 0xffffffff;
+}
+
+export function avatarTypeForBotId(
+    id?: string | null,
+    explicit?: BotAvatarType,
+): BotAvatarType {
+    if (explicit) {
+        return explicit;
+    }
+
+    if (id && CATALOG_AVATAR_TYPES[id]) {
+        return CATALOG_AVATAR_TYPES[id];
+    }
+
+    if (!id) {
+        return 'clover';
+    }
+
+    const index = Math.floor(seedFromBotId(id) * CUSTOM_AVATAR_TYPES.length);
+
+    return CUSTOM_AVATAR_TYPES[index] ?? 'clover';
+}
+
+export function avatarColorForTone(tone: AvatarTone): string {
+    if (tone === 'orange') {
+        return '#E8530E';
+    }
+
+    if (tone === 'teal') {
+        return '#0F4C5C';
+    }
+
+    return '#0D1B24';
+}
 
 export type ConnectorDefinition = {
     id: string;
@@ -53,6 +127,7 @@ export const BOT_CATALOG: BotDefinition[] = [
         description: 'A quiet front door for work that needs a specialist.',
         group: 'internal',
         avatarTone: 'ink',
+        avatarType: 'droid',
     },
     {
         id: 'closer',
@@ -61,6 +136,7 @@ export const BOT_CATALOG: BotDefinition[] = [
         description: 'Keeps momentum on qualified conversations and deals.',
         group: 'sales',
         avatarTone: 'orange',
+        avatarType: 'hexagon',
     },
     {
         id: 'qualifier',
@@ -69,6 +145,7 @@ export const BOT_CATALOG: BotDefinition[] = [
         description: 'Separates real buying intent from noise.',
         group: 'sales',
         avatarTone: 'teal',
+        avatarType: 'drop',
     },
     {
         id: 'quote-desk',
@@ -77,6 +154,7 @@ export const BOT_CATALOG: BotDefinition[] = [
         description: 'Helps shape the next quote without inventing numbers.',
         group: 'sales',
         avatarTone: 'ink',
+        avatarType: 'square',
     },
     {
         id: 'after-sale',
@@ -85,6 +163,7 @@ export const BOT_CATALOG: BotDefinition[] = [
         description: 'Surfaces follow-ups, meetings, and renewal signals.',
         group: 'sales',
         avatarTone: 'teal',
+        avatarType: 'flower',
     },
     {
         id: 'evopulse-shell-ia',
@@ -94,6 +173,7 @@ export const BOT_CATALOG: BotDefinition[] = [
             'Internal product intelligence for navigation and structure.',
         group: 'evopulse',
         avatarTone: 'night',
+        avatarType: 'mech',
     },
     {
         id: 'evopulse-pulse-ui',
@@ -103,6 +183,7 @@ export const BOT_CATALOG: BotDefinition[] = [
             'Internal product intelligence for calm, useful interfaces.',
         group: 'evopulse',
         avatarTone: 'teal',
+        avatarType: 'cloud',
     },
     {
         id: 'evopulse-command-ui',
@@ -111,6 +192,7 @@ export const BOT_CATALOG: BotDefinition[] = [
         description: 'Internal product intelligence for speed and clarity.',
         group: 'evopulse',
         avatarTone: 'orange',
+        avatarType: 'star',
     },
     {
         id: 'night-shift',
@@ -119,6 +201,7 @@ export const BOT_CATALOG: BotDefinition[] = [
         description: 'Internal product intelligence for low-noise monitoring.',
         group: 'evopulse',
         avatarTone: 'ink',
+        avatarType: 'ghost',
     },
 ];
 
@@ -233,14 +316,16 @@ export function getBotById(
 }
 
 export function createCustomBot(input: NewBotInput): BotDefinition {
+    const id = `custom-${Date.now()}-${customBotSequence++}`;
     const bot: BotDefinition = {
-        id: `custom-${Date.now()}-${customBotSequence++}`,
+        id,
         name: input.name.trim(),
         job: 'works from your instructions and selected tools',
         description:
             input.instructions.trim() || 'A custom bot for this workspace.',
         group: 'custom',
         avatarTone: input.avatarTone,
+        avatarType: avatarTypeForBotId(id),
         instructions: input.instructions.trim(),
         tools: input.tools,
         custom: true,

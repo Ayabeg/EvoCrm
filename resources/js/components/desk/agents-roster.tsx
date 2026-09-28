@@ -75,6 +75,7 @@ export function AgentsRoster({ className }: { className?: string }) {
                                 onClick={() => startChat(agent)}
                             >
                                 <BloubAvatar
+                                    botId={agent.id}
                                     label={
                                         agent.pinned
                                             ? `${agent.name} avatar, pinned and listening`
