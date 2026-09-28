@@ -11,6 +11,11 @@ import {
 } from '@phosphor-icons/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import {
+    AgentChatHeader,
+    AgentChatLayout,
+    AgentChatMessage,
+} from '@/components/desk/agent-chat-layout';
 import { AgentsComposer } from '@/components/desk/agents-composer';
 import { AgentsRoster } from '@/components/desk/agents-roster';
 import { BloubAvatar } from '@/components/desk/bloub-avatar';
@@ -199,7 +204,12 @@ export default function AgentsIndex() {
                 data-agents-page
                 data-agents-route={path}
             >
-                <header className="flex shrink-0 items-center justify-between gap-4 border-b border-black/8 bg-white px-5 py-4 sm:px-7">
+                <header
+                    className={cn(
+                        'flex shrink-0 items-center justify-between gap-4 border-b border-black/8 bg-white px-5 py-4 sm:px-7',
+                        isChatsRoute && 'sr-only',
+                    )}
+                >
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.12em] text-[#E8530E] uppercase">
                             <Sparkle className="size-3.5" weight="fill" />
@@ -397,124 +407,90 @@ function ChatView({
     onSend: (prompt: string) => void;
     onQuickPrompt: (prompt: string) => void;
 }) {
+    const messages = chat?.messages ?? [];
+    const hasThread = messages.length > 0;
+
     return (
-        <section className="flex min-h-0 flex-1 flex-col" data-agents-chat-view>
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-7 sm:px-7">
-                <div className="mx-auto flex w-full max-w-[760px] flex-1 flex-col">
-                    <div className="mb-8 flex items-start justify-between gap-4">
-                        <div className="flex min-w-0 items-start gap-3">
-                            <BloubAvatar
-                                bot={selectedBot}
-                                label={`${selectedBot.name} avatar`}
-                                size={28}
-                                state={chat ? 'listen' : 'idle'}
-                            />
-                            <div className="min-w-0">
-                                <p className="text-[10px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
-                                    {chat
-                                        ? 'Active conversation'
-                                        : 'Command surface'}
-                                </p>
-                                <h2 className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-[#0D1B24] sm:text-[34px]">
-                                    {chat ? chat.title : 'Ask the desk.'}
-                                </h2>
-                                <p className="mt-2 max-w-[520px] text-[13px] leading-6 text-[#0D1B24]/58">
-                                    {chat
-                                        ? `${selectedBot.name} is ready to keep the next step moving.`
-                                        : 'Grounded help for deals, leads, quotes, and the conversations behind them.'}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="hidden shrink-0 rounded-lg border border-[#E8530E]/15 bg-[#E8530E]/[0.05] px-3 py-2 text-right sm:block">
-                            <p className="text-[10px] font-semibold tracking-[0.1em] text-[#E8530E] uppercase">
-                                one bot
-                            </p>
-                            <p className="mt-0.5 text-[11px] text-[#0D1B24]/58">
-                                one clear thread
-                            </p>
-                        </div>
+        <AgentChatLayout
+            header={
+                <AgentChatHeader
+                    bot={selectedBot}
+                    status={hasThread ? 'Ready' : 'Waiting'}
+                    avatarState={hasThread ? 'idle' : 'listen'}
+                />
+            }
+            emptyState={
+                <div className="max-w-[540px]">
+                    <div className="grid size-11 place-items-center rounded-xl bg-[#0D1B24] text-[#E8530E] shadow-[0_8px_22px_rgba(13,27,36,0.14)]">
+                        <Lightning className="size-5" weight="fill" />
                     </div>
-
-                    {chat && chat.messages.length > 0 ? (
-                        <div className="space-y-5" aria-live="polite">
-                            {chat.messages.map((message) => (
-                                <div
-                                    key={message.id}
-                                    className={cn(
-                                        'flex',
-                                        message.role === 'user'
-                                            ? 'justify-end'
-                                            : 'justify-start',
-                                    )}
-                                >
-                                    <div
-                                        className={cn(
-                                            'max-w-[min(100%,580px)] rounded-xl border px-4 py-3 text-[13px] leading-6',
-                                            message.role === 'user'
-                                                ? 'border-[#0D1B24] bg-[#0D1B24] text-white'
-                                                : 'border-black/8 bg-white text-[#0D1B24]',
-                                        )}
-                                    >
-                                        {message.body}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="grid flex-1 content-center py-8">
-                            <div className="max-w-[540px]">
-                                <div className="grid size-11 place-items-center rounded-xl bg-[#0D1B24] text-[#E8530E] shadow-[0_8px_22px_rgba(13,27,36,0.14)]">
-                                    <Lightning
-                                        className="size-5"
-                                        weight="fill"
-                                    />
-                                </div>
-                                <p className="mt-4 text-[15px] font-medium text-[#0D1B24]">
-                                    Start with a useful question.
-                                </p>
-                                <div className="mt-4 flex flex-wrap gap-2">
-                                    {QUICK_PROMPTS.map((prompt) => (
-                                        <button
-                                            key={prompt}
-                                            type="button"
-                                            className={cn(
-                                                'inline-flex min-h-8 items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 text-[11px] text-[#0D1B24]/70 hover:border-[#0F4C5C]/25 hover:bg-[#0F4C5C]/[0.05] hover:text-[#0F4C5C]',
-                                                focusRing,
-                                            )}
-                                            onClick={() =>
-                                                onQuickPrompt(prompt)
-                                            }
-                                        >
-                                            {prompt}
-                                            <CaretRight
-                                                className="size-3"
-                                                weight="bold"
-                                            />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="mt-8">
-                        <AgentsComposer
-                            selectedBot={selectedBot}
-                            selectedConnectorIds={selectedConnectorIds}
-                            onSelectBot={onSelectBot}
-                            onAttachConnector={onAttachConnector}
-                            onRemoveConnector={onRemoveConnector}
-                            onCreateBot={onCreateBot}
-                            onSend={onSend}
-                        />
-                        <p className="mt-3 text-center text-[10px] text-[#0D1B24]/38">
-                            Stub replies only in this slice. No CRM records are
-                            written.
-                        </p>
+                    <p className="mt-4 text-[15px] font-medium text-[#0D1B24]">
+                        Start with a useful question.
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {QUICK_PROMPTS.map((prompt) => (
+                            <button
+                                key={prompt}
+                                type="button"
+                                className={cn(
+                                    'inline-flex min-h-8 items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 text-[11px] text-[#0D1B24]/70 hover:border-[#0F4C5C]/25 hover:bg-[#0F4C5C]/[0.05] hover:text-[#0F4C5C]',
+                                    focusRing,
+                                )}
+                                onClick={() => onQuickPrompt(prompt)}
+                            >
+                                {prompt}
+                                <CaretRight className="size-3" weight="bold" />
+                            </button>
+                        ))}
                     </div>
                 </div>
-            </div>
-        </section>
+            }
+            composer={
+                <>
+                    <AgentsComposer
+                        selectedBot={selectedBot}
+                        selectedConnectorIds={selectedConnectorIds}
+                        onSelectBot={onSelectBot}
+                        onAttachConnector={onAttachConnector}
+                        onRemoveConnector={onRemoveConnector}
+                        onCreateBot={onCreateBot}
+                        onSend={onSend}
+                    />
+                    <p className="mt-3 text-center text-[10px] text-[#0D1B24]/38">
+                        Stub replies only in this slice. No CRM records are
+                        written.
+                    </p>
+                </>
+            }
+            scrollKey={`${chat?.id ?? 'new'}:${messages.length}`}
+        >
+            {hasThread ? (
+                <div
+                    className="flex flex-col gap-4"
+                    role="log"
+                    aria-live="polite"
+                    aria-label={`${selectedBot.name} conversation`}
+                >
+                    {messages.map((message) => (
+                        <AgentChatMessage
+                            key={message.id}
+                            align={message.role === 'user' ? 'end' : 'start'}
+                        >
+                            <div
+                                className={cn(
+                                    'max-w-[min(100%,580px)] rounded-xl border px-4 py-3 text-[13px] leading-6 whitespace-pre-wrap',
+                                    message.role === 'user'
+                                        ? 'border-[#0D1B24] bg-[#0D1B24] text-white'
+                                        : 'border-black/8 bg-white text-[#0D1B24]',
+                                )}
+                            >
+                                {message.body}
+                            </div>
+                        </AgentChatMessage>
+                    ))}
+                </div>
+            ) : null}
+        </AgentChatLayout>
     );
 }
 

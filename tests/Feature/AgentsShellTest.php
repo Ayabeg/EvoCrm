@@ -39,3 +39,21 @@ it('keeps the agents shell slice route-driven and scoped to its sidebar contract
         ->toContain('Chats')
         ->toContain('Bots');
 });
+
+it('adapts Astryx ChatLayout regions on the agents chat surface', function () {
+    $layout = file_get_contents(resource_path('js/components/desk/agent-chat-layout.tsx'));
+    $page = file_get_contents(resource_path('js/pages/agents/index.tsx'));
+
+    expect($layout)
+        ->toContain('data-agent-chat-layout')
+        ->toContain('data-agent-chat-header')
+        ->toContain('data-agent-chat-thread')
+        ->toContain('data-agent-chat-composer')
+        ->toContain('@astryxdesign/core')
+        ->and($page)
+        ->toContain('AgentChatLayout')
+        ->toContain('AgentChatHeader')
+        ->toContain('AgentsComposer')
+        ->toContain('BloubAvatar')
+        ->not->toContain('SegmentedControl');
+});
