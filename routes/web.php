@@ -4,6 +4,8 @@ use App\Http\Controllers\Ads\AdsCenterController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\InstagramController;
 use App\Http\Controllers\Auth\MetaController;
+use App\Http\Controllers\Api\AgentOsController;
+use App\Http\Controllers\Api\OpenManusController;
 use App\Http\Controllers\Crm\ActivityController;
 use App\Http\Controllers\Crm\AskEvoController;
 use App\Http\Controllers\Crm\BulkActionController;
@@ -120,6 +122,22 @@ Route::post('/webhooks/meta/leads/{webhookKey}', [MetaLeadWebhookController::cla
 
 Route::middleware(['auth', 'verified', EnforceProductPermissions::class, EnforceSimpleMode::class])->group(function () {
     Route::get('/dashboard', HomeController::class)->name('dashboard');
+    Route::post('/api/agent/run', [OpenManusController::class, 'run'])->middleware('throttle:10,1')->name('api.agent.run');
+    Route::get('/api/agent/health', [OpenManusController::class, 'health'])->name('api.agent.health');
+    Route::middleware('can-manage-settings')->group(function () {
+        Route::get('/api/agent/status', [OpenManusController::class, 'status'])->name('api.agent.status');
+        Route::get('/api/agent/plugins', [AgentOsController::class, 'plugins'])->name('api.agent.plugins');
+        Route::put('/api/agent/plugins/{plugin}', [AgentOsController::class, 'updatePlugin'])
+            ->where('plugin', '[A-Za-z0-9._-]+')
+            ->name('api.agent.plugins.update');
+        Route::get('/api/agent/connectors', [AgentOsController::class, 'connectors'])->name('api.agent.connectors');
+        Route::put('/api/agent/connectors/{connector}', [AgentOsController::class, 'updateConnector'])
+            ->where('connector', '[A-Za-z0-9._-]+')
+            ->name('api.agent.connectors.update');
+        Route::delete('/api/agent/connectors/{connector}', [AgentOsController::class, 'destroyConnector'])
+            ->where('connector', '[A-Za-z0-9._-]+')
+            ->name('api.agent.connectors.destroy');
+    });
     Route::post('/dashboard/activation/dismiss', [ActivationDismissalController::class, 'store'])
         ->name('dashboard.activation.dismiss');
     Route::post('/lead-os/graph', [LeadOsController::class, 'runGraph'])->name('lead-os.graph');

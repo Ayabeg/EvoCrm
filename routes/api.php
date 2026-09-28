@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AgentToolController;
 use App\Http\Controllers\Api\V1\ActivityController;
 use App\Http\Controllers\Api\V1\AuthTokenController;
 use App\Http\Controllers\Api\V1\ContactController;
@@ -11,6 +12,11 @@ use App\Http\Controllers\Api\V1\QuoteController;
 use App\Http\Controllers\Api\V1\ThreadController;
 use App\Http\Middleware\EnforceProductPermissions;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/agent/tools/{tool}', [AgentToolController::class, 'invoke'])
+    ->middleware(['agent-runtime', 'throttle:60,1'])
+    ->where('tool', '[A-Za-z0-9._-]+')
+    ->name('api.agent.tools.invoke');
 
 Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::post('/auth/token', [AuthTokenController::class, 'store'])

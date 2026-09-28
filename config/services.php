@@ -117,4 +117,12 @@ return [
         'host' => env('POSTHOG_HOST', env('VITE_POSTHOG_HOST', 'https://us.i.posthog.com')),
     ],
 
+    'openmanus' => [
+        'enabled' => filter_var(env('OPENMANUS_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
+        'url' => env('OPENMANUS_URL', 'http://127.0.0.1:8001'),
+        'token' => env('OPENMANUS_API_TOKEN'),
+        'timeout' => env('OPENMANUS_TIMEOUT', 120),
+        'health_timeout' => env('OPENMANUS_HEALTH_TIMEOUT', 3),
+    ],
+
 ];

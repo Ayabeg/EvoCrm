@@ -1,0 +1,14 @@
+services:
+  openmanus:
+    build:
+      context: ./OpenManus
+    restart: unless-stopped
+    working_dir: /app/OpenManus
+    command: ["uvicorn", "evo_api:app", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      OPENMANUS_API_TOKEN: ${OPENMANUS_API_TOKEN}
+    volumes:
+      - ./config.toml:/app/OpenManus/config/config.toml:ro
+      - ./evo_api.py:/app/OpenManus/evo_api.py:ro
+    ports:
+      - "127.0.0.1:8001:8001"

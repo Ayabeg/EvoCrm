@@ -10,6 +10,7 @@ use App\Http\Controllers\Settings\QuotaController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\Settings\SmsSettingsController;
 use App\Http\Controllers\Settings\SystemHealthController;
+use App\Http\Controllers\Settings\AgentSettingsController;
 use App\Http\Controllers\Settings\WorkspaceSettingsController;
 use App\Http\Middleware\EnforceProductPermissions;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -59,5 +60,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('settings/quotas', [QuotaController::class, 'update'])->name('settings.quotas.update');
         Route::get('settings/workspace', [WorkspaceSettingsController::class, 'edit'])->name('settings.workspace');
         Route::put('settings/workspace', [WorkspaceSettingsController::class, 'update'])->name('settings.workspace.update');
+        Route::get('settings/agent', [AgentSettingsController::class, 'edit'])->name('settings.agent');
+        Route::put('settings/agent', [AgentSettingsController::class, 'update'])->name('settings.agent.update');
+        Route::post('settings/agent/health', [AgentSettingsController::class, 'health'])->name('settings.agent.health');
+        Route::put('settings/agent/plugins/{plugin}', [AgentSettingsController::class, 'updatePlugin'])
+            ->where('plugin', '[A-Za-z0-9._-]+')
+            ->name('settings.agent.plugins.update');
+        Route::put('settings/agent/connectors/{connector}', [AgentSettingsController::class, 'updateConnector'])
+            ->where('connector', '[A-Za-z0-9._-]+')
+            ->name('settings.agent.connectors.update');
+        Route::delete('settings/agent/connectors/{connector}', [AgentSettingsController::class, 'destroyConnector'])
+            ->where('connector', '[A-Za-z0-9._-]+')
+            ->name('settings.agent.connectors.destroy');
     });
 });

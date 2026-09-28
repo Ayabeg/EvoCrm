@@ -57,6 +57,14 @@ class Integration extends Model
 
     public const PROVIDER_SMS = 'sms';
 
+    public const PROVIDER_OPENMANUS = 'openmanus';
+
+    public const PROVIDER_AGENT_BROWSER_USE = 'agent_browser_use';
+
+    public const PROVIDER_AGENT_WEBHOOK = 'agent_webhook';
+
+    public const PROVIDER_AGENT_MCP = 'agent_mcp';
+
     protected function casts(): array
     {
         return [

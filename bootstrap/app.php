@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\UnofficialWhatsAppRefused;
+use App\Http\Middleware\AuthenticateAgentRuntime;
 use App\Http\Middleware\EmbedSecurityHeaders;
 use App\Http\Middleware\EnsureApiWorkspaceToken;
 use App\Http\Middleware\EnsureUserCanManageSettings;
@@ -27,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
+            'api/agent/tools',
+            'api/agent/tools/*',
         ]);
 
         $middleware->web(append: [
@@ -39,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'can-manage-settings' => EnsureUserCanManageSettings::class,
             'api-workspace' => EnsureApiWorkspaceToken::class,
+            'agent-runtime' => AuthenticateAgentRuntime::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

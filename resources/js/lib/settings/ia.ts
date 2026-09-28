@@ -225,6 +225,15 @@ export const SETTINGS_DESTINATIONS: SettingsDestination[] = [
         permission: 'settings.integrations',
     },
     {
+        title: 'Agent',
+        href: '/settings/agent',
+        group: 'Integrations',
+        scope: 'INTEGRATION',
+        keywords: ['agent', 'openmanus', 'plugins', 'onboarding', 'runtime'],
+        permission: 'settings.integrations',
+        adminOnly: true,
+    },
+    {
         title: 'Permissions',
         href: '/settings/permissions',
         group: 'Developer',
