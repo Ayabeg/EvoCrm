@@ -31,7 +31,7 @@ it('turns simple mode on for a newly provisioned workspace', function () {
     expect($workspace->simple_mode)->toBeTrue();
 });
 
-it('hides tickets, SMS, and a second kanban from Inertia nav on a new workspace', function () {
+it('shares the compact Salesforce-style nav on a new workspace', function () {
     $user = simpleModeOwner();
 
     $this->actingAs($user)
@@ -43,23 +43,34 @@ it('hides tickets, SMS, and a second kanban from Inertia nav on a new workspace'
                 ->where('features.tickets', false)
                 ->where('features.sms', false)
                 ->where('features.ask_evo', false)
-                ->has('nav', 5);
+                ->has('nav', 8);
 
             $nav = inertiaNav($page);
             $hrefs = collect($nav)->pluck('href')->all();
             $ids = collect($nav)->pluck('id')->all();
 
-            expect($ids)->toBe(['home', 'contacts', 'deals', 'inbox', 'quotes'])
+            expect($ids)->toBe([
+                'home',
+                'inbox',
+                'leads',
+                'contacts',
+                'companies',
+                'deals',
+                'quotes',
+                'activities',
+            ])
                 ->and($hrefs)->toBe([
                     '/dashboard',
-                    '/crm/contacts',
-                    '/crm/deals',
                     '/inbox',
+                    '/crm/leads',
+                    '/crm/contacts',
+                    '/crm/companies',
+                    '/crm/deals',
                     '/crm/quotes',
+                    '/crm/activities',
                 ])
                 ->and($hrefs)->not->toContain('/crm/tickets')
                 ->and($hrefs)->not->toContain('/settings/sms')
-                ->and($hrefs)->not->toContain('/crm/leads')
                 ->and($hrefs)->not->toContain('/ads')
                 ->and($hrefs)->not->toContain('/outbound/warmup')
                 ->and($hrefs)->not->toContain('/crm/report-builder')

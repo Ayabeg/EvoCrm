@@ -1,8 +1,8 @@
 import { Form, Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { BulkActionBar } from '@/components/crm/bulk-action-bar';
-import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
 import DealAttentionQueue from '@/components/crm/deal-attention-queue';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
@@ -75,7 +75,7 @@ export default function DealsIndex({
         <>
             <Head title={t('Deals')} />
             <div
-                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                className="v02-list flex h-app-workspace min-h-0 flex-col bg-[#f7f7f5]"
                 data-crm="deals-workspace"
             >
                 <CrmListShell
@@ -85,6 +85,23 @@ export default function DealsIndex({
                     basePath="/crm/deals"
                     primaryLabel="Create deal"
                     onCreate={() => setDrawer(true)}
+                    primarySlot={
+                        <MorphingForm
+                            label="Create deal"
+                            title="Create deal"
+                            open={drawer}
+                            onOpenChange={setDrawer}
+                        >
+                            <DealCreateFields
+                                contacts={contacts}
+                                stages={stages}
+                                pipelineId={pipeline.id}
+                                prefillContactId={prefillContactId}
+                                onDone={() => setDrawer(false)}
+                                showAddAnother
+                            />
+                        </MorphingForm>
+                    }
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -159,79 +176,98 @@ export default function DealsIndex({
                 />
             </div>
 
-            <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create deal">
-                <Form
-                    action="/crm/deals"
-                    method="post"
-                    className="space-y-3"
-                    resetOnSuccess
-                    onSuccess={() => setDrawer(false)}
-                >
-                    {({ processing }) => (
-                        <>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    {t('Deal name')} <span className="text-brand">*</span>
-                                </Label>
-                                <Input name="title" required />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
-                                <Input name="amount_dzd" type="number" min="0" step="0.01" />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
-                                <Input name="close_date" type="date" />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">{t('Contact')}</Label>
-                                <select
-                                    name="contact_id"
-                                    defaultValue={prefillContactId ?? ''}
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                >
-                                    <option value="">{t('New from deal name')}</option>
-                                    {contacts.map((contact) => (
-                                        <option key={contact.id} value={contact.id}>
-                                            {contact.first_name} {contact.last_name ?? ''}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">{t('Stage')}</Label>
-                                <select
-                                    name="stage_id"
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                >
-                                    {stages.map((stage) => (
-                                        <option key={stage.id} value={stage.id}>
-                                            {stage.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <input type="hidden" name="pipeline_id" value={pipeline.id} />
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
-                                    {t('Cancel')}
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    name="add_another"
-                                    value="1"
-                                    variant="outline"
-                                    disabled={processing}
-                                >
-                                    {t('Create and add another')}
-                                </Button>
-                                <Button disabled={processing}>{t('Create')}</Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </CreateDrawer>
         </>
+    );
+}
+
+function DealCreateFields({
+    contacts,
+    stages,
+    pipelineId,
+    prefillContactId,
+    onDone,
+    showAddAnother = false,
+}: {
+    contacts: { id: number; first_name: string; last_name?: string | null }[];
+    stages: { id: number; name: string }[];
+    pipelineId: number;
+    prefillContactId?: number | null;
+    onDone: () => void;
+    showAddAnother?: boolean;
+}) {
+    return (
+        <Form
+            action="/crm/deals"
+            method="post"
+            className="space-y-3"
+            resetOnSuccess
+            onSuccess={onDone}
+        >
+            {({ processing }) => (
+                <>
+                    <div>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Deal name')} <span className="text-brand">*</span>
+                        </Label>
+                        <Input name="title" required />
+                    </div>
+                    <div>
+                        <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
+                        <Input name="amount_dzd" type="number" min="0" step="0.01" />
+                    </div>
+                    <div>
+                        <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
+                        <Input name="close_date" type="date" />
+                    </div>
+                    <div>
+                        <Label className="mb-1 block text-[12px]">{t('Contact')}</Label>
+                        <select
+                            name="contact_id"
+                            defaultValue={prefillContactId ?? ''}
+                            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                        >
+                            <option value="">{t('New from deal name')}</option>
+                            {contacts.map((contact) => (
+                                <option key={contact.id} value={contact.id}>
+                                    {contact.first_name} {contact.last_name ?? ''}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <Label className="mb-1 block text-[12px]">{t('Stage')}</Label>
+                        <select
+                            name="stage_id"
+                            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                        >
+                            {stages.map((stage) => (
+                                <option key={stage.id} value={stage.id}>
+                                    {stage.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <input type="hidden" name="pipeline_id" value={pipelineId} />
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button type="button" variant="ghost" onClick={onDone}>
+                            {t('Cancel')}
+                        </Button>
+                        {showAddAnother ? (
+                            <Button
+                                type="submit"
+                                name="add_another"
+                                value="1"
+                                variant="outline"
+                                disabled={processing}
+                            >
+                                {t('Create and add another')}
+                            </Button>
+                        ) : null}
+                        <Button disabled={processing}>{t('Create')}</Button>
+                    </div>
+                </>
+            )}
+        </Form>
     );
 }
 

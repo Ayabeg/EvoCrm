@@ -101,7 +101,7 @@ export function LeadIdentityCell({
     const body = (
         <>
             <span
-                className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-[10px] leading-none font-medium text-white"
+                className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-[10px] leading-none font-medium text-white"
                 aria-hidden
             >
                 {initials || '?'}
@@ -110,25 +110,21 @@ export function LeadIdentityCell({
                 <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" title={name}>
                     {name}
                 </span>
-                {secondary ? (
-                    <span className="block truncate text-[12px] leading-4 text-mute" title={secondary}>
-                        {secondary}
-                    </span>
-                ) : null}
+                {secondary ? <span className="sr-only">{secondary}</span> : null}
             </span>
         </>
     );
 
     if (!linked) {
         return (
-            <span className="flex w-full min-w-0 items-start gap-2">{body}</span>
+            <span className="flex h-9 w-full min-w-0 items-center gap-2">{body}</span>
         );
     }
 
     return (
         <Link
             href={href}
-            className="flex w-full min-w-0 items-start gap-2 hover:underline"
+            className="flex h-9 w-full min-w-0 items-center gap-2 hover:underline"
         >
             {body}
         </Link>

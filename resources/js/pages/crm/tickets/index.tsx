@@ -1,7 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { useState } from 'react';
-import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { SkeletonList } from '@/components/crm/empty-room';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
@@ -69,6 +69,91 @@ export default function TicketsIndex({
                     entity="ticket"
                     basePath="/crm/tickets"
                     primaryLabel="Create ticket"
+                    onCreate={() => setDrawer(true)}
+                    primarySlot={
+                        <MorphingForm
+                            label="Create ticket"
+                            title="Create ticket"
+                            open={drawer}
+                            onOpenChange={setDrawer}
+                        >
+                            <Form
+                                action="/crm/tickets"
+                                method="post"
+                                className="space-y-3"
+                                resetOnSuccess
+                                onSuccess={() => setDrawer(false)}
+                            >
+                                {({ processing }) => (
+                                    <>
+                                        {createDefaults?.deal_id ? (
+                                            <input type="hidden" name="deal_id" value={createDefaults.deal_id} />
+                                        ) : null}
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">
+                                                Subject <span className="text-brand">*</span>
+                                            </Label>
+                                            <Input name="subject" required maxLength={180} />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">
+                                                Contact <span className="text-brand">*</span>
+                                            </Label>
+                                            <select
+                                                name="contact_id"
+                                                required
+                                                className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                                defaultValue={
+                                                    createDefaults?.contact_id
+                                                        ? String(createDefaults.contact_id)
+                                                        : ''
+                                                }
+                                            >
+                                                <option value="" disabled>
+                                                    Select a contact
+                                                </option>
+                                                {contacts.map((contact) => (
+                                                    <option key={contact.id} value={contact.id}>
+                                                        {contact.first_name} {contact.last_name ?? ''}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">Priority</Label>
+                                            <select
+                                                name="priority"
+                                                defaultValue="medium"
+                                                className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                            >
+                                                <option value="high">High</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="low">Low</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">Channel</Label>
+                                            <select
+                                                name="channel"
+                                                defaultValue="manual"
+                                                className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                            >
+                                                <option value="whatsapp_cloud">WhatsApp</option>
+                                                <option value="email">Email</option>
+                                                <option value="manual">Manual</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex justify-end gap-2 pt-2">
+                                            <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
+                                                Cancel
+                                            </Button>
+                                            <Button disabled={processing}>Create ticket</Button>
+                                        </div>
+                                    </>
+                                )}
+                            </Form>
+                        </MorphingForm>
+                    }
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -76,7 +161,6 @@ export default function TicketsIndex({
                     members={members}
                     contacts={contacts}
                     stagePills={stagePills}
-                    createHref="/crm/tickets?create=1"
                     layoutToggle={<TicketLayoutToggle current="list" />}
                 >
                     {(columns) => (
@@ -139,80 +223,6 @@ export default function TicketsIndex({
                     )}
                 </CrmListShell>
             </CrmShell>
-
-            <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create ticket">
-                <Form
-                    action="/crm/tickets"
-                    method="post"
-                    className="space-y-3"
-                    resetOnSuccess
-                    onSuccess={() => setDrawer(false)}
-                >
-                    {({ processing }) => (
-                        <>
-                            {createDefaults?.deal_id ? (
-                                <input type="hidden" name="deal_id" value={createDefaults.deal_id} />
-                            ) : null}
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    Subject <span className="text-brand">*</span>
-                                </Label>
-                                <Input name="subject" required maxLength={180} />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    Contact <span className="text-brand">*</span>
-                                </Label>
-                                <select
-                                    name="contact_id"
-                                    required
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                    defaultValue={createDefaults?.contact_id ? String(createDefaults.contact_id) : ''}
-                                >
-                                    <option value="" disabled>
-                                        Select a contact
-                                    </option>
-                                    {contacts.map((contact) => (
-                                        <option key={contact.id} value={contact.id}>
-                                            {contact.first_name} {contact.last_name ?? ''}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">Priority</Label>
-                                <select
-                                    name="priority"
-                                    defaultValue="medium"
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                >
-                                    <option value="high">High</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="low">Low</option>
-                                </select>
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">Channel</Label>
-                                <select
-                                    name="channel"
-                                    defaultValue="manual"
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                >
-                                    <option value="whatsapp_cloud">WhatsApp</option>
-                                    <option value="email">Email</option>
-                                    <option value="manual">Manual</option>
-                                </select>
-                            </div>
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
-                                    Cancel
-                                </Button>
-                                <Button disabled={processing}>Create ticket</Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </CreateDrawer>
         </>
     );
 }

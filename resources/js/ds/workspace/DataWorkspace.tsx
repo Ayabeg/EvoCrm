@@ -38,9 +38,9 @@ function renderSharedTableSurface<Row extends { id: RowId }>(
     if (props.loading) {
         return (
             <div className="space-y-2 px-4 py-4 md:px-8" aria-busy="true" data-p27="loading">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-9 w-full" />
+                <Skeleton className="h-9 w-full" />
+                <Skeleton className="h-9 w-full" />
             </div>
         );
     }
@@ -87,6 +87,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
         title,
         description,
         primaryAction,
+        primarySlot,
         views,
         activeViewId,
         onViewChange,
@@ -157,14 +158,21 @@ export function DataWorkspace<Row extends { id: RowId }>(
             <PageHeader
                 title={title}
                 description={description}
+                compact
                 secondaryActions={secondaryActions}
                 primaryAction={
-                    primaryAction ? (
+                    primarySlot ??
+                    (primaryAction ? (
                         <PageHeaderAction
                             label={primaryAction.label}
                             onClick={primaryAction.onClick}
+                            className={
+                                object === 'quote'
+                                    ? 'h-8 border-[#E8530E] bg-[#E8530E] px-3 text-[13px] text-white hover:bg-[#d44b0c]'
+                                    : undefined
+                            }
                         />
-                    ) : undefined
+                    ) : undefined)
                 }
             />
             {banner}

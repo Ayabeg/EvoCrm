@@ -32,7 +32,7 @@ export function DashboardWork({ work }: { work: DashboardWork }) {
 
     return (
         <div>
-            <p className="mb-3 text-[12px] leading-4 text-mute">
+            <p className="mb-2 text-[12px] leading-4 text-mute">
                 <Link
                     href={work.overdue_href}
                     className="hover:text-ink focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"

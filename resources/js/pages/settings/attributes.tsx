@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { CreateDrawer } from '@/components/crm/create-drawer';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { SettingsPageHeader } from '@/components/settings/chrome';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
 import {
@@ -244,9 +244,15 @@ export default function AttributeSettings({
                     title="Properties"
                     description="Workspace-defined fields on Contact, Company, and Deal. Add a date or list, group them, then edit or delete the definition."
                 >
-                    <Button size="sm" onClick={() => setCreateOpen(true)}>
-                        New attribute
-                    </Button>
+                    <MorphingForm
+                        label="New attribute"
+                        title="New attribute"
+                        description="Values are stored per record and shown on the contact or deal hub."
+                        open={createOpen}
+                        onOpenChange={setCreateOpen}
+                    >
+                        <DefinitionForm onDone={() => setCreateOpen(false)} />
+                    </MorphingForm>
                 </SettingsPageHeader>
 
                 {byEntity.length === 0 ? (
@@ -326,18 +332,78 @@ export default function AttributeSettings({
                                                 </HairlineTd>
                                                 <HairlineTd>
                                                     <div className="flex justify-end">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="text-brand"
-                                                            onClick={() =>
-                                                                setEditing(
-                                                                    definition,
-                                                                )
+                                                        <MorphingForm
+                                                            label="Edit"
+                                                            title={
+                                                                editing?.id === definition.id
+                                                                    ? `Edit ${editing.label}`
+                                                                    : 'Edit attribute'
                                                             }
+                                                            description={
+                                                                editing?.id === definition.id
+                                                                    ? `${editing.entity} · ${editing.key}`
+                                                                    : undefined
+                                                            }
+                                                            plainTrigger
+                                                            triggerClassName="text-brand"
+                                                            open={editing?.id === definition.id}
+                                                            onOpenChange={(open) => {
+                                                                if (open) {
+                                                                    setEditing(definition);
+                                                                    return;
+                                                                }
+                                                                if (editing?.id === definition.id) {
+                                                                    setEditing(null);
+                                                                }
+                                                            }}
                                                         >
-                                                            Edit
-                                                        </Button>
+                                                            <div className="space-y-4">
+                                                                {editing?.id === definition.id &&
+                                                                editing.fill_rate ? (
+                                                                    <div className="space-y-1 rounded-lg border border-hairline bg-canvas-soft p-3">
+                                                                        <div className="aurora-text-caption flex items-center justify-between text-mute">
+                                                                            <span>Fill rate</span>
+                                                                            <span className="money tabular-nums">
+                                                                                {editing.fill_rate.filled} /{' '}
+                                                                                {editing.fill_rate.total} ·{' '}
+                                                                                {editing.fill_rate.percent}%
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="h-1.5 overflow-hidden rounded-full bg-canvas">
+                                                                            <div
+                                                                                className="h-full bg-brand"
+                                                                                style={{
+                                                                                    width: `${editing.fill_rate.percent}%`,
+                                                                                }}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                ) : null}
+                                                                {editing?.id === definition.id ? (
+                                                                    <>
+                                                                        <DefinitionForm
+                                                                            key={editing.id}
+                                                                            definition={editing}
+                                                                            onDone={() => setEditing(null)}
+                                                                        />
+                                                                        <Form
+                                                                            action={`/settings/attributes/${editing.id}`}
+                                                                            method="delete"
+                                                                        >
+                                                                            {({ processing }) => (
+                                                                                <Button
+                                                                                    type="submit"
+                                                                                    variant="secondary"
+                                                                                    disabled={processing}
+                                                                                >
+                                                                                    Delete
+                                                                                </Button>
+                                                                            )}
+                                                                        </Form>
+                                                                    </>
+                                                                ) : null}
+                                                            </div>
+                                                        </MorphingForm>
                                                     </div>
                                                 </HairlineTd>
                                             </HairlineRow>
@@ -349,76 +415,6 @@ export default function AttributeSettings({
                     ))
                 )}
             </div>
-
-            <CreateDrawer
-                open={createOpen}
-                onOpenChange={setCreateOpen}
-                title="New attribute"
-                description="Values are stored per record and shown on the contact or deal hub."
-                showFormLink={false}
-            >
-                <DefinitionForm onDone={() => setCreateOpen(false)} />
-            </CreateDrawer>
-
-            <CreateDrawer
-                open={Boolean(editing)}
-                onOpenChange={(open) => {
-                    if (!open) {
-                        setEditing(null);
-                    }
-                }}
-                title={editing ? `Edit ${editing.label}` : 'Edit attribute'}
-                description={
-                    editing ? `${editing.entity} · ${editing.key}` : undefined
-                }
-                showFormLink={false}
-            >
-                {editing ? (
-                    <div className="space-y-4">
-                        {editing.fill_rate ? (
-                            <div className="space-y-1 rounded-lg border border-hairline bg-canvas-soft p-3">
-                                <div className="aurora-text-caption flex items-center justify-between text-mute">
-                                    <span>Fill rate</span>
-                                    <span className="money tabular-nums">
-                                        {editing.fill_rate.filled} /{' '}
-                                        {editing.fill_rate.total} ·{' '}
-                                        {editing.fill_rate.percent}%
-                                    </span>
-                                </div>
-                                <div className="h-1.5 overflow-hidden rounded-full bg-canvas">
-                                    <div
-                                        className="h-full bg-brand"
-                                        style={{
-                                            width: `${editing.fill_rate.percent}%`,
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        ) : null}
-
-                        <DefinitionForm
-                            key={editing.id}
-                            definition={editing}
-                            onDone={() => setEditing(null)}
-                        />
-
-                        <Form
-                            action={`/settings/attributes/${editing.id}`}
-                            method="delete"
-                        >
-                            {({ processing }) => (
-                                <Button
-                                    type="submit"
-                                    variant="secondary"
-                                    disabled={processing}
-                                >
-                                    Delete
-                                </Button>
-                            )}
-                        </Form>
-                    </div>
-                ) : null}
-            </CreateDrawer>
         </>
     );
 }

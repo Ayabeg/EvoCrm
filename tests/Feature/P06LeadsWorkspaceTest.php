@@ -123,7 +123,7 @@ it('preserves Lead create capture inbox and refuses invented query bulk and draw
     expect($leads)->toContain('primaryLabel="Create lead"')
         ->and($leads)->toContain('onCreate=')
         ->and($leads)->toContain('hasActiveListFilters(activeFilters)')
-        ->and($leads)->toContain('CreateDrawer')
+        ->and($leads)->toContain('MorphingForm')
         ->and($leads)->toContain('/crm/leads/captures')
         ->and($leads)->toContain('Capture inbox')
         ->and($leads)->not->toContain('searchParams.set')

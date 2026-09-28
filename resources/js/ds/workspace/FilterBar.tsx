@@ -110,6 +110,7 @@ export function FilterBar({
         navigateListQuery(basePath, current, { filters: { [key]: value } }, object);
     };
 
+    const desk = object === 'quote';
     const columnChooser =
         columnDefs && columns ? (
             <ColumnChooser
@@ -143,7 +144,10 @@ export function FilterBar({
                 return (
                     <label
                         key={field.id}
-                        className="inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink"
+                        className={cn(
+                            'inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-hairline bg-canvas text-[13px] text-ink',
+                            desk ? 'h-8 px-2' : 'h-9 px-3',
+                        )}
                     >
                         <span className="text-mute">{t(field.label)}</span>
                         <select
@@ -172,19 +176,19 @@ export function FilterBar({
             <Button
                 type="button"
                 variant="outline"
-                className="h-9 shrink-0"
+                className={desk ? 'h-8 shrink-0 px-2 text-[13px]' : 'h-9 shrink-0'}
                 aria-label={t('Advanced')}
                 onClick={onAdvanced}
             >
                 <Funnel className="size-4" weight="bold" />
-                {t('Advanced')}
+                {desk ? t('Filters') : t('Advanced')}
             </Button>
         </>
     );
 
     return (
         <div className={cn('border-b border-hairline bg-canvas', PAGE_OVERFLOW_CLASS)} data-crm="list-toolbar" data-ds="filter-bar">
-            <div className="flex min-w-0 flex-wrap items-center gap-2 px-4 py-3 md:px-8">
+            <div className={cn('flex min-w-0 flex-wrap items-center gap-2', desk ? 'px-4 py-1.5 md:px-6' : 'px-4 py-3 md:px-8')}>
                 {extra}
                 {queryEnabled ? (
                     <form
@@ -208,14 +212,14 @@ export function FilterBar({
                             name="q"
                             defaultValue={searchKey}
                             placeholder={searchPlaceholder}
-                            className="h-9 pl-9"
+                            className={desk ? 'h-8 pl-9 text-[13px]' : 'h-9 pl-9'}
                             aria-label={searchLabel}
                         />
                     </form>
                 ) : null}
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <div className={cn('flex min-w-0 flex-wrap items-center gap-2', desk && 'contents')}>
                     {quickFilters}
-                    {columnChooser}
+                    {desk ? <div className="ml-auto flex shrink-0">{columnChooser}</div> : columnChooser}
                 </div>
             </div>
             {queryEnabled && chips.length > 0 ? (

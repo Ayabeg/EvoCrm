@@ -1,7 +1,10 @@
 import { Link } from '@inertiajs/react';
 import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
-import type { DashboardAttention } from '@/lib/dashboard-operating-home';
+import {
+    HOME_ATTENTION_VISIBLE,
+    type DashboardAttention,
+} from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
 import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
@@ -34,12 +37,12 @@ export function DashboardAttention({
         );
     }
 
+    const visible = attention.items.slice(0, HOME_ATTENTION_VISIBLE);
+
     return (
         <ul className="divide-y divide-hairline">
-            {attention.items.map((item) => {
-                const overdue = item.primary.severity === 'critical';
+            {visible.map((item) => {
                 const reason = item.primary.reason?.trim() ?? '';
-                const showReason = overdue && reason !== '';
 
                 return (
                     <li key={item.id}>
@@ -63,15 +66,16 @@ export function DashboardAttention({
                                 >
                                     {item.title}
                                 </a>
-                                {showReason ? (
-                                    <span className="mt-0.5 block truncate text-[13px] leading-[18px] text-ink/80">
-                                        {reason}
+                                <span className="mt-0.5 block truncate text-[13px] leading-[18px]">
+                                    {reason !== '' ? (
+                                        <span className="text-ink/80">{reason}</span>
+                                    ) : null}
+                                    {reason !== '' ? (
+                                        <span className="text-mute"> · </span>
+                                    ) : null}
+                                    <span className={stateClass(item.primary.severity)}>
+                                        {item.primary.label}
                                     </span>
-                                ) : null}
-                                <span
-                                    className={`mt-0.5 block truncate text-[12px] leading-4 ${stateClass(item.primary.severity)}`}
-                                >
-                                    {item.primary.label}
                                 </span>
                             </span>
                         </button>

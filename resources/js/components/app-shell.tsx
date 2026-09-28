@@ -23,6 +23,7 @@ export function AppShell({ children, variant = 'sidebar' }: Props) {
         <SidebarProvider
             defaultOpen={isOpen}
             className="min-h-[100dvh] bg-[var(--aurora-shell-bg)] font-sans"
+            style={{ ['--sidebar-width' as string]: '248px' }}
         >
             {children}
         </SidebarProvider>

@@ -1,7 +1,7 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmObjectHeader } from '@/components/crm/crm-object-header';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
 import SegmentFilterForm from '@/components/crm/segment-filter-form';
@@ -71,11 +71,60 @@ export default function SegmentsIndex({
                 <CrmObjectHeader
                     title="Segments"
                     description="Saved views for contacts and deals."
-                    primaryLabel="New segment"
-                    onPrimary={() => {
-                        setDraftFilters({});
-                        setCreateOpen(true);
-                    }}
+                    primarySlot={
+                        <MorphingForm
+                            label="New segment"
+                            title="New segment"
+                            open={createOpen}
+                            onOpenChange={(open) => {
+                                if (open) {
+                                    setDraftFilters({});
+                                }
+                                setCreateOpen(open);
+                            }}
+                        >
+                            <Form
+                                action="/crm/segments"
+                                method="post"
+                                className="space-y-3"
+                                onSuccess={() => setCreateOpen(false)}
+                            >
+                                {({ processing }) => (
+                                    <>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">Name</Label>
+                                            <Input name="name" required placeholder="Name" />
+                                        </div>
+                                        <select
+                                            name="entity"
+                                            value={createEntity}
+                                            onChange={(event) =>
+                                                setCreateEntity(event.target.value as 'contact' | 'deal')
+                                            }
+                                            className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                                        >
+                                            <option value="contact">Contact</option>
+                                            <option value="deal">Deal</option>
+                                        </select>
+                                        <input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)} />
+                                        <SegmentFilterForm
+                                            entity={createEntity}
+                                            filters={draftFilters}
+                                            onChange={setDraftFilters}
+                                            members={members}
+                                            cities={cities}
+                                            wilayas={wilayas}
+                                            stages={stages}
+                                            filterFields={fields(createEntity)}
+                                        />
+                                        <div className="flex justify-end">
+                                            <Button disabled={processing}>Save</Button>
+                                        </div>
+                                    </>
+                                )}
+                            </Form>
+                        </MorphingForm>
+                    }
                 />
                 <div className="flex flex-wrap items-center gap-2 border-b border-hairline bg-canvas px-4 py-2 sm:px-6">
                     {(['all', 'contact', 'deal'] as const).map((value) => (
@@ -149,7 +198,50 @@ export default function SegmentsIndex({
                                             <td className="px-4 py-1.5 sm:pr-6">
                                                 <div className="flex flex-wrap items-center gap-2">
                                                     <Link href={`/crm/segments/${segment.id}`} className="text-[12px] text-mute hover:text-ink">History</Link>
-                                                    <button type="button" className="text-[12px] text-mute hover:text-ink" onClick={() => { setEditSegment(segment); setDraftFilters(segment.filters ?? {}); }}>Edit</button>
+                                                    <MorphingForm
+                                                        label="Edit"
+                                                        title="Edit segment"
+                                                        plainTrigger
+                                                        open={editSegment?.id === segment.id}
+                                                        onOpenChange={(open) => {
+                                                            if (open) {
+                                                                setEditSegment(segment);
+                                                                setDraftFilters(segment.filters ?? {});
+                                                                return;
+                                                            }
+                                                            if (editSegment?.id === segment.id) {
+                                                                setEditSegment(null);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Form
+                                                            action={`/crm/segments/${segment.id}`}
+                                                            method="put"
+                                                            className="space-y-3"
+                                                            onSuccess={() => setEditSegment(null)}
+                                                        >
+                                                            {({ processing }) => (
+                                                                <>
+                                                                    <Input name="name" defaultValue={segment.name} required />
+                                                                    <input type="hidden" name="entity" value={segment.entity} />
+                                                                    <input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)} />
+                                                                    <SegmentFilterForm
+                                                                        entity={segment.entity as 'contact' | 'deal'}
+                                                                        filters={draftFilters}
+                                                                        onChange={setDraftFilters}
+                                                                        members={members}
+                                                                        cities={cities}
+                                                                        wilayas={wilayas}
+                                                                        stages={stages}
+                                                                        filterFields={fields(segment.entity as 'contact' | 'deal')}
+                                                                    />
+                                                                    <div className="flex justify-end">
+                                                                        <Button disabled={processing}>Update</Button>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </Form>
+                                                    </MorphingForm>
                                                     {segment.entity === 'contact' && canSyncMeta ? (
                                                         <Form action={`/crm/segments/${segment.id}/sync-meta`} method="post" className="inline-flex items-center gap-1">
                                                             <Input name="audience_id" placeholder="Audience ID" className="h-7 w-28" />
@@ -168,46 +260,6 @@ export default function SegmentsIndex({
                     <CrmListFooter count={filtered.length} noun="segments" />
                 </div>
             </div>
-
-            <CreateDrawer open={createOpen} onOpenChange={setCreateOpen} title="New segment">
-                <Form action="/crm/segments" method="post" className="space-y-3" onSuccess={() => setCreateOpen(false)}>
-                    {({ processing }) => (
-                        <>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">Name</Label>
-                                <Input name="name" required placeholder="Name" />
-                            </div>
-                            <select name="entity" value={createEntity} onChange={(event) => setCreateEntity(event.target.value as 'contact' | 'deal')} className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]">
-                                <option value="contact">Contact</option>
-                                <option value="deal">Deal</option>
-                            </select>
-                            <input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)} />
-                            <SegmentFilterForm entity={createEntity} filters={draftFilters} onChange={setDraftFilters} members={members} cities={cities} wilayas={wilayas} stages={stages} filterFields={fields(createEntity)} />
-                            <div className="flex justify-end">
-                                <Button disabled={processing}>Save</Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </CreateDrawer>
-
-            <CreateDrawer open={editSegment !== null} onOpenChange={(open) => { if (!open) setEditSegment(null); }} title="Edit segment">
-                {editSegment ? (
-                    <Form action={`/crm/segments/${editSegment.id}`} method="put" className="space-y-3" onSuccess={() => setEditSegment(null)}>
-                        {({ processing }) => (
-                            <>
-                                <Input name="name" defaultValue={editSegment.name} required />
-                                <input type="hidden" name="entity" value={editSegment.entity} />
-                                <input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)} />
-                                <SegmentFilterForm entity={editSegment.entity as 'contact' | 'deal'} filters={draftFilters} onChange={setDraftFilters} members={members} cities={cities} wilayas={wilayas} stages={stages} filterFields={fields(editSegment.entity as 'contact' | 'deal')} />
-                                <div className="flex justify-end">
-                                    <Button disabled={processing}>Update</Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                ) : null}
-            </CreateDrawer>
         </CrmShell>
     );
 }

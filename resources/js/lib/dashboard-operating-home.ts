@@ -6,18 +6,37 @@ import type { DealAttentionQueueItem } from '@/lib/deal-attention';
 
 export const DASHBOARD_TIMEZONE = 'Africa/Algiers';
 
+/** Strongest Home exceptions. Full queue stays behind View all. P17 payload unchanged. */
+export const HOME_ATTENTION_VISIBLE = 4;
+
 /** 2×2 through 768; 4-col from lg (1024). Typographic columns, not spreadsheet cells. */
 export const HOME_KPI_STRIP_TRACK_CLASS =
-    'grid grid-cols-2 gap-x-8 gap-y-5 lg:grid-cols-4 lg:gap-y-0';
+    'grid grid-cols-2 gap-3 lg:grid-cols-4';
 
-/** Compact values may wrap. V02 keeps Home snapshot at 20/26 — not Brand Book text-kpi. */
+/** Compact values may wrap. Approved home snapshot is 25/30. */
 export const HOME_KPI_VALUE_CLASS =
-    'money min-w-0 max-w-full text-[20px] leading-[26px] font-semibold tracking-tight break-words text-ink';
+    'money min-w-0 max-w-full text-[25px] leading-[30px] font-semibold tracking-tight break-words text-ink';
 
 export type DashboardContext = {
     name: string;
     date: string;
     timezone: string;
+};
+
+export type DashboardTrendPoint = {
+    label: string;
+    won_cents: number;
+    created_cents: number;
+};
+
+export type DashboardRecentDeal = {
+    id: number;
+    title: string;
+    company: string | null;
+    stage: string | null;
+    amount_cents: number;
+    created_at: string | null;
+    href: string;
 };
 
 export type DashboardMetrics = {
@@ -28,6 +47,7 @@ export type DashboardMetrics = {
         timezone: string;
     };
     kpis: KpiTile[];
+    trend?: DashboardTrendPoint[];
 };
 
 export type DashboardAttention = {

@@ -8,10 +8,9 @@ it('§9.1 home is the operating composition not a guided feed', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
 
     expect($home)->toContain('data-home="workspace"')
-        ->and($home)->toContain('DashboardAttention')
-        ->and($home)->toContain('DashboardWork')
+        ->and($home)->toContain('HomeKpiStrip')
         ->and($home)->toContain('DashboardPipeline')
-        ->and($home)->toContain('DashboardRecent')
+        ->and($home)->toContain('Recent deals')
         ->and($home)->not->toContain('GuidedActions')
         ->and($home)->not->toContain('ActivityFeed')
         ->and($home)->not->toContain('Breeze')

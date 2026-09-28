@@ -532,7 +532,7 @@ export default function ListViewTable({
                     )}
                 >
                     <thead>
-                        <tr className="h-12 border-b border-hairline bg-canvas-soft text-left">
+                        <tr className={cn('sticky top-0 z-10 border-b border-hairline bg-canvas-soft text-left', quoteTable ? 'h-9' : 'h-9')}>
                             {selectable ? (
                                 <th className="w-10 px-4 md:px-8">
                                     <input
@@ -559,7 +559,9 @@ export default function ListViewTable({
                                 <th
                                     key={column.id}
                                     className={cn(
-                                        'h-12 px-4 text-left font-medium text-mute md:px-8',
+                                        quoteTable
+                                            ? 'h-9 px-3 text-left text-[12px] font-medium text-mute'
+                                            : 'h-9 px-4 text-left font-medium text-mute md:px-8',
                                         identityRow
                                             ? 'text-[13px] leading-[18px]'
                                             : 'text-[11px]',
@@ -593,16 +595,21 @@ export default function ListViewTable({
                                 }
                                 data-row-peek={onRowPeek ? 'true' : undefined}
                                 className={cn(
-                                    identityRow
+                                    quoteTable
                                         ? cn(
-                                              'min-h-12 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
+                                              'h-10 cursor-pointer border-b border-hairline hover:bg-[#f3f1ec]',
                                               MOTION_HOVER_CLASS,
                                           )
-                                        : cn(
-                                              'h-12 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
-                                              MOTION_HOVER_CLASS,
-                                          ),
-                                    selected && 'bg-canvas-soft',
+                                        : identityRow
+                                          ? cn(
+                                                'min-h-9 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
+                                                MOTION_HOVER_CLASS,
+                                            )
+                                          : cn(
+                                                'h-9 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
+                                                MOTION_HOVER_CLASS,
+                                            ),
+                                    selected && 'bg-[var(--evo-teal-soft)]',
                                     onRowPeek &&
                                         'focus-visible:bg-canvas-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--color-accent)]',
                                 )}
@@ -647,7 +654,7 @@ export default function ListViewTable({
                                 }}
                             >
                                 {selectable ? (
-                                    <td className={cn(identityRow ? 'min-h-12 py-2' : 'h-12', 'px-4 md:px-8')}>
+                                    <td className={cn(identityRow ? 'h-9 py-0' : 'h-9', 'px-4 md:px-8')}>
                                         <input
                                             type="checkbox"
                                             checked={selected}
@@ -706,13 +713,19 @@ export default function ListViewTable({
                                         <td
                                             key={column.id}
                                             className={cn(
-                                                identityRow ? 'min-h-12 py-2' : 'h-12',
-                                                'px-4 text-left md:px-8',
+                                                quoteTable
+                                                    ? 'h-10 px-3 text-left'
+                                                    : identityRow
+                                                      ? 'h-9 overflow-hidden py-0 px-4 text-left md:px-8'
+                                                      : 'h-9 px-4 text-left md:px-8',
                                                 column.id === primaryId
                                                     ? 'font-medium text-ink'
                                                     : 'text-mute',
                                                 column.id === 'amount' &&
                                                     'money tabular-nums text-ink',
+                                                quoteTable &&
+                                                    column.id === 'amount' &&
+                                                    'text-right',
                                                 fixedTable &&
                                                     column.id !== 'amount' &&
                                                     'overflow-hidden',

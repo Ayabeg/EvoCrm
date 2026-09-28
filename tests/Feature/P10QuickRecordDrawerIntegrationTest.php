@@ -157,7 +157,7 @@ it('preserves each object list contract while wiring peek at CrmListShell', func
     $routes = File::get(base_path('routes/web.php'));
 
     expect($contacts)->toContain('selectable: canBulk')
-        ->and($contacts)->toContain('CreateDrawer')
+        ->and($contacts)->toContain('MorphingForm')
         ->and($contacts)->toContain('BulkActionBar')
         ->and($companies)->toContain('selectable: false')
         ->and($companies)->not->toContain('BulkActionBar')

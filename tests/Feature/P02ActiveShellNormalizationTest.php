@@ -21,9 +21,10 @@ it('resolves command and rail Home hrefs to /dashboard not /home', function () {
         ->and($header)->not->toContain('href="/home"');
 });
 
-it('keeps AppLayout on the 64/240 sidebar shell and does not wire the leftover header', function () {
+it('keeps AppLayout on the approved 288px shell and does not wire the leftover header', function () {
     $appLayout = file_get_contents(resource_path('js/layouts/app-layout.tsx'));
     $sidebarLayout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
+    $shell = file_get_contents(resource_path('js/components/shell/evo-shell.tsx'));
     $headerLayout = file_get_contents(resource_path('js/layouts/app/app-header-layout.tsx'));
     $legacyHeader = file_get_contents(resource_path('js/components/app-header.tsx'));
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
@@ -32,7 +33,10 @@ it('keeps AppLayout on the 64/240 sidebar shell and does not wire the leftover h
         ->and($appLayout)->not->toContain("from '@/layouts/app/app-header-layout'")
         ->and($appLayout)->not->toContain("from '@/components/app-header'")
         ->and($sidebarLayout)->toContain('AppSidebarHeader')
-        ->and($sidebarLayout)->toContain('AppSidebar')
+        ->and($sidebarLayout)->toContain('EvoShell')
+        ->and($sidebarLayout)->not->toContain('<AppSidebar />')
+        ->and($sidebarLayout)->not->toContain('<AppSidebar>')
+        ->and($shell)->toContain('evo-rail-slot')
         ->and($headerLayout)->toContain('@deprecated')
         ->and($legacyHeader)->toContain('@deprecated')
         ->and($sidebar)->toContain('const SIDEBAR_WIDTH = "240px"')
@@ -42,14 +46,17 @@ it('keeps AppLayout on the 64/240 sidebar shell and does not wire the leftover h
 
 it('documents one search, one Ask Evo, one create, and one tasks overlay entry', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+    $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
 
-    expect($header)->toContain('data-chrome="search"')
-        ->and($header)->toContain("t('Search EvoCRM…')")
-        ->and($header)->toContain('useCommandPaletteShortcut')
+    expect($rail)->toContain('data-chrome="search"')
+        ->and($rail)->toContain('Search EvoCRM')
+        ->and($rail)->toContain('useCommandPaletteShortcut')
+        ->and($rail)->toContain('/crm/command/search')
         ->and($header)->toContain('data-chrome="ai"')
         ->and($header)->toContain("t('Ask Evo')")
-        ->and($header)->toContain('setPaletteOpen(true)')
+        ->and($header)->toContain('openAskEvo()')
         ->and($header)->not->toContain('AskEvoPanel')
+        ->and($header)->not->toContain('data-chrome="search"')
         ->and($header)->toContain("t('Create')")
         ->and($header)->toContain('/crm/contacts?create=1')
         ->and($header)->toContain('/crm/companies?create=1')

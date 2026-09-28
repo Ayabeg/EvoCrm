@@ -104,7 +104,7 @@ it('locks the quote show page as a split document/properties builder without a V
         ->and($lib)->toContain('input.canUpdate')
         ->and($lib)->toContain('!input.immutable');
 
-    expect($index)->toContain('CreateDrawer')
+    expect($index)->toContain('MorphingForm')
         ->and($index)->toContain('items[0][unit_dzd]')
         ->and($index)->toContain('can.create')
         ->and($index)->toContain('canCreate={can.create}')

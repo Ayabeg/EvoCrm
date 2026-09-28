@@ -118,7 +118,7 @@ export function QuoteIdentityCell({
     const body = (
         <>
             <span
-                className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-[10px] leading-none font-medium text-white"
+                className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[#eceae6] text-[10px] leading-none font-medium text-ink"
                 aria-hidden
             >
                 {initials || '?'}
@@ -162,7 +162,7 @@ export function QuoteAmountCell({ cents }: { cents?: number | null }) {
 
     return (
         <span
-            className="money block min-w-0 max-w-full break-words tabular-nums text-[13px] leading-[18px] text-ink"
+            className="money block min-w-0 max-w-full text-right break-words tabular-nums text-[13px] leading-[18px] text-ink"
             title={label}
         >
             {label}
@@ -223,7 +223,7 @@ export function QuoteStatusCell({
     return (
         <span
             className={cn(
-                'block truncate text-[13px] leading-[18px]',
+                'inline-flex max-w-full items-center gap-1.5 truncate text-[13px] leading-[18px]',
                 tone === 'accepted' && 'font-medium text-ink',
                 tone === 'sent' && 'text-ink',
                 (tone === 'draft' || tone === 'unknown') && 'text-mute',
@@ -231,7 +231,16 @@ export function QuoteStatusCell({
             title={label !== '—' ? label : undefined}
             data-status-tone={tone}
         >
-            {label}
+            {tone === 'accepted' || tone === 'sent' ? (
+                <i
+                    aria-hidden
+                    className={cn(
+                        'size-1.5 shrink-0 rounded-full',
+                        tone === 'accepted' ? 'bg-[#17a85b]' : 'bg-[#5c5a55]',
+                    )}
+                />
+            ) : null}
+            <span className="truncate">{label}</span>
         </span>
     );
 }

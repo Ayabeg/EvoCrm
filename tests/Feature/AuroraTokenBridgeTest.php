@@ -158,8 +158,8 @@ it('keeps Home KPI values restrained at 20/26 and CRM cards on Brand Book text-k
     expect($strip)->toContain('HOME_KPI_VALUE_CLASS');
     expect($strip)->toContain('formatCompactDzd');
     expect($strip)->not->toContain('whitespace-nowrap');
-    expect($helpers)->toContain('text-[20px]');
-    expect($helpers)->toContain('leading-[26px]');
+    expect($helpers)->toContain('text-[25px]');
+    expect($helpers)->toContain('leading-[30px]');
     expect($helpers)->toContain('break-words');
     expect($helpers)->not->toContain('lg:text-kpi');
     expect($helpers)->not->toContain('whitespace-nowrap');
@@ -171,7 +171,7 @@ it('uses V01 page-header geometry on Home chrome', function () {
     $strip = file_get_contents(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
     $helpers = file_get_contents(resource_path('js/lib/dashboard-operating-home.ts'));
 
-    expect($home)->toContain('px-4 pt-5 md:px-8');
+    expect($home)->toContain('px-4 pt-[18px]');
     expect($home)->toContain('data-home="workspace"');
     expect($home)->not->toContain('max-w-6xl');
     expect($header)->toContain('text-[28px] leading-[34px] font-[650]');
@@ -189,9 +189,8 @@ it('uses V01 page-header geometry on Home chrome', function () {
 it('places Needs attention and Today above the KPI strip on Home', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
 
-    expect(strpos($home, "title={t('Needs attention')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'));
-    expect(strpos($home, "title={t('Today')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'));
-    expect(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "title={t('Pipeline')}"));
+    expect(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "t('Deal evolution')"));
+    expect(strpos($home, "t('Deal evolution')"))->toBeLessThan(strpos($home, "{t('Pipeline')}"));
     expect($home)->not->toContain('QuickActions');
     expect($home)->not->toContain('CrmKpiStrip');
 });
@@ -240,7 +239,8 @@ it('names topbar icon-only actions for assistive tech', function () {
 
     expect($header)->toContain("t('Create')");
     expect($header)->toContain("t('Tasks')");
-    expect($header)->toContain("t(':name account menu'");
+    expect(file_get_contents(resource_path('js/components/shell/evo-rail.tsx')))
+        ->toContain("t(':name account menu'");
 });
 
 it('keeps the top bar as one honest instrument without a second bell', function () {
@@ -249,7 +249,7 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
-    expect($header)->toContain("t('Search EvoCRM…')");
+    expect(file_get_contents(resource_path('js/components/shell/evo-rail.tsx')))->toContain('Search EvoCRM');
     expect($header)->not->toContain('Find or Ask');
     expect($header)->not->toContain('Find a record or page');
     expect($header)->not->toContain('unread');

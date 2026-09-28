@@ -105,22 +105,60 @@ export default function ContactShow({
             {loading ? (
                 <SkeletonRecord />
             ) : (
+                <div className="contact-record flex min-h-0 flex-1 flex-col" data-crm="contacts-record">
                 <RecordPageFrame
                     header={
-                        <div
-                            className="flex items-center justify-between gap-3"
-                            data-crm="contacts-record"
-                        >
-                            <RecordBack
-                                href="/crm/contacts"
-                                label="Back to Contacts"
-                            />
-                            <div className="md:hidden">
-                                <AskEvoTrigger
-                                    action={askAction}
-                                    insight={askEvo}
+                        <div className="flex flex-col gap-4 py-1">
+                            <div className="flex items-center justify-end">
+                                <RecordBack
+                                    href="/crm/contacts"
+                                    label="Back to Contacts"
                                 />
+                                <div className="md:hidden">
+                                    <AskEvoTrigger
+                                        action={askAction}
+                                        insight={askEvo}
+                                    />
+                                </div>
                             </div>
+                            <RecordIdentity
+                                title={name}
+                                kind="Contact"
+                                subtitle={company?.name ?? 'No company'}
+                                badge={
+                                    contact.lead_status ? (
+                                        <RecordStatusBadge>
+                                            {contact.lead_status}
+                                        </RecordStatusBadge>
+                                    ) : null
+                                }
+                                meta={
+                                    contactEngagement ? (
+                                        <p className="text-[12px] leading-snug text-[#697080]">
+                                            <span className="font-medium text-[#151820]">
+                                                {contactEngagement.label}
+                                            </span>{' '}
+                                            ({contactEngagement.score}/100)
+                                            <span className="hidden sm:inline">
+                                                {' '}
+                                                · {contactEngagement.reason}
+                                            </span>
+                                        </p>
+                                    ) : null
+                                }
+                                actions={
+                                    <RecordActions
+                                        entityId={contact.id}
+                                        contactId={contact.id}
+                                        companyId={contact.company_id}
+                                        whatsappHref={
+                                            thread
+                                                ? `/conversations?thread=${thread.id}`
+                                                : '/inbox'
+                                        }
+                                    />
+                                }
+                            />
                         </div>
                     }
                 >
@@ -132,50 +170,7 @@ export default function ContactShow({
                         centerClassName="bg-white"
                         rightClassName="bg-white"
                         left={
-                            <div className="space-y-4">
-                                <RecordIdentity
-                                    title={name}
-                                    kind="Contact"
-                                    subtitle={
-                                        <>
-                                            {company?.name ?? 'No company'}
-                                            {contact.owner?.name
-                                                ? ` · ${contact.owner.name}`
-                                                : ''}
-                                        </>
-                                    }
-                                    badge={
-                                        contact.lead_status ? (
-                                            <RecordStatusBadge>
-                                                {contact.lead_status}
-                                            </RecordStatusBadge>
-                                        ) : null
-                                    }
-                                    meta={
-                                        contactEngagement ? (
-                                            <p className="text-[11px] leading-snug text-mute">
-                                                <span className="font-medium text-ink">
-                                                    {contactEngagement.label}
-                                                </span>{' '}
-                                                ({contactEngagement.score}/100)
-                                                <span className="hidden sm:inline">
-                                                    {' '}
-                                                    · {contactEngagement.reason}
-                                                </span>
-                                            </p>
-                                        ) : null
-                                    }
-                                />
-                                <RecordActions
-                                    entityId={contact.id}
-                                    contactId={contact.id}
-                                    companyId={contact.company_id}
-                                    whatsappHref={
-                                        thread
-                                            ? `/conversations?thread=${thread.id}`
-                                            : '/inbox'
-                                    }
-                                />
+                            <div className="space-y-5">
                                 <RecordSection title="About this contact">
                                     <RecordFactList>
                                         <RecordFact
@@ -232,18 +227,6 @@ export default function ContactShow({
                                 insight={askEvo}
                                 contactId={contact.id}
                                 companyId={contact.company_id}
-                                highlights={[
-                                    { label: 'Email', value: contact.email },
-                                    {
-                                        label: 'Phone',
-                                        value: contact.phone_e164,
-                                    },
-                                    { label: 'Company', value: company?.name },
-                                    {
-                                        label: 'Owner',
-                                        value: contact.owner?.name,
-                                    },
-                                ]}
                             />
                         }
                         right={
@@ -312,6 +295,7 @@ export default function ContactShow({
                         }
                     />
                 </RecordPageFrame>
+                </div>
             )}
         </>
     );

@@ -201,7 +201,7 @@ it('preserves existing settings mutations and danger confirmation', function () 
         ->and($security)->toContain('ManageTwoFactor')
         ->and($workspace)->toContain('action="/settings/workspace"')
         ->and($workspace)->toContain('name="simple_mode"')
-        ->and($people)->toContain('CreateDrawer')
+        ->and($people)->toContain('MorphingForm')
         ->and($people)->toContain('data-test="invite-person-button"')
         ->and($deleteUser)->toContain('confirm');
 });

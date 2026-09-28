@@ -1,7 +1,7 @@
 import { Form, Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import PeopleController from '@/actions/App/Http/Controllers/Settings/PeopleController';
-import { CreateDrawer } from '@/components/crm/create-drawer';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import InputError from '@/components/input-error';
 import { SettingsPageHeader } from '@/components/settings/chrome';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
@@ -107,13 +107,92 @@ export default function People({
                     title="Members"
                     description="Who can sign in to this Evotechly workspace, their role, and their first-login email."
                 >
-                    <Button
-                        size="sm"
-                        onClick={() => setInviteOpen(true)}
-                        data-test="invite-person-open"
+                    <MorphingForm
+                        label="Invite"
+                        title="Invite someone"
+                        description="They get a login email from the workspace mailbox with a single-use link to set their password. Invites are admin or member."
+                        open={inviteOpen}
+                        onOpenChange={setInviteOpen}
+                        triggerTestId="invite-person-open"
                     >
-                        Invite
-                    </Button>
+                        {!hasEnabledMailbox ? (
+                            <div className="mb-4 rounded-lg border border-hairline bg-brand/5 p-3">
+                                <p className="aurora-text-body-sm text-ink">
+                                    No enabled mailbox - the person is added as pending,
+                                    but the login email cannot leave until a mailbox is
+                                    enabled under Outbound → Mailboxes. You can resend
+                                    the invite from their row afterwards.
+                                </p>
+                            </div>
+                        ) : null}
+
+                        <Form
+                            {...PeopleController.store.form()}
+                            options={{ preserveScroll: true }}
+                            className="space-y-3"
+                            resetOnSuccess
+                            onSuccess={() => setInviteOpen(false)}
+                        >
+                            {({ processing, errors }) => (
+                                <>
+                                    <div>
+                                        <Label htmlFor="invite-name" className="mb-1 block">
+                                            Name
+                                        </Label>
+                                        <Input
+                                            id="invite-name"
+                                            name="name"
+                                            required
+                                            placeholder="Full name"
+                                        />
+                                        <InputError message={errors.name} />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="invite-email" className="mb-1 block">
+                                            Email
+                                        </Label>
+                                        <Input
+                                            id="invite-email"
+                                            name="email"
+                                            type="email"
+                                            required
+                                            placeholder="teammate@evotechly.com"
+                                        />
+                                        <InputError message={errors.email} />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="invite-role" className="mb-1 block">
+                                            Role
+                                        </Label>
+                                        <NativeSelect
+                                            id="invite-role"
+                                            name="role"
+                                            defaultValue="member"
+                                        >
+                                            <option value="member">Member</option>
+                                            <option value="admin">Admin</option>
+                                        </NativeSelect>
+                                        <InputError message={errors.role} />
+                                    </div>
+                                    <div className="flex justify-end gap-2 pt-2">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={() => setInviteOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            disabled={processing}
+                                            data-test="invite-person-button"
+                                        >
+                                            Send invite
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                        </Form>
+                    </MorphingForm>
                 </SettingsPageHeader>
 
                 <HairlinePanel>
@@ -283,101 +362,6 @@ export default function People({
                     </HairlineTable>
                 </HairlinePanel>
             </div>
-
-            <CreateDrawer
-                open={inviteOpen}
-                onOpenChange={setInviteOpen}
-                title="Invite someone"
-                description="They get a login email from the workspace mailbox with a single-use link to set their password. Invites are admin or member."
-                showFormLink={false}
-            >
-                {!hasEnabledMailbox ? (
-                    <div className="mb-4 rounded-lg border border-hairline bg-brand/5 p-3">
-                        <p className="aurora-text-body-sm text-ink">
-                            No enabled mailbox - the person is added as pending,
-                            but the login email cannot leave until a mailbox is
-                            enabled under Outbound → Mailboxes. You can resend
-                            the invite from their row afterwards.
-                        </p>
-                    </div>
-                ) : null}
-
-                <Form
-                    {...PeopleController.store.form()}
-                    options={{ preserveScroll: true }}
-                    className="space-y-3"
-                    resetOnSuccess
-                    onSuccess={() => setInviteOpen(false)}
-                >
-                    {({ processing, errors }) => (
-                        <>
-                            <div>
-                                <Label
-                                    htmlFor="invite-name"
-                                    className="mb-1 block"
-                                >
-                                    Name
-                                </Label>
-                                <Input
-                                    id="invite-name"
-                                    name="name"
-                                    required
-                                    placeholder="Full name"
-                                />
-                                <InputError message={errors.name} />
-                            </div>
-                            <div>
-                                <Label
-                                    htmlFor="invite-email"
-                                    className="mb-1 block"
-                                >
-                                    Email
-                                </Label>
-                                <Input
-                                    id="invite-email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    placeholder="teammate@evotechly.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-                            <div>
-                                <Label
-                                    htmlFor="invite-role"
-                                    className="mb-1 block"
-                                >
-                                    Role
-                                </Label>
-                                <NativeSelect
-                                    id="invite-role"
-                                    name="role"
-                                    defaultValue="member"
-                                >
-                                    <option value="member">Member</option>
-                                    <option value="admin">Admin</option>
-                                </NativeSelect>
-                                <InputError message={errors.role} />
-                            </div>
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => setInviteOpen(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    disabled={processing}
-                                    data-test="invite-person-button"
-                                >
-                                    Send invite
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </CreateDrawer>
         </>
     );
 }

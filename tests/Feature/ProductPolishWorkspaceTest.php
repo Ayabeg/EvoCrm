@@ -6,7 +6,7 @@ it('composes Home as a full workspace without a card stack or max-width stage', 
     $section = file_get_contents(resource_path('js/components/dashboard/dashboard-section.tsx'));
 
     expect($home)->toContain('data-home="workspace"')
-        ->and($home)->toContain('Needs attention')
+        ->and($home)->toContain('Deal evolution')
         ->and($home)->toContain('HomeKpiStrip')
         ->and($home)->not->toContain('max-w-6xl')
         ->and($home)->not->toContain('surface="panel"')
@@ -15,7 +15,7 @@ it('composes Home as a full workspace without a card stack or max-width stage', 
         ->and($header)->toContain('/crm/deals?create=1')
         ->and($section)->not->toContain('rounded-xl');
 
-    expect(strpos($home, "title={t('Needs attention')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'));
+    expect(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "t('Deal evolution')"));
 });
 
 it('keeps shared KPI and page chrome on hairlines instead of dashboard cards', function () {

@@ -36,6 +36,7 @@ use App\Http\Controllers\Crm\ScheduledReportController;
 use App\Http\Controllers\Crm\SegmentController;
 use App\Http\Controllers\Crm\TicketController;
 use App\Http\Controllers\Crm\WorkflowController;
+use App\Http\Controllers\Desk\AgentsController;
 use App\Http\Controllers\Desk\DeskConnectorController;
 use App\Http\Controllers\Desk\InboxController;
 use App\Http\Controllers\Activation\ActivationDismissalController;
@@ -138,6 +139,13 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
             ->where('connector', '[A-Za-z0-9._-]+')
             ->name('api.agent.connectors.destroy');
     });
+    Route::redirect('/shell', '/dashboard')->name('shell');
+    Route::get('/agents', [AgentsController::class, 'index'])->name('agents.index');
+    Route::get('/agents/chats', [AgentsController::class, 'chats'])->name('agents.chats.index');
+    Route::get('/agents/chats/{chat}', [AgentsController::class, 'chat'])->name('agents.chats.show');
+    Route::get('/agents/bots', [AgentsController::class, 'bots'])->name('agents.bots.index');
+    Route::get('/agents/bots/new', [AgentsController::class, 'newBot'])->name('agents.bots.create');
+    Route::get('/agents/bots/{bot}', [AgentsController::class, 'bot'])->name('agents.bots.show');
     Route::post('/dashboard/activation/dismiss', [ActivationDismissalController::class, 'store'])
         ->name('dashboard.activation.dismiss');
     Route::post('/lead-os/graph', [LeadOsController::class, 'runGraph'])->name('lead-os.graph');

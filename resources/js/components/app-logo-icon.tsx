@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 /**
- * EvoCrm product mark. Artwork fill is #E8530E — never recolor.
+ * EvoCrm product mark. Artwork fill is #d9500f — never recolor.
  */
 export default function AppLogoIcon({
     className,

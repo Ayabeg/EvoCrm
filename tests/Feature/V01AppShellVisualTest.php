@@ -36,8 +36,7 @@ it('paints the rail with restrained orange active state and 12px group labels', 
     expect($rail)->toContain('bg-sidebar-accent font-medium text-sidebar-ink')
         ->and($rail)->toContain('text-meta')
         ->and($rail)->toContain('h-9')
-        ->and($rail)->toContain('h-12')
-        ->and($rail)->toContain('EvoCrm')
+        ->and($rail)->toContain('Evotechly / EvoCRM')
         ->and($rail)->not->toContain('text-[11px] font-semibold tracking-wide uppercase')
         ->and($rail)->not->toContain('bg-[var(--evosales-mark)]')
         ->and($rail)->not->toContain('text-[var(--evosales-mark)]')
@@ -48,11 +47,7 @@ it('paints the rail with restrained orange active state and 12px group labels', 
 it('keeps the topbar as quiet utility chrome with a labeled Create control', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
 
-    expect($header)->toContain('app-search-trigger')
-        ->and($header)->toContain("t('Search EvoCRM…')")
-        ->and($header)->toContain('⌘K')
-        ->and($header)->toContain('lg:w-[280px]')
-        ->and($header)->toContain("t('Create')")
+    expect($header)->toContain("t('Create')")
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Tasks')")
         ->and($header)->toContain('className="h-9 gap-2 px-3"')

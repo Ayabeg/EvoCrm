@@ -45,6 +45,14 @@ const pillClass = (active: boolean) =>
             : 'border-hairline bg-canvas text-mute hover:text-ink',
     );
 
+const quoteViewClass = (active: boolean) =>
+    cn(
+        'inline-flex h-8 shrink-0 items-center border-b-2 px-0.5 text-[13px] whitespace-nowrap',
+        active
+            ? 'border-ink font-medium text-ink'
+            : 'border-transparent text-mute hover:text-ink',
+    );
+
 export function SavedViews({
     object,
     basePath,
@@ -134,9 +142,15 @@ export function SavedViews({
     const overflow = views.slice(3);
     const filterId = String(fields.filter_id ?? '');
 
+    const viewClass = object === 'quote' ? quoteViewClass : pillClass;
+
     return (
-        <div className="px-4 pt-3 md:px-8" data-crm="views" data-ds="saved-views">
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <div
+            className={cn(object === 'quote' ? 'px-4 pt-1 md:px-6' : 'px-4 pt-3 md:px-8')}
+            data-crm="views"
+            data-ds="saved-views"
+        >
+            <div className={cn('flex min-w-0 flex-wrap items-center', object === 'quote' ? 'gap-4' : 'gap-2')}>
                 {builtIn.map((view) => {
                     const active = activeViewId === view.id && !filterId;
 
@@ -145,7 +159,7 @@ export function SavedViews({
                             key={view.id}
                             href={view.href}
                             aria-current={active ? 'page' : undefined}
-                            className={pillClass(active)}
+                            className={viewClass(active)}
                         >
                             {view.label}
                         </Link>
@@ -156,7 +170,7 @@ export function SavedViews({
                         key={view.id}
                         href={savedHref(view.id)}
                         aria-current={String(view.id) === activeViewId ? 'page' : undefined}
-                        className={pillClass(String(view.id) === activeViewId)}
+                        className={viewClass(String(view.id) === activeViewId)}
                         title={
                             view.visibility === 'workspace'
                                 ? 'Shared with workspace'
@@ -174,7 +188,7 @@ export function SavedViews({
                         <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
-                                className={pillClass(
+                                className={viewClass(
                                     overflow.some((view) => String(view.id) === activeViewId),
                                 )}
                             >

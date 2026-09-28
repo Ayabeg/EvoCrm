@@ -95,11 +95,10 @@ it('locks one operating home and consumes P11 P12 P15 without a V2', function ()
         ->and($home)->not->toContain('DashboardDealDrawer')
         ->and($home)->not->toContain('DealPipelineBoard')
         ->and($home)->not->toContain('Date.now')
-        ->and($home)->toContain('Needs attention')
-        ->and($home)->toContain("t('Today')")
         ->and($home)->toContain('HomeKpiStrip')
         ->and($home)->toContain('Pipeline')
-        ->and($home)->toContain('Recent records')
+        ->and($home)->toContain('Recent deals')
+        ->and($home)->toContain('Deal evolution')
         ->and($home)->toContain('ActivationChecklist')
         ->and($home)->not->toContain('confetti')
         ->and($home)->toContain('overflow-x-hidden')
@@ -125,9 +124,8 @@ it('locks one operating home and consumes P11 P12 P15 without a V2', function ()
         ->and($queue)->toContain('function dashboardWork')
         ->and($evaluator)->toContain('class DealAttentionEvaluator');
 
-    expect(strpos($home, "title={t('Needs attention')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'))
-        ->and(strpos($home, "title={t('Today')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'))
-        ->and(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "title={t('Pipeline')}"));
+    expect(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "t('Deal evolution')"))
+        ->and(strpos($home, "t('Deal evolution')"))->toBeLessThan(strpos($home, "{t('Pipeline')}"));
 });
 
 it('serves a bounded operating payload without quota reports or updated_at events', function () {

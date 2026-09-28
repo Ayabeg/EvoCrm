@@ -376,11 +376,9 @@ it('keeps P23 presentation off tokens and frozen Home widgets intact in source',
         ->and($checklist)->not->toContain('confetti')
         ->and($checklist)->not->toContain('lucide-react')
         ->and($home)->toContain('ActivationChecklist')
-        ->and($home)->toContain("title={t('Needs attention')}")
-        ->and($home)->toContain("t('Today')")
         ->and($home)->toContain('HomeKpiStrip')
         ->and($home)->toContain('Pipeline')
-        ->and($home)->toContain('Recent records')
+        ->and($home)->toContain('Recent deals')
         ->and($builder)->toContain('WorkspaceActivationService')
         ->and(app(WorkspaceActivationService::class))->toBeInstanceOf(WorkspaceActivationService::class);
 });

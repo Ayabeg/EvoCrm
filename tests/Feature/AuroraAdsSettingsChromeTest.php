@@ -10,12 +10,12 @@ it('moves People, attribute, and workflow create flows onto overlay drawers', fu
     $attributes = file_get_contents(resource_path('js/pages/settings/attributes.tsx'));
     $workflows = file_get_contents(resource_path('js/pages/crm/workflows/index.tsx'));
 
-    expect($people)->toContain('CreateDrawer')
+    expect($people)->toContain('MorphingForm')
         ->and($people)->toContain('data-test="invite-person-button"')
         ->and($people)->toContain('border-hairline')
         ->and($people)->not->toContain('--aurora-');
 
-    expect($attributes)->toContain('CreateDrawer')
+    expect($attributes)->toContain('MorphingForm')
         ->and($attributes)->toContain('border-hairline')
         ->and($attributes)->not->toContain('--aurora-');
 

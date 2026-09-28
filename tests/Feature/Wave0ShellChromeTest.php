@@ -31,32 +31,30 @@ it('locks the P02 semantic palette: canvas, surface, accent primaries', function
         ->and($bridge)->not->toContain('#d9500f');
 });
 
-it('ships a grouped 64/240 paper rail in the EvoCrm triad', function () {
+it('ships an app-aware 64/240 paper rail in the EvoCrm triad', function () {
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
     expect($rail)->toContain("from '@phosphor-icons/react'")
         ->and($rail)->toContain("label: 'Home'")
-        ->and($rail)->toContain("label: 'CRM'")
+        ->and($rail)->toContain("label: 'Vendre'")
+        ->and($rail)->toContain("label: 'Leads'")
         ->and($rail)->toContain("label: 'Contacts'")
         ->and($rail)->toContain("label: 'Companies'")
         ->and($rail)->toContain("label: 'Deals'")
-        ->and($rail)->toContain("label: 'Pipeline'")
-        ->and($rail)->toContain("href: '/crm/deals/board'")
-        ->and($rail)->toContain("label: 'Communication'")
+        ->and($rail)->toContain("activePaths: ['/crm/deals/board']")
         ->and($rail)->toContain("label: 'Inbox'")
         ->and($rail)->toContain("label: 'Activities'")
         ->and($rail)->toContain("href: '/crm/activities'")
-        ->and($rail)->toContain("label: 'Sales'")
         ->and($rail)->toContain("label: 'Quotes'")
-        ->and($rail)->toContain("label: 'Automation'")
         ->and($rail)->toContain("label: 'Workflows'")
         ->and($rail)->toContain("href: '/crm/workflows'")
-        ->and($rail)->toContain("'/automation'")
+        ->and($rail)->toContain("label: 'Lead captures'")
         ->and($rail)->toContain("label: 'Settings'")
         ->and($rail)->toContain('useSimpleMode')
         ->and($rail)->toContain('bg-sidebar-accent')
         ->and($rail)->toContain('text-[13px]')
         ->and($rail)->toContain('h-9')
+        ->and($rail)->not->toContain("label: 'Pipeline'")
         ->and($rail)->not->toContain('lucide-react')
         ->and($rail)->not->toContain('EvoSales')
         ->and($rail)->not->toContain('#0176D3')
@@ -64,13 +62,15 @@ it('ships a grouped 64/240 paper rail in the EvoCrm triad', function () {
         ->and($rail)->not->toContain('#000000');
 });
 
-it('places Search EvoCRM on the top bar with Ask Evo, Create, Tasks, and Profile', function () {
+it('places Search EvoCRM on the shell with Ask Evo, Create, Tasks, and Profile', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+    $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
 
     expect($header)->toContain('AppLogoIcon')
-        ->and($header)->toContain("t('Search EvoCRM…')")
-        ->and($header)->toContain('⌘K')
-        ->and($header)->toContain('useCommandPaletteShortcut')
+        ->and($rail)->toContain('Search EvoCRM')
+        ->and($rail)->toContain('/crm/command/search')
+        ->and($rail)->toContain('useCommandPaletteShortcut')
+        ->and($rail)->toContain('account menu')
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Tasks')")
         ->and($header)->toContain("t('Create')")
@@ -113,11 +113,10 @@ it('lands Home as a CRM widget workspace, not a blank stub', function () {
     $home = file_get_contents(resource_path('js/pages/home.tsx'));
 
     expect($home)->toContain('data-home="workspace"')
-        ->and($home)->toContain('HomeWidget')
+        ->and($home)->toContain('HomeKpiStrip')
         ->and($home)->toContain('Pipeline')
-        ->and($home)->toContain('Needs attention')
-        ->and($home)->toContain('Recent records')
-        ->and($home)->toContain('HomeWidgetEmpty')
+        ->and($home)->toContain('Recent deals')
+        ->and($home)->toContain('Deal evolution')
         ->and($home)->not->toContain('EvoSales')
         ->and($home)->not->toContain('Breeze')
         ->and($home)->not->toContain('#0176D3');

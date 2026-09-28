@@ -22,11 +22,12 @@ export function StagePills({
     }
 
     return (
-        <div className="flex flex-wrap gap-1.5 px-4 pb-2 md:px-8">
+        <div className="flex flex-wrap gap-1.5 px-4 pb-2 md:px-8" data-crm="stage-pills">
             {stages.map((stage) => (
                 <Link
                     key={stage.id}
                     href={hrefFor(stage.slug)}
+                    aria-current={activeSlug === stage.slug ? 'page' : undefined}
                     className={cn(
                         'inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px]',
                         activeSlug === stage.slug

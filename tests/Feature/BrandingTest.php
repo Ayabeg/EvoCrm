@@ -1,23 +1,23 @@
 <?php
 
-it('ships the EvoCrm mark with artwork fill #E8530E', function () {
+it('ships the EvoCrm mark with artwork fill #d9500f', function () {
     $mark = public_path('brand/evocrm/logo.svg');
 
     expect(file_exists($mark))->toBeTrue();
-    expect(file_get_contents($mark))->toContain('#E8530E');
+    expect(file_get_contents($mark))->toContain('#d9500f');
     expect(file_get_contents($mark))->not->toContain('fill="currentColor"');
     expect(file_get_contents($mark))->not->toContain('xmp');
     expect(file_get_contents($mark))->not->toContain('#EC6025');
-    expect(file_get_contents($mark))->not->toContain('#d9500f');
+    expect(file_get_contents($mark))->not->toContain('#E8530E');
 });
 
 it('uses the EvoCrm mark as the favicon', function () {
     $favicon = public_path('favicon.svg');
 
     expect(file_exists($favicon))->toBeTrue();
-    expect(file_get_contents($favicon))->toContain('#E8530E');
+    expect(file_get_contents($favicon))->toContain('#d9500f');
     expect(file_get_contents($favicon))->not->toContain('#EC6025');
-    expect(file_get_contents($favicon))->not->toContain('#d9500f');
+    expect(file_get_contents($favicon))->not->toContain('#E8530E');
 });
 
 it('renders login with the EvoCrm lockup', function () {

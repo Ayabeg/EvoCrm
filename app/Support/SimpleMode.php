@@ -7,17 +7,16 @@ use Illuminate\Http\Request;
 
 class SimpleMode
 {
-    /**
-     * Soft-launch rail. One deals surface — list, not a second kanban.
-     *
-     * @var list<array{id: string, label: string, href: string}>
-     */
+    /** @var list<array{id: string, label: string, href: string}> */
     public const SIMPLE_NAV = [
         ['id' => 'home', 'label' => 'Home', 'href' => '/dashboard'],
-        ['id' => 'contacts', 'label' => 'Contacts', 'href' => '/crm/contacts'],
-        ['id' => 'deals', 'label' => 'Deals', 'href' => '/crm/deals'],
         ['id' => 'inbox', 'label' => 'Inbox', 'href' => '/inbox'],
+        ['id' => 'leads', 'label' => 'Leads', 'href' => '/crm/leads'],
+        ['id' => 'contacts', 'label' => 'Contacts', 'href' => '/crm/contacts'],
+        ['id' => 'companies', 'label' => 'Companies', 'href' => '/crm/companies'],
+        ['id' => 'deals', 'label' => 'Deals', 'href' => '/crm/deals'],
         ['id' => 'quotes', 'label' => 'Quotes', 'href' => '/crm/quotes'],
+        ['id' => 'activities', 'label' => 'Activities', 'href' => '/crm/activities'],
     ];
 
     /**
@@ -25,14 +24,14 @@ class SimpleMode
      */
     public const FULL_NAV = [
         ['id' => 'home', 'label' => 'Home', 'href' => '/dashboard'],
+        ['id' => 'inbox', 'label' => 'Inbox', 'href' => '/inbox'],
+        ['id' => 'leads', 'label' => 'Leads', 'href' => '/crm/leads'],
         ['id' => 'contacts', 'label' => 'Contacts', 'href' => '/crm/contacts'],
         ['id' => 'companies', 'label' => 'Companies', 'href' => '/crm/companies'],
         ['id' => 'deals', 'label' => 'Deals', 'href' => '/crm/deals'],
-        ['id' => 'leads', 'label' => 'Leads', 'href' => '/crm/leads'],
-        ['id' => 'pipelines', 'label' => 'Pipeline', 'href' => '/crm/deals/board'],
-        ['id' => 'tickets', 'label' => 'Tickets', 'href' => '/crm/tickets'],
-        ['id' => 'inbox', 'label' => 'Inbox', 'href' => '/inbox'],
         ['id' => 'quotes', 'label' => 'Quotes', 'href' => '/crm/quotes'],
+        ['id' => 'activities', 'label' => 'Activities', 'href' => '/crm/activities'],
+        ['id' => 'tickets', 'label' => 'Tickets', 'href' => '/crm/tickets'],
         ['id' => 'ads', 'label' => 'Ads', 'href' => '/ads'],
         ['id' => 'outbound-warmup', 'label' => 'Warmup', 'href' => '/outbound/warmup'],
         ['id' => 'report-builder', 'label' => 'Report builder', 'href' => '/crm/report-builder'],

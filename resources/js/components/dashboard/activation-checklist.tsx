@@ -21,23 +21,36 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
 
     return (
         <section
-            className="home-module mb-6 overflow-hidden px-5 py-3 md:px-6"
+            className={cn(
+                'home-module mb-4 overflow-hidden px-5 md:px-6',
+                activated ? 'flex h-14 items-center' : 'py-3',
+            )}
             aria-labelledby="activation-title"
             data-activation="checklist"
         >
-            <header className="flex flex-wrap items-start justify-between gap-2 px-0 py-1">
+            <header
+                className={cn(
+                    'flex w-full items-center justify-between gap-3',
+                    !activated && 'flex-wrap items-start py-1',
+                )}
+            >
                 <div className="min-w-0">
                     <h2
                         id="activation-title"
-                        className="text-[15px] leading-[22px] font-semibold tracking-tight text-ink"
+                        className={cn(
+                            'tracking-tight text-ink',
+                            activated
+                                ? 'text-[13px] leading-[18px] font-medium'
+                                : 'text-[15px] leading-[22px] font-semibold',
+                        )}
                     >
                         {activated ? t('Workspace ready') : t('Get started')}
                     </h2>
-                    <p className="mt-0.5 text-[12px] leading-4 text-mute">
-                        {activated
-                            ? t('Core sales setup is in place.')
-                            : t('Finish the first sales loop in this workspace.')}
-                    </p>
+                    {activated ? null : (
+                        <p className="mt-0.5 text-[12px] leading-4 text-mute">
+                            {t('Finish the first sales loop in this workspace.')}
+                        </p>
+                    )}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                     <p className="text-[12px] leading-4 tabular-nums text-mute" aria-hidden>
@@ -82,7 +95,7 @@ export function ActivationChecklist({ activation }: { activation: ActivationStat
             </div>
             )}
 
-            {collapsed ? null : (
+            {activated || collapsed ? null : (
                 <ol className="divide-y divide-hairline border-t border-hairline">
                     {activation.steps.map((step) => (
                         <ActivationStepRow

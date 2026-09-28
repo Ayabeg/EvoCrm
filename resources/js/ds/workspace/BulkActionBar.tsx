@@ -68,7 +68,7 @@ export function BulkActionBar({
     return (
         <div
             className={cn(
-                'sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-hairline bg-white px-4 py-2 md:px-8',
+                'fixed bottom-4 left-1/2 z-30 flex w-[min(100%-2rem,720px)] -translate-x-1/2 flex-wrap items-center gap-2 rounded-[12px] border border-hairline bg-surface px-4 py-2 shadow-[var(--evo-shadow-floating)] md:px-8',
                 PAGE_OVERFLOW_CLASS,
             )}
             data-crm="bulk-actions"

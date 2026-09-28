@@ -1,0 +1,278 @@
+{
+    "http": 200,
+    "component": "home",
+    "url": "/dashboard",
+    "props": {
+        "errors": {
+            "_list": 0,
+            "_item": null
+        },
+        "name": "EvoCrm · Evotechly",
+        "locale": "fr",
+        "translations": {
+            "_omitted": "chrome translations omitted"
+        },
+        "auth": {
+            "user": {
+                "id": 1,
+                "name": "Evotechly Owner",
+                "email": "owner@evosales.local",
+                "email_verified_at": "2026-09-20T21:48:07.000000Z",
+                "created_at": "2026-09-20T21:48:08.000000Z",
+                "updated_at": "2026-09-20T23:28:04.000000Z",
+                "two_factor_confirmed_at": null,
+                "workspace_id": 1,
+                "role": "owner",
+                "last_login_at": "2026-09-20T23:28:04.000000Z",
+                "permissions": null,
+                "workspace": {
+                    "id": 1,
+                    "name": "Evotechly",
+                    "slug": "evotechly-vfsqv",
+                    "timezone": "Africa/Algiers",
+                    "country_code": "DZ",
+                    "default_dial_code": "213",
+                    "evolution_last_webhook_at": null,
+                    "evolution_last_event": null,
+                    "created_at": "2026-09-20T21:48:07.000000Z",
+                    "updated_at": "2026-09-20T21:48:07.000000Z",
+                    "inbox_url": "https://desk.evotechly.com",
+                    "lead_score_settings": null,
+                    "monthly_quota_cents": null,
+                    "meeting_wa_templates": null,
+                    "simple_mode": true
+                }
+            },
+            "capabilities": {
+                "_list": 16,
+                "_item": "crm.view"
+            }
+        },
+        "workspace": {
+            "id": 1,
+            "name": "Evotechly",
+            "slug": "evotechly-vfsqv",
+            "timezone": "Africa/Algiers",
+            "country_code": "DZ",
+            "default_dial_code": "213",
+            "evolution_last_webhook_at": null,
+            "evolution_last_event": null,
+            "created_at": "2026-09-20T21:48:07.000000Z",
+            "updated_at": "2026-09-20T21:48:07.000000Z",
+            "inbox_url": "https://desk.evotechly.com",
+            "lead_score_settings": null,
+            "monthly_quota_cents": null,
+            "meeting_wa_templates": null,
+            "simple_mode": true
+        },
+        "simpleMode": true,
+        "nav": {
+            "_list": 5,
+            "_item": {
+                "id": "home",
+                "label": "Accueil",
+                "href": "/dashboard"
+            }
+        },
+        "features": {
+            "tickets": false,
+            "sms": false,
+            "ask_evo": false,
+            "ads": false,
+            "warmup": false,
+            "report_builder": false
+        },
+        "posthog": {
+            "enabled": true,
+            "key": "phc_zQkT5Qx8pfPRocL9puxTC7PFaciL4Q77MmTWzytXXKK5",
+            "host": "https://us.i.posthog.com",
+            "distinct_id": "1"
+        },
+        "integrations": {
+            "meta": {
+                "configured": false,
+                "connected": false,
+                "scopes": {
+                    "_list": 0,
+                    "_item": null
+                }
+            },
+            "google": {
+                "connected": false
+            },
+            "smtp": {
+                "connected": true,
+                "has_mailbox": true
+            },
+            "activation": {
+                "has_connected_communication_channel": false,
+                "has_configured_integration": true,
+                "has_mailbox": true,
+                "has_meta_configured": false
+            }
+        },
+        "sidebarOpen": true,
+        "evoOpenTaskCount": 7,
+        "evoOpenTasks": {
+            "_list": 7,
+            "_item": {
+                "id": 6,
+                "type": "task",
+                "subject": "Hekko",
+                "due_at": "2026-08-23T08:00:00+01:00"
+            }
+        },
+        "evoSearchIndex": {
+            "_list": 0,
+            "_item": null
+        },
+        "context": {
+            "name": "Evotechly",
+            "date": "Monday, 21 September 2026",
+            "timezone": "Africa/Algiers"
+        },
+        "metrics": {
+            "window": {
+                "from": "2026-09-01",
+                "to": "2026-09-30",
+                "label": "September 2026",
+                "timezone": "Africa/Algiers"
+            },
+            "kpis": {
+                "_list": 4,
+                "_item": {
+                    "key": "revenue",
+                    "label": "Won this month",
+                    "value": 62000000,
+                    "format": "money",
+                    "hint": "September 2026",
+                    "href": "/crm/deals?status=won",
+                    "change": null,
+                    "changeLabel": null
+                }
+            }
+        },
+        "attention": {
+            "items": {
+                "_list": 6,
+                "_item": {
+                    "id": 1,
+                    "title": "Clinic website intake",
+                    "href": "/crm/deals/1",
+                    "primary": {
+                        "type": "...",
+                        "severity": "...",
+                        "label": "...",
+                        "reason": "..."
+                    }
+                }
+            },
+            "view_all_href": "/crm/deals?attention=needs_attention"
+        },
+        "work": {
+            "counts": {
+                "overdue": 1,
+                "today": 0,
+                "upcoming": 1
+            },
+            "items": {
+                "_list": 2,
+                "_item": {
+                    "id": 6,
+                    "type": "task",
+                    "subject": "Hekko",
+                    "due_at": "2026-08-23T08:00:00+01:00",
+                    "completed_at": null,
+                    "done": false,
+                    "group": "overdue",
+                    "owner": {
+                        "id": "...",
+                        "name": "..."
+                    },
+                    "related": {
+                        "_list": 2,
+                        "_item": "..."
+                    },
+                    "meta": {
+                        "attendance": "..."
+                    },
+                    "can_complete": true
+                }
+            },
+            "view_all_href": "/crm/activities",
+            "overdue_href": "/crm/activities?group=overdue",
+            "today_href": "/crm/activities?group=today",
+            "upcoming_href": "/crm/activities?group=upcoming"
+        },
+        "pipeline": {
+            "pipeline_id": 1,
+            "label": "Sales",
+            "deal_count": 12,
+            "amount_cents": 228500000,
+            "currency": "DZD",
+            "weighted": false,
+            "stages": {
+                "_list": 4,
+                "_item": {
+                    "id": 1,
+                    "name": "New",
+                    "slug": "new",
+                    "count": 0,
+                    "amount_cents": 0,
+                    "href": "/crm/deals?pipeline=1&stage=new"
+                }
+            },
+            "view_all_href": "/crm/deals/board?pipeline=1"
+        },
+        "recent": {
+            "kind": "logged_activity",
+            "items": {
+                "_list": 6,
+                "_item": {
+                    "id": 9,
+                    "type": "stage_change",
+                    "subject": "Stage → Demo",
+                    "at": "2026-09-20T23:07:55+01:00",
+                    "recordRef": {
+                        "type": "...",
+                        "id": "..."
+                    },
+                    "related": {
+                        "_list": 3,
+                        "_item": "..."
+                    }
+                }
+            },
+            "view_all_href": "/crm/activities"
+        },
+        "activation": {
+            "activated": true,
+            "dismissed": false,
+            "visible": true,
+            "collapsed": true,
+            "progress": {
+                "completed": 5,
+                "total": 5,
+                "core_completed": 3,
+                "core_total": 3
+            },
+            "steps": {
+                "_list": 5,
+                "_item": {
+                    "id": "add_crm_data",
+                    "label": "Add CRM data",
+                    "description": "Create or import a contact or company.",
+                    "kind": "core",
+                    "complete": true,
+                    "can_view": true,
+                    "can_perform": true,
+                    "href": "/crm/contacts?create=1",
+                    "cta_label": "Ajouter un contact",
+                    "secondary_href": "/crm/contacts/import",
+                    "secondary_cta_label": "Importer"
+                }
+            },
+            "dismiss_href": "/dashboard/activation/dismiss"
+        }
+    }
+}

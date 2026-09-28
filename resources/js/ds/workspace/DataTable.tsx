@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 export function DataTable<Row extends { id: RowId }>({
     columns,
     rows,
-    rowHeight = 48,
+    rowHeight = 36,
     selectedIds = [],
     onToggle,
     onTogglePage,
@@ -102,9 +102,9 @@ export function DataTable<Row extends { id: RowId }>({
                                 key={row.id}
                                 aria-selected={onToggle ? selected : undefined}
                                 className={cn(
-                                    'h-12 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
+                                    'h-9 cursor-pointer border-b border-hairline hover:bg-canvas-soft',
                                     MOTION_HOVER_CLASS,
-                                    selected && 'bg-canvas-soft',
+                                    selected && 'bg-[var(--evo-teal-soft)]',
                                 )}
                                 style={{ height: rowHeight }}
                                 onClick={(event) => {

@@ -17,7 +17,7 @@ export function DashboardHeader({
         .join(' · ');
 
     return (
-        <header className="flex flex-col gap-3 pb-6 md:flex-row md:items-center md:justify-between">
+        <header className="flex flex-col gap-3 pb-4 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0">
                 <h1
                     className={cn(

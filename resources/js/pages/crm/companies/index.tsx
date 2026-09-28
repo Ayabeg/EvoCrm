@@ -1,7 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { hasActiveListFilters } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +54,57 @@ export default function CompaniesIndex({
                     basePath="/crm/companies"
                     primaryLabel="Create company"
                     onCreate={() => setDrawer(true)}
+                    primarySlot={
+                        <MorphingForm
+                            label="Create company"
+                            title="Create company"
+                            open={drawer}
+                            onOpenChange={setDrawer}
+                        >
+                            <Form
+                                action="/crm/companies"
+                                method="post"
+                                className="space-y-3"
+                                resetOnSuccess
+                                onSuccess={() => setDrawer(false)}
+                            >
+                                {({ processing }) => (
+                                    <>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">
+                                                Name <span className="text-brand">*</span>
+                                            </Label>
+                                            <Input name="name" required />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">Domain</Label>
+                                            <Input name="domain" />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">City</Label>
+                                            <select
+                                                name="city"
+                                                className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                            >
+                                                <option value="">None</option>
+                                                {cities.map((city) => (
+                                                    <option key={city} value={city}>
+                                                        {city}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="flex justify-end gap-2 pt-2">
+                                            <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
+                                                Cancel
+                                            </Button>
+                                            <Button disabled={processing}>Create</Button>
+                                        </div>
+                                    </>
+                                )}
+                            </Form>
+                        </MorphingForm>
+                    }
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -76,51 +127,6 @@ export default function CompaniesIndex({
                     }}
                 />
             </div>
-
-            <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create company">
-                <Form
-                    action="/crm/companies"
-                    method="post"
-                    className="space-y-3"
-                    resetOnSuccess
-                    onSuccess={() => setDrawer(false)}
-                >
-                    {({ processing }) => (
-                        <>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    Name <span className="text-brand">*</span>
-                                </Label>
-                                <Input name="name" required />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">Domain</Label>
-                                <Input name="domain" />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">City</Label>
-                                <select
-                                    name="city"
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                >
-                                    <option value="">None</option>
-                                    {cities.map((city) => (
-                                        <option key={city} value={city}>
-                                            {city}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
-                                    Cancel
-                                </Button>
-                                <Button disabled={processing}>Create</Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </CreateDrawer>
         </>
     );
 }

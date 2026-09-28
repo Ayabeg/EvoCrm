@@ -108,7 +108,7 @@ it('preserves Company create filters header and query ownership without inventin
     expect($companies)->toContain('primaryLabel="Create company"')
         ->and($companies)->toContain('onCreate=')
         ->and($companies)->toContain('hasActiveListFilters(activeFilters)')
-        ->and($companies)->toContain('CreateDrawer')
+        ->and($companies)->toContain('MorphingForm')
         ->and($companies)->toContain('cities={cities}')
         ->and($companies)->toContain('wilayas={wilayas}')
         ->and($companies)->not->toContain('searchParams.set')

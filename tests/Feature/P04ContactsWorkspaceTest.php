@@ -102,7 +102,7 @@ it('preserves Contact bulk actions permissions header and query ownership', func
         ->and($contacts)->toContain("capabilities.includes('crm.merge')")
         ->and($contacts)->toContain('bulk?.enabled')
         ->and($contacts)->toContain('hasActiveListFilters(activeFilters)')
-        ->and($contacts)->toContain('CreateDrawer')
+        ->and($contacts)->toContain('MorphingForm')
         ->and($contacts)->not->toContain('searchParams.set')
         ->and($contacts)->not->toContain('history.replaceState');
 

@@ -145,7 +145,7 @@ it('preserves Deal query adapter pipeline saved views filters bulk and create wi
     expect($deals)->toContain('primaryLabel="Create deal"')
         ->and($deals)->toContain('onCreate=')
         ->and($deals)->toContain('hasActiveListFilters(activeFilters)')
-        ->and($deals)->toContain('CreateDrawer')
+        ->and($deals)->toContain('MorphingForm')
         ->and($deals)->toContain('/crm/deals/import')
         ->and($deals)->toContain('exportHref={`/crm/deals/export?pipeline=${pipeline.id}`}')
         ->and($deals)->not->toContain('searchParams.set')

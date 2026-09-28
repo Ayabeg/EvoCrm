@@ -601,19 +601,21 @@ it('branches on deal stage after a move', function () {
         ->toBe(['Qualified and high amount']);
 });
 
-it('keeps Automation as its own rail group without reordering CRM objects', function () {
+it('keeps Workflows in Plus without reordering Vendre objects', function () {
     $sidebar = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
     expect($sidebar)
-        ->toContain("label: 'Automation'")
         ->toContain("label: 'Workflows'")
         ->toContain("href: '/crm/workflows'")
-        ->toContain("'/automation'");
+        ->toContain("activePaths: ['/automation']")
+        ->toContain("label: 'Vendre'");
 
-    expect(strpos($sidebar, "href: '/crm/companies'"))
+    expect(strpos($sidebar, "href: '/crm/leads'"))
+        ->toBeLessThan(strpos($sidebar, "href: '/crm/contacts'"))
+        ->and(strpos($sidebar, "href: '/crm/contacts'"))
+        ->toBeLessThan(strpos($sidebar, "href: '/crm/companies'"))
+        ->and(strpos($sidebar, "href: '/crm/companies'"))
         ->toBeLessThan(strpos($sidebar, "href: '/crm/deals'"))
         ->and(strpos($sidebar, "href: '/crm/deals'"))
-        ->toBeLessThan(strpos($sidebar, "href: '/crm/leads'"))
-        ->and(strpos($sidebar, "href: '/crm/leads'"))
         ->toBeLessThan(strpos($sidebar, "href: '/crm/segments'"));
 });

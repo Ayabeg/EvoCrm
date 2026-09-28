@@ -1,7 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
 import { hasActiveListFilters } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
@@ -55,6 +55,60 @@ export default function LeadsIndex({
                     basePath="/crm/leads"
                     primaryLabel="Create lead"
                     onCreate={() => setDrawer(true)}
+                    primarySlot={
+                        <MorphingForm
+                            label="Create lead"
+                            title="Create lead"
+                            open={drawer}
+                            onOpenChange={setDrawer}
+                        >
+                            <Form
+                                action="/crm/leads"
+                                method="post"
+                                className="space-y-3"
+                                resetOnSuccess
+                                onSuccess={() => setDrawer(false)}
+                            >
+                                {({ processing }) => (
+                                    <>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">
+                                                Title <span className="text-brand">*</span>
+                                            </Label>
+                                            <Input name="title" required />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">
+                                                Contact <span className="text-brand">*</span>
+                                            </Label>
+                                            <select
+                                                name="contact_id"
+                                                className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                                required
+                                            >
+                                                <option value="">Select</option>
+                                                {contacts.map((contact) => (
+                                                    <option key={contact.id} value={contact.id}>
+                                                        {contact.first_name} {contact.last_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">Source</Label>
+                                            <Input name="source" placeholder="manual" />
+                                        </div>
+                                        <div className="flex justify-end gap-2 pt-2">
+                                            <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
+                                                Cancel
+                                            </Button>
+                                            <Button disabled={processing}>Create</Button>
+                                        </div>
+                                    </>
+                                )}
+                            </Form>
+                        </MorphingForm>
+                    }
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -79,69 +133,6 @@ export default function LeadsIndex({
                     }}
                 />
             </div>
-
-            <CreateDrawer
-                open={drawer}
-                onOpenChange={setDrawer}
-                title="Create lead"
-            >
-                <Form
-                    action="/crm/leads"
-                    method="post"
-                    className="space-y-3"
-                    resetOnSuccess
-                    onSuccess={() => setDrawer(false)}
-                >
-                    {({ processing }) => (
-                        <>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    Title <span className="text-brand">*</span>
-                                </Label>
-                                <Input name="title" required />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    Contact{' '}
-                                    <span className="text-brand">*</span>
-                                </Label>
-                                <select
-                                    name="contact_id"
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                    required
-                                >
-                                    <option value="">Select</option>
-                                    {contacts.map((contact) => (
-                                        <option
-                                            key={contact.id}
-                                            value={contact.id}
-                                        >
-                                            {contact.first_name}{' '}
-                                            {contact.last_name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    Source
-                                </Label>
-                                <Input name="source" placeholder="manual" />
-                            </div>
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => setDrawer(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button disabled={processing}>Create</Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </CreateDrawer>
         </>
     );
 }

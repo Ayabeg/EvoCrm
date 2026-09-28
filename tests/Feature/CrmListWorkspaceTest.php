@@ -85,12 +85,14 @@ it('exposes CRM objects on the icon rail without replacing AppSidebar', function
         ->and($rail)->toContain("from '@/components/ui/sidebar'")
         ->and($rail)->toContain("from '@phosphor-icons/react'");
 
-    expect(strpos($rail, "label: 'Contacts'"))
+    expect(strpos($rail, "label: 'Leads'"))
+        ->toBeLessThan(strpos($rail, "label: 'Contacts'"))
+        ->and(strpos($rail, "label: 'Contacts'"))
         ->toBeLessThan(strpos($rail, "label: 'Companies'"))
         ->and(strpos($rail, "label: 'Companies'"))
         ->toBeLessThan(strpos($rail, "label: 'Deals'"))
         ->and(strpos($rail, "label: 'Deals'"))
-        ->toBeLessThan(strpos($rail, "label: 'Leads'"));
+        ->toBeLessThan(strpos($rail, "label: 'Quotes'"));
 });
 
 it('keeps the leads list on workspace chrome and retires the duplicate board product', function () {

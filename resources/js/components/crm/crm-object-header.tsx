@@ -9,6 +9,7 @@ export function CrmObjectHeader({
     description,
     primaryLabel,
     onPrimary,
+    primarySlot,
     primaryClassName,
     secondary,
 }: {
@@ -16,6 +17,7 @@ export function CrmObjectHeader({
     description?: string;
     primaryLabel?: string;
     onPrimary?: () => void;
+    primarySlot?: ReactNode;
     primaryClassName?: string;
     secondary?: ReactNode;
 }) {
@@ -34,10 +36,11 @@ export function CrmObjectHeader({
                     </p>
                 ) : null}
             </div>
-            {secondary || (primaryLabel && onPrimary) ? (
+            {secondary || primarySlot || (primaryLabel && onPrimary) ? (
                 <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                     {secondary}
-                    {primaryLabel && onPrimary ? (
+                    {primarySlot}
+                    {primaryLabel && onPrimary && !primarySlot ? (
                         <Button
                             type="button"
                             size="sm"

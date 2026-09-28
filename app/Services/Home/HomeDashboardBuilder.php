@@ -51,6 +51,7 @@ class HomeDashboardBuilder
         $work = $this->work($user, $now);
         $pipelineOverview = $this->pipeline($workspace, $pipeline);
         $recent = $this->recent($user, $now);
+        $recentDeals = $this->recentDeals($user, $pipeline);
         $activation = $this->activation->getState(
             $user,
             $pipeline,
@@ -64,6 +65,7 @@ class HomeDashboardBuilder
             'work' => $work,
             'pipeline' => $pipelineOverview,
             'recent' => $recent,
+            'recentDeals' => $recentDeals,
             'activation' => $activation,
         ];
     }
@@ -110,6 +112,8 @@ class HomeDashboardBuilder
         $pipelineCents = (int) collect($stageRows)->sum('amount_cents');
 
         $monthLabel = $from->copy()->locale('en')->isoFormat('MMMM YYYY');
+
+        $trend = $this->trend($workspace, $pipeline, $now);
 
         $kpis = $hasDeals ? [
             $this->kpi(
@@ -158,7 +162,36 @@ class HomeDashboardBuilder
                 'timezone' => self::TZ,
             ],
             'kpis' => $kpis,
+            'trend' => $trend,
         ];
+    }
+
+    /**
+     * Six calendar months ending now. Won is closed-won value.
+     * Created is the value of deals opened that month.
+     *
+     * @return list<array{label: string, won_cents: int, created_cents: int}>
+     */
+    private function trend(Workspace $workspace, Pipeline $pipeline, CarbonInterface $now): array
+    {
+        $points = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $from = $now->copy()->startOfMonth()->subMonths($i);
+            $to = $from->copy()->endOfMonth();
+
+            $points[] = [
+                'label' => $from->copy()->locale(app()->getLocale())->isoFormat('MMM'),
+                'won_cents' => $this->closedSum($workspace, $pipeline, true, $from, $to),
+                'created_cents' => (int) Deal::query()
+                    ->forWorkspace($workspace)
+                    ->where('pipeline_id', $pipeline->id)
+                    ->whereBetween('created_at', [$from, $to])
+                    ->sum('amount_cents'),
+            ];
+        }
+
+        return $points;
     }
 
     /**
@@ -264,6 +297,45 @@ class HomeDashboardBuilder
             'items' => $items,
             'view_all_href' => '/crm/activities',
         ];
+    }
+
+    /**
+     * @return list<array{id: int, title: string, company: string|null, stage: string|null, amount_cents: int, created_at: string|null, href: string}>
+     */
+    private function recentDeals(User $user, Pipeline $pipeline): array
+    {
+        $workspace = $user->workspace;
+
+        return Deal::query()
+            ->forWorkspace($workspace)
+            ->where('pipeline_id', $pipeline->id)
+            ->with([
+                'company:id,workspace_id,name',
+                'stage:id,name',
+                'contact:id,workspace_id,first_name,last_name',
+            ])
+            ->latest('created_at')
+            ->limit(12)
+            ->get()
+            ->filter(fn (Deal $deal): bool => Gate::forUser($user)->allows('view', $deal))
+            ->take(4)
+            ->map(function (Deal $deal): array {
+                $created = $deal->created_at instanceof CarbonInterface
+                    ? $deal->created_at->timezone(self::TZ)->toIso8601String()
+                    : null;
+
+                return [
+                    'id' => (int) $deal->id,
+                    'title' => (string) $deal->title,
+                    'company' => $deal->company?->name,
+                    'stage' => $deal->stage?->name,
+                    'amount_cents' => (int) $deal->amount_cents,
+                    'created_at' => $created,
+                    'href' => '/crm/deals/'.$deal->id,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     /**

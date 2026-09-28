@@ -48,7 +48,7 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
         ->and($hub)->toContain('RECORD_HUB_RADIUS = 12')
         ->and($hub)->toContain('variant="outline"')
         ->and($chrome)->toContain('AdaptiveWorkspaceShell')
-        ->and($chrome)->toContain('@/components/ui/tabs')
+        ->and($chrome)->toContain('@/ds/components/Tabs')
         ->and($chrome)->toContain('@/components/ui/card')
         ->and($chrome)->toContain('record-action-group')
         ->and($chrome)->toContain("label: 'Note'")

@@ -7,13 +7,13 @@ it('composes Home as an attention-first operating workspace', function () {
     $css = file_get_contents(resource_path('css/app.css'));
 
     expect($home)->toContain('data-home="workspace"')
-        ->and($home)->toContain("title={t('Needs attention')}")
-        ->and($home)->toContain("title={t('Today')}")
+        ->and($home)->toContain("t('Hello :name'")
         ->and($home)->toContain('<HomeKpiStrip')
-        ->and($home)->toContain("title={t('Pipeline')}")
-        ->and($home)->toContain("title={t('Recent records')}")
-        ->and($home)->toContain('lg:grid-cols-2')
-        ->and($home)->toContain('lg:border-l lg:border-hairline')
+        ->and($home)->toContain("t('Deal evolution')")
+        ->and($home)->toContain("t('Pipeline split')")
+        ->and($home)->toContain("t('Recent deals')")
+        ->and($home)->toContain("{t('Pipeline')}")
+        ->and($home)->not->toContain('min-h-[')
         ->and($home)->toContain('home-module')
         ->and($home)->toContain('overflow-x-hidden')
         ->and($home)->not->toContain('max-w-6xl')
@@ -23,10 +23,9 @@ it('composes Home as an attention-first operating workspace', function () {
         ->and($home)->not->toContain('Date.now')
         ->and($home)->not->toContain('text-brand');
 
-    expect(strpos($home, "title={t('Needs attention')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'));
-    expect(strpos($home, "title={t('Today')}"))->toBeLessThan(strpos($home, '<HomeKpiStrip'));
-    expect(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "title={t('Pipeline')}"));
-    expect(strpos($home, "title={t('Pipeline')}"))->toBeLessThan(strpos($home, "title={t('Recent records')}"));
+    expect(strpos($home, '<HomeKpiStrip'))->toBeLessThan(strpos($home, "t('Deal evolution')"));
+    expect(strpos($home, "t('Deal evolution')"))->toBeLessThan(strpos($home, "t('Recent deals')"));
+    expect(strpos($home, "t('Recent deals')"))->toBeLessThan(strpos($home, "{t('Pipeline')}"));
 
     expect($header)->toContain('text-[28px] leading-[34px] font-[650]')
         ->and($header)->toContain('/crm/deals?create=1')
@@ -58,6 +57,7 @@ it('keeps Home queues, snapshot, and feed on the 12px type floor', function () {
     }
 
     expect($attention)->toContain('text-[15px] leading-[22px]')
+        ->and($attention)->toContain('HOME_ATTENTION_VISIBLE')
         ->and($attention)->toContain('openRecord')
         ->and($work)->not->toContain('Date.now')
         ->and($work)->not->toContain('/complete')
@@ -66,7 +66,7 @@ it('keeps Home queues, snapshot, and feed on the 12px type floor', function () {
         ->and($pipeline)->toContain('bg-brand')
         ->and($recent)->toContain('text-[12px] leading-4')
         ->and($strip)->toContain('HOME_KPI_STRIP_TRACK_CLASS')
-        ->and($helpers)->toContain('text-[20px]')
+        ->and($helpers)->toContain('text-[25px]')
         ->and($helpers)->toContain('grid-cols-2')
         ->and($helpers)->toContain('lg:grid-cols-4');
 });

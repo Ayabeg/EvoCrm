@@ -104,13 +104,13 @@ it('keeps People and attribute create drawers on the existing Inertia actions', 
     $people = file_get_contents(resource_path('js/pages/settings/people.tsx'));
     $attributes = file_get_contents(resource_path('js/pages/settings/attributes.tsx'));
 
-    expect($people)->toContain('CreateDrawer')
+    expect($people)->toContain('MorphingForm')
         ->and($people)->toContain('data-test="invite-person-button"')
         ->and($people)->toContain('border-hairline')
         ->and($people)->toContain('SettingsPageHeader')
         ->and($people)->not->toContain('--aurora-');
 
-    expect($attributes)->toContain('CreateDrawer')
+    expect($attributes)->toContain('MorphingForm')
         ->and($attributes)->toContain('border-hairline')
         ->and($attributes)->toContain('SettingsPageHeader')
         ->and($attributes)->not->toContain('--aurora-');

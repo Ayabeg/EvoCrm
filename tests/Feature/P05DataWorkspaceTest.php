@@ -95,9 +95,9 @@ it('locks row 48, page pad-x 32, and 36px controls without object-specific CSS',
     $bar = file_get_contents(resource_path('js/ds/workspace/FilterBar.tsx'));
     $bulk = file_get_contents(resource_path('js/ds/workspace/BulkActionBar.tsx'));
 
-    expect($table)->toContain('h-12')
-        ->and($table)->toContain('rowHeight = 48')
-        ->and($listTable)->toContain('h-12')
+    expect($table)->toContain('h-9')
+        ->and($table)->toContain('rowHeight = 36')
+        ->and($listTable)->toContain('h-9')
         ->and($header)->toContain('md:px-8')
         ->and($bar)->toContain('md:px-8')
         ->and($bar)->toContain('h-9')

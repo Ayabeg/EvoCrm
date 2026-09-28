@@ -50,6 +50,8 @@ export type DataWorkspaceChromeProps = {
     title: string;
     description?: string;
     primaryAction?: { label: string; onClick: () => void };
+    /** Header control that owns its own open state, such as a morphing form. */
+    primarySlot?: ReactNode;
 
     views: SavedView[];
     activeViewId?: string;
@@ -171,7 +173,7 @@ export type DataTableColumn<Row> = {
 export type DataTableProps<Row extends { id: RowId } = { id: RowId }> = {
     columns: DataTableColumn<Row>[];
     rows: Row[];
-    rowHeight?: 48;
+    rowHeight?: 32 | 36 | 48;
     selectedIds?: RowId[];
     onToggle?: (id: RowId) => void;
     onTogglePage?: () => void;

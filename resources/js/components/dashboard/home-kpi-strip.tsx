@@ -1,12 +1,26 @@
 import { Link } from '@inertiajs/react';
+import {
+    ChartBar,
+    Kanban,
+    Percent,
+    TrendUp,
+} from '@phosphor-icons/react';
+import type { Icon } from '@phosphor-icons/react';
 import type { KpiTile } from '@/components/crm/crm-kpi-strip';
 import {
     HOME_KPI_STRIP_TRACK_CLASS,
     HOME_KPI_VALUE_CLASS,
 } from '@/lib/dashboard-operating-home';
+import { t } from '@/lib/i18n';
 import { formatCompactDzd } from '@/lib/money';
-import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
+
+const KPI_ICONS: Record<string, Icon> = {
+    revenue: TrendUp,
+    pipeline: ChartBar,
+    win_rate: Percent,
+    open_deals: Kanban,
+};
 
 function formatKpiValue(kpi: KpiTile): string {
     if (kpi.value === null || kpi.value === undefined) {
@@ -41,20 +55,38 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                     const change =
                         kpi.change === null || kpi.change === undefined
                             ? null
-                            : `${kpi.change > 0 ? '+' : ''}${kpi.change}%`;
+                            : kpi.change;
+                    const Icon = KPI_ICONS[kpi.key] ?? ChartBar;
                     const body = (
-                        <article className="flex min-w-0 flex-col gap-1 py-0.5">
-                            <p className="text-[12px] leading-4 font-medium text-mute">
-                                {kpi.label}
-                            </p>
-                            <p className={HOME_KPI_VALUE_CLASS}>{value}</p>
-                            {change || kpi.hint ? (
-                                <p className="hidden truncate text-[12px] leading-4 text-mute sm:block">
-                                    {[change, kpi.changeLabel, kpi.hint]
-                                        .filter(Boolean)
-                                        .join(' · ')}
-                                </p>
-                            ) : null}
+                        <article className="flex h-[140px] min-w-0 gap-3.5 rounded-[10px] border border-[var(--home-line)] bg-[var(--home-paper)] p-5">
+                            <span className="grid size-[46px] shrink-0 place-items-center rounded-xl bg-[var(--home-well)] text-[var(--home-ink)]">
+                                <Icon className="size-6" weight="regular" aria-hidden />
+                            </span>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-[12px] leading-4 text-[var(--home-muted)]">{kpi.label}</p>
+                                <p className={HOME_KPI_VALUE_CLASS}>{value}</p>
+                                {kpi.hint ? (
+                                    <p className="truncate text-[12px] leading-4 text-[var(--home-muted)]">
+                                        {kpi.hint}
+                                    </p>
+                                ) : null}
+                                {change !== null ? (
+                                    <p className="mt-1.5 text-right text-[12px] leading-4">
+                                        <span
+                                            className={cn(
+                                                'font-semibold',
+                                                change < 0 ? 'text-[#f04438]' : 'text-[#17a85b]',
+                                            )}
+                                        >
+                                            {change < 0 ? '↓' : '↑'} {change > 0 ? '+' : ''}
+                                            {change}%
+                                        </span>
+                                        <span className="mt-0.5 block text-[var(--home-muted)]">
+                                            {t('vs last month')}
+                                        </span>
+                                    </p>
+                                ) : null}
+                            </div>
                         </article>
                     );
 
@@ -63,11 +95,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             <Link
                                 key={kpi.key}
                                 href={kpi.href}
-                                className={cn(
-                                    'min-w-0 rounded-[10px] no-underline',
-                                    MOTION_HOVER_CLASS,
-                                    'hover:bg-subtle focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
-                                )}
+                                className="min-w-0 rounded-[10px] no-underline focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
                                 aria-label={`${kpi.label} ${value}`}
                             >
                                 {body}

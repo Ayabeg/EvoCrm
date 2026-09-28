@@ -1,0 +1,439 @@
+/*
+ * P01 canonical visual language. Imported by app.css, so these :root
+ * variables are available to every later page. Production --color-* in
+ * app.css stay the painted legacy palette until chrome tests move.
+ *
+ * Accent #EC6025 is scarce interaction orange.
+ * Logo orange #d9500f is the mark only. Do not use it as a control fill.
+ */
+:root {
+    --evo-canvas: #f7f8f5;
+    --evo-surface: #fbfcf9;
+    --evo-surface-raised: #ffffff;
+    --evo-ink: #0d1b24;
+    --evo-ink-secondary: #1a2c36;
+    --evo-ink-muted: #5b6b73;
+    --evo-ink-faint: #8a969c;
+    --evo-teal: #0f4c5c;
+    --evo-teal-ink: #0f4c5c;
+    --evo-teal-soft: rgba(15, 76, 92, 0.08);
+    --evo-hover: rgba(13, 27, 36, 0.04);
+    --evo-teal-line: color-mix(in srgb, var(--evo-teal) 40%, transparent);
+    --evo-accent: #ec6025;
+    --evo-focus: var(--evo-teal);
+    --evo-logo-orange: #d9500f;
+    --evo-track: #efefed;
+
+    /* L0 canvas, L1 workspace, L2 inset, L3 floating, L4 modal. */
+    --evo-surface-l0: var(--evo-canvas);
+    --evo-surface-l1: var(--evo-surface);
+    --evo-surface-l2: var(--evo-surface-raised);
+    --evo-surface-l3: var(--evo-surface-raised);
+    --evo-surface-l4: var(--evo-surface-raised);
+
+    --evo-border: rgba(13, 27, 36, 0.08);
+    --evo-border-subtle: rgba(13, 27, 36, 0.05);
+    --evo-border-strong: rgba(13, 27, 36, 0.16);
+    --evo-border-focus: var(--evo-focus);
+
+    --evo-radius-compact: 8px;
+    --evo-radius-standard: 10px;
+    --evo-radius-floating: 12px;
+    --evo-radius-pill: 999px;
+
+    --evo-control-compact: 32px;
+    --evo-control-standard: 36px;
+    --evo-row-compact: 32px;
+    --evo-row-standard: 36px;
+
+    --evo-shadow-none: none;
+    --evo-shadow-pill: 0 1px 1px rgba(13, 27, 36, 0.08);
+    --evo-shadow-floating: 0 1px 1px rgba(13, 27, 36, 0.16);
+    --evo-shadow-modal: 0 8px 24px rgba(13, 27, 36, 0.12);
+
+    --evo-glass-fill: rgba(251, 252, 249, 0.86);
+    --evo-glass-blur: 16px;
+
+    --evo-font-sans:
+        'Geist Sans', Geist, Inter, ui-sans-serif, system-ui, sans-serif;
+    --evo-type-page: var(--text-page);
+    --evo-type-section: var(--text-section);
+    --evo-type-body: var(--text-body);
+    --evo-type-secondary: var(--text-ui-relaxed);
+    --evo-type-caption: var(--text-meta);
+    --evo-type-label: var(--text-label);
+    --evo-type-metric: var(--text-kpi);
+}
+
+@theme {
+    --color-shell-canvas: var(--evo-canvas);
+    --color-shell-paper: var(--evo-surface);
+    --color-shell-ink: var(--evo-ink);
+    --color-shell-ink-2: var(--evo-ink-secondary);
+    --color-shell-muted: var(--evo-ink-muted);
+    --color-shell-faint: var(--evo-ink-faint);
+    --color-shell-hairline: var(--evo-border);
+    --color-shell-teal: var(--evo-teal);
+    --color-shell-teal-soft: var(--evo-teal-soft);
+    --color-shell-orange: var(--evo-accent);
+    --color-shell-track: var(--evo-track);
+    --color-shell-pill: var(--evo-surface-raised);
+
+    --color-evo-canvas: var(--evo-canvas);
+    --color-evo-surface: var(--evo-surface);
+    --color-evo-ink: var(--evo-ink);
+    --color-evo-teal: var(--evo-teal);
+    --color-evo-accent: var(--evo-accent);
+
+    --radius-shell: var(--evo-radius-compact);
+    --radius-shell-lg: var(--evo-radius-standard);
+    /* Prototype group only. Not a canonical radius. */
+    --radius-shell-group: 16px;
+}
+
+.evo-shell {
+    --evo-rail: 212px;
+    font-family: var(--evo-font-sans);
+    font-variant-numeric: tabular-nums;
+    color-scheme: inherit;
+    background: transparent;
+    color: inherit;
+}
+
+@media (min-width: 768px) {
+    .evo-rail-slot {
+        width: 212px;
+        transition: width 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .evo-rail-panel {
+        width: 212px;
+        transform: translateX(0);
+        transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .evo-workspace {
+        width: calc(100% - 212px);
+        transition: width 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .evo-shell[data-collapsed='true'] .evo-rail-slot {
+        width: 0;
+        border-right-width: 0;
+    }
+
+    .evo-shell[data-collapsed='true'] .evo-rail-panel {
+        transform: translateX(-100%);
+    }
+
+    .evo-shell[data-collapsed='true'] .evo-workspace {
+        width: 100%;
+    }
+}
+
+.evo-rail-reopen {
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        background-color 150ms ease;
+}
+
+.evo-shell[data-collapsed='true'] .evo-rail-reopen {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* The legacy top bar is position:fixed across the viewport and was
+   painting over the mode switch. Keep it inside the workspace column,
+   and let it follow the active appearance instead of a paper literal. */
+.evo-shell .app-topbar {
+    position: sticky;
+    top: 0;
+    right: auto;
+    left: auto;
+    z-index: 20;
+    width: auto;
+    background: var(--color-surface);
+    border-bottom-color: var(--color-border);
+    color: var(--color-text);
+}
+
+/* Dark cabinet only. Theme tokens are concrete, so override the
+   shell colors themselves. Workspace pages stay outside this box. */
+.evo-cabinet {
+    color-scheme: dark;
+    --evo-canvas: #000000;
+    --evo-surface: #0a0a0a;
+    --evo-surface-raised: #171717;
+    --evo-ink: #f5f5f5;
+    --evo-ink-secondary: #e5e5e5;
+    --evo-ink-muted: #a3a3a3;
+    --evo-ink-faint: #8a8a8a;
+    --evo-border: #1f1f1f;
+    --evo-track: #171717;
+    --evo-teal-ink: #d5e8ee;
+    --evo-teal-soft: rgba(213, 232, 238, 0.08);
+    --evo-hover: rgba(255, 255, 255, 0.06);
+    --color-shell-canvas: #000000;
+    --color-shell-paper: #0a0a0a;
+    --color-shell-ink: #f5f5f5;
+    --color-shell-ink-2: #e5e5e5;
+    --color-shell-muted: #a3a3a3;
+    --color-shell-faint: #8a8a8a;
+    --color-shell-hairline: #1f1f1f;
+    --color-shell-track: #171717;
+    --color-shell-pill: #171717;
+    --color-shell-teal-soft: rgba(213, 232, 238, 0.08);
+    background: #0a0a0a;
+    color: #f5f5f5;
+}
+
+.evo-workspace {
+    background: #f7f8f5;
+    color: #0d1b24;
+}
+
+/* Route-owned Agents IA: a fixed black desk panel beside the cream canvas. */
+.evo-agents-sidebar {
+    width: 240px;
+    color-scheme: dark;
+    --color-shell-ink: #f5f5f5;
+    --color-shell-ink-2: #e5e5e5;
+    --color-shell-muted: #a3a3a3;
+    --color-shell-faint: #737373;
+    --color-shell-hairline: #1f1f1f;
+    --color-shell-orange: #ec6025;
+    background: #000000;
+    color: #f5f5f5;
+}
+
+@media (max-width: 767px) {
+    .evo-agents-sidebar {
+        width: 100%;
+    }
+}
+
+.evo-mode-capsule {
+    transition:
+        transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        width 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.evo-mode {
+    transition:
+        opacity 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.evo-mode-on {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.evo-mode-off {
+    opacity: 0;
+    transform: translateX(6px);
+    pointer-events: none;
+}
+
+.evo-search-in {
+    animation: evo-search-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes evo-search-in {
+    from {
+        opacity: 0;
+        transform: translateY(-2px);
+    }
+}
+
+.evo-nav-indicator {
+    transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-instant='true'] .evo-nav-indicator {
+    transition: none;
+}
+
+.evo-nav-link[aria-current='page'] {
+    border-left: 3px solid #d5e8ee;
+    border-radius: 0 8px 8px 0;
+    background: rgba(255, 255, 255, 0.06);
+    color: #f5f5f5;
+}
+
+.evo-nav-label {
+    opacity: 0.82;
+    transform: translateX(0);
+    transition:
+        opacity 150ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.evo-nav-label[data-active='true'] {
+    opacity: 1;
+    transform: translateX(0);
+    animation: evo-label-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes evo-label-in {
+    from {
+        transform: translateX(2px);
+    }
+}
+
+/* Agents column stays on the light desk even when the cabinet is dark. */
+.evo-agents {
+    color-scheme: light;
+    --color-shell-canvas: #f7f8f5;
+    --color-shell-paper: #ffffff;
+    --color-shell-ink: #0d1b24;
+    --color-shell-muted: #5b6b73;
+    --color-shell-hairline: rgba(13, 27, 36, 0.08);
+    --color-shell-teal: #0f4c5c;
+    --color-shell-teal-soft: rgba(15, 76, 92, 0.08);
+    --color-shell-orange: #ec6025;
+    --evo-canvas: #f7f8f5;
+    --evo-surface: #fbfcf9;
+    --evo-ink: #0d1b24;
+    --evo-ink-secondary: #1a2c36;
+    --evo-ink-muted: #5b6b73;
+    --evo-ink-faint: #8a969c;
+    --evo-teal: #0f4c5c;
+    --evo-teal-soft: rgba(15, 76, 92, 0.08);
+    --evo-border: rgba(13, 27, 36, 0.08);
+    --evo-accent: #ec6025;
+    background: var(--evo-canvas);
+    color: var(--evo-ink);
+    caret-color: var(--evo-teal);
+}
+
+.evo-agents ::selection {
+    background: var(--evo-teal-soft);
+    color: var(--evo-ink);
+}
+
+[data-home='workspace'] {
+    --home-canvas: #f7f7f5;
+    --home-paper: #ffffff;
+    --home-ink: #141821;
+    --home-muted: #687184;
+    --home-line: #e6e6e3;
+    --home-line-soft: #efefed;
+    --home-well: #f4f4f3;
+    --home-wash: #fafaf9;
+    --home-chip: #f1f1f1;
+    --home-bar: #d9dadd;
+    background: var(--home-canvas);
+    color: var(--home-ink);
+}
+
+.dark [data-home='workspace'] {
+    --home-canvas: #000000;
+    --home-paper: #0a0a0a;
+    --home-ink: #f5f5f5;
+    --home-muted: #a3a3a3;
+    --home-line: #2a2a2a;
+    --home-line-soft: #1f1f1f;
+    --home-well: #171717;
+    --home-wash: #141414;
+    --home-chip: #171717;
+    --home-bar: #3a3a3a;
+}
+
+.dark .evo-agents {
+    color-scheme: dark;
+    --color-shell-canvas: #000000;
+    --color-shell-paper: #171717;
+    --color-shell-ink: #f5f5f5;
+    --color-shell-ink-2: #e5e5e5;
+    --color-shell-muted: #a3a3a3;
+    --color-shell-faint: #8a8a8a;
+    --color-shell-hairline: #2a2a2a;
+    --color-shell-teal: #d5e8ee;
+    --color-shell-teal-soft: rgba(213, 232, 238, 0.12);
+    --color-shell-orange: #f5f5f5;
+    --evo-canvas: #000000;
+    --evo-surface: #171717;
+    --evo-ink: #f5f5f5;
+    --evo-ink-secondary: #e5e5e5;
+    --evo-ink-muted: #a3a3a3;
+    --evo-ink-faint: #8a8a8a;
+    --evo-teal: #d5e8ee;
+    --evo-teal-soft: rgba(213, 232, 238, 0.12);
+    --evo-border: #2a2a2a;
+    --evo-accent: #f5f5f5;
+    background: #000000;
+    color: #f5f5f5;
+    caret-color: #f5f5f5;
+}
+
+.evo-row {
+    transition:
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+.evo-row:hover {
+    background-color: var(--color-shell-teal-soft);
+}
+
+.evo-scroll {
+    scrollbar-width: none;
+    scrollbar-color: transparent transparent;
+}
+
+.evo-scroll:hover {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-shell-hairline) transparent;
+}
+
+.evo-scroll::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.evo-scroll::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.evo-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.evo-scroll::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+}
+
+.evo-scroll:hover::-webkit-scrollbar-thumb {
+    background-color: var(--color-shell-hairline);
+}
+
+.dark {
+    --evo-canvas: #000000;
+    --evo-surface: #0a0a0a;
+    --evo-surface-raised: #171717;
+    --evo-ink: #f5f5f5;
+    --evo-ink-secondary: #e5e5e5;
+    --evo-ink-muted: #a3a3a3;
+    --evo-ink-faint: #8a8a8a;
+    --evo-border: #1f1f1f;
+    --evo-track: #171717;
+    --evo-teal-ink: #d5e8ee;
+    --evo-teal-soft: rgba(213, 232, 238, 0.08);
+    --evo-hover: rgba(255, 255, 255, 0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .evo-shell,
+    .evo-shell * {
+        transition: none;
+        animation: none;
+    }
+}

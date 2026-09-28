@@ -30,6 +30,7 @@ import { applyCompanyColumnContract } from '@/pages/crm/companies/company-column
 import { applyContactColumnContract } from '@/pages/crm/contacts/contact-columns';
 import { applyDealColumnContract } from '@/pages/crm/deals/deal-columns';
 import { applyLeadColumnContract } from '@/pages/crm/leads/lead-columns';
+import { t } from '@/lib/i18n';
 import { applyQuoteColumnContract } from '@/pages/crm/quotes/quote-columns';
 
 type Member = { id: number; name: string };
@@ -98,6 +99,7 @@ export function CrmListShell<Row extends { id: RowId }>({
     exportHref,
     createHref,
     onCreate,
+    primarySlot,
     canCreate = true,
     banner,
     headerActions,
@@ -138,6 +140,7 @@ export function CrmListShell<Row extends { id: RowId }>({
     exportHref?: string;
     createHref?: string;
     onCreate?: () => void;
+    primarySlot?: ReactNode;
     canCreate?: boolean;
     banner?: ReactNode;
     headerActions?: ReactNode;
@@ -183,7 +186,10 @@ export function CrmListShell<Row extends { id: RowId }>({
     const noun = OBJECT_NOUNS[entity];
     const description =
         typeof recordCount === 'number'
-            ? `${recordCount.toLocaleString()} ${noun}`
+            ? t(':count :noun', {
+                  count: recordCount.toLocaleString(),
+                  noun: t(noun),
+              })
             : undefined;
     const query = extraQuery ?? {};
     const columnDefs =
@@ -215,21 +221,33 @@ export function CrmListShell<Row extends { id: RowId }>({
         title,
         description,
         ...(canCreate
-            ? {
-                  primaryAction: {
-                      label: primaryLabel,
-                      onClick: () => {
-                          if (onCreate) {
-                              onCreate();
+            ? primarySlot
+                ? {
+                      primarySlot,
+                      ...(onCreate
+                          ? {
+                                primaryAction: {
+                                    label: primaryLabel,
+                                    onClick: onCreate,
+                                },
+                            }
+                          : {}),
+                  }
+                : {
+                      primaryAction: {
+                          label: primaryLabel,
+                          onClick: () => {
+                              if (onCreate) {
+                                  onCreate();
 
-                              return;
-                          }
+                                  return;
+                              }
 
-                          window.location.href =
-                              createHref ?? `${basePath}?create=1`;
+                              window.location.href =
+                                  createHref ?? `${basePath}?create=1`;
+                          },
                       },
-                  },
-              }
+                  }
             : {}),
         views: savedFilters ?? [],
         activeViewId: activeFilters.filter_id

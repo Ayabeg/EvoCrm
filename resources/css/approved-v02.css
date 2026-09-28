@@ -1,0 +1,420 @@
+/*
+ * Approved operating shell (dashboard, contacts, deals).
+ * Paper canvas, 52px top bar, 172px rail, orange only on the mark,
+ * the active icon, and the page primary action.
+ */
+
+.group\/sidebar-wrapper {
+    --app-chrome-height: 52px;
+}
+
+.app-topbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 40;
+    height: 52px;
+    padding-right: 18px;
+    background: #fbfbfa;
+    border-bottom: 1px solid #e6e6e3;
+}
+
+[data-slot='sidebar-inset'] {
+    padding-top: 52px;
+    background: #f7f7f5;
+}
+
+[data-slot='sidebar'] > .fixed {
+    top: 52px;
+    height: calc(100svh - 52px);
+    background: #fbfbfa;
+}
+
+[data-sidebar-brand] {
+    display: none;
+}
+
+.evo-brand {
+    display: flex;
+    width: 248px;
+    flex: none;
+    align-items: center;
+    gap: 9px;
+    padding-left: 22px;
+    color: #141821;
+    font-size: 15px;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+}
+
+.evo-mark {
+    width: 22px;
+    height: 22px;
+    border: 6px solid #e8530e;
+    border-right-color: transparent;
+    border-radius: 50%;
+    transform: rotate(-25deg);
+}
+
+.evo-brand b {
+    color: #e8530e;
+    font-weight: 750;
+}
+
+.app-topbar [data-chrome='search'] {
+    width: min(540px, calc(100vw - 420px));
+}
+
+.app-topbar .app-search-trigger {
+    height: 34px;
+    border-color: #ececea;
+    background: #f3f3f2;
+    color: #777e8d;
+    font-size: 12px;
+}
+
+.app-topbar [data-chrome='utilities'] {
+    gap: 6px;
+}
+
+.app-topbar [data-chrome='utilities'] .aurora-btn {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #3d4350;
+}
+
+.app-topbar [data-chrome='utilities'] .evo-create-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+}
+
+[data-cabinet='rail'] .app-rail-item {
+    height: 40px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+[data-cabinet='rail'] .app-rail-item[data-active='true'],
+[data-cabinet='rail'] .app-rail-item[aria-current='page'] {
+    background: #eceae6;
+    color: #151820;
+}
+
+[data-cabinet='rail'] .app-rail-item[data-active='true'] svg,
+[data-cabinet='rail'] .app-rail-item[aria-current='page'] svg {
+    color: #e8530e;
+}
+
+[data-crm='contacts-workspace'],
+[data-crm='deals-workspace'],
+[data-crm='deals-board'] {
+    background: #f7f7f5;
+}
+
+[data-crm='contacts-workspace'] [data-ds='page-header'],
+[data-crm='deals-workspace'] [data-ds='page-header'],
+[data-crm='deals-board'] [data-ds='page-header'] {
+    border-bottom: 0;
+    background: transparent;
+    padding-bottom: 8px;
+}
+
+[data-crm='contacts-workspace'] [data-ds='page-header'] h1,
+[data-crm='deals-workspace'] [data-ds='page-header'] h1,
+[data-crm='deals-board'] [data-ds='page-header'] h1 {
+    font-size: 22px;
+    line-height: 28px;
+    letter-spacing: -0.4px;
+}
+
+[data-crm='contacts-workspace'] [data-ds='saved-views'],
+[data-crm='deals-workspace'] [data-ds='saved-views'],
+[data-crm='deals-board'] [data-ds='saved-views'] {
+    margin-top: 8px;
+    border-bottom: 1px solid #e6e6e3;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+[data-crm='contacts-workspace'] [data-ds='saved-views'] a,
+[data-crm='deals-workspace'] [data-ds='saved-views'] a,
+[data-crm='deals-board'] [data-ds='saved-views'] a,
+[data-crm='contacts-workspace'] [data-ds='saved-views'] button,
+[data-crm='deals-workspace'] [data-ds='saved-views'] button,
+[data-crm='deals-board'] [data-ds='saved-views'] button {
+    height: 38px;
+    border: 0;
+    border-radius: 8px 8px 0 0;
+    background: transparent;
+    color: #5f687a;
+}
+
+[data-crm='contacts-workspace'] [data-ds='saved-views'] a[aria-current='page'],
+[data-crm='deals-workspace'] [data-ds='saved-views'] a[aria-current='page'],
+[data-crm='deals-board'] [data-ds='saved-views'] a[aria-current='page'] {
+    border-bottom: 2px solid #e8530e;
+    background: #fff3ee;
+    color: #e8530e;
+    font-weight: 650;
+}
+
+[data-crm='contacts-workspace'] [data-ds='filter-bar'],
+[data-crm='deals-workspace'] [data-ds='filter-bar'],
+[data-crm='deals-board'] [data-ds='filter-bar'] {
+    border-bottom: 0;
+    background: transparent;
+}
+
+[data-crm='contacts-workspace'] [data-ds='data-table'],
+[data-crm='deals-workspace'] [data-ds='data-table'],
+[data-crm='deals-board'] [data-ds='data-table'] {
+    margin: 0 16px 8px;
+    overflow: hidden;
+    border: 1px solid #e5e6e4;
+    border-radius: 9px;
+    background: #fff;
+}
+
+[data-crm='deals-workspace'] [data-crm='stage-pills'],
+[data-crm='deals-board'] [data-crm='stage-pills'] {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0;
+    margin: 0 16px 12px;
+    overflow: hidden;
+    border: 1px solid #e5e6e4;
+    border-radius: 9px;
+    background: #fff;
+    padding: 0;
+}
+
+[data-crm='deals-workspace'] [data-crm='stage-pills'] a,
+[data-crm='deals-board'] [data-crm='stage-pills'] a {
+    display: flex;
+    height: 72px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    border: 0;
+    border-right: 1px solid #e5e6e4;
+    border-radius: 0;
+    padding: 0 20px;
+    color: #6b758a;
+}
+
+[data-crm='deals-workspace'] [data-crm='stage-pills'] a:last-child,
+[data-crm='deals-board'] [data-crm='stage-pills'] a:last-child {
+    border-right: 0;
+}
+
+[data-crm='deals-workspace'] [data-crm='stage-pills'] a[aria-current='page'],
+[data-crm='deals-board'] [data-crm='stage-pills'] a[aria-current='page'] {
+    color: #e8530e;
+    box-shadow: inset 0 -2px 0 #e8530e;
+}
+
+.contact-record {
+    background: #f7f7f5;
+}
+
+.contact-record span.absolute.bg-brand {
+    display: none;
+}
+
+.contact-record .relative.shrink-0 {
+    border-bottom: 0;
+    background: transparent;
+    padding-top: 18px;
+    padding-bottom: 8px;
+}
+
+.contact-record h1 {
+    font-size: 28px;
+    letter-spacing: -0.7px;
+    line-height: 1.1;
+}
+
+.contact-record h3 {
+    color: #151820;
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    text-transform: none;
+}
+
+.contact-record .bg-hairline {
+    gap: 12px;
+    background: #f7f7f5;
+    padding: 0 16px 16px;
+}
+
+.contact-record .bg-canvas {
+    border: 1px solid #e6e6e3;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.contact-record [role='tab'][data-state='active'] {
+    color: #e8530e;
+    box-shadow: inset 0 -2px 0 #e8530e;
+}
+
+.contact-record .record-action-group {
+    border: 1px solid #e6e6e3;
+    border-radius: 8px;
+    background: #fff;
+    padding: 2px;
+}
+
+[data-crm='quotes-workspace'] {
+    background: #f7f7f5;
+}
+
+/* Quotes: the sidebar is the navigation. The top strip is only account tools. */
+@media (min-width: 768px) {
+    body:has([data-crm='quotes-workspace']) [data-slot='sidebar'] > .fixed {
+        top: 0;
+        height: 100svh;
+    }
+
+    body:has([data-crm='quotes-workspace']) [data-sidebar-brand] {
+        display: flex;
+    }
+
+    body:has([data-crm='quotes-workspace']) [data-slot='sidebar-inset'] {
+        padding-top: 40px;
+    }
+
+    body:has([data-crm='quotes-workspace']) .app-topbar {
+        left: var(--sidebar-width, 248px);
+        height: 40px;
+        background: #f7f7f5;
+    }
+}
+
+body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[data-active='true'] svg,
+body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[aria-current='page'] svg {
+    color: inherit;
+}
+
+[data-crm='quotes-workspace'] [data-ds='page-header'] {
+    align-items: center;
+    gap: 8px;
+    border-bottom: 0;
+    background: transparent;
+    padding: 12px 16px 0;
+}
+
+[data-crm='quotes-workspace'] [data-ds='page-header'] h1 {
+    font-size: 22px;
+    line-height: 28px;
+    letter-spacing: -0.4px;
+}
+
+[data-crm='quotes-workspace'] [data-ds='page-header'] p {
+    margin-top: 0;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+[data-crm='quotes-workspace'] [data-ds='page-header'] button,
+[data-crm='quotes-workspace'] [data-ds='page-header'] a {
+    height: 32px;
+    border-color: #e8530e;
+    background: #e8530e;
+    color: #fff;
+}
+
+[data-crm='quotes-workspace'] [data-ds='saved-views'] {
+    margin-top: 4px;
+    border-bottom: 1px solid #e6e6e3;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+[data-crm='quotes-workspace'] [data-ds='saved-views'] a,
+[data-crm='quotes-workspace'] [data-ds='saved-views'] button {
+    height: 32px;
+    margin-right: 16px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding-inline: 0;
+    color: #697080;
+}
+
+[data-crm='quotes-workspace'] [data-ds='saved-views'] a[aria-current='page'] {
+    border-bottom: 2px solid #151820;
+    background: transparent;
+    color: #151820;
+    font-weight: 600;
+}
+
+[data-crm='quotes-workspace'] [data-ds='filter-bar'] {
+    border-bottom: 0;
+    background: transparent;
+}
+
+[data-crm='quotes-workspace'] [data-ds='filter-bar'] > div {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+[data-crm='quotes-workspace'] [data-ds='filter-bar'] label,
+[data-crm='quotes-workspace'] [data-ds='filter-bar'] button,
+[data-crm='quotes-workspace'] [data-ds='filter-bar'] input {
+    height: 32px;
+    border-color: #e6e6e3;
+    background: transparent;
+    box-shadow: none;
+}
+
+[data-crm='quotes-workspace'] [data-ds='filter-bar'] label {
+    padding-inline: 8px;
+    color: #3d4350;
+}
+
+[data-crm='quotes-workspace'] [data-ds='data-table'] {
+    margin: 0;
+    overflow: auto;
+    border: 0;
+    border-top: 1px solid #e6e6e3;
+    border-radius: 0;
+    background: #fff;
+}
+
+[data-crm='quotes-workspace'] [data-ds='data-table'] .bg-white {
+    background: #fff;
+}
+
+[data-crm='quotes-workspace'] [data-ds='data-table'] tbody tr {
+    height: 40px;
+}
+
+[data-crm='quotes-workspace'] [data-ds='data-table'] tbody tr:hover {
+    background: #fafaf9;
+}
+
+@media (max-width: 900px) {
+    .evo-brand {
+        width: auto;
+        padding-left: 12px;
+    }
+
+    .app-topbar [data-chrome='search'] {
+        width: min(100%, 220px);
+    }
+
+    [data-crm='deals-workspace'] [data-crm='stage-pills'],
+    [data-crm='deals-board'] [data-crm='stage-pills'] {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

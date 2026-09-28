@@ -2,8 +2,8 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { BoardOptionsSheet } from '@/components/crm/board-options-sheet';
 import type { BoardOptions } from '@/components/crm/board-options-sheet';
-import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import DealAttentionQueue from '@/components/crm/deal-attention-queue';
 import DealForecastBar from '@/components/crm/deal-forecast-bar';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
@@ -118,7 +118,7 @@ export default function DealBoard({
         <>
             <Head title={t('Deals')} />
             <div
-                className="flex h-app-workspace min-h-0 flex-col overflow-x-hidden bg-canvas-soft"
+                className="v02-list flex h-app-workspace min-h-0 flex-col overflow-x-hidden bg-[#f7f7f5]"
                 data-crm="deals-board"
             >
                 <CrmListShell
@@ -129,6 +129,61 @@ export default function DealBoard({
                     basePath="/crm/deals/board"
                     primaryLabel="Create deal"
                     onCreate={() => setDrawer(true)}
+                    primarySlot={
+                        <MorphingForm
+                            label="Create deal"
+                            title="Create deal"
+                            open={drawer}
+                            onOpenChange={setDrawer}
+                        >
+                            <Form
+                                action="/crm/deals"
+                                method="post"
+                                className="space-y-3"
+                                resetOnSuccess
+                                onSuccess={() => setDrawer(false)}
+                            >
+                                {({ processing }) => (
+                                    <>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">
+                                                {t('Deal name')} <span className="text-brand">*</span>
+                                            </Label>
+                                            <Input name="title" required />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
+                                            <Input name="amount_dzd" type="number" min="0" step="0.01" />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
+                                            <Input name="close_date" type="date" />
+                                        </div>
+                                        <div>
+                                            <Label className="mb-1 block text-[12px]">{t('Stage')}</Label>
+                                            <select
+                                                name="stage_id"
+                                                className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                            >
+                                                {stages.map((stage) => (
+                                                    <option key={stage.id} value={stage.id}>
+                                                        {stage.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <input type="hidden" name="pipeline_id" value={pipeline.id} />
+                                        <div className="flex justify-end gap-2 pt-2">
+                                            <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
+                                                {t('Cancel')}
+                                            </Button>
+                                            <Button disabled={processing}>{t('Create')}</Button>
+                                        </div>
+                                    </>
+                                )}
+                            </Form>
+                        </MorphingForm>
+                    }
                     activeFilters={activeFilters}
                     savedFilters={savedFilters}
                     listView={listView}
@@ -251,54 +306,6 @@ export default function DealBoard({
                 options={boardOptions}
                 exportHref={exportHref}
             />
-            <CreateDrawer open={drawer} onOpenChange={setDrawer} title="Create deal">
-                <Form
-                    action="/crm/deals"
-                    method="post"
-                    className="space-y-3"
-                    resetOnSuccess
-                    onSuccess={() => setDrawer(false)}
-                >
-                    {({ processing }) => (
-                        <>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">
-                                    {t('Deal name')} <span className="text-brand">*</span>
-                                </Label>
-                                <Input name="title" required />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
-                                <Input name="amount_dzd" type="number" min="0" step="0.01" />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
-                                <Input name="close_date" type="date" />
-                            </div>
-                            <div>
-                                <Label className="mb-1 block text-[12px]">{t('Stage')}</Label>
-                                <select
-                                    name="stage_id"
-                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                >
-                                    {stages.map((stage) => (
-                                        <option key={stage.id} value={stage.id}>
-                                            {stage.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <input type="hidden" name="pipeline_id" value={pipeline.id} />
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
-                                    {t('Cancel')}
-                                </Button>
-                                <Button disabled={processing}>{t('Create')}</Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </CreateDrawer>
         </>
     );
 }
