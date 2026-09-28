@@ -34,3 +34,25 @@ it('promotes the approved shell without prototype records', function () {
         ->and($rail)->not->toContain('Evotechly')
         ->and($rail)->not->toContain('lucide-react');
 });
+
+it('switches sidebar modes with the real Astryx SegmentedControl', function () {
+    $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $css = file_get_contents(resource_path('css/evo-shell.css'));
+    $appCss = file_get_contents(resource_path('css/app.css'));
+    $local = file_get_contents(resource_path('js/components/ui/segmented-control.tsx'));
+    $agentsView = file_get_contents(resource_path('js/components/desk/agents-view-mode-control.tsx'));
+
+    expect($rail)->toContain("from '@astryxdesign/core/SegmentedControl'")
+        ->and($rail)->toContain('SegmentedControlItem')
+        ->and($rail)->toContain("from '@astryxdesign/core/theme'")
+        ->and($rail)->toContain('layout="fill"')
+        ->and($rail)->not->toContain('evo-mode-capsule')
+        ->and($rail)->not->toContain('translate3d')
+        ->and($rail)->not->toContain("from '@/components/ui/segmented-control'")
+        ->and($css)->not->toContain('.evo-mode-capsule')
+        ->and($appCss)->toContain("@astryxdesign/core/reset.css")
+        ->and($appCss)->toContain("@astryxdesign/core/astryx.css")
+        ->and($appCss)->toContain("@astryxdesign/theme-neutral/theme.css")
+        ->and($local)->toContain('Local Astryx SegmentedControl fallback')
+        ->and($agentsView)->toContain("from '@/components/ui/segmented-control'");
+});
