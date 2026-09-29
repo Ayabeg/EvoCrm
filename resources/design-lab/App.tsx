@@ -4,25 +4,77 @@ import { parseLabLocation } from './lib/routes';
 import type { LabRoute } from './lib/routes';
 import { AccueilPage } from './pages/AccueilPage';
 import { AdsHubPage } from './pages/AdsHubPage';
+import { CampaignPage } from './pages/CampaignPage';
 import { ContactDetailPage } from './pages/ContactDetailPage';
 import { ContactsListPage } from './pages/ContactsListPage';
 import { DealPage } from './pages/DealPage';
+import { DealsListPage } from './pages/DealsListPage';
 import { DevisPage } from './pages/DevisPage';
+import { InboxPage } from './pages/InboxPage';
 import { ReportsPage } from './pages/ReportsPage';
+import {
+    ActivitiesPage,
+    CompaniesPage,
+    CompanyPage,
+    LeadsPage,
+    OutboundPage,
+    QuotesListPage,
+    SegmentsPage,
+    SettingsPage,
+    TicketsPage,
+    WorkflowsPage,
+} from './pages/WorkspacePages';
 
 function currentRoute(): LabRoute {
     return parseLabLocation(window.location.pathname, window.location.hash);
 }
 
-const TITLES: Record<LabRoute['name'], string> = {
-    accueil: 'Accueil',
-    ads: 'Ads Hub',
-    contacts: 'Contacts',
-    contact: 'Contact',
-    deal: 'Deal',
-    devis: 'Devis',
-    reports: 'Reports',
-};
+function renderRoute(route: LabRoute) {
+    switch (route.name) {
+        case 'accueil':
+            return <AccueilPage />;
+        case 'inbox':
+            return <InboxPage />;
+        case 'contacts':
+            return <ContactsListPage />;
+        case 'contact':
+            return <ContactDetailPage id={route.id} />;
+        case 'companies':
+            return <CompaniesPage />;
+        case 'company':
+            return <CompanyPage id={route.id} />;
+        case 'leads':
+            return <LeadsPage />;
+        case 'deals':
+            return <DealsListPage />;
+        case 'deal':
+            return <DealPage id={route.id} />;
+        case 'quotes':
+            return <QuotesListPage />;
+        case 'devis':
+            return <DevisPage id={route.id} />;
+        case 'activities':
+            return <ActivitiesPage />;
+        case 'outbound':
+            return <OutboundPage view={route.view} />;
+        case 'ads':
+            return <AdsHubPage view={route.view} />;
+        case 'campaign':
+            return <CampaignPage id={route.id} />;
+        case 'tickets':
+            return <TicketsPage />;
+        case 'reports':
+            return <ReportsPage view={route.view} />;
+        case 'segments':
+            return <SegmentsPage />;
+        case 'workflows':
+            return <WorkflowsPage />;
+        case 'settings':
+            return <SettingsPage />;
+        default:
+            return <AccueilPage />;
+    }
+}
 
 export function App() {
     const [route, setRoute] = useState<LabRoute>(currentRoute);
@@ -41,25 +93,5 @@ export function App() {
         };
     }, []);
 
-    let body = <AccueilPage />;
-
-    if (route.name === 'ads') {
-        body = <AdsHubPage />;
-    } else if (route.name === 'contacts') {
-        body = <ContactsListPage />;
-    } else if (route.name === 'contact') {
-        body = <ContactDetailPage id={route.id} />;
-    } else if (route.name === 'deal') {
-        body = <DealPage id={route.id} />;
-    } else if (route.name === 'devis') {
-        body = <DevisPage id={route.id} />;
-    } else if (route.name === 'reports') {
-        body = <ReportsPage />;
-    }
-
-    return (
-        <LabShell route={route} title={TITLES[route.name]}>
-            {body}
-        </LabShell>
-    );
+    return <LabShell route={route}>{renderRoute(route)}</LabShell>;
 }

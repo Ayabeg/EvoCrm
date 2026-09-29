@@ -1,12 +1,24 @@
 import { EvilBarChart } from '@/components/evilcharts/charts/recharts-bar-chart';
 import { EvilLineChart } from '@/components/evilcharts/charts/recharts-line-chart';
+import { useState } from 'react';
+import { Button } from '../components/Button';
 import { ChartFrame } from '../components/ChartFrame';
-import { KpiCard } from '../components/KpiCard';
 import { LabLink } from '../components/LabLink';
+import { KpiMetric, KpiStrip } from '../components/KpiMetric';
+import { Module } from '../components/Module';
+import { ContextChip, PageHeader } from '../components/PageHeader';
+import { ProgressRow } from '../components/ProgressRow';
 import { useLabLoading } from '../components/useLabLoading';
 import { cumulativeChartConfig, leadsChartConfig, pipelineChartConfig } from '../data/chart-config';
-import { KNOWN_OBJECT_IDS } from '../data/evocrm-demo-data';
-import { contactName, formatCount, formatDa, formatDayLabel, formatPercent } from '../data/format';
+import {
+    contactName,
+    formatCompactAxis,
+    formatCount,
+    formatDa,
+    formatDayLabel,
+    formatPercent,
+    formatRoas,
+} from '../data/format';
 import {
     STAGE_LABELS,
     getClosedDeals,
@@ -14,8 +26,8 @@ import {
     getContact,
     getConversionRate,
     getCumulativeWonRevenue,
+    getGoalProgress,
     getLeadSourceChartRows,
-    getLeadSourceTotals,
     getOpenActivities,
     getOpenDealCount,
     getOpenDeals,
@@ -27,186 +39,265 @@ import {
     getWonRevenue,
 } from '../data/selectors';
 
+const CHART_MARGIN = { top: 6, right: 8, left: 0, bottom: 0 };
+
 export function AccueilPage() {
     const loading = useLabLoading();
+    const [done, setDone] = useState<Record<string, boolean>>({});
     const quotes = getQuoteTotals();
-    const wonCount = getWonDeals().length;
-    const closedCount = getClosedDeals().length;
-    const leadCount = getLeadSourceTotals().reduce((sum, row) => sum + row.count, 0);
-    const pipeline = getPipelineByStage();
+    const won = getWonDeals();
+    const closed = getClosedDeals();
+    const pipeline = getPipelineByStage().map((row) => ({
+        ...row,
+        axis: `${row.label} · ${row.count}`,
+    }));
     const cumulative = getCumulativeWonRevenue().map((row) => ({
-        date: row.date,
-        cumulative: row.cumulative,
+        ...row,
         label: formatDayLabel(row.date),
     }));
     const sources = getLeadSourceChartRows();
+    const goals = getGoalProgress();
     const deals = getOpenDeals()
         .slice()
         .sort((a, b) => b.value - a.value)
         .slice(0, 6);
+    const activities = getOpenActivities();
 
     return (
-        <div className="space-y-5">
-            <section className="grid grid-cols-2 border border-[var(--evo-border)] bg-[var(--evo-surface)] lg:grid-cols-4">
-                <KpiCard
+        <div className="space-y-7">
+            <PageHeader
+                title="Accueil"
+                descriptor="Vue d’ensemble · septembre 2026"
+                context={
+                    <>
+                        <ContextChip active>1–30 sept. 2026</ContextChip>
+                        <ContextChip>Équipe commerciale</ContextChip>
+                    </>
+                }
+                actions={
+                    <Button variant="primary" disabled title="Prototype — création non branchée">
+                        + Affaire
+                    </Button>
+                }
+            />
+
+            <KpiStrip>
+                <KpiMetric
                     label="CA gagné"
                     value={formatDa(getWonRevenue())}
-                    hint={`${wonCount} deals gagnés`}
+                    hint={`${won.length} affaires gagnées`}
                 />
-                <KpiCard
+                <KpiMetric
                     label="Pipeline ouvert"
                     value={formatDa(getTotalOpenPipeline())}
-                    hint={`${getOpenDealCount()} deals`}
+                    hint={`${getOpenDealCount()} affaires`}
                 />
-                <KpiCard
+                <KpiMetric
                     label="Conversion"
                     value={formatPercent(getConversionRate())}
-                    hint={`${wonCount} gagnés / ${closedCount} clos`}
+                    hint={`${won.length} gagnées · ${closed.length} closes`}
                 />
-                <KpiCard
+                <KpiMetric
                     label="Devis en attente"
                     value={formatCount(quotes.pending)}
                     hint={formatDa(quotes.pendingValue)}
                 />
-            </section>
+            </KpiStrip>
 
-            <div className="grid gap-4 xl:grid-cols-2">
-                <ChartFrame title="Pipeline par étape" loading={loading} hint="Deals ouverts">
-                    <EvilBarChart
-                        data={pipeline}
-                        config={pipelineChartConfig}
-                        className="h-full w-full"
-                        animationType="none"
-                    >
-                        <EvilBarChart.Grid />
-                        <EvilBarChart.XAxis dataKey="label" />
-                        <EvilBarChart.YAxis
-                            tickFormatter={(value: number) => formatCount(value)}
-                        />
-                        <EvilBarChart.Tooltip />
-                        <EvilBarChart.Bar dataKey="pipeline" enableHoverHighlight />
-                    </EvilBarChart>
-                </ChartFrame>
-                <ChartFrame
-                    title="CA cumulé septembre"
-                    loading={loading}
-                    hint="Palier à chaque deal gagné"
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+                <Module
+                    title="Pipeline ouvert"
+                    hint={`${getOpenDealCount()} affaires · ${formatDa(getTotalOpenPipeline())}`}
+                    flush
                 >
-                    <EvilLineChart
-                        data={cumulative}
-                        config={cumulativeChartConfig}
-                        className="h-full w-full"
-                        animationType="none"
-                    >
-                        <EvilLineChart.Grid />
-                        <EvilLineChart.XAxis dataKey="label" />
-                        <EvilLineChart.YAxis
-                            tickFormatter={(value: number) => formatCount(value)}
-                        />
-                        <EvilLineChart.Tooltip />
-                        <EvilLineChart.Line dataKey="cumulative" curveType="stepAfter" />
-                    </EvilLineChart>
-                </ChartFrame>
+                    <ChartFrame loading={loading}>
+                        <EvilBarChart
+                            data={pipeline}
+                            config={pipelineChartConfig}
+                            className="h-full w-full"
+                            animationType="none"
+                            chartProps={{ margin: CHART_MARGIN }}
+                        >
+                            <EvilBarChart.Grid stroke="var(--evo-hairline)" vertical={false} />
+                            <EvilBarChart.XAxis dataKey="axis" />
+                            <EvilBarChart.YAxis tickFormatter={(value: number) => formatCompactAxis(value)} />
+                            <EvilBarChart.Tooltip />
+                            <EvilBarChart.Bar dataKey="pipeline" enableHoverHighlight />
+                        </EvilBarChart>
+                    </ChartFrame>
+                </Module>
+
+                <Module title="CA gagné · septembre" hint={`Fin de période ${formatDa(getWonRevenue())}`} flush>
+                    <ChartFrame loading={loading}>
+                        <EvilLineChart
+                            data={cumulative}
+                            config={cumulativeChartConfig}
+                            className="h-full w-full"
+                            animationType="none"
+                            chartProps={{ margin: CHART_MARGIN }}
+                        >
+                            <EvilLineChart.Grid stroke="var(--evo-hairline)" vertical={false} />
+                            <EvilLineChart.XAxis dataKey="label" />
+                            <EvilLineChart.YAxis tickFormatter={(value: number) => formatCompactAxis(value)} />
+                            <EvilLineChart.Tooltip />
+                            <EvilLineChart.Line dataKey="cumulative" curveType="stepAfter" />
+                        </EvilLineChart>
+                    </ChartFrame>
+                </Module>
             </div>
 
-            <ChartFrame title="Sources de leads" loading={loading} hint={`${leadCount} leads`}>
-                <EvilBarChart
-                    data={sources}
-                    config={leadsChartConfig}
-                    className="h-full w-full"
-                    layout="horizontal"
-                    animationType="none"
-                >
-                    <EvilBarChart.Grid />
-                    <EvilBarChart.XAxis tickFormatter={(value: number) => formatCount(value)} />
-                    <EvilBarChart.YAxis dataKey="source" width={168} />
-                    <EvilBarChart.Tooltip />
-                    <EvilBarChart.Bar dataKey="leads" enableHoverHighlight />
-                </EvilBarChart>
-            </ChartFrame>
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+                <Module title="Sources de leads" hint="128 leads au total" flush>
+                    <ChartFrame loading={loading} height={280}>
+                        <EvilBarChart
+                            data={sources}
+                            config={leadsChartConfig}
+                            className="h-full w-full"
+                            layout="horizontal"
+                            animationType="none"
+                            chartProps={{ margin: { top: 4, right: 12, left: 0, bottom: 0 } }}
+                        >
+                            <EvilBarChart.Grid stroke="var(--evo-hairline)" vertical={false} />
+                            <EvilBarChart.XAxis tickFormatter={(value: number) => formatCount(value)} />
+                            <EvilBarChart.YAxis dataKey="source" width={132} />
+                            <EvilBarChart.Tooltip />
+                            <EvilBarChart.Bar dataKey="leads" enableHoverHighlight />
+                        </EvilBarChart>
+                    </ChartFrame>
+                </Module>
 
-            <section className="border border-[var(--evo-border)] bg-[var(--evo-surface)]">
-                <header className="border-b border-[var(--evo-border-subtle)] px-4 py-3">
-                    <h2 className="text-[15px] font-semibold">Pipeline à suivre</h2>
-                </header>
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[720px] text-left text-[13px]">
-                        <thead className="text-[11px] tracking-wide text-[var(--evo-ink-muted)]">
-                            <tr className="border-b border-[var(--evo-border-subtle)]">
-                                <th className="px-4 py-2 font-medium">Deal</th>
+                <Module title="Objectifs" hint="Septembre 2026" padded>
+                    <div className="space-y-4 py-1">
+                        {goals.map((goal) => (
+                            <ProgressRow
+                                key={goal.id}
+                                label={
+                                    goal.metric === 'won_revenue'
+                                        ? 'CA'
+                                        : goal.metric === 'open_pipeline'
+                                            ? 'Pipeline'
+                                            : goal.metric === 'ads_roas'
+                                                ? 'Valeur / dépenses'
+                                                : 'Devis envoyés'
+                                }
+                                current={
+                                    goal.metric === 'ads_roas'
+                                        ? formatRoas(goal.current)
+                                        : goal.metric === 'quotes_sent'
+                                            ? formatCount(goal.current)
+                                            : formatDa(goal.current)
+                                }
+                                target={
+                                    goal.metric === 'ads_roas'
+                                        ? formatRoas(goal.target)
+                                        : goal.metric === 'quotes_sent'
+                                            ? formatCount(goal.target)
+                                            : formatDa(goal.target)
+                                }
+                                ratio={goal.ratio}
+                            />
+                        ))}
+                    </div>
+                </Module>
+            </div>
+
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+                <Module title="Affaires à suivre" hint="Les plus importantes encore ouvertes">
+                    <table className="w-full text-left text-[13px]">
+                        <thead className="text-[11px] text-[var(--evo-ink-muted)]">
+                            <tr className="border-b border-[var(--evo-hairline)]">
+                                <th className="px-4 py-2 font-medium">Affaire</th>
                                 <th className="px-4 py-2 font-medium">Société</th>
-                                <th className="px-4 py-2 font-medium">Contact</th>
                                 <th className="px-4 py-2 font-medium">Étape</th>
-                                <th className="px-4 py-2 font-medium">Owner</th>
                                 <th className="px-4 py-2 text-right font-medium">Valeur</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {deals.map((deal) => {
-                                const contact = getContact(deal.contactId);
-                                const company = getCompany(deal.companyId);
-
-                                return (
-                                    <tr
-                                        key={deal.id}
-                                        className="border-b border-[var(--evo-border-subtle)] last:border-0 hover:bg-[var(--evo-hover)]"
-                                    >
-                                        <td className="px-4 py-2.5">
-                                            <LabLink
-                                                to={{ name: 'deal', id: deal.id }}
-                                                className="font-medium text-[var(--evo-teal)] hover:underline"
-                                            >
-                                                {deal.name}
-                                            </LabLink>
-                                        </td>
-                                        <td className="px-4 py-2.5">{company.name}</td>
-                                        <td className="px-4 py-2.5">
-                                            <LabLink
-                                                to={{ name: 'contact', id: contact.id }}
-                                                className="hover:underline"
-                                            >
-                                                {contactName(contact)}
-                                            </LabLink>
-                                        </td>
-                                        <td className="px-4 py-2.5">{STAGE_LABELS[deal.stage]}</td>
-                                        <td className="px-4 py-2.5">{getOwner(deal.ownerId).initials}</td>
-                                        <td className="px-4 py-2.5 text-right tabular-nums">
-                                            {formatDa(deal.value)}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
+                            {deals.map((deal) => (
+                                <tr
+                                    key={deal.id}
+                                    className="border-b border-[var(--evo-hairline)] last:border-0 hover:bg-[var(--evo-hover)]"
+                                >
+                                    <td className="px-4 py-2.5">
+                                        <LabLink
+                                            to={{ name: 'deal', id: deal.id }}
+                                            className="font-medium text-[var(--evo-teal)] hover:underline"
+                                        >
+                                            {deal.name}
+                                        </LabLink>
+                                        <p className="text-[12px] text-[var(--evo-ink-muted)]">
+                                            {contactName(getContact(deal.contactId))} · {getOwner(deal.ownerId).initials}
+                                        </p>
+                                    </td>
+                                    <td className="px-4 py-2.5">{getCompany(deal.companyId).name}</td>
+                                    <td className="px-4 py-2.5">{STAGE_LABELS[deal.stage]}</td>
+                                    <td className="px-4 py-2.5 text-right tabular-nums">{formatDa(deal.value)}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
-                </div>
-            </section>
+                </Module>
 
-            <section className="border border-[var(--evo-border)] bg-[var(--evo-surface)] px-4 py-3">
-                <h2 className="text-[15px] font-semibold">Travail du jour</h2>
-                <ul className="mt-2 space-y-2">
-                    {getOpenActivities().map((activity) => (
-                        <li key={activity.id} className="text-[13px] text-[var(--evo-ink-secondary)]">
-                            {activity.title}
-                        </li>
-                    ))}
-                </ul>
-                <p className="mt-3 text-[12px] text-[var(--evo-ink-muted)]">
-                    Objet ancré:{' '}
-                    <LabLink
-                        to={{ name: 'deal', id: KNOWN_OBJECT_IDS.dealModernisationCrm }}
-                        className="text-[var(--evo-teal)] hover:underline"
-                    >
-                        Modernisation CRM
-                    </LabLink>
-                    {' · '}
-                    <LabLink
-                        to={{ name: 'devis', id: KNOWN_OBJECT_IDS.quoteDv20260047 }}
-                        className="text-[var(--evo-teal)] hover:underline"
-                    >
-                        DV-2026-0047
-                    </LabLink>
-                </p>
-            </section>
+                <Module title="À faire aujourd’hui" hint={`${activities.length} ouvertes`}>
+                    <ul>
+                        {activities.map((activity) => {
+                            const checked = Boolean(done[activity.id]);
+                            const deal = deals.find((row) => row.id === activity.dealId) ?? null;
+
+                            return (
+                                <li
+                                    key={activity.id}
+                                    className="flex items-start gap-3 border-b border-[var(--evo-hairline)] px-4 py-3 last:border-0"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={() => {
+                                            setDone((current) => ({
+                                                ...current,
+                                                [activity.id]: !current[activity.id],
+                                            }));
+                                        }}
+                                        className="mt-0.5 size-3.5 accent-[var(--evo-teal)]"
+                                        aria-label={activity.title}
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                        <p
+                                            className={
+                                                checked
+                                                    ? 'text-[13px] text-[var(--evo-ink-muted)] line-through'
+                                                    : 'text-[13px] font-medium'
+                                            }
+                                        >
+                                            {activity.title}
+                                        </p>
+                                        <p className="mt-0.5 text-[12px] text-[var(--evo-ink-muted)]">
+                                            {activity.dealId ? (
+                                                <LabLink
+                                                    to={{ name: 'deal', id: activity.dealId }}
+                                                    className="hover:underline"
+                                                >
+                                                    {deal?.name ?? 'Affaire liée'}
+                                                </LabLink>
+                                            ) : (
+                                                'Sans affaire'
+                                            )}
+                                            {' · '}
+                                            {new Intl.DateTimeFormat('fr-DZ', {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            }).format(new Date(activity.dueAt))}
+                                        </p>
+                                    </div>
+                                    <span className="text-[11px] text-[var(--evo-ink-faint)]">
+                                        {getOwner(activity.ownerId).initials}
+                                    </span>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </Module>
+            </div>
         </div>
     );
 }

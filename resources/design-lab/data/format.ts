@@ -18,7 +18,48 @@ export function formatRoas(value: number): string {
     return `${value.toLocaleString('fr-DZ', {
         minimumFractionDigits: 1,
         maximumFractionDigits: 1,
-    })}x`;
+    })}×`;
+}
+
+export function formatExactRoas(value: number): string {
+    return `${value.toLocaleString('fr-DZ', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })}×`;
+}
+
+export function formatCompactAxis(value: number): string {
+    if (value === 0) {
+        return '0';
+    }
+
+    const abs = Math.abs(value);
+
+    if (abs >= 1_000_000) {
+        const millions = value / 1_000_000;
+        const label = Number.isInteger(millions)
+            ? String(millions)
+            : millions.toLocaleString('fr-DZ', { maximumFractionDigits: 1 });
+
+        return `${label} M`;
+    }
+
+    if (abs >= 1000) {
+        return `${Math.round(value / 1000)} k`;
+    }
+
+    return formatCount(value);
+}
+
+export function formatRatioPercent(ratio: number | null, digits = 2): string {
+    if (ratio === null) {
+        return '—';
+    }
+
+    return `${(ratio * 100).toLocaleString('fr-DZ', {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+    })}%`;
 }
 
 export function formatPercent(value: number): string {
