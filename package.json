@@ -11,7 +11,9 @@
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
         "lint:check": "eslint .",
-        "types:check": "tsc --noEmit"
+        "types:check": "tsc --noEmit",
+        "test": "vitest run",
+        "design-lab": "vite --config vite.design-lab.config.ts"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",
@@ -27,7 +29,8 @@
         "eslint-plugin-react-hooks": "^7.0.0",
         "prettier": "^3.4.2",
         "prettier-plugin-tailwindcss": "^0.6.11",
-        "typescript-eslint": "^8.23.0"
+        "typescript-eslint": "^8.23.0",
+        "vitest": "^5.0.2"
     },
     "dependencies": {
         "@astryxdesign/core": "^0.6.3",
@@ -71,6 +74,7 @@
         "posthog-js": "^1.426.2",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
+        "recharts": "^3.10.1",
         "sonner": "^2.0.0",
         "tailwind-merge": "^3.0.1",
         "tailwindcss": "^4.0.0",

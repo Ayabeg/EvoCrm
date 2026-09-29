@@ -2,6 +2,7 @@
 /bootstrap/ssr
 /node_modules
 /public/build
+/resources/design-lab/dist
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage

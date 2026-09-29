@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+@import '@fontsource/geist-sans/400.css';
+@import '@fontsource/geist-sans/500.css';
+@import '@fontsource/geist-sans/600.css';
+@import '../css/evo-shell.css';
+
+@source './**/*.{ts,tsx,html}';
+
+:root {
+    color-scheme: light;
+}
+
+html,
+body,
+#design-lab-root {
+    min-height: 100%;
+    background: var(--evo-canvas);
+    color: var(--evo-ink);
+}
+
+body {
+    margin: 0;
+    font-family: var(--evo-font-sans);
+    font-feature-settings: 'ss01' on, 'cv11' on;
+}
+
+::selection {
+    background: color-mix(in srgb, var(--evo-teal) 22%, white);
+    color: var(--evo-ink);
+}
+
+:focus-visible {
+    outline: 2px solid var(--evo-teal);
+    outline-offset: 2px;
+}
+
+.lab-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.lab-scrollbar::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--evo-ink) 18%, transparent);
+    border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
