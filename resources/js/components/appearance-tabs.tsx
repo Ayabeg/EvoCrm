@@ -53,7 +53,7 @@ export default function AppearanceToggleTab({
             </div>
             <p className="text-sm text-muted-foreground">
                 {t(
-                    'Light Cabinet is the white Sales Hub face. Dark Cabinet is true black - canvas #000000, cards #0A0A0A - with the same Evotechly orange actions. System follows your device.',
+                    'Light Cabinet is the paper Sales Hub face. Dark Cabinet is near-black with orange actions and teal selection. System follows your device.',
                 )}
             </p>
         </div>

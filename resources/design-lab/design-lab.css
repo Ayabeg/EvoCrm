@@ -52,7 +52,7 @@ body {
 }
 
 :focus-visible {
-    outline: 2px solid var(--evo-teal);
+    outline: 2px solid var(--evo-focus, var(--evo-teal));
     outline-offset: 2px;
 }
 
@@ -121,11 +121,40 @@ body {
 
 .lab-chart .recharts-tooltip-wrapper > div,
 .lab-chart [data-slot='tooltip-content'] {
-    background: #ffffff !important;
+    background: var(--evo-surface) !important;
     border: 1px solid var(--evo-hairline) !important;
     border-radius: 8px !important;
-    box-shadow: 0 6px 20px rgba(13, 27, 36, 0.08) !important;
+    box-shadow: none !important;
     color: var(--evo-ink) !important;
+}
+
+.dark .bg-white {
+    background-color: var(--evo-surface);
+}
+
+.dark .hover\:bg-white:hover,
+.dark .hover\:bg-white\/70:hover {
+    background-color: var(--evo-hover);
+}
+
+.dark {
+    color-scheme: dark;
+    --evo-canvas: #121212;
+    --evo-surface: #1c1c1c;
+    --evo-surface-raised: #262626;
+    --evo-ink: #e8e8e8;
+    --evo-ink-secondary: #e8e8e8;
+    --evo-ink-muted: #b3b3b3;
+    --evo-ink-faint: #8a8a8a;
+    --evo-hairline: #3a3a3a;
+    --evo-border: #3a3a3a;
+    --evo-border-subtle: #2a2a2a;
+    --evo-border-strong: #666666;
+    --evo-teal: #0F4C5C;
+    --evo-teal-soft: color-mix(in srgb, #0F4C5C 28%, #1c1c1c);
+    --evo-accent: #EC6025;
+    --evo-hover: #1c1c1c;
+    --evo-focus: #5EB0C0;
 }
 
 @media (prefers-reduced-motion: reduce) {

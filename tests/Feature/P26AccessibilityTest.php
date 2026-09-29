@@ -40,7 +40,7 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
 
     expect($list)->toContain("event.key !== 'Enter'")
         ->and($list)->toContain("event.key !== ' '")
-        ->and($list)->toContain('focus-visible:outline-[color:var(--color-accent)]')
+        ->and($list)->toContain('focus-visible:outline-[color:var(--color-focus-ring)]')
         ->and($list)->toContain('aria-label={`Select ${row.id}`}');
 
     expect($table)->toContain('aria-label="Select page"')
@@ -111,7 +111,8 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($js)->toContain('Space activates a focusable widget');
 
     expect($app)->toContain('--color-text-muted: #929292')
-        ->and($app)->toContain('--color-focus-ring: var(--color-accent)');
+        ->and($app)->toContain('--color-focus-ring: var(--color-accent)')
+        ->and($app)->toContain('--color-focus-ring: #5EB0C0');
 });
 
 it('does not claim WCAG certification or start P27 motion tokens', function () {

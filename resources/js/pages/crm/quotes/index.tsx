@@ -48,7 +48,7 @@ export default function QuotesIndex({
         <>
             <Head title={t('Quotes')} />
             <div
-                className="flex h-app-workspace min-h-0 flex-col bg-[#f7f7f5]"
+                className="flex h-app-workspace min-h-0 flex-col bg-canvas"
                 data-crm="quotes-workspace"
             >
                 <CrmListShell

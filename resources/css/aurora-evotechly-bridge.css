@@ -171,30 +171,26 @@
 }
 
 .dark {
-    /* Surfaces — EvoCrm Dark Cabinet (true black, never navy) */
+    /* Surfaces — near-black tonal steps, no navy and no heavy glow */
     --aurora-page-bg: var(--color-bg);
     --aurora-bg: var(--color-bg);
-    --aurora-nav-bg: #000000;
-    --sidebar: #000000;
-    --sidebar-foreground: #a3a3a3;
-    --sidebar-primary: #f5f5f5;
-    --sidebar-primary-foreground: #000000;
-    --sidebar-accent: var(--color-accent-soft);
-    --sidebar-accent-foreground: #f5f5f5;
-    --sidebar-border: #1f1f1f;
-    --sidebar-ring: #e8530e;
+    --aurora-nav-bg: #121212;
+    --sidebar: #121212;
+    --sidebar-foreground: #b3b3b3;
+    --sidebar-primary: #e8e8e8;
+    --sidebar-primary-foreground: #121212;
+    --sidebar-accent: var(--color-selection);
+    --sidebar-accent-foreground: #e8e8e8;
+    --sidebar-border: #3a3a3a;
+    --sidebar-ring: #5EB0C0;
     --aurora-panel-medium: var(--color-surface);
-    --aurora-panel-medium-top: rgba(10, 10, 10, 0.96);
-    --aurora-panel-strong: var(--color-surface);
-    --aurora-panel-strong-top: #141414;
-    --aurora-control-surface: #171717;
-    --aurora-control-surface-top: rgba(23, 23, 23, 0.96);
-    --aurora-hover-bg: #1f1f1f;
-    --aurora-surface-raised: linear-gradient(
-        180deg,
-        rgba(20, 20, 20, 0.96),
-        rgba(10, 10, 10, 0.98)
-    );
+    --aurora-panel-medium-top: #1c1c1c;
+    --aurora-panel-strong: var(--color-subtle);
+    --aurora-panel-strong-top: #262626;
+    --aurora-control-surface: #262626;
+    --aurora-control-surface-top: #262626;
+    --aurora-hover-bg: #2a2a2a;
+    --aurora-surface-raised: #262626;
 
     --aurora-border-default: var(--color-border);
     --aurora-border-strong: var(--color-border-strong);
@@ -207,7 +203,7 @@
     --aurora-accent-deep: var(--color-accent-pressed);
     --aurora-accent-lift: color-mix(in srgb, var(--color-accent) 78%, white);
     --aurora-accent-button: var(--color-accent);
-    --aurora-accent-foreground: #ffffff;
+    --aurora-accent-foreground: #121212;
     --aurora-accent-gradient: linear-gradient(
         180deg,
         var(--aurora-accent-lift) 0%,
@@ -237,13 +233,11 @@
     --axon-orange-border: color-mix(in srgb, var(--color-accent) 36%, transparent);
 
     --aurora-overlay: rgba(0, 0, 0, 0.72);
-    --aurora-selected-bg: color-mix(in srgb, var(--color-accent) 14%, transparent);
-    --aurora-pressed-bg: color-mix(in srgb, var(--color-accent) 20%, transparent);
-    --aurora-focus-ring: color-mix(in srgb, var(--color-accent) 30%, transparent);
-    --aurora-focus-ring-strong: color-mix(in srgb, var(--color-accent) 52%, transparent);
-    --aurora-active-glow:
-        0 0 0 1px color-mix(in srgb, var(--color-accent) 28%, transparent),
-        0 2px 8px color-mix(in srgb, var(--color-accent) 18%, transparent);
+    --aurora-selected-bg: var(--color-selection);
+    --aurora-pressed-bg: color-mix(in srgb, var(--color-selection) 72%, #121212);
+    --aurora-focus-ring: color-mix(in srgb, var(--color-focus-ring) 70%, transparent);
+    --aurora-focus-ring-strong: var(--color-focus-ring);
+    --aurora-active-glow: 0 0 0 2px var(--color-focus-ring);
 
     --aurora-shell-bg: var(--color-bg);
 
@@ -263,8 +257,8 @@
     --aurora-radius-1: 8px;
     --aurora-radius-2: 10px;
     --aurora-radius-3: 12px;
-    --aurora-shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.28), 0 8px 20px rgba(0, 0, 0, 0.18);
-    --aurora-shadow-strong: 0 4px 16px rgba(0, 0, 0, 0.36), 0 16px 32px rgba(0, 0, 0, 0.24);
+    --aurora-shadow-medium: none;
+    --aurora-shadow-strong: none;
     --aurora-highlight-medium: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     --aurora-highlight-strong: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
@@ -275,14 +269,14 @@
     --popover: var(--color-surface);
     --popover-foreground: var(--color-text);
     --primary: var(--color-accent);
-    --primary-foreground: #ffffff;
-    --secondary: #171717;
+    --primary-foreground: #121212;
+    --secondary: #262626;
     --secondary-foreground: var(--color-text);
-    --muted: #171717;
+    --muted: #262626;
     --muted-foreground: var(--color-text-muted);
-    --accent: #171717;
+    --accent: #262626;
     --accent-foreground: var(--color-text);
     --border: var(--color-border);
-    --input: var(--color-border);
+    --input: var(--color-border-strong);
     --ring: var(--color-focus-ring);
 }

@@ -95,7 +95,7 @@ export default function Home({
                         {canCreate ? (
                             <Link
                                 href="/crm/deals?create=1"
-                                className="inline-flex h-[39px] shrink-0 items-center rounded-lg bg-[#E8530E] px-[18px] text-[12px] font-semibold text-white focus-visible:ring-2 focus-visible:ring-[#E8530E] focus-visible:outline-none"
+                                className="inline-flex h-[39px] shrink-0 items-center rounded-lg bg-[var(--home-accent)] px-[18px] text-[12px] font-semibold text-white focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] focus-visible:outline-none"
                             >
                                 {t('New deal')}
                             </Link>
@@ -137,7 +137,7 @@ export default function Home({
                                     >
                                         <div className="flex h-[132px] items-end gap-1">
                                             <span
-                                                className="w-[18px] rounded-t-[3px] bg-[#E8530E]"
+                                                className="w-[18px] rounded-t-[3px] bg-[var(--home-accent)]"
                                                 style={{
                                                     height: `${Math.round((point.won_cents / peak) * 132)}px`,
                                                 }}
@@ -159,7 +159,7 @@ export default function Home({
                             </div>
                             <p className="mt-2 flex justify-center gap-4 text-[10px] text-[var(--home-muted)]">
                                 <span className="inline-flex items-center gap-1.5">
-                                    <i className="size-2 rounded-full bg-[#E8530E]" />
+                                    <i className="size-2 rounded-full bg-[var(--home-accent)]" />
                                     {t('Won deals')}
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">

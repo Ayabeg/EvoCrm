@@ -263,7 +263,7 @@ export function QuickRecordDrawer() {
                 }}
                 className={cn(
                     'w-full max-sm:w-full sm:w-[min(92vw,520px)] lg:w-[480px]',
-                    'gap-0 border-l bg-white p-0',
+                    'gap-0 border-l bg-surface p-0',
                     PAGE_OVERFLOW_CLASS,
                     MOTION_DRAWER_CLASS,
                     'motion-reduce:transition-none',

@@ -63,9 +63,9 @@ const subscribe = (callback: () => void) => {
 };
 
 /**
- * EvoSales ships Light Cabinet and a true-black Dark. The choice persists in
- * localStorage + the `appearance` cookie (read server-side by app.blade.php
- * to stamp class="dark" on <html> before first paint).
+ * EvoCrm ships Light Cabinet and a near-black Dark Cabinet. The choice
+ * persists in localStorage + the `appearance` cookie. app.blade.php reads
+ * both before first paint so the cabinet cannot flash.
  */
 export function initializeTheme(): void {
     if (typeof window === 'undefined') {

@@ -9,13 +9,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         {{-- class="dark" is stamped server-side only for an explicit Dark choice.
-             System followers get it here before first paint to avoid a flash. --}}
+             localStorage + system preference run here before first paint so
+             the cabinet cannot flash the wrong theme. --}}
         <script>
             (function () {
                 const appearance = @json($appearance);
+                let resolved = appearance;
+                try {
+                    const stored = localStorage.getItem('appearance');
+                    if (stored === 'light' || stored === 'dark' || stored === 'system') {
+                        resolved = stored;
+                    }
+                } catch (e) {}
                 const dark =
-                    appearance === 'dark' ||
-                    (appearance === 'system' &&
+                    resolved === 'dark' ||
+                    (resolved === 'system' &&
                         window.matchMedia('(prefers-color-scheme: dark)').matches);
 
                 document.documentElement.classList.toggle('dark', dark);
@@ -29,7 +37,7 @@
             }
 
             html.dark {
-                background-color: #000000;
+                background-color: #121212;
             }
         </style>
 

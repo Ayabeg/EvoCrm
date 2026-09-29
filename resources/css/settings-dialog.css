@@ -54,6 +54,37 @@
     color: #ffffff;
 }
 
+.dark [data-settings='dialog'] {
+    --settings-canvas: #1c1c1c;
+    --settings-surface: #262626;
+    --settings-ink: #e8e8e8;
+    --settings-mute: #b3b3b3;
+    --settings-accent: var(--evo-accent);
+    --settings-accent-soft: color-mix(in srgb, #0F4C5C 28%, #1c1c1c);
+    --settings-hairline: #3a3a3a;
+    --settings-shadow: none;
+    color: var(--settings-ink);
+}
+
+.dark [data-settings='dialog'] [data-settings='search']::selection,
+.dark [data-settings='dialog'] ::selection {
+    background: color-mix(in srgb, #0F4C5C 55%, #121212);
+    color: #e8e8e8;
+}
+
+.dark [data-settings='dialog'] [aria-current='page'] {
+    background: #0F4C5C;
+    border-color: #5EB0C0;
+    color: #e8e8e8;
+}
+
+.dark [data-settings='dialog'] [data-settings='search']:focus-visible,
+.dark [data-settings='dialog'] [data-settings='mobile-select']:focus-visible {
+    border-color: #5EB0C0;
+    outline: 2px solid #5EB0C0;
+    outline-offset: 2px;
+}
+
 @container settings-panel (max-width: 480px) {
     [data-settings='dialog'] [data-settings='card'] .sm\:grid-cols-\[11rem_minmax\(0\,1fr\)\] {
         grid-template-columns: minmax(0, 1fr);
