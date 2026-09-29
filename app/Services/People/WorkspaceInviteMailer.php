@@ -59,11 +59,18 @@ class WorkspaceInviteMailer
             inviteUrl: $this->setPasswordUrl($invitee),
         );
 
-        // Tests, the array mailer, and no-mailbox Resend (or other
-        // transactional default) go through Laravel Mail so Mail::fake()
-        // asserts the same mailable production Resend will send.
-        if (app()->environment('testing') || config('mail.default') === 'array' || ! $mailbox) {
+        // Tests and the array mailer stay on send() so Mail::fake() can
+        // assert the same mailable production Resend will send. Production
+        // Resend (no workspace mailbox) is queued onto the default mailer.
+        if (app()->environment('testing') || config('mail.default') === 'array') {
             Mail::to($invitee->email)->send($mailable);
+            $this->recordInvite($invitee, $inviter);
+
+            return InviteSendResult::sent();
+        }
+
+        if (! $mailbox) {
+            Mail::to($invitee->email)->queue($mailable);
             $this->recordInvite($invitee, $inviter);
 
             return InviteSendResult::sent();

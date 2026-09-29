@@ -24,6 +24,15 @@ services:
       SESSION_DRIVER: ${SESSION_DRIVER:-database}
       QUEUE_CONNECTION: ${QUEUE_CONNECTION:-database}
       CACHE_STORE: ${CACHE_STORE:-database}
+      MAIL_MAILER: ${MAIL_MAILER:-log}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-no-reply@evocrmapp.com}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-EvoCrm · Evotechly}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
+      POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
+      EVOCRM_SIGNUP_MODE: ${EVOCRM_SIGNUP_MODE:-invite}
+      EVOCRM_SIGNUP_REQUEST_URL: ${EVOCRM_SIGNUP_REQUEST_URL:-mailto:hello@evotechly.com}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-*}
       EVOLUTION_BASE_URL: ${EVOLUTION_BASE_URL:-}
       EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:-}
       EVOLUTION_INSTANCE: ${EVOLUTION_INSTANCE:-evosales}
@@ -46,7 +55,7 @@ services:
     environment: *app-environment
     volumes: *app-volumes
     command: >
-      sh -c "php artisan queue:work --sleep=3 --tries=3 --timeout=90 --max-time=3600"
+      sh -c "php artisan queue:work --sleep=3 --tries=3 --backoff=3 --timeout=90 --max-time=3600"
 
   scheduler:
     build: .

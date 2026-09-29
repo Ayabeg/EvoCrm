@@ -125,4 +125,23 @@ class CompanyController extends Controller
 
         return back();
     }
+
+    public function updateAttributes(Request $request, Company $company, CustomAttributes $attributes): RedirectResponse
+    {
+        $this->authorize('update', $company);
+
+        $data = $request->validate([
+            'attributes' => ['required', 'array'],
+        ]);
+
+        $attributes->saveValues(
+            $request->user()->workspace,
+            'company',
+            $company->id,
+            $data['attributes'],
+            enforceRequired: true,
+        );
+
+        return back();
+    }
 }

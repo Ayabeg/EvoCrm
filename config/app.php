@@ -123,4 +123,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    | Comma-separated proxy IPs, "*", or "none"/empty. Default "*" keeps
+    | the existing reverse-proxy deploy working; set specific IPs to tighten.
+    */
+    'trusted_proxies' => env('TRUSTED_PROXIES', '*'),
+
 ];

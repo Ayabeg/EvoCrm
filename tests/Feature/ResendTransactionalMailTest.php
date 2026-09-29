@@ -66,7 +66,7 @@ it('sends meeting booked and workspace invite through the default Resend mailer 
 it('reports Resend readiness from evocrm:mail-smoke without calling the live API', function () {
     config([
         'mail.default' => 'resend',
-        'mail.from.address' => 'noreply@evocrmapp.com',
+        'mail.from.address' => 'no-reply@evocrmapp.com',
         'mail.from.name' => 'EvoCrm · Evotechly',
         'services.resend.key' => 're_test_not_a_live_key',
     ]);
@@ -74,7 +74,7 @@ it('reports Resend readiness from evocrm:mail-smoke without calling the live API
 
     $this->artisan('evocrm:mail-smoke')
         ->expectsOutputToContain('default mailer : resend')
-        ->expectsOutputToContain('noreply@evocrmapp.com')
+        ->expectsOutputToContain('no-reply@evocrmapp.com')
         ->expectsOutputToContain('Resend SDK')
         ->expectsOutputToContain('set (')
         ->expectsOutputToContain('EVOSALES_SMTP_*')

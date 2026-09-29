@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Schedule;
 
+Schedule::command('schedule:heartbeat')->name('schedule:heartbeat')->everyMinute()->withoutOverlapping();
 Schedule::command('outbound:run')->name('outbound:run')->everyMinute()->withoutOverlapping();
 Schedule::command('workflow:run')->name('workflow:run')->everyMinute()->withoutOverlapping();
 Schedule::command('tickets:check-sla')->name('tickets:check-sla')->everyMinute()->withoutOverlapping();

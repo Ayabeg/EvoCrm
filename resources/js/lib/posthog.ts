@@ -23,8 +23,31 @@ type WorkspaceIdentity = {
 
 let headersBound = false;
 
+const SENSITIVE_KEY = /password|token|secret|api[_-]?key|authorization|cookie|access_token|refresh_token/i;
+
+function redactProperties(value: unknown): unknown {
+    if (Array.isArray(value)) {
+        return value.map(redactProperties);
+    }
+
+    if (value && typeof value === 'object') {
+        return Object.fromEntries(
+            Object.entries(value as Record<string, unknown>).map(([key, nested]) => [
+                key,
+                SENSITIVE_KEY.test(key) ? '[redacted]' : redactProperties(nested),
+            ]),
+        );
+    }
+
+    return value;
+}
+
 export function bootPosthog(config?: PosthogPageConfig | null): boolean {
-    const key = config?.key || import.meta.env.VITE_POSTHOG_KEY;
+    if (config && config.enabled === false) {
+        return false;
+    }
+
+    const key = config?.key || (!config ? import.meta.env.VITE_POSTHOG_KEY : null);
     const host = config?.host || import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com';
 
     if (!key) {
@@ -38,6 +61,17 @@ export function bootPosthog(config?: PosthogPageConfig | null): boolean {
             capture_pageview: true,
             capture_exceptions: true,
             person_profiles: 'identified_only',
+            before_send: (event) => {
+                if (!event) {
+                    return event;
+                }
+
+                if (event.properties) {
+                    event.properties = redactProperties(event.properties) as typeof event.properties;
+                }
+
+                return event;
+            },
         });
     }
 

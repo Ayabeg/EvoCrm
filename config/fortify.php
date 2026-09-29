@@ -144,6 +144,8 @@ return [
     */
 
     'features' => [
+        // Routes stay registered so Wayfinder can emit @/routes/register.
+        // Invite-only is enforced at runtime (SignupMode + middleware).
         Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),

@@ -93,13 +93,17 @@ Leave the client ID/secret empty and the "Continue with Google" button stays hid
 
 **Error 400 `redirect_uri_mismatch`:** the app is sending `https://crm.evotechly.com/auth/google/callback` (or your `APP_URL` + `/auth/google/callback`). Google Cloud Console → the **same** Web application OAuth client that owns `GOOGLE_CLIENT_ID` → **Authorized redirect URIs** must contain that exact string — `https` not `http`, no trailing slash, no `www`. Authorized JavaScript origins get the origin only (`https://crm.evotechly.com`). Saving the client can take a minute to apply. The same URI is printed on Settings → Apps and Settings → Connectors.
 
+### Invite-only signup
+
+Public `/register` is closed unless `EVOCRM_SIGNUP_MODE=open`. The default is `invite`: guests see “Invite-only pilot — request access” on the login screen (`EVOCRM_SIGNUP_REQUEST_URL`, default `mailto:hello@evotechly.com`). Workspace growth is Settings → People. Invited users still set a password through the Fortify reset link. Login, password reset, email verification, and 2FA are unchanged. Google/Apple sign-in still works for **existing** accounts; they cannot create a workspace while invite-only.
+
 ### People (Settings → People)
 
 `/settings/people` manages who can sign in to the workspace — owner/admin only (members get 403 and never see the nav item). The table lists name, email, role, last login / invited, and status (active vs invite pending). Invites take name + email + role (**admin|member only** — one owner by default; a second owner needs a real transfer) and send a **login email** with a single-use Fortify set-password link on `https://crm.evotechly.com` — never a standing password in the mail. Delivery prefers the workspace's default enabled SMTP mailbox (`SmtpMailboxMailer`). With no mailbox, invites (and meeting confirmations) use Laravel's default mailer — **Resend** when `MAIL_MAILER=resend`. If that mailer is still `log` and no mailbox is enabled, the invite stays pending and the failure is reported honestly. Setting a password through the link marks the email verified and flips the person to active. Rows support resend-invite (pending only), role change (the last owner can't be demoted, and nobody below owner touches an owner), and remove (not yourself, not the last owner).
 
 ### Transactional mail (Resend)
 
-Meetings, quotes, workspace invites, and Fortify auth use Laravel's default mailer. Official Evotechly mail is **Resend Pro**. Local `.env.example` stays `MAIL_MAILER=log`. Production copies `.env.production.example`: `MAIL_MAILER=resend`, `RESEND_API_KEY` (or alias `RESEND_KEY`), and `MAIL_FROM_ADDRESS` on a verified domain (`noreply@evocrmapp.com` or `support@evocrmapp.com`). Sequence send + warmup stay on `outbound.evotechly.com` SMTP (`EVOSALES_SMTP_*`) and are not Resend. After flipping Contabo env: `php artisan config:clear` then `php artisan evocrm:mail-smoke --send --to=you@evotechly.com`. See [`docs/production-processes.md`](docs/production-processes.md).
+Meetings, quotes, workspace invites, and Fortify auth use Laravel's default mailer. Official Evotechly mail is **Resend Pro**. Local `.env.example` stays `MAIL_MAILER=log`. Production copies `.env.production.example`: `MAIL_MAILER=resend`, `RESEND_API_KEY` (or alias `RESEND_KEY`), and `MAIL_FROM_ADDRESS` on a verified domain (`no-reply@evocrmapp.com` or `support@evocrmapp.com`). Sequence send + warmup stay on `outbound.evotechly.com` SMTP (`EVOSALES_SMTP_*`) and are not Resend. After flipping Contabo env: `php artisan config:clear` then `php artisan evocrm:mail-smoke --send --to=you@evotechly.com`. See [`docs/production-processes.md`](docs/production-processes.md).
 
 Local seed login (local only):
 

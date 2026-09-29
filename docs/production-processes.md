@@ -5,7 +5,7 @@ EvoSales runs three independent Laravel process responsibilities from the same r
 | Service | Responsibility | Command |
 |---|---|---|
 | `web` | HTTP application | `php artisan serve --host=0.0.0.0 --port=$PORT` |
-| `queue` | Consume queued jobs | `php artisan queue:work --sleep=3 --tries=3 --timeout=90 --max-time=3600` |
+| `queue` | Consume queued jobs | `php artisan queue:work --sleep=3 --tries=3 --backoff=3 --timeout=90 --max-time=3600` |
 | `scheduler` | Evaluate Laravel schedules | `php artisan schedule:work` |
 
 The queue process is not called a scheduler worker. It consumes queued jobs. The scheduler process evaluates the schedule in `routes/console.php`.
@@ -45,6 +45,26 @@ php artisan migrate --force
 ## Deployment
 
 Create the production environment from `.env.production.example` in the existing secret store. Never commit populated credentials.
+
+Reference compose services (the Contabo project `evocrm` keeps its own Dockerfile/compose; copy these if the server file is missing them):
+
+```yaml
+  queue:
+    build: .
+    restart: unless-stopped
+    environment: *app-environment
+    command: >
+      sh -c "php artisan queue:work --sleep=3 --tries=3 --backoff=3 --timeout=90 --max-time=3600"
+
+  scheduler:
+    build: .
+    restart: unless-stopped
+    environment: *app-environment
+    command: >
+      sh -c "php artisan schedule:work"
+```
+
+Both reuse the same image and env as `web` (`QUEUE_CONNECTION=database`, shared MySQL). The worker exits after `--max-time=3600`; Docker restarts it. Failed jobs land in `failed_jobs`.
 
 ```bash
 cd /home/deploy/evosales
@@ -102,6 +122,17 @@ Required platform values:
 
 Provider values are required only for enabled integrations. The complete non-secret template is `.env.production.example`.
 
+Pilot / hardening values the Contabo `.env` should also set (repo compose is reference only; the server keeps its own file):
+
+- `EVOCRM_SIGNUP_MODE=invite` (default) — close public `/register` and OAuth workspace creation
+- `EVOCRM_SIGNUP_REQUEST_URL=mailto:hello@evotechly.com` — login-page request-access target
+- `TRUSTED_PROXIES=*` or the nginx hop IP — do not leave blank behind a reverse proxy
+- `MAIL_MAILER=resend`, `RESEND_API_KEY`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`
+- `POSTHOG_API_KEY` + `POSTHOG_HOST` — leave empty to disable capture
+- `QUEUE_CONNECTION=database` — uses `jobs` / `failed_jobs`; worker `--tries=3 --backoff=3 --max-time=3600`
+
+Scheduler liveness: `GET /up/scheduler` (public JSON) and Settings → System health (`schedule:heartbeat`, every minute).
+
 ## Transactional mail (Resend) — Contabo flip
 
 Day-1 product mail (meetings, quotes, invites, Fortify) is Laravel's default mailer. Official Evotechly mail is Resend Pro. Sequence/warmup SMTP on `outbound.evotechly.com` stays separate (`EVOSALES_SMTP_*` / workspace mailboxes).
@@ -110,7 +141,7 @@ Contabo still ships theater until these env values are set (never commit the key
 
 1. `MAIL_MAILER=resend`
 2. `RESEND_API_KEY=` (Laravel official; `RESEND_KEY` is accepted as an alias)
-3. `MAIL_FROM_ADDRESS=noreply@evocrmapp.com` (or `support@evocrmapp.com`) on a **verified** Resend domain
+3. `MAIL_FROM_ADDRESS=no-reply@evocrmapp.com` (or `support@evocrmapp.com`) on a **verified** Resend domain
 4. `MAIL_FROM_NAME` / `APP_NAME` — `EvoCrm · Evotechly`
 5. `php artisan config:clear` (web, queue, and scheduler share this env)
 6. Send a test: `php artisan evocrm:mail-smoke --send --to=you@evotechly.com`

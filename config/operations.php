@@ -57,5 +57,20 @@ return [
             'cadence' => 'Every minute',
             'stale_after_seconds' => 180,
         ],
+        'tickets:check-sla' => [
+            'label' => 'Ticket SLA checks',
+            'cadence' => 'Every minute',
+            'stale_after_seconds' => 180,
+        ],
+        'meta:sync' => [
+            'label' => 'Meta ads sync',
+            'cadence' => 'Every fifteen minutes',
+            'stale_after_seconds' => 1800,
+        ],
+        'schedule:heartbeat' => [
+            'label' => 'Scheduler heartbeat',
+            'cadence' => 'Every minute',
+            'stale_after_seconds' => 180,
+        ],
     ],
 ];

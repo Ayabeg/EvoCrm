@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Activity;
 use App\Support\Integrations;
+use App\Support\SignupMode;
 use App\Support\SimpleMode;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -59,9 +60,15 @@ class HandleInertiaRequests extends Middleware
             'simpleMode' => SimpleMode::enabled($workspace),
             'nav' => SimpleMode::nav($workspace),
             'features' => SimpleMode::features($workspace),
+            'signup' => [
+                'open' => SignupMode::isOpen(),
+                'request_url' => SignupMode::requestUrl(),
+            ],
             'posthog' => [
                 'enabled' => filled(config('services.posthog.api_key')),
-                'key' => config('services.posthog.api_key'),
+                'key' => filled(config('services.posthog.api_key'))
+                    ? config('services.posthog.api_key')
+                    : null,
                 'host' => config('services.posthog.host', 'https://us.i.posthog.com'),
                 'distinct_id' => $user ? (string) $user->id : null,
             ],

@@ -61,6 +61,7 @@ use App\Http\Controllers\Public\MeetingBookController;
 use App\Http\Controllers\Public\QuoteAcceptanceController;
 use App\Http\Controllers\Public\TrackingController;
 use App\Http\Controllers\Public\UnsubscribeController;
+use App\Http\Controllers\SchedulerHeartbeatController;
 use App\Http\Controllers\Settings\AppsController;
 use App\Http\Controllers\Settings\ChannelSettingsController;
 use App\Http\Controllers\Settings\ConnectorController;
@@ -77,6 +78,7 @@ use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
 use App\Http\Controllers\Webhooks\OutboundBounceWebhookController;
 use App\Http\Middleware\EnforceProductPermissions;
 use App\Http\Middleware\EnforceSimpleMode;
+use App\Support\DesignLabAccess;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -105,7 +107,11 @@ Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 
+Route::get('/up/scheduler', SchedulerHeartbeatController::class)->name('up.scheduler');
+
 Route::get('/design-lab/{path?}', function () {
+    abort_unless(DesignLabAccess::allowed(auth()->user()), 404);
+
     return view('design-lab');
 })->where('path', '.*')->name('design-lab');
 Route::get('/q/{token}', [QuoteAcceptanceController::class, 'show'])->name('quotes.public.show');

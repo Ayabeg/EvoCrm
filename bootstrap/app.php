@@ -4,10 +4,13 @@ use App\Exceptions\UnofficialWhatsAppRefused;
 use App\Http\Middleware\AuthenticateAgentRuntime;
 use App\Http\Middleware\EmbedSecurityHeaders;
 use App\Http\Middleware\EnsureApiWorkspaceToken;
+use App\Http\Middleware\EnsureRegistrationIsOpen;
 use App\Http\Middleware\EnsureUserCanManageSettings;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PostHogRequestContext;
+use App\Http\Middleware\SecurityHeaders;
 use App\Services\Analytics\ProductAnalytics;
+use App\Support\TrustedProxies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
+        $middleware->trustProxies(at: TrustedProxies::at());
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
@@ -34,6 +37,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(append: [
+            EnsureRegistrationIsOpen::class,
+            SecurityHeaders::class,
             EmbedSecurityHeaders::class,
             PostHogRequestContext::class,
             HandleInertiaRequests::class,

@@ -7,6 +7,17 @@ return [
     'brand_title' => env('APP_NAME', 'EvoCrm · Evotechly'),
 
     /*
+    | Public self-serve signup. Default is invite-only for the pilot:
+    | /register is closed, OAuth cannot create a workspace, and the login
+    | screen shows a request-access link. Invited users still set a password
+    | through Fortify's reset flow. Set EVOCRM_SIGNUP_MODE=open to reopen.
+    */
+    'signup' => [
+        'mode' => env('EVOCRM_SIGNUP_MODE', 'invite'),
+        'request_url' => env('EVOCRM_SIGNUP_REQUEST_URL', 'mailto:hello@evotechly.com'),
+    ],
+
+    /*
     | Sold Desk is EvoDesk (Chatwoot Community MIT), not a Laravel inbox clone.
     | Default: https://desk.evotechly.com
     |

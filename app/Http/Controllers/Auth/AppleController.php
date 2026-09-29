@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Identity\WorkspaceProvisioner;
 use App\Support\AppleAuth;
+use App\Support\SignupMode;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -78,6 +79,10 @@ class AppleController extends Controller
         }
 
         $user = User::query()->firstWhere('email', $email);
+
+        if (! $user && SignupMode::isInviteOnly()) {
+            return redirect()->route('login')->with('status', SignupMode::closedStatus());
+        }
 
         if (! $user) {
             $user = User::create([

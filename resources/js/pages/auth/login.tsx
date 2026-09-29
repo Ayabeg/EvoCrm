@@ -17,12 +17,16 @@ import AuthStatus from './auth-status';
 type Props = {
     status?: string;
     canResetPassword: boolean;
+    canRegister?: boolean;
+    signupRequestUrl?: string;
     canLoginWithGoogle: boolean;
 };
 
 export default function Login({
     status,
     canResetPassword,
+    canRegister = false,
+    signupRequestUrl = 'mailto:hello@evotechly.com',
     canLoginWithGoogle: _canLoginWithGoogle,
 }: Props) {
     return (
@@ -109,12 +113,20 @@ export default function Login({
                             <SocialAuthButtons />
                         </div>
 
-                        <p className="text-center text-sm text-mute">
-                            {t("Don't have an account?")}{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                {t('Sign up')}
-                            </TextLink>
-                        </p>
+                        {canRegister ? (
+                            <p className="text-center text-sm text-mute">
+                                {t("Don't have an account?")}{' '}
+                                <TextLink href={register()} tabIndex={5}>
+                                    {t('Sign up')}
+                                </TextLink>
+                            </p>
+                        ) : (
+                            <p className="text-center text-sm text-mute">
+                                <TextLink href={signupRequestUrl} tabIndex={5}>
+                                    {t('Invite-only pilot — request access')}
+                                </TextLink>
+                            </p>
+                        )}
                     </>
                 )}
             </Form>

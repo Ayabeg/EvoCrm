@@ -4,6 +4,7 @@ namespace App\Services\Analytics;
 
 use App\Models\User;
 use App\Models\Workspace;
+use App\Support\PosthogPayload;
 use PostHog\PostHog;
 use Throwable;
 
@@ -85,15 +86,19 @@ class ProductAnalytics
             return;
         }
 
-        PostHog::init(
-            (string) config('services.posthog.api_key'),
-            [
-                'host' => (string) config('services.posthog.host', 'https://us.i.posthog.com'),
-                'error_tracking' => [
-                    'enabled' => true,
-                ],
-            ]
-        );
+        try {
+            PostHog::init(
+                (string) config('services.posthog.api_key'),
+                [
+                    'host' => (string) config('services.posthog.host', 'https://us.i.posthog.com'),
+                    'error_tracking' => [
+                        'enabled' => true,
+                    ],
+                ]
+            );
+        } catch (Throwable) {
+            return;
+        }
 
         $this->initialized = true;
     }
@@ -118,11 +123,11 @@ class ProductAnalytics
         $payload = [
             'event' => '$identify',
             'distinctId' => (string) $user->id,
-            'properties' => array_merge([
+            'properties' => PosthogPayload::redact(array_merge([
                 'email' => $user->email,
                 'name' => $user->name,
                 'role' => $user->role->value,
-            ], $properties),
+            ], $properties)),
             'groups' => $this->groups($workspace),
         ];
 
@@ -219,7 +224,9 @@ class ProductAnalytics
         $this->record([
             'event' => '$exception',
             'distinctId' => $this->distinctId($resolvedUser, $resolvedUser?->workspace),
-            'properties' => ['message' => $exception->getMessage()],
+            'properties' => PosthogPayload::redact([
+                'message' => PosthogPayload::redactString($exception->getMessage()),
+            ]),
             'groups' => $this->groups($resolvedUser?->workspace),
         ]);
 
@@ -229,10 +236,14 @@ class ProductAnalytics
 
         $this->boot();
 
-        PostHog::captureException(
-            $exception,
-            $resolvedUser instanceof User ? (string) $resolvedUser->id : null,
-        );
+        try {
+            PostHog::captureException(
+                $exception,
+                $resolvedUser instanceof User ? (string) $resolvedUser->id : null,
+            );
+        } catch (Throwable) {
+            // Fail quiet: error tracking must never break the request.
+        }
     }
 
     /**
@@ -319,7 +330,7 @@ class ProductAnalytics
             $properties['$session_id'] = $this->sessionId;
         }
 
-        return $properties;
+        return PosthogPayload::redact($properties);
     }
 
     /**
