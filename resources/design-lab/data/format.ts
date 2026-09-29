@@ -25,6 +25,17 @@ export function formatPercent(value: number): string {
     return `${value} %`;
 }
 
+export function formatRate(ratio: number | null): string {
+    if (ratio === null) {
+        return '—';
+    }
+
+    return `${(ratio * 100).toLocaleString('fr-DZ', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+    })} %`;
+}
+
 export function formatDayLabel(isoDate: string): string {
     const date = new Date(`${isoDate}T12:00:00+01:00`);
 

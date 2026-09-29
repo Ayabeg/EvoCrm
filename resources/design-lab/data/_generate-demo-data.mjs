@@ -27,14 +27,13 @@ function largestRemainder(total, weights) {
 }
 
 function weekdayWeight(isoDate) {
-    const day = new Date(`${isoDate}T12:00:00+01:00`).getUTCDay();
-    if (day === 5 || day === 6) {
-        return 0.35;
-    }
-    if (day === 0) {
-        return 0.55;
-    }
-    return 1;
+    const date = new Date(`${isoDate}T12:00:00+01:00`);
+    const dow = date.getUTCDay();
+    const day = Number(isoDate.slice(8, 10));
+    const week = [0.58, 1.08, 1.22, 1.16, 1.02, 0.42, 0.32][dow];
+    const month = day <= 5 ? 0.78 : day <= 12 ? 1.18 : day <= 20 ? 1.04 : day <= 26 ? 0.86 : 1.12;
+
+    return week * month;
 }
 
 const DAYS = Array.from({ length: 30 }, (_, i) => `2026-09-${String(i + 1).padStart(2, '0')}`);
@@ -450,43 +449,49 @@ const deals = [
     },
 ];
 
-const waTiny = [
-    { value: 1000, stage: 'nouveau', createdAt: '2026-09-09' },
-    { value: 1000, stage: 'nouveau', createdAt: '2026-09-12' },
-    { value: 1000, stage: 'qualification', createdAt: '2026-09-15' },
-    { value: 2500, stage: 'qualification', createdAt: '2026-09-18' },
-];
 const waLost = [
-    { value: 40000, createdAt: '2026-09-05', closedAt: '2026-09-16' },
-    { value: 32000, createdAt: '2026-09-08', closedAt: '2026-09-19' },
-    { value: 20000, createdAt: '2026-09-11', closedAt: '2026-09-22' },
-    { value: 14500, createdAt: '2026-09-14', closedAt: '2026-09-27' },
+    { value: 42000, createdAt: '2026-09-05', closedAt: '2026-09-16' },
+    { value: 33500, createdAt: '2026-09-08', closedAt: '2026-09-19' },
+    { value: 21000, createdAt: '2026-09-11', closedAt: '2026-09-22' },
+    { value: 15500, createdAt: '2026-09-14', closedAt: '2026-09-27' },
 ];
 const devisLost = [
-    { value: 72000, createdAt: '2026-09-04', closedAt: '2026-09-14' },
-    { value: 54000, createdAt: '2026-09-07', closedAt: '2026-09-17' },
-    { value: 42000, createdAt: '2026-09-10', closedAt: '2026-09-20' },
-    { value: 36000, createdAt: '2026-09-13', closedAt: '2026-09-23' },
-    { value: 28000, createdAt: '2026-09-16', closedAt: '2026-09-26' },
-    { value: 20000, createdAt: '2026-09-19', closedAt: '2026-09-29' },
+    { value: 28000, createdAt: '2026-09-04', closedAt: '2026-09-14' },
+    { value: 18000, createdAt: '2026-09-07', closedAt: '2026-09-17' },
+    { value: 9000, createdAt: '2026-09-10', closedAt: '2026-09-20' },
+    { value: 5000, createdAt: '2026-09-13', closedAt: '2026-09-23' },
+    { value: 4000, createdAt: '2026-09-16', closedAt: '2026-09-26' },
+    { value: 3000, createdAt: '2026-09-19', closedAt: '2026-09-29' },
 ];
 const retargetLost = [
-    { value: 48000, createdAt: '2026-09-06', closedAt: '2026-09-15' },
-    { value: 40000, createdAt: '2026-09-12', closedAt: '2026-09-21' },
-    { value: 24000, createdAt: '2026-09-17', closedAt: '2026-09-28' },
+    { value: 24000, createdAt: '2026-09-06', closedAt: '2026-09-15' },
+    { value: 18000, createdAt: '2026-09-12', closedAt: '2026-09-21' },
+    { value: 10000, createdAt: '2026-09-17', closedAt: '2026-09-28' },
 ];
 const oranLost = [{ value: 24000, createdAt: '2026-09-10', closedAt: '2026-09-24' }];
 
-const organicTinyValues = [
-    ...Array(11).fill(1000),
-    ...Array(5).fill(2500),
-    1000,
-];
-const organicTinyStages = [
-    'nouveau', 'nouveau', 'nouveau', 'nouveau', 'nouveau', 'nouveau',
-    'qualification', 'qualification', 'qualification', 'qualification',
-    'proposition', 'proposition', 'proposition', 'proposition',
-    'negociation', 'negociation', 'negociation',
+const leftoverOpens = [
+    { value: 80000, stage: 'nouveau', createdAt: '2026-09-09', name: 'Cadrage clinique neuve', source: 'recommandation', sourceCampaignId: null },
+    { value: 75000, stage: 'nouveau', createdAt: '2026-09-10', name: 'Premier échange polyclinique', source: 'email', sourceCampaignId: null },
+    { value: 70000, stage: 'nouveau', createdAt: '2026-09-11', name: 'Piste cabinet de groupe', source: 'instagram', sourceCampaignId: null },
+    { value: 65000, stage: 'nouveau', createdAt: '2026-09-12', name: 'Prise de contact laboratoire', source: 'recommandation', sourceCampaignId: null },
+    { value: 60000, stage: 'nouveau', createdAt: '2026-09-13', name: 'Lead site — clinique de ville', source: 'site_web', sourceCampaignId: 'campaign-devis-crm-sante' },
+    { value: 55000, stage: 'nouveau', createdAt: '2026-09-14', name: 'Signalement pharmacie de quartier', source: 'autres', sourceCampaignId: null },
+    { value: 50000, stage: 'nouveau', createdAt: '2026-09-15', name: 'Inbound email — cabinet dentaire', source: 'email', sourceCampaignId: null },
+    { value: 70000, stage: 'qualification', createdAt: '2026-09-08', name: 'Audit commercial clinique', source: 'recommandation', sourceCampaignId: null },
+    { value: 65000, stage: 'qualification', createdAt: '2026-09-16', name: 'Qualification devis site', source: 'site_web', sourceCampaignId: 'campaign-devis-crm-sante' },
+    { value: 60000, stage: 'qualification', createdAt: '2026-09-17', name: 'Diagnostic CRM cabinet', source: 'email', sourceCampaignId: null },
+    { value: 55000, stage: 'qualification', createdAt: '2026-09-18', name: 'Qualification Instagram organique', source: 'instagram', sourceCampaignId: null },
+    { value: 50000, stage: 'qualification', createdAt: '2026-09-19', name: 'Cadrage laboratoire régional', source: 'recommandation', sourceCampaignId: null },
+    { value: 65000, stage: 'proposition', createdAt: '2026-09-07', name: 'Proposition CRM clinique', source: 'email', sourceCampaignId: null },
+    { value: 60000, stage: 'proposition', createdAt: '2026-09-20', name: 'Offre digitalisation — site', source: 'site_web', sourceCampaignId: 'campaign-devis-crm-sante' },
+    { value: 55000, stage: 'proposition', createdAt: '2026-09-21', name: 'Proposition cabinet spécialisé', source: 'recommandation', sourceCampaignId: null },
+    { value: 50000, stage: 'proposition', createdAt: '2026-09-22', name: 'Offre support laboratoire', source: 'email', sourceCampaignId: null },
+    { value: 45000, stage: 'proposition', createdAt: '2026-09-23', name: 'Proposition pharmacie réseau', source: 'autres', sourceCampaignId: null },
+    { value: 60000, stage: 'negociation', createdAt: '2026-09-06', name: 'Négociation retargeting devis', source: 'instagram', sourceCampaignId: 'campaign-retargeting-devis' },
+    { value: 55000, stage: 'negociation', createdAt: '2026-09-24', name: 'Négociation licence clinique', source: 'recommandation', sourceCampaignId: null },
+    { value: 55000, stage: 'negociation', createdAt: '2026-09-25', name: 'Avenant support cabinet', source: 'email', sourceCampaignId: null },
+    { value: 60000, stage: 'negociation', createdAt: '2026-09-26', name: 'Négociation déploiement régional', source: 'instagram', sourceCampaignId: null },
 ];
 
 function slugName(name) {
@@ -539,18 +544,6 @@ function attachGeneratedDeal(spec) {
     });
 }
 
-waTiny.forEach((row, i) => {
-    attachGeneratedDeal({
-        kind: `wa-audit-${i + 1}`,
-        name: `Audit express WA ${i + 1}`,
-        value: row.value,
-        stage: row.stage,
-        status: 'open',
-        source: 'whatsapp',
-        sourceCampaignId: 'campaign-wa-cliniques-alger',
-        createdAt: row.createdAt,
-    });
-});
 waLost.forEach((row, i) => {
     attachGeneratedDeal({
         kind: `wa-lost-${i + 1}`,
@@ -603,17 +596,16 @@ oranLost.forEach((row, i) => {
         closedAt: row.closedAt,
     });
 });
-organicTinyValues.forEach((value, i) => {
-    const sources = ['recommandation', 'email', 'instagram', 'autres', 'email', 'recommandation', 'autres'];
+leftoverOpens.forEach((row, i) => {
     attachGeneratedDeal({
-        kind: `organic-open-${i + 1}`,
-        name: value === 2500 ? `Diagnostic cabinet ${i + 1}` : `Mini-audit ${i + 1}`,
-        value,
-        stage: organicTinyStages[i],
+        kind: `open-${i + 1}`,
+        name: row.name,
+        value: row.value,
+        stage: row.stage,
         status: 'open',
-        source: sources[i % sources.length],
-        sourceCampaignId: null,
-        createdAt: DAYS[8 + (i % 20)],
+        source: row.source,
+        sourceCampaignId: row.sourceCampaignId,
+        createdAt: row.createdAt,
     });
 });
 
@@ -994,8 +986,9 @@ const header = `/**
  *    lost). It is **created-deal value attributed to ads**, not closed-won
  *    revenue.
  *
- *    Why this definition: campaign deal counts are unique and partition the
- *    19 ad deals (9+6+3+1). Campaign attributedRevenue sums to 820 000 DA.
+ *    Why this definition: campaign deal counts partition the 19 ad deals.
+ *    After Option A, that split is WA 5 / Devis 9 / Retarget 4 / Oran 1
+ *    (was 9/6/3/1). Campaign attributedRevenue still sums to 820 000 DA.
  *    The 3 won deals total 1 280 000 DA. Those two amounts cannot be the same
  *    population: 1 280 000 > 820 000, so the won deals cannot all sit inside
  *    the 19 ad deals if attributedRevenue is deal.value.
@@ -1006,12 +999,20 @@ const header = `/**
  *    count shown beside the ads funnel, not "3 of the 19 ad deals won".
  *    DATA DECISION NEEDED FROM OWNER if the funnel must mean 3/19 won from ads.
  *
- * 2. Open pipeline shape (LOCKED, not believable)
- *    Open 25 deals / 1 320 000 DA. The four named open deals already sum to
- *    1 290 000 DA, leaving 30 000 DA across 21 other open deals. Those 21 are
- *    modelled as 1 000 DA or 2 500 DA "mini-audit / diagnostic express" rows
- *    so the locked totals hold exactly.
- *    DATA DECISION NEEDED FROM OWNER — proposed corrections in the PR.
+ * 2. Open pipeline — owner Option A (2026-09-29)
+ *    Locked: 25 open deals / 2 550 000 DA. The four named deals stay at
+ *    1 290 000 DA. The other 21 are 40 000–80 000 DA each and sum to
+ *    1 260 000 DA, spread across Nouveau / Qualification / Proposition /
+ *    Négociation.
+ *
+ *    Four of those 21 were WA-campaign leftover opens (5 500 DA). Raising
+ *    them to 40k+ on WA would break 432 000 attributed (Modernisation is
+ *    already 320 000). They were moved off WA: 3 → Devis CRM Santé, 1 →
+ *    Retargeting Devis. Their former 5 500 DA was folded into the 4 WA
+ *    lost deals (now 112 000). Devis/Retarget lost values were reduced by
+ *    the new open amounts so each campaign attributed total is unchanged.
+ *    Ad deals stay 19 / 820 000 DA. Per-campaign deal counts are now
+ *    5 / 9 / 4 / 1.
  *
  * 3. Ads leads 86 vs lead sources 128
  *    The 86 ad leads are a subset of the 128:

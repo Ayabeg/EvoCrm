@@ -82,7 +82,7 @@ export function ReportsPage() {
                         <EvilLineChart.XAxis dataKey="label" />
                         <EvilLineChart.YAxis tickFormatter={(value: number) => formatCount(value)} />
                         <EvilLineChart.Tooltip />
-                        <EvilLineChart.Line dataKey="cumulative" />
+                        <EvilLineChart.Line dataKey="cumulative" curveType="stepAfter" />
                     </EvilLineChart>
                 </ChartFrame>
                 <ChartFrame title="Dépensé Ads dans le mois" loading={loading}>
@@ -176,7 +176,7 @@ export function ReportsPage() {
                 >
                     <EvilBarChart.Grid />
                     <EvilBarChart.XAxis tickFormatter={(value: number) => formatCount(value)} />
-                    <EvilBarChart.YAxis dataKey="source" width={120} />
+                    <EvilBarChart.YAxis dataKey="source" width={168} />
                     <EvilBarChart.Tooltip />
                     <EvilBarChart.Bar dataKey="leads" enableHoverHighlight />
                 </EvilBarChart>

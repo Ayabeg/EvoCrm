@@ -20,7 +20,9 @@ import {
     getKnownObjects,
     getLeadSourceTotals,
     getLostDeals,
+    getCumulativeWonRevenue,
     getOpenDealCount,
+    getOpenDeals,
     getQuote,
     getQuoteTotals,
     getTotalOpenPipeline,
@@ -92,9 +94,27 @@ describe('EvoCRM demo data integrity', () => {
         expect(totals.pendingValue).toBe(1150000);
     });
 
-    it('computes 25 open deals and 1320000 open pipeline', () => {
+    it('computes 25 open deals and 2550000 open pipeline', () => {
         expect(getOpenDealCount()).toBe(25);
-        expect(getTotalOpenPipeline()).toBe(1320000);
+        expect(getTotalOpenPipeline()).toBe(2550000);
+    });
+
+    it('gives the 21 leftover open deals 40000–80000 DA totaling 1260000', () => {
+        const leftover = getOpenDeals().filter(
+            (deal) =>
+                deal.id !== KNOWN_OBJECT_IDS.dealModernisationCrm &&
+                deal.id !== KNOWN_OBJECT_IDS.dealCrmSupport &&
+                deal.id !== KNOWN_OBJECT_IDS.dealDigitalisation &&
+                deal.id !== KNOWN_OBJECT_IDS.dealSolutionCommerciale,
+        );
+
+        expect(leftover).toHaveLength(21);
+        expect(leftover.reduce((sum, deal) => sum + deal.value, 0)).toBe(1260000);
+
+        for (const deal of leftover) {
+            expect(deal.value).toBeGreaterThanOrEqual(40000);
+            expect(deal.value).toBeLessThanOrEqual(80000);
+        }
     });
 
     it('computes 17 closed deals as 3 won and 14 lost', () => {
@@ -199,6 +219,25 @@ describe('EvoCRM demo data integrity', () => {
         expect(amineFromList).toEqual(known.cliniqueElDjazair.contact);
         expect(dealFromList).toEqual(known.cliniqueElDjazair.deal);
         expect(quoteFromList).toEqual(known.cliniqueElDjazair.quote);
+    });
+
+    it('builds a 30-day cumulative CA series from the three won events', () => {
+        const series = getCumulativeWonRevenue();
+
+        expect(series).toHaveLength(30);
+        expect(series[0]?.date).toBe('2026-09-01');
+        expect(series[0]?.cumulative).toBe(0);
+        expect(series[9]?.cumulative).toBe(0);
+        expect(series[10]?.date).toBe('2026-09-11');
+        expect(series[10]?.won).toBe(620000);
+        expect(series[10]?.cumulative).toBe(620000);
+        expect(series[17]?.date).toBe('2026-09-18');
+        expect(series[17]?.won).toBe(460000);
+        expect(series[17]?.cumulative).toBe(1080000);
+        expect(series[24]?.date).toBe('2026-09-25');
+        expect(series[24]?.won).toBe(200000);
+        expect(series[29]?.date).toBe('2026-09-30');
+        expect(series[29]?.cumulative).toBe(1280000);
     });
 
     it('does not treat campaign identity rows as the spend source of truth', () => {

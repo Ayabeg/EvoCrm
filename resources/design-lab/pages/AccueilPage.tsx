@@ -87,7 +87,11 @@ export function AccueilPage() {
                         <EvilBarChart.Bar dataKey="pipeline" enableHoverHighlight />
                     </EvilBarChart>
                 </ChartFrame>
-                <ChartFrame title="CA cumulé septembre" loading={loading} hint="Événements gagnés">
+                <ChartFrame
+                    title="CA cumulé septembre"
+                    loading={loading}
+                    hint="Palier à chaque deal gagné"
+                >
                     <EvilLineChart
                         data={cumulative}
                         config={cumulativeChartConfig}
@@ -100,7 +104,7 @@ export function AccueilPage() {
                             tickFormatter={(value: number) => formatCount(value)}
                         />
                         <EvilLineChart.Tooltip />
-                        <EvilLineChart.Line dataKey="cumulative" />
+                        <EvilLineChart.Line dataKey="cumulative" curveType="stepAfter" />
                     </EvilLineChart>
                 </ChartFrame>
             </div>
@@ -115,7 +119,7 @@ export function AccueilPage() {
                 >
                     <EvilBarChart.Grid />
                     <EvilBarChart.XAxis tickFormatter={(value: number) => formatCount(value)} />
-                    <EvilBarChart.YAxis dataKey="source" width={120} />
+                    <EvilBarChart.YAxis dataKey="source" width={168} />
                     <EvilBarChart.Tooltip />
                     <EvilBarChart.Bar dataKey="leads" enableHoverHighlight />
                 </EvilBarChart>

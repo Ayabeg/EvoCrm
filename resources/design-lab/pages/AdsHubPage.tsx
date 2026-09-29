@@ -5,7 +5,7 @@ import { ChartFrame } from '../components/ChartFrame';
 import { KpiCard } from '../components/KpiCard';
 import { useLabLoading } from '../components/useLabLoading';
 import { spendLeadsChartConfig, valueChartConfig } from '../data/chart-config';
-import { formatCount, formatDa, formatDayLabel, formatRoas } from '../data/format';
+import { formatCount, formatDa, formatDayLabel, formatRate, formatRoas } from '../data/format';
 import {
     getAdsFunnel,
     getAdsTotals,
@@ -24,6 +24,8 @@ export function AdsHubPage() {
         label: formatDayLabel(row.date),
     }));
     const funnel = getAdsFunnel();
+    const topFunnel = funnel.filter((row) => row.group === 'top');
+    const bottomFunnel = funnel.filter((row) => row.group === 'bottom');
     const selected = campaigns.find((row) => row.id === campaignId);
 
     return (
@@ -44,42 +46,44 @@ export function AdsHubPage() {
                 />
             </section>
 
-            <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
-                <ChartFrame
-                    title="Dépensé vs Leads Inbox"
-                    loading={loading}
-                    hint={selected ? selected.name : 'Toutes les campagnes'}
+            <ChartFrame
+                title="Dépensé vs Leads Inbox"
+                loading={loading}
+                hint={selected ? selected.name : 'Toutes les campagnes'}
+            >
+                <EvilComposedChart
+                    data={daily}
+                    config={spendLeadsChartConfig}
+                    className="h-full w-full"
+                    animationType="none"
+                    chartProps={{ margin: { top: 8, right: 16, left: 4, bottom: 4 } }}
                 >
-                    <EvilComposedChart
-                        data={daily}
-                        config={spendLeadsChartConfig}
-                        className="h-full w-full"
-                        animationType="none"
-                    >
-                        <EvilComposedChart.Grid />
-                        <EvilComposedChart.XAxis dataKey="label" />
-                        <EvilComposedChart.YAxis
-                            yAxisId="left"
-                            tickFormatter={(value: number) => formatCount(value)}
-                        />
-                        <EvilComposedChart.YAxis
-                            yAxisId="right"
-                            orientation="right"
-                            tickFormatter={(value: number) => formatCount(value)}
-                        />
-                        <EvilComposedChart.Tooltip />
-                        <EvilComposedChart.Legend />
-                        <EvilComposedChart.Bar dataKey="spend" barProps={{ yAxisId: 'left' }} />
-                        <EvilComposedChart.Line dataKey="leads" lineProps={{ yAxisId: 'right' }} />
-                    </EvilComposedChart>
-                </ChartFrame>
+                    <EvilComposedChart.Grid />
+                    <EvilComposedChart.XAxis dataKey="label" />
+                    <EvilComposedChart.YAxis
+                        yAxisId="left"
+                        tickFormatter={(value: number) => formatCount(value)}
+                    />
+                    <EvilComposedChart.YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        tickFormatter={(value: number) => formatCount(value)}
+                    />
+                    <EvilComposedChart.Tooltip />
+                    <EvilComposedChart.Legend verticalAlign="bottom" align="center" />
+                    <EvilComposedChart.Bar dataKey="spend" barProps={{ yAxisId: 'left' }} />
+                    <EvilComposedChart.Line dataKey="leads" lineProps={{ yAxisId: 'right' }} />
+                </EvilComposedChart>
+            </ChartFrame>
+
+            <div className="grid gap-4 xl:grid-cols-2">
                 <ChartFrame
-                    title="Funnel Ads"
+                    title="Haut de funnel"
                     loading={loading}
-                    hint={`Gagnés ${getWonDeals().length} = période, pas ${ads.deals} deals ads`}
+                    hint="Échelle linéaire — impressions et clics"
                 >
                     <EvilBarChart
-                        data={funnel}
+                        data={topFunnel}
                         config={valueChartConfig}
                         className="h-full w-full"
                         layout="horizontal"
@@ -92,7 +96,61 @@ export function AdsHubPage() {
                         <EvilBarChart.Bar dataKey="value" enableHoverHighlight />
                     </EvilBarChart>
                 </ChartFrame>
+                <ChartFrame
+                    title="Bas de funnel"
+                    loading={loading}
+                    hint={`Gagnés ${getWonDeals().length} = période, pas ${ads.deals} deals ads`}
+                >
+                    <EvilBarChart
+                        data={bottomFunnel}
+                        config={valueChartConfig}
+                        className="h-full w-full"
+                        layout="horizontal"
+                        animationType="none"
+                    >
+                        <EvilBarChart.Grid />
+                        <EvilBarChart.XAxis tickFormatter={(value: number) => formatCount(value)} />
+                        <EvilBarChart.YAxis dataKey="step" width={130} />
+                        <EvilBarChart.Tooltip />
+                        <EvilBarChart.Bar dataKey="value" enableHoverHighlight />
+                    </EvilBarChart>
+                </ChartFrame>
             </div>
+
+            <section className="border border-[var(--evo-border)] bg-[var(--evo-surface)]">
+                <header className="border-b border-[var(--evo-border-subtle)] px-4 py-3">
+                    <h2 className="text-[15px] font-semibold">Taux de passage</h2>
+                    <p className="mt-1 text-[12px] text-[var(--evo-ink-muted)]">
+                        Volumes réels ci-dessus. Ici, le ratio d’une étape à la suivante — pas une barre d’impressions.
+                    </p>
+                </header>
+                <div className="grid grid-cols-2 md:grid-cols-4">
+                    {funnel.map((row, index) => {
+                        if (index === 0) {
+                            return null;
+                        }
+
+                        const previous = funnel[index - 1];
+
+                        return (
+                            <div
+                                key={row.step}
+                                className="border-t border-[var(--evo-border-subtle)] px-4 py-3 md:border-t-0 md:border-l md:first:border-l-0"
+                            >
+                                <p className="text-[11px] text-[var(--evo-ink-muted)]">
+                                    {previous.step} → {row.step}
+                                </p>
+                                <p className="mt-1 text-[18px] font-semibold tabular-nums">
+                                    {formatRate(row.conversionFromPrevious)}
+                                </p>
+                                <p className="mt-1 text-[12px] text-[var(--evo-ink-secondary)]">
+                                    {formatCount(previous.value)} → {formatCount(row.value)}
+                                </p>
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
 
             <section className="border border-[var(--evo-border)] bg-[var(--evo-surface)]">
                 <header className="flex items-center justify-between border-b border-[var(--evo-border-subtle)] px-4 py-3">
