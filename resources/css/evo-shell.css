@@ -334,21 +334,23 @@
     --home-wash: #fafaf9;
     --home-chip: #f1f1f1;
     --home-bar: #d9dadd;
+    --home-accent: #e8530e;
     background: var(--home-canvas);
     color: var(--home-ink);
 }
 
 .dark [data-home='workspace'] {
-    --home-canvas: #000000;
-    --home-paper: #0a0a0a;
-    --home-ink: #f5f5f5;
-    --home-muted: #a3a3a3;
-    --home-line: #2a2a2a;
-    --home-line-soft: #1f1f1f;
-    --home-well: #171717;
-    --home-wash: #141414;
-    --home-chip: #171717;
-    --home-bar: #3a3a3a;
+    --home-canvas: #121212;
+    --home-paper: #1c1c1c;
+    --home-ink: #e8e8e8;
+    --home-muted: #b3b3b3;
+    --home-line: #3a3a3a;
+    --home-line-soft: #2a2a2a;
+    --home-well: #262626;
+    --home-wash: #1c1c1c;
+    --home-chip: #262626;
+    --home-bar: #666666;
+    --home-accent: #EC6025;
 }
 
 .evo-row {
@@ -396,18 +398,32 @@
 }
 
 .dark {
-    --evo-canvas: #000000;
-    --evo-surface: #0a0a0a;
-    --evo-surface-raised: #171717;
-    --evo-ink: #f5f5f5;
-    --evo-ink-secondary: #e5e5e5;
-    --evo-ink-muted: #a3a3a3;
+    --evo-canvas: #121212;
+    --evo-surface: #1c1c1c;
+    --evo-surface-raised: #262626;
+    --evo-surface-l0: #121212;
+    --evo-surface-l1: #1c1c1c;
+    --evo-surface-l2: #262626;
+    --evo-surface-l3: #2a2a2a;
+    --evo-surface-l4: #2a2a2a;
+    --evo-ink: #e8e8e8;
+    --evo-ink-secondary: #e8e8e8;
+    --evo-ink-muted: #b3b3b3;
     --evo-ink-faint: #8a8a8a;
-    --evo-border: #1f1f1f;
-    --evo-track: #171717;
-    --evo-teal-ink: #d5e8ee;
-    --evo-teal-soft: rgba(213, 232, 238, 0.08);
-    --evo-hover: rgba(255, 255, 255, 0.06);
+    --evo-border: #3a3a3a;
+    --evo-border-subtle: #2a2a2a;
+    --evo-border-strong: #666666;
+    --evo-track: #262626;
+    --evo-teal: #0F4C5C;
+    --evo-teal-ink: #5EB0C0;
+    --evo-teal-soft: color-mix(in srgb, #0F4C5C 28%, #1c1c1c);
+    --evo-hover: #1c1c1c;
+    --evo-accent: #EC6025;
+    --evo-focus: #5EB0C0;
+    --evo-border-focus: #5EB0C0;
+    --evo-shadow-pill: none;
+    --evo-shadow-floating: none;
+    --evo-shadow-modal: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

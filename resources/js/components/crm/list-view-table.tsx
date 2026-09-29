@@ -611,7 +611,7 @@ export default function ListViewTable({
                                             ),
                                     selected && 'bg-[var(--evo-teal-soft)]',
                                     onRowPeek &&
-                                        'focus-visible:bg-canvas-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--color-accent)]',
+                                        'focus-visible:bg-canvas-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--color-focus-ring)]',
                                 )}
                                 onClick={(event) => {
                                     activateListRow(

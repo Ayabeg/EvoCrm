@@ -10,7 +10,7 @@ export default function Appearance() {
 
             <SettingsPageHeader
                 title="Appearance"
-                description="Cabinet for this browser. Light Cabinet is the EvoCrm default."
+                description="Cabinet for this browser. Light Cabinet is the EvoCrm default. Dark Cabinet is near-black with orange actions and teal selection."
             />
 
             <SettingsCard

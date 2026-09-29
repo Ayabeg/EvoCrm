@@ -292,64 +292,95 @@
 @import './aurora-motion.css';
 
 /*
- * Dark Cabinet — TRUE BLACK, never navy/charcoal-blue. Out of scope for a
- * visual redesign in P02–P15; accent + aliases still resolve through the
- * semantic tokens. No blue, indigo, navy, or teal tint.
- * Aurora remapping for .dark lives in aurora-evotechly-bridge.css.
+ * Dark Cabinet — near-black tonal elevation, not true black.
+ * Orange is primary/brand only (`--evo-accent` / #EC6025).
+ * Teal is selection, focus, and context.
+ *
+ * dark-cabinet-contrast (WCAG 2.1, sRGB relative luminance):
+ * - #E8E8E8 on #121212 is 15.29:1 (body / primary text)
+ * - #B3B3B3 on #121212 is 8.93:1 (secondary text)
+ * - #8A8A8A on #121212 is 5.43:1 (muted text)
+ * - #666666 on #121212 is 3.26:1 (UI boundary / input edge)
+ * - #0F4C5C on #121212 is 1.97:1 — too low for a ring, kept as selection fill
+ * - #E8E8E8 on #0F4C5C is 7.76:1 (label on selected row / nav)
+ * - #5EB0C0 on #121212 is 7.54:1 — teal focus ring / selected outline
+ * - #EC6025 on #121212 is 5.59:1 (primary action vs base)
  */
 .dark {
-    --color-bg: #000000;
-    --color-surface: #0a0a0a;
-    --color-subtle: #171717;
-    --color-text: #f5f5f5;
-    --color-text-secondary: #a3a3a3;
-    --color-text-muted: #a3a3a3;
-    --color-border: #1f1f1f;
-    --color-border-strong: #2a2a2a;
-    --color-sidebar: #000000;
-    --color-sidebar-text: #f5f5f5;
-    --color-sidebar-text-mute: #a3a3a3;
-    --color-sidebar-border: #1f1f1f;
-    --color-sidebar-hover: rgba(255, 255, 255, 0.06);
-    --color-sidebar-well: #171717;
+    color-scheme: dark;
+    --color-bg: #121212;
+    --color-surface: #1c1c1c;
+    --color-subtle: #262626;
+    --color-overlay: #2a2a2a;
+    --color-text: #e8e8e8;
+    --color-text-secondary: #b3b3b3;
+    --color-text-muted: #8a8a8a;
+    --color-border: #3a3a3a;
+    --color-border-strong: #666666;
+    --color-accent: var(--evo-accent);
+    --color-accent-hover: color-mix(in srgb, var(--evo-accent) 86%, #000000);
+    --color-accent-pressed: color-mix(in srgb, var(--evo-accent) 72%, #000000);
+    --color-accent-soft: color-mix(in srgb, var(--color-selection) 28%, var(--color-surface));
+    --color-accent-wash: var(--color-accent-soft);
+    --color-selection: #0F4C5C;
+    --color-focus-ring: #5EB0C0;
+    --color-canvas: #121212;
+    --color-canvas-soft: #121212;
+    --color-ink: #e8e8e8;
+    --color-mute: #b3b3b3;
+    --color-hairline: #3a3a3a;
+    --color-sidebar: #121212;
+    --color-sidebar-text: #e8e8e8;
+    --color-sidebar-text-mute: #b3b3b3;
+    --color-sidebar-border: #3a3a3a;
+    --color-sidebar-hover: #1c1c1c;
+    --color-sidebar-active: var(--color-selection);
+    --color-sidebar-well: #262626;
 
     --evosales-canvas: var(--color-surface);
     --evosales-canvas-soft: var(--color-bg);
     --evosales-ink: var(--color-text);
     --evosales-mute: var(--color-text-secondary);
     --evosales-hairline: var(--color-border);
+    --evosales-mark: var(--color-accent);
+    --evosales-mark-hover: var(--color-accent-hover);
+    --evosales-mark-pressed: var(--color-accent-pressed);
 
-    /* Muted family sits one step above the card instead of sinking to black. */
-    --secondary: #171717;
-    --muted: #171717;
-    --accent: #171717;
-    /* Filled CTAs stay accent in both cabinets. */
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
+    --secondary: var(--color-subtle);
+    --muted: var(--color-subtle);
+    --accent: var(--color-subtle);
     --primary: var(--color-accent);
-    --primary-foreground: #ffffff;
+    --primary-foreground: #121212;
     --card: var(--color-surface);
-    --popover: var(--color-surface);
-    /* Chart series that would otherwise collapse onto the black canvas. */
-    --chart-4: #525252;
-    --chart-5: #3a3a3a;
+    --popover: var(--color-overlay);
+    --border: var(--color-border);
+    --input: var(--color-border-strong);
+    --ring: var(--color-focus-ring);
+    --chart-1: var(--color-accent);
+    --chart-2: var(--color-text);
+    --chart-3: var(--color-text-secondary);
+    --chart-4: #8a8a8a;
+    --chart-5: #525252;
 
-    /* Rail stays true black in dark — same soft pill as light, paper ink inverted. */
-    --sidebar: #000000;
-    --sidebar-foreground: #a3a3a3;
-    --sidebar-primary: #f5f5f5;
-    --sidebar-primary-foreground: #000000;
-    --sidebar-accent: var(--color-accent-soft);
-    --sidebar-accent-foreground: #f5f5f5;
-    --sidebar-border: #1f1f1f;
-    --sidebar-ring: #e8530e;
-    --sidebar-ink: #f5f5f5;
-    --sidebar-mute: #a3a3a3;
-    --sidebar-faint: #737373;
-    --sidebar-well: #171717;
-    --sidebar-well-hover: #1f1f1f;
-    --sidebar-line: #1f1f1f;
-    --sidebar-strong: #262626;
-    --sidebar-hover: rgba(255, 255, 255, 0.06);
-    --sidebar-overlay: rgba(0, 0, 0, 0.8);
+    --sidebar: #121212;
+    --sidebar-foreground: #b3b3b3;
+    --sidebar-primary: #e8e8e8;
+    --sidebar-primary-foreground: #121212;
+    --sidebar-accent: var(--color-selection);
+    --sidebar-accent-foreground: #e8e8e8;
+    --sidebar-border: #3a3a3a;
+    --sidebar-ring: #5EB0C0;
+    --sidebar-ink: #e8e8e8;
+    --sidebar-mute: #b3b3b3;
+    --sidebar-faint: #8a8a8a;
+    --sidebar-well: #262626;
+    --sidebar-well-hover: #2a2a2a;
+    --sidebar-line: #3a3a3a;
+    --sidebar-strong: #666666;
+    --sidebar-hover: #1c1c1c;
+    --sidebar-overlay: rgba(0, 0, 0, 0.72);
     --sidebar-online: #22c55e;
 }
 
@@ -614,6 +645,10 @@
         0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 22%, transparent);
 }
 
+.dark :focus-visible {
+    outline-color: var(--color-focus-ring);
+}
+
 .aurora-btn--neutral,
 .aurora-btn--aurora:not(.aurora-btn--filled),
 .aurora-btn--rose:not(.aurora-btn--filled),
@@ -644,6 +679,10 @@
     border-color: var(--primary);
     color: #ffffff;
     box-shadow: none;
+}
+
+.dark .aurora-btn--filled.aurora-btn--aurora {
+    color: #121212;
 }
 
 .aurora-btn--filled.aurora-btn--aurora:hover {
@@ -926,4 +965,185 @@
         min-height: 10.5rem;
         max-height: 12.5rem;
     }
+}
+
+/*
+ * Dark login — remaps the light-locked auth chrome without touching the
+ * paper values above. Inline card background is still '#ffffff' in TS
+ * (Wave0 lock); this !important wins after the cabinet class is set.
+ */
+.dark .auth-screen {
+    color-scheme: dark;
+    background-color: #121212;
+    color: #e8e8e8;
+    --color-bg: #121212;
+    --color-surface: #1c1c1c;
+    --color-subtle: #262626;
+    --color-text: #e8e8e8;
+    --color-text-secondary: #b3b3b3;
+    --color-text-muted: #8a8a8a;
+    --color-border: #3a3a3a;
+    --color-border-strong: #666666;
+    --color-canvas: #121212;
+    --color-canvas-soft: #121212;
+    --color-ink: #e8e8e8;
+    --color-mute: #b3b3b3;
+    --color-hairline: #3a3a3a;
+    --evosales-canvas: #1c1c1c;
+    --evosales-canvas-soft: #121212;
+    --evosales-ink: #e8e8e8;
+    --evosales-mute: #b3b3b3;
+    --evosales-hairline: #3a3a3a;
+    --aurora-page-bg: #121212;
+    --aurora-bg: #121212;
+    --aurora-text-primary: #e8e8e8;
+    --aurora-text-muted: #b3b3b3;
+    --aurora-control-surface: #262626;
+    --aurora-control-surface-top: #262626;
+    --aurora-hover-bg: #2a2a2a;
+    --aurora-border-default: #3a3a3a;
+    --aurora-border-strong: #666666;
+    --background: #121212;
+    --foreground: #e8e8e8;
+    --card: #1c1c1c;
+    --card-foreground: #e8e8e8;
+    --muted-foreground: #8a8a8a;
+    --input: #666666;
+    --border: #3a3a3a;
+    --primary: var(--evo-accent);
+    --primary-foreground: #121212;
+}
+
+.dark .login-split-card {
+    background: #1c1c1c !important;
+    border-color: #3a3a3a;
+    box-shadow: none;
+}
+
+.dark .auth-screen .login-split-brand {
+    background: #0F4C5C;
+    color: #e8e8e8;
+    --aurora-text-primary: #e8e8e8;
+    --aurora-text-muted: #b3b3b3;
+    --color-text: #e8e8e8;
+}
+
+.dark .auth-screen .login-split-brand-name,
+.dark .auth-screen .login-split-brand-tagline {
+    color: #e8e8e8;
+}
+
+.dark .auth-screen .login-split-form input:not([type='checkbox']):not(
+        [type='hidden']
+    ):not([type='radio']) {
+    border-color: #666666 !important;
+    background-color: #262626;
+    color: #e8e8e8;
+}
+
+.dark .auth-screen .login-split-form input:not([type='checkbox']):not(
+        [type='hidden']
+    ):not([type='radio']):focus,
+.dark .auth-screen .login-split-form input:not([type='checkbox']):not(
+        [type='hidden']
+    ):not([type='radio']):focus-visible {
+    border-color: #5EB0C0 !important;
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, #5EB0C0 45%, transparent),
+        0 0 0 3px color-mix(in srgb, #5EB0C0 22%, transparent) !important;
+}
+
+.dark .auth-screen .login-split-sso-divider,
+.dark .auth-screen .login-split-sso-divider span,
+.dark .auth-screen .login-split-legal {
+    color: #b3b3b3;
+}
+
+.dark .auth-screen .login-split-sso-divider::before,
+.dark .auth-screen .login-split-sso-divider::after {
+    background: #3a3a3a;
+}
+
+.dark .auth-screen .login-split-legal a {
+    color: #e8e8e8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.dark *,
+    html.dark *::before,
+    html.dark *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+.dark .bg-white {
+    background-color: var(--color-surface);
+}
+
+.dark [class*='bg-[#f7f7f5]'],
+.dark [class*='bg-[#F7F7F5]'] {
+    background-color: var(--color-bg);
+}
+
+.dark .hover\:bg-white\/70:hover,
+.dark .hover\:bg-white:hover {
+    background-color: var(--color-subtle);
+}
+
+.dark .bg-ink.text-white {
+    color: var(--color-bg);
+}
+
+.dark [aria-selected='true'] {
+    background-color: var(--color-selection);
+    color: var(--color-text);
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -2px;
+}
+
+.dark [data-test^='appearance-'][aria-pressed='true'] {
+    background-color: var(--color-selection);
+    color: var(--color-text);
+    box-shadow: none;
+}
+
+.dark ::selection {
+    background: color-mix(in srgb, var(--color-selection) 55%, #121212);
+    color: var(--color-text);
+}
+
+.dark [data-ds='quick-record-drawer'] {
+    background: var(--color-overlay) !important;
+    color: var(--color-text);
+    border-color: var(--color-border) !important;
+}
+
+.dark [data-ds='quick-record-drawer'] [class*='text-[#161616]'] {
+    color: var(--color-text) !important;
+}
+
+.dark [data-ds='quick-record-drawer'] [class*='text-[#666666]'] {
+    color: var(--color-text-secondary) !important;
+}
+
+.dark [data-ds='quick-record-drawer'] [class*='bg-[#FFFFFF]'],
+.dark [data-ds='quick-record-drawer'] [class*='bg-[#F7F7F5]'],
+.dark [data-ds='quick-record-drawer'] [class*='bg-[#F1F1EF]'] {
+    background-color: var(--color-surface) !important;
+}
+
+.dark [data-ds='quick-record-drawer'] [class*='border-[#E3E3DF]'] {
+    border-color: var(--color-border) !important;
+}
+
+.dark [data-ds='quick-record-drawer'] [class*='ring-[#E8530E]'] {
+    --tw-ring-color: var(--color-focus-ring);
+}
+
+.dark [data-ds='quick-record-drawer'] [class*='bg-[#161616]'] {
+    background-color: var(--color-selection) !important;
+    color: var(--color-text) !important;
 }
