@@ -160,7 +160,8 @@ it('does not redesign the bulk bar or change the bulk POST shape', function () {
         ->and($dsBar)->toContain('sequence_id:')
         ->and($dsBar)->toContain('stage_id:')
         ->and($dsBar)->toContain('data-ds="bulk-action-bar"')
-        ->and($dsBar)->toContain('sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-hairline bg-white px-4 py-2 md:px-8');
+        ->and($dsBar)->toContain('fixed bottom-4 left-1/2 z-30 flex w-[min(100%-2rem,720px)] -translate-x-1/2 flex-wrap items-center gap-2 rounded-[12px] border border-hairline bg-surface px-4 py-2 shadow-[var(--evo-shadow-floating)] md:px-8')
+        ->and($dsBar)->not->toContain('sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-hairline bg-white px-4 py-2 md:px-8');
 
     expect($domainBar)->toContain("from '@/ds/workspace/BulkActionBar'")
         ->and($contacts)->toContain("from '@/components/crm/bulk-action-bar'")

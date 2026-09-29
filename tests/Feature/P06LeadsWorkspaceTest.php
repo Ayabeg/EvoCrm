@@ -77,9 +77,11 @@ it('keeps Leads row identity href columns and selection on the shared contracts'
         ->and($columns)->toContain("label: 'Lead'")
         ->and($columns)->toContain('leadIdentitySecondary')
         ->and($columns)->toContain('Secondary line is the linked contact')
-        ->and($columns)->toContain('flex w-full min-w-0 items-start gap-2')
+        ->and($columns)->toContain('flex h-9 w-full min-w-0 items-center gap-2')
+        ->and($columns)->toContain('{secondary ? <span className="sr-only">{secondary}</span> : null}')
         ->and($columns)->toContain('block truncate text-[13px] leading-[18px]')
         ->and($columns)->toContain('title={name}')
+        ->and($columns)->not->toContain('flex w-full min-w-0 items-start gap-2')
         ->and($columns)->not->toContain('last_activity')
         ->and($columns)->not->toContain('owner_id')
         ->and($columns)->not->toContain('contacts_count');

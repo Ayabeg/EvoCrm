@@ -71,9 +71,11 @@ it('keeps Companies row identity href columns and selection on the shared contra
         ->and($columns)->toContain("label: 'Company'")
         ->and($columns)->toContain('companyIdentitySecondary')
         ->and($columns)->toContain('Secondary line is compact location')
-        ->and($columns)->toContain('flex w-full min-w-0 items-start gap-2')
+        ->and($columns)->toContain('flex h-9 w-full min-w-0 items-center gap-2')
+        ->and($columns)->toContain('{secondary ? <span className="sr-only">{secondary}</span> : null}')
         ->and($columns)->toContain('block truncate text-[13px] leading-[18px]')
         ->and($columns)->toContain('title={name}')
+        ->and($columns)->not->toContain('flex w-full min-w-0 items-start gap-2')
         ->and($columns)->not->toContain('row.owner?.name')
         ->and($columns)->not->toContain('contacts_count')
         ->and($columns)->not->toContain('deals_count');

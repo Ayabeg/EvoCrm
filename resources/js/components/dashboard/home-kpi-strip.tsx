@@ -13,6 +13,7 @@ import {
 } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
 import { formatCompactDzd } from '@/lib/money';
+import { MOTION_HOVER_CLASS } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 const KPI_ICONS: Record<string, Icon> = {
@@ -95,7 +96,11 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                             <Link
                                 key={kpi.key}
                                 href={kpi.href}
-                                className="min-w-0 rounded-[10px] no-underline focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                                className={cn(
+                                    'min-w-0 rounded-[10px] no-underline',
+                                    MOTION_HOVER_CLASS,
+                                    'focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none',
+                                )}
                                 aria-label={`${kpi.label} ${value}`}
                             >
                                 {body}
