@@ -154,8 +154,13 @@ export function ReportsPage() {
                     config={sankeyChartConfig}
                     className="h-full w-full"
                 >
-                    <EvilSankeyChart.Node />
-                    <EvilSankeyChart.NodeLabel />
+                    <EvilSankeyChart.Node>
+                        <EvilSankeyChart.NodeLabel
+                            position="outside"
+                            showValues
+                            valueFormatter={formatCount}
+                        />
+                    </EvilSankeyChart.Node>
                     <EvilSankeyChart.Link />
                     <EvilSankeyChart.Tooltip />
                 </EvilSankeyChart>
