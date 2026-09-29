@@ -276,16 +276,33 @@ export function getDailyAdPerformanceForCampaign(campaignId: string | null) {
 }
 
 export function getCumulativeWonRevenue() {
+    const wonByDate = new Map<string, { won: number; dealIds: string[] }>();
+
+    for (const deal of getWonDeals()) {
+        const date = deal.wonAt ?? deal.closedAt ?? deal.createdAt;
+        const current = wonByDate.get(date) ?? { won: 0, dealIds: [] };
+
+        current.won += deal.value;
+        current.dealIds.push(deal.id);
+        wonByDate.set(date, current);
+    }
+
+    const days = Array.from({ length: 30 }, (_, index) => {
+        return `2026-09-${String(index + 1).padStart(2, '0')}`;
+    });
+
     let running = 0;
 
-    return getWonDeals().map((deal) => {
-        running += deal.value;
+    return days.map((date) => {
+        const day = wonByDate.get(date);
+        const won = day?.won ?? 0;
+
+        running += won;
 
         return {
-            date: deal.wonAt ?? deal.closedAt ?? deal.createdAt,
-            dealId: deal.id,
-            name: deal.name,
-            won: deal.value,
+            date,
+            dealIds: day?.dealIds ?? [],
+            won,
             cumulative: running,
         };
     });
@@ -313,15 +330,27 @@ export function getPipelineByStage() {
 
 export function getAdsFunnel() {
     const ads = getAdsTotals();
-
-    return [
-        { step: 'Impressions', value: ads.impressions },
-        { step: 'Clics', value: ads.clicks },
-        { step: 'Leads Inbox', value: ads.leadsInbox },
-        { step: 'Deals', value: ads.deals },
-        { step: 'Gagnés (période)', value: getWonDeals().length },
+    const won = getWonDeals().length;
+    const steps = [
+        { step: 'Impressions', value: ads.impressions, group: 'top' as const },
+        { step: 'Clics', value: ads.clicks, group: 'top' as const },
+        { step: 'Leads Inbox', value: ads.leadsInbox, group: 'bottom' as const },
+        { step: 'Deals', value: ads.deals, group: 'bottom' as const },
+        { step: 'Gagnés (période)', value: won, group: 'bottom' as const },
     ];
+
+    return steps.map((row, index) => {
+        const previous = steps[index - 1];
+        const conversionFromPrevious =
+            previous && previous.value > 0 ? row.value / previous.value : null;
+
+        return {
+            ...row,
+            conversionFromPrevious,
+        };
+    });
 }
+
 
 export function getLeadSourceChartRows() {
     return getLeadSourceTotals().map((row) => ({
