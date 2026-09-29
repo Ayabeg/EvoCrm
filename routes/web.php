@@ -93,6 +93,10 @@ Route::middleware('guest')->group(function () {
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
+
+Route::get('/design-lab/{path?}', function () {
+    return view('design-lab');
+})->where('path', '.*')->name('design-lab');
 Route::get('/q/{token}', [QuoteAcceptanceController::class, 'show'])->name('quotes.public.show');
 Route::post('/q/{token}/accept', [QuoteAcceptanceController::class, 'accept'])->name('quotes.public.accept');
 Route::get('/book/{slug}', [MeetingBookController::class, 'show'])->name('meetings.public.show');

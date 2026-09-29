@@ -109,13 +109,20 @@
         "skipLibCheck": true /* Skip type checking all .d.ts files. */,
         "baseUrl": ".",
         "paths": {
-            "@/*": ["./resources/js/*"]
+            "@/*": ["./resources/js/*"],
+            "@lab/*": ["./resources/design-lab/*"]
         },
         "jsx": "react-jsx"
     },
     "include": [
         "resources/js/**/*.ts",
         "resources/js/**/*.d.ts",
-        "resources/js/**/*.tsx"
+        "resources/js/**/*.tsx",
+        "resources/design-lab/**/*.ts",
+        "resources/design-lab/**/*.tsx",
+        "resources/design-lab/**/*.d.ts"
+    ],
+    "exclude": [
+        "resources/js/components/evilcharts"
     ]
 }
