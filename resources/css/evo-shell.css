@@ -194,9 +194,16 @@
     color: #0d1b24;
 }
 
-/* Route-owned Agents IA: a fixed black desk panel beside the cream canvas. */
+.evo-workspace .agents-route-page-shell {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Agents content fills the persistent mode sidebar. */
 .evo-agents-sidebar {
-    width: 240px;
+    width: 100%;
     color-scheme: dark;
     --color-shell-ink: #f5f5f5;
     --color-shell-ink-2: #e5e5e5;
@@ -204,14 +211,8 @@
     --color-shell-faint: #737373;
     --color-shell-hairline: #1f1f1f;
     --color-shell-orange: #ec6025;
-    background: #000000;
+    background: #080909;
     color: #f5f5f5;
-}
-
-@media (max-width: 767px) {
-    .evo-agents-sidebar {
-        width: 100%;
-    }
 }
 
 .evo-mode {
@@ -229,7 +230,13 @@
 
 .evo-mode-off {
     opacity: 0;
-    transform: translateX(6px);
+    transform: translateX(10px);
+    pointer-events: none;
+}
+
+.evo-mode-exit-left {
+    opacity: 0;
+    transform: translateX(-8px);
     pointer-events: none;
 }
 
@@ -282,6 +289,12 @@
 /* Agents column stays on the light desk even when the cabinet is dark. */
 .evo-agents {
     color-scheme: light;
+    --color-text: #0d1b24;
+    --color-text-primary: #0d1b24;
+    --color-text-secondary: #5b6b73;
+    --color-text-muted: #5b6b73;
+    --aurora-text-primary: #0d1b24;
+    --aurora-text-muted: #5b6b73;
     --color-shell-canvas: #f7f8f5;
     --color-shell-paper: #ffffff;
     --color-shell-ink: #0d1b24;
@@ -336,33 +349,6 @@
     --home-wash: #141414;
     --home-chip: #171717;
     --home-bar: #3a3a3a;
-}
-
-.dark .evo-agents {
-    color-scheme: dark;
-    --color-shell-canvas: #000000;
-    --color-shell-paper: #171717;
-    --color-shell-ink: #f5f5f5;
-    --color-shell-ink-2: #e5e5e5;
-    --color-shell-muted: #a3a3a3;
-    --color-shell-faint: #8a8a8a;
-    --color-shell-hairline: #2a2a2a;
-    --color-shell-teal: #d5e8ee;
-    --color-shell-teal-soft: rgba(213, 232, 238, 0.12);
-    --color-shell-orange: #f5f5f5;
-    --evo-canvas: #000000;
-    --evo-surface: #171717;
-    --evo-ink: #f5f5f5;
-    --evo-ink-secondary: #e5e5e5;
-    --evo-ink-muted: #a3a3a3;
-    --evo-ink-faint: #8a8a8a;
-    --evo-teal: #d5e8ee;
-    --evo-teal-soft: rgba(213, 232, 238, 0.12);
-    --evo-border: #2a2a2a;
-    --evo-accent: #f5f5f5;
-    background: #000000;
-    color: #f5f5f5;
-    caret-color: #f5f5f5;
 }
 
 .evo-row {

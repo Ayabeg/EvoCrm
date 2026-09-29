@@ -10,10 +10,12 @@ import type { BotDefinition } from '@/lib/desk/bot-catalog';
 import { cn } from '@/lib/utils';
 
 export type BloubState = 'idle' | 'listen' | 'think' | 'speak';
-export type BloubAvatarSize = 72 | 28 | 18 | 16;
+export type BloubAvatarSize = 72 | 42 | 32 | 28 | 18 | 16;
 
 const SIZE_PX: Record<BloubAvatarSize, number> = {
     72: 72,
+    42: 42,
+    32: 32,
     28: 28,
     18: 18,
     16: 16,

@@ -14,7 +14,8 @@ import {
     MagnifyingGlass,
     Robot,
 } from '@phosphor-icons/react';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { useCommandPaletteShortcut } from '@/components/crm/command-palette';
 import {
@@ -72,12 +73,14 @@ export function EvoRail({
     onModeChange,
     onNavigate,
     onToggleCollapsed,
+    agentsContent,
 }: {
     activeHotkeys?: boolean;
     mode?: RailMode;
     onModeChange?: (mode: RailMode) => void;
     onNavigate?: () => void;
     onToggleCollapsed?: () => void;
+    agentsContent?: ReactNode;
 }) {
     const page = usePage();
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
@@ -96,13 +99,13 @@ export function EvoRail({
     const [uncontrolledMode, setUncontrolledMode] = useState<RailMode>('menu');
     const mode = modeProp ?? uncontrolledMode;
 
-    function setMode(next: RailMode) {
+    const setMode = useCallback((next: RailMode) => {
         onModeChange?.(next);
 
         if (modeProp === undefined) {
             setUncontrolledMode(next);
         }
-    }
+    }, [modeProp, onModeChange]);
     const [query, setQuery] = useState('');
     const [remoteHits, setRemoteHits] = useState<CommandSearchHit[]>([]);
     const [hitsForQuery, setHitsForQuery] = useState('');
@@ -186,7 +189,7 @@ export function EvoRail({
             window.removeEventListener('keydown', onKey, true);
             document.removeEventListener('keydown', onKey, true);
         };
-    }, [activeHotkeys]);
+    }, [activeHotkeys, setMode]);
 
     useEffect(() => {
         if (mode === 'search' && activeHotkeys) {
@@ -274,7 +277,10 @@ export function EvoRail({
 
         if (next === 'agents') {
             onNavigate?.();
-            router.visit('/agents');
+
+            if (path !== '/agents') {
+                router.visit('/agents');
+            }
         }
     }
 
@@ -354,9 +360,14 @@ export function EvoRail({
             <div className="relative min-h-0 flex-1">
                 <div
                     inert={mode !== 'menu'}
+                    data-shell-mode="menu"
                     className={cn(
                         'evo-mode absolute inset-0 flex min-h-0 flex-col',
-                        mode === 'menu' ? 'evo-mode-on' : 'evo-mode-off',
+                        mode === 'menu'
+                            ? 'evo-mode-on'
+                            : mode === 'agents'
+                              ? 'evo-mode-exit-left'
+                              : 'evo-mode-off',
                     )}
                 >
                     <div className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pb-2">
@@ -460,23 +471,18 @@ export function EvoRail({
 
                 <div
                     inert={mode !== 'agents'}
+                    data-shell-mode="agents"
                     className={cn(
                         'evo-mode absolute inset-0 flex min-h-0 flex-col',
                         mode === 'agents' ? 'evo-mode-on' : 'evo-mode-off',
                     )}
                 >
-                    <div className="flex min-h-0 flex-1 flex-col justify-center px-4">
-                        <p className="text-[14px] font-medium text-shell-ink">
-                            {t('Agents')}
-                        </p>
-                        <p className="mt-1 text-[13px] text-shell-muted">
-                            {t('The desk is open in the workspace.')}
-                        </p>
-                    </div>
+                    {agentsContent}
                 </div>
 
                 <div
                     inert={mode !== 'search'}
+                    data-shell-mode="search"
                     className={cn(
                         'evo-mode absolute inset-0 flex min-h-0 flex-col',
                         mode === 'search' ? 'evo-mode-on' : 'evo-mode-off',

@@ -1,5 +1,6 @@
 import type { BotAvatarType } from 'bot-avatars';
 import { useSyncExternalStore } from 'react';
+import type { AskEvoAction, AskEvoContextPayload } from '@/lib/ask-evo';
 
 export type AvatarTone = 'ink' | 'teal' | 'orange' | 'night';
 
@@ -102,6 +103,15 @@ export type ChatMessage = {
     id: string;
     role: 'user' | 'assistant';
     body: string;
+    recordContext?: AgentRecordContext | null;
+    crmActions?: AskEvoAction[];
+};
+
+export type AgentRecordContext = {
+    type: string;
+    id: number;
+    label: string;
+    href: string;
 };
 
 export type AgentChat = {
@@ -110,6 +120,7 @@ export type AgentChat = {
     title: string;
     relativeTime: string;
     messages: ChatMessage[];
+    recordContext?: AgentRecordContext | null;
 };
 
 export type NewBotInput = {
@@ -342,9 +353,10 @@ export function createChat(botId: string): AgentChat {
     const chat: AgentChat = {
         id: `chat-${Date.now()}-${chatSequence++}`,
         botId: bot.id,
-        title: `${bot.name} chat`,
-        relativeTime: 'now',
+        title: 'Nouveau chat',
+        relativeTime: 'Aujourd’hui',
         messages: [],
+        recordContext: null,
     };
 
     chats = [chat, ...chats];
@@ -359,9 +371,9 @@ export function getChatById(
     return chats.find((chat) => chat.id === id);
 }
 
-export function addChatTurn(
+export function setChatRecordContext(
     chatId: string,
-    prompt: string,
+    recordContext: AgentRecordContext | null,
 ): AgentChat | undefined {
     const chat = getChatById(chatId);
 
@@ -369,23 +381,59 @@ export function addChatTurn(
         return undefined;
     }
 
-    const bot = getBotById(chat.botId) ?? BOT_CATALOG[0];
-    const nextUsefulStep =
-        'Review the context, then confirm the next owner and due date.';
+    chat.recordContext = recordContext;
+    publish();
+
+    return chat;
+}
+
+export function addUserChatMessage(
+    chatId: string,
+    prompt: string,
+    recordContext: AgentRecordContext | null = null,
+): AgentChat | undefined {
+    const chat = getChatById(chatId);
+
+    if (!chat) {
+        return undefined;
+    }
+
     const userMessage: ChatMessage = {
-        id: `${chatId}-user-${chat.messages.length}`,
+        id: `${chatId}-message-${chat.messages.length}`,
         role: 'user',
         body: prompt.trim(),
-    };
-    const assistantMessage: ChatMessage = {
-        id: `${chatId}-assistant-${chat.messages.length}`,
-        role: 'assistant',
-        body: `${bot.name} · ${bot.job}\n\n${nextUsefulStep}`,
+        recordContext,
     };
 
-    chat.messages = [...chat.messages, userMessage, assistantMessage];
-    chat.title = prompt.trim().slice(0, 42) || `${bot.name} chat`;
-    chat.relativeTime = 'now';
+    chat.messages = [...chat.messages, userMessage];
+    chat.title = prompt.trim().slice(0, 48) || 'Nouveau chat';
+    chat.relativeTime = 'Aujourd’hui';
+    chats = [chat, ...chats.filter((item) => item.id !== chat.id)];
+    publish();
+
+    return chat;
+}
+
+export function addAssistantChatMessage(
+    chatId: string,
+    answer: string,
+    context?: AskEvoContextPayload,
+): AgentChat | undefined {
+    const chat = getChatById(chatId);
+
+    if (!chat) {
+        return undefined;
+    }
+
+    const assistantMessage: ChatMessage = {
+        id: `${chatId}-message-${chat.messages.length}`,
+        role: 'assistant',
+        body: answer,
+        crmActions: context?.actions ?? [],
+    };
+
+    chat.messages = [...chat.messages, assistantMessage];
+    chat.relativeTime = 'Aujourd’hui';
     chats = [chat, ...chats.filter((item) => item.id !== chat.id)];
     publish();
 
