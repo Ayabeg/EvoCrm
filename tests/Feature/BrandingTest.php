@@ -28,6 +28,8 @@ it('renders login with the EvoCrm lockup', function () {
 
     expect(file_get_contents(resource_path('js/pages/auth/auth-screen.tsx')))
         ->toContain('EvoCrm')
+        ->toContain('login-split-grid')
+        ->not->toContain('Product Inc.')
         ->and(file_get_contents(resource_path('js/components/app-logo.tsx')))
         ->toContain('EvoCrm')
         ->and(file_get_contents(resource_path('js/components/app-logo-icon.tsx')))

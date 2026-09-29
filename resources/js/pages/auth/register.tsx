@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
-import GoogleAuthButton from '@/components/google-auth-button';
 import PasswordInput from '@/components/password-input';
+import SocialAuthButtons from '@/components/social-auth-buttons';
 import TextLink from '@/components/text-link';
 import { FieldError } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,13 @@ type Props = {
     canLoginWithGoogle: boolean;
 };
 
-export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
+export default function Register({
+    passwordRules,
+    canLoginWithGoogle: _canLoginWithGoogle,
+}: Props) {
     return (
         <>
             <Head title={t('Register')} />
-            {canLoginWithGoogle && (
-                <GoogleAuthButton separator="Or register with email" />
-            )}
             <Form
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -110,6 +110,8 @@ export default function Register({ passwordRules, canLoginWithGoogle }: Props) {
                                 {processing && <Spinner />}
                                 {t('Create account')}
                             </Button>
+
+                            <SocialAuthButtons />
                         </div>
 
                         <p className="text-center text-sm text-mute">

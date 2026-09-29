@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
-import GoogleAuthButton from '@/components/google-auth-button';
 import PasswordInput from '@/components/password-input';
+import SocialAuthButtons from '@/components/social-auth-buttons';
 import TextLink from '@/components/text-link';
 import { FieldError } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
@@ -23,15 +23,13 @@ type Props = {
 export default function Login({
     status,
     canResetPassword,
-    canLoginWithGoogle,
+    canLoginWithGoogle: _canLoginWithGoogle,
 }: Props) {
     return (
         <>
             <Head title={t('Log in')} />
 
             {status ? <AuthStatus>{status}</AuthStatus> : null}
-
-            {canLoginWithGoogle && <GoogleAuthButton />}
 
             <Form
                 {...store.form()}
@@ -42,7 +40,9 @@ export default function Login({
                     <>
                         <div className="grid gap-5">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{t('Email address')}</Label>
+                                <Label htmlFor="email" className="sr-only">
+                                    {t('Email')}
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -51,7 +51,7 @@ export default function Login({
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="name@company.com"
                                 />
                                 {errors.email ? (
                                     <FieldError>{errors.email}</FieldError>
@@ -59,26 +59,28 @@ export default function Login({
                             </div>
 
                             <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">{t('Password')}</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-xs"
-                                            tabIndex={5}
-                                        >
-                                            {t('Forgot your password?')}
-                                        </TextLink>
-                                    )}
-                                </div>
+                                <Label htmlFor="password" className="sr-only">
+                                    {t('Password')}
+                                </Label>
                                 <PasswordInput
                                     id="password"
                                     name="password"
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder={t('Password')}
+                                    placeholder={t('Enter your password')}
                                 />
+                                {canResetPassword && (
+                                    <div className="flex justify-end">
+                                        <TextLink
+                                            href={request()}
+                                            className="text-xs"
+                                            tabIndex={5}
+                                        >
+                                            {t('Forgot your password?')}
+                                        </TextLink>
+                                    </div>
+                                )}
                                 {errors.password ? (
                                     <FieldError>{errors.password}</FieldError>
                                 ) : null}
@@ -103,6 +105,8 @@ export default function Login({
                                 {processing && <Spinner />}
                                 {t('Log in')}
                             </Button>
+
+                            <SocialAuthButtons />
                         </div>
 
                         <p className="text-center text-sm text-mute">
@@ -119,6 +123,6 @@ export default function Login({
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: 'Welcome back',
+    description: 'Log in to your EvoCrm account',
 };

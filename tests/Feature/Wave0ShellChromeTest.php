@@ -97,8 +97,12 @@ it('keeps auth chrome on paper with the EvoCrm lockup', function () {
         ->and($screen)->toContain('bg-canvas-soft')
         ->and($screen)->toContain('auth-screen')
         ->and($screen)->toContain('text-ink')
+        ->and($screen)->toContain('login-split-grid')
+        ->and($screen)->toContain('/brand/evocrm/logo.svg')
         ->and($screen)->not->toContain('aurora-text-display-1')
-        ->and($screen)->not->toContain('aurora-text-body-sm');
+        ->and($screen)->not->toContain('aurora-text-body-sm')
+        ->and($screen)->not->toContain('Product Inc.')
+        ->and($screen)->not->toContain('light-working-vertical-1');
 
     $app = file_get_contents(resource_path('css/app.css'));
 

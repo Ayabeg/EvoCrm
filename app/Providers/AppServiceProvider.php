@@ -49,6 +49,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\FacebookProvider;
+use SocialiteProviders\Apple\Provider;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -98,6 +100,10 @@ class AppServiceProvider extends ServiceProvider
         // under the "meta" driver name, configured from META_* env vars.
         Socialite::extend('meta', function ($app) {
             return Socialite::buildProvider(FacebookProvider::class, $app['config']['services.meta']);
+        });
+
+        Event::listen(function (SocialiteWasCalled $event) {
+            $event->extendSocialite('apple', Provider::class);
         });
 
         Event::listen(Authenticated::class, function (Authenticated $event): void {

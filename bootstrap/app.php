@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhooks/*',
             'api/agent/tools',
             'api/agent/tools/*',
+            'auth/apple/callback',
         ]);
 
         $middleware->web(append: [

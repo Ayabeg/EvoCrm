@@ -62,6 +62,22 @@ return [
     ],
 
     /*
+    | Sign in with Apple (SocialiteProviders). The login button is always
+    | shown. Leave these empty to send /auth/apple back to /login with a
+    | status instead of a 500. client_secret is minted from the .p8 key.
+    */
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'redirect' => env('APPLE_REDIRECT_URI') ?: 'https://crm.evotechly.com/auth/apple/callback',
+        'team_id' => env('APPLE_TEAM_ID'),
+        'key_id' => env('APPLE_KEY_ID'),
+        // Absolute path to AuthKey_*.p8, or the PEM body (use \n for newlines).
+        'private_key' => env('APPLE_PRIVATE_KEY'),
+        'passphrase' => env('APPLE_PASSPHRASE'),
+    ],
+
+    /*
     | Meta workspace connection (Facebook Login via Socialite's Facebook
     | provider, registered as the "meta" driver). Leave empty to disable
     | Connect on Settings → Apps without breaking the marketplace page.
