@@ -289,6 +289,11 @@
 /* Agents column stays on the light desk even when the cabinet is dark. */
 .evo-agents {
     color-scheme: light;
+    --color-bg: #f7f8f5;
+    --color-surface: #ffffff;
+    --color-subtle: #f3f5f1;
+    --color-selection: rgba(15, 76, 92, 0.08);
+    --color-focus-ring: #0f4c5c;
     --color-text: #0d1b24;
     --color-text-primary: #0d1b24;
     --color-text-secondary: #5b6b73;

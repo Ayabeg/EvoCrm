@@ -56,6 +56,7 @@ it('keeps directory and selected-agent views inside the same agents sidebar', fu
         ->toContain('agents-route-page-shell')
         ->and($styles)
         ->toContain('.evo-workspace .agents-route-page-shell')
+        ->toContain('--color-surface: #ffffff;')
         ->toContain('--color-text-primary: #0d1b24;');
 });
 
