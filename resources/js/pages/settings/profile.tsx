@@ -114,7 +114,10 @@ export default function Profile({
                     )}
                 </Form>
 
-                <SettingsCard title="Delete account">
+                <SettingsCard
+                    title="Delete account"
+                    description="Delete your account and all of its resources"
+                >
                     <DeleteUser />
                 </SettingsCard>
             </div>

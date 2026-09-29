@@ -183,9 +183,9 @@ export function SettingsEmptyState({
                     {icon}
                 </span>
             ) : null}
-            <h3 className="text-[14px] font-semibold text-ink">{title}</h3>
+            <h3 className="text-[14px] font-semibold text-ink">{t(title)}</h3>
             <p className="max-w-[42ch] text-[12px] leading-4 text-mute">
-                {description}
+                {t(description)}
             </p>
             {action}
         </div>

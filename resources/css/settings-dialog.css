@@ -1,0 +1,61 @@
+/*
+ * Settings dialog chrome — Astryx settings-dialog IA, EvoCrm tokens.
+ * Palette: canvas #eaeaea, mark #d9500f, ink #000000.
+ * Logo orange stays the mark / active accent only.
+ */
+
+[data-settings='dialog'] {
+    --settings-canvas: #eaeaea;
+    --settings-surface: #ffffff;
+    --settings-ink: #000000;
+    --settings-mute: #5c5c5c;
+    --settings-accent: #d9500f;
+    --settings-accent-soft: #fff1ea;
+    --settings-hairline: color-mix(in srgb, #000000 12%, #eaeaea);
+    --settings-shadow:
+        0 18px 48px color-mix(in srgb, #000000 18%, transparent),
+        0 1px 0 color-mix(in srgb, #000000 6%, transparent);
+    color: var(--settings-ink);
+    font-family: var(--font-sans, 'Geist Sans', Inter, system-ui, sans-serif);
+}
+
+[data-settings='dialog'] [data-settings='page-header'] h1 {
+    font-size: 22px;
+    line-height: 28px;
+}
+
+[data-settings='dialog'] [data-settings='search'] {
+    padding-inline-start: 2.5rem;
+    appearance: none;
+}
+
+[data-settings='dialog'] [data-settings='search']::-webkit-search-decoration,
+[data-settings='dialog'] [data-settings='search']::-webkit-search-cancel-button,
+[data-settings='dialog'] [data-settings='search']::-webkit-search-results-button {
+    display: none;
+    appearance: none;
+}
+
+[data-settings='dialog'] [data-settings='search']::selection,
+[data-settings='dialog'] ::selection {
+    background: color-mix(in srgb, var(--settings-accent) 28%, transparent);
+    color: var(--settings-ink);
+}
+
+[data-settings='danger'].aurora-btn {
+    background: var(--color-danger);
+    border-color: var(--color-danger);
+    color: #ffffff;
+}
+
+[data-settings='danger'].aurora-btn:hover {
+    background: color-mix(in srgb, var(--color-danger) 86%, #000000);
+    border-color: color-mix(in srgb, var(--color-danger) 86%, #000000);
+    color: #ffffff;
+}
+
+@container settings-panel (max-width: 480px) {
+    [data-settings='dialog'] [data-settings='card'] .sm\:grid-cols-\[11rem_minmax\(0\,1fr\)\] {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

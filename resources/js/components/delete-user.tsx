@@ -1,7 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
@@ -15,22 +14,18 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
 
     return (
         <div className="space-y-6">
-            <Heading
-                variant="small"
-                title="Delete account"
-                description="Delete your account and all of its resources"
-            />
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4">
                 <div className="relative space-y-0.5 text-red-600">
-                    <p className="font-medium">Warning</p>
+                    <p className="font-medium">{t('Warning')}</p>
                     <p className="text-sm">
-                        Please proceed with caution, this cannot be undone.
+                        {t('Please proceed with caution, this cannot be undone.')}
                     </p>
                 </div>
 
@@ -39,19 +34,17 @@ export default function DeleteUser() {
                         <Button
                             variant="destructive"
                             data-test="delete-user-button"
+                            data-settings="danger"
                         >
-                            Delete account
+                            {t('Delete account')}
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogTitle>
-                            Are you sure you want to delete your account?
+                            {t('Are you sure you want to delete your account?')}
                         </DialogTitle>
                         <DialogDescription>
-                            Once your account is deleted, all of its resources
-                            and data will also be permanently deleted. Please
-                            enter your password to confirm you would like to
-                            permanently delete your account.
+                            {t('Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.')}
                         </DialogDescription>
 
                         <Form
@@ -70,14 +63,14 @@ export default function DeleteUser() {
                                             htmlFor="password"
                                             className="sr-only"
                                         >
-                                            Password
+                                            {t('Password')}
                                         </Label>
 
                                         <PasswordInput
                                             id="password"
                                             name="password"
                                             ref={passwordInput}
-                                            placeholder="Password"
+                                            placeholder={t('Password')}
                                             autoComplete="current-password"
                                         />
 
@@ -92,12 +85,13 @@ export default function DeleteUser() {
                                                     resetAndClearErrors()
                                                 }
                                             >
-                                                Cancel
+                                                {t('Cancel')}
                                             </Button>
                                         </DialogClose>
 
                                         <Button
                                             variant="destructive"
+                                            data-settings="danger"
                                             disabled={processing}
                                             asChild
                                         >
@@ -105,7 +99,7 @@ export default function DeleteUser() {
                                                 type="submit"
                                                 data-test="confirm-delete-user-button"
                                             >
-                                                Delete account
+                                                {t('Delete account')}
                                             </button>
                                         </Button>
                                     </DialogFooter>

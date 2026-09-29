@@ -13,6 +13,7 @@
 @import '@fontsource/inter/500.css';
 @import './evo-shell.css';
 @import './approved-v02.css';
+@import './settings-dialog.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

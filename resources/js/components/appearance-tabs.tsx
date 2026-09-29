@@ -3,6 +3,7 @@ import { Desktop, Moon, Sun } from '@phosphor-icons/react';
 import type { HTMLAttributes } from 'react';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useAppearance } from '@/hooks/use-appearance';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 const tabs: { value: Appearance; icon: Icon; label: string }[] = [
@@ -46,14 +47,14 @@ export default function AppearanceToggleTab({
                             weight="regular"
                             aria-hidden
                         />
-                        <span className="ml-1.5 text-sm">{label}</span>
+                        <span className="ml-1.5 text-sm">{t(label)}</span>
                     </button>
                 ))}
             </div>
             <p className="text-sm text-muted-foreground">
-                Light Cabinet is the white Sales Hub face. Dark Cabinet is true
-                black — canvas #000000, cards #0A0A0A — with the same Evotechly
-                orange actions. System follows your device.
+                {t(
+                    'Light Cabinet is the white Sales Hub face. Dark Cabinet is true black - canvas #000000, cards #0A0A0A - with the same Evotechly orange actions. System follows your device.',
+                )}
             </p>
         </div>
     );
