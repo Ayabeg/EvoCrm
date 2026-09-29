@@ -16,8 +16,8 @@
  *    revenue.
  *
  *    Why this definition: campaign deal counts partition the 19 ad deals.
- *    After Option A, that split is WA 5 / Devis 9 / Retarget 4 / Oran 1
- *    (was 9/6/3/1). Campaign attributedRevenue still sums to 820 000 DA.
+ *    Owner-locked split is WA 9 / Devis 6 / Retarget 3 / Oran 1. Campaign
+ *    attributedRevenue still sums to 820 000 DA (432 / 252 / 112 / 24).
  *    The 3 won deals total 1 280 000 DA. Those two amounts cannot be the same
  *    population: 1 280 000 > 820 000, so the won deals cannot all sit inside
  *    the 19 ad deals if attributedRevenue is deal.value.
@@ -28,20 +28,24 @@
  *    count shown beside the ads funnel, not "3 of the 19 ad deals won".
  *    DATA DECISION NEEDED FROM OWNER if the funnel must mean 3/19 won from ads.
  *
- * 2. Open pipeline — owner Option A (2026-09-29)
+ * 2. Open pipeline — owner Option A (2026-09-29), counts restored (2026-09-29)
  *    Locked: 25 open deals / 2 550 000 DA. The four named deals stay at
  *    1 290 000 DA. The other 21 are 40 000–80 000 DA each and sum to
  *    1 260 000 DA, spread across Nouveau / Qualification / Proposition /
  *    Négociation.
  *
- *    Four of those 21 were WA-campaign leftover opens (5 500 DA). Raising
- *    them to 40k+ on WA would break 432 000 attributed (Modernisation is
- *    already 320 000). They were moved off WA: 3 → Devis CRM Santé, 1 →
- *    Retargeting Devis. Their former 5 500 DA was folded into the 4 WA
- *    lost deals (now 112 000). Devis/Retarget lost values were reduced by
- *    the new open amounts so each campaign attributed total is unchanged.
- *    Ad deals stay 19 / 820 000 DA. Per-campaign deal counts are now
- *    5 / 9 / 4 / 1.
+ *    Campaign membership stays 9 / 6 / 3 / 1. Option A leftover opens cannot
+ *    sit on WA (Modernisation 320 000 + 40k+ would exceed 432 000), so the
+ *    four leftover ad-sourced opens stay on Devis (3 × 60 000) and Retarget
+ *    (1 × 60 000). Locked counts are kept by changing open vs lost, not by
+ *    moving deals between campaigns:
+ *      WA:        1 open (Modernisation 320 000) + 8 lost = 112 000 → 432 000
+ *      Devis:     3 open leftovers = 180 000 + 3 lost = 72 000 → 252 000
+ *      Retarget:  1 open leftover = 60 000 + 2 lost = 52 000 → 112 000
+ *      Oran:      1 lost = 24 000
+ *    Lost = 8+3+2+1 = 14, all ad-sourced. Won = 3 organic. Closed = 17.
+ *    Open = 25: 5 ad-sourced (Modernisation + 4 leftovers) + 20 organic
+ *    (Ibn Sina, Amrani, Pharmacie + 17 leftovers). Ad deals stay 19 / 820 000.
  *
  * 3. Ads leads 86 vs lead sources 128
  *    The 86 ad leads are a subset of the 128:
@@ -693,7 +697,7 @@ export const contacts: Contact[] = [
         ownerId: "owner-rc",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
-        createdAt: "2026-09-08",
+        createdAt: "2026-09-06",
         title: "Contact commercial",
         city: "Sétif"
     },
@@ -707,7 +711,7 @@ export const contacts: Contact[] = [
         ownerId: "owner-mt",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
-        createdAt: "2026-09-11",
+        createdAt: "2026-09-08",
         title: "Contact commercial",
         city: "Tizi Ouzou"
     },
@@ -721,133 +725,133 @@ export const contacts: Contact[] = [
         ownerId: "owner-sk",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
-        createdAt: "2026-09-14",
+        createdAt: "2026-09-09",
         title: "Contact commercial",
         city: "Alger"
     },
     {
-        id: "contact-hakim-lounis-site-lost-1",
+        id: "contact-hakim-lounis-wa-lost-5",
         firstName: "Hakim",
         lastName: "Lounis",
-        email: "hakim.lounis.site-lost-1@mail.dz",
+        email: "hakim.lounis.wa-lost-5@mail.dz",
         phone: "+213 574 124 34",
         companyId: "company-centre-dentaire-lumiere",
         ownerId: "owner-eo",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-04",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-11",
         title: "Contact commercial",
         city: "Oran"
     },
     {
-        id: "contact-nadia-kaci-site-lost-2",
+        id: "contact-nadia-kaci-wa-lost-6",
         firstName: "Nadia",
         lastName: "Kaci",
-        email: "nadia.kaci.site-lost-2@mail.dz",
+        email: "nadia.kaci.wa-lost-6@mail.dz",
         phone: "+213 575 125 35",
         companyId: "company-clinique-el-amel",
         ownerId: "owner-rc",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-07",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-13",
         title: "Contact commercial",
         city: "Annaba"
     },
     {
-        id: "contact-lotfi-mansouri-site-lost-3",
+        id: "contact-lotfi-mansouri-wa-lost-7",
         firstName: "Lotfi",
         lastName: "Mansouri",
-        email: "lotfi.mansouri.site-lost-3@mail.dz",
+        email: "lotfi.mansouri.wa-lost-7@mail.dz",
         phone: "+213 576 126 36",
         companyId: "company-laboratoire-el-hikma",
         ownerId: "owner-mt",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-10",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-14",
         title: "Contact commercial",
         city: "Blida"
     },
     {
-        id: "contact-salima-benali-site-lost-4",
+        id: "contact-salima-benali-wa-lost-8",
         firstName: "Salima",
         lastName: "Benali",
-        email: "salima.benali.site-lost-4@mail.dz",
+        email: "salima.benali.wa-lost-8@mail.dz",
         phone: "+213 577 127 37",
         companyId: "company-cabinet-dr-ziani",
         ownerId: "owner-sk",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-13",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-21",
         title: "Contact commercial",
         city: "Béjaïa"
     },
     {
-        id: "contact-youcef-boudiaf-site-lost-5",
+        id: "contact-youcef-boudiaf-site-lost-1",
         firstName: "Youcef",
         lastName: "Boudiaf",
-        email: "youcef.boudiaf.site-lost-5@mail.dz",
+        email: "youcef.boudiaf.site-lost-1@mail.dz",
         phone: "+213 578 128 38",
         companyId: "company-pharmacie-ibn-khaldoun",
         ownerId: "owner-eo",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-16",
+        createdAt: "2026-09-04",
         title: "Contact commercial",
         city: "Constantine"
     },
     {
-        id: "contact-fella-ziani-site-lost-6",
+        id: "contact-fella-ziani-site-lost-2",
         firstName: "Fella",
         lastName: "Ziani",
-        email: "fella.ziani.site-lost-6@mail.dz",
+        email: "fella.ziani.site-lost-2@mail.dz",
         phone: "+213 579 129 39",
         companyId: "company-clinique-el-nour",
         ownerId: "owner-rc",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-19",
+        createdAt: "2026-09-07",
         title: "Contact commercial",
         city: "Alger"
     },
     {
-        id: "contact-karim-cherif-ig-lost-1",
+        id: "contact-karim-cherif-site-lost-3",
         firstName: "Karim",
         lastName: "Cherif",
-        email: "karim.cherif.ig-lost-1@mail.dz",
+        email: "karim.cherif.site-lost-3@mail.dz",
         phone: "+213 580 130 40",
         companyId: "company-hopital-el-massira",
         ownerId: "owner-mt",
-        source: "instagram",
-        sourceCampaignId: "campaign-retargeting-devis",
-        createdAt: "2026-09-06",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
+        createdAt: "2026-09-10",
         title: "Contact commercial",
         city: "Oran"
     },
     {
-        id: "contact-rania-touati-ig-lost-2",
+        id: "contact-rania-touati-ig-lost-1",
         firstName: "Rania",
         lastName: "Touati",
-        email: "rania.touati.ig-lost-2@mail.dz",
+        email: "rania.touati.ig-lost-1@mail.dz",
         phone: "+213 581 131 41",
         companyId: "company-cabinet-dr-hamdi",
         ownerId: "owner-sk",
         source: "instagram",
         sourceCampaignId: "campaign-retargeting-devis",
-        createdAt: "2026-09-12",
+        createdAt: "2026-09-06",
         title: "Contact commercial",
         city: "Tlemcen"
     },
     {
-        id: "contact-omar-ait-ali-ig-lost-3",
+        id: "contact-omar-ait-ali-ig-lost-2",
         firstName: "Omar",
         lastName: "Ait Ali",
-        email: "omar.aitali.ig-lost-3@mail.dz",
+        email: "omar.aitali.ig-lost-2@mail.dz",
         phone: "+213 582 132 42",
         companyId: "company-clinique-el-qods",
         ownerId: "owner-eo",
         source: "instagram",
         sourceCampaignId: "campaign-retargeting-devis",
-        createdAt: "2026-09-17",
+        createdAt: "2026-09-12",
         title: "Contact commercial",
         city: "Alger"
     },
@@ -1622,57 +1626,57 @@ export const contacts: Contact[] = [
         city: "Alger"
     },
     {
-        id: "contact-lead-whatsapp-34",
+        id: "contact-lead-site_web-34",
         firstName: "Hayat",
         lastName: "Ibrahim",
-        email: "hayat.ibrahim.whatsapp@mail.dz",
+        email: "hayat.ibrahim.site_web@mail.dz",
         phone: "+213 583 333 63",
         companyId: "company-cabinet-dr-mokrani",
         ownerId: "owner-rc",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-07",
         title: "Prospect",
         city: "Constantine"
     },
     {
-        id: "contact-lead-whatsapp-35",
+        id: "contact-lead-site_web-35",
         firstName: "Zakaria",
         lastName: "Rahal",
-        email: "zakaria.rahal.whatsapp@mail.dz",
+        email: "zakaria.rahal.site_web@mail.dz",
         phone: "+213 584 334 64",
         companyId: "company-clinique-el-houda",
         ownerId: "owner-mt",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-08",
         title: "Prospect",
         city: "Sétif"
     },
     {
-        id: "contact-lead-whatsapp-36",
+        id: "contact-lead-site_web-36",
         firstName: "Sihem",
         lastName: "Bouaziz",
-        email: "sihem.bouaziz.whatsapp@mail.dz",
+        email: "sihem.bouaziz.site_web@mail.dz",
         phone: "+213 585 335 65",
         companyId: "company-clinique-el-wafa",
         ownerId: "owner-sk",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-09",
         title: "Prospect",
         city: "Oran"
     },
     {
-        id: "contact-lead-whatsapp-37",
+        id: "contact-lead-site_web-37",
         firstName: "Amine",
         lastName: "Saadi",
-        email: "amine.saadi.whatsapp@mail.dz",
+        email: "amine.saadi.site_web@mail.dz",
         phone: "+213 586 336 66",
         companyId: "company-cabinet-dr-boudiaf",
         ownerId: "owner-eo",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-10",
         title: "Prospect",
         city: "Sétif"
@@ -1930,15 +1934,15 @@ export const contacts: Contact[] = [
         city: "Annaba"
     },
     {
-        id: "contact-lead-site_web-56",
+        id: "contact-lead-instagram-56",
         firstName: "Sara",
         lastName: "Touati",
-        email: "sara.touati.site_web@mail.dz",
+        email: "sara.touati.instagram@mail.dz",
         phone: "+213 565 355 85",
         companyId: "company-clinique-el-hayat",
         ownerId: "owner-sk",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
+        source: "instagram",
+        sourceCampaignId: "campaign-retargeting-devis",
         createdAt: "2026-09-29",
         title: "Prospect",
         city: "Oran"
@@ -2518,7 +2522,7 @@ export const deals: Deal[] = [
         name: "Piste WA non retenue 1",
         companyId: "company-clinique-el-wafa",
         contactId: "contact-anis-messaoudi-wa-lost-1",
-        value: 42000,
+        value: 20000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-eo",
@@ -2534,15 +2538,15 @@ export const deals: Deal[] = [
         name: "Piste WA non retenue 2",
         companyId: "company-cabinet-dr-boudiaf",
         contactId: "contact-kahina-hamdi-wa-lost-2",
-        value: 33500,
+        value: 18000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-rc",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
         quoteId: "quote-dv-2026-0021",
-        createdAt: "2026-09-08",
-        closedAt: "2026-09-19",
+        createdAt: "2026-09-06",
+        closedAt: "2026-09-17",
         wonAt: null
     },
     {
@@ -2550,15 +2554,15 @@ export const deals: Deal[] = [
         name: "Piste WA non retenue 3",
         companyId: "company-pharmacie-el-amel",
         contactId: "contact-reda-belaid-wa-lost-3",
-        value: 21000,
+        value: 16000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-mt",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
         quoteId: "quote-dv-2026-0022",
-        createdAt: "2026-09-11",
-        closedAt: "2026-09-22",
+        createdAt: "2026-09-08",
+        closedAt: "2026-09-19",
         wonAt: null
     },
     {
@@ -2566,122 +2570,138 @@ export const deals: Deal[] = [
         name: "Piste WA non retenue 4",
         companyId: "company-polyclinique-el-hidhab",
         contactId: "contact-imane-benkhaled-wa-lost-4",
-        value: 15500,
+        value: 15000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-sk",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
         quoteId: "quote-dv-2026-0023",
+        createdAt: "2026-09-09",
+        closedAt: "2026-09-20",
+        wonAt: null
+    },
+    {
+        id: "deal-wa-lost-5-12",
+        name: "Piste WA non retenue 5",
+        companyId: "company-centre-dentaire-lumiere",
+        contactId: "contact-hakim-lounis-wa-lost-5",
+        value: 14000,
+        stage: "perdu",
+        status: "lost",
+        ownerId: "owner-eo",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        quoteId: "quote-dv-2026-0024",
+        createdAt: "2026-09-11",
+        closedAt: "2026-09-22",
+        wonAt: null
+    },
+    {
+        id: "deal-wa-lost-6-13",
+        name: "Piste WA non retenue 6",
+        companyId: "company-clinique-el-amel",
+        contactId: "contact-nadia-kaci-wa-lost-6",
+        value: 12000,
+        stage: "perdu",
+        status: "lost",
+        ownerId: "owner-rc",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        quoteId: "quote-dv-2026-0025",
+        createdAt: "2026-09-13",
+        closedAt: "2026-09-24",
+        wonAt: null
+    },
+    {
+        id: "deal-wa-lost-7-14",
+        name: "Piste WA non retenue 7",
+        companyId: "company-laboratoire-el-hikma",
+        contactId: "contact-lotfi-mansouri-wa-lost-7",
+        value: 10000,
+        stage: "perdu",
+        status: "lost",
+        ownerId: "owner-mt",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        quoteId: "quote-dv-2026-0026",
         createdAt: "2026-09-14",
         closedAt: "2026-09-27",
         wonAt: null
     },
     {
-        id: "deal-site-lost-1-12",
+        id: "deal-wa-lost-8-15",
+        name: "Piste WA non retenue 8",
+        companyId: "company-cabinet-dr-ziani",
+        contactId: "contact-salima-benali-wa-lost-8",
+        value: 7000,
+        stage: "perdu",
+        status: "lost",
+        ownerId: "owner-sk",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        quoteId: "quote-dv-2026-0027",
+        createdAt: "2026-09-21",
+        closedAt: "2026-09-29",
+        wonAt: null
+    },
+    {
+        id: "deal-site-lost-1-16",
         name: "Devis site non retenu 1",
-        companyId: "company-centre-dentaire-lumiere",
-        contactId: "contact-hakim-lounis-site-lost-1",
-        value: 28000,
+        companyId: "company-pharmacie-ibn-khaldoun",
+        contactId: "contact-youcef-boudiaf-site-lost-1",
+        value: 32000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-eo",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
-        quoteId: "quote-dv-2026-0024",
+        quoteId: null,
         createdAt: "2026-09-04",
         closedAt: "2026-09-14",
         wonAt: null
     },
     {
-        id: "deal-site-lost-2-13",
+        id: "deal-site-lost-2-17",
         name: "Devis site non retenu 2",
-        companyId: "company-clinique-el-amel",
-        contactId: "contact-nadia-kaci-site-lost-2",
-        value: 18000,
+        companyId: "company-clinique-el-nour",
+        contactId: "contact-fella-ziani-site-lost-2",
+        value: 24000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-rc",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
-        quoteId: "quote-dv-2026-0025",
+        quoteId: null,
         createdAt: "2026-09-07",
         closedAt: "2026-09-17",
         wonAt: null
     },
     {
-        id: "deal-site-lost-3-14",
+        id: "deal-site-lost-3-18",
         name: "Devis site non retenu 3",
-        companyId: "company-laboratoire-el-hikma",
-        contactId: "contact-lotfi-mansouri-site-lost-3",
-        value: 9000,
+        companyId: "company-hopital-el-massira",
+        contactId: "contact-karim-cherif-site-lost-3",
+        value: 16000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-mt",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
-        quoteId: "quote-dv-2026-0026",
+        quoteId: null,
         createdAt: "2026-09-10",
         closedAt: "2026-09-20",
         wonAt: null
     },
     {
-        id: "deal-site-lost-4-15",
-        name: "Devis site non retenu 4",
-        companyId: "company-cabinet-dr-ziani",
-        contactId: "contact-salima-benali-site-lost-4",
-        value: 5000,
+        id: "deal-ig-lost-1-19",
+        name: "Retargeting non converti 1",
+        companyId: "company-cabinet-dr-hamdi",
+        contactId: "contact-rania-touati-ig-lost-1",
+        value: 30000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-sk",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        quoteId: "quote-dv-2026-0027",
-        createdAt: "2026-09-13",
-        closedAt: "2026-09-23",
-        wonAt: null
-    },
-    {
-        id: "deal-site-lost-5-16",
-        name: "Devis site non retenu 5",
-        companyId: "company-pharmacie-ibn-khaldoun",
-        contactId: "contact-youcef-boudiaf-site-lost-5",
-        value: 4000,
-        stage: "perdu",
-        status: "lost",
-        ownerId: "owner-eo",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        quoteId: null,
-        createdAt: "2026-09-16",
-        closedAt: "2026-09-26",
-        wonAt: null
-    },
-    {
-        id: "deal-site-lost-6-17",
-        name: "Devis site non retenu 6",
-        companyId: "company-clinique-el-nour",
-        contactId: "contact-fella-ziani-site-lost-6",
-        value: 3000,
-        stage: "perdu",
-        status: "lost",
-        ownerId: "owner-rc",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        quoteId: null,
-        createdAt: "2026-09-19",
-        closedAt: "2026-09-29",
-        wonAt: null
-    },
-    {
-        id: "deal-ig-lost-1-18",
-        name: "Retargeting non converti 1",
-        companyId: "company-hopital-el-massira",
-        contactId: "contact-karim-cherif-ig-lost-1",
-        value: 24000,
-        stage: "perdu",
-        status: "lost",
-        ownerId: "owner-mt",
         source: "instagram",
         sourceCampaignId: "campaign-retargeting-devis",
         quoteId: null,
@@ -2690,35 +2710,19 @@ export const deals: Deal[] = [
         wonAt: null
     },
     {
-        id: "deal-ig-lost-2-19",
+        id: "deal-ig-lost-2-20",
         name: "Retargeting non converti 2",
-        companyId: "company-cabinet-dr-hamdi",
-        contactId: "contact-rania-touati-ig-lost-2",
-        value: 18000,
-        stage: "perdu",
-        status: "lost",
-        ownerId: "owner-sk",
-        source: "instagram",
-        sourceCampaignId: "campaign-retargeting-devis",
-        quoteId: null,
-        createdAt: "2026-09-12",
-        closedAt: "2026-09-21",
-        wonAt: null
-    },
-    {
-        id: "deal-ig-lost-3-20",
-        name: "Retargeting non converti 3",
         companyId: "company-clinique-el-qods",
-        contactId: "contact-omar-ait-ali-ig-lost-3",
-        value: 10000,
+        contactId: "contact-omar-ait-ali-ig-lost-2",
+        value: 22000,
         stage: "perdu",
         status: "lost",
         ownerId: "owner-eo",
         source: "instagram",
         sourceCampaignId: "campaign-retargeting-devis",
         quoteId: null,
-        createdAt: "2026-09-17",
-        closedAt: "2026-09-28",
+        createdAt: "2026-09-12",
+        closedAt: "2026-09-21",
         wonAt: null
     },
     {
@@ -2870,7 +2874,7 @@ export const deals: Deal[] = [
         name: "Qualification devis site",
         companyId: "company-centre-ophtalmo-el-nour",
         contactId: "contact-zakaria-djebbar-open-9",
-        value: 65000,
+        value: 60000,
         stage: "qualification",
         status: "open",
         ownerId: "owner-mt",
@@ -2998,7 +3002,7 @@ export const deals: Deal[] = [
         name: "Proposition pharmacie réseau",
         companyId: "company-clinique-el-massara",
         contactId: "contact-bilal-belaid-open-17",
-        value: 45000,
+        value: 50000,
         stage: "proposition",
         status: "open",
         ownerId: "owner-mt",
@@ -3262,7 +3266,7 @@ export const quotes: Quote[] = [
     {
         id: "quote-dv-2026-0020",
         number: "DV-2026-0020",
-        value: 42000,
+        value: 20000,
         dealId: "deal-wa-lost-1-08",
         contactId: "contact-anis-messaoudi-wa-lost-1",
         companyId: "company-clinique-el-wafa",
@@ -3275,91 +3279,91 @@ export const quotes: Quote[] = [
     {
         id: "quote-dv-2026-0021",
         number: "DV-2026-0021",
-        value: 33500,
+        value: 18000,
         dealId: "deal-wa-lost-2-09",
         contactId: "contact-kahina-hamdi-wa-lost-2",
         companyId: "company-cabinet-dr-boudiaf",
         ownerId: "owner-rc",
-        sentAt: "2026-09-08",
-        refusedAt: "2026-09-19",
+        sentAt: "2026-09-06",
+        refusedAt: "2026-09-17",
         status: "refuse",
         title: "Devis DV-2026-0021"
     },
     {
         id: "quote-dv-2026-0022",
         number: "DV-2026-0022",
-        value: 21000,
+        value: 16000,
         dealId: "deal-wa-lost-3-10",
         contactId: "contact-reda-belaid-wa-lost-3",
         companyId: "company-pharmacie-el-amel",
         ownerId: "owner-mt",
-        sentAt: "2026-09-11",
-        refusedAt: "2026-09-22",
+        sentAt: "2026-09-08",
+        refusedAt: "2026-09-19",
         status: "refuse",
         title: "Devis DV-2026-0022"
     },
     {
         id: "quote-dv-2026-0023",
         number: "DV-2026-0023",
-        value: 15500,
+        value: 15000,
         dealId: "deal-wa-lost-4-11",
         contactId: "contact-imane-benkhaled-wa-lost-4",
         companyId: "company-polyclinique-el-hidhab",
         ownerId: "owner-sk",
-        sentAt: "2026-09-14",
-        refusedAt: "2026-09-27",
+        sentAt: "2026-09-09",
+        refusedAt: "2026-09-20",
         status: "refuse",
         title: "Devis DV-2026-0023"
     },
     {
         id: "quote-dv-2026-0024",
         number: "DV-2026-0024",
-        value: 28000,
-        dealId: "deal-site-lost-1-12",
-        contactId: "contact-hakim-lounis-site-lost-1",
+        value: 14000,
+        dealId: "deal-wa-lost-5-12",
+        contactId: "contact-hakim-lounis-wa-lost-5",
         companyId: "company-centre-dentaire-lumiere",
         ownerId: "owner-eo",
-        sentAt: "2026-09-04",
-        refusedAt: "2026-09-14",
+        sentAt: "2026-09-11",
+        refusedAt: "2026-09-22",
         status: "refuse",
         title: "Devis DV-2026-0024"
     },
     {
         id: "quote-dv-2026-0025",
         number: "DV-2026-0025",
-        value: 18000,
-        dealId: "deal-site-lost-2-13",
-        contactId: "contact-nadia-kaci-site-lost-2",
+        value: 12000,
+        dealId: "deal-wa-lost-6-13",
+        contactId: "contact-nadia-kaci-wa-lost-6",
         companyId: "company-clinique-el-amel",
         ownerId: "owner-rc",
-        sentAt: "2026-09-07",
-        refusedAt: "2026-09-17",
+        sentAt: "2026-09-13",
+        refusedAt: "2026-09-24",
         status: "refuse",
         title: "Devis DV-2026-0025"
     },
     {
         id: "quote-dv-2026-0026",
         number: "DV-2026-0026",
-        value: 9000,
-        dealId: "deal-site-lost-3-14",
-        contactId: "contact-lotfi-mansouri-site-lost-3",
+        value: 10000,
+        dealId: "deal-wa-lost-7-14",
+        contactId: "contact-lotfi-mansouri-wa-lost-7",
         companyId: "company-laboratoire-el-hikma",
         ownerId: "owner-mt",
-        sentAt: "2026-09-10",
-        refusedAt: "2026-09-20",
+        sentAt: "2026-09-14",
+        refusedAt: "2026-09-27",
         status: "refuse",
         title: "Devis DV-2026-0026"
     },
     {
         id: "quote-dv-2026-0027",
         number: "DV-2026-0027",
-        value: 5000,
-        dealId: "deal-site-lost-4-15",
-        contactId: "contact-salima-benali-site-lost-4",
+        value: 7000,
+        dealId: "deal-wa-lost-8-15",
+        contactId: "contact-salima-benali-wa-lost-8",
         companyId: "company-cabinet-dr-ziani",
         ownerId: "owner-sk",
-        sentAt: "2026-09-13",
-        refusedAt: "2026-09-23",
+        sentAt: "2026-09-21",
+        refusedAt: "2026-09-29",
         status: "refuse",
         title: "Devis DV-2026-0027"
     },
@@ -3715,7 +3719,7 @@ export const leads: Lead[] = [
         companyId: "company-cabinet-dr-boudiaf",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
-        createdAt: "2026-09-08",
+        createdAt: "2026-09-06",
         inbox: true,
         ownerId: "owner-rc",
         status: "perdu",
@@ -3727,7 +3731,7 @@ export const leads: Lead[] = [
         companyId: "company-pharmacie-el-amel",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
-        createdAt: "2026-09-11",
+        createdAt: "2026-09-08",
         inbox: true,
         ownerId: "owner-mt",
         status: "perdu",
@@ -3739,119 +3743,119 @@ export const leads: Lead[] = [
         companyId: "company-polyclinique-el-hidhab",
         source: "whatsapp",
         sourceCampaignId: "campaign-wa-cliniques-alger",
-        createdAt: "2026-09-14",
+        createdAt: "2026-09-09",
         inbox: true,
         ownerId: "owner-sk",
         status: "perdu",
         dealId: "deal-wa-lost-4-11"
     },
     {
-        id: "lead-hakim-lounis-site-lost-1",
-        contactId: "contact-hakim-lounis-site-lost-1",
+        id: "lead-hakim-lounis-wa-lost-5",
+        contactId: "contact-hakim-lounis-wa-lost-5",
         companyId: "company-centre-dentaire-lumiere",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-11",
+        inbox: true,
+        ownerId: "owner-eo",
+        status: "perdu",
+        dealId: "deal-wa-lost-5-12"
+    },
+    {
+        id: "lead-nadia-kaci-wa-lost-6",
+        contactId: "contact-nadia-kaci-wa-lost-6",
+        companyId: "company-clinique-el-amel",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-13",
+        inbox: true,
+        ownerId: "owner-rc",
+        status: "perdu",
+        dealId: "deal-wa-lost-6-13"
+    },
+    {
+        id: "lead-lotfi-mansouri-wa-lost-7",
+        contactId: "contact-lotfi-mansouri-wa-lost-7",
+        companyId: "company-laboratoire-el-hikma",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-14",
+        inbox: true,
+        ownerId: "owner-mt",
+        status: "perdu",
+        dealId: "deal-wa-lost-7-14"
+    },
+    {
+        id: "lead-salima-benali-wa-lost-8",
+        contactId: "contact-salima-benali-wa-lost-8",
+        companyId: "company-cabinet-dr-ziani",
+        source: "whatsapp",
+        sourceCampaignId: "campaign-wa-cliniques-alger",
+        createdAt: "2026-09-21",
+        inbox: true,
+        ownerId: "owner-sk",
+        status: "perdu",
+        dealId: "deal-wa-lost-8-15"
+    },
+    {
+        id: "lead-youcef-boudiaf-site-lost-1",
+        contactId: "contact-youcef-boudiaf-site-lost-1",
+        companyId: "company-pharmacie-ibn-khaldoun",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-04",
         inbox: true,
         ownerId: "owner-eo",
         status: "perdu",
-        dealId: "deal-site-lost-1-12"
+        dealId: "deal-site-lost-1-16"
     },
     {
-        id: "lead-nadia-kaci-site-lost-2",
-        contactId: "contact-nadia-kaci-site-lost-2",
-        companyId: "company-clinique-el-amel",
+        id: "lead-fella-ziani-site-lost-2",
+        contactId: "contact-fella-ziani-site-lost-2",
+        companyId: "company-clinique-el-nour",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-07",
         inbox: true,
         ownerId: "owner-rc",
         status: "perdu",
-        dealId: "deal-site-lost-2-13"
+        dealId: "deal-site-lost-2-17"
     },
     {
-        id: "lead-lotfi-mansouri-site-lost-3",
-        contactId: "contact-lotfi-mansouri-site-lost-3",
-        companyId: "company-laboratoire-el-hikma",
+        id: "lead-karim-cherif-site-lost-3",
+        contactId: "contact-karim-cherif-site-lost-3",
+        companyId: "company-hopital-el-massira",
         source: "site_web",
         sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-10",
         inbox: true,
         ownerId: "owner-mt",
         status: "perdu",
-        dealId: "deal-site-lost-3-14"
+        dealId: "deal-site-lost-3-18"
     },
     {
-        id: "lead-salima-benali-site-lost-4",
-        contactId: "contact-salima-benali-site-lost-4",
-        companyId: "company-cabinet-dr-ziani",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-13",
-        inbox: true,
-        ownerId: "owner-sk",
-        status: "perdu",
-        dealId: "deal-site-lost-4-15"
-    },
-    {
-        id: "lead-youcef-boudiaf-site-lost-5",
-        contactId: "contact-youcef-boudiaf-site-lost-5",
-        companyId: "company-pharmacie-ibn-khaldoun",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-16",
-        inbox: true,
-        ownerId: "owner-eo",
-        status: "perdu",
-        dealId: "deal-site-lost-5-16"
-    },
-    {
-        id: "lead-fella-ziani-site-lost-6",
-        contactId: "contact-fella-ziani-site-lost-6",
-        companyId: "company-clinique-el-nour",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
-        createdAt: "2026-09-19",
-        inbox: true,
-        ownerId: "owner-rc",
-        status: "perdu",
-        dealId: "deal-site-lost-6-17"
-    },
-    {
-        id: "lead-karim-cherif-ig-lost-1",
-        contactId: "contact-karim-cherif-ig-lost-1",
-        companyId: "company-hopital-el-massira",
+        id: "lead-rania-touati-ig-lost-1",
+        contactId: "contact-rania-touati-ig-lost-1",
+        companyId: "company-cabinet-dr-hamdi",
         source: "instagram",
         sourceCampaignId: "campaign-retargeting-devis",
         createdAt: "2026-09-06",
         inbox: true,
-        ownerId: "owner-mt",
+        ownerId: "owner-sk",
         status: "perdu",
-        dealId: "deal-ig-lost-1-18"
+        dealId: "deal-ig-lost-1-19"
     },
     {
-        id: "lead-rania-touati-ig-lost-2",
-        contactId: "contact-rania-touati-ig-lost-2",
-        companyId: "company-cabinet-dr-hamdi",
+        id: "lead-omar-ait-ali-ig-lost-2",
+        contactId: "contact-omar-ait-ali-ig-lost-2",
+        companyId: "company-clinique-el-qods",
         source: "instagram",
         sourceCampaignId: "campaign-retargeting-devis",
         createdAt: "2026-09-12",
         inbox: true,
-        ownerId: "owner-sk",
-        status: "perdu",
-        dealId: "deal-ig-lost-2-19"
-    },
-    {
-        id: "lead-omar-ait-ali-ig-lost-3",
-        contactId: "contact-omar-ait-ali-ig-lost-3",
-        companyId: "company-clinique-el-qods",
-        source: "instagram",
-        sourceCampaignId: "campaign-retargeting-devis",
-        createdAt: "2026-09-17",
-        inbox: true,
         ownerId: "owner-eo",
         status: "perdu",
-        dealId: "deal-ig-lost-3-20"
+        dealId: "deal-ig-lost-2-20"
     },
     {
         id: "lead-celine-oussedik-oran-lost-1",
@@ -4514,11 +4518,11 @@ export const leads: Lead[] = [
         dealId: null
     },
     {
-        id: "lead-fill-whatsapp-34",
-        contactId: "contact-lead-whatsapp-34",
+        id: "lead-fill-site_web-34",
+        contactId: "contact-lead-site_web-34",
         companyId: "company-cabinet-dr-mokrani",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-07",
         inbox: true,
         ownerId: "owner-rc",
@@ -4526,11 +4530,11 @@ export const leads: Lead[] = [
         dealId: null
     },
     {
-        id: "lead-fill-whatsapp-35",
-        contactId: "contact-lead-whatsapp-35",
+        id: "lead-fill-site_web-35",
+        contactId: "contact-lead-site_web-35",
         companyId: "company-clinique-el-houda",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-08",
         inbox: true,
         ownerId: "owner-mt",
@@ -4538,11 +4542,11 @@ export const leads: Lead[] = [
         dealId: null
     },
     {
-        id: "lead-fill-whatsapp-36",
-        contactId: "contact-lead-whatsapp-36",
+        id: "lead-fill-site_web-36",
+        contactId: "contact-lead-site_web-36",
         companyId: "company-clinique-el-wafa",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-09",
         inbox: true,
         ownerId: "owner-sk",
@@ -4550,11 +4554,11 @@ export const leads: Lead[] = [
         dealId: null
     },
     {
-        id: "lead-fill-whatsapp-37",
-        contactId: "contact-lead-whatsapp-37",
+        id: "lead-fill-site_web-37",
+        contactId: "contact-lead-site_web-37",
         companyId: "company-cabinet-dr-boudiaf",
-        source: "whatsapp",
-        sourceCampaignId: "campaign-wa-cliniques-alger",
+        source: "site_web",
+        sourceCampaignId: "campaign-devis-crm-sante",
         createdAt: "2026-09-10",
         inbox: true,
         ownerId: "owner-eo",
@@ -4778,11 +4782,11 @@ export const leads: Lead[] = [
         dealId: null
     },
     {
-        id: "lead-fill-site_web-56",
-        contactId: "contact-lead-site_web-56",
+        id: "lead-fill-instagram-56",
+        contactId: "contact-lead-instagram-56",
         companyId: "company-clinique-el-hayat",
-        source: "site_web",
-        sourceCampaignId: "campaign-devis-crm-sante",
+        source: "instagram",
+        sourceCampaignId: "campaign-retargeting-devis",
         createdAt: "2026-09-29",
         inbox: true,
         ownerId: "owner-sk",
@@ -6379,19 +6383,19 @@ export const conversations: Conversation[] = [
         channel: "whatsapp",
         campaignId: "campaign-wa-cliniques-alger",
         subject: "Lead WA Cliniques Alger",
-        lastMessageAt: "2026-09-08T11:11:00+01:00",
+        lastMessageAt: "2026-09-06T11:11:00+01:00",
         unread: false,
         dealId: "deal-wa-lost-2-09",
         messages: [
             {
                 id: "msg-contact-kahina-hamdi-wa-lost-2-1",
-                at: "2026-09-08T10:02:00+01:00",
+                at: "2026-09-06T10:02:00+01:00",
                 from: "contact",
                 body: "Je veux un devis CRM pour notre structure."
             },
             {
                 id: "msg-contact-kahina-hamdi-wa-lost-2-2",
-                at: "2026-09-08T11:11:00+01:00",
+                at: "2026-09-06T11:11:00+01:00",
                 from: "owner",
                 body: "Bien reçu, on relance le cadrage."
             }
@@ -6404,19 +6408,19 @@ export const conversations: Conversation[] = [
         channel: "whatsapp",
         campaignId: "campaign-wa-cliniques-alger",
         subject: "Lead WA Cliniques Alger",
-        lastMessageAt: "2026-09-11T11:12:00+01:00",
+        lastMessageAt: "2026-09-08T11:12:00+01:00",
         unread: false,
         dealId: "deal-wa-lost-3-10",
         messages: [
             {
                 id: "msg-contact-reda-belaid-wa-lost-3-1",
-                at: "2026-09-11T10:02:00+01:00",
+                at: "2026-09-08T10:02:00+01:00",
                 from: "contact",
                 body: "Je veux un devis CRM pour notre structure."
             },
             {
                 id: "msg-contact-reda-belaid-wa-lost-3-2",
-                at: "2026-09-11T11:12:00+01:00",
+                at: "2026-09-08T11:12:00+01:00",
                 from: "owner",
                 body: "Bien reçu, on relance le cadrage."
             }
@@ -6429,169 +6433,169 @@ export const conversations: Conversation[] = [
         channel: "whatsapp",
         campaignId: "campaign-wa-cliniques-alger",
         subject: "Lead WA Cliniques Alger",
-        lastMessageAt: "2026-09-14T11:13:00+01:00",
+        lastMessageAt: "2026-09-09T11:13:00+01:00",
         unread: true,
         dealId: "deal-wa-lost-4-11",
         messages: [
             {
                 id: "msg-contact-imane-benkhaled-wa-lost-4-1",
-                at: "2026-09-14T10:02:00+01:00",
+                at: "2026-09-09T10:02:00+01:00",
                 from: "contact",
                 body: "Je veux un devis CRM pour notre structure."
             },
             {
                 id: "msg-contact-imane-benkhaled-wa-lost-4-2",
-                at: "2026-09-14T11:13:00+01:00",
+                at: "2026-09-09T11:13:00+01:00",
                 from: "owner",
                 body: "Bien reçu, on relance le cadrage."
             }
         ]
     },
     {
-        id: "inbox-contact-hakim-lounis-site-lost-1",
-        contactId: "contact-hakim-lounis-site-lost-1",
+        id: "inbox-contact-hakim-lounis-wa-lost-5",
+        contactId: "contact-hakim-lounis-wa-lost-5",
         companyId: "company-centre-dentaire-lumiere",
-        channel: "email",
-        campaignId: "campaign-devis-crm-sante",
-        subject: "Lead Devis CRM Santé",
-        lastMessageAt: "2026-09-04T11:14:00+01:00",
+        channel: "whatsapp",
+        campaignId: "campaign-wa-cliniques-alger",
+        subject: "Lead WA Cliniques Alger",
+        lastMessageAt: "2026-09-11T11:14:00+01:00",
         unread: false,
-        dealId: "deal-site-lost-1-12",
+        dealId: "deal-wa-lost-5-12",
         messages: [
             {
-                id: "msg-contact-hakim-lounis-site-lost-1-1",
-                at: "2026-09-04T10:02:00+01:00",
+                id: "msg-contact-hakim-lounis-wa-lost-5-1",
+                at: "2026-09-11T10:02:00+01:00",
                 from: "contact",
                 body: "Je veux un devis CRM pour notre structure."
             },
             {
-                id: "msg-contact-hakim-lounis-site-lost-1-2",
-                at: "2026-09-04T11:14:00+01:00",
+                id: "msg-contact-hakim-lounis-wa-lost-5-2",
+                at: "2026-09-11T11:14:00+01:00",
                 from: "owner",
                 body: "Bien reçu, on relance le cadrage."
             }
         ]
     },
     {
-        id: "inbox-contact-nadia-kaci-site-lost-2",
-        contactId: "contact-nadia-kaci-site-lost-2",
+        id: "inbox-contact-nadia-kaci-wa-lost-6",
+        contactId: "contact-nadia-kaci-wa-lost-6",
         companyId: "company-clinique-el-amel",
-        channel: "email",
-        campaignId: "campaign-devis-crm-sante",
-        subject: "Lead Devis CRM Santé",
-        lastMessageAt: "2026-09-07T11:15:00+01:00",
+        channel: "whatsapp",
+        campaignId: "campaign-wa-cliniques-alger",
+        subject: "Lead WA Cliniques Alger",
+        lastMessageAt: "2026-09-13T11:15:00+01:00",
         unread: false,
-        dealId: "deal-site-lost-2-13",
+        dealId: "deal-wa-lost-6-13",
         messages: [
             {
-                id: "msg-contact-nadia-kaci-site-lost-2-1",
-                at: "2026-09-07T10:02:00+01:00",
-                from: "contact",
-                body: "Je veux un devis CRM pour notre structure."
-            },
-            {
-                id: "msg-contact-nadia-kaci-site-lost-2-2",
-                at: "2026-09-07T11:15:00+01:00",
-                from: "owner",
-                body: "Bien reçu, on relance le cadrage."
-            }
-        ]
-    },
-    {
-        id: "inbox-contact-lotfi-mansouri-site-lost-3",
-        contactId: "contact-lotfi-mansouri-site-lost-3",
-        companyId: "company-laboratoire-el-hikma",
-        channel: "email",
-        campaignId: "campaign-devis-crm-sante",
-        subject: "Lead Devis CRM Santé",
-        lastMessageAt: "2026-09-10T11:16:00+01:00",
-        unread: true,
-        dealId: "deal-site-lost-3-14",
-        messages: [
-            {
-                id: "msg-contact-lotfi-mansouri-site-lost-3-1",
-                at: "2026-09-10T10:02:00+01:00",
-                from: "contact",
-                body: "Je veux un devis CRM pour notre structure."
-            },
-            {
-                id: "msg-contact-lotfi-mansouri-site-lost-3-2",
-                at: "2026-09-10T11:16:00+01:00",
-                from: "owner",
-                body: "Bien reçu, on relance le cadrage."
-            }
-        ]
-    },
-    {
-        id: "inbox-contact-salima-benali-site-lost-4",
-        contactId: "contact-salima-benali-site-lost-4",
-        companyId: "company-cabinet-dr-ziani",
-        channel: "email",
-        campaignId: "campaign-devis-crm-sante",
-        subject: "Lead Devis CRM Santé",
-        lastMessageAt: "2026-09-13T11:17:00+01:00",
-        unread: false,
-        dealId: "deal-site-lost-4-15",
-        messages: [
-            {
-                id: "msg-contact-salima-benali-site-lost-4-1",
+                id: "msg-contact-nadia-kaci-wa-lost-6-1",
                 at: "2026-09-13T10:02:00+01:00",
                 from: "contact",
                 body: "Je veux un devis CRM pour notre structure."
             },
             {
-                id: "msg-contact-salima-benali-site-lost-4-2",
-                at: "2026-09-13T11:17:00+01:00",
+                id: "msg-contact-nadia-kaci-wa-lost-6-2",
+                at: "2026-09-13T11:15:00+01:00",
                 from: "owner",
                 body: "Bien reçu, on relance le cadrage."
             }
         ]
     },
     {
-        id: "inbox-contact-youcef-boudiaf-site-lost-5",
-        contactId: "contact-youcef-boudiaf-site-lost-5",
+        id: "inbox-contact-lotfi-mansouri-wa-lost-7",
+        contactId: "contact-lotfi-mansouri-wa-lost-7",
+        companyId: "company-laboratoire-el-hikma",
+        channel: "whatsapp",
+        campaignId: "campaign-wa-cliniques-alger",
+        subject: "Lead WA Cliniques Alger",
+        lastMessageAt: "2026-09-14T11:16:00+01:00",
+        unread: true,
+        dealId: "deal-wa-lost-7-14",
+        messages: [
+            {
+                id: "msg-contact-lotfi-mansouri-wa-lost-7-1",
+                at: "2026-09-14T10:02:00+01:00",
+                from: "contact",
+                body: "Je veux un devis CRM pour notre structure."
+            },
+            {
+                id: "msg-contact-lotfi-mansouri-wa-lost-7-2",
+                at: "2026-09-14T11:16:00+01:00",
+                from: "owner",
+                body: "Bien reçu, on relance le cadrage."
+            }
+        ]
+    },
+    {
+        id: "inbox-contact-salima-benali-wa-lost-8",
+        contactId: "contact-salima-benali-wa-lost-8",
+        companyId: "company-cabinet-dr-ziani",
+        channel: "whatsapp",
+        campaignId: "campaign-wa-cliniques-alger",
+        subject: "Lead WA Cliniques Alger",
+        lastMessageAt: "2026-09-21T11:17:00+01:00",
+        unread: false,
+        dealId: "deal-wa-lost-8-15",
+        messages: [
+            {
+                id: "msg-contact-salima-benali-wa-lost-8-1",
+                at: "2026-09-21T10:02:00+01:00",
+                from: "contact",
+                body: "Je veux un devis CRM pour notre structure."
+            },
+            {
+                id: "msg-contact-salima-benali-wa-lost-8-2",
+                at: "2026-09-21T11:17:00+01:00",
+                from: "owner",
+                body: "Bien reçu, on relance le cadrage."
+            }
+        ]
+    },
+    {
+        id: "inbox-contact-youcef-boudiaf-site-lost-1",
+        contactId: "contact-youcef-boudiaf-site-lost-1",
         companyId: "company-pharmacie-ibn-khaldoun",
         channel: "email",
         campaignId: "campaign-devis-crm-sante",
         subject: "Lead Devis CRM Santé",
-        lastMessageAt: "2026-09-16T11:18:00+01:00",
+        lastMessageAt: "2026-09-04T11:18:00+01:00",
         unread: false,
-        dealId: "deal-site-lost-5-16",
+        dealId: "deal-site-lost-1-16",
         messages: [
             {
-                id: "msg-contact-youcef-boudiaf-site-lost-5-1",
-                at: "2026-09-16T10:02:00+01:00",
+                id: "msg-contact-youcef-boudiaf-site-lost-1-1",
+                at: "2026-09-04T10:02:00+01:00",
                 from: "contact",
                 body: "Je veux un devis CRM pour notre structure."
             },
             {
-                id: "msg-contact-youcef-boudiaf-site-lost-5-2",
-                at: "2026-09-16T11:18:00+01:00",
+                id: "msg-contact-youcef-boudiaf-site-lost-1-2",
+                at: "2026-09-04T11:18:00+01:00",
                 from: "owner",
                 body: "Bien reçu, on relance le cadrage."
             }
         ]
     },
     {
-        id: "inbox-contact-fella-ziani-site-lost-6",
-        contactId: "contact-fella-ziani-site-lost-6",
+        id: "inbox-contact-fella-ziani-site-lost-2",
+        contactId: "contact-fella-ziani-site-lost-2",
         companyId: "company-clinique-el-nour",
         channel: "email",
         campaignId: "campaign-devis-crm-sante",
         subject: "Lead Devis CRM Santé",
-        lastMessageAt: "2026-09-19T11:19:00+01:00",
+        lastMessageAt: "2026-09-07T11:19:00+01:00",
         unread: true,
-        dealId: "deal-site-lost-6-17",
+        dealId: "deal-site-lost-2-17",
         messages: [
             {
-                id: "msg-contact-fella-ziani-site-lost-6-1",
-                at: "2026-09-19T10:02:00+01:00",
+                id: "msg-contact-fella-ziani-site-lost-2-1",
+                at: "2026-09-07T10:02:00+01:00",
                 from: "contact",
                 body: "Je veux un devis CRM pour notre structure."
             },
             {
-                id: "msg-contact-fella-ziani-site-lost-6-2",
-                at: "2026-09-19T11:19:00+01:00",
+                id: "msg-contact-fella-ziani-site-lost-2-2",
+                at: "2026-09-07T11:19:00+01:00",
                 from: "owner",
                 body: "Bien reçu, on relance le cadrage."
             }
@@ -6675,13 +6679,13 @@ export const outboundSequences: OutboundSequence[] = [
             "contact-kahina-hamdi-wa-lost-2",
             "contact-reda-belaid-wa-lost-3",
             "contact-imane-benkhaled-wa-lost-4",
-            "contact-hakim-lounis-site-lost-1",
-            "contact-nadia-kaci-site-lost-2",
-            "contact-lotfi-mansouri-site-lost-3",
-            "contact-salima-benali-site-lost-4",
-            "contact-youcef-boudiaf-site-lost-5",
-            "contact-fella-ziani-site-lost-6",
-            "contact-karim-cherif-ig-lost-1"
+            "contact-hakim-lounis-wa-lost-5",
+            "contact-nadia-kaci-wa-lost-6",
+            "contact-lotfi-mansouri-wa-lost-7",
+            "contact-salima-benali-wa-lost-8",
+            "contact-youcef-boudiaf-site-lost-1",
+            "contact-fella-ziani-site-lost-2",
+            "contact-karim-cherif-site-lost-3"
         ],
         sent: 24,
         replies: 7

@@ -23,8 +23,10 @@ import {
     getCumulativeWonRevenue,
     getOpenDealCount,
     getOpenDeals,
+    getPipelineByStage,
     getQuote,
     getQuoteTotals,
+    getSankeyDealFlow,
     getTotalOpenPipeline,
     getWonDeals,
     getWonRevenue,
@@ -47,11 +49,33 @@ describe('EvoCRM demo data integrity', () => {
         expect(getAdsTotals().deals).toBe(19);
     });
 
+    it('keeps owner-locked per-campaign deal counts 9 / 6 / 3 / 1', () => {
+        const byName = Object.fromEntries(
+            getCampaignTotals().map((row) => [row.name, row.deals]),
+        );
+
+        expect(byName['WA Cliniques Alger']).toBe(9);
+        expect(byName['Devis CRM Santé']).toBe(6);
+        expect(byName['Retargeting Devis']).toBe(3);
+        expect(byName['Prospecting Oran']).toBe(1);
+    });
+
     it('sums campaign attributed revenue to 820000', () => {
         expect(getCampaignTotals().reduce((sum, row) => sum + row.attributedRevenue, 0)).toBe(
             820000,
         );
         expect(getAdsTotals().attributedRevenue).toBe(820000);
+    });
+
+    it('keeps owner-locked per-campaign attributed revenue 432000 / 252000 / 112000 / 24000', () => {
+        const byName = Object.fromEntries(
+            getCampaignTotals().map((row) => [row.name, row.attributedRevenue]),
+        );
+
+        expect(byName['WA Cliniques Alger']).toBe(432000);
+        expect(byName['Devis CRM Santé']).toBe(252000);
+        expect(byName['Retargeting Devis']).toBe(112000);
+        expect(byName['Prospecting Oran']).toBe(24000);
     });
 
     it('sums lead sources to 128', () => {
@@ -121,6 +145,43 @@ describe('EvoCRM demo data integrity', () => {
         expect(getClosedDeals()).toHaveLength(17);
         expect(getWonDeals()).toHaveLength(3);
         expect(getLostDeals()).toHaveLength(14);
+        expect(getLostDeals().every((deal) => deal.sourceCampaignId !== null)).toBe(true);
+        expect(getWonDeals().every((deal) => deal.sourceCampaignId === null)).toBe(true);
+    });
+
+    it('keeps pipeline stages totaling 25 deals and 2550000 DA', () => {
+        const stages = getPipelineByStage();
+        const byStage = Object.fromEntries(stages.map((row) => [row.stage, row]));
+
+        expect(stages.reduce((sum, row) => sum + row.count, 0)).toBe(25);
+        expect(stages.reduce((sum, row) => sum + row.pipeline, 0)).toBe(2550000);
+        expect(byStage.nouveau.count).toBe(7);
+        expect(byStage.nouveau.pipeline).toBe(455000);
+        expect(byStage.qualification.count).toBe(6);
+        expect(byStage.qualification.pipeline).toBe(615000);
+        expect(byStage.proposition.count).toBe(6);
+        expect(byStage.proposition.pipeline).toBe(560000);
+        expect(byStage.negociation.count).toBe(6);
+        expect(byStage.negociation.pipeline).toBe(920000);
+    });
+
+    it('routes Sankey campaign membership into open / won / lost without leftover value', () => {
+        const { links } = getSankeyDealFlow();
+        const byPair = Object.fromEntries(
+            links.map((link) => [`${link.source}->${link.target}`, link.value]),
+        );
+
+        expect(byPair['0->5']).toBe(320000);
+        expect(byPair['0->7']).toBe(112000);
+        expect(byPair['1->5']).toBe(180000);
+        expect(byPair['1->7']).toBe(72000);
+        expect(byPair['2->5']).toBe(60000);
+        expect(byPair['2->7']).toBe(52000);
+        expect(byPair['3->7']).toBe(24000);
+        expect(byPair['4->5']).toBe(1990000);
+        expect(byPair['4->6']).toBe(1280000);
+        expect(links.some((link) => link.source === 3 && link.target === 5)).toBe(false);
+        expect(links.reduce((sum, link) => sum + link.value, 0)).toBe(820000 + 1990000 + 1280000);
     });
 
     it('rounds conversion 3/17 to 18 percent', () => {

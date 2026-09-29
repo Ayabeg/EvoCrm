@@ -450,23 +450,23 @@ const deals = [
 ];
 
 const waLost = [
-    { value: 42000, createdAt: '2026-09-05', closedAt: '2026-09-16' },
-    { value: 33500, createdAt: '2026-09-08', closedAt: '2026-09-19' },
-    { value: 21000, createdAt: '2026-09-11', closedAt: '2026-09-22' },
-    { value: 15500, createdAt: '2026-09-14', closedAt: '2026-09-27' },
+    { value: 20000, createdAt: '2026-09-05', closedAt: '2026-09-16' },
+    { value: 18000, createdAt: '2026-09-06', closedAt: '2026-09-17' },
+    { value: 16000, createdAt: '2026-09-08', closedAt: '2026-09-19' },
+    { value: 15000, createdAt: '2026-09-09', closedAt: '2026-09-20' },
+    { value: 14000, createdAt: '2026-09-11', closedAt: '2026-09-22' },
+    { value: 12000, createdAt: '2026-09-13', closedAt: '2026-09-24' },
+    { value: 10000, createdAt: '2026-09-14', closedAt: '2026-09-27' },
+    { value: 7000, createdAt: '2026-09-21', closedAt: '2026-09-29' },
 ];
 const devisLost = [
-    { value: 28000, createdAt: '2026-09-04', closedAt: '2026-09-14' },
-    { value: 18000, createdAt: '2026-09-07', closedAt: '2026-09-17' },
-    { value: 9000, createdAt: '2026-09-10', closedAt: '2026-09-20' },
-    { value: 5000, createdAt: '2026-09-13', closedAt: '2026-09-23' },
-    { value: 4000, createdAt: '2026-09-16', closedAt: '2026-09-26' },
-    { value: 3000, createdAt: '2026-09-19', closedAt: '2026-09-29' },
+    { value: 32000, createdAt: '2026-09-04', closedAt: '2026-09-14' },
+    { value: 24000, createdAt: '2026-09-07', closedAt: '2026-09-17' },
+    { value: 16000, createdAt: '2026-09-10', closedAt: '2026-09-20' },
 ];
 const retargetLost = [
-    { value: 24000, createdAt: '2026-09-06', closedAt: '2026-09-15' },
-    { value: 18000, createdAt: '2026-09-12', closedAt: '2026-09-21' },
-    { value: 10000, createdAt: '2026-09-17', closedAt: '2026-09-28' },
+    { value: 30000, createdAt: '2026-09-06', closedAt: '2026-09-15' },
+    { value: 22000, createdAt: '2026-09-12', closedAt: '2026-09-21' },
 ];
 const oranLost = [{ value: 24000, createdAt: '2026-09-10', closedAt: '2026-09-24' }];
 
@@ -479,7 +479,7 @@ const leftoverOpens = [
     { value: 55000, stage: 'nouveau', createdAt: '2026-09-14', name: 'Signalement pharmacie de quartier', source: 'autres', sourceCampaignId: null },
     { value: 50000, stage: 'nouveau', createdAt: '2026-09-15', name: 'Inbound email — cabinet dentaire', source: 'email', sourceCampaignId: null },
     { value: 70000, stage: 'qualification', createdAt: '2026-09-08', name: 'Audit commercial clinique', source: 'recommandation', sourceCampaignId: null },
-    { value: 65000, stage: 'qualification', createdAt: '2026-09-16', name: 'Qualification devis site', source: 'site_web', sourceCampaignId: 'campaign-devis-crm-sante' },
+    { value: 60000, stage: 'qualification', createdAt: '2026-09-16', name: 'Qualification devis site', source: 'site_web', sourceCampaignId: 'campaign-devis-crm-sante' },
     { value: 60000, stage: 'qualification', createdAt: '2026-09-17', name: 'Diagnostic CRM cabinet', source: 'email', sourceCampaignId: null },
     { value: 55000, stage: 'qualification', createdAt: '2026-09-18', name: 'Qualification Instagram organique', source: 'instagram', sourceCampaignId: null },
     { value: 50000, stage: 'qualification', createdAt: '2026-09-19', name: 'Cadrage laboratoire régional', source: 'recommandation', sourceCampaignId: null },
@@ -487,7 +487,7 @@ const leftoverOpens = [
     { value: 60000, stage: 'proposition', createdAt: '2026-09-20', name: 'Offre digitalisation — site', source: 'site_web', sourceCampaignId: 'campaign-devis-crm-sante' },
     { value: 55000, stage: 'proposition', createdAt: '2026-09-21', name: 'Proposition cabinet spécialisé', source: 'recommandation', sourceCampaignId: null },
     { value: 50000, stage: 'proposition', createdAt: '2026-09-22', name: 'Offre support laboratoire', source: 'email', sourceCampaignId: null },
-    { value: 45000, stage: 'proposition', createdAt: '2026-09-23', name: 'Proposition pharmacie réseau', source: 'autres', sourceCampaignId: null },
+    { value: 50000, stage: 'proposition', createdAt: '2026-09-23', name: 'Proposition pharmacie réseau', source: 'autres', sourceCampaignId: null },
     { value: 60000, stage: 'negociation', createdAt: '2026-09-06', name: 'Négociation retargeting devis', source: 'instagram', sourceCampaignId: 'campaign-retargeting-devis' },
     { value: 55000, stage: 'negociation', createdAt: '2026-09-24', name: 'Négociation licence clinique', source: 'recommandation', sourceCampaignId: null },
     { value: 55000, stage: 'negociation', createdAt: '2026-09-25', name: 'Avenant support cabinet', source: 'email', sourceCampaignId: null },
@@ -987,8 +987,8 @@ const header = `/**
  *    revenue.
  *
  *    Why this definition: campaign deal counts partition the 19 ad deals.
- *    After Option A, that split is WA 5 / Devis 9 / Retarget 4 / Oran 1
- *    (was 9/6/3/1). Campaign attributedRevenue still sums to 820 000 DA.
+ *    Owner-locked split is WA 9 / Devis 6 / Retarget 3 / Oran 1. Campaign
+ *    attributedRevenue still sums to 820 000 DA (432 / 252 / 112 / 24).
  *    The 3 won deals total 1 280 000 DA. Those two amounts cannot be the same
  *    population: 1 280 000 > 820 000, so the won deals cannot all sit inside
  *    the 19 ad deals if attributedRevenue is deal.value.
@@ -999,20 +999,24 @@ const header = `/**
  *    count shown beside the ads funnel, not "3 of the 19 ad deals won".
  *    DATA DECISION NEEDED FROM OWNER if the funnel must mean 3/19 won from ads.
  *
- * 2. Open pipeline — owner Option A (2026-09-29)
+ * 2. Open pipeline — owner Option A (2026-09-29), counts restored (2026-09-29)
  *    Locked: 25 open deals / 2 550 000 DA. The four named deals stay at
  *    1 290 000 DA. The other 21 are 40 000–80 000 DA each and sum to
  *    1 260 000 DA, spread across Nouveau / Qualification / Proposition /
  *    Négociation.
  *
- *    Four of those 21 were WA-campaign leftover opens (5 500 DA). Raising
- *    them to 40k+ on WA would break 432 000 attributed (Modernisation is
- *    already 320 000). They were moved off WA: 3 → Devis CRM Santé, 1 →
- *    Retargeting Devis. Their former 5 500 DA was folded into the 4 WA
- *    lost deals (now 112 000). Devis/Retarget lost values were reduced by
- *    the new open amounts so each campaign attributed total is unchanged.
- *    Ad deals stay 19 / 820 000 DA. Per-campaign deal counts are now
- *    5 / 9 / 4 / 1.
+ *    Campaign membership stays 9 / 6 / 3 / 1. Option A leftover opens cannot
+ *    sit on WA (Modernisation 320 000 + 40k+ would exceed 432 000), so the
+ *    four leftover ad-sourced opens stay on Devis (3 × 60 000) and Retarget
+ *    (1 × 60 000). Locked counts are kept by changing open vs lost, not by
+ *    moving deals between campaigns:
+ *      WA:        1 open (Modernisation 320 000) + 8 lost = 112 000 → 432 000
+ *      Devis:     3 open leftovers = 180 000 + 3 lost = 72 000 → 252 000
+ *      Retarget:  1 open leftover = 60 000 + 2 lost = 52 000 → 112 000
+ *      Oran:      1 lost = 24 000
+ *    Lost = 8+3+2+1 = 14, all ad-sourced. Won = 3 organic. Closed = 17.
+ *    Open = 25: 5 ad-sourced (Modernisation + 4 leftovers) + 20 organic
+ *    (Ibn Sina, Amrani, Pharmacie + 17 leftovers). Ad deals stay 19 / 820 000.
  *
  * 3. Ads leads 86 vs lead sources 128
  *    The 86 ad leads are a subset of the 128:
@@ -1264,6 +1268,18 @@ for (const lead of leads) {
     sourceTally[lead.source] = (sourceTally[lead.source] ?? 0) + 1;
 }
 
+const campaignDealTally = Object.fromEntries(
+    CAMPAIGNS.map((campaign) => [
+        campaign.name,
+        {
+            deals: deals.filter((d) => d.sourceCampaignId === campaign.id).length,
+            attributed: deals
+                .filter((d) => d.sourceCampaignId === campaign.id)
+                .reduce((s, d) => s + d.value, 0),
+        },
+    ]),
+);
+
 console.log({
     deals: deals.length,
     open: open.length,
@@ -1277,6 +1293,7 @@ console.log({
     pendingValue: sum(pending, 'value'),
     adDeals: adDeals.length,
     adDealValue: sum(adDeals, 'value'),
+    campaignDealTally,
     leads: leads.length,
     adLeads: leads.filter((l) => l.sourceCampaignId).length,
     sourceTally,
