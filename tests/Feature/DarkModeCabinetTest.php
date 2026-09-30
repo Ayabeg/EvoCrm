@@ -95,7 +95,11 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
         ->toContain('.evo-cabinet .evo-nav-section-label')
         ->toContain('color: var(--color-shell-muted)')
         ->toContain('.evo-agents-sidebar input[type=\'search\']')
-        ->toContain('padding-left: 2.5rem');
+        ->toContain('padding-left: 2.5rem')
+        ->toContain('[data-agents-page] .evo-agents-primary-btn')
+        ->toContain('background-color: #EC6025')
+        ->toContain('color: #121212')
+        ->toContain('padding-inline: 12px');
 
     expect($settings)->toContain('.dark [data-settings=\'dialog\']')
         ->and($settings)->toContain('--settings-canvas: #1c1c1c')
@@ -125,5 +129,9 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
         ->and($v02)->toContain('border: 1px solid #3a3a3a')
         ->and($v02)->toContain("[data-crm='deal-attention-row']")
         ->and($v02)->toContain('padding-left: 16px')
+        ->and($v02)->toContain('.evo-create-btn')
+        ->and($v02)->toContain('background: #EC6025')
+        ->and($v02)->toContain("[data-crm='deals-workspace'] [data-ds='filter-bar'] input")
+        ->and($v02)->toContain('padding-left: 2.5rem')
         ->and($v02)->not->toContain('clip: rect(0 0 0 0)');
 });

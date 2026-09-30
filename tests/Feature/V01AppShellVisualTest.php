@@ -50,7 +50,7 @@ it('keeps the topbar as quiet utility chrome with a labeled Create control', fun
     expect($header)->toContain("t('Create')")
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Tasks')")
-        ->and($header)->toContain('className="h-9 gap-2 px-3"')
+        ->and($header)->toContain('className="evo-create-btn h-9 gap-2 px-3"')
         ->and($header)->not->toContain('sm:max-w-md')
         ->and($header)->not->toContain('size="sm"')
         ->and($header)->not->toContain('className="rounded-full"');

@@ -79,7 +79,7 @@
     gap: 6px;
 }
 
-.app-topbar [data-chrome='utilities'] .aurora-btn {
+.app-topbar [data-chrome='utilities'] .aurora-btn:not(.evo-create-btn) {
     width: 32px;
     height: 32px;
     border: 0;
@@ -88,12 +88,25 @@
     color: #3d4350;
 }
 
+.app-topbar [data-chrome='utilities'] .evo-create-btn,
+.app-topbar [data-chrome='utilities'] .evo-create-btn:hover,
+.app-topbar [data-chrome='utilities'] .evo-create-btn:active {
+    width: auto;
+    height: 36px;
+    padding-inline: 12px;
+    background: #EC6025;
+    border: 0;
+    box-shadow: none;
+    color: #121212;
+}
+
 .app-topbar [data-chrome='utilities'] .evo-create-label {
     position: static;
     width: auto;
     height: auto;
     overflow: visible;
     clip: auto;
+    color: inherit;
 }
 
 [data-cabinet='rail'] .app-rail-item {
@@ -171,6 +184,12 @@
 [data-crm='deals-board'] [data-ds='filter-bar'] {
     border-bottom: 0;
     background: transparent;
+}
+
+[data-crm='contacts-workspace'] [data-ds='filter-bar'] input,
+[data-crm='deals-workspace'] [data-ds='filter-bar'] input,
+[data-crm='deals-board'] [data-ds='filter-bar'] input {
+    padding-left: 2.5rem;
 }
 
 [data-crm='contacts-workspace'] [data-ds='data-table'],
@@ -440,6 +459,13 @@ body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[ari
 .dark .app-topbar {
     background: #1c1c1c;
     border-bottom-color: #3a3a3a;
+}
+
+.dark .app-topbar [data-chrome='utilities'] .evo-create-btn,
+.dark .app-topbar [data-chrome='utilities'] .evo-create-btn:hover,
+.dark .app-topbar [data-chrome='utilities'] .evo-create-btn:active {
+    background: #EC6025;
+    color: #121212;
 }
 
 .dark [data-slot='sidebar-inset'] {

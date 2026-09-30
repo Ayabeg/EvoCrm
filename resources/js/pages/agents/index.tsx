@@ -253,7 +253,7 @@ export default function AgentsIndex() {
                         <button
                             type="button"
                             className={cn(
-                                'inline-flex h-8 items-center gap-1.5 rounded-md bg-[#E8530E] px-3 text-[12px] font-semibold text-white hover:bg-[#C9480B]',
+                                'evo-agents-primary-btn inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-[12px] font-semibold',
                                 focusRing,
                             )}
                             onClick={() => setCreateBotOpen(true)}
@@ -360,7 +360,7 @@ function BotsView({
                         <button
                             type="button"
                             className={cn(
-                                'inline-flex h-9 items-center gap-1.5 rounded-md bg-[#E8530E] px-3.5 text-[12px] font-semibold text-white hover:bg-[#C9480B]',
+                                'evo-agents-primary-btn inline-flex h-9 items-center gap-1.5 rounded-md px-3.5 text-[12px] font-semibold',
                                 focusRing,
                             )}
                             onClick={() => onStartChat(selectedBot)}

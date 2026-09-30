@@ -343,10 +343,22 @@ html.dark [data-agents-page] :is(h1, h2, h3) {
 }
 
 html.dark .evo-agents .bg-white,
-html.dark [data-agents-page] .bg-white,
-html.dark .evo-agents [class*='bg-white'],
-html.dark [data-agents-page] [class*='bg-white'] {
+html.dark [data-agents-page] .bg-white {
     background-color: #ffffff;
+}
+
+[data-agents-page] .evo-agents-primary-btn,
+html.dark [data-agents-page] .evo-agents-primary-btn {
+    background-color: #EC6025;
+    color: #121212;
+    border-color: #EC6025;
+    padding-inline: 12px;
+}
+
+[data-agents-page] .evo-agents-primary-btn:hover,
+html.dark [data-agents-page] .evo-agents-primary-btn:hover {
+    background-color: #d45520;
+    color: #121212;
 }
 
 html.dark .evo-agents .text-ink,

@@ -105,7 +105,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                 variant="default"
                                 title={t('Create')}
                                 aria-label={t('Create')}
-                                className="h-9 gap-2 px-3"
+                                className="evo-create-btn h-9 gap-2 px-3"
                                 hidden={quoteWorkspace}
                             >
                                 <Plus className="size-4" weight="bold" aria-hidden />

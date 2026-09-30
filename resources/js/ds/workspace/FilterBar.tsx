@@ -212,7 +212,7 @@ export function FilterBar({
                             name="q"
                             defaultValue={searchKey}
                             placeholder={searchPlaceholder}
-                            className={desk ? 'h-8 pl-9 text-[13px]' : 'h-9 pl-9'}
+                            className={desk ? 'h-8 pl-10 text-[13px]' : 'h-9 pl-10'}
                             aria-label={searchLabel}
                         />
                     </form>

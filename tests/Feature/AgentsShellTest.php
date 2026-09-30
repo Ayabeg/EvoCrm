@@ -111,6 +111,8 @@ it('keeps StarFour on Agents and Robot on the Bots listing header', function () 
         ->toContain('className="evo-agents light')
         ->toContain('<Robot')
         ->toContain('Bots')
+        ->toContain('evo-agents-primary-btn')
+        ->not->toContain('bg-[#E8530E] text-white')
         ->and($table)
         ->toContain("column.id === 'close_date'")
         ->toContain('whitespace-nowrap');
