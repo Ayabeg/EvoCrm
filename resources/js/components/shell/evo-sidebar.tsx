@@ -169,7 +169,7 @@ export function EvoSidebar({
 
                     {NAV_SECTIONS.map((section) => (
                         <section key={section.id}>
-                            <h2 className="mt-2 mb-1 text-[11px] font-normal tracking-[0.06em] text-shell-faint uppercase">
+                            <h2 className="evo-nav-section-label mt-2 mb-1 text-[11px] font-normal tracking-[0.06em] text-shell-faint uppercase">
                                 {section.label}
                             </h2>
                             <ul>

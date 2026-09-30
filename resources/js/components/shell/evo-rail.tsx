@@ -405,7 +405,7 @@ export function EvoRail({
                                     }
                                 >
                                     {section.label ? (
-                                        <h2 className="mb-1 border-t border-shell-hairline px-2 pt-3 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
+                                        <h2 className="evo-nav-section-label mb-1 border-t border-shell-hairline px-2 pt-3 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
                                             {section.label}
                                         </h2>
                                     ) : null}

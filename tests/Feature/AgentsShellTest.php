@@ -34,6 +34,7 @@ it('keeps directory and selected-agent views inside the same agents sidebar', fu
         ->not->toContain('showLegacyAgentsRoom')
         ->and($rail)
         ->toContain("{ id: 'agents', label: 'Agents', icon: StarFour }")
+        ->toContain('evo-nav-section-label')
         ->toContain('{agentsContent}')
         ->not->toContain('The desk is open in the workspace.')
         ->and($navigation)
@@ -92,5 +93,25 @@ it('uses the chat layout regions for the agent conversation surface', function (
         ->toContain('AgentChatLayout')
         ->toContain('AgentsComposer')
         ->toContain('BloubAvatar')
+        ->toContain('data-theme="light"')
         ->not->toContain('Stub replies only');
+});
+
+it('keeps StarFour on Agents and Robot on the Bots listing header', function () {
+    $sidebar = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
+    $page = file_get_contents(resource_path('js/pages/agents/index.tsx'));
+    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+
+    expect($sidebar)
+        ->toContain('StarFour')
+        ->toContain('pl-10')
+        ->not->toContain('label="Bots"')
+        ->and($page)
+        ->toContain('data-theme="light"')
+        ->toContain('className="evo-agents light')
+        ->toContain('<Robot')
+        ->toContain('Bots')
+        ->and($table)
+        ->toContain("column.id === 'close_date'")
+        ->toContain('whitespace-nowrap');
 });

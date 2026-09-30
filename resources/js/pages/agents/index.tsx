@@ -6,6 +6,7 @@ import {
     ChatCircle,
     CheckCircle,
     Plus,
+    Robot,
 } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -230,16 +231,22 @@ export default function AgentsIndex() {
                 <Head title="Bots · Agents" />
                 <main
                     aria-label="Agents workspace"
-                    className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#F7F8F5] text-[#0D1B24]"
+                    className="evo-agents light flex min-h-0 min-w-0 flex-1 flex-col bg-[#F7F8F5] text-[#0D1B24]"
                     data-agents-page
                     data-agents-route={path}
+                    data-theme="light"
                 >
                     <header className="flex shrink-0 items-center justify-between gap-4 border-b border-black/8 bg-white px-5 py-4 sm:px-7">
                         <div>
                             <p className="text-[10px] font-semibold tracking-[0.12em] text-[#E8530E] uppercase">
                                 Agents
                             </p>
-                            <h1 className="mt-1 text-[20px] font-semibold tracking-[-0.03em]">
+                            <h1 className="mt-1 flex items-center gap-2 text-[20px] font-semibold tracking-[-0.03em] text-[#0D1B24]">
+                                <Robot
+                                    className="size-5 shrink-0 text-[#0D1B24]"
+                                    weight="regular"
+                                    aria-hidden
+                                />
                                 Bots
                             </h1>
                         </div>

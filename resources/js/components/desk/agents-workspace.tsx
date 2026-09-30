@@ -53,10 +53,11 @@ export function AgentsWorkspace({
     return (
         <main
             aria-label={`${profile.bot.name} workspace`}
-            className="evo-agents flex min-h-0 min-w-0 flex-1 flex-col"
+            className="evo-agents light flex min-h-0 min-w-0 flex-1 flex-col"
             data-agent-id={profile.bot.id}
             data-agents-page
             data-agent-workspace
+            data-theme="light"
         >
             <header
                 className="flex min-h-[64px] shrink-0 items-center justify-between gap-4 border-b border-black/[0.08] bg-white px-5 py-3 sm:px-7"
@@ -271,9 +272,10 @@ export function AgentsDirectoryHome({
     return (
         <main
             aria-label="Agents directory workspace"
-            className="evo-agents flex min-h-0 min-w-0 flex-1 flex-col"
+            className="evo-agents light flex min-h-0 min-w-0 flex-1 flex-col"
             data-agents-page
             data-agents-home
+            data-theme="light"
         >
             <header className="flex min-h-[64px] shrink-0 items-center justify-between border-b border-black/[0.08] bg-white px-5 sm:px-7">
                 <div>

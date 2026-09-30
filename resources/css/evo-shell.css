@@ -189,6 +189,13 @@
     color: #f5f5f5;
 }
 
+/* Astryx headings use --color-text-primary (#000 in light). The rail
+   is always a dark cabinet, so section labels must keep muted ink. */
+.evo-cabinet :is(h1, h2, h3),
+.evo-cabinet .evo-nav-section-label {
+    color: var(--color-shell-muted);
+}
+
 .evo-workspace {
     background: #f7f8f5;
     color: #0d1b24;
@@ -286,9 +293,14 @@
     }
 }
 
-/* Agents column stays on the light desk even when the cabinet is dark. */
-.evo-agents {
+/* Agents column stays on the light desk even when the cabinet is dark.
+   Pin LightningCSS to the light pair so html.dark cannot paint #e8e8e8
+   headings or remap bg-white cards on this island. */
+.evo-agents,
+[data-agents-page] {
     color-scheme: light;
+    --lightningcss-light: initial;
+    --lightningcss-dark: ;
     --color-bg: #f7f8f5;
     --color-surface: #ffffff;
     --color-subtle: #f3f5f1;
@@ -298,6 +310,8 @@
     --color-text-primary: #0d1b24;
     --color-text-secondary: #5b6b73;
     --color-text-muted: #5b6b73;
+    --color-ink: #0d1b24;
+    --color-mute: #5b6b73;
     --aurora-text-primary: #0d1b24;
     --aurora-text-muted: #5b6b73;
     --color-shell-canvas: #f7f8f5;
@@ -321,6 +335,32 @@
     background: var(--evo-canvas);
     color: var(--evo-ink);
     caret-color: var(--evo-teal);
+}
+
+html.dark .evo-agents :is(h1, h2, h3),
+html.dark [data-agents-page] :is(h1, h2, h3) {
+    color: #0d1b24;
+}
+
+html.dark .evo-agents .bg-white,
+html.dark [data-agents-page] .bg-white,
+html.dark .evo-agents [class*='bg-white'],
+html.dark [data-agents-page] [class*='bg-white'] {
+    background-color: #ffffff;
+}
+
+html.dark .evo-agents .text-ink,
+html.dark [data-agents-page] .text-ink {
+    color: #0d1b24;
+}
+
+html.dark .evo-agents .text-white,
+html.dark [data-agents-page] .text-white {
+    color: #ffffff;
+}
+
+.evo-agents-sidebar input[type='search'] {
+    padding-left: 2.5rem;
 }
 
 .evo-agents ::selection {

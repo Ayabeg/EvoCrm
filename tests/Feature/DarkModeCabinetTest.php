@@ -78,14 +78,24 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
         ->and($app)->toContain('.dark :where(h1, h2, h3)')
         ->and($app)->toContain('.dark .auth-screen .login-split-brand')
         ->and($app)->toContain('background: #262626')
-        ->and($app)->not->toContain('.dark [data-agents-page]');
+        ->and($app)->not->toContain('.dark [data-agents-page]')
+        ->and($app)->toContain('padding: 0.625rem 0.875rem !important');
 
     $shell = file_get_contents(resource_path('css/evo-shell.css'));
 
     expect($shell)
         ->toContain('Agents column stays on the light desk even when the cabinet is dark.')
+        ->toContain('--lightningcss-light: initial')
+        ->toContain('--lightningcss-dark: ;')
         ->toContain('--color-surface: #ffffff;')
-        ->toContain('--color-text-primary: #0d1b24;');
+        ->toContain('--color-text-primary: #0d1b24;')
+        ->toContain('html.dark .evo-agents :is(h1, h2, h3)')
+        ->toContain('html.dark [data-agents-page] .bg-white')
+        ->toContain('background-color: #ffffff')
+        ->toContain('.evo-cabinet .evo-nav-section-label')
+        ->toContain('color: var(--color-shell-muted)')
+        ->toContain('.evo-agents-sidebar input[type=\'search\']')
+        ->toContain('padding-left: 2.5rem');
 
     expect($settings)->toContain('.dark [data-settings=\'dialog\']')
         ->and($settings)->toContain('--settings-canvas: #1c1c1c')
@@ -106,9 +116,14 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
     $queue = file_get_contents(resource_path('js/components/crm/deal-attention-queue.tsx'));
 
     expect($queue)->toContain('rounded-[9px] border border-hairline bg-surface')
-        ->and($queue)->toContain('mx-4');
+        ->and($queue)->toContain('mx-4')
+        ->and($queue)->toContain('data-crm="deal-attention-row"')
+        ->and($queue)->toContain('px-4 py-2');
 
     expect($v02)->toContain("[data-crm='deals-workspace'] [data-crm='deal-attention-queue']")
         ->and($v02)->toContain('border: 1px solid #e5e6e4')
-        ->and($v02)->toContain('border: 1px solid #3a3a3a');
+        ->and($v02)->toContain('border: 1px solid #3a3a3a')
+        ->and($v02)->toContain("[data-crm='deal-attention-row']")
+        ->and($v02)->toContain('padding-left: 16px')
+        ->and($v02)->not->toContain('clip: rect(0 0 0 0)');
 });

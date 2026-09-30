@@ -568,6 +568,9 @@ export default function ListViewTable({
                                         companyTable && companyColumnWidth(column.id),
                                         leadTable && leadColumnWidth(column.id),
                                         dealTable && dealColumnWidth(column.id),
+                                        dealTable &&
+                                            column.id === 'close_date' &&
+                                            'whitespace-nowrap',
                                         quoteTable && quoteColumnWidth(column.id),
                                         fixedTable &&
                                             index === visible.length - 1 &&

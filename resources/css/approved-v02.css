@@ -89,11 +89,11 @@
 }
 
 .app-topbar [data-chrome='utilities'] .evo-create-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
 }
 
 [data-cabinet='rail'] .app-rail-item {
@@ -190,6 +190,11 @@
     border: 1px solid #e5e6e4;
     border-radius: 9px;
     background: #fff;
+}
+
+[data-crm='deal-attention-queue'] [data-crm='deal-attention-row'] {
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 [data-crm='deals-workspace'] [data-crm='stage-pills'],

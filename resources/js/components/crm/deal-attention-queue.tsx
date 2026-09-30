@@ -61,6 +61,7 @@ export default function DealAttentionQueue({
                     <li key={item.id}>
                         <button
                             type="button"
+                            data-crm="deal-attention-row"
                             className="flex w-full items-start justify-between gap-3 px-4 py-2 text-left hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
                             onClick={() =>
                                 openRecord(

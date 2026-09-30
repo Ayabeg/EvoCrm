@@ -299,7 +299,7 @@ function DirectoryPane({
                         tab === 'agents' ? 'Search agents' : 'Search chats'
                     }
                     className={cn(
-                        'h-9 w-full rounded-md border border-shell-hairline bg-white/[0.035] pr-3 pl-9 text-[12px] text-shell-ink placeholder:text-shell-muted/75 focus:border-shell-orange/70 focus-visible:outline-none',
+                        'h-9 w-full rounded-md border border-shell-hairline bg-white/[0.035] pr-3 pl-10 text-[12px] text-shell-ink placeholder:text-shell-muted/75 focus:border-shell-orange/70 focus-visible:outline-none',
                         'motion-reduce:transition-none',
                     )}
                 />
