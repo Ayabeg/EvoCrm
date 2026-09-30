@@ -3,12 +3,10 @@ import { List } from '@phosphor-icons/react';
 import { useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { AgentsSidebar } from '@/components/desk/agents-sidebar';
-import { AgentsRoom } from '@/components/shell/agents-room';
 import { EvoRail } from '@/components/shell/evo-rail';
 import type { RailMode } from '@/components/shell/evo-rail';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 
 let shellHydrated = false;
 
@@ -38,11 +36,38 @@ export function EvoShell({ children }: { children: ReactNode }) {
     const isMobile = useIsMobile();
     const { setOpenMobile } = useSidebar();
     const showMobileSheet = useShellHydrated() && isMobile;
-    const [mode, setMode] = useState<RailMode>('menu');
-    const [collapsed, setCollapsed] = useState(false);
+    const [modeState, setModeState] = useState<{
+        agentsActive: boolean;
+        mode: RailMode;
+    } | null>(null);
+    const [collapsedState, setCollapsedState] = useState<{
+        agentsActive: boolean;
+        collapsed: boolean;
+    } | null>(null);
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
     const agentsActive = path === '/agents' || path.startsWith('/agents/');
-    const showLegacyAgentsRoom = mode === 'agents' && !agentsActive;
+    const mode =
+        modeState?.agentsActive === agentsActive
+            ? modeState.mode
+            : agentsActive
+              ? 'agents'
+              : 'menu';
+    const collapsed =
+        collapsedState?.agentsActive === agentsActive
+            ? collapsedState.collapsed
+            : false;
+
+    function setMode(next: RailMode) {
+        setModeState({ agentsActive, mode: next });
+
+        if (next !== 'menu') {
+            setCollapsedState({ agentsActive, collapsed: false });
+        }
+    }
+
+    function renderAgentsContent(onNavigate?: () => void) {
+        return <AgentsSidebar onNavigate={onNavigate} />;
+    }
 
     return (
         <div
@@ -57,32 +82,26 @@ export function EvoShell({ children }: { children: ReactNode }) {
                     <EvoRail
                         activeHotkeys={!isMobile}
                         mode={mode}
-                        onModeChange={(next) => {
-                            setMode(next);
-
-                            if (next !== 'menu') {
-                                setCollapsed(false);
-                            }
-                        }}
-                        onToggleCollapsed={() => setCollapsed(true)}
+                        onModeChange={setMode}
+                        onToggleCollapsed={() =>
+                            setCollapsedState({ agentsActive, collapsed: true })
+                        }
+                        agentsContent={renderAgentsContent()}
                     />
                 </div>
             </aside>
             {showMobileSheet ? (
                 <Sidebar collapsible="offcanvas">
                     <div className="evo-cabinet flex h-full min-h-0 flex-col">
-                        {agentsActive ? (
-                            <AgentsSidebar
-                                onNavigate={() => setOpenMobile(false)}
-                            />
-                        ) : (
-                            <EvoRail
-                                activeHotkeys
-                                mode={mode}
-                                onModeChange={setMode}
-                                onNavigate={() => setOpenMobile(false)}
-                            />
-                        )}
+                        <EvoRail
+                            activeHotkeys
+                            mode={mode}
+                            onModeChange={setMode}
+                            onNavigate={() => setOpenMobile(false)}
+                            agentsContent={renderAgentsContent(() =>
+                                setOpenMobile(false),
+                            )}
+                        />
                     </div>
                 </Sidebar>
             ) : null}
@@ -94,30 +113,15 @@ export function EvoShell({ children }: { children: ReactNode }) {
                     title="Ouvrir le menu"
                     tabIndex={collapsed ? 0 : -1}
                     aria-hidden={collapsed ? undefined : true}
-                    onClick={() => setCollapsed(false)}
+                    onClick={() =>
+                        setCollapsedState({ agentsActive, collapsed: false })
+                    }
                 >
                     <List className="size-4" weight="regular" />
                 </button>
-                <div className="flex min-h-0 min-w-0 flex-1">
-                    {agentsActive ? (
-                        <div className="hidden h-full shrink-0 md:flex">
-                            <AgentsSidebar />
-                        </div>
-                    ) : null}
-                    <div
-                        className={cn(
-                            'flex min-h-0 min-w-0 flex-1 flex-col',
-                            showLegacyAgentsRoom && 'hidden',
-                        )}
-                    >
-                        {children}
-                    </div>
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                    {children}
                 </div>
-                {showLegacyAgentsRoom ? (
-                    <div className="absolute inset-0 z-10 flex min-h-0">
-                        <AgentsRoom />
-                    </div>
-                ) : null}
             </div>
         </div>
     );

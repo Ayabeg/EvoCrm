@@ -1,253 +1,577 @@
-import { Link, usePage } from '@inertiajs/react';
-import { ChatCircle, House, Plus, Robot } from '@phosphor-icons/react';
-import type { Icon } from '@phosphor-icons/react';
-import type { ReactNode } from 'react';
-import { AgentsViewModeControl } from '@/components/desk/agents-view-mode-control';
-import { AgentsViewModePanel } from '@/components/desk/agents-view-mode-panel';
+import { Link } from '@inertiajs/react';
+import {
+    ArrowLeft,
+    ArrowRight,
+    CaretRight,
+    ChatCircle,
+    GearSix,
+    MagnifyingGlass,
+    Plus,
+    Robot,
+} from '@phosphor-icons/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { BloubAvatar } from '@/components/desk/bloub-avatar';
-import type { AgentsViewMode } from '@/lib/desk/agents-view-mode';
-import { getBotById, useBotDeskStore } from '@/lib/desk/bot-catalog';
-import { useAgentsViewMode } from '@/lib/desk/use-agents-view-mode';
+import { AGENT_PROFILES, resolveAgentProfile } from '@/lib/desk/agent-profiles';
+import type { AgentProfile } from '@/lib/desk/agent-profiles';
+import {
+    dispatchAgentsWorkspace,
+    useAgentsWorkspaceState,
+} from '@/lib/desk/agents-workspace-state';
+import type { AgentChat, BotDefinition } from '@/lib/desk/bot-catalog';
+import { createChat, useBotDeskStore } from '@/lib/desk/bot-catalog';
 import { cn } from '@/lib/utils';
 
-type ChatSummary = {
-    id: string;
-    title: string;
-    relativeTime: string;
-};
-
-type BotSummary = {
-    id: string;
-    job?: string;
-    label: string;
-};
-
-const SALES_BOTS: BotSummary[] = [
-    { id: 'closer', label: 'Closer' },
-    { id: 'qualifier', label: 'Qualifier' },
-    { id: 'quote-desk', label: 'Quote desk' },
-    { id: 'after-sale', label: 'After-sale' },
-];
-
-const INTERNAL_BOTS: BotSummary[] = [{ id: 'desk', label: 'Desk router' }];
-
-const EVOPULSE_BOTS: BotSummary[] = [
-    { id: 'evopulse-shell-ia', label: 'EvoPulse · Shell IA' },
-    { id: 'evopulse-pulse-ui', label: 'EvoPulse · Pulse UI' },
-    { id: 'evopulse-command-ui', label: 'EvoPulse · Command UI' },
-    { id: 'night-shift', label: 'Night shift' },
-];
-
-const sectionLinkClass =
-    'group flex size-9 items-center justify-center rounded-lg text-shell-muted transition-colors hover:bg-white/[0.08] hover:text-shell-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange motion-reduce:transition-none';
-
-const rowClass =
-    'flex min-h-9 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] text-shell-ink-2 transition-colors hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange motion-reduce:transition-none';
-
 type Props = {
-    chats?: ChatSummary[];
-    customBots?: BotSummary[];
     onNavigate?: () => void;
 };
 
-export function AgentsSidebar({
-    chats = [],
-    customBots = [],
-    onNavigate,
-}: Props) {
-    const page = usePage();
-    const store = useBotDeskStore();
-    const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
-    const visibleChats = chats.length > 0 ? chats : store.chats;
-    const [viewMode] = useAgentsViewMode();
-    const visibleCustomBots: BotSummary[] =
-        customBots.length > 0
-            ? customBots
-            : store.customBots.map((bot) => ({
-                  id: bot.id,
-                  job: bot.job,
-                  label: bot.name,
-              }));
+const focusRing =
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange';
+
+const quietButton =
+    'inline-flex min-h-8 items-center gap-2 rounded-md px-2 text-[12px] text-shell-ink-2 transition-colors hover:bg-white/[0.08] hover:text-shell-ink motion-reduce:transition-none';
+
+export function AgentsSidebar({ onNavigate }: Props) {
+    const workspace = useAgentsWorkspaceState();
+    const { chats, customBots } = useBotDeskStore();
+    const reduceMotion = useReducedMotion();
+    const directoryScrollRef = useRef<HTMLDivElement>(null);
+    const agentScrollRef = useRef<HTMLDivElement>(null);
+    const [savedScroll, setSavedScroll] = useState({ directory: 0, agent: 0 });
+    const selectedProfile =
+        resolveAgentProfile(workspace.selectedAgentId) ?? AGENT_PROFILES[0];
+    const entryX = workspace.view === 'directory' ? -12 : 16;
+    const exitX = workspace.view === 'directory' ? -12 : 16;
+
+    useLayoutEffect(() => {
+        if (workspace.view === 'directory' && directoryScrollRef.current) {
+            directoryScrollRef.current.scrollTop = savedScroll.directory;
+        }
+
+        if (workspace.view === 'agent' && agentScrollRef.current) {
+            agentScrollRef.current.scrollTop = savedScroll.agent;
+        }
+    }, [savedScroll, workspace.view]);
+
+    function selectAgent(agentId: string) {
+        setSavedScroll((current) => ({
+            directory: directoryScrollRef.current?.scrollTop ?? 0,
+            agent: workspace.selectedAgentId === agentId ? current.agent : 0,
+        }));
+
+        dispatchAgentsWorkspace({ type: 'select-agent', agentId });
+        onNavigate?.();
+    }
+
+    function startChat(agentId: string) {
+        setSavedScroll((current) => ({
+            ...current,
+            agent: agentScrollRef.current?.scrollTop ?? 0,
+        }));
+        const chat = createChat(agentId);
+        dispatchAgentsWorkspace({
+            type: 'open-chat',
+            agentId,
+            chatId: chat.id,
+        });
+        onNavigate?.();
+    }
+
+    function backToDirectory() {
+        setSavedScroll((current) => ({
+            ...current,
+            agent: agentScrollRef.current?.scrollTop ?? 0,
+        }));
+        dispatchAgentsWorkspace({ type: 'back-to-directory' });
+        onNavigate?.();
+    }
 
     return (
-        <aside
-            aria-label="Agents desk navigation"
-            className="evo-agents-sidebar flex min-h-0 w-full shrink-0 flex-col"
+        <div
+            className="evo-agents-sidebar flex h-full min-h-0 w-full shrink-0 flex-col"
             data-agents-sidebar
         >
-            <div className="flex h-14 shrink-0 items-center justify-between border-b border-shell-hairline px-3">
-                <Link
-                    href="/agents"
-                    className="flex min-w-0 items-center gap-2 rounded-lg px-1.5 py-1 text-[14px] font-semibold text-shell-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange"
-                    aria-current={path === '/agents' ? 'page' : undefined}
-                    onClick={onNavigate}
-                >
+            <div className="relative min-h-0 flex-1 overflow-hidden">
+                <AnimatePresence initial={false} mode="wait">
+                    {workspace.view === 'directory' ? (
+                        <motion.div
+                            key="directory"
+                            className="absolute inset-0 flex min-h-0 flex-col"
+                            initial={
+                                reduceMotion ? false : { opacity: 0, x: entryX }
+                            }
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={
+                                reduceMotion
+                                    ? { opacity: 0 }
+                                    : { opacity: 0, x: exitX }
+                            }
+                            transition={{
+                                duration: reduceMotion ? 0 : 0.2,
+                                ease: [0.2, 0.8, 0.2, 1],
+                            }}
+                        >
+                            <DirectoryPane
+                                chats={chats}
+                                customBots={customBots}
+                                scrollRef={directoryScrollRef}
+                                initialScrollTop={savedScroll.directory}
+                                tab={workspace.tab}
+                                selectedAgentId={workspace.selectedAgentId}
+                                onSelectAgent={selectAgent}
+                                onSelectChat={(chat) => {
+                                    setSavedScroll((current) => ({
+                                        ...current,
+                                        directory:
+                                            directoryScrollRef.current
+                                                ?.scrollTop ?? 0,
+                                    }));
+                                    dispatchAgentsWorkspace({
+                                        type: 'open-chat',
+                                        agentId: chat.botId,
+                                        chatId: chat.id,
+                                    });
+                                    onNavigate?.();
+                                }}
+                                onChangeTab={(tab) =>
+                                    dispatchAgentsWorkspace({
+                                        type: 'set-directory-tab',
+                                        tab,
+                                    })
+                                }
+                                onNavigate={onNavigate}
+                            />
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="agent"
+                            className="absolute inset-0 flex min-h-0 flex-col"
+                            initial={
+                                reduceMotion ? false : { opacity: 0, x: entryX }
+                            }
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={
+                                reduceMotion
+                                    ? { opacity: 0 }
+                                    : { opacity: 0, x: exitX }
+                            }
+                            transition={{
+                                duration: reduceMotion ? 0 : 0.2,
+                                ease: [0.2, 0.8, 0.2, 1],
+                            }}
+                        >
+                            <AgentPane
+                                agent={selectedProfile}
+                                chats={chats}
+                                scrollRef={agentScrollRef}
+                                initialScrollTop={savedScroll.agent}
+                                onBack={backToDirectory}
+                                onStartChat={() =>
+                                    startChat(selectedProfile.bot.id)
+                                }
+                                onOpenChat={(chat) => {
+                                    dispatchAgentsWorkspace({
+                                        type: 'open-chat',
+                                        agentId: chat.botId,
+                                        chatId: chat.id,
+                                    });
+                                    onNavigate?.();
+                                }}
+                                onNavigate={onNavigate}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+    );
+}
+
+function DirectoryPane({
+    chats,
+    customBots,
+    scrollRef,
+    initialScrollTop,
+    tab,
+    selectedAgentId,
+    onSelectAgent,
+    onSelectChat,
+    onChangeTab,
+    onNavigate,
+}: {
+    chats: AgentChat[];
+    customBots: BotDefinition[];
+    scrollRef: RefObject<HTMLDivElement | null>;
+    initialScrollTop: number;
+    tab: 'agents' | 'chats';
+    selectedAgentId: string | null;
+    onSelectAgent: (agentId: string) => void;
+    onSelectChat: (chat: AgentChat) => void;
+    onChangeTab: (tab: 'agents' | 'chats') => void;
+    onNavigate?: () => void;
+}) {
+    const [query, setQuery] = useState('');
+    const needle = query.trim().toLocaleLowerCase();
+    const filteredAgents = useMemo(() => {
+        const profiles = [
+            ...AGENT_PROFILES,
+            ...customBots
+                .map((bot) => resolveAgentProfile(bot.id))
+                .filter(
+                    (profile): profile is AgentProfile => profile !== undefined,
+                ),
+        ];
+
+        return profiles.filter((profile) =>
+            `${profile.bot.name} ${profile.summary}`
+                .toLocaleLowerCase()
+                .includes(needle),
+        );
+    }, [customBots, needle]);
+    const filteredChats = useMemo(
+        () =>
+            chats.filter((chat) => {
+                const agentName =
+                    resolveAgentProfile(chat.botId)?.bot.name ?? '';
+
+                return `${chat.title} ${agentName}`
+                    .toLocaleLowerCase()
+                    .includes(needle);
+            }),
+        [chats, needle],
+    );
+    const yourAgents = filteredAgents.filter(
+        (profile) => profile.section === 'your',
+    );
+    const systemAgents = filteredAgents.filter(
+        (profile) => profile.section === 'system',
+    );
+
+    useLayoutEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = initialScrollTop;
+        }
+    }, [initialScrollTop, scrollRef]);
+
+    return (
+        <div className="flex h-full min-h-0 flex-col">
+            <header className="flex h-14 shrink-0 items-center justify-between border-b border-shell-hairline px-4">
+                <div className="flex min-w-0 items-center gap-2 text-[15px] font-semibold text-shell-ink">
                     <Robot
-                        className="size-5 shrink-0 text-shell-orange"
+                        className="size-[18px] shrink-0 text-shell-orange"
                         weight="regular"
                         aria-hidden
                     />
-                    <span className="truncate">Agents</span>
-                </Link>
+                    <span>Agents</span>
+                </div>
                 <Link
-                    href="/agents/chats"
-                    className="grid size-8 place-items-center rounded-lg text-shell-muted hover:bg-white/[0.08] hover:text-shell-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange"
-                    aria-label="New chat"
-                    title="New chat"
+                    href="/agents/bots/new"
+                    className={cn(
+                        'grid size-8 shrink-0 place-items-center rounded-md text-shell-muted transition-colors hover:bg-white/[0.08] hover:text-shell-ink motion-reduce:transition-none',
+                        focusRing,
+                    )}
+                    aria-label="Add an agent"
+                    title="Add an agent"
                     onClick={onNavigate}
                 >
                     <Plus className="size-4" weight="bold" aria-hidden />
                 </Link>
-            </div>
+            </header>
 
-            <nav
-                aria-label="Agents sections"
-                className="flex shrink-0 items-center gap-1 px-3 py-2"
+            <label className="relative mx-3 mt-3 block shrink-0">
+                <MagnifyingGlass
+                    className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-shell-muted"
+                    weight="regular"
+                    aria-hidden
+                />
+                <input
+                    type="search"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={
+                        tab === 'agents'
+                            ? 'Search agents...'
+                            : 'Search chats...'
+                    }
+                    aria-label={
+                        tab === 'agents' ? 'Search agents' : 'Search chats'
+                    }
+                    className={cn(
+                        'h-9 w-full rounded-md border border-shell-hairline bg-white/[0.035] pr-3 pl-9 text-[12px] text-shell-ink placeholder:text-shell-muted/75 focus:border-shell-orange/70 focus-visible:outline-none',
+                        'motion-reduce:transition-none',
+                    )}
+                />
+            </label>
+
+            <div
+                role="tablist"
+                aria-label="Agents and chats"
+                className="mx-3 mt-3 grid shrink-0 grid-cols-2 rounded-md bg-white/[0.04] p-0.5"
             >
-                <SectionLink
-                    href="/agents"
-                    label="Desk"
-                    icon={House}
-                    active={path === '/agents'}
-                    onNavigate={onNavigate}
-                />
-                <SectionLink
-                    href="/agents/chats"
-                    label="Chats"
-                    icon={ChatCircle}
-                    active={
-                        path === '/agents/chats' ||
-                        path.startsWith('/agents/chats/')
-                    }
-                    onNavigate={onNavigate}
-                />
-                <SectionLink
-                    href="/agents/bots"
-                    label="Bots"
-                    icon={Robot}
-                    active={
-                        path === '/agents/bots' ||
-                        path.startsWith('/agents/bots/')
-                    }
-                    onNavigate={onNavigate}
-                />
-            </nav>
-
-            <div className="px-3 pb-2">
-                <AgentsViewModeControl />
+                <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === 'agents'}
+                    className={cn(
+                        'h-7 rounded text-[12px] transition-colors motion-reduce:transition-none',
+                        tab === 'agents'
+                            ? 'bg-white/[0.1] font-medium text-shell-ink'
+                            : 'text-shell-muted hover:text-shell-ink-2',
+                        focusRing,
+                    )}
+                    onClick={() => onChangeTab('agents')}
+                >
+                    Agents
+                </button>
+                <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === 'chats'}
+                    className={cn(
+                        'h-7 rounded text-[12px] transition-colors motion-reduce:transition-none',
+                        tab === 'chats'
+                            ? 'bg-white/[0.1] font-medium text-shell-ink'
+                            : 'text-shell-muted hover:text-shell-ink-2',
+                        focusRing,
+                    )}
+                    onClick={() => onChangeTab('chats')}
+                >
+                    Chats
+                </button>
             </div>
 
-            <div className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pb-3">
+            <div
+                ref={scrollRef}
+                id={`agents-${tab}-panel`}
+                role="tabpanel"
+                aria-label={tab === 'agents' ? 'Agents directory' : 'Chats'}
+                className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pt-5 pb-3"
+            >
+                {tab === 'agents' ? (
+                    <>
+                        <SidebarSection title="YOUR AGENTS">
+                            {yourAgents.length > 0 ? (
+                                <ul className="space-y-1">
+                                    {yourAgents.map((profile) => (
+                                        <li key={profile.bot.id}>
+                                            <AgentRow
+                                                agent={profile}
+                                                selected={
+                                                    selectedAgentId ===
+                                                    profile.bot.id
+                                                }
+                                                onClick={() =>
+                                                    onSelectAgent(
+                                                        profile.bot.id,
+                                                    )
+                                                }
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="px-2 py-2 text-[12px] text-shell-muted">
+                                    No agents match this search.
+                                </p>
+                            )}
+                        </SidebarSection>
+
+                        {systemAgents.length > 0 ? (
+                            <SidebarSection title="SYSTEM" className="mt-6">
+                                <ul className="space-y-1">
+                                    {systemAgents.map((profile) => (
+                                        <li key={profile.bot.id}>
+                                            <AgentRow
+                                                agent={profile}
+                                                selected={
+                                                    selectedAgentId ===
+                                                    profile.bot.id
+                                                }
+                                                onClick={() =>
+                                                    onSelectAgent(
+                                                        profile.bot.id,
+                                                    )
+                                                }
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </SidebarSection>
+                        ) : null}
+                    </>
+                ) : (
+                    <ChatDirectory
+                        chats={filteredChats}
+                        onSelect={onSelectChat}
+                    />
+                )}
+            </div>
+        </div>
+    );
+}
+
+function AgentPane({
+    agent,
+    chats,
+    scrollRef,
+    initialScrollTop,
+    onBack,
+    onStartChat,
+    onOpenChat,
+    onNavigate,
+}: {
+    agent: AgentProfile;
+    chats: AgentChat[];
+    scrollRef: RefObject<HTMLDivElement | null>;
+    initialScrollTop: number;
+    onBack: () => void;
+    onStartChat: () => void;
+    onOpenChat: (chat: AgentChat) => void;
+    onNavigate?: () => void;
+}) {
+    const agentChats = chats.filter((chat) => chat.botId === agent.bot.id);
+    const today = agentChats.filter(
+        (chat) => chat.relativeTime === 'Aujourd’hui',
+    );
+    const previous = agentChats.filter(
+        (chat) => chat.relativeTime !== 'Aujourd’hui',
+    );
+
+    useLayoutEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = initialScrollTop;
+        }
+    }, [agent.bot.id, initialScrollTop, scrollRef]);
+
+    return (
+        <div className="flex h-full min-h-0 flex-col">
+            <header className="flex h-14 shrink-0 items-center border-b border-shell-hairline px-3">
+                <button
+                    type="button"
+                    className={cn(
+                        'inline-flex h-9 items-center gap-2 rounded-md px-2 text-[13px] font-medium text-shell-ink-2 transition-colors hover:bg-white/[0.08] hover:text-shell-ink motion-reduce:transition-none',
+                        focusRing,
+                    )}
+                    aria-label="Retour aux agents"
+                    onClick={onBack}
+                >
+                    <ArrowLeft
+                        className="size-4"
+                        weight="regular"
+                        aria-hidden
+                    />
+                    <span>Agents</span>
+                </button>
+            </header>
+
+            <div className="shrink-0 px-4 pt-4 pb-3">
+                <div className="flex items-start gap-3">
+                    <BloubAvatar
+                        bot={agent.bot}
+                        label={`${agent.bot.name} avatar`}
+                        size={32}
+                        state="idle"
+                    />
+                    <div className="min-w-0 pt-0.5">
+                        <h2 className="truncate text-[15px] font-semibold text-shell-ink">
+                            {agent.bot.name}
+                        </h2>
+                        <p className="mt-0.5 text-[12px] leading-4 text-shell-muted">
+                            {agent.summary}
+                        </p>
+                        <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-shell-muted">
+                            <span
+                                aria-hidden="true"
+                                className="size-1.5 rounded-full bg-[#76B49A]"
+                            />
+                            {agent.availability}
+                        </p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    className={cn(
+                        'mt-4 inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-shell-orange px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#D8511E] motion-reduce:transition-none',
+                        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
+                    )}
+                    onClick={onStartChat}
+                >
+                    <Plus className="size-4" weight="bold" aria-hidden />
+                    New chat
+                </button>
+            </div>
+
+            <div
+                ref={scrollRef}
+                className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pt-3 pb-4"
+            >
                 <SidebarSection title="CHATS">
-                    {visibleChats.length > 0 ? (
-                        <ul className="space-y-0.5">
-                            {visibleChats.map((chat) => (
-                                <li key={chat.id}>
-                                    <Link
-                                        href={`/agents/chats/${chat.id}`}
-                                        className={rowClass}
-                                        onClick={onNavigate}
-                                    >
-                                        <BloubAvatar
-                                            botId={
-                                                store.chats.find(
-                                                    (item) =>
-                                                        item.id === chat.id,
-                                                )?.botId
-                                            }
-                                            label={`${chat.title} avatar`}
-                                            size={16}
-                                            state="idle"
-                                        />
-                                        <span className="min-w-0 flex-1 truncate">
-                                            {chat.title}
-                                        </span>
-                                        <span className="shrink-0 text-[11px] text-shell-muted">
-                                            {chat.relativeTime}
-                                        </span>
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
+                    {agentChats.length === 0 ? (
                         <p className="px-2 py-2 text-[12px] text-shell-muted">
                             No chats yet.
                         </p>
+                    ) : (
+                        <>
+                            {today.length > 0 ? (
+                                <ChatGroup
+                                    title="Today"
+                                    chats={today}
+                                    onSelect={onOpenChat}
+                                />
+                            ) : null}
+                            {previous.length > 0 ? (
+                                <ChatGroup
+                                    title="Previous"
+                                    chats={previous}
+                                    onSelect={onOpenChat}
+                                    className="mt-5"
+                                />
+                            ) : null}
+                        </>
                     )}
                 </SidebarSection>
 
-                <SidebarSection title="BOTS" className="mt-5">
-                    <Link
-                        href="/agents/bots/new"
-                        className={cn(
-                            rowClass,
-                            'mb-2 text-shell-orange hover:text-shell-orange',
-                        )}
-                        onClick={onNavigate}
-                    >
-                        <Plus
-                            className="size-4 shrink-0"
-                            weight="bold"
-                            aria-hidden
-                        />
-                        <span>Create a new Bot</span>
-                    </Link>
-
-                    <AgentsViewModePanel mode={viewMode}>
-                        <BotList
-                            bots={SALES_BOTS}
-                            onNavigate={onNavigate}
-                            viewMode={viewMode}
-                        />
-
-                        <div
-                            className="my-3 flex items-center gap-2 px-2"
-                            role="separator"
-                        >
-                            <span className="h-px flex-1 bg-shell-hairline" />
-                            <span className="text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                                Internal
-                            </span>
-                            <span className="h-px flex-1 bg-shell-hairline" />
-                        </div>
-
-                        <BotList
-                            bots={INTERNAL_BOTS}
-                            onNavigate={onNavigate}
-                            viewMode={viewMode}
-                        />
-
-                        <h3 className="mt-4 px-2 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                            EvoPulse
-                        </h3>
-                        <BotList
-                            bots={EVOPULSE_BOTS}
-                            onNavigate={onNavigate}
-                            viewMode={viewMode}
-                        />
-
-                        <h3 className="mt-4 px-2 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                            Custom
-                        </h3>
-                        {visibleCustomBots.length > 0 ? (
-                            <BotList
-                                bots={visibleCustomBots}
-                                onNavigate={onNavigate}
-                                viewMode={viewMode}
-                            />
-                        ) : (
-                            <p className="px-2 py-2 text-[12px] text-shell-muted">
-                                No custom bots yet.
-                            </p>
-                        )}
-                    </AgentsViewModePanel>
+                <SidebarSection title="CONTEXT" className="mt-6">
+                    <ul className="space-y-0.5">
+                        {agent.contexts.map((target) => (
+                            <li key={target.href}>
+                                <Link
+                                    href={target.href}
+                                    className={cn(
+                                        'flex min-h-8 items-center gap-2 rounded-md px-2 text-[12px] text-shell-ink-2 transition-colors hover:bg-white/[0.08] hover:text-shell-ink motion-reduce:transition-none',
+                                        focusRing,
+                                    )}
+                                    onClick={onNavigate}
+                                >
+                                    <span className="size-1.5 rounded-full bg-shell-teal/90" />
+                                    <span className="min-w-0 flex-1 truncate">
+                                        {target.label}
+                                    </span>
+                                    <ArrowRight
+                                        className="size-3.5 text-shell-muted/70"
+                                        weight="regular"
+                                        aria-hidden
+                                    />
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
                 </SidebarSection>
             </div>
 
-            <footer className="shrink-0 border-t border-shell-hairline px-3 py-3 text-[11px] leading-4 text-shell-muted">
-                The desk is open in the workspace.
+            <footer className="shrink-0 border-t border-shell-hairline px-3 py-2.5">
+                <Link
+                    href={`/agents/bots/${agent.bot.id}`}
+                    className={cn(quietButton, focusRing)}
+                    onClick={onNavigate}
+                >
+                    <GearSix className="size-4" weight="regular" aria-hidden />
+                    Agent settings
+                </Link>
             </footer>
-        </aside>
+        </div>
     );
 }
 
@@ -262,135 +586,167 @@ function SidebarSection({
 }) {
     return (
         <section
-            aria-labelledby={`agents-${title.toLowerCase()}`}
+            aria-labelledby={`agents-section-${title.toLowerCase().replaceAll(' ', '-')}`}
             className={className}
         >
-            <h2
-                id={`agents-${title.toLowerCase()}`}
-                className="px-2 pb-1 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase"
+            <h3
+                id={`agents-section-${title.toLowerCase().replaceAll(' ', '-')}`}
+                className="px-2 pb-1.5 text-[11px] font-semibold tracking-[0.09em] text-shell-muted uppercase"
             >
                 {title}
-            </h2>
+            </h3>
             {children}
         </section>
     );
 }
 
-function botJob(bot: BotSummary): string {
-    return bot.job ?? getBotById(bot.id)?.job ?? '';
+function AgentRow({
+    agent,
+    selected,
+    onClick,
+}: {
+    agent: AgentProfile;
+    selected: boolean;
+    onClick: () => void;
+}) {
+    return (
+        <button
+            type="button"
+            className={cn(
+                'group flex min-h-[58px] w-full items-center gap-2.5 rounded-lg px-2 text-left transition-colors hover:bg-white/[0.08] motion-reduce:transition-none',
+                selected && 'bg-white/[0.075]',
+                focusRing,
+            )}
+            aria-current={selected ? 'page' : undefined}
+            onClick={onClick}
+        >
+            <BloubAvatar
+                bot={agent.bot}
+                label={`${agent.bot.name} avatar`}
+                size={28}
+                state="idle"
+            />
+            <span className="min-w-0 flex-1 py-1">
+                <span className="flex items-center justify-between gap-2">
+                    <span className="truncate text-[13px] font-medium text-shell-ink">
+                        {agent.bot.name}
+                    </span>
+                    <span className="shrink-0 text-[10px] text-shell-muted">
+                        <span
+                            aria-hidden="true"
+                            className="mr-1 inline-block size-1.5 rounded-full bg-[#76B49A] align-middle"
+                        />
+                        {agent.availability}
+                    </span>
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] leading-4 text-shell-muted">
+                    {agent.summary}
+                </span>
+            </span>
+            <CaretRight
+                className="size-3.5 shrink-0 text-shell-muted/65 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none"
+                weight="bold"
+                aria-hidden
+            />
+        </button>
+    );
 }
 
-function BotList({
-    bots,
-    onNavigate,
-    viewMode,
+function ChatDirectory({
+    chats,
+    onSelect,
 }: {
-    bots: BotSummary[];
-    onNavigate?: () => void;
-    viewMode: AgentsViewMode;
+    chats: AgentChat[];
+    onSelect: (chat: AgentChat) => void;
 }) {
-    if (viewMode === 'grid') {
+    const today = chats.filter((chat) => chat.relativeTime === 'Aujourd’hui');
+    const previous = chats.filter(
+        (chat) => chat.relativeTime !== 'Aujourd’hui',
+    );
+
+    if (chats.length === 0) {
         return (
-            <ul className="grid grid-cols-3 gap-1">
-                {bots.map((bot) => (
-                    <li key={bot.id}>
-                        <Link
-                            href={`/agents/bots/${bot.id}`}
-                            className="flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-center text-[11px] text-shell-ink-2 transition-colors hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange motion-reduce:transition-none"
-                            onClick={onNavigate}
-                            title={bot.label}
-                        >
-                            <BloubAvatar
-                                botId={bot.id}
-                                label={`${bot.label} avatar`}
-                                size={16}
-                                state="idle"
-                            />
-                            <span className="w-full truncate">{bot.label}</span>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
+            <div className="px-2 py-3">
+                <div className="flex items-center gap-2 text-[13px] font-medium text-shell-ink-2">
+                    <ChatCircle
+                        className="size-4"
+                        weight="regular"
+                        aria-hidden
+                    />
+                    No chats yet.
+                </div>
+                <p className="mt-1.5 text-[12px] leading-5 text-shell-muted">
+                    Start a chat from any agent workspace.
+                </p>
+            </div>
         );
     }
 
-    if (viewMode === 'table') {
-        return (
+    return (
+        <>
+            {today.length > 0 ? (
+                <ChatGroup title="Today" chats={today} onSelect={onSelect} />
+            ) : null}
+            {previous.length > 0 ? (
+                <ChatGroup
+                    title="Previous"
+                    chats={previous}
+                    onSelect={onSelect}
+                    className={today.length > 0 ? 'mt-5' : undefined}
+                />
+            ) : null}
+        </>
+    );
+}
+
+function ChatGroup({
+    title,
+    chats,
+    onSelect,
+    className,
+}: {
+    title: string;
+    chats: AgentChat[];
+    onSelect: (chat: AgentChat) => void;
+    className?: string;
+}) {
+    return (
+        <section aria-label={title} className={className}>
+            <h4 className="px-2 pb-1 text-[11px] font-medium text-shell-muted">
+                {title}
+            </h4>
             <ul className="space-y-0.5">
-                {bots.map((bot) => {
-                    const job = botJob(bot);
+                {chats.map((chat) => {
+                    const profile = resolveAgentProfile(chat.botId);
 
                     return (
-                        <li key={bot.id}>
-                            <Link
-                                href={`/agents/bots/${bot.id}`}
-                                className="grid min-h-8 w-full grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-center gap-2 rounded-lg px-2 text-left transition-colors hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange motion-reduce:transition-none"
-                                onClick={onNavigate}
+                        <li key={chat.id}>
+                            <button
+                                type="button"
+                                className={cn(
+                                    'flex min-h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[12px] text-shell-ink-2 transition-colors hover:bg-white/[0.08] hover:text-shell-ink motion-reduce:transition-none',
+                                    focusRing,
+                                )}
+                                onClick={() => onSelect(chat)}
                             >
-                                <span className="truncate text-[12px] text-shell-ink">
-                                    {bot.label}
+                                <BloubAvatar
+                                    bot={profile?.bot}
+                                    botId={chat.botId}
+                                    label={`${profile?.bot.name ?? 'Agent'} avatar`}
+                                    size={16}
+                                    state="idle"
+                                />
+                                <span className="min-w-0 flex-1 truncate">
+                                    {chat.title}
                                 </span>
-                                <span className="truncate text-[11px] text-shell-muted">
-                                    {job}
+                                <span className="shrink-0 text-[10px] text-shell-muted">
+                                    {chat.relativeTime}
                                 </span>
-                            </Link>
+                            </button>
                         </li>
                     );
                 })}
             </ul>
-        );
-    }
-
-    return (
-        <ul className="space-y-0.5">
-            {bots.map((bot) => (
-                <li key={bot.id}>
-                    <Link
-                        href={`/agents/bots/${bot.id}`}
-                        className={rowClass}
-                        onClick={onNavigate}
-                    >
-                        <BloubAvatar
-                            botId={bot.id}
-                            label={`${bot.label} avatar`}
-                            size={16}
-                            state="idle"
-                        />
-                        <span className="min-w-0 truncate">{bot.label}</span>
-                    </Link>
-                </li>
-            ))}
-        </ul>
-    );
-}
-
-function SectionLink({
-    href,
-    label,
-    icon: Icon,
-    active,
-    onNavigate,
-}: {
-    href: string;
-    label: string;
-    icon: Icon;
-    active: boolean;
-    onNavigate?: () => void;
-}) {
-    return (
-        <Link
-            href={href}
-            className={cn(
-                sectionLinkClass,
-                active && 'bg-white/[0.12] text-shell-ink',
-            )}
-            aria-current={active ? 'page' : undefined}
-            aria-label={label}
-            title={label}
-            onClick={onNavigate}
-        >
-            <Icon className="size-4" weight="regular" aria-hidden />
-            <span className="sr-only">{label}</span>
-        </Link>
+        </section>
     );
 }

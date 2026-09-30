@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  * Official `@astryxdesign/core/Chat` ChatLayout is StyleX-backed and needs
  * `@stylexjs/stylex` plus a theme peer. That install is heavy for this Vite
  * + Tailwind 4 app, so regions are composed locally:
- * - navigation (optional): bot + chat list. EvoShell already mounts AgentsSidebar.
+ * - navigation (optional): bot + chat list. EvoShell mounts AgentsSidebar inside the shared mode sidebar.
  * - header: conversation chrome (avatar, name, status)
  * - thread: scrollable messages (`role="log"`)
  * - composer: sticky dock with a frosted glass fade

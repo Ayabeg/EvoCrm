@@ -2,7 +2,7 @@
 
 use App\Models\User;
 
-it('serves the agents desk route family through one minimal Inertia page', function () {
+it('serves the agents desk route family through one Inertia page', function () {
     $user = User::factory()->create();
 
     foreach ([
@@ -20,88 +20,75 @@ it('serves the agents desk route family through one minimal Inertia page', funct
     }
 });
 
-it('keeps the agents shell slice route-driven and scoped to its sidebar contract', function () {
+it('keeps directory and selected-agent views inside the same agents sidebar', function () {
     $shell = file_get_contents(resource_path('js/components/shell/evo-shell.tsx'));
-    $nav = file_get_contents(resource_path('js/components/shell/product-nav.ts'));
+    $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $navigation = file_get_contents(resource_path('js/components/shell/product-nav.ts'));
     $sidebar = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
+    $state = file_get_contents(resource_path('js/lib/desk/agents-workspace-state.ts'));
+    $layout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
+    $styles = file_get_contents(resource_path('css/evo-shell.css'));
 
     expect($shell)
-        ->toContain('AgentsSidebar')
-        ->toContain('/agents')
-        ->and($nav)
-        ->toContain("id: 'agents'")
-        ->toContain("activePaths: ['/agents']")
+        ->toContain('agentsContent={renderAgentsContent()}')
+        ->not->toContain('showLegacyAgentsRoom')
+        ->and($rail)
+        ->toContain("{ id: 'agents', label: 'Agents', icon: Robot }")
+        ->toContain('{agentsContent}')
+        ->not->toContain('The desk is open in the workspace.')
+        ->and($navigation)
+        ->not->toContain("id: 'agents'")
+        ->and($rail)
+        ->toContain("path !== '/agents'")
         ->and($sidebar)
-        ->toContain('No chats yet.')
-        ->toContain('Create a new Bot')
-        ->toContain('The desk is open in the workspace.')
-        ->toContain('Desk')
-        ->toContain('Chats')
-        ->toContain('Bots');
+        ->toContain('data-agents-sidebar')
+        ->toContain('AnimatePresence')
+        ->toContain('evo-agents-sidebar')
+        ->toContain('YOUR AGENTS')
+        ->toContain('CONTEXT')
+        ->not->toContain('AgentsViewModeControl')
+        ->not->toContain('Grid')
+        ->not->toContain('Table')
+        ->and($state)
+        ->toContain('selectedChatByAgent')
+        ->toContain('back-to-directory')
+        ->and($layout)
+        ->toContain('agents-route-page-shell')
+        ->and($styles)
+        ->toContain('.evo-workspace .agents-route-page-shell')
+        ->toContain('--color-surface: #ffffff;')
+        ->toContain('--color-text-primary: #0d1b24;');
 });
 
-it('adapts Astryx ChatLayout regions on the agents chat surface', function () {
+it('renders CRM-grounded chats and record actions in the workspace', function () {
+    $workspace = file_get_contents(resource_path('js/components/desk/agents-workspace.tsx'));
+    $composer = file_get_contents(resource_path('js/components/desk/agents-composer.tsx'));
+    $askAgent = file_get_contents(resource_path('js/lib/desk/ask-agent.ts'));
+
+    expect($workspace)
+        ->toContain('data-agent-workspace')
+        ->toContain('AgentChatLayout')
+        ->toContain('crmActions')
+        ->and($composer)
+        ->toContain('/crm/command/search')
+        ->toContain('selectedContext')
+        ->and($askAgent)
+        ->toContain("fetch('/ask-evo'")
+        ->toContain('entity_type')
+        ->toContain('entity_id');
+});
+
+it('uses the chat layout regions for the agent conversation surface', function () {
     $layout = file_get_contents(resource_path('js/components/desk/agent-chat-layout.tsx'));
-    $page = file_get_contents(resource_path('js/pages/agents/index.tsx'));
+    $workspace = file_get_contents(resource_path('js/components/desk/agents-workspace.tsx'));
 
     expect($layout)
         ->toContain('data-agent-chat-layout')
-        ->toContain('data-agent-chat-header')
         ->toContain('data-agent-chat-thread')
         ->toContain('data-agent-chat-composer')
-        ->toContain('@astryxdesign/core')
-        ->and($page)
+        ->and($workspace)
         ->toContain('AgentChatLayout')
-        ->toContain('AgentChatHeader')
         ->toContain('AgentsComposer')
         ->toContain('BloubAvatar')
-        ->not->toContain('SegmentedControl');
-});
-
-it('switches agents nav bot rows with a local icon+text view-mode control', function () {
-    $sidebar = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
-    $roster = file_get_contents(resource_path('js/components/desk/agents-roster.tsx'));
-    $control = file_get_contents(resource_path('js/components/desk/agents-view-mode-control.tsx'));
-    $segmented = file_get_contents(resource_path('js/components/ui/segmented-control.tsx'));
-
-    expect($sidebar)
-        ->toContain('AgentsViewModeControl')
-        ->toContain('AgentsViewModePanel')
-        ->toContain('viewMode === \'grid\'')
-        ->toContain('viewMode === \'table\'')
-        ->not->toContain('@astryxdesign/core')
-        ->and($roster)
-        ->toContain('AgentsViewModeControl')
-        ->toContain('data-agents-roster')
-        ->toContain('viewMode === \'grid\'')
-        ->toContain('viewMode === \'table\'')
-        ->and($control)
-        ->toContain('label="View mode"')
-        ->toContain('label="Grid"')
-        ->toContain('label="List"')
-        ->toContain('label="Table"')
-        ->toContain('icon={<GridIcon />}')
-        ->toContain('icon={<ListIcon />}')
-        ->toContain('icon={<TableIcon />}')
-        ->toContain('@/components/ui/segmented-control')
-        ->not->toContain('@astryxdesign/core')
-        ->and($segmented)
-        ->toContain('role="radiogroup"')
-        ->toContain('role="radio"')
-        ->toContain('layoutId')
-        ->toContain('useReducedMotion')
-        ->toContain('motion-reduce:transition-none')
-        ->toContain('Local Astryx SegmentedControl fallback');
-});
-
-it('keeps agents view-mode parsing on the list/grid/table contract', function () {
-    $js = file_get_contents(base_path('tests/js/agents-view-mode.ts'));
-
-    expect($js)
-        ->toContain("DEFAULT_AGENTS_VIEW_MODE")
-        ->toContain("'list'")
-        ->toContain("isAgentsViewMode('grid')")
-        ->toContain("isAgentsViewMode('list')")
-        ->toContain("isAgentsViewMode('table')")
-        ->toContain("parseAgentsViewMode('nope')");
+        ->not->toContain('Stub replies only');
 });

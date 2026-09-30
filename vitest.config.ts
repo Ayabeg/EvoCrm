@@ -9,7 +9,10 @@ export default defineConfig({
         },
     },
     test: {
-        include: ['resources/design-lab/**/*.test.ts'],
+        include: [
+            'resources/design-lab/**/*.test.ts',
+            'resources/js/**/*.test.ts',
+        ],
         environment: 'node',
     },
 });

@@ -40,7 +40,7 @@ it('switches sidebar modes with the real Astryx SegmentedControl', function () {
     $css = file_get_contents(resource_path('css/evo-shell.css'));
     $appCss = file_get_contents(resource_path('css/app.css'));
     $local = file_get_contents(resource_path('js/components/ui/segmented-control.tsx'));
-    $agentsView = file_get_contents(resource_path('js/components/desk/agents-view-mode-control.tsx'));
+    $agentsState = file_get_contents(resource_path('js/lib/desk/agents-workspace-state.ts'));
 
     expect($rail)->toContain("from '@astryxdesign/core/SegmentedControl'")
         ->and($rail)->toContain('SegmentedControlItem')
@@ -54,5 +54,7 @@ it('switches sidebar modes with the real Astryx SegmentedControl', function () {
         ->and($appCss)->toContain("@astryxdesign/core/astryx.css")
         ->and($appCss)->toContain("@astryxdesign/theme-neutral/theme.css")
         ->and($local)->toContain('Local Astryx SegmentedControl fallback')
-        ->and($agentsView)->toContain("from '@/components/ui/segmented-control'");
+        ->and($rail)->toContain('data-shell-mode="agents"')
+        ->and($rail)->toContain('{agentsContent}')
+        ->and($agentsState)->toContain('selectedChatByAgent');
 });

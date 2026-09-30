@@ -5,67 +5,41 @@ import {
     CaretRight,
     ChatCircle,
     CheckCircle,
-    Lightning,
     Plus,
-    Sparkle,
 } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
-    AgentChatHeader,
-    AgentChatLayout,
-    AgentChatMessage,
-} from '@/components/desk/agent-chat-layout';
-import { AgentsComposer } from '@/components/desk/agents-composer';
-import { AgentsRoster } from '@/components/desk/agents-roster';
+    AgentsWorkspace,
+    AgentsDirectoryHome,
+} from '@/components/desk/agents-workspace';
 import { BloubAvatar } from '@/components/desk/bloub-avatar';
 import { CreateBotSheet } from '@/components/desk/create-bot-sheet';
+import { resolveAgentProfile } from '@/lib/desk/agent-profiles';
 import {
-    addChatTurn,
+    dispatchAgentsWorkspace,
+    useAgentsWorkspaceState,
+} from '@/lib/desk/agents-workspace-state';
+import { agentAskError, askAgent } from '@/lib/desk/ask-agent';
+import type {
+    AgentChat,
+    AgentRecordContext,
+    BotDefinition,
+} from '@/lib/desk/bot-catalog';
+import {
+    addAssistantChatMessage,
+    addUserChatMessage,
     BOT_CATALOG,
     createChat,
     getBotById,
     getChatById,
+    setChatRecordContext,
     useBotDeskStore,
-} from '@/lib/desk/bot-catalog';
-import type {
-    AgentChat,
-    BotDefinition,
-    ConnectorDefinition,
 } from '@/lib/desk/bot-catalog';
 import { cn } from '@/lib/utils';
 
 const focusRing =
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E8530E]';
-
-const QUICK_PROMPTS = [
-    'What needs a follow-up today?',
-    'Qualify the newest lead',
-    'Prepare the next quote step',
-];
-
-const PULSE_CHIPS = [
-    {
-        label: 'follow-up',
-        botId: 'closer',
-        prompt: 'What deserves a follow-up today?',
-    },
-    {
-        label: 'meeting',
-        botId: 'closer',
-        prompt: 'Which meeting should I prepare next?',
-    },
-    {
-        label: 'qualify',
-        botId: 'qualifier',
-        prompt: 'Qualify the newest lead.',
-    },
-    {
-        label: 'quote',
-        botId: 'quote-desk',
-        prompt: 'What is the next useful quote step?',
-    },
-];
 
 type PageProps = {
     chats?: AgentChat[];
@@ -75,6 +49,7 @@ type PageProps = {
 export default function AgentsIndex() {
     const page = usePage<PageProps>();
     const { chats, customBots } = useBotDeskStore();
+    const workspace = useAgentsWorkspaceState();
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
     const query = new URLSearchParams(page.url.split('?')[1] ?? '');
     const routeChatId = path.startsWith('/agents/chats/')
@@ -83,7 +58,6 @@ export default function AgentsIndex() {
     const routeBotId = path.startsWith('/agents/bots/')
         ? path.split('/').pop() || null
         : null;
-    const isChatsRoute = path === '/agents/chats' || Boolean(routeChatId);
     const isBotsRoute = path === '/agents/bots' || Boolean(routeBotId);
     const isNewBotRoute = path === '/agents/bots/new';
     const inheritedCustomBots = page.props.customBots ?? [];
@@ -94,85 +68,142 @@ export default function AgentsIndex() {
     const routeChat = getChatById(routeChatId);
     const routeBot = getBotById(routeBotId);
     const requestedBot = getBotById(query.get('bot'));
-    const [pendingChatId, setPendingChatId] = useState<string | null>(null);
-    const [selectedBotOverride, setSelectedBotOverride] =
-        useState<BotDefinition | null>(null);
-    const [selectedConnectorIds, setSelectedConnectorIds] = useState<string[]>(
-        [],
+    const activeChatId =
+        workspace.view === 'agent'
+            ? (workspace.selectedChatId ??
+              (routeChat?.botId === workspace.selectedAgentId
+                  ? routeChatId
+                  : null))
+            : routeChatId;
+    const activeChat = allChats.find((chat) => chat.id === activeChatId);
+    const selectedAgentId =
+        activeChat?.botId ??
+        workspace.selectedAgentId ??
+        routeChat?.botId ??
+        routeBot?.id ??
+        requestedBot?.id ??
+        'closer';
+    const selectedBot = getBotById(selectedAgentId) ?? BOT_CATALOG[1];
+    const profile =
+        resolveAgentProfile(selectedAgentId) ?? resolveAgentProfile('closer')!;
+    const [draftContext, setDraftContext] = useState<AgentRecordContext | null>(
+        null,
     );
+    const [sendingChatId, setSendingChatId] = useState<string | null>(null);
     const [createBotOpen, setCreateBotOpen] = useState(false);
 
-    const activeChatId =
-        routeChatId ?? (path === '/agents/chats' ? pendingChatId : null);
-    const activeChat = allChats.find((chat) => chat.id === activeChatId);
-    const selectedBot =
-        (routeChat
-            ? getBotById(routeChat.botId)
-            : (routeBot ?? requestedBot ?? selectedBotOverride)) ??
-        BOT_CATALOG[1];
-    const isLanding = !isChatsRoute && !isBotsRoute;
+    useEffect(() => {
+        if (isBotsRoute) {
+            return;
+        }
 
-    function navigateToChat(chatId: string) {
-        router.visit(`/agents/chats/${chatId}`, {
-            preserveScroll: true,
-            preserveState: true,
-            replace: true,
-        });
-    }
-
-    function startChat(bot: BotDefinition) {
-        const chat = createChat(bot.id);
-        setSelectedBotOverride(bot);
-        setSelectedConnectorIds([]);
-        setPendingChatId(chat.id);
-        navigateToChat(chat.id);
-    }
-
-    function handleBotSelect(bot: BotDefinition) {
-        if (activeChat && activeChat.botId === bot.id) {
-            setSelectedBotOverride(bot);
+        if (routeChatId && routeChat) {
+            dispatchAgentsWorkspace({
+                type: 'open-chat',
+                agentId: routeChat.botId,
+                chatId: routeChat.id,
+            });
 
             return;
         }
 
-        startChat(bot);
-    }
+        if (path === '/agents/chats') {
+            dispatchAgentsWorkspace({
+                type: 'set-directory-tab',
+                tab: 'chats',
+            });
 
-    function handleSend(prompt: string) {
-        let chat = activeChat;
-
-        if (!chat) {
-            chat = createChat(selectedBot.id);
-            setPendingChatId(chat.id);
-            navigateToChat(chat.id);
+            return;
         }
 
-        addChatTurn(chat.id, prompt);
+        if (path === '/agents') {
+            if (requestedBot) {
+                dispatchAgentsWorkspace({
+                    type: 'select-agent',
+                    agentId: requestedBot.id,
+                });
+            } else {
+                dispatchAgentsWorkspace({
+                    type: 'set-directory-tab',
+                    tab: 'agents',
+                });
+            }
+        }
+    }, [isBotsRoute, path, requestedBot, routeChat, routeChatId]);
+
+    function startChat(bot: BotDefinition) {
+        const chat = createChat(bot.id);
+        setDraftContext(null);
+        dispatchAgentsWorkspace({
+            type: 'open-chat',
+            agentId: bot.id,
+            chatId: chat.id,
+        });
     }
 
-    function handlePulseChip(botId: string, prompt: string) {
-        const bot = getBotById(botId) ?? BOT_CATALOG[1];
-        const chat =
-            activeChat?.botId === bot.id ? activeChat : createChat(bot.id);
+    function handleBotSelect(bot: BotDefinition) {
+        if (bot.id !== selectedAgentId) {
+            setDraftContext(null);
+        }
 
-        setSelectedBotOverride(bot);
-        setPendingChatId(chat.id);
-        setSelectedConnectorIds([]);
-        navigateToChat(chat.id);
-        addChatTurn(chat.id, prompt);
+        dispatchAgentsWorkspace({
+            type: 'select-agent',
+            agentId: bot.id,
+        });
     }
 
-    function handleAttachConnector(connector: ConnectorDefinition) {
-        setSelectedConnectorIds((current) =>
-            current.includes(connector.id)
-                ? current
-                : [...current, connector.id],
-        );
+    function handleContextSelect(context: AgentRecordContext | null) {
+        setDraftContext(context);
+
+        if (activeChat) {
+            setChatRecordContext(activeChat.id, context);
+        }
+    }
+
+    async function handleSend(
+        prompt: string,
+        context: AgentRecordContext | null,
+    ) {
+        let chat = activeChat;
+
+        if (!chat || chat.botId !== selectedAgentId) {
+            chat = createChat(selectedAgentId);
+            dispatchAgentsWorkspace({
+                type: 'open-chat',
+                agentId: selectedAgentId,
+                chatId: chat.id,
+            });
+        }
+
+        const chatId = chat.id;
+        const recordContext = context ?? chat.recordContext ?? null;
+        setDraftContext(recordContext);
+        setChatRecordContext(chatId, recordContext);
+        addUserChatMessage(chatId, prompt, recordContext);
+        setSendingChatId(chatId);
+
+        try {
+            const response = await askAgent(prompt, profile, recordContext);
+            const answer =
+                response.ok && response.answer?.trim()
+                    ? response.answer.trim()
+                    : agentAskError(response);
+            addAssistantChatMessage(chatId, answer, response.context);
+        } catch {
+            addAssistantChatMessage(
+                chatId,
+                'Le service est momentanément indisponible. Réessayez.',
+            );
+        } finally {
+            setSendingChatId((current) =>
+                current === chatId ? null : current,
+            );
+        }
     }
 
     function handleCreated(bot: BotDefinition) {
-        setSelectedBotOverride(bot);
         setCreateBotOpen(false);
+        handleBotSelect(bot);
 
         if (isNewBotRoute) {
             router.visit('/agents/bots', {
@@ -193,307 +224,88 @@ export default function AgentsIndex() {
         }
     }
 
-    const title = isBotsRoute ? 'Bots' : isChatsRoute ? 'Chats' : 'Agents';
-
-    return (
-        <>
-            <Head title={`${title} · Agents`} />
-            <main
-                aria-label="Agents workspace"
-                className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#F7F8F5] text-[#0D1B24]"
-                data-agents-page
-                data-agents-route={path}
-            >
-                <header
-                    className={cn(
-                        'flex shrink-0 items-center justify-between gap-4 border-b border-black/8 bg-white px-5 py-4 sm:px-7',
-                        isChatsRoute && 'sr-only',
-                    )}
+    if (isBotsRoute) {
+        return (
+            <>
+                <Head title="Bots · Agents" />
+                <main
+                    aria-label="Agents workspace"
+                    className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#F7F8F5] text-[#0D1B24]"
+                    data-agents-page
+                    data-agents-route={path}
                 >
-                    <div className="min-w-0">
-                        <div className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.12em] text-[#E8530E] uppercase">
-                            <Sparkle className="size-3.5" weight="fill" />
-                            EvoPulse command
+                    <header className="flex shrink-0 items-center justify-between gap-4 border-b border-black/8 bg-white px-5 py-4 sm:px-7">
+                        <div>
+                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#E8530E] uppercase">
+                                Agents
+                            </p>
+                            <h1 className="mt-1 text-[20px] font-semibold tracking-[-0.03em]">
+                                Bots
+                            </h1>
                         </div>
-                        <div className="mt-1 flex items-center gap-2">
-                            {isLanding ? (
-                                <p className="truncate text-[20px] font-semibold tracking-[-0.03em] text-[#0D1B24]">
-                                    Agents
-                                </p>
-                            ) : (
-                                <h1 className="truncate text-[20px] font-semibold tracking-[-0.03em] text-[#0D1B24]">
-                                    {title}
-                                </h1>
-                            )}
-                            <span className="hidden rounded-full border border-[#0F4C5C]/15 bg-[#0F4C5C]/[0.05] px-2 py-0.5 text-[10px] font-medium text-[#0F4C5C] sm:inline-flex">
-                                local slice
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                        {isBotsRoute ? (
-                            <button
-                                type="button"
-                                className={cn(
-                                    'inline-flex h-8 items-center gap-1.5 rounded-md bg-[#E8530E] px-3 text-[12px] font-semibold text-white hover:bg-[#C9480B]',
-                                    focusRing,
-                                )}
-                                onClick={() => setCreateBotOpen(true)}
-                            >
-                                <Plus className="size-3.5" weight="bold" />
-                                New bot
-                            </button>
-                        ) : null}
-                        <Link
-                            href="/agents/chats"
+                        <button
+                            type="button"
                             className={cn(
-                                'hidden h-8 items-center gap-1.5 rounded-md border border-black/10 bg-white px-3 text-[12px] font-medium text-[#0D1B24] hover:bg-[#F7F8F5] sm:inline-flex',
+                                'inline-flex h-8 items-center gap-1.5 rounded-md bg-[#E8530E] px-3 text-[12px] font-semibold text-white hover:bg-[#C9480B]',
                                 focusRing,
                             )}
+                            onClick={() => setCreateBotOpen(true)}
                         >
-                            <ChatCircle className="size-3.5" weight="regular" />
-                            New chat
-                        </Link>
-                    </div>
-                </header>
-
-                {isBotsRoute ? (
+                            <Plus className="size-3.5" weight="bold" />
+                            New bot
+                        </button>
+                    </header>
                     <BotsView
                         botId={routeBotId}
                         customBots={allCustomBots}
                         onStartChat={startChat}
                         onCreateBot={() => setCreateBotOpen(true)}
                     />
-                ) : isLanding ? (
-                    <PulseLanding
-                        selectedBot={selectedBot}
-                        selectedConnectorIds={selectedConnectorIds}
-                        onSelectBot={handleBotSelect}
-                        onAttachConnector={handleAttachConnector}
-                        onRemoveConnector={(connectorId) =>
-                            setSelectedConnectorIds((current) =>
-                                current.filter((id) => id !== connectorId),
-                            )
-                        }
-                        onCreateBot={() => setCreateBotOpen(true)}
-                        onSend={handleSend}
-                        onPulseChip={handlePulseChip}
-                    />
-                ) : (
-                    <ChatView
-                        chat={activeChat}
-                        selectedBot={selectedBot}
-                        selectedConnectorIds={selectedConnectorIds}
-                        onSelectBot={handleBotSelect}
-                        onAttachConnector={handleAttachConnector}
-                        onRemoveConnector={(connectorId) =>
-                            setSelectedConnectorIds((current) =>
-                                current.filter((id) => id !== connectorId),
-                            )
-                        }
-                        onCreateBot={() => setCreateBotOpen(true)}
-                        onSend={handleSend}
-                        onQuickPrompt={handleSend}
-                    />
-                )}
-            </main>
+                </main>
+                <CreateBotSheet
+                    open={createBotOpen || isNewBotRoute}
+                    onOpenChange={handleCreateBotOpenChange}
+                    onCreated={handleCreated}
+                />
+            </>
+        );
+    }
+
+    return (
+        <>
+            <Head title={`${selectedBot.name} · Agents`} />
+            {workspace.view === 'agent' ? (
+                <AgentsWorkspace
+                    profile={profile}
+                    selectedBot={selectedBot}
+                    chat={activeChat}
+                    selectedContext={activeChat?.recordContext ?? draftContext}
+                    sending={sendingChatId === activeChat?.id}
+                    onNewChat={() => startChat(selectedBot)}
+                    onSelectBot={handleBotSelect}
+                    onSelectContext={handleContextSelect}
+                    onCreateBot={() => setCreateBotOpen(true)}
+                    onSend={handleSend}
+                />
+            ) : (
+                <AgentsDirectoryHome
+                    onSelectAgent={(agentId) => {
+                        setDraftContext(null);
+                        dispatchAgentsWorkspace({
+                            type: 'select-agent',
+                            agentId,
+                        });
+                    }}
+                />
+            )}
             <CreateBotSheet
-                open={createBotOpen || isNewBotRoute}
+                open={createBotOpen}
                 onOpenChange={handleCreateBotOpenChange}
                 onCreated={handleCreated}
             />
         </>
     );
 }
-
-function PulseLanding({
-    selectedBot,
-    selectedConnectorIds,
-    onSelectBot,
-    onAttachConnector,
-    onRemoveConnector,
-    onCreateBot,
-    onSend,
-    onPulseChip,
-}: {
-    selectedBot: BotDefinition;
-    selectedConnectorIds: string[];
-    onSelectBot: (bot: BotDefinition) => void;
-    onAttachConnector: (connector: ConnectorDefinition) => void;
-    onRemoveConnector: (connectorId: string) => void;
-    onCreateBot: () => void;
-    onSend: (prompt: string) => void;
-    onPulseChip: (botId: string, prompt: string) => void;
-}) {
-    return (
-        <section className="min-h-0 flex-1 overflow-y-auto" data-pulse-landing>
-            <div className="mx-auto flex min-h-full w-full max-w-[640px] flex-col items-center px-5 py-12 text-center sm:py-16">
-                <BloubAvatar
-                    bot={selectedBot}
-                    label={`${selectedBot.name} avatar`}
-                    size={72}
-                    state="idle"
-                />
-                <h1 className="mt-6 text-[34px] font-semibold tracking-[-0.05em] text-[#0D1B24] sm:text-[42px]">
-                    What should we do next?
-                </h1>
-                <p className="mt-3 max-w-[520px] text-[13px] leading-6 text-[#0D1B24]/58">
-                    Ask for the next useful move across deals, leads, quotes, or
-                    a WhatsApp thread.
-                </p>
-
-                {/* composer */}
-                <div className="mt-8 w-full text-left">
-                    <AgentsComposer
-                        selectedBot={selectedBot}
-                        selectedConnectorIds={selectedConnectorIds}
-                        onSelectBot={onSelectBot}
-                        onAttachConnector={onAttachConnector}
-                        onRemoveConnector={onRemoveConnector}
-                        onCreateBot={onCreateBot}
-                        onSend={onSend}
-                    />
-                    <p className="mt-3 text-center text-[10px] text-[#0D1B24]/38">
-                        Stub replies only in this slice. No CRM records are
-                        written.
-                    </p>
-                </div>
-
-                {/* chips */}
-                <div
-                    role="group"
-                    aria-label="Command shortcuts"
-                    className="mt-5 flex flex-wrap justify-center gap-2"
-                >
-                    {PULSE_CHIPS.map((chip) => (
-                        <button
-                            key={chip.label}
-                            type="button"
-                            className={cn(
-                                'inline-flex min-h-8 items-center rounded-full border border-[#0D1B24]/10 bg-white px-3 text-[11px] font-medium text-[#0D1B24]/68 transition-colors hover:border-[#E8530E]/30 hover:bg-[#E8530E]/[0.05] hover:text-[#E8530E]',
-                                focusRing,
-                            )}
-                            onClick={() => onPulseChip(chip.botId, chip.prompt)}
-                        >
-                            {chip.label}
-                        </button>
-                    ))}
-                </div>
-
-                <AgentsRoster className="mt-8 text-left" />
-            </div>
-        </section>
-    );
-}
-
-function ChatView({
-    chat,
-    selectedBot,
-    selectedConnectorIds,
-    onSelectBot,
-    onAttachConnector,
-    onRemoveConnector,
-    onCreateBot,
-    onSend,
-    onQuickPrompt,
-}: {
-    chat?: AgentChat;
-    selectedBot: BotDefinition;
-    selectedConnectorIds: string[];
-    onSelectBot: (bot: BotDefinition) => void;
-    onAttachConnector: (connector: ConnectorDefinition) => void;
-    onRemoveConnector: (connectorId: string) => void;
-    onCreateBot: () => void;
-    onSend: (prompt: string) => void;
-    onQuickPrompt: (prompt: string) => void;
-}) {
-    const messages = chat?.messages ?? [];
-    const hasThread = messages.length > 0;
-
-    return (
-        <AgentChatLayout
-            header={
-                <AgentChatHeader
-                    bot={selectedBot}
-                    status={hasThread ? 'Ready' : 'Waiting'}
-                    avatarState={hasThread ? 'idle' : 'listen'}
-                />
-            }
-            emptyState={
-                <div className="max-w-[540px]">
-                    <div className="grid size-11 place-items-center rounded-xl bg-[#0D1B24] text-[#E8530E] shadow-[0_8px_22px_rgba(13,27,36,0.14)]">
-                        <Lightning className="size-5" weight="fill" />
-                    </div>
-                    <p className="mt-4 text-[15px] font-medium text-[#0D1B24]">
-                        Start with a useful question.
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        {QUICK_PROMPTS.map((prompt) => (
-                            <button
-                                key={prompt}
-                                type="button"
-                                className={cn(
-                                    'inline-flex min-h-8 items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 text-[11px] text-[#0D1B24]/70 hover:border-[#0F4C5C]/25 hover:bg-[#0F4C5C]/[0.05] hover:text-[#0F4C5C]',
-                                    focusRing,
-                                )}
-                                onClick={() => onQuickPrompt(prompt)}
-                            >
-                                {prompt}
-                                <CaretRight className="size-3" weight="bold" />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            }
-            composer={
-                <>
-                    <AgentsComposer
-                        selectedBot={selectedBot}
-                        selectedConnectorIds={selectedConnectorIds}
-                        onSelectBot={onSelectBot}
-                        onAttachConnector={onAttachConnector}
-                        onRemoveConnector={onRemoveConnector}
-                        onCreateBot={onCreateBot}
-                        onSend={onSend}
-                    />
-                    <p className="mt-3 text-center text-[10px] text-[#0D1B24]/38">
-                        Stub replies only in this slice. No CRM records are
-                        written.
-                    </p>
-                </>
-            }
-            scrollKey={`${chat?.id ?? 'new'}:${messages.length}`}
-        >
-            {hasThread ? (
-                <div
-                    className="flex flex-col gap-4"
-                    role="log"
-                    aria-live="polite"
-                    aria-label={`${selectedBot.name} conversation`}
-                >
-                    {messages.map((message) => (
-                        <AgentChatMessage
-                            key={message.id}
-                            align={message.role === 'user' ? 'end' : 'start'}
-                        >
-                            <div
-                                className={cn(
-                                    'max-w-[min(100%,580px)] rounded-xl border px-4 py-3 text-[13px] leading-6 whitespace-pre-wrap',
-                                    message.role === 'user'
-                                        ? 'border-[#0D1B24] bg-[#0D1B24] text-white'
-                                        : 'border-black/8 bg-white text-[#0D1B24]',
-                                )}
-                            >
-                                {message.body}
-                            </div>
-                        </AgentChatMessage>
-                    ))}
-                </div>
-            ) : null}
-        </AgentChatLayout>
-    );
-}
-
 function BotsView({
     botId,
     customBots,

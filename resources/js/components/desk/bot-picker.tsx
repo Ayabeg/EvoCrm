@@ -1,23 +1,9 @@
-import { Link } from '@inertiajs/react';
-import {
-    ArrowSquareOut,
-    CaretDown,
-    Check,
-    LinkSimple,
-    Plus,
-} from '@phosphor-icons/react';
+import { CaretDown, Check, Plus } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BloubAvatar } from '@/components/desk/bloub-avatar';
-import {
-    BOT_CATALOG,
-    BOT_GROUPS,
-    CONNECTORS,
-    useBotDeskStore,
-} from '@/lib/desk/bot-catalog';
-import type {
-    BotDefinition,
-    ConnectorDefinition,
-} from '@/lib/desk/bot-catalog';
+import { AGENT_PROFILES } from '@/lib/desk/agent-profiles';
+import { useBotDeskStore } from '@/lib/desk/bot-catalog';
+import type { BotDefinition } from '@/lib/desk/bot-catalog';
 import { cn } from '@/lib/utils';
 
 const focusRing =
@@ -25,21 +11,13 @@ const focusRing =
 
 type PickerProps = {
     selectedBot: BotDefinition;
-    selectedConnectorIds: string[];
     onSelectBot: (bot: BotDefinition) => void;
-    onAttachConnector: (connector: ConnectorDefinition) => void;
     onCreateBot: () => void;
 };
 
-type PickerOption =
-    | { kind: 'bot'; item: BotDefinition }
-    | { kind: 'connector'; item: ConnectorDefinition };
-
 export function BotPicker({
     selectedBot,
-    selectedConnectorIds,
     onSelectBot,
-    onAttachConnector,
     onCreateBot,
 }: PickerProps) {
     const { customBots } = useBotDeskStore();
@@ -47,24 +25,14 @@ export function BotPicker({
     const [activeOption, setActiveOption] = useState(0);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+    const options = useMemo(
+        () => [...AGENT_PROFILES.map((profile) => profile.bot), ...customBots],
+        [customBots],
+    );
 
     function registerOptionRef(index: number, node: HTMLButtonElement | null) {
         optionRefs.current[index] = node;
     }
-
-    const options = useMemo<PickerOption[]>(() => {
-        const bots = BOT_GROUPS.flatMap((group) =>
-            group.ids
-                .map((id) => BOT_CATALOG.find((bot) => bot.id === id))
-                .filter((bot): bot is BotDefinition => Boolean(bot)),
-        );
-
-        return [
-            ...bots.map((item) => ({ kind: 'bot' as const, item })),
-            ...customBots.map((item) => ({ kind: 'bot' as const, item })),
-            ...CONNECTORS.map((item) => ({ kind: 'connector' as const, item })),
-        ];
-    }, [customBots]);
 
     useEffect(() => {
         if (!open) {
@@ -85,18 +53,8 @@ export function BotPicker({
         optionRefs.current[next]?.focus();
     }
 
-    function selectOption(option: PickerOption) {
-        if (option.kind === 'connector') {
-            if (option.item.status === 'coming_soon') {
-                return;
-            }
-
-            onAttachConnector(option.item);
-
-            return;
-        }
-
-        onSelectBot(option.item);
+    function selectBot(bot: BotDefinition) {
+        onSelectBot(bot);
         closePicker();
     }
 
@@ -106,7 +64,7 @@ export function BotPicker({
                 ref={triggerRef}
                 type="button"
                 className={cn(
-                    'inline-flex h-8 max-w-[190px] items-center gap-2 rounded-md border border-black/10 bg-white px-2.5 text-[12px] font-medium text-[#0D1B24] transition-colors hover:border-[#0F4C5C]/40 hover:bg-[#F7F8F5]',
+                    'inline-flex h-7 max-w-[190px] items-center gap-2 rounded-md px-1.5 text-[12px] font-medium text-[#0D1B24] transition-colors hover:bg-[#F7F8F5] motion-reduce:transition-none',
                     focusRing,
                 )}
                 aria-haspopup="listbox"
@@ -139,16 +97,16 @@ export function BotPicker({
 
             {open ? (
                 <div
-                    className="absolute bottom-[calc(100%+8px)] left-0 z-40 flex h-[360px] w-[280px] flex-col overflow-hidden rounded-lg border border-black/10 bg-white text-[#0D1B24] shadow-[0_14px_32px_rgba(13,27,36,0.14)]"
+                    className="absolute bottom-[calc(100%+8px)] left-0 z-40 flex max-h-[340px] w-[260px] flex-col overflow-hidden rounded-lg border border-black/10 bg-white text-[#0D1B24] shadow-[0_14px_32px_rgba(13,27,36,0.14)]"
                     data-bot-picker-panel
                 >
                     <div className="flex shrink-0 items-center justify-between border-b border-black/8 px-3 py-2.5">
                         <div>
                             <p className="text-[11px] font-semibold tracking-[0.08em] text-[#0D1B24]/55 uppercase">
-                                Command with
+                                Choose agent
                             </p>
                             <p className="mt-0.5 text-[12px] text-[#0D1B24]/65">
-                                One bot per chat
+                                One agent per chat
                             </p>
                         </div>
                         <button
@@ -157,7 +115,7 @@ export function BotPicker({
                                 'grid size-7 place-items-center rounded-md text-[#0D1B24]/55 hover:bg-[#F7F8F5] hover:text-[#0D1B24]',
                                 focusRing,
                             )}
-                            aria-label="Create a new Bot"
+                            aria-label="Create a new agent"
                             onClick={() => {
                                 closePicker();
                                 onCreateBot();
@@ -170,7 +128,7 @@ export function BotPicker({
                     <div
                         id="evo-bot-picker-list"
                         role="listbox"
-                        aria-label="Bots and connectors"
+                        aria-label="Choose an agent"
                         tabIndex={-1}
                         className="evo-scroll min-h-0 flex-1 overflow-y-auto px-1.5 py-2"
                         onKeyDown={(event) => {
@@ -200,58 +158,50 @@ export function BotPicker({
                             }
                         }}
                     >
-                        {BOT_GROUPS.map((group, groupIndex) => {
-                            const groupBots = group.ids
-                                .map((id) =>
-                                    BOT_CATALOG.find((bot) => bot.id === id),
-                                )
-                                .filter((bot): bot is BotDefinition =>
-                                    Boolean(bot),
-                                );
+                        <p className="px-2 pb-1 text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
+                            Your agents
+                        </p>
+                        {AGENT_PROFILES.filter(
+                            (profile) => profile.section === 'your',
+                        ).map(({ bot }) => (
+                            <BotOption
+                                key={bot.id}
+                                bot={bot}
+                                selected={selectedBot.id === bot.id}
+                                optionIndex={options.findIndex(
+                                    (option) => option.id === bot.id,
+                                )}
+                                registerOptionRef={registerOptionRef}
+                                onFocus={setActiveOption}
+                                onSelect={() => selectBot(bot)}
+                            />
+                        ))}
 
-                            return (
-                                <div key={group.key}>
-                                    {groupIndex > 0 ? (
-                                        <div
-                                            className="my-2 flex items-center gap-2 px-2"
-                                            role="separator"
-                                        >
-                                            <span className="h-px flex-1 bg-black/8" />
-                                            <span className="text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
-                                                {group.label}
-                                            </span>
-                                            <span className="h-px flex-1 bg-black/8" />
-                                        </div>
-                                    ) : (
-                                        <p className="px-2 pb-1 text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
-                                            {group.label}
-                                        </p>
-                                    )}
-                                    {groupBots.map((bot) => (
-                                        <BotOption
-                                            key={bot.id}
-                                            bot={bot}
-                                            selected={selectedBot.id === bot.id}
-                                            optionIndex={options.findIndex(
-                                                (option) =>
-                                                    option.kind === 'bot' &&
-                                                    option.item.id === bot.id,
-                                            )}
-                                            registerOptionRef={
-                                                registerOptionRef
-                                            }
-                                            onFocus={setActiveOption}
-                                            onSelect={() =>
-                                                selectOption({
-                                                    kind: 'bot',
-                                                    item: bot,
-                                                })
-                                            }
-                                        />
-                                    ))}
-                                </div>
-                            );
-                        })}
+                        <div
+                            className="my-2 flex items-center gap-2 px-2"
+                            role="separator"
+                        >
+                            <span className="h-px flex-1 bg-black/8" />
+                            <span className="text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
+                                System
+                            </span>
+                            <span className="h-px flex-1 bg-black/8" />
+                        </div>
+                        {AGENT_PROFILES.filter(
+                            (profile) => profile.section === 'system',
+                        ).map(({ bot }) => (
+                            <BotOption
+                                key={bot.id}
+                                bot={bot}
+                                selected={selectedBot.id === bot.id}
+                                optionIndex={options.findIndex(
+                                    (option) => option.id === bot.id,
+                                )}
+                                registerOptionRef={registerOptionRef}
+                                onFocus={setActiveOption}
+                                onSelect={() => selectBot(bot)}
+                            />
+                        ))}
 
                         {customBots.length > 0 ? (
                             <div className="mt-2">
@@ -268,55 +218,16 @@ export function BotPicker({
                                         bot={bot}
                                         selected={selectedBot.id === bot.id}
                                         optionIndex={options.findIndex(
-                                            (option) =>
-                                                option.kind === 'bot' &&
-                                                option.item.id === bot.id,
+                                            (option) => option.id === bot.id,
                                         )}
                                         registerOptionRef={registerOptionRef}
                                         onFocus={setActiveOption}
-                                        onSelect={() =>
-                                            selectOption({
-                                                kind: 'bot',
-                                                item: bot,
-                                            })
-                                        }
+                                        onSelect={() => selectBot(bot)}
                                     />
                                 ))}
                             </div>
                         ) : null}
-
-                        <div className="my-3 flex items-center gap-2 px-2">
-                            <span className="h-px flex-1 bg-black/8" />
-                            <span className="text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
-                                Connectors
-                            </span>
-                            <span className="h-px flex-1 bg-black/8" />
-                        </div>
-
-                        {CONNECTORS.map((connector) => (
-                            <ConnectorOption
-                                key={connector.id}
-                                connector={connector}
-                                selected={selectedConnectorIds.includes(
-                                    connector.id,
-                                )}
-                                optionIndex={options.findIndex(
-                                    (option) =>
-                                        option.kind === 'connector' &&
-                                        option.item.id === connector.id,
-                                )}
-                                registerOptionRef={registerOptionRef}
-                                onFocus={setActiveOption}
-                                onSelect={() =>
-                                    selectOption({
-                                        kind: 'connector',
-                                        item: connector,
-                                    })
-                                }
-                            />
-                        ))}
                     </div>
-
                     <button
                         type="button"
                         className={cn(
@@ -329,7 +240,7 @@ export function BotPicker({
                         }}
                     >
                         <Plus className="size-4" weight="bold" />
-                        Create a new Bot
+                        Create a new agent
                     </button>
                 </div>
             ) : null}
@@ -380,73 +291,5 @@ function BotOption({
                 />
             ) : null}
         </button>
-    );
-}
-
-function ConnectorOption({
-    connector,
-    selected,
-    optionIndex,
-    registerOptionRef,
-    onFocus,
-    onSelect,
-}: {
-    connector: ConnectorDefinition;
-    selected: boolean;
-    optionIndex: number;
-    registerOptionRef: (index: number, node: HTMLButtonElement | null) => void;
-    onFocus: (index: number) => void;
-    onSelect: () => void;
-}) {
-    const disabled = connector.status === 'coming_soon';
-
-    return (
-        <div className="flex items-center gap-1">
-            <button
-                ref={(node) => registerOptionRef(optionIndex, node)}
-                type="button"
-                role="option"
-                aria-selected={selected}
-                aria-disabled={disabled}
-                disabled={disabled}
-                className={cn(
-                    'flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-left text-[12px] transition-colors hover:bg-[#F7F8F5] disabled:cursor-not-allowed disabled:opacity-45',
-                    selected && 'bg-[#0F4C5C]/[0.06]',
-                    focusRing,
-                )}
-                onFocus={() => onFocus(optionIndex)}
-                onClick={onSelect}
-            >
-                <span className="grid size-5 shrink-0 place-items-center rounded-sm bg-[#F7F8F5] text-[#0D1B24]/60">
-                    <LinkSimple className="size-3.5" weight="regular" />
-                </span>
-                <span className="min-w-0 flex-1 truncate">
-                    {connector.name}
-                </span>
-                {selected ? (
-                    <Check
-                        className="size-3.5 shrink-0 text-[#0F4C5C]"
-                        weight="bold"
-                    />
-                ) : disabled ? (
-                    <span className="shrink-0 text-[10px] text-[#0D1B24]/45">
-                        Coming soon
-                    </span>
-                ) : null}
-            </button>
-            {connector.href ? (
-                <Link
-                    href={connector.href}
-                    className={cn(
-                        'grid size-7 shrink-0 place-items-center rounded-md text-[#0D1B24]/45 hover:bg-[#F7F8F5] hover:text-[#0D1B24]',
-                        focusRing,
-                    )}
-                    aria-label={`Open ${connector.name} settings`}
-                    onClick={(event) => event.stopPropagation()}
-                >
-                    <ArrowSquareOut className="size-3.5" weight="regular" />
-                </Link>
-            ) : null}
-        </div>
     );
 }

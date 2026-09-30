@@ -10,7 +10,6 @@ import {
     House,
     Megaphone,
     PaperPlaneTilt,
-    Robot,
     Ticket,
     UserList,
     Users,
@@ -64,13 +63,6 @@ export const NAV_SECTIONS: NavSection[] = [
                 href: '/inbox',
                 icon: Envelope,
                 also: ['/desk', '/conversations'],
-            },
-            {
-                id: 'agents',
-                label: 'Agents',
-                href: '/agents',
-                icon: Robot,
-                activePaths: ['/agents'],
             },
         ],
     },
@@ -316,8 +308,7 @@ function idAllowed(
         return true;
     }
 
-    // Agents is a shell-level workspace and stays reachable in simple mode.
-    return id === 'agents' || allowed.has(id);
+    return allowed.has(id);
 }
 
 export function visibleSections(
