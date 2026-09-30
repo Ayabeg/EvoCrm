@@ -1,5 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
-import { Robot } from '@phosphor-icons/react';
+import { StarFour } from '@phosphor-icons/react';
 import {
     SettingsCard,
     SettingsEmptyState,
@@ -86,7 +86,7 @@ export default function AgentSettings({
             <div className="grid gap-3">
                 {onboarding.status === 'disabled' ? (
                     <SettingsEmptyState
-                        icon={<Robot className="size-6" weight="regular" />}
+                        icon={<StarFour className="size-6" weight="regular" />}
                         title="Agent is off"
                         description={
                             onboarding.env_enabled

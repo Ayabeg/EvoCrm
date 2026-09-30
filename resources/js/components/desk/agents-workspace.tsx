@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowUpRight, DotsThree, Plus, Robot } from '@phosphor-icons/react';
+import { ArrowUpRight, DotsThree, Plus, StarFour } from '@phosphor-icons/react';
 import { useState } from 'react';
 import {
     AgentChatLayout,
@@ -288,7 +288,7 @@ export function AgentsDirectoryHome({
             <div className="evo-scroll min-h-0 flex-1 overflow-y-auto">
                 <section className="mx-auto flex min-h-full w-full max-w-[760px] flex-col justify-center px-6 py-12 sm:px-10">
                     <div className="grid size-11 place-items-center rounded-xl border border-[#0F4C5C]/15 bg-[#0F4C5C]/[0.06] text-[#0F4C5C]">
-                        <Robot
+                        <StarFour
                             className="size-5"
                             weight="regular"
                             aria-hidden

@@ -7,7 +7,7 @@ import {
     GearSix,
     MagnifyingGlass,
     Plus,
-    Robot,
+    StarFour,
 } from '@phosphor-icons/react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -259,7 +259,7 @@ function DirectoryPane({
         <div className="flex h-full min-h-0 flex-col">
             <header className="flex h-14 shrink-0 items-center justify-between border-b border-shell-hairline px-4">
                 <div className="flex min-w-0 items-center gap-2 text-[15px] font-semibold text-shell-ink">
-                    <Robot
+                    <StarFour
                         className="size-[18px] shrink-0 text-shell-orange"
                         weight="regular"
                         aria-hidden

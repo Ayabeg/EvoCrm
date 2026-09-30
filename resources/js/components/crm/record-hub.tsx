@@ -178,7 +178,7 @@ export function RecordIdentity({
                 />
                 <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <h1 className="text-record-title leading-snug font-semibold tracking-tight">
+                        <h1 className="text-record-title leading-snug font-semibold tracking-tight text-ink">
                             {title}
                         </h1>
                         {badge}

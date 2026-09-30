@@ -1020,12 +1020,68 @@
     box-shadow: none;
 }
 
+/*
+ * Astryx compiles light-dark() to LightningCSS vars driven by
+ * prefers-color-scheme, not html.dark. Force the dark pair when the
+ * cabinet class is on so OS-light + Dark Cabinet cannot paint #000 ink.
+ */
+html.dark {
+    color-scheme: dark;
+    --lightningcss-light: ;
+    --lightningcss-dark: initial;
+    --color-text-primary: #e8e8e8;
+    --color-text-secondary: #b3b3b3;
+}
+
+/*
+ * Astryx Theme defaults to mode=system and redefines --color-text-primary
+ * on [data-astryx-theme] as lightningcss #000/#fff. OS-light + html.dark
+ * then paints headings black. Pin the cabinet ink on the theme root and
+ * on scoped headings so Dark Cabinet wins over prefers-color-scheme.
+ */
+.dark [data-astryx-theme],
+.dark [data-astryx-media='light'] {
+    --lightningcss-light: ;
+    --lightningcss-dark: initial;
+    --color-text-primary: #e8e8e8;
+    --color-text-secondary: #b3b3b3;
+}
+
+.dark :where(h1, h2, h3) {
+    color: #e8e8e8;
+}
+
+.dark .text-black,
+.dark .text-neutral-900 {
+    color: #e8e8e8;
+}
+
+.dark .text-ink {
+    color: #e8e8e8;
+}
+
+.dark .text-mute {
+    color: #b3b3b3;
+}
+
 .dark .auth-screen .login-split-brand {
-    background: #0F4C5C;
+    background: #262626;
     color: #e8e8e8;
     --aurora-text-primary: #e8e8e8;
     --aurora-text-muted: #b3b3b3;
     --color-text: #e8e8e8;
+}
+
+.dark .auth-screen .login-split-form h1,
+.dark .auth-screen .login-split-form p,
+.dark .auth-screen .login-split-form label,
+.dark .auth-screen .login-split-form span {
+    color: #e8e8e8;
+}
+
+.dark .auth-screen .login-split-form .text-mute,
+.dark .auth-screen .login-split-form p.text-mute {
+    color: #b3b3b3;
 }
 
 .dark .auth-screen .login-split-brand-name,

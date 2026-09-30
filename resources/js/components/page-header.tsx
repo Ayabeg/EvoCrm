@@ -10,7 +10,7 @@ export default function PageHeader({
     return (
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
-                <h1 className="text-page-title font-semibold tracking-tight">
+                <h1 className="text-page-title font-semibold tracking-tight text-ink">
                     {title}
                 </h1>
                 {description ? (

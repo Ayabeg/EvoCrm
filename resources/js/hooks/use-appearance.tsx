@@ -37,19 +37,37 @@ const applyTheme = (value: Appearance): void => {
     const isDark = resolveAppearance(value) === 'dark';
 
     document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 };
 
-const readStoredAppearance = (): Appearance => {
+const isAppearance = (value: string | null): value is Appearance =>
+    value === 'light' || value === 'dark' || value === 'system';
+
+const readCookieAppearance = (): Appearance | null => {
+    if (typeof document === 'undefined') {
+        return null;
+    }
+
+    const match = document.cookie.match(/(?:^|;\s*)appearance=([^;]*)/);
+    const value = match ? decodeURIComponent(match[1]) : null;
+
+    return isAppearance(value) ? value : null;
+};
+
+/** localStorage, then the appearance cookie, then system. */
+export const readStoredAppearance = (): Appearance => {
     if (typeof window === 'undefined') {
         return 'system';
     }
 
     const stored = window.localStorage.getItem('appearance');
 
-    return stored === 'light' || stored === 'dark' || stored === 'system'
-        ? stored
-        : 'system';
+    if (isAppearance(stored)) {
+        return stored;
+    }
+
+    return readCookieAppearance() ?? 'system';
 };
 
 const notify = (): void => {

@@ -40,14 +40,29 @@ it('ships a no-flash appearance script on the Blade root and design-lab', functi
     $lab = file_get_contents(resource_path('views/design-lab.blade.php'));
 
     expect($root)->toContain('localStorage.getItem(\'appearance\')')
+        ->and($root)->toContain('document.cookie.match')
         ->and($root)->toContain('prefers-color-scheme: dark')
         ->and($root)->toContain('classList.toggle(\'dark\'')
+        ->and($root)->toContain("setAttribute('data-theme'")
         ->and($root)->toContain('html.dark')
         ->and($root)->toContain('#121212');
 
     expect($lab)->toContain('localStorage.getItem(\'appearance\')')
+        ->and($lab)->toContain('document.cookie.match')
         ->and($lab)->toContain('classList.toggle(\'dark\'')
+        ->and($lab)->toContain("setAttribute('data-theme'")
         ->and($lab)->toContain('#121212');
+});
+
+it('resolves appearance from localStorage then the cookie then system', function () {
+    $hook = file_get_contents(resource_path('js/hooks/use-appearance.tsx'));
+
+    expect($hook)->toContain('export const readStoredAppearance')
+        ->and($hook)->toContain("localStorage.getItem('appearance')")
+        ->and($hook)->toContain('readCookieAppearance')
+        ->and($hook)->toContain('document.cookie.match(/(?:^|;\\s*)appearance=([^;]*)/)')
+        ->and($hook)->toContain('return readCookieAppearance() ?? \'system\'')
+        ->and($hook)->toContain("setAttribute('data-theme', isDark ? 'dark' : 'light')");
 });
 
 it('lets the login split and settings dialog follow the dark cabinet', function () {
@@ -57,7 +72,20 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
 
     expect($app)->toContain('.dark .auth-screen')
         ->and($app)->toContain('color-scheme: dark')
-        ->and($app)->toContain('.dark .login-split-card');
+        ->and($app)->toContain('.dark .login-split-card')
+        ->and($app)->toContain('--lightningcss-dark: initial')
+        ->and($app)->toContain('.dark [data-astryx-theme]')
+        ->and($app)->toContain('.dark :where(h1, h2, h3)')
+        ->and($app)->toContain('.dark .auth-screen .login-split-brand')
+        ->and($app)->toContain('background: #262626')
+        ->and($app)->not->toContain('.dark [data-agents-page]');
+
+    $shell = file_get_contents(resource_path('css/evo-shell.css'));
+
+    expect($shell)
+        ->toContain('Agents column stays on the light desk even when the cabinet is dark.')
+        ->toContain('--color-surface: #ffffff;')
+        ->toContain('--color-text-primary: #0d1b24;');
 
     expect($settings)->toContain('.dark [data-settings=\'dialog\']')
         ->and($settings)->toContain('--settings-canvas: #1c1c1c')
@@ -74,4 +102,13 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
         ->and($v02)->toContain('.dark [data-crm=\'deals-workspace\']')
         ->and($v02)->toContain('background: #0F4C5C')
         ->and($v02)->toContain('background: #1c1c1c');
+
+    $queue = file_get_contents(resource_path('js/components/crm/deal-attention-queue.tsx'));
+
+    expect($queue)->toContain('rounded-[9px] border border-hairline bg-surface')
+        ->and($queue)->toContain('mx-4');
+
+    expect($v02)->toContain("[data-crm='deals-workspace'] [data-crm='deal-attention-queue']")
+        ->and($v02)->toContain('border: 1px solid #e5e6e4')
+        ->and($v02)->toContain('border: 1px solid #3a3a3a');
 });

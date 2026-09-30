@@ -29,11 +29,11 @@ export default function DealAttentionQueue({
 
     return (
         <section
-            className="border-b border-hairline bg-canvas"
+            className="mx-4 mt-3 mb-1 overflow-hidden rounded-[9px] border border-hairline bg-surface md:mx-4"
             data-crm="deal-attention-queue"
             aria-labelledby="deal-attention-queue-heading"
         >
-            <div className="flex items-center justify-between gap-3 px-4 py-2 md:px-8">
+            <div className="flex items-center justify-between gap-3 px-4 py-2">
                 <h2
                     id="deal-attention-queue-heading"
                     className="text-[12px] font-medium text-ink"
@@ -61,7 +61,7 @@ export default function DealAttentionQueue({
                     <li key={item.id}>
                         <button
                             type="button"
-                            className="flex w-full items-start justify-between gap-3 px-4 py-2 text-left hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink md:px-8"
+                            className="flex w-full items-start justify-between gap-3 px-4 py-2 text-left hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
                             onClick={() =>
                                 openRecord(
                                     { type: 'deal', id: item.id },

@@ -15,7 +15,8 @@ export const HOME_KPI_STRIP_TRACK_CLASS =
 
 /** Compact values may wrap. Approved home snapshot is 25/30. */
 export const HOME_KPI_VALUE_CLASS =
-    'money min-w-0 max-w-full text-[25px] leading-[30px] font-semibold tracking-tight break-words text-ink';
+    'money min-w-0 max-w-full text-[25px] leading-[30px] font-semibold tracking-tight break-words text-[var(--home-ink)]';
+
 
 export type DashboardContext = {
     name: string;

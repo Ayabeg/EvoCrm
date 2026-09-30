@@ -12,6 +12,12 @@
                     const stored = localStorage.getItem('appearance');
                     if (stored === 'light' || stored === 'dark' || stored === 'system') {
                         resolved = stored;
+                    } else {
+                        const match = document.cookie.match(/(?:^|;\s*)appearance=([^;]*)/);
+                        const cookie = match ? decodeURIComponent(match[1]) : '';
+                        if (cookie === 'light' || cookie === 'dark' || cookie === 'system') {
+                            resolved = cookie;
+                        }
                     }
                 } catch (e) {}
                 const dark =
@@ -19,6 +25,7 @@
                     (resolved === 'system' &&
                         window.matchMedia('(prefers-color-scheme: dark)').matches);
                 document.documentElement.classList.toggle('dark', dark);
+                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
                 document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
             })();
         </script>

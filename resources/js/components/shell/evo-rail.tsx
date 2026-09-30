@@ -12,7 +12,7 @@ import {
     CaretRight,
     List,
     MagnifyingGlass,
-    Robot,
+    StarFour,
 } from '@phosphor-icons/react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -60,7 +60,7 @@ export type RailMode = 'menu' | 'agents' | 'search';
 
 const MODES: { id: RailMode; label: string; icon: Icon }[] = [
     { id: 'menu', label: 'Menu', icon: List },
-    { id: 'agents', label: 'Agents', icon: Robot },
+    { id: 'agents', label: 'Agents', icon: StarFour },
     { id: 'search', label: 'Search', icon: MagnifyingGlass },
 ];
 

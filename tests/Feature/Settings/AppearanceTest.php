@@ -29,7 +29,8 @@ class AppearanceTest extends TestCase
         $response = $this->withUnencryptedCookie('appearance', 'dark')->get(route('login'));
 
         $response->assertOk();
-        $this->assertStringContainsString('<html lang="en" class="dark">', $response->getContent());
+        $this->assertStringContainsString('class="dark"', $response->getContent());
+        $this->assertStringContainsString('data-theme="dark"', $response->getContent());
     }
 
     public function test_html_root_has_no_dark_class_for_light_or_system()
