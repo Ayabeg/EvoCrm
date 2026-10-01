@@ -4,27 +4,28 @@ it('keeps the light cabinet lock and only paints the dark cabinet', function () 
     $app = file_get_contents(resource_path('css/app.css'));
     $shell = file_get_contents(resource_path('css/evo-shell.css'));
 
-    expect($app)->toContain('--color-bg: #f7f7f5')
-        ->and($app)->toContain('--color-accent: #e8530e')
-        ->and($app)->toContain('--color-focus-ring: var(--color-accent)')
-        ->and($app)->not->toContain('#ec6025')
-        ->and($app)->not->toContain('#eaeaea')
-        ->and($app)->not->toContain('#d9500f');
+    expect($app)->toContain('--color-bg: var(--evo-canvas)')
+        ->and($app)->toContain('--color-accent: var(--evo-primary)')
+        ->and($app)->toContain('--color-focus-ring: var(--evo-focus)')
+        ->and($app)->not->toContain('#eaeaea');
 
-    expect($app)->toContain('--color-bg: #121212')
-        ->and($app)->toContain('--color-surface: #1c1c1c')
-        ->and($app)->toContain('--color-subtle: #262626')
-        ->and($app)->toContain('--color-text: #e8e8e8')
-        ->and($app)->toContain('--color-text-secondary: #b3b3b3')
-        ->and($app)->toContain('--color-text-muted: #8a8a8a')
-        ->and($app)->toContain('--color-selection: #0F4C5C')
-        ->and($app)->toContain('--color-focus-ring: #5EB0C0')
-        ->and($app)->toContain('--color-accent: var(--evo-accent)')
+    expect($app)->toContain('--color-bg: var(--evo-canvas)')
+        ->and($app)->toContain('--color-surface: var(--evo-surface)')
+        ->and($app)->toContain('--color-subtle: var(--evo-surface-subtle)')
+        ->and($app)->toContain('--color-text: var(--evo-ink)')
+        ->and($app)->toContain('--color-text-secondary: var(--evo-ink-secondary)')
+        ->and($app)->toContain('--color-text-muted: var(--evo-ink-muted)')
+        ->and($app)->toContain('--color-selection: var(--evo-teal)')
+        ->and($app)->toContain('--color-focus-ring: var(--evo-focus)')
+        ->and($app)->toContain('--color-accent: var(--evo-primary)')
         ->and($app)->toContain('dark-cabinet-contrast');
 
-    expect($shell)->toContain('--evo-accent: #EC6025')
-        ->and($shell)->toContain('--evo-teal: #0F4C5C')
-        ->and($shell)->toContain('--evo-focus: #5EB0C0');
+    $evo = file_get_contents(resource_path('js/evo/tokens/evo.css'));
+
+    expect($evo)->toContain('--evo-primary: #ec6025')
+        ->and($evo)->toContain('--evo-teal: #0f4c5c')
+        ->and($evo)->toContain('--evo-focus: #5eb0c0')
+        ->and($shell)->toContain('background: var(--evo-canvas)');
 });
 
 it('documents why the teal focus ring is lighter than the selection fill', function () {
@@ -45,13 +46,13 @@ it('ships a no-flash appearance script on the Blade root and design-lab', functi
         ->and($root)->toContain('classList.toggle(\'dark\'')
         ->and($root)->toContain("setAttribute('data-theme'")
         ->and($root)->toContain('html.dark')
-        ->and($root)->toContain('#121212');
+        ->and($root)->toContain('#0A0A0A');
 
     expect($lab)->toContain('localStorage.getItem(\'appearance\')')
         ->and($lab)->toContain('document.cookie.match')
         ->and($lab)->toContain('classList.toggle(\'dark\'')
         ->and($lab)->toContain("setAttribute('data-theme'")
-        ->and($lab)->toContain('#121212');
+        ->and($lab)->toContain('#0A0A0A');
 });
 
 it('resolves appearance from localStorage then the cookie then system', function () {
@@ -97,16 +98,15 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
         ->toContain('.evo-agents-sidebar input[type=\'search\']')
         ->toContain('padding-left: 2.5rem')
         ->toContain('[data-agents-page] .evo-agents-primary-btn')
-        ->toContain('background-color: #EC6025')
-        ->toContain('color: #121212')
+        ->toContain('background-color: var(--evo-primary)')
+        ->toContain('color: var(--evo-on-primary)')
         ->toContain('padding-inline: 12px');
 
     expect($settings)->toContain('.dark [data-settings=\'dialog\']')
         ->and($settings)->toContain('--settings-canvas: #1c1c1c')
         ->and($settings)->toContain('--settings-shadow: none');
 
-    expect($lab)->toContain('.dark')
-        ->and($lab)->toContain('--evo-canvas: #121212')
+    expect($lab)->toContain("@import '../js/evo/tokens/evo.css'")
         ->and($lab)->toContain('var(--evo-surface)')
         ->and($lab)->toContain('.dark .bg-white');
 

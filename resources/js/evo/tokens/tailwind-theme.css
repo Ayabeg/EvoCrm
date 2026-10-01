@@ -1,0 +1,64 @@
+/*
+ * Tailwind 4 @theme mappings for the Evo token layer.
+ * Utilities such as bg-evo-canvas / text-evo-ink / duration-evo-normal
+ * read these. Production --color-* aliases live in app.css.
+ */
+
+@theme {
+    --font-evo-sans: var(--evo-font-sans);
+    --font-evo-mono: var(--evo-font-mono);
+
+    --color-evo-canvas: var(--evo-canvas);
+    --color-evo-surface: var(--evo-surface);
+    --color-evo-surface-subtle: var(--evo-surface-subtle);
+    --color-evo-surface-raised: var(--evo-surface-raised);
+    --color-evo-ink: var(--evo-ink);
+    --color-evo-ink-secondary: var(--evo-ink-secondary);
+    --color-evo-ink-muted: var(--evo-ink-muted);
+    --color-evo-ink-faint: var(--evo-ink-faint);
+    --color-evo-hairline: var(--evo-hairline);
+    --color-evo-hairline-strong: var(--evo-hairline-strong);
+    --color-evo-teal: var(--evo-teal);
+    --color-evo-teal-ink: var(--evo-teal-ink);
+    --color-evo-teal-soft: var(--evo-teal-soft);
+    --color-evo-focus: var(--evo-focus);
+    --color-evo-hover: var(--evo-hover);
+    --color-evo-primary: var(--evo-primary);
+    --color-evo-primary-hover: var(--evo-primary-hover);
+    --color-evo-primary-pressed: var(--evo-primary-pressed);
+    --color-evo-primary-soft: var(--evo-primary-soft);
+    --color-evo-on-primary: var(--evo-on-primary);
+    --color-evo-logo: var(--evo-logo);
+    --color-evo-success: var(--evo-success);
+    --color-evo-warning: var(--evo-warning);
+    --color-evo-danger: var(--evo-danger);
+    --color-evo-info: var(--evo-info);
+    --color-evo-on-danger: var(--evo-on-danger);
+    --color-evo-track: var(--evo-track);
+    --color-evo-chart-1: var(--evo-chart-1);
+    --color-evo-chart-2: var(--evo-chart-2);
+    --color-evo-chart-3: var(--evo-chart-3);
+    --color-evo-chart-4: var(--evo-chart-4);
+    --color-evo-chart-5: var(--evo-chart-5);
+    --color-evo-chart-highlight: var(--evo-chart-highlight);
+
+    --text-evo-11: var(--evo-text-11);
+    --text-evo-12: var(--evo-text-12);
+    --text-evo-13: var(--evo-text-13);
+    --text-evo-14: var(--evo-text-14);
+    --text-evo-16: var(--evo-text-16);
+    --text-evo-18: var(--evo-text-18);
+    --text-evo-20: var(--evo-text-20);
+    --text-evo-24: var(--evo-text-24);
+    --text-evo-32: var(--evo-text-32);
+
+    --radius-evo-compact: var(--evo-radius-compact);
+    --radius-evo-standard: var(--evo-radius-standard);
+    --radius-evo-floating: var(--evo-radius-floating);
+    --radius-evo-pill: var(--evo-radius-pill);
+
+    --shadow-evo-floating: var(--evo-shadow-floating);
+    --shadow-evo-modal: var(--evo-shadow-modal);
+
+    --ease-evo: var(--evo-ease);
+}

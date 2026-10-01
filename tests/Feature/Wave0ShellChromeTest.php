@@ -4,17 +4,17 @@ it('locks the P02 semantic palette: canvas, surface, accent primaries', function
     $app = file_get_contents(resource_path('css/app.css'));
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
 
-    expect($app)->toContain('--color-bg: #f7f7f5')
-        ->and($app)->toContain('--color-surface: #ffffff')
-        ->and($app)->toContain('--color-subtle: #f1f1ef')
-        ->and($app)->toContain('--color-text: #161616')
-        ->and($app)->toContain('--color-text-secondary: #666666')
-        ->and($app)->toContain('--color-text-muted: #929292')
-        ->and($app)->toContain('--color-border: #e3e3df')
-        ->and($app)->toContain('--color-accent: #e8530e')
-        ->and($app)->toContain('--color-accent-hover: #d74908')
-        ->and($app)->toContain('--color-accent-soft: #fff1ea')
-        ->and($app)->toContain('--color-focus-ring: var(--color-accent)')
+    expect($app)->toContain('--color-bg: var(--evo-canvas)')
+        ->and($app)->toContain('--color-surface: var(--evo-surface)')
+        ->and($app)->toContain('--color-subtle: var(--evo-surface-subtle)')
+        ->and($app)->toContain('--color-text: var(--evo-ink)')
+        ->and($app)->toContain('--color-text-secondary: var(--evo-ink-secondary)')
+        ->and($app)->toContain('--color-text-muted: var(--evo-ink-muted)')
+        ->and($app)->toContain('--color-border: var(--evo-hairline)')
+        ->and($app)->toContain('--color-accent: var(--evo-primary)')
+        ->and($app)->toContain('--color-accent-hover: var(--evo-primary-hover)')
+        ->and($app)->toContain('--color-accent-soft: var(--evo-primary-soft)')
+        ->and($app)->toContain('--color-focus-ring: var(--evo-focus)')
         ->and($app)->toContain('--evosales-canvas: var(--color-bg)')
         ->and($app)->toContain('--evosales-ink: var(--color-text)')
         ->and($app)->toContain('--evosales-mark: var(--color-accent)')
@@ -109,8 +109,8 @@ it('keeps auth chrome on paper with the EvoCrm lockup', function () {
     expect($app)->toContain('.auth-screen')
         ->and($app)->toContain('color-scheme: light')
         ->and($app)->toContain('--aurora-letter-ui: 0')
-        ->and($app)->toContain('--aurora-text-primary: #161616')
-        ->and($app)->toContain('--aurora-control-surface: #ffffff');
+        ->and($app)->toContain('--aurora-text-primary: var(--evo-ink)')
+        ->and($app)->toContain('--aurora-control-surface: var(--evo-surface)');
 });
 
 it('lands Home as a CRM widget workspace, not a blank stub', function () {

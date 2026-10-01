@@ -30,8 +30,8 @@ it('locks P27 timing tokens without a new motion framework', function () {
         ->and($css)->toContain('--motion-duration-page: 150ms')
         ->and($css)->toContain('--motion-duration-modal: 180ms')
         ->and($css)->toContain('--motion-duration-drawer: 200ms')
-        ->and($css)->toContain('--color-text-muted: #929292')
-        ->and($css)->toContain('--color-focus-ring: var(--color-accent)');
+        ->and($css)->toContain('--color-text-muted: var(--evo-ink-muted)')
+        ->and($css)->toContain('--color-focus-ring: var(--evo-focus)');
 
     expect($motion)->toContain('--motion-duration-hover')
         ->and($motion)->toContain('--motion-duration-drawer')

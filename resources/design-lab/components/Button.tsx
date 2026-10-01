@@ -8,7 +8,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 export function Button({ variant = 'secondary', className = '', children, ...props }: Props) {
     const look =
         variant === 'primary'
-            ? 'bg-[var(--evo-accent)] text-white hover:brightness-[1.04]'
+            ? 'bg-[var(--evo-primary)] text-[var(--evo-on-primary)] hover:brightness-[1.04]'
             : variant === 'ghost'
                 ? 'bg-transparent text-[var(--evo-ink-secondary)] hover:bg-[var(--evo-hover)]'
                 : 'border border-[var(--evo-hairline)] bg-white text-[var(--evo-ink)] hover:bg-[var(--evo-hover)]';

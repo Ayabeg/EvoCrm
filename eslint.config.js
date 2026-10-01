@@ -103,6 +103,61 @@ export default [
         },
     },
     {
+        files: [
+            'resources/js/**/*.{js,jsx,ts,tsx}',
+            'resources/design-lab/**/*.{js,jsx,ts,tsx}',
+        ],
+        ignores: [
+            'resources/js/evo/tokens/**',
+            'resources/js/components/ui/aurora/**',
+            'resources/js/components/aurora/**',
+            'resources/js/components/evilcharts/**',
+        ],
+        rules: {
+            'no-restricted-imports': [
+                'warn',
+                {
+                    paths: [
+                        {
+                            name: 'lucide-react',
+                            message:
+                                'Phosphor is the Evo icon set. Import from @/evo/icons. Existing lucide usage is frozen until PR2–PR12.',
+                        },
+                    ],
+                    patterns: [
+                        {
+                            group: [
+                                '@/components/ui/aurora',
+                                '@/components/ui/aurora/*',
+                                '@/components/aurora',
+                                '@/components/aurora/*',
+                                '**/components/ui/aurora/*',
+                                '**/components/aurora/*',
+                            ],
+                            message:
+                                'Aurora is AGPL-3.0-only and frozen. Do not add imports. Removal is PR3.',
+                        },
+                    ],
+                },
+            ],
+            'no-restricted-syntax': [
+                'warn',
+                {
+                    selector:
+                        'Literal[raw=/#[0-9A-Fa-f]{3,8}\\b/]',
+                    message:
+                        'Raw hex belongs in resources/js/evo/tokens. Use a token or a Tailwind theme class.',
+                },
+                {
+                    selector:
+                        'TemplateElement[value.raw=/#[0-9A-Fa-f]{3,8}\\b/]',
+                    message:
+                        'Raw hex belongs in resources/js/evo/tokens. Use a token or a Tailwind theme class.',
+                },
+            ],
+        },
+    },
+    {
         ignores: [
             'vendor',
             'node_modules',

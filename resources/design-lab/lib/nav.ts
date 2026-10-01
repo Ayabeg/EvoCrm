@@ -62,6 +62,7 @@ export const NAV_SECTIONS: NavSection[] = [
         label: null,
         items: [
             { id: 'accueil', label: 'Accueil', to: { name: 'accueil' } },
+            { id: 'tokens', label: 'Jetons', to: { name: 'tokens' } },
             { id: 'inbox', label: 'Inbox', to: { name: 'inbox' } },
         ],
     },

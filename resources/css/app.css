@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+@import '../js/evo/tokens/evo.css';
+@import '../js/evo/tokens/tailwind-theme.css';
+
 @import '@astryxdesign/core/reset.css';
 @import '@astryxdesign/core/astryx.css';
 @import '@astryxdesign/theme-neutral/theme.css';
@@ -9,8 +12,6 @@
 @import '@fontsource/geist-sans/400.css';
 @import '@fontsource/geist-sans/500.css';
 @import '@fontsource/geist-sans/600.css';
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
 @import './evo-shell.css';
 @import './approved-v02.css';
 @import './settings-dialog.css';
@@ -27,51 +28,47 @@
 @layer reset, theme, base, astryx-base, astryx-theme, components, aurora-components, utilities;
 
 /*
- * P02 semantic tokens — one source of truth for product UI.
- * shadcn New York (`--background`, `--primary`, `--accent`, …) and Aurora
- * (`--aurora-*`) consume these variables. Do not invent a third palette.
+ * Production --color-* / shadcn / Aurora names are aliases of the
+ * canonical Evo tokens in resources/js/evo/tokens/evo.css.
+ * Do not introduce a parallel hex palette here.
  *
- * Light: canvas #F7F7F5, surface #FFFFFF, text #161616, accent #E8530E.
- * Orange is selective (CTA / active / focus / selected / charts) — never a page wash.
- *
- * P01 canonical language (--evo-*) is declared on :root in evo-shell.css.
- * This block stays the painted production palette. Do not retarget --color-*
- * at those aliases until a later phase moves the chrome tests with it.
- * Dark cabinet remains true-black and is out of scope for a visual redesign.
- * Authenticated rail is paper (not a global black wash). Desktop 64px / 240px.
+ * Light: canvas #F7F8F5, surface #FFFFFF, ink #0D1B24, accent #EC6025.
+ * Orange is primary / intentional actions only. Teal is focus, selection
+ * and active. Authenticated rail is 212px (stale 64/240 comments retired).
  */
 :root {
     /* Compact enterprise topbar — 48px phones, 48px from sm. Not a tall header. */
-    --app-chrome-height: 48px;
+    --app-chrome-height: var(--evo-chrome-height);
 
     /* Surfaces */
-    --color-bg: #f7f7f5;
-    --color-surface: #ffffff;
-    --color-subtle: #f1f1ef;
+    --color-bg: var(--evo-canvas);
+    --color-surface: var(--evo-surface);
+    --color-subtle: var(--evo-surface-subtle);
 
     /* Text */
-    --color-text: #161616;
-    --color-text-secondary: #666666;
-    --color-text-muted: #929292;
+    --color-text: var(--evo-ink);
+    --color-text-secondary: var(--evo-ink-secondary);
+    --color-text-muted: var(--evo-ink-muted);
 
     /* Borders */
-    --color-border: #e3e3df;
-    --color-border-strong: #d6d6d1;
+    --color-border: var(--evo-hairline);
+    --color-border-strong: var(--evo-hairline-strong);
 
-    /* Accent — selective only */
-    --color-accent: #e8530e;
-    --color-accent-hover: #d74908;
-    --color-accent-pressed: #b8410b;
-    --color-accent-soft: #fff1ea;
+    /* Accent — primary / intentional actions only */
+    --color-accent: var(--evo-primary);
+    --color-accent-hover: var(--evo-primary-hover);
+    --color-accent-pressed: var(--evo-primary-pressed);
+    --color-accent-soft: var(--evo-primary-soft);
     --color-accent-wash: var(--color-accent-soft);
 
     /* Status — semantic, not brand hues */
-    --color-success: #24845b;
-    --color-warning: #c77a11;
-    --color-danger: #d92d20;
+    --color-success: var(--evo-success);
+    --color-warning: var(--evo-warning);
+    --color-danger: var(--evo-danger);
 
-    /* Focus */
-    --color-focus-ring: var(--color-accent);
+    /* Focus — teal, never orange */
+    --color-focus-ring: var(--evo-focus);
+    --color-selection: var(--evo-teal);
 
     /*
      * P27 product motion — one restrained language.
@@ -85,7 +82,7 @@
     --motion-duration-drawer: 200ms;
 
     /* Sidebar surfaces / states — paper rail, not a second black product */
-    --color-sidebar: #f7f7f5;
+    --color-sidebar: var(--evo-canvas);
     --color-sidebar-text: var(--color-text);
     --color-sidebar-text-mute: var(--color-text-secondary);
     --color-sidebar-border: var(--color-border);
@@ -94,7 +91,7 @@
         var(--color-text) 6%,
         var(--color-sidebar)
     );
-    --color-sidebar-active: var(--color-accent-soft);
+    --color-sidebar-active: var(--evo-teal-soft);
     --color-sidebar-well: var(--color-surface);
 
     /*
@@ -124,9 +121,8 @@
 
 @theme {
     --font-sans:
-        'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+        var(--evo-font-sans), 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -244,7 +240,7 @@
     --popover: var(--color-surface);
     --popover-foreground: var(--color-text);
     --primary: var(--color-accent);
-    --primary-foreground: #ffffff;
+    --primary-foreground: var(--evo-on-primary);
     --secondary: var(--color-subtle);
     --secondary-foreground: var(--color-text);
     --muted: var(--color-subtle);
@@ -254,35 +250,36 @@
     --accent-foreground: var(--color-text);
     /* Framework semantic, not a brand color — delete/destructive flows only. */
     --destructive: var(--color-danger);
-    --destructive-foreground: var(--color-danger);
+    --destructive-foreground: var(--evo-on-danger);
     --border: var(--color-border);
     --input: var(--color-border);
     --ring: var(--color-focus-ring);
-    --chart-1: var(--color-accent);
-    --chart-2: var(--color-text);
-    --chart-3: var(--color-text-secondary);
-    --chart-4: var(--color-border);
-    --chart-5: var(--color-subtle);
+    --chart-1: var(--evo-chart-1);
+    --chart-2: var(--evo-chart-2);
+    --chart-3: var(--evo-chart-3);
+    --chart-4: var(--evo-chart-4);
+    --chart-5: var(--evo-chart-5);
     --radius: 0.5rem;
-    /* Paper rail — literals re-asserted in the Aurora bridge to avoid cycles. */
-    --sidebar: #f7f7f5;
-    --sidebar-foreground: #161616;
-    --sidebar-primary: #161616;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: var(--color-accent-soft);
-    --sidebar-accent-foreground: #161616;
-    --sidebar-border: #e3e3df;
-    --sidebar-ring: #e8530e;
-    --sidebar-ink: #161616;
-    --sidebar-mute: #666666;
-    --sidebar-faint: #929292;
-    --sidebar-well: #ffffff;
-    --sidebar-well-hover: #f1f1ef;
-    --sidebar-line: #e3e3df;
-    --sidebar-strong: #e3e3df;
-    --sidebar-hover: color-mix(in srgb, #161616 6%, #f7f7f5);
+    /* Paper rail — literals for the cycle-prone pair live in the Aurora
+       bridge. These aliases follow the canonical Evo canvas / ink / teal. */
+    --sidebar: var(--evo-canvas);
+    --sidebar-foreground: var(--evo-ink);
+    --sidebar-primary: var(--evo-ink);
+    --sidebar-primary-foreground: var(--evo-surface);
+    --sidebar-accent: var(--evo-teal-soft);
+    --sidebar-accent-foreground: var(--evo-ink);
+    --sidebar-border: var(--evo-hairline);
+    --sidebar-ring: var(--evo-focus);
+    --sidebar-ink: var(--evo-ink);
+    --sidebar-mute: var(--evo-ink-secondary);
+    --sidebar-faint: var(--evo-ink-muted);
+    --sidebar-well: var(--evo-surface);
+    --sidebar-well-hover: var(--evo-surface-subtle);
+    --sidebar-line: var(--evo-hairline);
+    --sidebar-strong: var(--evo-hairline-strong);
+    --sidebar-hover: var(--evo-hover);
     --sidebar-overlay: rgba(0, 0, 0, 0.8);
-    --sidebar-online: #22c55e;
+    --sidebar-online: var(--evo-success);
 }
 
 /* Aurora Design System — registry primitives + component CSS */
@@ -292,50 +289,50 @@
 @import './aurora-motion.css';
 
 /*
- * Dark Cabinet — near-black tonal elevation, not true black.
- * Orange is primary/brand only (`--evo-accent` / #EC6025).
- * Teal is selection, focus, and context.
+ * Dark Cabinet — one approved scale from evo.css:
+ * canvas #0A0A0A / surface #121212 / raised #1C1C1C.
+ * Orange is primary only. Teal is selection, focus, and context.
  *
  * dark-cabinet-contrast (WCAG 2.1, sRGB relative luminance):
- * - #E8E8E8 on #121212 is 15.29:1 (body / primary text)
- * - #B3B3B3 on #121212 is 8.93:1 (secondary text)
- * - #8A8A8A on #121212 is 5.43:1 (muted text)
- * - #666666 on #121212 is 3.26:1 (UI boundary / input edge)
+ * - #F5F5F5 on #0A0A0A is 18.16:1 (body / primary text — not pure white)
+ * - #A3A3A3 on #0A0A0A is 7.85:1 (secondary text)
+ * - #8A8A8A on #0A0A0A is 5.73:1 (muted text)
+ * - #8A8A8A on #1C1C1C is 4.94:1 (muted on raised)
  * - #0F4C5C on #121212 is 1.97:1 — too low for a ring, kept as selection fill
  * - #E8E8E8 on #0F4C5C is 7.76:1 (label on selected row / nav)
  * - #5EB0C0 on #121212 is 7.54:1 — teal focus ring / selected outline
- * - #EC6025 on #121212 is 5.59:1 (primary action vs base)
+ * - #EC6025 on #0A0A0A is 5.91:1 (primary action vs base)
  */
 .dark {
     color-scheme: dark;
-    --color-bg: #121212;
-    --color-surface: #1c1c1c;
-    --color-subtle: #262626;
-    --color-overlay: #2a2a2a;
-    --color-text: #e8e8e8;
-    --color-text-secondary: #b3b3b3;
-    --color-text-muted: #8a8a8a;
-    --color-border: #3a3a3a;
-    --color-border-strong: #666666;
-    --color-accent: var(--evo-accent);
-    --color-accent-hover: color-mix(in srgb, var(--evo-accent) 86%, #000000);
-    --color-accent-pressed: color-mix(in srgb, var(--evo-accent) 72%, #000000);
-    --color-accent-soft: color-mix(in srgb, var(--color-selection) 28%, var(--color-surface));
+    --color-bg: var(--evo-canvas);
+    --color-surface: var(--evo-surface);
+    --color-subtle: var(--evo-surface-subtle);
+    --color-overlay: var(--evo-surface-raised);
+    --color-text: var(--evo-ink);
+    --color-text-secondary: var(--evo-ink-secondary);
+    --color-text-muted: var(--evo-ink-muted);
+    --color-border: var(--evo-hairline);
+    --color-border-strong: var(--evo-hairline-strong);
+    --color-accent: var(--evo-primary);
+    --color-accent-hover: var(--evo-primary-hover);
+    --color-accent-pressed: var(--evo-primary-pressed);
+    --color-accent-soft: var(--evo-primary-soft);
     --color-accent-wash: var(--color-accent-soft);
-    --color-selection: #0F4C5C;
-    --color-focus-ring: #5EB0C0;
-    --color-canvas: #121212;
-    --color-canvas-soft: #121212;
-    --color-ink: #e8e8e8;
-    --color-mute: #b3b3b3;
-    --color-hairline: #3a3a3a;
-    --color-sidebar: #121212;
-    --color-sidebar-text: #e8e8e8;
-    --color-sidebar-text-mute: #b3b3b3;
-    --color-sidebar-border: #3a3a3a;
-    --color-sidebar-hover: #1c1c1c;
-    --color-sidebar-active: var(--color-selection);
-    --color-sidebar-well: #262626;
+    --color-selection: var(--evo-teal);
+    --color-focus-ring: var(--evo-focus);
+    --color-canvas: var(--evo-canvas);
+    --color-canvas-soft: var(--evo-canvas);
+    --color-ink: var(--evo-ink);
+    --color-mute: var(--evo-ink-secondary);
+    --color-hairline: var(--evo-hairline);
+    --color-sidebar: var(--evo-canvas);
+    --color-sidebar-text: var(--evo-ink);
+    --color-sidebar-text-mute: var(--evo-ink-secondary);
+    --color-sidebar-border: var(--evo-hairline);
+    --color-sidebar-hover: var(--evo-surface);
+    --color-sidebar-active: var(--evo-teal-soft);
+    --color-sidebar-well: var(--evo-surface-subtle);
 
     --evosales-canvas: var(--color-surface);
     --evosales-canvas-soft: var(--color-bg);
@@ -352,36 +349,36 @@
     --muted: var(--color-subtle);
     --accent: var(--color-subtle);
     --primary: var(--color-accent);
-    --primary-foreground: #121212;
+    --primary-foreground: var(--evo-on-primary);
     --card: var(--color-surface);
     --popover: var(--color-overlay);
     --border: var(--color-border);
     --input: var(--color-border-strong);
     --ring: var(--color-focus-ring);
-    --chart-1: var(--color-accent);
-    --chart-2: var(--color-text);
-    --chart-3: var(--color-text-secondary);
-    --chart-4: #8a8a8a;
-    --chart-5: #525252;
+    --chart-1: var(--evo-chart-1);
+    --chart-2: var(--evo-chart-2);
+    --chart-3: var(--evo-chart-3);
+    --chart-4: var(--evo-chart-4);
+    --chart-5: var(--evo-chart-5);
 
-    --sidebar: #121212;
-    --sidebar-foreground: #b3b3b3;
-    --sidebar-primary: #e8e8e8;
-    --sidebar-primary-foreground: #121212;
-    --sidebar-accent: var(--color-selection);
-    --sidebar-accent-foreground: #e8e8e8;
-    --sidebar-border: #3a3a3a;
-    --sidebar-ring: #5EB0C0;
-    --sidebar-ink: #e8e8e8;
-    --sidebar-mute: #b3b3b3;
-    --sidebar-faint: #8a8a8a;
-    --sidebar-well: #262626;
-    --sidebar-well-hover: #2a2a2a;
-    --sidebar-line: #3a3a3a;
-    --sidebar-strong: #666666;
-    --sidebar-hover: #1c1c1c;
+    --sidebar: var(--evo-canvas);
+    --sidebar-foreground: var(--evo-ink-secondary);
+    --sidebar-primary: var(--evo-ink);
+    --sidebar-primary-foreground: var(--evo-surface);
+    --sidebar-accent: var(--evo-teal-soft);
+    --sidebar-accent-foreground: var(--evo-ink);
+    --sidebar-border: var(--evo-hairline);
+    --sidebar-ring: var(--evo-focus);
+    --sidebar-ink: var(--evo-ink);
+    --sidebar-mute: var(--evo-ink-secondary);
+    --sidebar-faint: var(--evo-ink-muted);
+    --sidebar-well: var(--evo-surface-subtle);
+    --sidebar-well-hover: var(--evo-surface-raised);
+    --sidebar-line: var(--evo-hairline);
+    --sidebar-strong: var(--evo-hairline-strong);
+    --sidebar-hover: var(--evo-surface);
     --sidebar-overlay: rgba(0, 0, 0, 0.72);
-    --sidebar-online: #22c55e;
+    --sidebar-online: var(--evo-success);
 }
 
 @layer base {
@@ -677,25 +674,25 @@
 .aurora-btn--filled.aurora-btn--aurora {
     background: var(--primary);
     border-color: var(--primary);
-    color: #ffffff;
+    color: var(--evo-on-primary);
     box-shadow: none;
 }
 
 .dark .aurora-btn--filled.aurora-btn--aurora {
-    color: #121212;
+    color: var(--evo-on-primary);
 }
 
 .aurora-btn--filled.aurora-btn--aurora:hover {
     background: var(--evosales-mark-hover);
     border-color: var(--evosales-mark-hover);
-    color: #ffffff;
+    color: var(--evo-on-primary);
     box-shadow: none;
 }
 
 .aurora-btn--filled.aurora-btn--aurora:active {
     background: var(--evosales-mark-pressed);
     border-color: var(--evosales-mark-pressed);
-    color: #ffffff;
+    color: var(--evo-on-primary);
     box-shadow: none;
 }
 
@@ -767,49 +764,49 @@
  */
 .auth-screen {
     color-scheme: light;
-    background-color: #f7f7f5;
-    color: #161616;
+    background-color: var(--evo-canvas);
+    color: var(--evo-ink);
     letter-spacing: 0;
     word-spacing: 0.06em;
-    --color-bg: #f7f7f5;
-    --color-surface: #ffffff;
-    --color-subtle: #f1f1ef;
-    --color-text: #161616;
-    --color-text-secondary: #666666;
-    --color-text-muted: #929292;
-    --color-border: #e3e3df;
-    --color-border-strong: color-mix(in srgb, #161616 18%, #e3e3df);
-    --color-canvas: #f7f7f5;
-    --color-canvas-soft: #f7f7f5;
-    --color-ink: #161616;
-    --color-mute: #666666;
-    --color-hairline: #e3e3df;
-    --evosales-canvas: #f7f7f5;
-    --evosales-canvas-soft: #f7f7f5;
-    --evosales-ink: #161616;
-    --evosales-mute: #666666;
-    --evosales-hairline: #e3e3df;
-    --aurora-page-bg: #f7f7f5;
-    --aurora-bg: #f7f7f5;
-    --aurora-text-primary: #161616;
-    --aurora-text-muted: #666666;
-    --aurora-control-surface: #ffffff;
-    --aurora-control-surface-top: #ffffff;
-    --aurora-hover-bg: color-mix(in srgb, #161616 4%, #f7f7f5);
-    --aurora-border-default: #e3e3df;
-    --aurora-border-strong: color-mix(in srgb, #161616 18%, #e3e3df);
+    --color-bg: var(--evo-canvas);
+    --color-surface: var(--evo-surface);
+    --color-subtle: var(--evo-surface-subtle);
+    --color-text: var(--evo-ink);
+    --color-text-secondary: var(--evo-ink-secondary);
+    --color-text-muted: var(--evo-ink-muted);
+    --color-border: var(--evo-hairline);
+    --color-border-strong: var(--evo-hairline-strong);
+    --color-canvas: var(--evo-canvas);
+    --color-canvas-soft: var(--evo-canvas);
+    --color-ink: var(--evo-ink);
+    --color-mute: var(--evo-ink-secondary);
+    --color-hairline: var(--evo-hairline);
+    --evosales-canvas: var(--evo-canvas);
+    --evosales-canvas-soft: var(--evo-canvas);
+    --evosales-ink: var(--evo-ink);
+    --evosales-mute: var(--evo-ink-secondary);
+    --evosales-hairline: var(--evo-hairline);
+    --aurora-page-bg: var(--evo-canvas);
+    --aurora-bg: var(--evo-canvas);
+    --aurora-text-primary: var(--evo-ink);
+    --aurora-text-muted: var(--evo-ink-secondary);
+    --aurora-control-surface: var(--evo-surface);
+    --aurora-control-surface-top: var(--evo-surface);
+    --aurora-hover-bg: var(--evo-hover);
+    --aurora-border-default: var(--evo-hairline);
+    --aurora-border-strong: var(--evo-hairline-strong);
     --aurora-letter-ui: 0;
     --aurora-letter-label: 0;
     --aurora-letter-meta: 0;
-    --background: #f7f7f5;
-    --foreground: #161616;
-    --card: #ffffff;
-    --card-foreground: #161616;
-    --muted-foreground: #929292;
-    --input: #e3e3df;
-    --border: #e3e3df;
-    --primary: #e8530e;
-    --primary-foreground: #ffffff;
+    --background: var(--evo-canvas);
+    --foreground: var(--evo-ink);
+    --card: var(--evo-surface);
+    --card-foreground: var(--evo-ink);
+    --muted-foreground: var(--evo-ink-muted);
+    --input: var(--evo-hairline);
+    --border: var(--evo-hairline);
+    --primary: var(--evo-primary);
+    --primary-foreground: var(--evo-on-primary);
 }
 
 .auth-screen h1,
@@ -898,11 +895,11 @@
 .auth-screen .login-split-form input:not([type='checkbox']):not(
         [type='hidden']
     ):not([type='radio']):focus-visible {
-    border-color: #e8530e !important;
+    border-color: var(--evo-focus) !important;
     outline: none;
     box-shadow:
-        0 0 0 1px color-mix(in srgb, #e8530e 45%, transparent),
-        0 0 0 3px color-mix(in srgb, #e8530e 22%, transparent) !important;
+        0 0 0 1px color-mix(in srgb, var(--evo-focus) 45%, transparent),
+        0 0 0 3px color-mix(in srgb, var(--evo-focus) 22%, transparent) !important;
 }
 
 .auth-screen .login-split-sso {
@@ -1127,9 +1124,9 @@ html.dark {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html.dark *,
-    html.dark *::before,
-    html.dark *::after {
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;

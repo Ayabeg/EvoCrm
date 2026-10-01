@@ -3,12 +3,12 @@
 it('locks V01 Visual Law tokens for chrome inheritance', function () {
     $app = file_get_contents(resource_path('css/app.css'));
 
-    expect($app)->toContain('--color-accent-hover: #d74908')
-        ->and($app)->toContain('--color-accent-soft: #fff1ea')
-        ->and($app)->toContain('--color-success: #24845b')
-        ->and($app)->toContain('--color-warning: #c77a11')
-        ->and($app)->toContain('--color-danger: #d92d20')
-        ->and($app)->toContain('--color-border-strong: #d6d6d1')
+    expect($app)->toContain('--color-accent-hover: var(--evo-primary-hover)')
+        ->and($app)->toContain('--color-accent-soft: var(--evo-primary-soft)')
+        ->and($app)->toContain('--color-success: var(--evo-success)')
+        ->and($app)->toContain('--color-warning: var(--evo-warning)')
+        ->and($app)->toContain('--color-danger: var(--evo-danger)')
+        ->and($app)->toContain('--color-border-strong: var(--evo-hairline-strong)')
         ->and($app)->toContain('--text-section-label: 0.75rem')
         ->and($app)->toContain('--text-micro: 0.75rem')
         ->and($app)->toContain('--app-chrome-height: 48px')

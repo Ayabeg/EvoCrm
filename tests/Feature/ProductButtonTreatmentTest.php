@@ -30,7 +30,7 @@ it('restyles Aurora buttons at the EvoCrm layer without rewriting Aurora CSS', f
         ->and($product)->toContain('.aurora-btn {')
         ->and($product)->toContain('box-shadow: none')
         ->and($product)->toContain('.aurora-btn--filled.aurora-btn--aurora')
-        ->and($product)->toContain('color: #ffffff')
+        ->and($product)->toContain('color: var(--evo-on-primary)')
         ->and($product)->toContain('background: var(--primary)')
         ->and($product)->toContain('.record-action-group');
 

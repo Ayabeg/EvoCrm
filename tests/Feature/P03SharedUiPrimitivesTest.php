@@ -20,7 +20,7 @@ it('keeps product buttons on the Aurora adapter with a 36px default control', fu
         ->and($product)->toContain('.aurora-btn {')
         ->and($product)->toContain('border-radius: 8px')
         ->and($product)->toContain('.aurora-btn--filled.aurora-btn--aurora')
-        ->and($product)->toContain('color: #ffffff')
+        ->and($product)->toContain('color: var(--evo-on-primary)')
         ->and($product)->toContain('background: var(--primary)');
 });
 

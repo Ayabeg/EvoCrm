@@ -110,9 +110,8 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($js)->toContain('selection is named, not wash-only')
         ->and($js)->toContain('Space activates a focusable widget');
 
-    expect($app)->toContain('--color-text-muted: #929292')
-        ->and($app)->toContain('--color-focus-ring: var(--color-accent)')
-        ->and($app)->toContain('--color-focus-ring: #5EB0C0');
+    expect($app)->toContain('--color-text-muted: var(--evo-ink-muted)')
+        ->and($app)->toContain('--color-focus-ring: var(--evo-focus)');
 });
 
 it('does not claim WCAG certification or start P27 motion tokens', function () {

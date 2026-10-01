@@ -11,8 +11,8 @@ it('re-asserts the EvoDesk rail as a literal after Aurora remaps --sidebar', fun
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
 
     expect($bridge)->toBeString();
-    expect($bridge)->toMatch('/--aurora-nav-bg:\s*#f7f7f5/');
-    expect($bridge)->toMatch('/--sidebar:\s*#f7f7f5/');
+    expect($bridge)->toMatch('/--aurora-nav-bg:\s*#f7f8f5/');
+    expect($bridge)->toMatch('/--sidebar:\s*#f7f8f5/');
     expect($bridge)->not->toMatch('/--aurora-nav-bg:\s*var\(--sidebar\)/');
 });
 
@@ -107,11 +107,11 @@ it('locks the P02 semantic tokens and retires Slate and antique orange', functio
     $app = file_get_contents(resource_path('css/app.css'));
     $bridge = file_get_contents(resource_path('css/aurora-evotechly-bridge.css'));
 
-    expect($app)->toContain('--color-bg: #f7f7f5');
-    expect($app)->toContain('--color-text: #161616');
-    expect($app)->toContain('--color-accent: #e8530e');
-    expect($app)->toContain('--color-accent-hover: #d74908');
-    expect($app)->toContain('--color-accent-pressed: #b8410b');
+    expect($app)->toContain('--color-bg: var(--evo-canvas)');
+    expect($app)->toContain('--color-text: var(--evo-ink)');
+    expect($app)->toContain('--color-accent: var(--evo-primary)');
+    expect($app)->toContain('--color-accent-hover: var(--evo-primary-hover)');
+    expect($app)->toContain('--color-accent-pressed: var(--evo-primary-pressed)');
     expect($app)->toContain('--evosales-canvas: var(--color-bg)');
     expect($app)->toContain('--evosales-canvas-soft: var(--color-bg)');
     expect($app)->toContain('--evosales-ink: var(--color-text)');
@@ -204,9 +204,9 @@ it('uses the EvoCrm accent pill on the active rail', function () {
     expect($bridge)->not->toContain('--sidebar-accent: rgba(236, 96, 37, 0.22)');
     expect($app)->not->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
     expect($bridge)->not->toContain('--sidebar-accent: rgba(255, 255, 255, 0.1)');
-    expect($app)->toContain('--sidebar-accent: var(--color-accent-soft)');
-    expect($bridge)->toContain('--sidebar-accent: var(--color-accent-soft)');
-    expect($app)->toContain('--sidebar-ring: #e8530e');
+    expect($app)->toContain('--sidebar-accent: var(--evo-teal-soft)');
+    expect($bridge)->toContain('--sidebar-accent: var(--evo-teal-soft)');
+    expect($app)->toContain('--sidebar-ring: var(--evo-focus)');
     expect($rail)->toContain('app-rail-item');
     expect($rail)->not->toContain('inset_2px_0_0_0');
     expect($rail)->toContain("from '@inertiajs/react'");

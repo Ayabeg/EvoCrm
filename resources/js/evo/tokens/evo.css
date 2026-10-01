@@ -1,0 +1,180 @@
+/*
+ * Evo Design System — canonical tokens.
+ * This is the only file that may declare --evo-* values.
+ * app.css, evo-shell.css, design-lab.css and ds layers alias into these.
+ *
+ * Light workspace: canvas #F7F8F5, surface #FFFFFF, ink #0D1B24,
+ * hairline #E6E8E3, teal #0F4C5C, primary #EC6025.
+ * Dark cabinet (one scale): #0A0A0A / #121212 / #1C1C1C.
+ * Logo orange #D9500F is the mark only — never a control fill.
+ * Primary labels on orange use #121212 (white on #EC6025 is 3.35:1).
+ */
+
+:root {
+    --evo-canvas: #f7f8f5;
+    --evo-surface: #ffffff;
+    --evo-surface-subtle: #f1f2ee;
+    --evo-surface-raised: #ffffff;
+    --evo-ink: #0d1b24;
+    --evo-ink-secondary: #4a5a63;
+    --evo-ink-muted: #5b6b73;
+    --evo-ink-faint: #8a969c;
+    --evo-hairline: #e6e8e3;
+    --evo-hairline-strong: #d5d8d1;
+    --evo-teal: #0f4c5c;
+    --evo-teal-ink: #0f4c5c;
+    --evo-teal-soft: rgba(15, 76, 92, 0.08);
+    --evo-teal-line: color-mix(in srgb, var(--evo-teal) 40%, transparent);
+    --evo-focus: var(--evo-teal);
+    --evo-hover: rgba(13, 27, 36, 0.04);
+    --evo-primary: #ec6025;
+    --evo-primary-hover: color-mix(in srgb, #ec6025 88%, #000);
+    --evo-primary-pressed: color-mix(in srgb, #ec6025 76%, #000);
+    --evo-primary-soft: color-mix(in srgb, #ec6025 12%, #ffffff);
+    --evo-on-primary: #121212;
+    --evo-logo: #d9500f;
+    --evo-success: #24845b;
+    --evo-success-soft: color-mix(in srgb, #24845b 8%, var(--evo-surface));
+    --evo-warning: #c77a11;
+    --evo-warning-soft: color-mix(in srgb, #c77a11 8%, var(--evo-surface));
+    --evo-danger: #d92d20;
+    --evo-danger-soft: color-mix(in srgb, #d92d20 8%, var(--evo-surface));
+    --evo-info: var(--evo-teal);
+    --evo-info-soft: var(--evo-teal-soft);
+    --evo-on-danger: #ffffff;
+    --evo-track: #efefed;
+    --evo-chart-1: #0d1b24;
+    --evo-chart-2: #0f4c5c;
+    --evo-chart-3: #5e8a94;
+    --evo-chart-4: #9aa5ab;
+    --evo-chart-5: #c9cfcb;
+    --evo-chart-highlight: #ec6025;
+
+    --evo-surface-l0: var(--evo-canvas);
+    --evo-surface-l1: var(--evo-surface);
+    --evo-surface-l2: var(--evo-surface-raised);
+    --evo-surface-l3: var(--evo-surface-raised);
+    --evo-surface-l4: var(--evo-surface-raised);
+
+    --evo-border: var(--evo-hairline);
+    --evo-border-subtle: color-mix(in srgb, var(--evo-ink) 5%, transparent);
+    --evo-border-strong: var(--evo-hairline-strong);
+    --evo-border-focus: var(--evo-focus);
+    --evo-accent: var(--evo-primary);
+    --evo-logo-orange: var(--evo-logo);
+
+    --evo-font-sans: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --evo-font-mono: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+
+    --evo-text-11: 0.6875rem;
+    --evo-text-12: 0.75rem;
+    --evo-text-13: 0.8125rem;
+    --evo-text-14: 0.875rem;
+    --evo-text-16: 1rem;
+    --evo-text-18: 1.125rem;
+    --evo-text-20: 1.25rem;
+    --evo-text-24: 1.5rem;
+    --evo-text-32: 2rem;
+
+    --evo-type-caption: var(--evo-text-11);
+    --evo-type-meta: var(--evo-text-12);
+    --evo-type-body: var(--evo-text-13);
+    --evo-type-ui: var(--evo-text-14);
+    --evo-type-section: var(--evo-text-16);
+    --evo-type-section-lg: var(--evo-text-18);
+    --evo-type-page: var(--evo-text-20);
+    --evo-type-page-lg: var(--evo-text-24);
+    --evo-type-metric: var(--evo-text-32);
+
+    --evo-control-compact: 32px;
+    --evo-control-standard: 36px;
+    --evo-row-compact: 32px;
+    --evo-row-standard: 36px;
+    --evo-chrome-height: 48px;
+    --evo-rail: 212px;
+
+    --evo-radius-compact: 8px;
+    --evo-radius-standard: 10px;
+    --evo-radius-floating: 12px;
+    --evo-radius-pill: 999px;
+
+    --evo-shadow-none: none;
+    --evo-shadow-pill: 0 1px 1px rgba(13, 27, 36, 0.08);
+    --evo-shadow-floating: 0 1px 1px rgba(13, 27, 36, 0.16);
+    --evo-shadow-modal: 0 8px 24px rgba(13, 27, 36, 0.12);
+
+    --evo-duration-micro: 120ms;
+    --evo-duration-normal: 200ms;
+    --evo-duration-context: 240ms;
+    --evo-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    --evo-z-base: 0;
+    --evo-z-sticky: 20;
+    --evo-z-dropdown: 40;
+    --evo-z-overlay: 50;
+    --evo-z-modal: 60;
+    --evo-z-toast: 70;
+    --evo-z-command: 80;
+    --evo-z-max: 999;
+}
+
+.dark,
+.evo-cabinet,
+[data-evo-theme='dark'] {
+    color-scheme: dark;
+    --evo-canvas: #0a0a0a;
+    --evo-surface: #121212;
+    --evo-surface-subtle: #1c1c1c;
+    --evo-surface-raised: #1c1c1c;
+    --evo-ink: #f5f5f5;
+    --evo-ink-secondary: #a3a3a3;
+    --evo-ink-muted: #8a8a8a;
+    --evo-ink-faint: #737373;
+    --evo-hairline: #262626;
+    --evo-hairline-strong: #3a3a3a;
+    --evo-teal: #0f4c5c;
+    --evo-teal-ink: #5eb0c0;
+    --evo-teal-soft: color-mix(in srgb, #0f4c5c 28%, #121212);
+    --evo-teal-line: color-mix(in srgb, #5eb0c0 40%, transparent);
+    --evo-focus: #5eb0c0;
+    --evo-hover: rgba(255, 255, 255, 0.06);
+    --evo-primary: #ec6025;
+    --evo-primary-hover: color-mix(in srgb, #ec6025 88%, #000);
+    --evo-primary-pressed: color-mix(in srgb, #ec6025 76%, #000);
+    --evo-primary-soft: color-mix(in srgb, #ec6025 18%, #121212);
+    --evo-on-primary: #121212;
+    --evo-success-soft: color-mix(in srgb, #24845b 18%, #121212);
+    --evo-warning-soft: color-mix(in srgb, #c77a11 18%, #121212);
+    --evo-danger-soft: color-mix(in srgb, #d92d20 18%, #121212);
+    --evo-info-soft: var(--evo-teal-soft);
+    --evo-track: #1c1c1c;
+    --evo-chart-1: #f5f5f5;
+    --evo-chart-2: #5eb0c0;
+    --evo-chart-3: #8a969c;
+    --evo-chart-4: #5e8a94;
+    --evo-chart-5: #3a3a3a;
+    --evo-surface-l0: #0a0a0a;
+    --evo-surface-l1: #121212;
+    --evo-surface-l2: #1c1c1c;
+    --evo-surface-l3: #1c1c1c;
+    --evo-surface-l4: #1c1c1c;
+    --evo-border: #262626;
+    --evo-border-subtle: #1c1c1c;
+    --evo-border-strong: #3a3a3a;
+    --evo-border-focus: #5eb0c0;
+    --evo-accent: #ec6025;
+    --evo-shadow-pill: none;
+    --evo-shadow-floating: none;
+    --evo-shadow-modal: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

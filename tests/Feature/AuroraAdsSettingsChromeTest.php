@@ -54,9 +54,9 @@ it('does not rewrite app.css or the EvoDesk rail in this chrome pass', function 
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
 
-    expect($app)->toContain('--color-accent: #e8530e')
-        ->and($app)->toContain('--color-bg: #f7f7f5')
-        ->and($app)->toContain('--color-text: #161616')
+    expect($app)->toContain('--color-accent: var(--evo-primary)')
+        ->and($app)->toContain('--color-bg: var(--evo-canvas)')
+        ->and($app)->toContain('--color-text: var(--evo-ink)')
         ->and($app)->toContain('--evosales-mark: var(--color-accent)')
         ->and($app)->toContain('--evosales-canvas: var(--color-bg)')
         ->and($app)->toContain('--evosales-ink: var(--color-text)')

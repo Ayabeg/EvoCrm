@@ -31,7 +31,7 @@
         </script>
         <style>
             html { background: #F7F8F5; }
-            html.dark { background: #121212; }
+            html.dark { background: #0A0A0A; }
         </style>
         @vite(['resources/design-lab/design-lab.css', 'resources/design-lab/main.tsx'])
     </head>

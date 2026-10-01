@@ -28,17 +28,17 @@
      * aurora.css sets `--sidebar: var(--aurora-nav-bg)`. Pointing
      * `--aurora-nav-bg` back at `--sidebar` made both invalid at
      * computed-value time (transparent rail / mobile sheet) in light mode.
-     * Literals must match `--color-sidebar` / `--color-bg` (#F7F7F5).
+     * Literals must match `--evo-canvas` / `--evo-ink` (#F7F8F5 / #0D1B24).
      */
-    --aurora-nav-bg: #f7f7f5;
-    --sidebar: #f7f7f5;
-    --sidebar-foreground: #161616;
-    --sidebar-primary: #161616;
+    --aurora-nav-bg: #f7f8f5;
+    --sidebar: #f7f8f5;
+    --sidebar-foreground: #0d1b24;
+    --sidebar-primary: #0d1b24;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: var(--color-accent-soft);
-    --sidebar-accent-foreground: #161616;
-    --sidebar-border: #e3e3df;
-    --sidebar-ring: #e8530e;
+    --sidebar-accent: var(--evo-teal-soft);
+    --sidebar-accent-foreground: #0d1b24;
+    --sidebar-border: #e6e8e3;
+    --sidebar-ring: #0f4c5c;
     --aurora-panel-medium: var(--color-surface);
     --aurora-panel-medium-top: var(--color-surface);
     --aurora-panel-strong: var(--color-surface);
@@ -174,15 +174,15 @@
     /* Surfaces — near-black tonal steps, no navy and no heavy glow */
     --aurora-page-bg: var(--color-bg);
     --aurora-bg: var(--color-bg);
-    --aurora-nav-bg: #121212;
-    --sidebar: #121212;
-    --sidebar-foreground: #b3b3b3;
-    --sidebar-primary: #e8e8e8;
+    --aurora-nav-bg: #0a0a0a;
+    --sidebar: #0a0a0a;
+    --sidebar-foreground: #a3a3a3;
+    --sidebar-primary: #f5f5f5;
     --sidebar-primary-foreground: #121212;
-    --sidebar-accent: var(--color-selection);
-    --sidebar-accent-foreground: #e8e8e8;
-    --sidebar-border: #3a3a3a;
-    --sidebar-ring: #5EB0C0;
+    --sidebar-accent: var(--evo-teal-soft);
+    --sidebar-accent-foreground: #f5f5f5;
+    --sidebar-border: #262626;
+    --sidebar-ring: #5eb0c0;
     --aurora-panel-medium: var(--color-surface);
     --aurora-panel-medium-top: #1c1c1c;
     --aurora-panel-strong: var(--color-subtle);

@@ -8,6 +8,7 @@ it('allows design-lab in non-production environments', function () {
     expect(app()->isProduction())->toBeFalse();
 
     $this->get('/design-lab')->assertOk();
+    $this->get('/design-lab/tokens')->assertOk();
 });
 
 it('hides design-lab from guests and members in production', function () {

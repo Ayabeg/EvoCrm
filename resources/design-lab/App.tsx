@@ -12,6 +12,7 @@ import { DealsListPage } from './pages/DealsListPage';
 import { DevisPage } from './pages/DevisPage';
 import { InboxPage } from './pages/InboxPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { TokensPage } from './pages/TokensPage';
 import {
     ActivitiesPage,
     CompaniesPage,
@@ -33,6 +34,8 @@ function renderRoute(route: LabRoute) {
     switch (route.name) {
         case 'accueil':
             return <AccueilPage />;
+        case 'tokens':
+            return <TokensPage />;
         case 'inbox':
             return <InboxPage />;
         case 'contacts':

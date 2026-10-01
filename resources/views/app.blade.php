@@ -40,11 +40,11 @@
 
         <style>
             html {
-                background-color: #F7F7F5;
+                background-color: #F7F8F5;
             }
 
             html.dark {
-                background-color: #121212;
+                background-color: #0A0A0A;
             }
         </style>
 
