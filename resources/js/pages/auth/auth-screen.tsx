@@ -1,30 +1,25 @@
 import { Link } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { t } from '@/lib/i18n';
-import type { AuthLayoutProps } from '@/types';
 import { home } from '@/routes';
+import type { AuthLayoutProps } from '@/types';
 
 /**
  * Auth chrome for every `auth/*` page.
  *
- * Layout ports Astryx `login-split` from
- * `npx @astryxdesign/cli template login-split` (same source as
- * facebook/astryx `packages/cli/assets/templates/pages/login-split`):
- * a centered two-pane card that stacks on a narrow container. Astryx
- * Card/Grid/Center stay out — same StyleX conflict as the local
- * SegmentedControl. Form fields, Fortify POST, and SSO live in the
- * page, not here.
+ * Split login card: centered two-pane that stacks on a narrow container.
+ * Surfaces and ink come from `--evo-*` tokens. Form fields, Fortify POST,
+ * and SSO live in the page, not here.
  *
- * Brand pane uses the EvoCrm mark, not the template's stock photo.
- * Apple/Google sit in the form (login page). Terms/Privacy sit under
- * the card. No placeholder vendor copy in this file.
+ * Brand pane uses the EvoCrm mark. Apple/Google sit in the form (login
+ * page). Terms/Privacy sit under the card. No placeholder vendor copy.
  */
 const hairlineCardStyle = {
-    background: '#ffffff',
+    background: 'var(--evo-surface)',
     backgroundImage: 'none',
-    borderColor: 'var(--evosales-hairline)',
-    borderRadius: '4px',
-    boxShadow: '0 1px 0 rgba(0, 0, 0, 0.04)',
+    borderColor: 'var(--evo-hairline)',
+    borderRadius: 'var(--evo-radius-compact)',
+    boxShadow: 'var(--evo-shadow-pill)',
 } as const;
 
 export default function AuthScreen({

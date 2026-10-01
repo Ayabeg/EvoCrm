@@ -1,23 +1,7 @@
-﻿import {
-    SegmentedControl,
-    SegmentedControlItem,
-} from '@astryxdesign/core/SegmentedControl';
-import { Theme } from '@astryxdesign/core/theme';
-import { neutralTheme } from '@astryxdesign/theme-neutral/built';
-import { Link, router, usePage } from '@inertiajs/react';
-import type { Icon } from '@phosphor-icons/react';
-import {
-    CaretDown,
-    CaretLeft,
-    CaretRight,
-    List,
-    MagnifyingGlass,
-    StarFour,
-} from '@phosphor-icons/react';
+﻿import { Link, router, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
-import { useCommandPaletteShortcut } from '@/components/crm/command-palette';
 import {
     SETTINGS_NAV,
     activeNavId,
@@ -31,6 +15,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
+import { CaretDown, CaretLeft, CaretRight } from '@/evo/icons';
+import { ShellModeSwitch } from '@/evo/shell/mode-switch';
+import type { ShellMode } from '@/evo/shell/mode-switch';
 import { useInitials } from '@/hooks/use-initials';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { openAskEvo } from '@/lib/ask-evo';
@@ -56,16 +43,10 @@ import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types/auth';
 
-export type RailMode = 'menu' | 'agents' | 'search';
-
-const MODES: { id: RailMode; label: string; icon: Icon }[] = [
-    { id: 'menu', label: 'Menu', icon: List },
-    { id: 'agents', label: 'Agents', icon: StarFour },
-    { id: 'search', label: 'Search', icon: MagnifyingGlass },
-];
+export type RailMode = ShellMode;
 
 const rowClass =
-    'evo-nav-link flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-left text-[13px] text-shell-ink-2 transition-colors duration-150 hover:bg-[var(--evo-hover)] motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-teal-ink)]';
+    'evo-nav-link flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-left text-[13px] text-shell-ink-2 transition-colors duration-[var(--evo-duration-micro)] hover:bg-[var(--evo-hover)] motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]';
 
 export function EvoRail({
     activeHotkeys = true,
@@ -99,13 +80,16 @@ export function EvoRail({
     const [uncontrolledMode, setUncontrolledMode] = useState<RailMode>('menu');
     const mode = modeProp ?? uncontrolledMode;
 
-    const setMode = useCallback((next: RailMode) => {
-        onModeChange?.(next);
+    const setMode = useCallback(
+        (next: RailMode) => {
+            onModeChange?.(next);
 
-        if (modeProp === undefined) {
-            setUncontrolledMode(next);
-        }
-    }, [modeProp, onModeChange]);
+            if (modeProp === undefined) {
+                setUncontrolledMode(next);
+            }
+        },
+        [modeProp, onModeChange],
+    );
     const [query, setQuery] = useState('');
     const [remoteHits, setRemoteHits] = useState<CommandSearchHit[]>([]);
     const [hitsForQuery, setHitsForQuery] = useState('');
@@ -154,42 +138,6 @@ export function EvoRail({
             }),
         [availableIds, catalog, hitsForQuery, query, recents, remoteHits],
     );
-
-    function openSearch() {
-        if (!activeHotkeys) {
-            return;
-        }
-
-        setMode('search');
-        searchRef.current?.focus();
-    }
-
-    useCommandPaletteShortcut(openSearch);
-
-    useEffect(() => {
-        if (!activeHotkeys) {
-            return;
-        }
-
-        function onKey(event: KeyboardEvent) {
-            if (
-                (event.metaKey || event.ctrlKey) &&
-                (event.key.toLowerCase() === 'k' || event.code === 'KeyK')
-            ) {
-                event.preventDefault();
-                setMode('search');
-                searchRef.current?.focus();
-            }
-        }
-
-        window.addEventListener('keydown', onKey, true);
-        document.addEventListener('keydown', onKey, true);
-
-        return () => {
-            window.removeEventListener('keydown', onKey, true);
-            document.removeEventListener('keydown', onKey, true);
-        };
-    }, [activeHotkeys, setMode]);
 
     useEffect(() => {
         if (mode === 'search' && activeHotkeys) {
@@ -284,12 +232,6 @@ export function EvoRail({
         }
     }
 
-    function handleModeChange(value: string) {
-        if (value === 'menu' || value === 'agents' || value === 'search') {
-            selectMode(value);
-        }
-    }
-
     function selectResult(result: CommandResult) {
         if (result.kind !== 'search') {
             const next = persistCommandRecents(
@@ -326,40 +268,15 @@ export function EvoRail({
             className="relative flex h-full min-h-0 w-full min-w-0 flex-col bg-shell-paper"
         >
             <div className="shrink-0 px-3 pt-3">
-                <Theme mode="dark" theme={neutralTheme}>
-                    <SegmentedControl
-                        label="Sidebar"
-                        layout="fill"
-                        onChange={handleModeChange}
-                        size="md"
-                        value={mode}
-                    >
-                        {MODES.map((item) => {
-                            const Icon = item.icon;
-
-                            return (
-                                <SegmentedControlItem
-                                    icon={
-                                        <Icon
-                                            aria-hidden
-                                            className="size-4"
-                                            weight="regular"
-                                        />
-                                    }
-                                    isLabelHidden={item.id !== 'menu'}
-                                    key={item.id}
-                                    label={item.label}
-                                    value={item.id}
-                                />
-                            );
-                        })}
-                    </SegmentedControl>
-                </Theme>
+                <ShellModeSwitch mode={mode} onModeChange={selectMode} />
             </div>
 
             <div className="relative min-h-0 flex-1">
                 <div
                     inert={mode !== 'menu'}
+                    role="tabpanel"
+                    id="shell-panel-menu"
+                    aria-labelledby="shell-tab-menu"
                     data-shell-mode="menu"
                     className={cn(
                         'evo-mode absolute inset-0 flex min-h-0 flex-col',
@@ -384,7 +301,7 @@ export function EvoRail({
                             {onToggleCollapsed ? (
                                 <button
                                     type="button"
-                                    className="grid size-8 shrink-0 place-items-center rounded-lg text-shell-muted hover:bg-[var(--evo-hover)] hover:text-shell-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-teal-ink)]"
+                                    className="grid size-8 shrink-0 place-items-center rounded-lg text-shell-muted hover:bg-[var(--evo-hover)] hover:text-shell-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]"
                                     aria-label="Fermer le menu"
                                     onClick={onToggleCollapsed}
                                 >
@@ -471,6 +388,9 @@ export function EvoRail({
 
                 <div
                     inert={mode !== 'agents'}
+                    role="tabpanel"
+                    id="shell-panel-agents"
+                    aria-labelledby="shell-tab-agents"
                     data-shell-mode="agents"
                     className={cn(
                         'evo-mode absolute inset-0 flex min-h-0 flex-col',
@@ -482,6 +402,9 @@ export function EvoRail({
 
                 <div
                     inert={mode !== 'search'}
+                    role="tabpanel"
+                    id="shell-panel-search"
+                    aria-labelledby="shell-tab-search"
                     data-shell-mode="search"
                     className={cn(
                         'evo-mode absolute inset-0 flex min-h-0 flex-col',
@@ -552,7 +475,7 @@ export function EvoRail({
                                             className={cn(
                                                 'w-full rounded-lg px-1 py-2 text-left',
                                                 index === cursorIndex &&
-                                                    'bg-[var(--evo-hover)]',
+                                                    'bg-[var(--evo-teal-soft)]',
                                             )}
                                             onMouseEnter={() =>
                                                 setCursor(index)

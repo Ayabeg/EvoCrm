@@ -41,8 +41,8 @@ it('keeps listed product chrome off lucide-react', function () {
             ->and($src)->not->toContain('from "lucide-react"');
     }
 
-    expect(file_get_contents(resource_path('js/components/crm/command-palette.tsx')))
-        ->toContain('@phosphor-icons/react');
+    expect(file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx')))
+        ->toContain('@/evo/icons');
 });
 
 it('routes active product overlays through canonical drawer or dialog barrels', function () {
@@ -80,10 +80,10 @@ it('does not delete leftover header files or change Inertia contracts', function
     $header = file_get_contents(resource_path('js/components/app-header.tsx'));
     expect($header)->toContain('lucide-react');
 
-    $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
-    expect($palette)->toContain("id: 'navigate'")
-        ->and($palette)->toContain("id: 'search'")
-        ->and($palette)->toContain("id: 'create'")
-        ->and($palette)->toContain("id: 'ask'")
+    $palette = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
+    expect($palette)->toContain("'navigate'")
+        ->and($palette)->toContain("'search'")
+        ->and($palette)->toContain("'create'")
+        ->and($palette)->toContain("'ask'")
         ->and($palette)->not->toContain('lucide-react');
 });

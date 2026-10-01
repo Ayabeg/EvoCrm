@@ -56,7 +56,7 @@ it('locks the P04 topbar search, command shortcut, and Ask Evo · Create · Task
 
     expect($rail)->toContain('Search EvoCRM')
         ->and($rail)->toContain('/crm/command/search')
-        ->and($rail)->toContain('useCommandPaletteShortcut')
+        ->and(file_get_contents(resource_path('js/components/shell/evo-shell.tsx')))->toContain('useCommandPaletteShortcut')
         ->and($rail)->toContain('account menu')
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Create')")

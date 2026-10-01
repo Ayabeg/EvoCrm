@@ -3,10 +3,6 @@
 @import '../js/evo/tokens/evo.css';
 @import '../js/evo/tokens/tailwind-theme.css';
 
-@import '@astryxdesign/core/reset.css';
-@import '@astryxdesign/core/astryx.css';
-@import '@astryxdesign/theme-neutral/theme.css';
-
 @import 'tw-animate-css';
 
 @import '@fontsource/geist-sans/400.css';
@@ -25,7 +21,7 @@
  * Aurora layer order — required by aurora-components registry item.
  * See docs/visual-system/aurora-adoption.md
  */
-@layer reset, theme, base, astryx-base, astryx-theme, components, aurora-components, utilities;
+@layer reset, theme, base, components, aurora-components, utilities;
 
 /*
  * Production --color-* / shadcn / Aurora names are aliases of the
@@ -34,7 +30,7 @@
  *
  * Light: canvas #F7F8F5, surface #FFFFFF, ink #0D1B24, accent #EC6025.
  * Orange is primary / intentional actions only. Teal is focus, selection
- * and active. Authenticated rail is 212px (stale 64/240 comments retired).
+ * and active. Authenticated rail is 212px.
  */
 :root {
     /* Compact enterprise topbar — 48px phones, 48px from sm. Not a tall header. */
@@ -821,7 +817,7 @@
 }
 
 /*
- * Astryx login-split port. Container query is keyed to the card, not the
+ * Auth login-split. Container query is keyed to the card, not the
  * window, so the image pane stacks and the inset tightens at the same
  * width the two 240px columns stop fitting (template: max-width 511px).
  */
@@ -1019,26 +1015,12 @@
 }
 
 /*
- * Astryx compiles light-dark() to LightningCSS vars driven by
- * prefers-color-scheme, not html.dark. Force the dark pair when the
- * cabinet class is on so OS-light + Dark Cabinet cannot paint #000 ink.
+ * Dark cabinet ink. html.dark is the product appearance switch, not
+ * prefers-color-scheme. Keep headings and body copy on the off-white
+ * cabinet scale so OS-light + Dark Cabinet cannot paint #000 ink.
  */
 html.dark {
     color-scheme: dark;
-    --lightningcss-light: ;
-    --lightningcss-dark: initial;
-    --color-text-primary: #e8e8e8;
-    --color-text-secondary: #b3b3b3;
-}
-
-/*
- * Astryx Theme defaults to mode=system and redefines --color-text-primary
- * on [data-astryx-theme] as lightningcss #000/#fff. OS-light + html.dark
- * then paints headings black. Pin the cabinet ink on the theme root and
- * on scoped headings so Dark Cabinet wins over prefers-color-scheme.
- */
-.dark [data-astryx-theme],
-.dark [data-astryx-media='light'] {
     --lightningcss-light: ;
     --lightningcss-dark: initial;
     --color-text-primary: #e8e8e8;

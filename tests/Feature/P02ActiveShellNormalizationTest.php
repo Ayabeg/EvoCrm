@@ -21,7 +21,7 @@ it('resolves command and rail Home hrefs to /dashboard not /home', function () {
         ->and($header)->not->toContain('href="/home"');
 });
 
-it('keeps AppLayout on the approved 288px shell and does not wire the leftover header', function () {
+it('keeps AppLayout on the approved 212px shell and does not wire the leftover header', function () {
     $appLayout = file_get_contents(resource_path('js/layouts/app-layout.tsx'));
     $sidebarLayout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
     $shell = file_get_contents(resource_path('js/components/shell/evo-shell.tsx'));
@@ -50,7 +50,7 @@ it('documents one search, one Ask Evo, one create, and one tasks overlay entry',
 
     expect($rail)->toContain('data-chrome="search"')
         ->and($rail)->toContain('Search EvoCRM')
-        ->and($rail)->toContain('useCommandPaletteShortcut')
+        ->and(file_get_contents(resource_path('js/components/shell/evo-shell.tsx')))->toContain('useCommandPaletteShortcut')
         ->and($rail)->toContain('/crm/command/search')
         ->and($header)->toContain('data-chrome="ai"')
         ->and($header)->toContain("t('Ask Evo')")

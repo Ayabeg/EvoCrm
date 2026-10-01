@@ -44,18 +44,18 @@
 @media (min-width: 768px) {
     .evo-rail-slot {
         width: 212px;
-        transition: width 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: width var(--evo-duration-normal) var(--evo-ease);
     }
 
     .evo-rail-panel {
         width: 212px;
         transform: translateX(0);
-        transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: transform var(--evo-duration-normal) var(--evo-ease);
     }
 
     .evo-workspace {
         width: calc(100% - 212px);
-        transition: width 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: width var(--evo-duration-normal) var(--evo-ease);
     }
 
     .evo-shell[data-collapsed='true'] .evo-rail-slot {
@@ -76,8 +76,8 @@
     opacity: 0;
     pointer-events: none;
     transition:
-        opacity 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-        background-color 150ms ease;
+        opacity var(--evo-duration-normal) var(--evo-ease),
+        background-color var(--evo-duration-micro) var(--evo-ease);
 }
 
 .evo-shell[data-collapsed='true'] .evo-rail-reopen {
@@ -118,8 +118,7 @@
     color: var(--evo-ink);
 }
 
-/* Astryx headings use --color-text-primary (#000 in light). The rail
-   is always a dark cabinet, so section labels must keep muted ink. */
+/* The rail is always a dark cabinet, so section labels must keep muted ink. */
 .evo-cabinet :is(h1, h2, h3),
 .evo-cabinet .evo-nav-section-label {
     color: var(--color-shell-muted);
@@ -153,8 +152,8 @@
 
 .evo-mode {
     transition:
-        opacity 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
-        transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        opacity var(--evo-duration-normal) var(--evo-ease),
+        transform var(--evo-duration-normal) var(--evo-ease);
 }
 
 .evo-mode-on {
@@ -166,18 +165,18 @@
 
 .evo-mode-off {
     opacity: 0;
-    transform: translateX(10px);
+    transform: translateX(16px);
     pointer-events: none;
 }
 
 .evo-mode-exit-left {
     opacity: 0;
-    transform: translateX(-8px);
+    transform: translateX(-12px);
     pointer-events: none;
 }
 
 .evo-search-in {
-    animation: evo-search-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: evo-search-in var(--evo-duration-normal) var(--evo-ease);
 }
 
 @keyframes evo-search-in {
@@ -206,8 +205,8 @@
     opacity: 0.82;
     transform: translateX(0);
     transition:
-        opacity 150ms cubic-bezier(0.2, 0.8, 0.2, 1),
-        transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        opacity var(--evo-duration-micro) var(--evo-ease),
+        transform var(--evo-duration-micro) var(--evo-ease);
 }
 
 .evo-nav-label[data-active='true'] {
@@ -330,8 +329,8 @@ html.dark [data-agents-page] .text-white {
 
 .evo-row {
     transition:
-        background-color 150ms ease,
-        color 150ms ease;
+        background-color var(--evo-duration-micro) var(--evo-ease),
+        color var(--evo-duration-micro) var(--evo-ease);
 }
 
 .evo-row:hover {

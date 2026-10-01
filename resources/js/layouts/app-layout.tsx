@@ -3,7 +3,7 @@ import { HydrateI18n } from '@/components/i18n-provider';
 import { PosthogIdentity } from '@/components/posthog-identity';
 import { QuickRecordProvider } from '@/ds/workspace/quick-record';
 import { QuickRecordDrawer } from '@/ds/workspace/QuickRecordDrawer';
-// Approved 288px production shell. Leftover header layout stays unwired (P02 / P28).
+// Approved 212px production shell. Leftover header layout stays unwired (P02 / P28).
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import type { BreadcrumbItem } from '@/types';
 

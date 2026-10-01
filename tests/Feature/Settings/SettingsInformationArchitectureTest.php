@@ -42,7 +42,7 @@ it('keeps one settings shell and the P21 destination catalog', function () {
         ->and($layout)->toContain('aria-current')
         ->and($layout)->toContain('router.visit')
         ->and($layout)->toContain('<Link')
-        ->and($layout)->toContain("from '@astryxdesign/core/theme'")
+        ->and($layout)->not->toContain('@astryxdesign')
         ->and($layout)->toContain("from '@radix-ui/react-dialog'")
         ->and($layout)->not->toContain('SettingsV2')
         ->and($layout)->not->toContain('createBrowserRouter')

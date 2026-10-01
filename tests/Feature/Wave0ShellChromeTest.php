@@ -69,7 +69,7 @@ it('places Search EvoCRM on the shell with Ask Evo, Create, Tasks, and Profile',
     expect($header)->toContain('AppLogoIcon')
         ->and($rail)->toContain('Search EvoCRM')
         ->and($rail)->toContain('/crm/command/search')
-        ->and($rail)->toContain('useCommandPaletteShortcut')
+        ->and(file_get_contents(resource_path('js/components/shell/evo-shell.tsx')))->toContain('useCommandPaletteShortcut')
         ->and($rail)->toContain('account menu')
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain("t('Tasks')")
@@ -93,7 +93,7 @@ it('keeps auth chrome on paper with the EvoCrm lockup', function () {
             ->and($src)->not->toContain('EvoSales');
     }
 
-    expect($screen)->toContain("background: '#ffffff'")
+    expect($screen)->toContain("background: 'var(--evo-surface)'")
         ->and($screen)->toContain('bg-canvas-soft')
         ->and($screen)->toContain('auth-screen')
         ->and($screen)->toContain('text-ink')

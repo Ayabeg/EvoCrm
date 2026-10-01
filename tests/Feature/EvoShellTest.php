@@ -24,7 +24,7 @@ it('promotes the approved shell without prototype records', function () {
         ->and($rail)->toContain('useSimpleMode')
         ->and($rail)->toContain('visibleSections')
         ->and($rail)->toContain('/crm/command/search')
-        ->and($rail)->toContain('useCommandPaletteShortcut')
+        ->and($shell)->toContain('useCommandPaletteShortcut')
         ->and($rail)->toContain("t('Search EvoCRM…')")
         ->and($rail)->toContain('⌘K')
         ->and($rail)->toContain('account menu')
@@ -35,24 +35,25 @@ it('promotes the approved shell without prototype records', function () {
         ->and($rail)->not->toContain('lucide-react');
 });
 
-it('switches sidebar modes with the real Astryx SegmentedControl', function () {
+it('switches sidebar modes with the Evo tablist — Astryx SegmentedControl retired in PR2', function () {
     $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $switch = file_get_contents(resource_path('js/evo/shell/mode-switch.tsx'));
     $css = file_get_contents(resource_path('css/evo-shell.css'));
     $appCss = file_get_contents(resource_path('css/app.css'));
     $local = file_get_contents(resource_path('js/components/ui/segmented-control.tsx'));
     $agentsState = file_get_contents(resource_path('js/lib/desk/agents-workspace-state.ts'));
 
-    expect($rail)->toContain("from '@astryxdesign/core/SegmentedControl'")
-        ->and($rail)->toContain('SegmentedControlItem')
-        ->and($rail)->toContain("from '@astryxdesign/core/theme'")
-        ->and($rail)->toContain('layout="fill"')
+    expect($rail)->toContain("from '@/evo/shell/mode-switch'")
+        ->and($rail)->toContain('ShellModeSwitch')
+        ->and($rail)->not->toContain('@astryxdesign')
+        ->and($switch)->toContain('role="tablist"')
+        ->and($switch)->toContain('role="tab"')
+        ->and($switch)->toContain("{ id: 'agents', label: 'Agents', icon: StarFour }")
         ->and($rail)->not->toContain('evo-mode-capsule')
         ->and($rail)->not->toContain('translate3d')
         ->and($rail)->not->toContain("from '@/components/ui/segmented-control'")
         ->and($css)->not->toContain('.evo-mode-capsule')
-        ->and($appCss)->toContain("@astryxdesign/core/reset.css")
-        ->and($appCss)->toContain("@astryxdesign/core/astryx.css")
-        ->and($appCss)->toContain("@astryxdesign/theme-neutral/theme.css")
+        ->and($appCss)->not->toContain('@astryxdesign')
         ->and($local)->toContain('Local Astryx SegmentedControl fallback')
         ->and($rail)->toContain('data-shell-mode="agents"')
         ->and($rail)->toContain('{agentsContent}')

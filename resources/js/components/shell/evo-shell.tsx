@@ -1,11 +1,15 @@
 import { usePage } from '@inertiajs/react';
-import { List } from '@phosphor-icons/react';
-import { useState, useSyncExternalStore } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { AgentsSidebar } from '@/components/desk/agents-sidebar';
 import { EvoRail } from '@/components/shell/evo-rail';
 import type { RailMode } from '@/components/shell/evo-rail';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
+import { List } from '@/evo/icons';
+import {
+    CommandPalette,
+    useCommandPaletteShortcut,
+} from '@/evo/patterns/command-palette';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 let shellHydrated = false;
@@ -44,6 +48,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
         agentsActive: boolean;
         collapsed: boolean;
     } | null>(null);
+    const [paletteOpen, setPaletteOpen] = useState(false);
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
     const agentsActive = path === '/agents' || path.startsWith('/agents/');
     const mode =
@@ -64,6 +69,16 @@ export function EvoShell({ children }: { children: ReactNode }) {
             setCollapsedState({ agentsActive, collapsed: false });
         }
     }
+
+    const togglePalette = useCallback(() => {
+        if (isMobile) {
+            return;
+        }
+
+        setPaletteOpen((current) => !current);
+    }, [isMobile]);
+
+    useCommandPaletteShortcut(togglePalette);
 
     function renderAgentsContent(onNavigate?: () => void) {
         return <AgentsSidebar onNavigate={onNavigate} />;
@@ -108,7 +123,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
             <div className="evo-workspace relative flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
                 <button
                     type="button"
-                    className="evo-rail-reopen absolute top-3 left-3 z-30 hidden size-8 place-items-center rounded-lg bg-[#171717] text-[#f5f5f5] hover:bg-[#2a2a2a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F4C5C] md:grid"
+                    className="evo-rail-reopen absolute top-3 left-3 z-30 hidden size-8 place-items-center rounded-lg bg-[var(--evo-surface)] text-[var(--evo-ink)] hover:bg-[var(--evo-surface-raised)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)] md:grid"
                     aria-label="Ouvrir le menu"
                     title="Ouvrir le menu"
                     tabIndex={collapsed ? 0 : -1}
@@ -123,6 +138,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
                     {children}
                 </div>
             </div>
+            <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
         </div>
     );
 }

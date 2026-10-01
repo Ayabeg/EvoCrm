@@ -58,7 +58,8 @@ it('keeps the topbar as quiet utility chrome with a labeled Create control', fun
 
 it('restyles Command OS presentation without a second palette', function () {
     $aurora = file_get_contents(resource_path('js/components/aurora/command-palette.tsx'));
-    $product = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
+    $product = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
+    $compat = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
 
     expect($aurora)->toContain('560px')
         ->and($aurora)->toContain('var(--aurora-radius-3)')
@@ -67,7 +68,8 @@ it('restyles Command OS presentation without a second palette', function () {
         ->and($aurora)->toContain('unstyled')
         ->and($aurora)->not->toContain('fontSize: "10px"')
         ->and($product)->toContain('buildCommandCatalog')
-        ->and($product)->toContain('composeCommandResults');
+        ->and($product)->toContain('composeCommandResults')
+        ->and($compat)->toContain("from '@/evo/patterns/command-palette'");
 });
 
 it('maps shared Badge default away from Aurora cyan', function () {

@@ -72,7 +72,8 @@ function p16Workspace(): array
 }
 
 it('extends the one existing command surface without a second palette', function () {
-    $palette = File::get(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
+    $compat = File::get(resource_path('js/components/crm/command-palette.tsx'));
     $aurora = File::get(resource_path('js/components/aurora/command-palette.tsx'));
     $header = File::get(resource_path('js/components/app-sidebar-header.tsx'));
     $lib = File::get(resource_path('js/lib/command-os.ts'));
@@ -80,9 +81,13 @@ it('extends the one existing command surface without a second palette', function
     $share = File::get(app_path('Http/Middleware/HandleInertiaRequests.php'));
     $js = File::get(base_path('tests/js/p16-command-os.ts'));
     $drawer = File::get(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
+    $shell = File::get(resource_path('js/components/shell/evo-shell.tsx'));
+    $rail = File::get(resource_path('js/components/shell/evo-rail.tsx'));
 
     expect(class_exists('App\\Http\\Controllers\\Crm\\CommandPaletteV2Controller'))->toBeFalse()
-        ->and($palette)->toContain('from \'@/components/aurora/command-palette\'')
+        ->and($compat)->toContain("from '@/evo/patterns/command-palette'")
+        ->and($compat)->not->toContain("from '@/components/aurora/command-palette'")
+        ->and($palette)->toContain("from 'cmdk'")
         ->and($palette)->toContain('useQuickRecord')
         ->and($palette)->toContain('openRecord')
         ->and($palette)->toContain('kind !== \'search\'')
@@ -96,15 +101,17 @@ it('extends the one existing command surface without a second palette', function
         ->and($palette)->not->toContain('evoSearchIndex')
         ->and($palette)->not->toContain('from \'lucide-react\'')
         ->and($aurora)->toContain('isComposing')
-        ->and($aurora)->toContain('data-command="os"')
-        ->and($aurora)->toContain('560px')
-        ->and($aurora)->toContain('overflowX')
+        ->and($palette)->toContain('isComposing')
+        ->and($palette)->toContain('data-command="os"')
+        ->and($palette)->toContain('560px')
+        ->and($palette)->toContain('overflow-x-hidden')
         ->and($header)->toContain("t('Ask Evo')")
         ->and($header)->toContain('openAskEvo()')
         ->and($header)->not->toContain('from \'@/components/crm/command-palette\'')
-        ->and(File::get(resource_path('js/components/shell/evo-rail.tsx')))->toContain('useCommandPaletteShortcut')
-        ->and(File::get(resource_path('js/components/shell/evo-rail.tsx')))->toContain('/crm/command/search')
-        ->and(File::get(resource_path('js/components/shell/evo-rail.tsx')))->toContain('buildCommandCatalog')
+        ->and($shell)->toContain('useCommandPaletteShortcut')
+        ->and($rail)->not->toContain('useCommandPaletteShortcut')
+        ->and($rail)->toContain('/crm/command/search')
+        ->and($rail)->toContain('buildCommandCatalog')
         ->and($lib)->toContain('kind:')
         ->and($lib)->toContain("href: '/dashboard'")
         ->and($lib)->not->toContain("href: '/home'")

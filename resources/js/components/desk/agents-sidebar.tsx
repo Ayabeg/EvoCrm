@@ -28,7 +28,7 @@ type Props = {
 };
 
 const focusRing =
-    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-shell-orange';
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]';
 
 const quietButton =
     'inline-flex min-h-8 items-center gap-2 rounded-md px-2 text-[12px] text-shell-ink-2 transition-colors hover:bg-white/[0.08] hover:text-shell-ink motion-reduce:transition-none';
@@ -272,8 +272,8 @@ function DirectoryPane({
                         'grid size-8 shrink-0 place-items-center rounded-md text-shell-muted transition-colors hover:bg-white/[0.08] hover:text-shell-ink motion-reduce:transition-none',
                         focusRing,
                     )}
-                    aria-label="Add an agent"
-                    title="Add an agent"
+                    aria-label="Ajouter un agent"
+                    title="Ajouter un agent"
                     onClick={onNavigate}
                 >
                     <Plus className="size-4" weight="bold" aria-hidden />
@@ -292,14 +292,16 @@ function DirectoryPane({
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder={
                         tab === 'agents'
-                            ? 'Search agents...'
-                            : 'Search chats...'
+                            ? 'Rechercher un agent…'
+                            : 'Rechercher une conversation…'
                     }
                     aria-label={
-                        tab === 'agents' ? 'Search agents' : 'Search chats'
+                        tab === 'agents'
+                            ? 'Rechercher un agent'
+                            : 'Rechercher une conversation'
                     }
                     className={cn(
-                        'h-9 w-full rounded-md border border-shell-hairline bg-white/[0.035] pr-3 pl-10 text-[12px] text-shell-ink placeholder:text-shell-muted/75 focus:border-shell-orange/70 focus-visible:outline-none',
+                        'h-9 w-full rounded-md border border-shell-hairline bg-white/[0.035] pr-3 pl-10 text-[12px] text-shell-ink placeholder:text-shell-muted/75 focus:border-[var(--evo-teal-line)] focus-visible:outline-none',
                         'motion-reduce:transition-none',
                     )}
                 />
@@ -307,7 +309,7 @@ function DirectoryPane({
 
             <div
                 role="tablist"
-                aria-label="Agents and chats"
+                aria-label="Agents et conversations"
                 className="mx-3 mt-3 grid shrink-0 grid-cols-2 rounded-md bg-white/[0.04] p-0.5"
             >
                 <button
@@ -351,7 +353,7 @@ function DirectoryPane({
             >
                 {tab === 'agents' ? (
                     <>
-                        <SidebarSection title="YOUR AGENTS">
+                        <SidebarSection title="VOS AGENTS">
                             {yourAgents.length > 0 ? (
                                 <ul className="space-y-1">
                                     {yourAgents.map((profile) => (
@@ -373,13 +375,13 @@ function DirectoryPane({
                                 </ul>
                             ) : (
                                 <p className="px-2 py-2 text-[12px] text-shell-muted">
-                                    No agents match this search.
+                                    Aucun agent ne correspond.
                                 </p>
                             )}
                         </SidebarSection>
 
                         {systemAgents.length > 0 ? (
-                            <SidebarSection title="SYSTEM" className="mt-6">
+                            <SidebarSection title="SYSTÈME" className="mt-6">
                                 <ul className="space-y-1">
                                     {systemAgents.map((profile) => (
                                         <li key={profile.bot.id}>
@@ -484,7 +486,7 @@ function AgentPane({
                         <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-shell-muted">
                             <span
                                 aria-hidden="true"
-                                className="size-1.5 rounded-full bg-[#76B49A]"
+                                className="size-1.5 rounded-full bg-[var(--evo-success)]"
                             />
                             {agent.availability}
                         </p>
@@ -493,13 +495,13 @@ function AgentPane({
                 <button
                     type="button"
                     className={cn(
-                        'mt-4 inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-shell-orange px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#D8511E] motion-reduce:transition-none',
-                        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
+                        'mt-4 inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-[var(--evo-primary)] px-3 text-[12px] font-semibold text-[var(--evo-on-primary)] transition-colors hover:bg-[var(--evo-primary-hover)] motion-reduce:transition-none',
+                        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]',
                     )}
                     onClick={onStartChat}
                 >
                     <Plus className="size-4" weight="bold" aria-hidden />
-                    New chat
+                    + Nouvelle conversation
                 </button>
             </div>
 
@@ -507,23 +509,23 @@ function AgentPane({
                 ref={scrollRef}
                 className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pt-3 pb-4"
             >
-                <SidebarSection title="CHATS">
+                <SidebarSection title="CONVERSATIONS">
                     {agentChats.length === 0 ? (
                         <p className="px-2 py-2 text-[12px] text-shell-muted">
-                            No chats yet.
+                            Aucune conversation.
                         </p>
                     ) : (
                         <>
                             {today.length > 0 ? (
                                 <ChatGroup
-                                    title="Today"
+                                    title="Aujourd'hui"
                                     chats={today}
                                     onSelect={onOpenChat}
                                 />
                             ) : null}
                             {previous.length > 0 ? (
                                 <ChatGroup
-                                    title="Previous"
+                                    title="Précédentes"
                                     chats={previous}
                                     onSelect={onOpenChat}
                                     className="mt-5"
@@ -533,7 +535,7 @@ function AgentPane({
                     )}
                 </SidebarSection>
 
-                <SidebarSection title="CONTEXT" className="mt-6">
+                <SidebarSection title="CONTEXTE" className="mt-6">
                     <ul className="space-y-0.5">
                         {agent.contexts.map((target) => (
                             <li key={target.href}>
@@ -568,7 +570,7 @@ function AgentPane({
                     onClick={onNavigate}
                 >
                     <GearSix className="size-4" weight="regular" aria-hidden />
-                    Agent settings
+                    Réglages de l'agent
                 </Link>
             </footer>
         </div>
@@ -614,7 +616,7 @@ function AgentRow({
             type="button"
             className={cn(
                 'group flex min-h-[58px] w-full items-center gap-2.5 rounded-lg px-2 text-left transition-colors hover:bg-white/[0.08] motion-reduce:transition-none',
-                selected && 'bg-white/[0.075]',
+                selected && 'bg-[var(--evo-teal-soft)]',
                 focusRing,
             )}
             aria-current={selected ? 'page' : undefined}
@@ -634,7 +636,7 @@ function AgentRow({
                     <span className="shrink-0 text-[10px] text-shell-muted">
                         <span
                             aria-hidden="true"
-                            className="mr-1 inline-block size-1.5 rounded-full bg-[#76B49A] align-middle"
+                            className="mr-1 inline-block size-1.5 rounded-full bg-[var(--evo-success)] align-middle"
                         />
                         {agent.availability}
                     </span>
@@ -673,10 +675,10 @@ function ChatDirectory({
                         weight="regular"
                         aria-hidden
                     />
-                    No chats yet.
+                    Aucune conversation.
                 </div>
                 <p className="mt-1.5 text-[12px] leading-5 text-shell-muted">
-                    Start a chat from any agent workspace.
+                    Démarrez une conversation depuis un agent.
                 </p>
             </div>
         );
@@ -685,11 +687,11 @@ function ChatDirectory({
     return (
         <>
             {today.length > 0 ? (
-                <ChatGroup title="Today" chats={today} onSelect={onSelect} />
+                <ChatGroup title="Aujourd'hui" chats={today} onSelect={onSelect} />
             ) : null}
             {previous.length > 0 ? (
                 <ChatGroup
-                    title="Previous"
+                    title="Précédentes"
                     chats={previous}
                     onSelect={onSelect}
                     className={today.length > 0 ? 'mt-5' : undefined}

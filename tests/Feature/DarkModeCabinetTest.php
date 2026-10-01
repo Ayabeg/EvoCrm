@@ -75,7 +75,7 @@ it('lets the login split and settings dialog follow the dark cabinet', function 
         ->and($app)->toContain('color-scheme: dark')
         ->and($app)->toContain('.dark .login-split-card')
         ->and($app)->toContain('--lightningcss-dark: initial')
-        ->and($app)->toContain('.dark [data-astryx-theme]')
+        ->and($app)->not->toContain('[data-astryx-theme]')
         ->and($app)->toContain('.dark :where(h1, h2, h3)')
         ->and($app)->toContain('.dark .auth-screen .login-split-brand')
         ->and($app)->toContain('background: #262626')

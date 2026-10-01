@@ -16,7 +16,7 @@ export type AgentProfile = {
     bot: BotDefinition;
     section: 'your' | 'system';
     summary: string;
-    availability: 'Available';
+    availability: 'Disponible';
     defaultAskPage: 'workspace' | 'dashboard';
     emptyMessage: string;
     placeholder: string;
@@ -41,17 +41,17 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('closer'),
         section: 'your',
-        summary: 'Active opportunities → next steps',
-        availability: 'Available',
+        summary: 'Opportunités actives → prochaines actions',
+        availability: 'Disponible',
         defaultAskPage: 'dashboard',
         emptyMessage:
             'Transformez vos opportunités actives en prochaines actions.',
         placeholder: commonPlaceholder,
         contexts: [
-            { label: 'Deals', href: '/crm/deals' },
+            { label: 'Affaires', href: '/crm/deals' },
             { label: 'Leads', href: '/crm/leads' },
             { label: 'Inbox', href: '/inbox' },
-            { label: 'Quotes', href: '/crm/quotes' },
+            { label: 'Devis', href: '/crm/quotes' },
         ],
         prompts: [
             {
@@ -75,8 +75,8 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('qualifier'),
         section: 'your',
-        summary: 'Qualify and enrich incoming leads',
-        availability: 'Available',
+        summary: 'Qualifie et enrichit les leads entrants',
+        availability: 'Disponible',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Évaluez le potentiel de vos nouveaux leads avec le contexte du CRM.',
@@ -85,7 +85,7 @@ export const AGENT_PROFILES: AgentProfile[] = [
         contexts: [
             { label: 'Leads', href: '/crm/leads' },
             { label: 'Contacts', href: '/crm/contacts' },
-            { label: 'Companies', href: '/crm/companies' },
+            { label: 'Sociétés', href: '/crm/companies' },
             { label: 'Inbox', href: '/inbox' },
         ],
         prompts: [
@@ -106,15 +106,15 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('quote-desk'),
         section: 'your',
-        summary: 'Prepare and manage quote workflows',
-        availability: 'Available',
+        summary: 'Prépare et suit les devis',
+        availability: 'Disponible',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Préparez la prochaine étape d’un devis à partir des données de l’affaire.',
         placeholder: 'Posez une question sur un devis ou une affaire…',
         contexts: [
-            { label: 'Quotes', href: '/crm/quotes' },
-            { label: 'Deals', href: '/crm/deals' },
+            { label: 'Devis', href: '/crm/quotes' },
+            { label: 'Affaires', href: '/crm/deals' },
             { label: 'Contacts', href: '/crm/contacts' },
         ],
         prompts: [
@@ -135,17 +135,17 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('after-sale'),
         section: 'your',
-        summary: 'Handle post-sale follow-up',
-        availability: 'Available',
+        summary: 'Suit les clients après la vente',
+        availability: 'Disponible',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Suivez les clients après la vente, de l’accueil au support.',
         placeholder: 'Posez une question sur un client, un ticket ou un suivi…',
         contexts: [
-            { label: 'Companies', href: '/crm/companies' },
+            { label: 'Sociétés', href: '/crm/companies' },
             { label: 'Contacts', href: '/crm/contacts' },
             { label: 'Tickets', href: '/crm/tickets' },
-            { label: 'Activities', href: '/crm/activities' },
+            { label: 'Activités', href: '/crm/activities' },
         ],
         prompts: [
             {
@@ -165,8 +165,8 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('desk'),
         section: 'system',
-        summary: 'Route Inbox conversations',
-        availability: 'Available',
+        summary: 'Route les conversations Inbox',
+        availability: 'Disponible',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Trouvez le bon contexte CRM et la bonne équipe pour une conversation.',
@@ -175,7 +175,7 @@ export const AGENT_PROFILES: AgentProfile[] = [
         contexts: [
             { label: 'Inbox', href: '/inbox' },
             { label: 'Contacts', href: '/crm/contacts' },
-            { label: 'Activities', href: '/crm/activities' },
+            { label: 'Activités', href: '/crm/activities' },
         ],
         prompts: [
             {

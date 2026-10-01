@@ -37,7 +37,7 @@ function p24Deal(User $user, array $overrides = []): Deal
 it('keeps one Ask Evo orchestration path and the frozen record posts', function () {
     $controller = File::get(app_path('Http/Controllers/Crm/AskEvoController.php'));
     $copilot = File::get(app_path('Services/Ai/AskEvoCopilot.php'));
-    $palette = File::get(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $routes = File::get(base_path('routes/web.php'));
 
     expect($controller)->toContain('function ask(')
@@ -261,7 +261,7 @@ it('bounds inbox messages and documents embed mode', function () {
 
 it('opens Command OS Ask Evo on one path and resets when scope changes', function () {
     $lib = File::get(resource_path('js/lib/ask-evo.ts'));
-    $palette = File::get(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $js = File::get(base_path('tests/js/p24-ask-evo.ts'));
 
     expect($lib)->toContain('shouldResetAskEvoScope')

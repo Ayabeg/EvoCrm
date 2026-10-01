@@ -217,7 +217,7 @@ it('does not change production list rowHref board inbox or command surfaces', fu
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
     $inbox = file_get_contents(resource_path('js/pages/desk/inbox.tsx'));
-    $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 

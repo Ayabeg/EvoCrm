@@ -64,6 +64,20 @@ it('keeps the Design Lab token page behind the existing admin gate', function ()
     $this->get('/design-lab/tokens')->assertOk();
 });
 
+it('keeps the Design Lab shell page behind the existing admin gate', function () {
+    $routes = file_get_contents(resource_path('design-lab/lib/routes.ts'));
+    $page = file_get_contents(resource_path('design-lab/pages/ShellPage.tsx'));
+    $package = file_get_contents(base_path('package.json'));
+
+    expect($routes)->toContain("name: 'shell'")
+        ->and($page)->toContain('VOS AGENTS')
+        ->and($page)->toContain('ShellModeSwitch')
+        ->and($package)->not->toContain('@astryxdesign')
+        ->and($package)->not->toContain('@stylexjs/stylex');
+
+    $this->get('/design-lab/shell')->assertOk();
+});
+
 it('ships provenance, token, catalog and icon docs', function () {
     $provenance = file_get_contents(base_path('docs/design-system/component-provenance.md'));
     $tokens = file_get_contents(base_path('docs/design-system/tokens.md'));

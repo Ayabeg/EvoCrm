@@ -151,7 +151,7 @@ it('preserves each object list contract while wiring peek at CrmListShell', func
     $quotes = File::get(resource_path('js/pages/crm/quotes/index.tsx'));
     $board = File::get(resource_path('js/pages/crm/deals/board.tsx'));
     $inbox = File::get(resource_path('js/pages/desk/inbox.tsx'));
-    $palette = File::get(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $activities = File::get(resource_path('js/pages/crm/activities/index.tsx'));
     $tickets = File::get(resource_path('js/pages/crm/tickets/index.tsx'));
     $routes = File::get(base_path('routes/web.php'));

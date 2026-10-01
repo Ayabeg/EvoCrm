@@ -12,6 +12,7 @@ import { DealsListPage } from './pages/DealsListPage';
 import { DevisPage } from './pages/DevisPage';
 import { InboxPage } from './pages/InboxPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { ShellPage } from './pages/ShellPage';
 import { TokensPage } from './pages/TokensPage';
 import {
     ActivitiesPage,
@@ -36,6 +37,8 @@ function renderRoute(route: LabRoute) {
             return <AccueilPage />;
         case 'tokens':
             return <TokensPage />;
+        case 'shell':
+            return <ShellPage />;
         case 'inbox':
             return <InboxPage />;
         case 'contacts':
@@ -95,6 +98,10 @@ export function App() {
             window.removeEventListener('hashchange', onChange);
         };
     }, []);
+
+    if (route.name === 'shell') {
+        return renderRoute(route);
+    }
 
     return <LabShell route={route}>{renderRoute(route)}</LabShell>;
 }

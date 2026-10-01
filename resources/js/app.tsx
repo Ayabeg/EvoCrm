@@ -1,10 +1,8 @@
-import { Theme } from '@astryxdesign/core/theme';
-import { neutralTheme } from '@astryxdesign/theme-neutral/built';
 import { createInertiaApp } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { initializeTheme, useAppearance } from '@/hooks/use-appearance';
+import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import PublicLayout from '@/layouts/public-layout';
@@ -32,20 +30,16 @@ createInertiaApp({
         return <AppProviders>{app}</AppProviders>;
     },
     progress: {
-        color: '#E8530E',
+        color: 'var(--evo-primary)',
     },
 });
 
 function AppProviders({ children }: { children: ReactNode }) {
-    const { resolvedAppearance } = useAppearance();
-
     return (
-        <Theme theme={neutralTheme} mode={resolvedAppearance}>
-            <TooltipProvider delayDuration={0}>
-                {children}
-                <Toaster />
-            </TooltipProvider>
-        </Theme>
+        <TooltipProvider delayDuration={0}>
+            {children}
+            <Toaster />
+        </TooltipProvider>
     );
 }
 

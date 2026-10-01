@@ -1,5 +1,5 @@
 /**
- * Workspace utilities. Navigation and search live in the 288px shell.
+ * Workspace utilities. Navigation and search live in the 212px shell.
  * Create stays this dropdown. One Tasks overlay. Ask Evo stays its own drawer.
  */
 import { Link, usePage } from '@inertiajs/react';

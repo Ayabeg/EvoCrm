@@ -313,7 +313,7 @@ it('leaves leads redirect inbox command and peek URL decision B frozen', functio
         ->and(Route::getRoutes()->getByName('crm.deals.move')?->uri())->toBe('crm/deals/{deal}/move');
 
     $inbox = File::get(resource_path('js/pages/desk/inbox.tsx'));
-    $palette = File::get(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $home = File::get(resource_path('js/pages/home.tsx'));
     $keys = File::get(resource_path('js/lib/list-query/keys.ts'));
 

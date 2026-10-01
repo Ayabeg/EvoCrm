@@ -1,8 +1,6 @@
-import { Theme } from '@astryxdesign/core/theme';
-import { neutralTheme } from '@astryxdesign/theme-neutral/built';
-import * as Dialog from '@radix-ui/react-dialog';
 import { Link, router, usePage } from '@inertiajs/react';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import * as Dialog from '@radix-ui/react-dialog';
 import { useId, useMemo, useState } from 'react';
 import type { KeyboardEvent, PropsWithChildren } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
@@ -187,6 +185,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             event.stopPropagation();
             setQuery('');
             setActiveIndex(0);
+
             return;
         }
 
@@ -203,6 +202,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         } else if (event.key === 'Enter') {
             event.preventDefault();
             const next = visible[activeIndex];
+
             if (next) {
                 router.visit(next.href);
             }
@@ -340,7 +340,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     );
 
     return (
-        <Theme theme={neutralTheme}>
+        <>
             <div
                 aria-hidden
                 className={cn('min-h-full bg-canvas', PAGE_OVERFLOW_CLASS)}
@@ -364,7 +364,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         aria-labelledby={titleId}
                         data-settings="dialog"
                         className={cn(
-                            'fixed inset-0 z-50 flex flex-col bg-[var(--settings-surface,#fff)] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(800px,calc(100dvh-2rem))] sm:w-[min(1120px,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[8px] sm:border sm:border-hairline sm:shadow-[var(--settings-shadow)]',
+                            'fixed inset-0 z-50 flex flex-col bg-[var(--settings-surface,var(--evo-surface))] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(800px,calc(100dvh-2rem))] sm:w-[min(1120px,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[8px] sm:border sm:border-hairline sm:shadow-[var(--settings-shadow)]',
                             MOTION_MODAL_CLASS,
                             PAGE_OVERFLOW_CLASS,
                         )}
@@ -378,7 +378,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         >
                             <aside
                                 data-settings="nav"
-                                className="shrink-0 border-b border-hairline bg-[var(--settings-canvas,#eaeaea)] sm:flex sm:w-[16.25rem] sm:flex-col sm:border-r sm:border-b-0"
+                                className="shrink-0 border-b border-hairline bg-[var(--settings-canvas,var(--evo-canvas))] sm:flex sm:w-[16.25rem] sm:flex-col sm:border-r sm:border-b-0"
                             >
                                 <div className="flex items-center gap-2 px-3 pt-3 pb-2">
                                     <AppLogoIcon className="size-6" alt={t('EvoCrm')} />
@@ -460,6 +460,6 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     </Dialog.Content>
                 </Dialog.Portal>
             </Dialog.Root>
-        </Theme>
+        </>
     );
 }

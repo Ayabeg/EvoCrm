@@ -73,7 +73,8 @@ it('keeps one-product wiring frozen across list, peek, command, inbox, activatio
         ->and($workspace)->not->toContain('rows={[]}');
 
     expect($qrd)->toContain('onEscapeKeyDown')
-        ->and($command)->toContain('from \'@/components/aurora/command-palette\'')
+        ->and($command)->toContain("from '@/evo/patterns/command-palette'")
+        ->and($command)->not->toContain("from '@/components/aurora/command-palette'")
         ->and($command)->not->toContain('CommandPaletteV2');
 
     expect($inbox)->toContain('data-inbox="native"')

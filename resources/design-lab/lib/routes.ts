@@ -1,6 +1,7 @@
 export type LabRoute =
     | { name: 'accueil' }
     | { name: 'tokens' }
+    | { name: 'shell' }
     | { name: 'inbox' }
     | { name: 'contacts' }
     | { name: 'contact'; id: string }
@@ -37,6 +38,8 @@ export function routePath(route: LabRoute): string {
             return '/';
         case 'tokens':
             return '/tokens';
+        case 'shell':
+            return '/shell';
         case 'inbox':
             return '/inbox';
         case 'contacts':
@@ -110,6 +113,10 @@ export function parseLabLocation(pathname: string, hash: string): LabRoute {
 
     if (path === '/tokens') {
         return { name: 'tokens' };
+    }
+
+    if (path === '/shell') {
+        return { name: 'shell' };
     }
 
     if (path === '/inbox') {

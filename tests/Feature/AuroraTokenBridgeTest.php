@@ -245,7 +245,7 @@ it('names topbar icon-only actions for assistive tech', function () {
 
 it('keeps the top bar as one honest instrument without a second bell', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
-    $palette = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
+    $palette = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
@@ -253,7 +253,7 @@ it('keeps the top bar as one honest instrument without a second bell', function 
     expect($header)->not->toContain('Find or Ask');
     expect($header)->not->toContain('Find a record or page');
     expect($header)->not->toContain('unread');
-    expect($palette)->toContain('placeholder="Search, navigate, create, or act"');
+    expect($palette)->toContain('placeholder="Rechercher, naviguer, créer ou agir"');
     expect($palette)->not->toContain('Search contacts, deals');
     expect($rail)->not->toContain('Bell');
     expect($header)->toContain('data-chrome="notify"');
