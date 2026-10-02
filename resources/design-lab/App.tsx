@@ -14,6 +14,7 @@ import { DealPage } from './pages/DealPage';
 import { DealsListPage } from './pages/DealsListPage';
 import { DevisPage } from './pages/DevisPage';
 import { InboxPage } from './pages/InboxPage';
+import { OutboundLabPage } from './pages/OutboundLabPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsLabPage } from './pages/SettingsLabPage';
 import { ShellPage } from './pages/ShellPage';
@@ -23,7 +24,6 @@ import {
     CompaniesPage,
     CompanyPage,
     LeadsPage,
-    OutboundPage,
     QuotesListPage,
     SegmentsPage,
     TicketsPage,
@@ -71,7 +71,7 @@ function renderRoute(route: LabRoute) {
         case 'activities':
             return <ActivitiesPage />;
         case 'outbound':
-            return <OutboundPage view={route.view} />;
+            return <OutboundLabPage view={route.view} />;
         case 'ads':
             return <AdsHubPage view={route.view} />;
         case 'campaign':

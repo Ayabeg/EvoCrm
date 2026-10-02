@@ -1,49 +1,95 @@
-import { Form, Link, router } from '@inertiajs/react';
-import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
+import { Form, router } from '@inertiajs/react';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+import { DataGrid, DataGridRowAction } from '@/evo/data/data-grid';
+import type { EvoDataGridColumn } from '@/evo/data/data-grid';
+import { Field, OutboundSection } from '@/evo/outbound/section';
+import { channelLabel } from '@/evo/outbound/status';
+import type { SequenceRow } from '@/evo/outbound/types';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { NativeSelect } from '@/evo/ui/native-select';
+import { Status } from '@/evo/ui/status';
+import { t } from '@/lib/i18n';
 
-type SequenceRow = {
-    id: number;
-    name: string;
-    channel: string;
-    active: boolean;
-    description?: string | null;
-    steps: { id: number }[];
-    enrollments_count: number;
-    enrollments_active: number;
-    enrollments_paused: number;
-    enrollments_finished: number;
-};
+export default function SequencesIndex({ sequences }: { sequences: SequenceRow[] }) {
+    const columns: EvoDataGridColumn<SequenceRow>[] = [
+        {
+            id: 'sequence',
+            header: t('Sequence'),
+            accessorFn: (row) => row.name,
+            cell: ({ row }) => (
+                <div>
+                    <button
+                        type="button"
+                        className="font-medium text-[var(--evo-ink)] underline-offset-2 hover:underline"
+                        onClick={() => router.visit(`/outbound/sequences/${row.original.id}`)}
+                    >
+                        {row.original.name}
+                    </button>
+                    {row.original.description ? (
+                        <p className="mt-0.5 text-[11px] text-[var(--evo-ink-muted)]">
+                            {row.original.description}
+                        </p>
+                    ) : null}
+                </div>
+            ),
+        },
+        {
+            id: 'channel',
+            header: t('Channel'),
+            accessorFn: (row) => channelLabel(row.channel),
+        },
+        {
+            id: 'steps',
+            header: t('Steps'),
+            accessorFn: (row) => row.steps?.length ?? 0,
+            cell: ({ row }) => <span className="tabular-nums">{row.original.steps?.length ?? 0}</span>,
+        },
+        {
+            id: 'enrolled',
+            header: t('Enrolled'),
+            accessorFn: (row) => row.enrollments_count,
+            cell: ({ row }) => <span className="tabular-nums">{row.original.enrollments_count}</span>,
+        },
+        {
+            id: 'active',
+            header: t('Active'),
+            accessorFn: (row) => row.enrollments_active,
+            cell: ({ row }) => <span className="tabular-nums">{row.original.enrollments_active}</span>,
+        },
+        {
+            id: 'paused',
+            header: t('Paused'),
+            accessorFn: (row) => row.enrollments_paused,
+            cell: ({ row }) => <span className="tabular-nums">{row.original.enrollments_paused}</span>,
+        },
+        {
+            id: 'finished',
+            header: t('Finished'),
+            accessorFn: (row) => row.enrollments_finished,
+            cell: ({ row }) => <span className="tabular-nums">{row.original.enrollments_finished}</span>,
+        },
+        {
+            id: 'state',
+            header: t('State'),
+            cell: ({ row }) => (
+                <Status
+                    tone={row.original.active ? 'success' : 'neutral'}
+                    label={row.original.active ? t('active') : t('draft')}
+                />
+            ),
+        },
+    ];
 
-function channelLabel(channel: string): string {
-    if (channel === 'whatsapp_cloud') {
-        return 'WhatsApp Cloud';
-    }
-
-    if (channel === 'sms') {
-        return 'SMS (DZ)';
-    }
-
-    return 'Email SMTP';
-}
-
-export default function SequencesIndex({
-    sequences,
-}: {
-    sequences: SequenceRow[];
-}) {
     return (
-        <OutboundShell title="Sequences">
+        <OutboundShell title={t('Sequences')}>
             <OutboundPage
-                title="Sequences"
-                description="Email and Algerian SMS steps with {{variables}}. Quiet hours (Africa/Algiers) defer sends; suppression cancels enrollment. WhatsApp steps use official Cloud templates only. SMS never stubs — connect a DZ gateway in Settings."
+                title={t('Sequences')}
+                description={t(
+                    'Email and Algerian SMS steps with {{variables}}. Quiet hours (Africa/Algiers) defer sends; suppression cancels enrollment. WhatsApp steps use official Cloud templates only. SMS never stubs — connect a DZ gateway in Settings.',
+                )}
             >
-                <HairlinePanel title="Create sequence">
+                <OutboundSection title={t('Create sequence')}>
                     <Form
                         action="/outbound/sequences"
                         method="post"
@@ -52,194 +98,56 @@ export default function SequencesIndex({
                     >
                         {({ processing }) => (
                             <>
-                                <div className="space-y-1.5 md:col-span-3">
-                                    <Label>Start from</Label>
+                                <Field label={t('Start from')} className="md:col-span-3">
                                     <div className="flex flex-wrap gap-3 text-[13px]">
                                         <label className="flex items-center gap-2">
-                                            <input
-                                                type="radio"
-                                                name="origin"
-                                                value="scratch"
-                                                defaultChecked
-                                            />
-                                            From scratch
+                                            <input type="radio" name="origin" value="scratch" defaultChecked />
+                                            {t('From scratch')}
                                         </label>
                                         <label className="flex items-center gap-2">
-                                            <input
-                                                type="radio"
-                                                name="origin"
-                                                value="template"
-                                            />
-                                            From template
+                                            <input type="radio" name="origin" value="template" />
+                                            {t('From template')}
                                         </label>
                                     </div>
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="sequence-name">Name</Label>
+                                </Field>
+                                <Field label={t('Name')} htmlFor="sequence-name">
                                     <Input
                                         id="sequence-name"
                                         name="name"
                                         required
-                                        placeholder="Clinic email nurture"
+                                        placeholder={t('Clinic email nurture')}
                                     />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="sequence-channel">
-                                        Channel
-                                    </Label>
-                                    <NativeSelect
-                                        id="sequence-channel"
-                                        name="channel"
-                                        defaultValue="email"
-                                    >
-                                        <option value="email">
-                                            Email SMTP
-                                        </option>
-                                        <option value="sms">
-                                            SMS (Algeria 05 / 06 / 07)
-                                        </option>
-                                        <option value="whatsapp_cloud">
-                                            WhatsApp Cloud template
-                                        </option>
+                                </Field>
+                                <Field label={t('Channel')} htmlFor="sequence-channel">
+                                    <NativeSelect id="sequence-channel" name="channel" defaultValue="email">
+                                        <option value="email">{t('Email SMTP')}</option>
+                                        <option value="sms">{t('SMS (Algeria 05 / 06 / 07)')}</option>
+                                        <option value="whatsapp_cloud">{t('WhatsApp Cloud template')}</option>
                                     </NativeSelect>
-                                </div>
+                                </Field>
                                 <div className="flex items-end">
-                                    <Button disabled={processing}>
-                                        Create
-                                    </Button>
+                                    <Button disabled={processing}>{t('Create')}</Button>
                                 </div>
                             </>
                         )}
                     </Form>
-                </HairlinePanel>
+                </OutboundSection>
 
-                <HairlineTable
-                    minWidth={760}
-                    empty="No sequences yet. Create one above."
-                    columns={[
-                        { key: 'sequence', header: 'Sequence' },
-                        { key: 'channel', header: 'Channel' },
-                        { key: 'steps', header: 'Steps' },
-                        { key: 'enrolled', header: 'Enrolled' },
-                        { key: 'active', header: 'Active' },
-                        { key: 'paused', header: 'Paused' },
-                        { key: 'finished', header: 'Finished' },
-                        { key: 'state', header: 'State' },
-                        { key: 'actions', header: '', align: 'right' },
-                    ]}
-                    rows={sequences.map((sequence) => ({
-                        id: sequence.id,
-                        mobileTitle: (
-                            <Link
-                                href={`/outbound/sequences/${sequence.id}`}
-                                className="font-medium text-ink hover:underline"
-                            >
-                                {sequence.name}
-                            </Link>
-                        ),
-                        mobileMeta: [
-                            {
-                                label: 'Channel',
-                                value: channelLabel(sequence.channel),
-                            },
-                            {
-                                label: 'Steps',
-                                value: sequence.steps?.length ?? 0,
-                            },
-                            {
-                                label: 'Enrolled',
-                                value: `${sequence.enrollments_count} · ${sequence.enrollments_active} active`,
-                            },
-                            {
-                                label: 'State',
-                                value: sequence.active ? 'active' : 'draft',
-                            },
-                        ],
-                        mobileFooter: (
-                            <div className="mt-3 flex justify-end">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                        router.post(
-                                            `/outbound/sequences/${sequence.id}/toggle`,
-                                        )
-                                    }
-                                >
-                                    {sequence.active ? 'Pause' : 'Activate'}
-                                </Button>
-                            </div>
-                        ),
-                        cells: {
-                            sequence: (
-                                <div>
-                                    <Link
-                                        href={`/outbound/sequences/${sequence.id}`}
-                                        className="font-medium text-ink hover:underline"
-                                    >
-                                        {sequence.name}
-                                    </Link>
-                                    {sequence.description ? (
-                                        <p className="aurora-text-caption mt-0.5 text-mute">
-                                            {sequence.description}
-                                        </p>
-                                    ) : null}
-                                </div>
-                            ),
-                            channel: (
-                                <span className="text-ink">
-                                    {channelLabel(sequence.channel)}
-                                </span>
-                            ),
-                            steps: (
-                                <span className="money tabular-nums">
-                                    {sequence.steps?.length ?? 0}
-                                </span>
-                            ),
-                            enrolled: (
-                                <span className="money tabular-nums">
-                                    {sequence.enrollments_count}
-                                </span>
-                            ),
-                            active: (
-                                <span className="money tabular-nums">
-                                    {sequence.enrollments_active}
-                                </span>
-                            ),
-                            paused: (
-                                <span className="money tabular-nums">
-                                    {sequence.enrollments_paused}
-                                </span>
-                            ),
-                            finished: (
-                                <span className="money tabular-nums">
-                                    {sequence.enrollments_finished}
-                                </span>
-                            ),
-                            state: (
-                                <Badge
-                                    variant={
-                                        sequence.active ? 'default' : 'outline'
-                                    }
-                                >
-                                    {sequence.active ? 'active' : 'draft'}
-                                </Badge>
-                            ),
-                            actions: (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                        router.post(
-                                            `/outbound/sequences/${sequence.id}/toggle`,
-                                        )
-                                    }
-                                >
-                                    {sequence.active ? 'Pause' : 'Activate'}
-                                </Button>
-                            ),
-                        },
-                    }))}
+                <DataGrid
+                    columns={columns}
+                    data={sequences}
+                    getRowId={(row) => String(row.id)}
+                    density="compact"
+                    enableSelection={false}
+                    onRowClick={(row) => router.visit(`/outbound/sequences/${row.id}`)}
+                    emptyTitle={t('No sequences yet. Create one above.')}
+                    rowActions={(sequence) => (
+                        <DataGridRowAction
+                            onClick={() => router.post(`/outbound/sequences/${sequence.id}/toggle`)}
+                        >
+                            {sequence.active ? t('Pause') : t('Activate')}
+                        </DataGridRowAction>
+                    )}
                 />
             </OutboundPage>
         </OutboundShell>
@@ -247,5 +155,5 @@ export default function SequencesIndex({
 }
 
 SequencesIndex.layout = {
-    breadcrumbs: [{ title: 'Sequences', href: '/outbound/sequences' }],
+    breadcrumbs: [{ title: t('Sequences'), href: '/outbound/sequences' }],
 };

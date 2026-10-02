@@ -30,6 +30,21 @@ describe('design-lab token route', () => {
     });
 });
 
+describe('design-lab outbound route', () => {
+    it('parses /design-lab/outbound as the outbound lab page', () => {
+        expect(parseLabLocation('/design-lab/outbound', '')).toEqual({
+            name: 'outbound',
+            view: 'overview',
+        });
+        expect(parseLabLocation('/design-lab/outbound/sequences', '')).toEqual({
+            name: 'outbound',
+            view: 'sequences',
+        });
+        expect(routePath({ name: 'outbound' })).toBe('/outbound');
+        expect(labHref({ name: 'outbound', view: 'sequences' })).toMatch(/outbound\/sequences/);
+    });
+});
+
 describe('design-lab settings route', () => {
     it('parses /design-lab/settings as the settings family page', () => {
         expect(parseLabLocation('/design-lab/settings', '')).toEqual({

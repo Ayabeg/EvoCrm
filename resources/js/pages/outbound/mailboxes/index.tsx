@@ -1,34 +1,23 @@
 import { Form, router } from '@inertiajs/react';
-import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+import { MailboxList } from '@/evo/outbound/MailboxList';
+import { Field, OutboundSection } from '@/evo/outbound/section';
+import type { MailboxRow } from '@/evo/outbound/types';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { NativeSelect } from '@/evo/ui/native-select';
+import { t } from '@/lib/i18n';
 
-type MailboxRow = {
-    id: number;
+type MailboxPageRow = MailboxRow & {
     source: string;
-    name: string;
     from_name: string;
-    from_address: string;
     host: string;
     port: number;
     encryption: string;
     username: string;
-    imap_host?: string | null;
-    imap_port?: number | null;
-    imap_encryption?: string | null;
-    imap_username?: string | null;
     imap_configured: boolean;
     is_default: boolean;
     enabled: boolean;
-    status: string;
-    effective_status: string;
-    daily_limit: number;
-    sent_today: number;
-    last_tested_at?: string | null;
     password_set: boolean;
     imap_password_set: boolean;
 };
@@ -38,23 +27,11 @@ type MailStack = {
     roundcube_url: string;
 };
 
-function statusVariant(status: string): 'default' | 'secondary' | 'outline' {
-    if (status === 'active') {
-        return 'default';
-    }
-
-    if (status === 'warming') {
-        return 'secondary';
-    }
-
-    return 'outline';
-}
-
 function MailboxActions({
     box,
     roundcubeUrl,
 }: {
-    box: MailboxRow;
+    box: MailboxPageRow;
     roundcubeUrl: string;
 }) {
     return (
@@ -62,21 +39,17 @@ function MailboxActions({
             <Button
                 variant="outline"
                 size="sm"
-                onClick={() =>
-                    router.post(`/outbound/mailboxes/${box.id}/toggle`)
-                }
+                onClick={() => router.post(`/outbound/mailboxes/${box.id}/toggle`)}
             >
-                {box.enabled ? 'Disable' : 'Enable'}
+                {box.enabled ? t('Disable') : t('Enable')}
             </Button>
             {!box.is_default ? (
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                        router.post(`/outbound/mailboxes/${box.id}/default`)
-                    }
+                    onClick={() => router.post(`/outbound/mailboxes/${box.id}/default`)}
                 >
-                    Make default
+                    {t('Make default')}
                 </Button>
             ) : null}
             <Form
@@ -93,365 +66,41 @@ function MailboxActions({
                             placeholder="test@you.dz"
                             required
                             className="h-8 w-48"
-                            aria-label="Test recipient"
+                            aria-label={t('Test recipient')}
                         />
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={processing || !box.enabled}
-                        >
-                            Send test
+                        <Button variant="outline" size="sm" disabled={processing || !box.enabled}>
+                            {t('Send test')}
                         </Button>
                     </>
                 )}
             </Form>
             <Button variant="outline" size="sm" asChild>
-                <a
-                    href={roundcubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Open Roundcube
+                <a href={roundcubeUrl} target="_blank" rel="noopener noreferrer">
+                    {t('Open Roundcube')}
                 </a>
             </Button>
             {box.source === 'mail_stack' ? (
-                <span className="aurora-text-caption text-mute">
-                    Synced from the mail stack - remove it there, not here.
+                <span className="text-[11px] text-[var(--evo-ink-muted)]">
+                    {t('Synced from the mail stack - remove it there, not here.')}
                 </span>
             ) : (
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="text-brand"
                     onClick={() => {
-                        if (window.confirm(`Delete mailbox ${box.name}?`)) {
+                        if (window.confirm(t('Delete mailbox :name?', { name: box.name }))) {
                             router.delete(`/outbound/mailboxes/${box.id}`);
                         }
                     }}
                 >
-                    Delete
+                    {t('Delete')}
                 </Button>
             )}
         </div>
     );
 }
 
-export default function MailboxesIndex({
-    mailboxes,
-    mail_stack,
-}: {
-    mailboxes: MailboxRow[];
-    mail_stack: MailStack;
-}) {
-    return (
-        <OutboundShell title="Mailboxes">
-            <OutboundPage
-                title="SMTP mailboxes"
-                description="Passwords are encrypted at rest. New mailboxes start disabled - enable one, warm it up, then sequences send through it. Without an enabled mailbox, outbound email uses the Disabled provider and fails honestly in the outbox."
-            >
-                {mail_stack.configured ? (
-                    <HairlinePanel
-                        title="Mail stack sync"
-                        description="Every mailbox on the live mail stack lands here automatically. The sync runs every 15 minutes. Webmail is Roundcube on the same host; campaigns and sequences stay in the CRM."
-                        action={
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                    router.post('/outbound/mailboxes/sync')
-                                }
-                            >
-                                Sync now
-                            </Button>
-                        }
-                    >
-                        <p className="aurora-text-caption text-mute">
-                            SMTP send, IMAP replies, and Roundcube stay on the
-                            stack. This page is the CRM view of those boxes.
-                        </p>
-                    </HairlinePanel>
-                ) : (
-                    <HairlinePanel title="Connect the mail stack">
-                        <p className="aurora-text-body-sm text-mute">
-                            Set{' '}
-                            <code className="text-ink">
-                                EVOSALES_MAIL_API_TOKEN
-                            </code>{' '}
-                            (and optionally{' '}
-                            <code className="text-ink">
-                                EVOSALES_MAIL_API_URL
-                            </code>
-                            ) in the environment and every mailbox on the live
-                            mail stack appears here automatically - SMTP send,
-                            IMAP replies, and Roundcube webmail. Until then, add
-                            a mailbox manually below.
-                        </p>
-                    </HairlinePanel>
-                )}
-
-                <HairlinePanel title="Add mailbox">
-                    <Form
-                        action="/outbound/mailboxes"
-                        method="post"
-                        className="grid gap-3 md:grid-cols-4"
-                        resetOnSuccess
-                    >
-                        {({ processing }) => (
-                            <>
-                                <div className="space-y-1.5">
-                                    <Label>Name</Label>
-                                    <Input
-                                        name="name"
-                                        required
-                                        placeholder="Sales - Amine"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>From name</Label>
-                                    <Input
-                                        name="from_name"
-                                        required
-                                        placeholder="Amine · Evotechly"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>From address</Label>
-                                    <Input
-                                        name="from_address"
-                                        type="email"
-                                        required
-                                        placeholder="amine@evotechly.com"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>Daily limit</Label>
-                                    <Input
-                                        name="daily_limit"
-                                        type="number"
-                                        min={0}
-                                        defaultValue={50}
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>SMTP host</Label>
-                                    <Input
-                                        name="host"
-                                        required
-                                        placeholder="smtp.evotechly.com"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>SMTP port</Label>
-                                    <Input
-                                        name="port"
-                                        type="number"
-                                        defaultValue={587}
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>SMTP encryption</Label>
-                                    <NativeSelect
-                                        name="encryption"
-                                        defaultValue="tls"
-                                    >
-                                        <option value="tls">tls</option>
-                                        <option value="ssl">ssl</option>
-                                        <option value="none">none</option>
-                                    </NativeSelect>
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>SMTP username</Label>
-                                    <Input name="username" required />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>SMTP password</Label>
-                                    <Input
-                                        name="password"
-                                        type="password"
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>IMAP host (replies)</Label>
-                                    <Input
-                                        name="imap_host"
-                                        placeholder="imap.evotechly.com"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>IMAP port</Label>
-                                    <Input
-                                        name="imap_port"
-                                        type="number"
-                                        defaultValue={993}
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>IMAP encryption</Label>
-                                    <NativeSelect
-                                        name="imap_encryption"
-                                        defaultValue="ssl"
-                                    >
-                                        <option value="ssl">ssl</option>
-                                        <option value="tls">tls</option>
-                                        <option value="none">none</option>
-                                    </NativeSelect>
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>IMAP username</Label>
-                                    <Input name="imap_username" />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label>IMAP password</Label>
-                                    <Input
-                                        name="imap_password"
-                                        type="password"
-                                    />
-                                </div>
-                                <div className="flex items-end">
-                                    <Button disabled={processing}>
-                                        Save mailbox
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </HairlinePanel>
-
-                <HairlineTable
-                    minWidth={880}
-                    empty="No mailbox - SMTP is disabled."
-                    columns={[
-                        { key: 'mailbox', header: 'Mailbox' },
-                        { key: 'status', header: 'Status' },
-                        { key: 'smtp', header: 'SMTP' },
-                        { key: 'imap', header: 'IMAP' },
-                        { key: 'sent', header: 'Sent today' },
-                        { key: 'actions', header: '', align: 'right' },
-                    ]}
-                    rows={mailboxes.map((box) => ({
-                        id: box.id,
-                        mobileTitle: (
-                            <span className="flex flex-wrap items-center gap-2">
-                                {box.name}
-                                <Badge
-                                    variant={statusVariant(
-                                        box.effective_status,
-                                    )}
-                                >
-                                    {box.effective_status}
-                                </Badge>
-                            </span>
-                        ),
-                        mobileMeta: [
-                            {
-                                label: 'From',
-                                value: `${box.from_name} <${box.from_address}>`,
-                            },
-                            {
-                                label: 'SMTP',
-                                value: `${box.host}:${box.port} (${box.encryption})`,
-                            },
-                            {
-                                label: 'IMAP',
-                                value: box.imap_configured
-                                    ? 'replies on'
-                                    : 'off',
-                            },
-                            {
-                                label: 'Sent today',
-                                value: `${box.sent_today}/${box.daily_limit}${
-                                    box.last_tested_at
-                                        ? ` · tested ${box.last_tested_at}`
-                                        : ''
-                                }`,
-                            },
-                        ],
-                        mobileFooter: (
-                            <div className="mt-3">
-                                <MailboxActions
-                                    box={box}
-                                    roundcubeUrl={mail_stack.roundcube_url}
-                                />
-                            </div>
-                        ),
-                        after: (
-                            <details className="rounded-xl border border-hairline bg-canvas px-3 py-2">
-                                <summary className="aurora-text-caption cursor-pointer font-medium text-mute">
-                                    Edit mailbox
-                                </summary>
-                                <MailboxEditForm box={box} />
-                            </details>
-                        ),
-                        cells: {
-                            mailbox: (
-                                <div>
-                                    <p className="flex flex-wrap items-center gap-2 font-medium text-ink">
-                                        {box.name}
-                                        {box.is_default ? (
-                                            <Badge variant="secondary">
-                                                default
-                                            </Badge>
-                                        ) : null}
-                                        {box.source === 'mail_stack' ? (
-                                            <Badge variant="secondary">
-                                                Mail stack
-                                            </Badge>
-                                        ) : null}
-                                    </p>
-                                    <p className="aurora-text-caption mt-0.5 text-mute">
-                                        {box.from_name} &lt;{box.from_address}
-                                        &gt;
-                                    </p>
-                                </div>
-                            ),
-                            status: (
-                                <Badge
-                                    variant={statusVariant(
-                                        box.effective_status,
-                                    )}
-                                >
-                                    {box.effective_status}
-                                </Badge>
-                            ),
-                            smtp: (
-                                <span className="aurora-text-caption text-mute">
-                                    {box.host}:{box.port} ({box.encryption})
-                                </span>
-                            ),
-                            imap: (
-                                <span className="aurora-text-caption text-mute">
-                                    {box.imap_configured ? 'replies on' : 'off'}
-                                </span>
-                            ),
-                            sent: (
-                                <div>
-                                    <span className="money tabular-nums">
-                                        {box.sent_today}/{box.daily_limit}
-                                    </span>
-                                    {box.last_tested_at ? (
-                                        <span className="aurora-text-caption block text-mute">
-                                            tested {box.last_tested_at}
-                                        </span>
-                                    ) : null}
-                                </div>
-                            ),
-                            actions: (
-                                <MailboxActions
-                                    box={box}
-                                    roundcubeUrl={mail_stack.roundcube_url}
-                                />
-                            ),
-                        },
-                    }))}
-                />
-            </OutboundPage>
-        </OutboundShell>
-    );
-}
-
-function MailboxEditForm({ box }: { box: MailboxRow }) {
+function MailboxEditForm({ box }: { box: MailboxPageRow }) {
     return (
         <Form
             action={`/outbound/mailboxes/${box.id}`}
@@ -460,138 +109,78 @@ function MailboxEditForm({ box }: { box: MailboxRow }) {
         >
             {({ processing }) => (
                 <>
-                    <div className="space-y-1.5">
-                        <Label>Name</Label>
+                    <Field label={t('Name')}>
                         <Input name="name" required defaultValue={box.name} />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>From name</Label>
-                        <Input
-                            name="from_name"
-                            required
-                            defaultValue={box.from_name}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>From address</Label>
-                        <Input
-                            name="from_address"
-                            type="email"
-                            required
-                            defaultValue={box.from_address}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>Daily limit</Label>
-                        <Input
-                            name="daily_limit"
-                            type="number"
-                            min={0}
-                            defaultValue={box.daily_limit}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>SMTP host</Label>
+                    </Field>
+                    <Field label={t('From name')}>
+                        <Input name="from_name" required defaultValue={box.from_name} />
+                    </Field>
+                    <Field label={t('From address')}>
+                        <Input name="from_address" type="email" required defaultValue={box.from_address} />
+                    </Field>
+                    <Field label={t('Daily limit')}>
+                        <Input name="daily_limit" type="number" min={0} defaultValue={box.daily_limit} />
+                    </Field>
+                    <Field label={t('SMTP host')}>
                         <Input name="host" required defaultValue={box.host} />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>SMTP port</Label>
-                        <Input
-                            name="port"
-                            type="number"
-                            required
-                            defaultValue={box.port}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>SMTP encryption</Label>
-                        <NativeSelect
-                            name="encryption"
-                            defaultValue={box.encryption}
-                        >
+                    </Field>
+                    <Field label={t('SMTP port')}>
+                        <Input name="port" type="number" required defaultValue={box.port} />
+                    </Field>
+                    <Field label={t('SMTP encryption')}>
+                        <NativeSelect name="encryption" defaultValue={box.encryption}>
                             <option value="tls">tls</option>
                             <option value="ssl">ssl</option>
                             <option value="none">none</option>
                         </NativeSelect>
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>SMTP username</Label>
-                        <Input
-                            name="username"
-                            required
-                            defaultValue={box.username}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>SMTP password (blank = keep)</Label>
+                    </Field>
+                    <Field label={t('SMTP username')}>
+                        <Input name="username" required defaultValue={box.username} />
+                    </Field>
+                    <Field label={t('SMTP password (blank = keep)')}>
                         <Input
                             name="password"
                             type="password"
                             placeholder={box.password_set ? '••••••••' : ''}
                         />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>IMAP host (replies)</Label>
-                        <Input
-                            name="imap_host"
-                            defaultValue={box.imap_host ?? ''}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>IMAP port</Label>
-                        <Input
-                            name="imap_port"
-                            type="number"
-                            defaultValue={box.imap_port ?? 993}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>IMAP encryption</Label>
-                        <NativeSelect
-                            name="imap_encryption"
-                            defaultValue={box.imap_encryption ?? 'ssl'}
-                        >
+                    </Field>
+                    <Field label={t('IMAP host (replies)')}>
+                        <Input name="imap_host" defaultValue={box.imap_host ?? ''} />
+                    </Field>
+                    <Field label={t('IMAP port')}>
+                        <Input name="imap_port" type="number" defaultValue={box.imap_port ?? 993} />
+                    </Field>
+                    <Field label={t('IMAP encryption')}>
+                        <NativeSelect name="imap_encryption" defaultValue={box.imap_encryption ?? 'ssl'}>
                             <option value="ssl">ssl</option>
                             <option value="tls">tls</option>
                             <option value="none">none</option>
                         </NativeSelect>
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>IMAP username</Label>
-                        <Input
-                            name="imap_username"
-                            defaultValue={box.imap_username ?? ''}
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label>IMAP password (blank = keep)</Label>
+                    </Field>
+                    <Field label={t('IMAP username')}>
+                        <Input name="imap_username" defaultValue={box.imap_username ?? ''} />
+                    </Field>
+                    <Field label={t('IMAP password (blank = keep)')}>
                         <Input
                             name="imap_password"
                             type="password"
-                            placeholder={
-                                box.imap_password_set ? '••••••••' : ''
-                            }
+                            placeholder={box.imap_password_set ? '••••••••' : ''}
                         />
-                    </div>
+                    </Field>
                     {box.enabled ? (
-                        <div className="space-y-1.5">
-                            <Label>Warmup status</Label>
+                        <Field label={t('Warmup status')}>
                             <NativeSelect
                                 name="status"
-                                defaultValue={
-                                    box.effective_status === 'active'
-                                        ? 'active'
-                                        : 'warming'
-                                }
+                                defaultValue={box.effective_status === 'active' ? 'active' : 'warming'}
                             >
-                                <option value="warming">warming</option>
-                                <option value="active">active</option>
+                                <option value="warming">{t('warming')}</option>
+                                <option value="active">{t('active')}</option>
                             </NativeSelect>
-                        </div>
+                        </Field>
                     ) : null}
                     <div className="flex items-end">
                         <Button size="sm" disabled={processing}>
-                            Save changes
+                            {t('Save changes')}
                         </Button>
                     </div>
                 </>
@@ -600,6 +189,144 @@ function MailboxEditForm({ box }: { box: MailboxRow }) {
     );
 }
 
+export default function MailboxesIndex({
+    mailboxes,
+    mail_stack,
+}: {
+    mailboxes: MailboxPageRow[];
+    mail_stack: MailStack;
+}) {
+    return (
+        <OutboundShell title={t('Mailboxes')}>
+            <OutboundPage
+                title={t('SMTP mailboxes')}
+                description={t(
+                    'Passwords are encrypted at rest. New mailboxes start disabled - enable one, warm it up, then sequences send through it. Without an enabled mailbox, outbound email uses the Disabled provider and fails honestly in the outbox.',
+                )}
+            >
+                {mail_stack.configured ? (
+                    <OutboundSection
+                        title={t('Mail stack sync')}
+                        description={t(
+                            'Every mailbox on the live mail stack lands here automatically. The sync runs every 15 minutes. Webmail is Roundcube on the same host; campaigns and sequences stay in the CRM.',
+                        )}
+                        actions={
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => router.post('/outbound/mailboxes/sync')}
+                            >
+                                {t('Sync now')}
+                            </Button>
+                        }
+                    >
+                        <p className="text-[12px] text-[var(--evo-ink-muted)]">
+                            {t(
+                                'SMTP send, IMAP replies, and Roundcube stay on the stack. This page is the CRM view of those boxes.',
+                            )}
+                        </p>
+                    </OutboundSection>
+                ) : (
+                    <OutboundSection title={t('Connect the mail stack')}>
+                        <p className="text-[13px] text-[var(--evo-ink-muted)]">
+                            {t(
+                                'Set EVOSALES_MAIL_API_TOKEN (and optionally EVOSALES_MAIL_API_URL) in the environment and every mailbox on the live mail stack appears here automatically - SMTP send, IMAP replies, and Roundcube webmail. Until then, add a mailbox manually below.',
+                            )}
+                        </p>
+                    </OutboundSection>
+                )}
+
+                <OutboundSection title={t('Add mailbox')}>
+                    <Form
+                        action="/outbound/mailboxes"
+                        method="post"
+                        className="grid gap-3 md:grid-cols-4"
+                        resetOnSuccess
+                    >
+                        {({ processing }) => (
+                            <>
+                                <Field label={t('Name')}>
+                                    <Input name="name" required placeholder="Sales - Amine" />
+                                </Field>
+                                <Field label={t('From name')}>
+                                    <Input name="from_name" required placeholder="Amine · Evotechly" />
+                                </Field>
+                                <Field label={t('From address')}>
+                                    <Input
+                                        name="from_address"
+                                        type="email"
+                                        required
+                                        placeholder="amine@evotechly.com"
+                                    />
+                                </Field>
+                                <Field label={t('Daily limit')}>
+                                    <Input name="daily_limit" type="number" min={0} defaultValue={50} />
+                                </Field>
+                                <Field label={t('SMTP host')}>
+                                    <Input name="host" required placeholder="smtp.evotechly.com" />
+                                </Field>
+                                <Field label={t('SMTP port')}>
+                                    <Input name="port" type="number" defaultValue={587} required />
+                                </Field>
+                                <Field label={t('SMTP encryption')}>
+                                    <NativeSelect name="encryption" defaultValue="tls">
+                                        <option value="tls">tls</option>
+                                        <option value="ssl">ssl</option>
+                                        <option value="none">none</option>
+                                    </NativeSelect>
+                                </Field>
+                                <Field label={t('SMTP username')}>
+                                    <Input name="username" required />
+                                </Field>
+                                <Field label={t('SMTP password')}>
+                                    <Input name="password" type="password" required />
+                                </Field>
+                                <Field label={t('IMAP host (replies)')}>
+                                    <Input name="imap_host" placeholder="imap.evotechly.com" />
+                                </Field>
+                                <Field label={t('IMAP port')}>
+                                    <Input name="imap_port" type="number" defaultValue={993} />
+                                </Field>
+                                <Field label={t('IMAP encryption')}>
+                                    <NativeSelect name="imap_encryption" defaultValue="ssl">
+                                        <option value="ssl">ssl</option>
+                                        <option value="tls">tls</option>
+                                        <option value="none">none</option>
+                                    </NativeSelect>
+                                </Field>
+                                <Field label={t('IMAP username')}>
+                                    <Input name="imap_username" />
+                                </Field>
+                                <Field label={t('IMAP password')}>
+                                    <Input name="imap_password" type="password" />
+                                </Field>
+                                <div className="flex items-end">
+                                    <Button disabled={processing}>{t('Save mailbox')}</Button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                </OutboundSection>
+
+                <MailboxList
+                    mailboxes={mailboxes}
+                    renderActions={(box) => (
+                        <MailboxActions box={box as MailboxPageRow} roundcubeUrl={mail_stack.roundcube_url} />
+                    )}
+                    renderAfter={(box) => (
+                        <details className="mt-2 rounded-[var(--evo-radius-compact)] border border-[var(--evo-hairline)] bg-[var(--evo-canvas)] px-3 py-2">
+                            <summary className="cursor-pointer text-[12px] font-medium text-[var(--evo-ink-muted)]">
+                                {t('Edit mailbox')}
+                            </summary>
+                            <MailboxEditForm box={box as MailboxPageRow} />
+                        </details>
+                    )}
+                />
+            </OutboundPage>
+        </OutboundShell>
+    );
+}
+
 MailboxesIndex.layout = {
-    breadcrumbs: [{ title: 'Mailboxes', href: '/outbound/mailboxes' }],
+    breadcrumbs: [{ title: t('Mailboxes'), href: '/outbound/mailboxes' }],
 };

@@ -1,17 +1,20 @@
-import { Form, Link } from '@inertiajs/react';
+import { Form, router } from '@inertiajs/react';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { DataGrid, DataGridRowAction } from '@/evo/data/data-grid';
+import type { EvoDataGridColumn } from '@/evo/data/data-grid';
+import { Field, OutboundSection } from '@/evo/outbound/section';
+import { TemplateEditor } from '@/evo/outbound/TemplateEditor';
+import type { TemplateRow } from '@/evo/outbound/types';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { NativeSelect } from '@/evo/ui/native-select';
+import { Status } from '@/evo/ui/status';
+import { t } from '@/lib/i18n';
 
-type TemplateRow = {
+type ContactRow = {
     id: number;
-    name: string;
-    subject?: string | null;
-    body: string;
-    body_html?: string | null;
-    created_at: string;
+    first_name: string;
+    phone_e164?: string | null;
 };
 
 export default function TemplatesIndex({
@@ -20,121 +23,70 @@ export default function TemplatesIndex({
     note,
 }: {
     templates: TemplateRow[];
-    contacts: any[];
+    contacts: ContactRow[];
     note: string;
 }) {
+    const columns: EvoDataGridColumn<TemplateRow>[] = [
+        {
+            id: 'name',
+            header: t('Name'),
+            accessorFn: (row) => row.name,
+            cell: ({ row }) => (
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium text-[var(--evo-ink)]">{row.original.name}</span>
+                    {row.original.body_html ? <Status tone="info" label={t('HTML')} /> : null}
+                </div>
+            ),
+        },
+        {
+            id: 'subject',
+            header: t('Subject'),
+            accessorFn: (row) => row.subject ?? '—',
+        },
+        {
+            id: 'created',
+            header: t('When'),
+            accessorFn: (row) => row.created_at ?? '—',
+        },
+    ];
+
     return (
-        <OutboundShell title="Templates">
+        <OutboundShell title={t('Templates')}>
             <OutboundPage
-                title="Email templates"
-                description="Reusable subject + text/HTML body with {{first_name}}, {{last_name}}, {{name}}, {{email}}, {{phone}}, {{company}}, {{city}}, {{wilaya}}, {{unsub}}. Sequence steps and campaigns prefill from these. The unsubscribe link always points at this CRM host."
+                title={t('Email templates')}
+                description={t(
+                    'Reusable subject + text/HTML body with {{first_name}}, {{last_name}}, {{name}}, {{email}}, {{phone}}, {{company}}, {{city}}, {{wilaya}}, {{unsub}}. Sequence steps and campaigns prefill from these. The unsubscribe link always points at this CRM host.',
+                )}
             >
-                <section className="border-t border-hairline pt-3">
-                    <h2 className="mb-3 font-medium">New template</h2>
-                    <Form
-                        action="/outbound/templates"
-                        method="post"
-                        className="grid gap-3"
-                        resetOnSuccess
-                    >
+                <OutboundSection title={t('New template')}>
+                    <Form action="/outbound/templates" method="post" className="grid gap-3" resetOnSuccess>
                         {({ processing }) => (
                             <>
-                                <div className="grid gap-3 md:grid-cols-2">
-                                    <div>
-                                        <Label>Name</Label>
-                                        <Input
-                                            name="name"
-                                            required
-                                            placeholder="Clinic intro — FR"
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label>Subject</Label>
-                                        <Input
-                                            name="subject"
-                                            placeholder="EvoSales pour {{company}}"
-                                        />
-                                    </div>
-                                </div>
+                                <TemplateEditor />
                                 <div>
-                                    <Label>Body (text)</Label>
-                                    <textarea
-                                        name="body"
-                                        rows={5}
-                                        required
-                                        placeholder={
-                                            'Bonjour {{first_name}},\n\n…\n\nSe désabonner : {{unsub}}'
-                                        }
-                                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <Label>Body (HTML, optional)</Label>
-                                    <textarea
-                                        name="body_html"
-                                        rows={4}
-                                        placeholder={
-                                            '<p>Bonjour {{first_name}},</p><p>…</p>'
-                                        }
-                                        className="w-full rounded-md border bg-background px-3 py-2 font-mono text-xs"
-                                    />
-                                </div>
-                                <div>
-                                    <Button disabled={processing}>
-                                        Save template
-                                    </Button>
+                                    <Button disabled={processing}>{t('Save template')}</Button>
                                 </div>
                             </>
                         )}
                     </Form>
-                </section>
+                </OutboundSection>
 
-                <div className="grid gap-3 border-t border-hairline pt-3 lg:grid-cols-2">
-                    {templates.length === 0 ? (
-                        <p className="py-4 text-[13px] text-muted-foreground">
-                            No templates yet.
-                        </p>
-                    ) : null}
-                    {templates.map((template) => (
-                        <article
-                            key={template.id}
-                            className="space-y-2 border-t border-hairline pt-3 text-sm"
-                        >
-                            <div className="flex items-center justify-between">
-                                <p className="font-medium">
-                                    {template.name}
-                                    {template.body_html ? (
-                                        <Badge
-                                            variant="secondary"
-                                            className="ms-2"
-                                        >
-                                            HTML
-                                        </Badge>
-                                    ) : null}
-                                </p>
-                                <Link
-                                    href={`/outbound/templates/${template.id}`}
-                                >
-                                    <Button variant="outline" size="sm">
-                                        Edit & preview
-                                    </Button>
-                                </Link>
-                            </div>
-                            <p className="text-muted-foreground">
-                                Subject: {template.subject ?? '—'}
-                            </p>
-                            <p className="rounded-md bg-canvas-soft p-3 whitespace-pre-wrap text-muted-foreground">
-                                {template.body}
-                            </p>
-                        </article>
-                    ))}
-                </div>
+                <DataGrid
+                    columns={columns}
+                    data={templates}
+                    getRowId={(row) => String(row.id)}
+                    density="compact"
+                    enableSelection={false}
+                    onRowClick={(row) => router.visit(`/outbound/templates/${row.id}`)}
+                    emptyTitle={t('No templates yet.')}
+                    rowActions={(template) => (
+                        <DataGridRowAction onClick={() => router.visit(`/outbound/templates/${template.id}`)}>
+                            {t('Edit & preview')}
+                        </DataGridRowAction>
+                    )}
+                />
 
-                <section className="border-t border-hairline pt-3">
-                    <h2 className="mb-1 font-medium">
-                        Official WhatsApp Cloud template send
-                    </h2>
-                    <p className="mb-3 text-sm text-muted-foreground">{note}</p>
+                <OutboundSection title={t('Official WhatsApp Cloud template send')} description={note}>
                     <Form
                         action="/outbound/templates/send"
                         method="post"
@@ -142,54 +94,34 @@ export default function TemplatesIndex({
                     >
                         {({ processing }) => (
                             <>
-                                <div>
-                                    <Label>Contact</Label>
-                                    <select
-                                        name="contact_id"
-                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                        required
-                                    >
-                                        <option value="">Select</option>
+                                <Field label={t('Contact')}>
+                                    <NativeSelect name="contact_id" required>
+                                        <option value="">{t('Select')}</option>
                                         {contacts.map((contact) => (
-                                            <option
-                                                key={contact.id}
-                                                value={contact.id}
-                                            >
-                                                {contact.first_name}{' '}
-                                                {contact.phone_e164}
+                                            <option key={contact.id} value={contact.id}>
+                                                {contact.first_name} {contact.phone_e164}
                                             </option>
                                         ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <Label>Template name</Label>
-                                    <Input
-                                        name="wa_template_name"
-                                        placeholder="hello_world"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label>Language</Label>
-                                    <Input
-                                        name="wa_template_language"
-                                        defaultValue="fr"
-                                    />
-                                </div>
+                                    </NativeSelect>
+                                </Field>
+                                <Field label={t('Template name')}>
+                                    <Input name="wa_template_name" placeholder="hello_world" required />
+                                </Field>
+                                <Field label={t('Language')}>
+                                    <Input name="wa_template_language" defaultValue="fr" />
+                                </Field>
                                 <div className="flex items-end">
-                                    <Button disabled={processing}>
-                                        Send via Evolution Cloud
-                                    </Button>
+                                    <Button disabled={processing}>{t('Send via Evolution Cloud')}</Button>
                                 </div>
                             </>
                         )}
                     </Form>
-                </section>
+                </OutboundSection>
             </OutboundPage>
         </OutboundShell>
     );
 }
 
 TemplatesIndex.layout = {
-    breadcrumbs: [{ title: 'Templates', href: '/outbound/templates' }],
+    breadcrumbs: [{ title: t('Templates'), href: '/outbound/templates' }],
 };

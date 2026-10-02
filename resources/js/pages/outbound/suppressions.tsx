@@ -1,111 +1,69 @@
 import { Form, router } from '@inertiajs/react';
+import { useState } from 'react';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Field } from '@/evo/outbound/section';
+import { SuppressionList } from '@/evo/outbound/SuppressionList';
+import type { SuppressionRow } from '@/evo/outbound/types';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { NativeSelect } from '@/evo/ui/native-select';
+import { t } from '@/lib/i18n';
 
-export default function SuppressionsIndex({
-    items,
-}: {
-    items: {
-        id: number;
-        type: string;
-        value: string;
-        reason?: string | null;
-        source?: string | null;
-    }[];
-}) {
+export default function SuppressionsIndex({ items }: { items: SuppressionRow[] }) {
+    const [search, setSearch] = useState('');
+    const filtered = items.filter((item) =>
+        `${item.type} ${item.value} ${item.reason ?? ''}`.toLowerCase().includes(search.toLowerCase()),
+    );
+
     return (
-        <OutboundShell title="Suppressions">
+        <OutboundShell title={t('Suppressions')}>
             <OutboundPage
-                title="Suppressions"
-                description="Suppressed emails and phones never receive automated outbound — sequences skip them, campaigns fail them honestly, and the public unsubscribe link lands here."
+                title={t('Suppressions')}
+                description={t(
+                    'Suppressed emails and phones never receive automated outbound — sequences skip them, campaigns fail them honestly, and the public unsubscribe link lands here.',
+                )}
             >
-                <section className="border-t border-hairline pt-3">
-                    <Form
-                        action="/outbound/suppressions"
-                        method="post"
-                        className="grid gap-3 md:grid-cols-4"
-                        resetOnSuccess
-                    >
-                        {({ processing }) => (
-                            <>
-                                <div>
-                                    <Label>Type</Label>
-                                    <select
-                                        name="type"
-                                        className="h-9 w-full rounded-md border bg-background px-2 text-sm"
-                                    >
-                                        <option value="email">Email</option>
-                                        <option value="phone">Phone</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <Label>Value</Label>
-                                    <Input name="value" required />
-                                </div>
-                                <div>
-                                    <Label>Reason</Label>
-                                    <Input
-                                        name="reason"
-                                        defaultValue="manual"
-                                    />
-                                </div>
-                                <div className="flex items-end">
-                                    <Button disabled={processing}>Add</Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </section>
-                <section className="overflow-x-auto border-t border-hairline">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2">Type</th>
-                                <th className="px-4 py-2">Value</th>
-                                <th className="px-4 py-2">Reason</th>
-                                <th className="px-4 py-2"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {items.map((item) => (
-                                <tr key={item.id} className="border-t">
-                                    <td className="px-4 py-2">{item.type}</td>
-                                    <td className="px-4 py-2">{item.value}</td>
-                                    <td className="px-4 py-2">
-                                        {item.reason ?? '—'}
-                                    </td>
-                                    <td className="px-4 py-2 text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-ink hover:underline"
-                                            onClick={() => {
-                                                if (
-                                                    window.confirm(
-                                                        `Remove ${item.value} from the suppression list?`,
-                                                    )
-                                                ) {
-                                                    router.delete(
-                                                        `/outbound/suppressions/${item.id}`,
-                                                    );
-                                                }
-                                            }}
-                                        >
-                                            Remove
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </section>
+                <Form
+                    action="/outbound/suppressions"
+                    method="post"
+                    className="grid gap-3 border-t border-[var(--evo-hairline)] pt-3 md:grid-cols-4"
+                    resetOnSuccess
+                >
+                    {({ processing }) => (
+                        <>
+                            <Field label={t('Type')}>
+                                <NativeSelect name="type">
+                                    <option value="email">{t('Email')}</option>
+                                    <option value="phone">{t('Phone')}</option>
+                                </NativeSelect>
+                            </Field>
+                            <Field label={t('Value')}>
+                                <Input name="value" required />
+                            </Field>
+                            <Field label={t('Reason')}>
+                                <Input name="reason" defaultValue="manual" />
+                            </Field>
+                            <div className="flex items-end">
+                                <Button disabled={processing}>{t('Add')}</Button>
+                            </div>
+                        </>
+                    )}
+                </Form>
+                <SuppressionList
+                    items={filtered}
+                    search={search}
+                    onSearchChange={setSearch}
+                    onRemove={(item) => {
+                        if (window.confirm(t('Remove :value from the suppression list?', { value: item.value }))) {
+                            router.delete(`/outbound/suppressions/${item.id}`);
+                        }
+                    }}
+                />
             </OutboundPage>
         </OutboundShell>
     );
 }
 
 SuppressionsIndex.layout = {
-    breadcrumbs: [{ title: 'Suppression', href: '/outbound/suppressions' }],
+    breadcrumbs: [{ title: t('Suppressions'), href: '/outbound/suppressions' }],
 };

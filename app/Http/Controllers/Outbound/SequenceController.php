@@ -263,6 +263,30 @@ class SequenceController extends Controller
         return back();
     }
 
+    public function reorderSteps(Request $request, Sequence $sequence): RedirectResponse
+    {
+        abort_unless((int) $sequence->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $data = $request->validate([
+            'order' => ['required', 'array', 'min:1'],
+            'order.*' => ['required'],
+        ]);
+
+        $ids = collect($data['order'])->map(fn ($id) => (int) $id)->unique()->values();
+        $owned = $sequence->steps()->whereIn('id', $ids)->pluck('id')->map(fn ($id) => (int) $id);
+
+        abort_unless($owned->count() === $ids->count(), 404);
+
+        foreach ($ids as $index => $id) {
+            SequenceStep::query()
+                ->where('sequence_id', $sequence->id)
+                ->where('id', $id)
+                ->update(['position' => $index + 1]);
+        }
+
+        return back();
+    }
+
     public function enroll(Request $request, Sequence $sequence, SequenceEnrollment $enrollment, CrmFilter $crmFilter): RedirectResponse
     {
         abort_unless((int) $sequence->workspace_id === (int) $request->user()->workspace_id, 404);

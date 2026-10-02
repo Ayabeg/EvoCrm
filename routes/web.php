@@ -373,6 +373,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::put('/outbound/sequences/{sequence}', [SequenceController::class, 'update'])->name('outbound.sequences.update');
     Route::post('/outbound/sequences/{sequence}/toggle', [SequenceController::class, 'toggle'])->name('outbound.sequences.toggle');
     Route::post('/outbound/sequences/{sequence}/steps', [SequenceController::class, 'addStep'])->name('outbound.sequences.steps.store');
+    Route::post('/outbound/sequences/{sequence}/steps/reorder', [SequenceController::class, 'reorderSteps'])->name('outbound.sequences.steps.reorder');
     Route::put('/outbound/sequences/{sequence}/steps/{step}', [SequenceController::class, 'updateStep'])->name('outbound.sequences.steps.update');
     Route::delete('/outbound/sequences/{sequence}/steps/{step}', [SequenceController::class, 'removeStep'])->name('outbound.sequences.steps.destroy');
     Route::post('/outbound/sequences/{sequence}/enroll', [SequenceController::class, 'enroll'])->name('outbound.sequences.enroll');

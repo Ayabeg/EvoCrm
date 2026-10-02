@@ -209,3 +209,29 @@ LICENSE copies: `evo/vendor/prompt-kit/LICENCE.md`, `evo/vendor/pastaui/LICENSE`
 AGPL leftover in `resources/js`: **zero**. `components/aurora/prompt-input.tsx` deleted.
 
 Deferred: OpenManus streaming UI (backend still fail-closed; Ask Evo remains the production send path). Settings/agent page is PR11. No new backend features.
+
+## PR8 copy log (2026-10-02)
+
+Outbound family is custom Evo (no registry copy) on `evo/ui/*` + PR3 DataGrid / FilterBar / SavedViews. Sequence builder uses dnd-kit (MIT). Template HTML uses Tiptap starter-kit (MIT) wrapped in `evo/ui/rich-text-editor`. Charts stay on Recharts (already in tree). No AGPL, no Aurora, no lucide-react, no Tiptap Pro.
+
+| Component | Source | License | Destination | Notes |
+|---|---|---|---|---|
+| Overview / CampaignList / CampaignWorkspace / SequenceBuilder / SequenceStep / MailboxList / DomainList / TemplateEditor / WarmupStatus / Outbox / SuppressionList / AudienceList / Reports | custom Evo | MIT (original) | `resources/js/evo/outbound/` | Presentational domain layer. Pages own Inertia. |
+| SequenceBuilder DnD | dnd-kit | MIT | `evo/outbound/SequenceBuilder.tsx`, `SequenceStep.tsx` | KeyboardSensor + sortableKeyboardCoordinates + French `Announcements`. Modifiers: vertical + parent. |
+| RichTextEditor | Tiptap starter-kit | MIT | `evo/ui/rich-text-editor.tsx` | Phosphor toolbar; `--evo-*`; hidden input; no Tiptap Pro / Cloud. |
+| Outbound reports chart | Recharts (existing) | MIT | `evo/outbound/ReportsChart.tsx` | Ink / teal from `evo/tokens/palette` LIGHT_SWATCHES. No new chart lib. |
+| Design Lab `/design-lab/outbound` | custom Evo | MIT (original) | `resources/design-lab/pages/OutboundLabPage.tsx` | Pharmacie Centrale sequence; hydrates `outboundMessages`. |
+
+### npm added in PR8 (LICENSE file read)
+
+| Package | License | Used |
+|---|---|---|
+| `@dnd-kit/core` | MIT | SequenceBuilder DndContext / sensors / announcements |
+| `@dnd-kit/sortable` | MIT | SortableContext + useSortable + keyboard coordinates |
+| `@dnd-kit/utilities` | MIT | CSS.Transform |
+| `@dnd-kit/modifiers` | MIT | restrictToVerticalAxis / restrictToParentElement |
+| `@tiptap/react` | MIT | RichTextEditor |
+| `@tiptap/starter-kit` | MIT | Bold / italic / lists only |
+| `@tiptap/pm` | MIT | ProseMirror peer of Tiptap |
+
+AGPL leftover in `resources/js`: **zero**.

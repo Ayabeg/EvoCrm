@@ -4,3 +4,4 @@
  */
 export * from './evocrm-demo-data';
 export * from './selectors';
+export * from './outbound';
