@@ -1,14 +1,15 @@
-import { EvilComposedChart } from '@/components/evilcharts/charts/recharts-composed-chart';
-import { Button } from '../components/Button';
-import { ChartFrame } from '../components/ChartFrame';
-import { FunnelJourney } from '../components/FunnelJourney';
+import { useEffect, useMemo, useState } from 'react';
+
+import { AdsListToolbar } from '@/evo/ads';
+import type { AdsListViewId } from '@/evo/ads';
+import { ChartFrame, ComposedChart, FunnelChart, SankeyChart } from '@/evo/charts';
+import { DataGrid } from '@/evo/data/data-grid';
+import { CrmKpiStrip } from '@/evo/patterns/kpi';
+import { Card, CardContent, CardHeader, CardTitle } from '@/evo/ui/card';
 import { LabLink } from '../components/LabLink';
-import { KpiMetric, KpiStrip } from '../components/KpiMetric';
-import { Module } from '../components/Module';
 import { ContextChip, PageHeader } from '../components/PageHeader';
 import { PrototypeRoom } from '../components/PrototypeRoom';
 import { useLabLoading } from '../components/useLabLoading';
-import { spendLeadsChartConfig } from '../data/chart-config';
 import {
     formatCompactAxis,
     formatCount,
@@ -23,56 +24,359 @@ import {
     getAdsTotals,
     getCampaignTotals,
     getDailyAdPerformanceForCampaign,
+    getKnownObjects,
+    getLeadSourceTotals,
+    getSankeyDealFlow,
     getWonDeals,
 } from '../data/selectors';
 
-const CHART_MARGIN = { top: 8, right: 12, left: 0, bottom: 4 };
+function applyTheme(theme: 'light' | 'dark') {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
+}
+
+function channelKind(channel: string): string {
+    if (channel === 'whatsapp') {
+        return 'Click-to-WhatsApp';
+    }
+
+    if (channel === 'instagram') {
+        return 'Lead form';
+    }
+
+    if (channel === 'site_web') {
+        return 'Lead form';
+    }
+
+    return 'Traffic';
+}
 
 type Props = {
     view?: string;
 };
 
 export function AdsHubPage({ view = 'overview' }: Props) {
-    if (view !== 'overview' && view !== 'campaigns') {
-        const labels: Record<string, string> = {
-            accounts: 'Comptes',
-            adsets: 'Ensembles',
-            creatives: 'Publicités',
-            leads: 'Leads pubs',
-            audiences: 'Audiences',
-            attribution: 'Attribution',
-        };
-
-        return (
-            <PrototypeRoom
-                title={labels[view] ?? 'Pubs'}
-                descriptor="Pubs · Meta · septembre 2026"
-                rows={[
-                    { label: 'Compte', value: 'Compte Meta EO' },
-                    { label: 'Période', value: '1–30 sept. 2026' },
-                    { label: 'Campagnes actives', value: '4' },
-                ]}
-                note="Vue de navigation. Les totaux restent ceux du jeu septembre validé."
-            />
-        );
-    }
-
     const loading = useLabLoading();
+    const [search, setSearch] = useState('');
+    const [listView, setListView] = useState<AdsListViewId>('all');
+    const [theme] = useState<'light' | 'dark'>(() =>
+        new URLSearchParams(window.location.search).get('theme') === 'dark' ? 'dark' : 'light',
+    );
+
+    useEffect(() => {
+        applyTheme(theme);
+    }, [theme]);
+
     const ads = getAdsTotals();
-    const campaigns = getCampaignTotals();
+    const campaignRows = getCampaignTotals();
     const daily = getDailyAdPerformanceForCampaign(null).map((row) => ({
         ...row,
         label: formatDayLabel(row.date),
     }));
     const funnel = getAdsFunnel();
     const won = getWonDeals().length;
-    const cpl = Math.round(ads.spend / ads.leadsInbox);
+    const flow = getSankeyDealFlow();
+    const known = getKnownObjects();
+    const sources = getLeadSourceTotals();
+    const cpl = ads.leadsInbox > 0 ? Math.round(ads.spend / ads.leadsInbox) : 0;
+
+    const filteredCampaigns = useMemo(() => {
+        const query = search.trim().toLocaleLowerCase('fr-DZ');
+
+        return campaignRows.filter((campaign) => {
+            if (query && !`${campaign.name} ${campaign.channel}`.toLocaleLowerCase('fr-DZ').includes(query)) {
+                return false;
+            }
+
+            if (listView === 'paused') {
+                return false;
+            }
+
+            return true;
+        });
+    }, [campaignRows, listView, search]);
+
+    if (view === 'accounts') {
+        return (
+            <PrototypeRoom
+                title="Comptes"
+                descriptor="Pubs · Meta · septembre 2026"
+                rows={[
+                    { label: 'Compte', value: 'Compte Meta EO' },
+                    { label: 'Devise', value: 'DZD' },
+                    { label: 'Campagnes', value: String(campaignRows.length) },
+                ]}
+                note="Un compte Meta. Les totaux restent ceux du jeu septembre validé."
+            />
+        );
+    }
+
+    if (view === 'leads') {
+        return (
+            <div className="space-y-5">
+                <PageHeader title="Leads pubs" descriptor="Formulaires Instagram / Messenger · septembre 2026" />
+                <DataGrid
+                    columns={[
+                        { id: 'source', header: 'Source', accessorFn: (row) => row.label },
+                        {
+                            id: 'count',
+                            header: 'Leads',
+                            accessorFn: (row) => row.count,
+                            cell: ({ row }) => (
+                                <span className="tabular-nums">{formatCount(row.original.count)}</span>
+                            ),
+                        },
+                        {
+                            id: 'ads',
+                            header: 'Attribués pubs',
+                            accessorFn: (row) => row.adCount,
+                            cell: ({ row }) => (
+                                <span className="tabular-nums">{formatCount(row.original.adCount)}</span>
+                            ),
+                        },
+                    ]}
+                    data={sources}
+                    getRowId={(row) => row.source}
+                    density="compact"
+                    enableSelection={false}
+                />
+            </div>
+        );
+    }
+
+    if (view === 'audiences') {
+        const audiences = [
+            {
+                id: 'clinique',
+                name: known.cliniqueElDjazair.company.name,
+                note: 'Compte principal · Alger',
+                channel: 'WhatsApp',
+            },
+            {
+                id: 'cabinet',
+                name: known.cabinetDrAmrani.company.name,
+                note: 'Lead Instagram / Messenger',
+                channel: 'Instagram',
+            },
+            {
+                id: 'pharmacie',
+                name: known.pharmacieCentrale.company.name,
+                note: 'Après-vente · Blida',
+                channel: 'Email',
+            },
+            {
+                id: 'hopital',
+                name: known.hopitalIbnSina.company.name,
+                note: 'Appel d’offres · Oran',
+                channel: 'Site web',
+            },
+        ];
+
+        return (
+            <div className="space-y-5">
+                <PageHeader
+                    title="Audiences"
+                    descriptor="Segments CRM du monde démo · septembre 2026"
+                />
+                <DataGrid
+                    columns={[
+                        { id: 'name', header: 'Audience', accessorFn: (row) => row.name },
+                        { id: 'channel', header: 'Canal', accessorFn: (row) => row.channel },
+                        { id: 'note', header: 'Rôle', accessorFn: (row) => row.note },
+                    ]}
+                    data={audiences}
+                    getRowId={(row) => row.id}
+                    density="compact"
+                    enableSelection={false}
+                />
+            </div>
+        );
+    }
+
+    if (view === 'adsets' || view === 'creatives') {
+        const rows = campaignRows.map((campaign) => ({
+            id: campaign.id,
+            name:
+                view === 'adsets'
+                    ? `${campaign.name} · ensemble`
+                    : `${campaign.name} · créa`,
+            campaign: campaign.name,
+            kind: channelKind(campaign.channel),
+            spend: campaign.spend,
+        }));
+
+        return (
+            <div className="space-y-5">
+                <PageHeader
+                    title={view === 'adsets' ? 'Ensembles' : 'Publicités'}
+                    descriptor="Dérivé des campagnes du jeu septembre 2026"
+                />
+                <DataGrid
+                    columns={[
+                        { id: 'name', header: view === 'adsets' ? 'Ensemble' : 'Publicité', accessorFn: (row) => row.name },
+                        {
+                            id: 'campaign',
+                            header: 'Campagne',
+                            accessorFn: (row) => row.campaign,
+                            cell: ({ row }) => (
+                                <LabLink
+                                    to={{ name: 'campaign', id: row.original.id }}
+                                    className="text-[var(--evo-teal)] hover:underline"
+                                >
+                                    {row.original.campaign}
+                                </LabLink>
+                            ),
+                        },
+                        { id: 'kind', header: 'Type', accessorFn: (row) => row.kind },
+                        {
+                            id: 'spend',
+                            header: 'Dépensé',
+                            accessorFn: (row) => row.spend,
+                            cell: ({ row }) => (
+                                <span className="tabular-nums">{formatDa(row.original.spend)}</span>
+                            ),
+                        },
+                    ]}
+                    data={rows}
+                    getRowId={(row) => row.id}
+                    density="compact"
+                    enableSelection={false}
+                />
+            </div>
+        );
+    }
+
+    if (view === 'attribution') {
+        return (
+            <div className="space-y-5">
+                <PageHeader
+                    title="Attribution"
+                    descriptor="Même Sankey que Rapports · septembre 2026"
+                    context={
+                        <>
+                            <ContextChip active>Compte Meta EO</ContextChip>
+                            <ContextChip>1–30 sept. 2026</ContextChip>
+                        </>
+                    }
+                />
+                <CrmKpiStrip
+                    columns={5}
+                    kpis={[
+                        { key: 'spend', label: 'Dépensé', value: formatDa(ads.spend) },
+                        { key: 'leads', label: 'Leads Inbox', value: formatCount(ads.leadsInbox) },
+                        { key: 'deals', label: 'Affaires', value: formatCount(ads.deals) },
+                        { key: 'pipeline', label: 'Pipeline attribué', value: formatDa(ads.attributedRevenue) },
+                        {
+                            key: 'roas',
+                            label: 'Valeur / dépenses',
+                            value: formatRoas(ads.displayedRoas),
+                            hint: `exact ${formatExactRoas(ads.exactRoas)}`,
+                        },
+                    ]}
+                />
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Flux campagnes → pipeline</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ChartFrame height={380} loading={loading} label="Attribution">
+                            <SankeyChart data={flow} height={380} formatValue={formatDa} />
+                        </ChartFrame>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+    if (view === 'campaigns') {
+        return (
+            <div className="space-y-5">
+                <PageHeader
+                    title="Campagnes"
+                    descriptor="Meta · septembre 2026"
+                    context={<ContextChip active>Compte Meta EO</ContextChip>}
+                />
+                <AdsListToolbar
+                    search={search}
+                    onSearchChange={setSearch}
+                    view={listView}
+                    onViewChange={setListView}
+                    views={[
+                        { id: 'all', name: 'Toutes' },
+                        { id: 'active', name: 'Actives' },
+                        { id: 'paused', name: 'En pause' },
+                    ]}
+                />
+                <DataGrid
+                    columns={[
+                        {
+                            id: 'name',
+                            header: 'Campagne',
+                            accessorFn: (row) => row.name,
+                            cell: ({ row }) => (
+                                <LabLink
+                                    to={{ name: 'campaign', id: row.original.id }}
+                                    className="font-medium text-[var(--evo-teal)] hover:underline"
+                                >
+                                    {row.original.name}
+                                </LabLink>
+                            ),
+                        },
+                        {
+                            id: 'kind',
+                            header: 'Type',
+                            accessorFn: (row) => channelKind(row.channel),
+                        },
+                        {
+                            id: 'spend',
+                            header: 'Dépensé',
+                            accessorFn: (row) => row.spend,
+                            cell: ({ row }) => (
+                                <span className="tabular-nums">{formatDa(row.original.spend)}</span>
+                            ),
+                        },
+                        {
+                            id: 'leads',
+                            header: 'Leads',
+                            accessorFn: (row) => row.leads,
+                            cell: ({ row }) => (
+                                <span className="tabular-nums">{formatCount(row.original.leads)}</span>
+                            ),
+                        },
+                        {
+                            id: 'deals',
+                            header: 'Affaires',
+                            accessorFn: (row) => row.deals,
+                            cell: ({ row }) => (
+                                <span className="tabular-nums">{formatCount(row.original.deals)}</span>
+                            ),
+                        },
+                        {
+                            id: 'roas',
+                            header: 'Valeur / dép.',
+                            accessorFn: (row) => row.roas,
+                            cell: ({ row }) => (
+                                <span className="tabular-nums">{formatRoas(row.original.roas)}</span>
+                            ),
+                        },
+                    ]}
+                    data={filteredCampaigns}
+                    getRowId={(row) => row.id}
+                    density="compact"
+                    enableSelection={false}
+                    emptyTitle="Aucune campagne"
+                />
+            </div>
+        );
+    }
 
     const journey = [
-        { label: 'Impressions', value: funnel[0]?.value ?? 0 },
-        { label: 'Clics', value: funnel[1]?.value ?? 0 },
-        { label: 'Leads', value: funnel[2]?.value ?? 0 },
-        { label: 'Affaires', value: funnel[3]?.value ?? 0 },
+        { id: 'impressions', label: 'Impressions', value: funnel[0]?.value ?? 0 },
+        { id: 'clicks', label: 'Clics', value: funnel[1]?.value ?? 0 },
+        { id: 'leads', label: 'Leads Inbox', value: funnel[2]?.value ?? 0 },
+        { id: 'deals', label: 'Affaires', value: funnel[3]?.value ?? 0 },
+        { id: 'won', label: 'Gagnés (période)', value: funnel[4]?.value ?? won },
     ];
 
     return (
@@ -86,123 +390,151 @@ export function AdsHubPage({ view = 'overview' }: Props) {
                         <ContextChip>1–30 sept. 2026</ContextChip>
                     </>
                 }
-                actions={
-                    <Button variant="primary" disabled title="Prototype — création non branchée">
-                        + Campagne
-                    </Button>
-                }
             />
 
-            <KpiStrip>
-                <KpiMetric label="Dépensé" value={formatDa(ads.spend)} />
-                <KpiMetric label="Leads Inbox" value={formatCount(ads.leadsInbox)} hint={`CPL ${formatDa(cpl)}`} />
-                <KpiMetric label="Affaires créées" value={formatCount(ads.deals)} />
-                <KpiMetric
-                    label="Pipeline attribué"
-                    value={formatDa(ads.attributedRevenue)}
-                    hint={`${formatCount(ads.deals)} affaires créées`}
-                />
-                <KpiMetric
-                    label="Valeur / dépenses"
-                    value={formatRoas(ads.displayedRoas)}
-                    hint={`${formatDa(ads.attributedRevenue)} / ${formatDa(ads.spend)} · exact ${formatExactRoas(ads.exactRoas)}`}
-                />
-            </KpiStrip>
+            <CrmKpiStrip
+                columns={5}
+                kpis={[
+                    { key: 'spend', label: 'Dépensé', value: formatDa(ads.spend) },
+                    {
+                        key: 'leads',
+                        label: 'Leads Inbox',
+                        value: formatCount(ads.leadsInbox),
+                        hint: `CPL ${formatDa(cpl)}`,
+                    },
+                    { key: 'deals', label: 'Affaires créées', value: formatCount(ads.deals) },
+                    {
+                        key: 'pipeline',
+                        label: 'Pipeline attribué',
+                        value: formatDa(ads.attributedRevenue),
+                    },
+                    {
+                        key: 'roas',
+                        label: 'Valeur / dépenses',
+                        value: formatRoas(ads.displayedRoas),
+                        hint: `${formatDa(ads.attributedRevenue)} / ${formatDa(ads.spend)} · exact ${formatExactRoas(ads.exactRoas)}`,
+                    },
+                ]}
+            />
 
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,0.9fr)]">
-                <Module title="Dépenses & leads" hint="Barres = dépensé · ligne = leads" flush>
-                    <ChartFrame loading={loading}>
-                        <EvilComposedChart
-                            data={daily}
-                            config={spendLeadsChartConfig}
-                            className="h-full w-full"
-                            animationType="none"
-                            chartProps={{ margin: CHART_MARGIN }}
-                        >
-                            <EvilComposedChart.Grid stroke="var(--evo-hairline)" vertical={false} />
-                            <EvilComposedChart.XAxis dataKey="label" />
-                            <EvilComposedChart.YAxis
-                                yAxisId="left"
-                                tickFormatter={(value: number) => formatCompactAxis(value)}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Dépenses & leads</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ChartFrame height={280} loading={loading} label="Dépenses et leads">
+                            <ComposedChart
+                                data={daily}
+                                xKey="label"
+                                height={280}
+                                yTickFormatter={(value) => formatCompactAxis(value)}
+                                rightYTickFormatter={(value) => formatCount(value)}
+                                series={[
+                                    { type: 'bar', dataKey: 'spend', name: 'Dépensé', yAxisId: 'left' },
+                                    { type: 'line', dataKey: 'leads', name: 'Leads', yAxisId: 'right' },
+                                ]}
                             />
-                            <EvilComposedChart.YAxis
-                                yAxisId="right"
-                                orientation="right"
-                                tickFormatter={(value: number) => formatCount(value)}
-                            />
-                            <EvilComposedChart.Tooltip />
-                            <EvilComposedChart.Legend verticalAlign="bottom" align="center" />
-                            <EvilComposedChart.Bar dataKey="spend" barProps={{ yAxisId: 'left' }} />
-                            <EvilComposedChart.Line dataKey="leads" lineProps={{ yAxisId: 'right' }} />
-                        </EvilComposedChart>
-                    </ChartFrame>
-                </Module>
+                        </ChartFrame>
+                    </CardContent>
+                </Card>
 
-                <Module
-                    title="Parcours pubs"
-                    hint="Les pourcentages sont les taux de passage. Les largeurs ne sont pas proportionnelles."
-                >
-                    <FunnelJourney
-                        steps={journey}
-                        footnote={`${won} gagnées sur la période — total compte, pas nécessairement attribuable aux pubs.`}
-                    />
-                </Module>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Parcours pubs</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <FunnelChart steps={journey} />
+                        <p className="mt-3 text-[11px] text-[var(--evo-ink-muted)]">
+                            {won} gagnées sur la période — total compte, pas nécessairement attribuable aux pubs.
+                        </p>
+                    </CardContent>
+                </Card>
             </div>
 
-            <Module title="Performance campagnes" hint="Valeur créée, pas CA gagné">
-                <table className="w-full min-w-[720px] text-left text-[13px]">
-                    <thead className="text-[11px] text-[var(--evo-ink-muted)]">
-                        <tr className="border-b border-[var(--evo-hairline)]">
-                            <th className="px-4 py-2 font-medium">Campagne</th>
-                            <th className="px-4 py-2 text-right font-medium">Dépensé</th>
-                            <th className="px-4 py-2 text-right font-medium">Leads</th>
-                            <th className="px-4 py-2 text-right font-medium">Affaires</th>
-                            <th className="px-4 py-2 text-right font-medium">Attribué</th>
-                            <th className="px-4 py-2 text-right font-medium">Valeur / dép.</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {campaigns.map((campaign) => (
-                            <tr
-                                key={campaign.id}
-                                className="border-b border-[var(--evo-hairline)] hover:bg-[var(--evo-hover)]"
-                            >
-                                <td className="px-4 py-2.5">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Performance campagnes</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    <AdsListToolbar
+                        search={search}
+                        onSearchChange={setSearch}
+                        view={listView}
+                        onViewChange={setListView}
+                        views={[
+                            { id: 'all', name: 'Toutes' },
+                            { id: 'active', name: 'Actives' },
+                            { id: 'paused', name: 'En pause' },
+                        ]}
+                    />
+                    <DataGrid
+                        columns={[
+                            {
+                                id: 'name',
+                                header: 'Campagne',
+                                accessorFn: (row) => row.name,
+                                cell: ({ row }) => (
                                     <LabLink
-                                        to={{ name: 'campaign', id: campaign.id }}
+                                        to={{ name: 'campaign', id: row.original.id }}
                                         className="font-medium text-[var(--evo-teal)] hover:underline"
                                     >
-                                        {campaign.name}
+                                        {row.original.name}
                                     </LabLink>
-                                </td>
-                                <td className="px-4 py-2.5 text-right tabular-nums">{formatDa(campaign.spend)}</td>
-                                <td className="px-4 py-2.5 text-right tabular-nums">{formatCount(campaign.leads)}</td>
-                                <td className="px-4 py-2.5 text-right tabular-nums">{formatCount(campaign.deals)}</td>
-                                <td className="px-4 py-2.5 text-right tabular-nums">
-                                    {formatDa(campaign.attributedRevenue)}
-                                </td>
-                                <td className="px-4 py-2.5 text-right tabular-nums">{formatRoas(campaign.roas)}</td>
-                            </tr>
-                        ))}
-                        <tr className="bg-[var(--evo-canvas)]">
-                            <td className="px-4 py-2.5 font-medium">Total</td>
-                            <td className="px-4 py-2.5 text-right font-medium tabular-nums">{formatDa(ads.spend)}</td>
-                            <td className="px-4 py-2.5 text-right font-medium tabular-nums">
-                                {formatCount(ads.leadsInbox)}
-                            </td>
-                            <td className="px-4 py-2.5 text-right font-medium tabular-nums">
-                                {formatCount(ads.deals)}
-                            </td>
-                            <td className="px-4 py-2.5 text-right font-medium tabular-nums">
-                                {formatDa(ads.attributedRevenue)}
-                            </td>
-                            <td className="px-4 py-2.5 text-right font-medium tabular-nums">
-                                {formatExactRoas(exactRoas(ads.attributedRevenue, ads.spend))}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </Module>
+                                ),
+                            },
+                            {
+                                id: 'spend',
+                                header: 'Dépensé',
+                                accessorFn: (row) => row.spend,
+                                cell: ({ row }) => (
+                                    <span className="tabular-nums">{formatDa(row.original.spend)}</span>
+                                ),
+                            },
+                            {
+                                id: 'leads',
+                                header: 'Leads',
+                                accessorFn: (row) => row.leads,
+                                cell: ({ row }) => (
+                                    <span className="tabular-nums">{formatCount(row.original.leads)}</span>
+                                ),
+                            },
+                            {
+                                id: 'deals',
+                                header: 'Affaires',
+                                accessorFn: (row) => row.deals,
+                                cell: ({ row }) => (
+                                    <span className="tabular-nums">{formatCount(row.original.deals)}</span>
+                                ),
+                            },
+                            {
+                                id: 'attributed',
+                                header: 'Attribué',
+                                accessorFn: (row) => row.attributedRevenue,
+                                cell: ({ row }) => (
+                                    <span className="tabular-nums">{formatDa(row.original.attributedRevenue)}</span>
+                                ),
+                            },
+                            {
+                                id: 'roas',
+                                header: 'Valeur / dép.',
+                                accessorFn: (row) => row.roas,
+                                cell: ({ row }) => (
+                                    <span className="tabular-nums">{formatRoas(row.original.roas)}</span>
+                                ),
+                            },
+                        ]}
+                        data={filteredCampaigns}
+                        getRowId={(row) => row.id}
+                        density="compact"
+                        enableSelection={false}
+                    />
+                    <p className="text-[12px] text-[var(--evo-ink-secondary)]">
+                        Total {formatDa(ads.spend)} · {formatCount(ads.leadsInbox)} leads ·{' '}
+                        {formatExactRoas(exactRoas(ads.attributedRevenue, ads.spend))}
+                    </p>
+                </CardContent>
+            </Card>
         </div>
     );
 }

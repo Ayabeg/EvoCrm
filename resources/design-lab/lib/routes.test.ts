@@ -55,6 +55,25 @@ describe('design-lab settings route', () => {
     });
 });
 
+describe('design-lab ads route', () => {
+    it('parses /design-lab/ads and attribution', () => {
+        expect(parseLabLocation('/design-lab/ads', '')).toEqual({
+            name: 'ads',
+            view: 'overview',
+        });
+        expect(parseLabLocation('/design-lab/ads/attribution', '')).toEqual({
+            name: 'ads',
+            view: 'attribution',
+        });
+        expect(parseLabLocation('/design-lab/ads/campaigns/campaign-wa-cliniques-alger', '')).toEqual({
+            name: 'campaign',
+            id: 'campaign-wa-cliniques-alger',
+        });
+        expect(routePath({ name: 'ads' })).toBe('/ads');
+        expect(routePath({ name: 'ads', view: 'attribution' })).toBe('/ads/attribution');
+    });
+});
+
 describe('design-lab shell route', () => {
     it('parses /design-lab/shell as the shell page', () => {
         expect(parseLabLocation('/design-lab/shell', '')).toEqual({

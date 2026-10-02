@@ -235,3 +235,17 @@ Outbound family is custom Evo (no registry copy) on `evo/ui/*` + PR3 DataGrid / 
 | `@tiptap/pm` | MIT | ProseMirror peer of Tiptap |
 
 AGPL leftover in `resources/js`: **zero**.
+
+## PR9 copy log (2026-10-02)
+
+Charts are Recharts wrappers (already installed `recharts` ^3.10.1, MIT). No new npm package. No evilcharts import from pages or `evo/charts`. Ink/teal default series (`--evo-chart-1` / `--evo-chart-2`); orange is `--evo-chart-highlight` only.
+
+| Component | Registry | Source URL | License | Files copied | Files modified | Evo destination | Date verified |
+|---|---|---|---|---|---|---|---|
+| ChartFrame / Tooltip / Legend / Axis | evilcharts prior art · Recharts | https://github.com/recharts/recharts · https://github.com/legions-developer/evilcharts | MIT (LICENSE) | wrappers only | `--evo-*` ticks/grid/tooltip; reduced-motion | `resources/js/evo/charts/` | 2026-10-02 |
+| Line / Area / Bar / Composed | Recharts | https://github.com/recharts/recharts | MIT | wrappers only | ink/teal series; no orange default | `resources/js/evo/charts/{line,area,bar,composed}-chart.tsx` | 2026-10-02 |
+| Sankey | Recharts Sankey | https://github.com/recharts/recharts | MIT | wrapper only | custom node/link; teal flows | `resources/js/evo/charts/sankey-chart.tsx` | 2026-10-02 |
+| Sparkline / FunnelChart | custom Evo on Recharts / CSS | — | MIT (original) | original | teal bars; tabular-nums | `resources/js/evo/charts/sparkline.tsx`, `funnel-chart.tsx` | 2026-10-02 |
+| Ads shell / funnel / attribution Sankey / list toolbar | custom Evo | — | MIT (original) | original | DataGrid 32/36; French `t()`; Meta names kept | `resources/js/evo/ads/` | 2026-10-02 |
+
+No new npm dependencies. Recharts license already listed in Libraries. dnd-kit / Tiptap rows stay in the PR8 log above.

@@ -39,13 +39,19 @@ it('keeps Ads hub chrome on Brand Book hairline and mark links', function () {
         $src = file_get_contents($file);
 
         expect($src)->not->toContain('--aurora-')
-            ->and($src)->toMatch('/border-hairline|HairlinePanel|HairlineTable|KpiMeter/');
+            ->and($src)->not->toContain('lucide-react')
+            ->and($src)->toContain('@/evo/ads')
+            ->and($src)->toMatch('/AdsShell|CrmKpiStrip|DataGrid/');
     }
 
     $index = file_get_contents(resource_path('js/pages/ads/index.tsx'));
+    $shell = file_get_contents(resource_path('js/evo/ads/shell.tsx'));
     $panel = file_get_contents(resource_path('js/components/surface/hairline-panel.tsx'));
 
-    expect($index)->toContain('text-brand')
+    expect($index)->toContain('--evo-teal')
+        ->and($index)->toContain('CrmKpiStrip')
+        ->and($shell)->toContain('RoomShell')
+        ->and($shell)->toContain('--evo-canvas')
         ->and($panel)->toContain('border-hairline');
 });
 

@@ -1,19 +1,27 @@
 import { Form, Link } from '@inertiajs/react';
-import type { FunnelCounts } from '@/components/ads/funnel';
-import { BrandConnectButtons } from '@/components/connectors/brand-connect';
-import { AdsShell } from '@/components/crm/ads-shell';
-import { HairlinePanel } from '@/components/surface/hairline-panel';
+import { useMemo, useState } from 'react';
+
 import {
-    HairlineRow,
-    HairlineTable,
-    HairlineTd,
-    HairlineTh,
-} from '@/components/surface/hairline-table';
-import { KpiMeter } from '@/components/surface/kpi-meter';
-import { SurfaceHeader } from '@/components/surface/surface-header';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { formatDzd } from '@/lib/money';
+    AdsConnectBanner,
+    AdsFunnel,
+    AdsListToolbar,
+    AdsPageHeader,
+    AdsShell,
+    EMPTY_ADS_FUNNEL,
+    campaignKind,
+    campaignStatusTone,
+    matchesAdsView,
+    matchesSearch,
+} from '@/evo/ads';
+import type { AdsFunnelCounts, AdsListViewId, AdsMetaStatus } from '@/evo/ads';
+import { DataGrid } from '@/evo/data/data-grid';
+import { formatMoneyFromCents, formatNumber } from '@/evo/lib/format';
+import { CrmKpiStrip } from '@/evo/patterns/kpi';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/evo/ui/card';
+import { Status } from '@/evo/ui/status';
+import { t } from '@/lib/i18n';
 
 type Account = {
     id: number;
@@ -52,247 +60,280 @@ type AdLeadRow = {
 type Props = {
     accounts: Account[];
     campaigns: Campaign[];
-    funnels: Record<number, FunnelCounts>;
-    totals: FunnelCounts;
+    funnels: Record<number, AdsFunnelCounts>;
+    totals: AdsFunnelCounts;
     leads: AdLeadRow[];
-    meta: {
-        connected: boolean;
-        reason: string | null;
-        connect_url?: string | null;
-    };
+    meta: AdsMetaStatus;
 };
 
-function kindOf(campaign: Campaign): string {
-    if (campaign.click_to_whatsapp && campaign.lead_form) {
-        return 'CTWA + Lead form';
-    }
-
-    if (campaign.click_to_whatsapp) {
-        return 'Click-to-WhatsApp';
-    }
-
-    if (campaign.lead_form) {
-        return 'Lead form';
-    }
-
-    return 'Traffic';
-}
-
 export default function AdsHub({ accounts, campaigns, totals, leads, meta }: Props) {
+    const [search, setSearch] = useState('');
+    const [view, setView] = useState<AdsListViewId>('all');
+
+    const rows = useMemo(
+        () =>
+            campaigns.filter((campaign) => {
+                const haystack = `${campaign.name} ${campaign.account?.name ?? ''} ${campaignKind(campaign)}`;
+
+                return matchesAdsView(campaign.status, view) && matchesSearch(haystack, search);
+            }),
+        [campaigns, search, view],
+    );
+
     return (
         <AdsShell title="Ads">
             <div className="flex-1 space-y-5 p-6">
-                <SurfaceHeader
+                <AdsPageHeader
                     title="Overview"
                     description="Meta ad accounts, campaigns, and lead intake. Funnel attribution lives on the Attribution tab."
-                >
-                    <Badge variant={meta.connected ? 'default' : 'secondary'}>
-                        {meta.connected ? 'Meta connected' : 'Demo data'}
-                    </Badge>
-                    <Form action="/ads/sync" method="post">
-                        {({ processing }) => (
-                            <Button size="sm" disabled={processing}>
-                                Sync from Meta
-                            </Button>
-                        )}
-                    </Form>
-                </SurfaceHeader>
+                    actions={
+                        <>
+                            <Badge tone={meta.connected ? 'success' : 'neutral'} fill="soft">
+                                {t(meta.connected ? 'Meta connected' : 'Demo data')}
+                            </Badge>
+                            <Form action="/ads/sync" method="post">
+                                {({ processing }) => (
+                                    <Button type="submit" size="sm" disabled={processing} loading={processing}>
+                                        {t('Sync from Meta')}
+                                    </Button>
+                                )}
+                            </Form>
+                        </>
+                    }
+                />
 
-                {meta.reason || !meta.connected ? (
-                    <HairlinePanel className="space-y-3 px-4 py-3">
-                        {meta.reason ? (
-                            <p className="aurora-text-body-sm text-brand">{meta.reason}</p>
-                        ) : null}
-                        <BrandConnectButtons facebookUrl={meta.connect_url ?? '/auth/meta?popup=1'} />
-                        <p className="aurora-text-caption text-mute">
-                            Log in with Facebook in the popup. Lead forms POST to{' '}
-                            <code>/webhooks/meta/leads/{'{webhookKey}'}</code> and create Contact +
-                            Lead in the resolved workspace.
-                        </p>
-                    </HairlinePanel>
-                ) : null}
+                <AdsConnectBanner meta={meta} />
 
-                <KpiMeter
-                    items={[
-                        { label: 'Spend', value: formatDzd(totals.spend_cents) },
-                        { label: 'Impressions', value: totals.impressions.toLocaleString() },
-                        { label: 'Clicks', value: totals.clicks.toLocaleString() },
+                <CrmKpiStrip
+                    columns={6}
+                    kpis={[
+                        { key: 'spend', label: t('Spend'), value: formatMoneyFromCents(totals.spend_cents) },
+                        { key: 'impressions', label: t('Impressions'), value: formatNumber(totals.impressions) },
+                        { key: 'clicks', label: t('Clicks'), value: formatNumber(totals.clicks) },
                         {
-                            label: 'Conv. / Leads',
-                            value: String(totals.conversations + totals.form_leads),
+                            key: 'leads',
+                            label: t('Conversations / Leads'),
+                            value: formatNumber(totals.conversations + totals.form_leads),
                         },
-                        { label: 'Deals', value: String(totals.deals) },
-                        { label: 'Won', value: String(totals.won) },
+                        { key: 'deals', label: t('Deals'), value: formatNumber(totals.deals) },
+                        { key: 'won', label: t('Won'), value: formatNumber(totals.won) },
                     ]}
                 />
 
-                <p className="aurora-text-body-sm text-mute">
-                    Funnel boards:{' '}
-                    <Link href="/ads/attribution" className="font-medium text-brand hover:underline">
-                        Attribution
+                <p className="text-[13px] text-[var(--evo-ink-secondary)]">
+                    {t('Funnel boards:')}{' '}
+                    <Link href="/ads/attribution" className="font-medium text-[var(--evo-teal)] hover:underline">
+                        {t('Attribution')}
                     </Link>
-                    . Meta audiences:{' '}
-                    <Link href="/ads/audiences" className="font-medium text-brand hover:underline">
-                        Audiences
+                    . {t('Meta audiences:')}{' '}
+                    <Link href="/ads/audiences" className="font-medium text-[var(--evo-teal)] hover:underline">
+                        {t('Audiences')}
                     </Link>
                     .
                 </p>
 
-                <HairlinePanel>
-                    <div className="border-b border-hairline px-4 py-2.5">
-                        <h2 className="aurora-text-ui font-medium text-ink">Campaigns</h2>
-                    </div>
-                    <HairlineTable>
-                        <thead>
-                            <tr className="border-b border-hairline">
-                                <HairlineTh>Campaign</HairlineTh>
-                                <HairlineTh>Account</HairlineTh>
-                                <HairlineTh>Kind</HairlineTh>
-                                <HairlineTh>Status</HairlineTh>
-                                <HairlineTh>Budget/day</HairlineTh>
-                                <HairlineTh align="right">Ad sets</HairlineTh>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {campaigns.length === 0 ? (
-                                <HairlineRow>
-                                    <HairlineTd colSpan={6} className="py-6 text-mute">
-                                        No campaigns yet - sync from Meta or use demo data.
-                                    </HairlineTd>
-                                </HairlineRow>
-                            ) : (
-                                campaigns.map((campaign) => (
-                                    <HairlineRow key={campaign.id}>
-                                        <HairlineTd>
-                                            <Link
-                                                href={`/ads/campaigns/${campaign.id}`}
-                                                className="font-medium text-brand hover:underline"
-                                            >
-                                                {campaign.name}
-                                            </Link>
-                                        </HairlineTd>
-                                        <HairlineTd className="text-mute">
-                                            {campaign.account?.name ?? '-'}
-                                        </HairlineTd>
-                                        <HairlineTd>{kindOf(campaign)}</HairlineTd>
-                                        <HairlineTd>{campaign.status}</HairlineTd>
-                                        <HairlineTd className="money tabular-nums">
-                                            {formatDzd(campaign.daily_budget_cents)}
-                                        </HairlineTd>
-                                        <HairlineTd align="right" className="tabular-nums">
-                                            {campaign.ad_sets_count}
-                                        </HairlineTd>
-                                    </HairlineRow>
-                                ))
-                            )}
-                        </tbody>
-                    </HairlineTable>
-                </HairlinePanel>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('Campaigns')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <AdsListToolbar
+                            search={search}
+                            onSearchChange={setSearch}
+                            view={view}
+                            onViewChange={setView}
+                        />
+                        <DataGrid
+                            columns={[
+                                {
+                                    id: 'name',
+                                    header: t('Campaign'),
+                                    accessorFn: (row) => row.name,
+                                    cell: ({ row }) => (
+                                        <Link
+                                            href={`/ads/campaigns/${row.original.id}`}
+                                            className="font-medium text-[var(--evo-teal)] hover:underline"
+                                        >
+                                            {row.original.name}
+                                        </Link>
+                                    ),
+                                },
+                                {
+                                    id: 'account',
+                                    header: t('Account'),
+                                    accessorFn: (row) => row.account?.name ?? '—',
+                                },
+                                {
+                                    id: 'kind',
+                                    header: t('Kind'),
+                                    accessorFn: (row) => t(campaignKind(row)),
+                                },
+                                {
+                                    id: 'status',
+                                    header: t('Status'),
+                                    accessorFn: (row) => row.status,
+                                    cell: ({ row }) => (
+                                        <Status
+                                            tone={campaignStatusTone(row.original.status)}
+                                            label={row.original.status}
+                                        />
+                                    ),
+                                },
+                                {
+                                    id: 'budget',
+                                    header: t('Budget/day'),
+                                    accessorFn: (row) => row.daily_budget_cents,
+                                    cell: ({ row }) => (
+                                        <span className="tabular-nums">
+                                            {formatMoneyFromCents(row.original.daily_budget_cents)}
+                                        </span>
+                                    ),
+                                },
+                                {
+                                    id: 'ad_sets',
+                                    header: t('Ad sets'),
+                                    accessorFn: (row) => row.ad_sets_count,
+                                    cell: ({ row }) => (
+                                        <span className="tabular-nums">{formatNumber(row.original.ad_sets_count)}</span>
+                                    ),
+                                },
+                            ]}
+                            data={rows}
+                            getRowId={(row) => String(row.id)}
+                            density="compact"
+                            enableSelection={false}
+                            emptyTitle={t('No campaigns yet')}
+                            emptyDescription={t('Sync from Meta or use demo data.')}
+                        />
+                    </CardContent>
+                </Card>
 
                 <div className="grid gap-4 lg:grid-cols-2">
-                    <HairlinePanel>
-                        <div className="border-b border-hairline px-4 py-2.5">
-                            <h2 className="aurora-text-ui font-medium text-ink">Ad accounts</h2>
-                        </div>
-                        <HairlineTable>
-                            <thead>
-                                <tr className="border-b border-hairline">
-                                    <HairlineTh>Account</HairlineTh>
-                                    <HairlineTh>Status</HairlineTh>
-                                    <HairlineTh>Currency</HairlineTh>
-                                    <HairlineTh align="right">Campaigns</HairlineTh>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {accounts.length === 0 ? (
-                                    <HairlineRow>
-                                        <HairlineTd colSpan={4} className="py-6 text-mute">
-                                            No ad accounts yet.
-                                        </HairlineTd>
-                                    </HairlineRow>
-                                ) : (
-                                    accounts.map((account) => (
-                                        <HairlineRow key={account.id}>
-                                            <HairlineTd className="font-medium">{account.name}</HairlineTd>
-                                            <HairlineTd>{account.status}</HairlineTd>
-                                            <HairlineTd>{account.currency}</HairlineTd>
-                                            <HairlineTd align="right">{account.campaigns_count}</HairlineTd>
-                                        </HairlineRow>
-                                    ))
-                                )}
-                            </tbody>
-                        </HairlineTable>
-                    </HairlinePanel>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Ad accounts')}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <DataGrid
+                                columns={[
+                                    { id: 'name', header: t('Account'), accessorFn: (row) => row.name },
+                                    {
+                                        id: 'status',
+                                        header: t('Status'),
+                                        accessorFn: (row) => row.status,
+                                        cell: ({ row }) => (
+                                            <Status
+                                                tone={campaignStatusTone(row.original.status)}
+                                                label={row.original.status}
+                                            />
+                                        ),
+                                    },
+                                    { id: 'currency', header: t('Currency'), accessorFn: (row) => row.currency },
+                                    {
+                                        id: 'campaigns',
+                                        header: t('Campaigns'),
+                                        accessorFn: (row) => row.campaigns_count,
+                                        cell: ({ row }) => (
+                                            <span className="tabular-nums">
+                                                {formatNumber(row.original.campaigns_count)}
+                                            </span>
+                                        ),
+                                    },
+                                ]}
+                                data={accounts}
+                                getRowId={(row) => String(row.id)}
+                                density="compact"
+                                enableSelection={false}
+                                emptyTitle={t('No ad accounts yet')}
+                            />
+                        </CardContent>
+                    </Card>
 
-                    <HairlinePanel>
-                        <div className="border-b border-hairline px-4 py-2.5">
-                            <h2 className="aurora-text-ui font-medium text-ink">Latest form leads</h2>
-                        </div>
-                        <HairlineTable>
-                            <thead>
-                                <tr className="border-b border-hairline">
-                                    <HairlineTh>Contact</HairlineTh>
-                                    <HairlineTh>Campaign</HairlineTh>
-                                    <HairlineTh>CRM lead</HairlineTh>
-                                    <HairlineTh>Deal</HairlineTh>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {leads.length === 0 ? (
-                                    <HairlineRow>
-                                        <HairlineTd colSpan={4} className="py-6 text-mute">
-                                            No form submissions yet.
-                                        </HairlineTd>
-                                    </HairlineRow>
-                                ) : (
-                                    leads.map((row) => (
-                                        <HairlineRow key={row.id}>
-                                            <HairlineTd>
-                                                {row.contact ? (
-                                                    <Link
-                                                        href={`/crm/contacts/${row.contact.id}`}
-                                                        className="text-brand hover:underline"
-                                                    >
-                                                        {row.contact.first_name} {row.contact.last_name ?? ''}
-                                                    </Link>
-                                                ) : (
-                                                    '-'
-                                                )}
-                                            </HairlineTd>
-                                            <HairlineTd className="text-mute">
-                                                {row.campaign?.name ?? '-'}
-                                            </HairlineTd>
-                                            <HairlineTd>
-                                                {row.lead ? (
-                                                    <Link
-                                                        href={`/crm/leads/${row.lead.id}`}
-                                                        className="text-brand hover:underline"
-                                                    >
-                                                        {row.lead.status}
-                                                    </Link>
-                                                ) : (
-                                                    '-'
-                                                )}
-                                            </HairlineTd>
-                                            <HairlineTd>
-                                                {row.lead?.deal ? (
-                                                    <Link
-                                                        href={`/crm/deals/${row.lead.deal.id}`}
-                                                        className="text-brand hover:underline"
-                                                    >
-                                                        {row.lead.deal.title}
-                                                    </Link>
-                                                ) : (
-                                                    '-'
-                                                )}
-                                            </HairlineTd>
-                                        </HairlineRow>
-                                    ))
-                                )}
-                            </tbody>
-                        </HairlineTable>
-                    </HairlinePanel>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Latest form leads')}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <DataGrid
+                                columns={[
+                                    {
+                                        id: 'contact',
+                                        header: t('Contact'),
+                                        accessorFn: (row) =>
+                                            row.contact
+                                                ? `${row.contact.first_name} ${row.contact.last_name ?? ''}`
+                                                : '—',
+                                        cell: ({ row }) =>
+                                            row.original.contact ? (
+                                                <Link
+                                                    href={`/crm/contacts/${row.original.contact.id}`}
+                                                    className="text-[var(--evo-teal)] hover:underline"
+                                                >
+                                                    {row.original.contact.first_name}{' '}
+                                                    {row.original.contact.last_name ?? ''}
+                                                </Link>
+                                            ) : (
+                                                '—'
+                                            ),
+                                    },
+                                    {
+                                        id: 'campaign',
+                                        header: t('Campaign'),
+                                        accessorFn: (row) => row.campaign?.name ?? '—',
+                                    },
+                                    {
+                                        id: 'lead',
+                                        header: t('CRM lead'),
+                                        accessorFn: (row) => row.lead?.status ?? '—',
+                                        cell: ({ row }) =>
+                                            row.original.lead ? (
+                                                <Link
+                                                    href={`/crm/leads/${row.original.lead.id}`}
+                                                    className="text-[var(--evo-teal)] hover:underline"
+                                                >
+                                                    {row.original.lead.status}
+                                                </Link>
+                                            ) : (
+                                                '—'
+                                            ),
+                                    },
+                                    {
+                                        id: 'deal',
+                                        header: t('Deal'),
+                                        accessorFn: (row) => row.lead?.deal?.title ?? '—',
+                                        cell: ({ row }) =>
+                                            row.original.lead?.deal ? (
+                                                <Link
+                                                    href={`/crm/deals/${row.original.lead.deal.id}`}
+                                                    className="text-[var(--evo-teal)] hover:underline"
+                                                >
+                                                    {row.original.lead.deal.title}
+                                                </Link>
+                                            ) : (
+                                                '—'
+                                            ),
+                                    },
+                                ]}
+                                data={leads}
+                                getRowId={(row) => String(row.id)}
+                                density="compact"
+                                enableSelection={false}
+                                emptyTitle={t('No form submissions yet')}
+                            />
+                        </CardContent>
+                    </Card>
                 </div>
+
+                {campaigns[0] ? (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Workspace funnel')}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <AdsFunnel funnel={totals ?? EMPTY_ADS_FUNNEL} />
+                        </CardContent>
+                    </Card>
+                ) : null}
             </div>
         </AdsShell>
     );
