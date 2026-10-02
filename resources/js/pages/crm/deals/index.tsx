@@ -15,6 +15,7 @@ import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { DealAttentionQueueItem } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
+import { stageLabel } from '@/lib/stage-copy';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {
     dealEmptyState,
@@ -189,7 +190,7 @@ function DealCreateFields({
     showAddAnother = false,
 }: {
     contacts: { id: number; first_name: string; last_name?: string | null }[];
-    stages: { id: number; name: string }[];
+    stages: { id: number; name: string; slug?: string }[];
     pipelineId: number;
     prefillContactId?: number | null;
     onDone: () => void;
@@ -242,7 +243,7 @@ function DealCreateFields({
                         >
                             {stages.map((stage) => (
                                 <option key={stage.id} value={stage.id}>
-                                    {stage.name}
+                                    {stageLabel(stage.slug, stage.name)}
                                 </option>
                             ))}
                         </select>

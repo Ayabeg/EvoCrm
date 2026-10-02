@@ -39,6 +39,7 @@ import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
+import { sortStages, stageLabel } from '@/lib/stage-copy';
 
 type Deal = {
     id: number;
@@ -48,12 +49,19 @@ type Deal = {
     type?: string | null;
     priority?: string | null;
     last_activity_at?: string | null;
+    next_step?: string | null;
+    source?: string | null;
     owner?: { id: number; name: string } | null;
     owner_id?: number | null;
     contact_id?: number | null;
     company_id?: number | null;
-    stage?: { id: number; name: string; slug: string } | null;
-    pipeline?: { name: string; stages?: { id: number; name: string }[] } | null;
+    stage?: {
+        id: number;
+        name: string;
+        slug: string;
+        probability?: number | null;
+    } | null;
+    pipeline?: { name: string; stages?: { id: number; name: string; slug?: string }[] } | null;
 };
 
 type QuoteRow = {
@@ -116,7 +124,7 @@ export default function DealShow({
         tickets?: TicketsRelated;
     } | null;
     timeline: RecordActivity[];
-    stages: { id: number; name: string }[];
+    stages: { id: number; name: string; slug?: string }[];
     attributes?: AttributeBag;
     askEvo?: AskEvoPayload | null;
     dealHealth?: {
@@ -202,9 +210,12 @@ export default function DealShow({
                                         </>
                                     }
                                     badge={
-                                        deal.stage?.name ? (
+                                        deal.stage ? (
                                             <RecordStatusBadge>
-                                                {deal.stage.name}
+                                                {stageLabel(
+                                                    deal.stage.slug,
+                                                    deal.stage.name,
+                                                )}
                                             </RecordStatusBadge>
                                         ) : null
                                     }
@@ -237,10 +248,30 @@ export default function DealShow({
                                 <RecordSection title={t('About this deal')}>
                                     <RecordFactList>
                                         <RecordFact
+                                            label="Company"
+                                            value={company?.name}
+                                        />
+                                        <RecordFact
+                                            label="Contact"
+                                            value={contactName}
+                                        />
+                                        <RecordFact
                                             label="Amount"
                                             value={formatDzd(deal.amount_cents)}
                                             money
                                             hideEmpty={false}
+                                        />
+                                        <RecordFact
+                                            label="Probability"
+                                            value={
+                                                deal.stage?.probability != null
+                                                    ? `${deal.stage.probability} %`
+                                                    : null
+                                            }
+                                        />
+                                        <RecordFact
+                                            label="Source"
+                                            value={deal.source}
                                         />
                                         <RecordFact
                                             label="Owner"
@@ -257,22 +288,9 @@ export default function DealShow({
                                             }
                                         />
                                         <RecordFact
-                                            label="Last activity"
-                                            value={
-                                                deal.last_activity_at
-                                                    ? String(
-                                                          deal.last_activity_at,
-                                                      ).slice(0, 10)
-                                                    : null
-                                            }
-                                        />
-                                        <RecordFact
-                                            label="Type"
-                                            value={deal.type}
-                                        />
-                                        <RecordFact
-                                            label="Priority"
-                                            value={deal.priority}
+                                            label="Next action"
+                                            value={deal.next_step}
+                                            wrap
                                         />
                                     </RecordFactList>
                                 </RecordSection>
@@ -291,12 +309,15 @@ export default function DealShow({
                                                     }
                                                     className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
                                                 >
-                                                    {stages.map((stage) => (
+                                                    {sortStages(stages).map((stage) => (
                                                         <option
                                                             key={stage.id}
                                                             value={stage.id}
                                                         >
-                                                            {stage.name}
+                                                            {stageLabel(
+                                                                stage.slug,
+                                                                stage.name,
+                                                            )}
                                                         </option>
                                                     ))}
                                                 </select>
@@ -393,7 +414,15 @@ export default function DealShow({
                                         label: t('Amount'),
                                         value: formatDzd(deal.amount_cents),
                                     },
-                                    { label: t('Stage'), value: deal.stage?.name },
+                                    {
+                                        label: t('Stage'),
+                                        value: deal.stage
+                                            ? stageLabel(
+                                                  deal.stage.slug,
+                                                  deal.stage.name,
+                                              )
+                                            : undefined,
+                                    },
                                     { label: t('Contact'), value: contactName },
                                     { label: t('Company'), value: company?.name },
                                 ]}

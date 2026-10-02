@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToWorkspace;
+use App\Support\PublicAppUrl;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -57,7 +58,7 @@ class MeetingSchedule extends Model
 
     public function publicUrl(): string
     {
-        return url('/book/'.$this->slug);
+        return PublicAppUrl::to('/book/'.$this->slug);
     }
 
     public static function forUser(User $user): self

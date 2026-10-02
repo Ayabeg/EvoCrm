@@ -37,6 +37,20 @@ function bookPayload(array $overrides = []): array
     ], $overrides);
 }
 
+it('publishes booking links on the public origin when APP_URL is loopback', function () {
+    config([
+        'app.url' => 'http://127.0.0.1:8000',
+        'app.public_origin' => 'https://app.evocrmapp.com',
+    ]);
+
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+
+    expect($schedule->publicUrl())->toStartWith('https://app.evocrmapp.com/book/')
+        ->and($schedule->publicUrl())->not->toContain('evosales')
+        ->and($schedule->publicUrl())->not->toContain('127.0.0.1');
+});
+
 it('lets a seller publish a public booking link', function () {
     $user = meetingHost();
 

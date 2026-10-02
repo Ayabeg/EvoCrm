@@ -22,6 +22,7 @@ import type { DealAttention } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 import { dealStageColumnAccent } from '@/lib/stage-colors';
+import { stageLabel } from '@/lib/stage-copy';
 
 export type BoardStage = {
     id: number;
@@ -173,7 +174,7 @@ function BoardDealCard({
                                     key={stage.id}
                                     onSelect={() => moveDeal(deal.id, stage.id)}
                                 >
-                                    {stage.name}
+                                    {stageLabel(stage.slug, stage.name)}
                                 </DropdownMenuItem>
                             ))}
                     </DropdownMenuContent>
@@ -202,7 +203,7 @@ export function DealPipelineBoard({
 
     const columns: PipelineColumnData[] = stages.map((stage) => ({
         id: String(stage.id),
-        name: stage.name,
+        name: stageLabel(stage.slug, stage.name),
         slug: stage.slug,
         count: stage.count,
         amount: formatDzd(stage.amount_cents),

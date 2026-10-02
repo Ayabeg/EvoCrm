@@ -17,6 +17,8 @@ it('seeds a week of Algeria-first sales-OS data', function () {
     Artisan::call('db:seed', ['--class' => DatabaseSeeder::class, '--no-interaction' => true]);
 
     expect(User::query()->where('email', 'owner@evosales.local')->exists())->toBeTrue()
+        ->and(User::query()->where('email', 'visualqa@evosales.local')->exists())->toBeTrue()
+        ->and(Deal::query()->where('title', 'Modernisation CRM')->exists())->toBeTrue()
         ->and(Company::query()->count())->toBeGreaterThanOrEqual(10)
         ->and(Contact::query()->count())->toBeGreaterThanOrEqual(20)
         ->and(Deal::query()->count())->toBeGreaterThanOrEqual(12)

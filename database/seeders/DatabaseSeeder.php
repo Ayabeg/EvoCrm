@@ -938,5 +938,7 @@ class DatabaseSeeder extends Seeder
                     ->where('name', 'Unanswered desk')
                     ->first()?->id,
             ]);
+
+        $this->call(VisualQaSeeder::class);
     }
 }

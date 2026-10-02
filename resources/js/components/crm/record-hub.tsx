@@ -7,7 +7,7 @@ import { Avatar } from '@/evo/ui/avatar';
 import { Badge } from '@/evo/ui/badge';
 import { Button } from '@/evo/ui/button';
 import { Card, CardContent } from '@/evo/ui/card';
-import { t } from '@/lib/i18n';
+import { dateLocale, t } from '@/lib/i18n';
 import { MONEY_NEVER_CLIP_CLASS, PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
@@ -32,12 +32,13 @@ export function formatRecordWhen(iso?: string | null): string | null {
     }
 
     try {
-        return new Intl.DateTimeFormat('en-GB', {
+        return new Intl.DateTimeFormat(dateLocale(), {
             timeZone: ALGIERS,
             day: 'numeric',
             month: 'short',
             hour: '2-digit',
             minute: '2-digit',
+            hour12: false,
         }).format(new Date(iso));
     } catch {
         return iso.slice(0, 10);
@@ -138,10 +139,6 @@ export function RecordPageFrame({
     return (
         <div className={cn('h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink', PAGE_OVERFLOW_CLASS)}>
             <div className="relative shrink-0 border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6">
-                <span
-                    className="absolute inset-y-0 start-0 w-[3px] bg-brand"
-                    aria-hidden
-                />
                 {header}
             </div>
             {children}
@@ -209,16 +206,21 @@ export function RecordIdentity({
     );
 }
 
+export const RECORD_SECTION_HEADING =
+    'font-sans text-[13px] font-semibold tracking-tight text-ink normal-case';
+
 export function RecordFact({
     label,
     value,
     money = false,
     hideEmpty = true,
+    wrap = false,
 }: {
     label: string;
     value?: string | null;
     money?: boolean;
     hideEmpty?: boolean;
+    wrap?: boolean;
 }) {
     if (hideEmpty && isEmptyFact(value)) {
         return null;
@@ -233,7 +235,11 @@ export function RecordFact({
             <p
                 className={cn(
                     'text-[13px] text-ink',
-                    money ? MONEY_NEVER_CLIP_CLASS : 'truncate',
+                    money
+                        ? MONEY_NEVER_CLIP_CLASS
+                        : wrap
+                          ? 'whitespace-normal break-words'
+                          : 'truncate',
                     money && 'font-medium',
                 )}
             >
@@ -277,7 +283,7 @@ export function RecordSection({
         <section className={cn('space-y-2', className)}>
             {title ? (
                 <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">
+                    <h3 className={RECORD_SECTION_HEADING}>
                         {t(title)}
                     </h3>
                     {action}
@@ -304,23 +310,21 @@ export function RecordTimelineItem({
     children?: ReactNode;
 }) {
     const when = formatRecordWhen(at);
+    const typeLabel = t(type.charAt(0).toUpperCase() + type.slice(1));
+    const subject =
+        typeof title === 'string' ? title.trim() : title ? String(title) : '';
+    const line =
+        subject &&
+        !subject.toLowerCase().startsWith(typeLabel.toLowerCase())
+            ? `${typeLabel} · ${subject}`
+            : subject || typeLabel;
 
     return (
         <article className="border-b border-hairline py-2.5 last:border-b-0">
-            <div className="flex items-baseline justify-between gap-3">
-                <p className="text-[11px] font-medium tracking-wide text-mute capitalize">
-                    {t(type.charAt(0).toUpperCase() + type.slice(1))}
-                </p>
-                {when ? (
-                    <time className="shrink-0 text-[11px] text-mute" dateTime={at ?? undefined}>
-                        {when}
-                    </time>
-                ) : null}
-            </div>
-            {title ? (
-                <p className="mt-0.5 text-[13px] font-medium text-ink">{title}</p>
-            ) : null}
-            {author ? <p className="text-[11px] text-mute">{author}</p> : null}
+            <p className="text-[13px] font-medium text-ink">{line}</p>
+            <p className="mt-0.5 text-[11px] text-mute">
+                {[author, when].filter(Boolean).join(' · ')}
+            </p>
             {children}
         </article>
     );
@@ -342,7 +346,7 @@ export function RecordNextAction({
     return (
         <div className="flex items-start justify-between gap-3 border-b border-hairline pb-3">
             <div className="min-w-0">
-                <p className="text-[11px] font-medium tracking-wide text-mute uppercase">
+                <p className={RECORD_SECTION_HEADING}>
                     {t('Next')}
                 </p>
                 <p className="mt-0.5 text-[13px] font-medium text-ink">{title}</p>

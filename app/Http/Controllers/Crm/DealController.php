@@ -24,6 +24,7 @@ use App\Services\Crm\StagePropertyGate;
 use App\Services\LeadOs\DealHealthScorer;
 use App\Services\LeadOs\NextMoveAdvisor;
 use App\Support\CrmHub;
+use App\Support\StageCopy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -207,7 +208,7 @@ class DealController extends Controller
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('deal', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
             'members' => $hub->members($workspace),
-            'recordCount' => $board['forecast']['count'],
+            'recordCount' => count($board['deals']),
             'stagePills' => $stagePills,
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
@@ -253,7 +254,7 @@ class DealController extends Controller
             'catchUp' => $hub->catchUp(deal: $deal),
             'attributes' => $hub->attributeBag($workspace, 'deal', $deal->id),
             'playbooks' => $hub->playbooks($workspace, 'deal'),
-            'stages' => $deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages,
+            'stages' => StageCopy::sort($deal->pipeline?->stages ?? $workspace->defaultPipeline()->stages),
             'members' => $hub->members($workspace),
             'products' => Product::query()->forWorkspace($workspace)->orderBy('name')->get(),
             'splits' => $deal->splits,

@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { stageLabel } from '@/lib/stage-copy';
 import { cn } from '@/lib/utils';
 
 export type StagePill = {
@@ -35,7 +36,7 @@ export function StagePills({
                             : 'border-hairline text-mute hover:text-ink',
                     )}
                 >
-                    {stage.name}
+                    {stageLabel(stage.slug, stage.name)}
                     <span className="tabular-nums">{stage.count}</span>
                 </Link>
             ))}

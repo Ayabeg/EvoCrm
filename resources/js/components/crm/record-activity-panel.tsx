@@ -180,7 +180,7 @@ export default function RecordActivityPanel({
                                 key={item.id}
                                 type={item.type}
                                 title={item.subject ?? item.body}
-                                at={item.created_at}
+                                at={item.due_at ?? item.created_at}
                                 author={
                                     item.actor?.name ?? item.owner?.name ?? null
                                 }

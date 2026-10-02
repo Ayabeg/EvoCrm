@@ -232,11 +232,11 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                             <Form
                                 action={quoteSendAction(quote.id)}
                                 method="post"
-                                className="flex flex-wrap items-end gap-2"
+                                className="grid gap-2"
                             >
                                 {({ processing }) => (
                                     <>
-                                        <div className="min-w-0 flex-1">
+                                        <div className="min-w-0">
                                             <label
                                                 htmlFor="quote-send-to"
                                                 className="mb-1 block text-[11px] text-mute"
@@ -250,14 +250,14 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                                                 defaultValue={
                                                     quote.contact?.email ?? ''
                                                 }
-                                                placeholder="Customer email"
-                                                className="h-8"
+                                                placeholder={t('Customer email')}
+                                                className="h-8 w-full"
                                             />
                                         </div>
                                         <Button
                                             disabled={processing}
                                             size="sm"
-                                            className="h-8 bg-brand text-white hover:bg-brand-hover"
+                                            className="h-8 w-full bg-brand text-white hover:bg-brand-hover"
                                         >
                                             <PaperPlaneTilt className="size-3.5" />
                                             {sent

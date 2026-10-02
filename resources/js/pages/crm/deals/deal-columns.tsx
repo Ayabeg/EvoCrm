@@ -7,6 +7,7 @@ import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
+import { stageLabel } from '@/lib/stage-copy';
 import { cn } from '@/lib/utils';
 
 /**
@@ -239,7 +240,9 @@ export function DealStageCell({
 }: {
     stage?: DealListRow['stage'] | null;
 }) {
-    const name = stage?.name?.trim() || '—';
+    const name = stage
+        ? stageLabel(stage.slug, stage.name)
+        : '—';
     const tone = dealStageTone(stage);
 
     return (

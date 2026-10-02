@@ -55,6 +55,11 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     /*
+    | Customer-facing origin for booking / share links when APP_URL is loopback.
+    */
+    'public_origin' => env('APP_PUBLIC_ORIGIN', 'https://app.evocrmapp.com'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
