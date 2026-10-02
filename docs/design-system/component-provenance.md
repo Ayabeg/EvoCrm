@@ -249,3 +249,20 @@ Charts are Recharts wrappers (already installed `recharts` ^3.10.1, MIT). No new
 | Ads shell / funnel / attribution Sankey / list toolbar | custom Evo | — | MIT (original) | original | DataGrid 32/36; French `t()`; Meta names kept | `resources/js/evo/ads/` | 2026-10-02 |
 
 No new npm dependencies. Recharts license already listed in Libraries. dnd-kit / Tiptap rows stay in the PR8 log above.
+
+## PR10 copy log (2026-10-02)
+
+Reports + Automation reuse PR3 FilterBuilder / DataGrid and PR9 Recharts wrappers. No new npm package. No evilcharts import from pages, `evo/reports`, or `evo/automation`. `/reports/outbound` keeps PR8 `evo/outbound/Reports`.
+
+| Component | Source | License | Destination | Notes |
+|---|---|---|---|---|
+| DonutChart / HorizontalBarChart | Recharts | MIT | `evo/charts/donut-chart.tsx`, `horizontal-bar-chart.tsx` | Additive PR10 wrappers; `--evo-*` only |
+| ChartFromPayload / rooms / builder / funnel | custom Evo on Recharts | MIT (original) | `resources/js/evo/reports/` | EvoViz payload → existing chart kinds |
+| WorkflowBuilder | custom Evo | MIT (original) | `evo/automation/WorkflowBuilder.tsx` | WHEN / IF / THEN / ELSE; P19 strings locked via shim |
+| ExecutionHistory | custom Evo | MIT (original) | `evo/automation/ExecutionHistory.tsx` | DataGrid; Retry is not available |
+| SegmentRulesEditor | custom Evo + PR3 FilterBuilder | MIT (original) | `evo/automation/SegmentRulesEditor.tsx` | AND / OR groups (`allowGroups`) |
+| Design Lab `/design-lab/reports` + `/design-lab/automation` | custom Evo | MIT (original) | `resources/design-lab/pages/{Reports,AutomationLab}Page.tsx` | Clinique El Djazair / Hôpital Ibn Sina / Cabinet Dr. Amrani / Pharmacie Centrale; `1 280 000 DA` |
+
+Compatibility shims: `components/crm/workflow-builder.tsx`, `workflow-execution-history.tsx`, `segment-filter-form.tsx`.
+
+No new npm dependencies. Recharts / Phosphor licenses already listed.

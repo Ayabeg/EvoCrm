@@ -21,6 +21,7 @@ export type LabRoute =
     | { name: 'campaign'; id: string }
     | { name: 'tickets' }
     | { name: 'reports'; view?: string }
+    | { name: 'automation'; view?: string }
     | { name: 'segments' }
     | { name: 'workflows' }
     | { name: 'settings' };
@@ -81,6 +82,10 @@ export function routePath(route: LabRoute): string {
             return '/tickets';
         case 'reports':
             return route.view && route.view !== 'overview' ? `/reports/${route.view}` : '/reports';
+        case 'automation':
+            return route.view && route.view !== 'overview' && route.view !== 'workflows'
+                ? `/automation/${route.view}`
+                : '/automation';
         case 'segments':
             return '/segments';
         case 'workflows':
@@ -212,6 +217,10 @@ export function parseLabLocation(pathname: string, hash: string): LabRoute {
 
     if (path === '/reports' || path.startsWith('/reports/')) {
         return { name: 'reports', view: matchView('/reports', path) };
+    }
+
+    if (path === '/automation' || path.startsWith('/automation/')) {
+        return { name: 'automation', view: matchView('/automation', path) };
     }
 
     if (path === '/segments') {

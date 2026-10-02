@@ -1,22 +1,25 @@
-import { EvilBarChart } from '@/components/evilcharts/charts/recharts-bar-chart';
-import { EvilComposedChart } from '@/components/evilcharts/charts/recharts-composed-chart';
-import { EvilLineChart } from '@/components/evilcharts/charts/recharts-line-chart';
-import { EvilSankeyChart } from '@/components/evilcharts/charts/recharts-sankey-chart';
-import { ChartFrame } from '../components/ChartFrame';
-import { LabLink } from '../components/LabLink';
+import { useEffect, useMemo, useState } from 'react';
+
+import {
+    BarChart,
+    ChartFrame,
+    ComposedChart,
+    FunnelChart,
+    HorizontalBarChart,
+    LineChart,
+    SankeyChart,
+} from '@/evo/charts';
+import { Moon, Sun } from '@/evo/icons';
+import { outboundMessages } from '@/evo/outbound/messages';
+import { OutboundReports } from '@/evo/outbound/Reports';
+import { CrossObjectReportPanel, ReportBuilderForm, reportsMessages } from '@/evo/reports';
+import { hydrateI18n } from '@/lib/i18n';
 import { KpiMetric, KpiStrip } from '../components/KpiMetric';
+import { LabLink } from '../components/LabLink';
 import { Module } from '../components/Module';
 import { ContextChip, PageHeader } from '../components/PageHeader';
 import { PrototypeRoom } from '../components/PrototypeRoom';
 import { useLabLoading } from '../components/useLabLoading';
-import {
-    campaignCompareChartConfig,
-    cumulativeChartConfig,
-    leadsChartConfig,
-    pipelineChartConfig,
-    sankeyChartConfig,
-    spendLeadsChartConfig,
-} from '../data/chart-config';
 import {
     formatCompactAxis,
     formatCount,
@@ -26,13 +29,15 @@ import {
     formatPercent,
     formatRoas,
 } from '../data/format';
-import { REPORT_CHILDREN } from '../lib/nav';
+import { getOutboundLabFixtures } from '../data/outbound';
 import {
+    getAdsFunnel,
     getAdsTotals,
     getCampaignTotals,
     getConversionRate,
     getCumulativeWonRevenue,
     getDailyAdPerformance,
+    getKnownObjects,
     getLeadSourceChartRows,
     getOpenDealCount,
     getPipelineByStage,
@@ -40,16 +45,84 @@ import {
     getTotalOpenPipeline,
     getWonRevenue,
 } from '../data/selectors';
+import { REPORT_CHILDREN } from '../lib/nav';
 
-const CHART_MARGIN = { top: 6, right: 8, left: 0, bottom: 0 };
+hydrateI18n('fr', { ...outboundMessages, ...reportsMessages });
 
-const SHELL_VIEWS = new Set(['desk', 'activity', 'dashboards', 'builder', 'scheduled', 'outbound']);
+function applyTheme(theme: 'light' | 'dark') {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
+}
+
+function readThemeParam(): 'light' | 'dark' {
+    if (typeof window === 'undefined') {
+        return 'light';
+    }
+
+    return new URLSearchParams(window.location.search).get('theme') === 'dark' ? 'dark' : 'light';
+}
+
+const SHELL_VIEWS = new Set(['desk', 'activity', 'dashboards', 'scheduled']);
 
 type Props = {
     view?: string;
 };
 
 export function ReportsPage({ view = 'overview' }: Props) {
+    const [theme, setTheme] = useState<'light' | 'dark'>(readThemeParam);
+    const loading = useLabLoading();
+    const known = getKnownObjects();
+    const outbound = useMemo(() => getOutboundLabFixtures().reports, []);
+
+    useEffect(() => {
+        applyTheme(theme);
+    }, [theme]);
+
+    const themeToggle = (
+        <button
+            type="button"
+            className="inline-flex h-8 items-center gap-1.5 rounded-[8px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-3 text-[12px] font-medium"
+            onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+        >
+            {theme === 'dark' ? <Sun className="size-3.5" weight="regular" /> : <Moon className="size-3.5" weight="regular" />}
+            {theme === 'dark' ? 'Clair' : 'Sombre'}
+        </button>
+    );
+
+    const ads = getAdsTotals();
+    const pipeline = getPipelineByStage();
+    const sources = getLeadSourceChartRows();
+    const campaigns = getCampaignTotals().map((row) => ({
+        label: row.name,
+        spend: row.spend,
+        pipeline: row.attributedRevenue,
+    }));
+    const daily = getDailyAdPerformance().map((row) => ({
+        ...row,
+        label: formatDayLabel(row.date),
+    }));
+    const cumulative = getCumulativeWonRevenue().map((row) => ({
+        label: formatDayLabel(row.date),
+        cumulative: row.cumulative,
+    }));
+    const flow = getSankeyDealFlow();
+    const funnel = getAdsFunnel();
+    const held = pipeline.reduce((max, row) => (row.pipeline > max.pipeline ? row : max), pipeline[0]);
+
+    const crossObject = useMemo(
+        () => ({
+            metric: 'reply_rate',
+            groups: [
+                { label: 'Alger', value: 28, count: 86 },
+                { label: 'Oran', value: 22, count: 41 },
+                { label: 'Constantine', value: 19, count: 24 },
+                { label: 'Blida', value: 16, count: 18 },
+            ],
+        }),
+        [],
+    );
+
     if (SHELL_VIEWS.has(view)) {
         const label = REPORT_CHILDREN.find((child) => child.id === view)?.label ?? 'Rapport';
 
@@ -66,25 +139,101 @@ export function ReportsPage({ view = 'overview' }: Props) {
         );
     }
 
-    const loading = useLabLoading();
-    const ads = getAdsTotals();
-    const pipeline = getPipelineByStage();
-    const sources = getLeadSourceChartRows();
-    const campaigns = getCampaignTotals().map((row) => ({
-        label: row.name,
-        spend: row.spend,
-        pipeline: row.attributedRevenue,
-    }));
-    const daily = getDailyAdPerformance().map((row) => ({
-        ...row,
-        label: formatDayLabel(row.date),
-    }));
-    const cumulative = getCumulativeWonRevenue().map((row) => ({
-        ...row,
-        label: formatDayLabel(row.date),
-    }));
-    const flow = getSankeyDealFlow();
-    const held = pipeline.reduce((max, row) => (row.pipeline > max.pipeline ? row : max), pipeline[0]);
+    if (view === 'builder') {
+        return (
+            <div className="space-y-7">
+                <PageHeader
+                    title="Générateur de rapports"
+                    descriptor="Rapports ad hoc · Clinique El Djazair"
+                    actions={themeToggle}
+                />
+                <ReportBuilderForm
+                    preview
+                    reports={[
+                        {
+                            id: 1,
+                            name: 'Pipeline El Djazair',
+                            entity: 'deal',
+                            metric: 'sum_amount',
+                            group_by: 'stage',
+                        },
+                    ]}
+                    result={{ metric: 'sum_amount', value: 1280000, groups: [{ label: 'Gagné', value: 1280000 }] }}
+                    activeReport={{
+                        id: 1,
+                        name: 'Pipeline El Djazair',
+                        entity: 'deal',
+                        metric: 'sum_amount',
+                        group_by: 'stage',
+                    }}
+                />
+            </div>
+        );
+    }
+
+    if (view === 'cross-object') {
+        return (
+            <div className="space-y-7">
+                <PageHeader
+                    title="Rapport cross-objet"
+                    descriptor="Taux de réponse par wilaya · Hôpital Ibn Sina / Cabinet Dr. Amrani"
+                    actions={themeToggle}
+                />
+                <CrossObjectReportPanel report={crossObject} />
+            </div>
+        );
+    }
+
+    if (view === 'outbound') {
+        return (
+            <div className="space-y-7">
+                <PageHeader
+                    title="Rapports outbound"
+                    descriptor="Pharmacie Centrale · septembre 2026"
+                    context={
+                        <ContextChip active>
+                            {known.pharmacieCentrale?.company.name ?? 'Pharmacie Centrale'}
+                        </ContextChip>
+                    }
+                    actions={themeToggle}
+                />
+                <OutboundReports {...outbound} />
+            </div>
+        );
+    }
+
+    if (view === 'funnels') {
+        return (
+            <div className="space-y-7">
+                <PageHeader
+                    title="Entonnoir de conversion"
+                    descriptor="Pharmacie Centrale · septembre 2026"
+                    context={
+                        <ContextChip active>
+                            {known.pharmacieCentrale?.company.name ?? 'Pharmacie Centrale'}
+                        </ContextChip>
+                    }
+                    actions={themeToggle}
+                />
+                <KpiStrip>
+                    <KpiMetric label="Visites" value={formatCount(funnel[0]?.value ?? 0)} />
+                    <KpiMetric label="Leads" value={formatCount(funnel[1]?.value ?? 0)} />
+                    <KpiMetric label="Commandes" value={formatCount(funnel[funnel.length - 1]?.value ?? 0)} />
+                </KpiStrip>
+                <Module title="Étapes" flush>
+                    <div className="p-4">
+                        <FunnelChart
+                            steps={funnel.map((step) => ({
+                                id: step.step,
+                                label: step.step,
+                                value: step.value,
+                            }))}
+                        />
+                    </div>
+                </Module>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-7">
@@ -93,13 +242,14 @@ export function ReportsPage({ view = 'overview' }: Props) {
                 descriptor="Performance commerciale · septembre 2026"
                 context={
                     <>
-                        {REPORT_CHILDREN.slice(0, 6).map((child) => (
+                        {REPORT_CHILDREN.slice(0, 8).map((child) => (
                             <LabLink key={child.id} to={child.to}>
                                 <ContextChip active={view === child.id}>{child.label}</ContextChip>
                             </LabLink>
                         ))}
                     </>
                 }
+                actions={themeToggle}
             />
 
             {(view === 'overview' || view === 'pipeline') && (
@@ -110,7 +260,11 @@ export function ReportsPage({ view = 'overview' }: Props) {
                         value={formatDa(getTotalOpenPipeline())}
                         hint={`${getOpenDealCount()} affaires`}
                     />
-                    <KpiMetric label="Conversion" value={formatPercent(getConversionRate())} hint="3 gagnées · 17 closes" />
+                    <KpiMetric
+                        label="Conversion"
+                        value={formatPercent(getConversionRate())}
+                        hint="3 gagnées · 17 closes"
+                    />
                     <KpiMetric
                         label="Valeur / dépenses"
                         value={formatRoas(ads.displayedRoas)}
@@ -126,20 +280,14 @@ export function ReportsPage({ view = 'overview' }: Props) {
                     hint={`Palier jusqu’à ${formatDa(getWonRevenue())}`}
                     flush
                 >
-                    <ChartFrame loading={loading} height={320}>
-                        <EvilLineChart
+                    <ChartFrame loading={loading} height={320} label="CA cumulé">
+                        <LineChart
                             data={cumulative}
-                            config={cumulativeChartConfig}
-                            className="h-full w-full"
-                            animationType="none"
-                            chartProps={{ margin: CHART_MARGIN }}
-                        >
-                            <EvilLineChart.Grid stroke="var(--evo-hairline)" vertical={false} />
-                            <EvilLineChart.XAxis dataKey="label" />
-                            <EvilLineChart.YAxis tickFormatter={(value: number) => formatCompactAxis(value)} />
-                            <EvilLineChart.Tooltip />
-                            <EvilLineChart.Line dataKey="cumulative" curveType="stepAfter" />
-                        </EvilLineChart>
+                            series={[{ dataKey: 'cumulative', name: 'CA cumulé' }]}
+                            height={320}
+                            showLegend={false}
+                            yTickFormatter={formatCompactAxis}
+                        />
                     </ChartFrame>
                 </Module>
             )}
@@ -152,20 +300,13 @@ export function ReportsPage({ view = 'overview' }: Props) {
                         hint={held ? `${held.label} · ${formatDa(held.pipeline)}` : undefined}
                         flush
                     >
-                        <ChartFrame loading={loading} height={280}>
-                            <EvilBarChart
+                        <ChartFrame loading={loading} height={280} label="Pipeline par étape">
+                            <BarChart
                                 data={pipeline}
-                                config={pipelineChartConfig}
-                                className="h-full w-full"
-                                animationType="none"
-                                chartProps={{ margin: CHART_MARGIN }}
-                            >
-                                <EvilBarChart.Grid stroke="var(--evo-hairline)" vertical={false} />
-                                <EvilBarChart.XAxis dataKey="label" />
-                                <EvilBarChart.YAxis tickFormatter={(value: number) => formatCompactAxis(value)} />
-                                <EvilBarChart.Tooltip />
-                                <EvilBarChart.Bar dataKey="pipeline" enableHoverHighlight />
-                            </EvilBarChart>
+                                series={[{ dataKey: 'pipeline', name: 'Pipeline' }]}
+                                height={280}
+                                yTickFormatter={formatCompactAxis}
+                            />
                         </ChartFrame>
                     </Module>
 
@@ -175,18 +316,8 @@ export function ReportsPage({ view = 'overview' }: Props) {
                         hint="Les 3 gagnées sont organiques"
                         flush
                     >
-                        <ChartFrame loading={loading} height={280}>
-                            <EvilSankeyChart data={flow} config={sankeyChartConfig} className="h-full w-full">
-                                <EvilSankeyChart.Node>
-                                    <EvilSankeyChart.NodeLabel
-                                        position="outside"
-                                        showValues
-                                        valueFormatter={formatCompactAxis}
-                                    />
-                                </EvilSankeyChart.Node>
-                                <EvilSankeyChart.Link />
-                                <EvilSankeyChart.Tooltip />
-                            </EvilSankeyChart>
+                        <ChartFrame loading={loading} height={280} label="Flux d’affaires">
+                            <SankeyChart data={flow} height={280} formatValue={formatCompactAxis} />
                         </ChartFrame>
                     </Module>
                 </div>
@@ -194,21 +325,13 @@ export function ReportsPage({ view = 'overview' }: Props) {
 
             {(view === 'overview' || view === 'leads') && (
                 <Module question="Quels canaux génèrent les leads ?" title="Sources de leads" hint="128 leads" flush>
-                    <ChartFrame loading={loading} height={280}>
-                        <EvilBarChart
-                            data={sources}
-                            config={leadsChartConfig}
-                            className="h-full w-full"
-                            layout="horizontal"
-                            animationType="none"
-                            chartProps={{ margin: { top: 4, right: 12, left: 0, bottom: 0 } }}
-                        >
-                            <EvilBarChart.Grid stroke="var(--evo-hairline)" vertical={false} />
-                            <EvilBarChart.XAxis tickFormatter={(value: number) => formatCount(value)} />
-                            <EvilBarChart.YAxis dataKey="source" width={132} />
-                            <EvilBarChart.Tooltip />
-                            <EvilBarChart.Bar dataKey="leads" enableHoverHighlight />
-                        </EvilBarChart>
+                    <ChartFrame loading={loading} height={280} label="Sources de leads">
+                        <HorizontalBarChart
+                            data={sources.map((row) => ({ label: row.source, leads: row.leads }))}
+                            series={[{ dataKey: 'leads', name: 'Leads' }]}
+                            height={280}
+                            yTickFormatter={formatCount}
+                        />
                     </ChartFrame>
                 </Module>
             )}
@@ -220,48 +343,30 @@ export function ReportsPage({ view = 'overview' }: Props) {
                         title="Pipeline attribué vs dépensé"
                         flush
                     >
-                        <ChartFrame loading={loading} height={280}>
-                            <EvilBarChart
+                        <ChartFrame loading={loading} height={280} label="Pipeline vs dépensé">
+                            <BarChart
                                 data={campaigns}
-                                config={campaignCompareChartConfig}
-                                className="h-full w-full"
-                                animationType="none"
-                                chartProps={{ margin: CHART_MARGIN }}
-                            >
-                                <EvilBarChart.Grid stroke="var(--evo-hairline)" vertical={false} />
-                                <EvilBarChart.XAxis dataKey="label" />
-                                <EvilBarChart.YAxis tickFormatter={(value: number) => formatCompactAxis(value)} />
-                                <EvilBarChart.Tooltip />
-                                <EvilBarChart.Legend verticalAlign="bottom" />
-                                <EvilBarChart.Bar dataKey="spend" enableHoverHighlight />
-                                <EvilBarChart.Bar dataKey="pipeline" enableHoverHighlight />
-                            </EvilBarChart>
+                                series={[
+                                    { dataKey: 'spend', name: 'Dépensé' },
+                                    { dataKey: 'pipeline', name: 'Pipeline' },
+                                ]}
+                                height={280}
+                                showLegend
+                                yTickFormatter={formatCompactAxis}
+                            />
                         </ChartFrame>
                     </Module>
                     <Module title="Dépenses & leads" hint="Même série que Pubs" flush>
-                        <ChartFrame loading={loading} height={280}>
-                            <EvilComposedChart
+                        <ChartFrame loading={loading} height={280} label="Dépenses et leads">
+                            <ComposedChart
                                 data={daily}
-                                config={spendLeadsChartConfig}
-                                className="h-full w-full"
-                                animationType="none"
-                                chartProps={{ margin: CHART_MARGIN }}
-                            >
-                                <EvilComposedChart.Grid stroke="var(--evo-hairline)" vertical={false} />
-                                <EvilComposedChart.XAxis dataKey="label" />
-                                <EvilComposedChart.YAxis
-                                    yAxisId="left"
-                                    tickFormatter={(value: number) => formatCompactAxis(value)}
-                                />
-                                <EvilComposedChart.YAxis
-                                    yAxisId="right"
-                                    orientation="right"
-                                    tickFormatter={(value: number) => formatCount(value)}
-                                />
-                                <EvilComposedChart.Tooltip />
-                                <EvilComposedChart.Bar dataKey="spend" barProps={{ yAxisId: 'left' }} />
-                                <EvilComposedChart.Line dataKey="leads" lineProps={{ yAxisId: 'right' }} />
-                            </EvilComposedChart>
+                                height={280}
+                                yTickFormatter={formatCompactAxis}
+                                series={[
+                                    { type: 'bar', dataKey: 'spend', name: 'Dépensé', yAxisId: 'left' },
+                                    { type: 'line', dataKey: 'leads', name: 'Leads', yAxisId: 'right' },
+                                ]}
+                            />
                         </ChartFrame>
                     </Module>
                 </div>

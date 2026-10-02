@@ -1,7 +1,5 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
-import { CrmKpiStrip } from '@/components/crm/crm-kpi-strip';
-import type { KpiTile } from '@/components/crm/crm-kpi-strip';
 import LeadOsGraphStatus from '@/components/crm/lead-os-graph-status';
 import type { LeadOsGraphPayload } from '@/components/crm/lead-os-graph-status';
 import LostReviewList from '@/components/crm/lost-review-list';
@@ -9,46 +7,28 @@ import type { LostReviewRow } from '@/components/crm/lost-review-list';
 import { ReportsShell, reportsBasePath } from '@/components/crm/reports-shell';
 import { OutboundReportsDetail } from '@/components/outbound/reports-detail';
 import type { OutboundDetailProps } from '@/components/outbound/reports-detail';
+import { EmptyState } from '@/evo/patterns/empty-state';
+import {
+    ChartFromPayload,
+    DashboardNav,
+    ReportRoomSection,
+    ReportsFilters,
+    SchedulePanel,
+} from '@/evo/reports';
+import type { ReportCategory, ReportSchedule, SavedReportRow } from '@/evo/reports';
+import { Button } from '@/evo/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog';
-import { EvoVizChart, WidgetPicker } from '@/evoviz';
+} from '@/evo/ui/dialog';
+import { Input } from '@/evo/ui/input';
+import { NativeSelect } from '@/evo/ui/native-select';
+import { WidgetPicker } from '@/evoviz';
 import type { EvoVizPayload, ReportWidgetCatalogItem } from '@/evoviz';
-import { formatDzd } from '@/lib/money';
-
-type KpiFormat = 'number' | 'money' | 'percent';
-
-type ReportKpi = {
-    label: string;
-    value: number | null;
-    format?: KpiFormat;
-    hint?: string;
-};
-
-type ReportColumn = {
-    key: string;
-    label: string;
-    format?: KpiFormat | 'text';
-    align?: 'left' | 'right';
-};
-
-type ReportTable = {
-    columns: ReportColumn[];
-    rows: (string | number | null)[][];
-};
-
-type ReportCategory = {
-    key: string;
-    title: string;
-    description?: string;
-    kpis: ReportKpi[];
-    charts: EvoVizPayload[];
-    table: ReportTable | null;
-};
+import { t } from '@/lib/i18n';
 
 type DashboardOwner = {
     id: number;
@@ -93,140 +73,11 @@ type Props = {
     dashboards: DashboardSummary[];
     dashboard: OpenDashboard | null;
     widgetCatalog: ReportWidgetCatalogItem[];
-    schedules?: {
-        id: number;
-        name?: string | null;
-        cron: string;
-        recipients: string[];
-        active: boolean;
-        last_status?: string | null;
-        last_error?: string | null;
-        last_sent_at?: string | null;
-    }[];
-    savedReports?: { id: number; name: string }[];
+    schedules?: ReportSchedule[];
+    savedReports?: SavedReportRow[];
     leadOsGraph?: LeadOsGraphPayload | null;
     lostReview?: LostReviewRow[];
 };
-
-const NUMBER = new Intl.NumberFormat('en-US');
-
-function formatValue(
-    value: number | null,
-    format: KpiFormat = 'number',
-): string {
-    if (value === null) {
-        return '—';
-    }
-
-    if (format === 'money') {
-        return formatDzd(value);
-    }
-
-    if (format === 'percent') {
-        return `${NUMBER.format(value)}%`;
-    }
-
-    return NUMBER.format(value);
-}
-
-function KpiStrip({ kpis }: { kpis: ReportKpi[] }) {
-    const tiles: KpiTile[] = kpis.map((kpi, index) => ({
-        key: `${kpi.label}-${index}`,
-        label: kpi.label,
-        value: kpi.value,
-        format: kpi.format,
-        hint: kpi.hint,
-    }));
-
-    return <CrmKpiStrip kpis={tiles} columns={6} />;
-}
-
-function BackingTable({ table }: { table: ReportTable }) {
-    if (table.rows.length === 0) {
-        return null;
-    }
-
-    return (
-        <div className="overflow-x-auto border-t border-hairline">
-            <table className="w-full">
-                <thead className="bg-canvas-soft text-left text-[11px] text-mute">
-                    <tr>
-                        {table.columns.map((column) => (
-                            <th
-                                key={column.key}
-                                className={`px-4 py-2.5 font-medium ${column.align === 'right' ? 'text-right' : ''}`}
-                            >
-                                {column.label}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {table.rows.map((row, i) => (
-                        <tr key={i} className="border-t border-hairline">
-                            {row.map((cell, j) => {
-                                const column = table.columns[j];
-                                const right = column?.align === 'right';
-
-                                return (
-                                    <td
-                                        key={column?.key ?? j}
-                                        className={`px-4 py-2.5 text-[13px] ${right ? 'money text-right' : ''} ${cell === null || cell === 0 ? 'text-mute' : 'text-ink'}`}
-                                    >
-                                        {typeof cell === 'number'
-                                            ? formatValue(
-                                                  cell,
-                                                  column?.format === 'text'
-                                                      ? 'number'
-                                                      : column?.format,
-                                              )
-                                            : (cell ?? '—')}
-                                    </td>
-                                );
-                            })}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-}
-
-function CategorySection({ category }: { category: ReportCategory }) {
-    return (
-        <section aria-label={category.title} className="mt-6 first:mt-0">
-            <div className="mb-3">
-                <h2 className="text-[15px] font-semibold tracking-tight text-ink">
-                    {category.title}
-                </h2>
-                {category.description ? (
-                    <p className="mt-1 text-[12px] leading-5 text-mute">
-                        {category.description}
-                    </p>
-                ) : null}
-            </div>
-
-            <KpiStrip kpis={category.kpis} />
-
-            {category.charts.length > 0 ? (
-                <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {category.charts.map((chart) => (
-                        <EvoVizChart
-                            key={`${chart.id}-${chart.title}`}
-                            payload={chart}
-                        />
-                    ))}
-                </div>
-            ) : null}
-
-            {category.table ? (
-                <div className="mt-5">
-                    <BackingTable table={category.table} />
-                </div>
-            ) : null}
-        </section>
-    );
-}
 
 function filterQuery(
     from: string,
@@ -259,15 +110,11 @@ export default function Reports({
     const reportsPath = reportsBasePath(activeCategory);
     const [from, setFrom] = useState(window.from);
     const [to, setTo] = useState(window.to);
-    const [owner, setOwner] = useState(
-        window.owner_id ? String(window.owner_id) : '',
-    );
+    const [owner, setOwner] = useState(window.owner_id ? String(window.owner_id) : '');
     const [newOpen, setNewOpen] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [newName, setNewName] = useState('');
-    const [newVisibility, setNewVisibility] = useState<
-        'private' | 'team' | 'workspace'
-    >('private');
+    const [newVisibility, setNewVisibility] = useState<'private' | 'team' | 'workspace'>('private');
 
     const apply = (event: React.FormEvent) => {
         event.preventDefault();
@@ -325,11 +172,7 @@ export default function Reports({
             return;
         }
 
-        router.post(
-            `/reports/dashboards/${dashboard.id}/widgets`,
-            { key },
-            { preserveScroll: true },
-        );
+        router.post(`/reports/dashboards/${dashboard.id}/widgets`, { key }, { preserveScroll: true });
     };
 
     const removeWidget = (key: string) => {
@@ -362,309 +205,101 @@ export default function Reports({
                 pageTitle={title}
                 description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only. Empty categories stay hidden.`}
                 filters={
-                    <form
-                        onSubmit={apply}
-                        className="flex flex-wrap items-end gap-2"
-                        aria-label="Dashboard filters"
-                    >
-                        <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                            Owner
-                            <select
-                                value={owner}
-                                onChange={(event) =>
-                                    setOwner(event.target.value)
-                                }
-                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                                aria-label="Owner"
-                            >
-                                <option value="">All owners</option>
-                                {owners.map((person) => (
-                                    <option key={person.id} value={person.id}>
-                                        {person.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                            From
-                            <input
-                                type="date"
-                                name="from"
-                                value={from}
-                                max={to}
-                                onChange={(event) =>
-                                    setFrom(event.target.value)
-                                }
-                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                            />
-                        </label>
-                        <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                            To
-                            <input
-                                type="date"
-                                name="to"
-                                value={to}
-                                min={from}
-                                onChange={(event) => setTo(event.target.value)}
-                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
-                            />
-                        </label>
-                        <button
-                            type="submit"
-                            className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink hover:bg-canvas-soft"
-                        >
-                            Apply
-                        </button>
-                        {window.custom ? (
-                            <button
-                                type="button"
-                                onClick={reset}
-                                className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-muted-foreground transition-colors hover:text-ink"
-                            >
-                                Last 30 days
-                            </button>
-                        ) : null}
-                    </form>
+                    <ReportsFilters
+                        from={from}
+                        to={to}
+                        owner={owner}
+                        owners={owners}
+                        custom={window.custom}
+                        onFrom={setFrom}
+                        onTo={setTo}
+                        onOwner={setOwner}
+                        onApply={apply}
+                        onReset={reset}
+                    />
                 }
-                footer={`Reports window ${window.from} → ${window.to} · ${window.timezone}`}
+                footer={`${t('Reports')} ${window.from} → ${window.to} · ${window.timezone}`}
             >
                 <LeadOsGraphStatus graph={leadOsGraph} compact />
                 <LostReviewList items={lostReview} />
-                <nav
-                    aria-label="Dashboards"
-                    className="mb-4 flex flex-wrap items-center gap-2"
-                >
-                    <button
-                        type="button"
-                        onClick={openRooms}
-                        className={`h-8 rounded-md px-3 text-[13px] ${
-                            dashboard
-                                ? 'border border-hairline bg-canvas text-muted-foreground hover:text-ink'
-                                : 'bg-canvas-soft text-ink'
-                        }`}
-                    >
-                        Rooms
-                    </button>
-                    {dashboards.map((board) => (
-                        <button
-                            key={board.id}
-                            type="button"
-                            onClick={() => openDashboard(board.id)}
-                            className={`h-8 rounded-md px-3 text-[13px] ${
-                                dashboard?.id === board.id
-                                    ? 'bg-canvas-soft text-ink'
-                                    : 'border border-hairline bg-canvas text-muted-foreground hover:text-ink'
-                            }`}
-                        >
-                            {board.visibility === 'workspace'
-                                ? '◆ '
-                                : board.visibility === 'team'
-                                  ? '◇ '
-                                  : ''}
-                            {board.name}
-                        </button>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={() => setNewOpen(true)}
-                        className="h-8 rounded-md border border-dashed border-hairline bg-canvas px-3 text-[13px] text-muted-foreground hover:text-ink"
-                    >
-                        New dashboard
-                    </button>
-                </nav>
-                <section className="mb-4 border-t border-hairline pt-3 text-sm">
-                    <h2 className="mb-3 text-[11px] text-mute">
-                        Scheduled reports
-                    </h2>
-                    {schedules.length === 0 ? (
-                        <p className="mb-3 text-[12px] text-mute">
-                            No schedules yet.
-                        </p>
-                    ) : (
-                        <ul className="mb-3 space-y-1 text-[12px]">
-                            {schedules.map((schedule) => (
-                                <li
-                                    key={schedule.id}
-                                    className="flex flex-wrap items-center justify-between gap-2"
-                                >
-                                    <span>
-                                        {schedule.name ?? 'Untitled'} ·{' '}
-                                        {schedule.cron} ·{' '}
-                                        {schedule.active ? 'active' : 'paused'}{' '}
-                                        · {schedule.last_status ?? 'never sent'}
-                                    </span>
-                                    <span className="flex gap-1">
-                                        <form
-                                            onSubmit={(event) => {
-                                                event.preventDefault();
-                                                router.put(
-                                                    `/reports/schedules/${schedule.id}`,
-                                                    {
-                                                        recipients:
-                                                            schedule.recipients,
-                                                        active: !schedule.active,
-                                                    },
-                                                );
-                                            }}
-                                        >
-                                            <button
-                                                type="submit"
-                                                className="text-ink hover:underline"
-                                            >
-                                                {schedule.active
-                                                    ? 'Pause'
-                                                    : 'Resume'}
-                                            </button>
-                                        </form>
-                                        <form
-                                            onSubmit={(event) => {
-                                                event.preventDefault();
-                                                router.delete(
-                                                    `/reports/schedules/${schedule.id}`,
-                                                );
-                                            }}
-                                        >
-                                            <button
-                                                type="submit"
-                                                className="text-destructive"
-                                            >
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                    <form
-                        className="grid gap-2 md:grid-cols-4"
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            const form = event.currentTarget;
-                            const recipients = String(
-                                new FormData(form).get('recipients') ?? '',
-                            )
-                                .split(',')
-                                .map((value) => value.trim())
-                                .filter(Boolean);
-                            router.post('/reports/schedules', {
-                                name: String(
-                                    new FormData(form).get('name') ?? '',
-                                ),
-                                saved_report_id:
-                                    String(
-                                        new FormData(form).get(
-                                            'saved_report_id',
-                                        ) ?? '',
-                                    ) || null,
-                                dashboard_id: dashboard?.id ?? null,
-                                cron: String(
-                                    new FormData(form).get('cron') ??
-                                        '0 8 * * 1',
-                                ),
-                                recipients,
-                                active: true,
-                            });
-                        }}
-                    >
-                        <input
-                            name="name"
-                            placeholder="Schedule name"
-                            className="h-8 rounded-md border border-hairline px-2 text-[13px]"
-                        />
-                        <select
-                            name="saved_report_id"
-                            className="h-8 rounded-md border border-hairline px-2 text-[13px]"
-                        >
-                            <option value="">Saved report…</option>
-                            {savedReports.map((report) => (
-                                <option key={report.id} value={report.id}>
-                                    {report.name}
-                                </option>
-                            ))}
-                        </select>
-                        <input
-                            name="cron"
-                            defaultValue="0 8 * * 1"
-                            className="h-8 rounded-md border border-hairline px-2 font-mono text-[12px]"
-                        />
-                        <input
-                            name="recipients"
-                            placeholder="a@b.com, c@d.com"
-                            className="h-8 rounded-md border border-hairline px-2 text-[13px]"
-                        />
-                        <button
-                            type="submit"
-                            className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-ink hover:bg-canvas-soft md:col-span-4"
-                        >
-                            Create schedule
-                        </button>
-                    </form>
-                </section>
+                <DashboardNav
+                    dashboards={dashboards}
+                    activeId={dashboard?.id}
+                    onRooms={openRooms}
+                    onOpen={openDashboard}
+                    onNew={() => setNewOpen(true)}
+                />
+                <SchedulePanel
+                    schedules={schedules}
+                    savedReports={savedReports}
+                    onToggle={(schedule) =>
+                        router.put(`/reports/schedules/${schedule.id}`, {
+                            recipients: schedule.recipients,
+                            active: !schedule.active,
+                        })
+                    }
+                    onDelete={(schedule) => router.delete(`/reports/schedules/${schedule.id}`)}
+                    onCreate={(payload) =>
+                        router.post('/reports/schedules', {
+                            ...payload,
+                            dashboard_id: dashboard?.id ?? null,
+                            active: true,
+                        })
+                    }
+                />
 
                 {dashboard ? (
                     <section aria-label={dashboard.name}>
                         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                            <p className="text-[12px] text-mute">
+                            <p className="text-[12px] text-[var(--evo-ink-muted)]">
                                 {dashboard.owner.name
-                                    ? `Owned by ${dashboard.owner.name}`
-                                    : 'Saved dashboard'}
-                                {` · ${dashboard.widgets.length} widgets`}
+                                    ? t('Owned by :name', { name: dashboard.owner.name })
+                                    : t('Saved dashboard')}
+                                {` · ${dashboard.widgets.length} ${t('widgets')}`}
                             </p>
                             <div className="flex items-center gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setPickerOpen(true)}
-                                    className="h-8 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                                    className="bg-brand h-8 rounded-md px-3 text-[13px] font-medium text-[var(--evo-on-primary)]"
                                 >
                                     Add widget
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={deleteDashboard}
-                                    className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] text-muted-foreground hover:text-ink"
-                                >
-                                    Delete
-                                </button>
+                                <Button type="button" size="sm" variant="outline" onClick={deleteDashboard}>
+                                    {t('Delete')}
+                                </Button>
                             </div>
                         </div>
 
                         {dashboard.widgets.length === 0 ? (
-                            <div className="border-t border-hairline py-6">
-                                <p className="text-[13px] font-medium tracking-tight text-ink">
-                                    No widgets on this dashboard
-                                </p>
-                                <p className="mt-1 text-[12px] text-mute">
-                                    Add an existing EvoViz chart from the rooms:
-                                    pipeline, leads, outbound, desk, or
-                                    activity.
-                                </p>
-                            </div>
+                            <EmptyState
+                                title={t('No widgets on this dashboard')}
+                                description={t(
+                                    'Add an existing EvoViz chart from the rooms: pipeline, leads, outbound, desk, or activity.',
+                                )}
+                                density="panel"
+                            />
                         ) : (
                             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                                 {dashboard.widgets.map((widget) => (
                                     <div key={widget.key} className="relative">
                                         <button
                                             type="button"
-                                            onClick={() =>
-                                                removeWidget(widget.key)
-                                            }
-                                            className="absolute top-2 right-2 z-10 rounded-md border border-hairline bg-canvas px-2 py-0.5 text-[11px] text-muted-foreground hover:text-ink"
-                                            aria-label={`Remove ${widget.title}`}
+                                            onClick={() => removeWidget(widget.key)}
+                                            className="absolute top-2 right-2 z-10 rounded-[var(--evo-radius-compact)] border border-hairline bg-[var(--evo-surface)] px-2 py-0.5 text-[11px] text-[var(--evo-ink-muted)] hover:text-[var(--evo-ink)]"
+                                            aria-label={t('Remove :title', { title: widget.title })}
                                         >
-                                            Remove
+                                            {t('Remove')}
                                         </button>
                                         {widget.chart ? (
-                                            <EvoVizChart
-                                                payload={widget.chart}
-                                            />
+                                            <ChartFromPayload payload={widget.chart} />
                                         ) : (
                                             <div className="border border-hairline px-4 py-6">
-                                                <p className="text-[13px] font-medium text-ink">
+                                                <p className="text-[13px] font-medium text-[var(--evo-ink)]">
                                                     {widget.title}
                                                 </p>
-                                                <p className="mt-1 text-[12px] text-mute">
-                                                    No rows in this window
+                                                <p className="mt-1 text-[12px] text-[var(--evo-ink-muted)]">
+                                                    {t('No rows in this window')}
                                                 </p>
                                             </div>
                                         )}
@@ -674,27 +309,19 @@ export default function Reports({
                         )}
                     </section>
                 ) : categories.length === 0 ? (
-                    <div className="border-t border-hairline py-6">
-                        <p className="text-[13px] font-medium tracking-tight text-ink">
-                            Nothing to report in this window
-                        </p>
-                        <p className="mt-1 text-[12px] text-mute">
-                            Deals, leads, outbound sends, conversations, and
-                            activities appear here as soon as they exist. No
-                            placeholders.
-                        </p>
-                    </div>
+                    <EmptyState
+                        title={t('Nothing to report in this window')}
+                        description={t(
+                            'Deals, leads, outbound sends, conversations, and activities appear here as soon as they exist. No placeholders.',
+                        )}
+                        density="panel"
+                    />
                 ) : (
                     <>
                         {categories.map((category) => (
-                            <CategorySection
-                                key={category.key}
-                                category={category}
-                            />
+                            <ReportRoomSection key={category.key} category={category} />
                         ))}
-                        {outboundDetail ? (
-                            <OutboundReportsDetail {...outboundDetail} />
-                        ) : null}
+                        {outboundDetail ? <OutboundReportsDetail {...outboundDetail} /> : null}
                     </>
                 )}
             </ReportsShell>
@@ -702,48 +329,41 @@ export default function Reports({
             <Dialog open={newOpen} onOpenChange={setNewOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>New dashboard</DialogTitle>
+                        <DialogTitle>{t('New dashboard')}</DialogTitle>
                         <DialogDescription>
-                            A saved board on top of the rooms. Add existing
-                            EvoViz charts after you create it.
+                            {t(
+                                'A saved board on top of the rooms. Add existing EvoViz charts after you create it.',
+                            )}
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={createDashboard} className="grid gap-3">
-                        <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                            Name
-                            <input
+                        <label className="grid gap-1 text-[11px] tracking-wide text-[var(--evo-ink-muted)] uppercase">
+                            {t('Name')}
+                            <Input
                                 name="name"
                                 required
                                 value={newName}
-                                onChange={(event) =>
-                                    setNewName(event.target.value)
-                                }
-                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
+                                onChange={(event) => setNewName(event.target.value)}
+                                className="h-8"
                             />
                         </label>
-                        <label className="grid gap-1 text-[11px] tracking-wide text-muted-foreground uppercase">
-                            Sharing
-                            <select
+                        <label className="grid gap-1 text-[11px] tracking-wide text-[var(--evo-ink-muted)] uppercase">
+                            {t('Sharing')}
+                            <NativeSelect
                                 value={newVisibility}
                                 onChange={(event) =>
-                                    setNewVisibility(
-                                        event.target.value as
-                                            'private' | 'team' | 'workspace',
-                                    )
+                                    setNewVisibility(event.target.value as 'private' | 'team' | 'workspace')
                                 }
-                                className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink normal-case"
+                                className="h-8"
                             >
-                                <option value="private">Private</option>
-                                <option value="team">Team</option>
-                                <option value="workspace">Workspace</option>
-                            </select>
+                                <option value="private">{t('Private')}</option>
+                                <option value="team">{t('Team')}</option>
+                                <option value="workspace">{t('Workspace')}</option>
+                            </NativeSelect>
                         </label>
-                        <button
-                            type="submit"
-                            className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[13px] font-medium text-ink hover:bg-canvas-soft"
-                        >
-                            Create
-                        </button>
+                        <Button type="submit" variant="outline" size="sm">
+                            {t('Create')}
+                        </Button>
                     </form>
                 </DialogContent>
             </Dialog>
@@ -751,17 +371,14 @@ export default function Reports({
             <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
                 <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Add widget</DialogTitle>
+                        <DialogTitle>{t('Add widget')}</DialogTitle>
                         <DialogDescription>
-                            Existing EvoViz charts from the report rooms. No new
-                            chart types.
+                            {t('Existing EvoViz charts from the report rooms. No new chart types.')}
                         </DialogDescription>
                     </DialogHeader>
                     <WidgetPicker
                         catalog={widgetCatalog}
-                        addedKeys={
-                            dashboard?.widgets.map((widget) => widget.key) ?? []
-                        }
+                        addedKeys={dashboard?.widgets.map((widget) => widget.key) ?? []}
                         onAdd={addWidget}
                     />
                 </DialogContent>

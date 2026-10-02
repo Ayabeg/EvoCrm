@@ -74,6 +74,53 @@ describe('design-lab ads route', () => {
     });
 });
 
+describe('design-lab reports route', () => {
+    it('parses /design-lab/reports and report builder views', () => {
+        expect(parseLabLocation('/design-lab/reports', '')).toEqual({
+            name: 'reports',
+            view: 'overview',
+        });
+        expect(parseLabLocation('/design-lab/reports/funnels', '')).toEqual({
+            name: 'reports',
+            view: 'funnels',
+        });
+        expect(parseLabLocation('/design-lab/reports/builder', '')).toEqual({
+            name: 'reports',
+            view: 'builder',
+        });
+        expect(parseLabLocation('/design-lab/reports/cross-object', '')).toEqual({
+            name: 'reports',
+            view: 'cross-object',
+        });
+        expect(routePath({ name: 'reports' })).toBe('/reports');
+        expect(routePath({ name: 'reports', view: 'funnels' })).toBe('/reports/funnels');
+    });
+});
+
+describe('design-lab automation route', () => {
+    it('parses /design-lab/automation and WHEN/IF/THEN views', () => {
+        expect(parseLabLocation('/design-lab/automation', '')).toEqual({
+            name: 'automation',
+            view: 'overview',
+        });
+        expect(parseLabLocation('/design-lab/automation/editor', '')).toEqual({
+            name: 'automation',
+            view: 'editor',
+        });
+        expect(parseLabLocation('/design-lab/automation/segments', '')).toEqual({
+            name: 'automation',
+            view: 'segments',
+        });
+        expect(parseLabLocation('/design-lab/automation/history', '')).toEqual({
+            name: 'automation',
+            view: 'history',
+        });
+        expect(routePath({ name: 'automation' })).toBe('/automation');
+        expect(routePath({ name: 'automation', view: 'editor' })).toBe('/automation/editor');
+        expect(labHref({ name: 'automation', view: 'history' })).toMatch(/automation\/history/);
+    });
+});
+
 describe('design-lab shell route', () => {
     it('parses /design-lab/shell as the shell page', () => {
         expect(parseLabLocation('/design-lab/shell', '')).toEqual({

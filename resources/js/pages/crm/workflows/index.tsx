@@ -5,23 +5,18 @@ import { CreateDrawer } from '@/components/crm/create-drawer';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { WorkflowBuilder } from '@/components/crm/workflow-builder';
 import { WorkflowExecutionHistory } from '@/components/crm/workflow-execution-history';
-import { HairlinePanel } from '@/components/surface/hairline-panel';
-import { SurfaceHeader } from '@/components/surface/surface-header';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { WorkflowList } from '@/evo/automation';
+import { Button } from '@/evo/ui/button';
+import { t } from '@/lib/i18n';
 import {
     beginExclusiveAction,
     draftFromWorkflow,
     draftsEqual,
     emptyWorkflowDraft,
-    formatWorkflowTimestamp,
     releaseExclusiveAction,
     summarizeWorkflow,
-    summarizeWorkflowRow,
-    triggerLabel,
     validateWorkflowDraft,
     workflowFormPayload,
-    workflowStatusLabel,
 } from '@/lib/workflow-authoring';
 import type {
     WorkflowCapabilities,
@@ -128,7 +123,7 @@ export default function WorkflowsIndex({
         }
 
         if (!ignoreDirtyClose.current && dirty) {
-            const confirmed = window.confirm('Discard unsaved changes?');
+            const confirmed = window.confirm(t('Discard unsaved changes?'));
 
             if (!confirmed) {
                 return;
@@ -152,9 +147,7 @@ export default function WorkflowsIndex({
         const issues = validateWorkflowDraft(draft);
 
         if (issues.length > 0) {
-            setClientErrors(
-                Object.fromEntries(issues.map((issue) => [issue.field, issue.message])),
-            );
+            setClientErrors(Object.fromEntries(issues.map((issue) => [issue.field, issue.message])));
 
             return;
         }
@@ -198,8 +191,12 @@ export default function WorkflowsIndex({
     const toggleWorkflow = (workflow: WorkflowRow) => {
         const confirmed = window.confirm(
             workflow.active
-                ? 'Turn off this workflow? Pending delayed runs will be cancelled and will not execute. Historical executions stay as they were.'
-                : 'Turn on this workflow? New matching events will run. Existing history is unchanged.',
+                ? t(
+                      'Turn off this workflow? Pending delayed runs will be cancelled and will not execute. Historical executions stay as they were.',
+                  )
+                : t(
+                      'Turn on this workflow? New matching events will run. Existing history is unchanged.',
+                  ),
         );
 
         if (!confirmed) {
@@ -239,7 +236,7 @@ export default function WorkflowsIndex({
 
     const deleteWorkflow = (workflow: WorkflowRow) => {
         const confirmed = window.confirm(
-            'Delete this workflow? Its execution history is removed with it.',
+            t('Delete this workflow? Its execution history is removed with it.'),
         );
 
         if (!confirmed) {
@@ -267,7 +264,7 @@ export default function WorkflowsIndex({
                 return;
             }
 
-            if (!window.confirm('You have unsaved changes. Leave anyway?')) {
+            if (!window.confirm(t('You have unsaved changes. Leave anyway?'))) {
                 event.preventDefault();
             }
         };
@@ -298,12 +295,17 @@ export default function WorkflowsIndex({
 
     return (
         <CrmShell title="Automation">
-            <div className="h-full overflow-y-auto overflow-x-hidden" data-workflow="page">
+            <div className="h-full overflow-y-auto overflow-x-hidden bg-[var(--evo-canvas)]" data-workflow="page">
                 <div className="flex-1 space-y-5 p-4 md:p-6">
-                    <SurfaceHeader
-                        title="Automation"
-                        description="Structured workflows the runner can execute: when, if, then, else."
-                    >
+                    <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <h1 className="text-[20px] font-semibold tracking-tight text-[var(--evo-ink)]">
+                                {t('Automation')}
+                            </h1>
+                            <p className="mt-1 text-[13px] text-[var(--evo-ink-secondary)]">
+                                {t('Structured workflows the runner can execute: when, if, then, else.')}
+                            </p>
+                        </div>
                         {canManage && view !== 'history' ? (
                             <Button
                                 size="sm"
@@ -311,181 +313,52 @@ export default function WorkflowsIndex({
                                 disabled={mutating}
                                 data-workflow="create"
                             >
-                                Create workflow
+                                {t('Create workflow')}
                             </Button>
                         ) : null}
-                    </SurfaceHeader>
+                    </header>
 
                     <nav
                         className="flex gap-4 border-b border-hairline text-[13px]"
-                        aria-label="Automation sections"
+                        aria-label={t('Automation sections')}
                     >
                         <Link
                             href="/crm/workflows"
                             className={
                                 view === 'history'
-                                    ? 'pb-2 text-mute'
-                                    : 'border-b-2 border-brand pb-2 font-medium text-ink'
+                                    ? 'pb-2 text-[var(--evo-ink-muted)]'
+                                    : 'border-b-2 border-[var(--evo-teal)] pb-2 font-medium text-[var(--evo-ink)]'
                             }
                         >
-                            Workflows
+                            {t('Workflows')}
                         </Link>
                         <Link
                             href="/crm/workflows?view=history"
                             className={
                                 view === 'history'
-                                    ? 'border-b-2 border-brand pb-2 font-medium text-ink'
-                                    : 'pb-2 text-mute'
+                                    ? 'border-b-2 border-[var(--evo-teal)] pb-2 font-medium text-[var(--evo-ink)]'
+                                    : 'pb-2 text-[var(--evo-ink-muted)]'
                             }
                         >
-                            History
+                            {t('History')}
                         </Link>
                     </nav>
 
                     {view === 'history' ? (
-                        <WorkflowExecutionHistory
-                            executions={executions}
+                        <WorkflowExecutionHistory executions={executions} workflows={workflows} />
+                    ) : (
+                        <WorkflowList
                             workflows={workflows}
+                            templates={templates}
+                            conditionFields={condition_fields}
+                            stages={stages}
+                            canManage={canManage}
+                            mutating={mutating}
+                            onEdit={openEdit}
+                            onToggle={toggleWorkflow}
+                            onDelete={deleteWorkflow}
+                            onUseTemplate={applyTemplate}
                         />
-                    ) : null}
-
-                    {view === 'history' ? null : (
-                    <>
-                    <HairlinePanel>
-                        <div className="border-b border-hairline px-4 py-3">
-                            <h2 className="aurora-text-ui font-medium text-ink">
-                                Evo templates
-                            </h2>
-                            <p className="aurora-text-caption mt-1 text-mute">
-                                Starters that write a valid workflow into this workspace.
-                            </p>
-                        </div>
-                        <ul className="divide-y divide-hairline">
-                            {templates.map((template) => (
-                                <li
-                                    key={template.key}
-                                    className="flex flex-wrap items-start justify-between gap-3 px-4 py-3"
-                                >
-                                    <div className="min-w-0">
-                                        <p className="aurora-text-body-sm font-medium text-ink">
-                                            {template.name}
-                                        </p>
-                                        <p className="aurora-text-caption mt-0.5 text-mute">
-                                            {template.description}
-                                        </p>
-                                    </div>
-                                    {canManage ? (
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            className="shrink-0"
-                                            disabled={mutating}
-                                            onClick={() => applyTemplate(template.key)}
-                                        >
-                                            Use template
-                                        </Button>
-                                    ) : null}
-                                </li>
-                            ))}
-                        </ul>
-                    </HairlinePanel>
-
-                    <p className="px-1 text-[12px] text-mute">
-                        History stays inspectable when a workflow is Draft. Turning a
-                        workflow off cancels pending delayed runs and does not rewrite
-                        completed or failed history.
-                    </p>
-
-                    <HairlinePanel data-workflow="list">
-                        <div className="hidden border-b border-hairline px-4 py-2 text-[12px] text-mute md:grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_7rem_7rem_auto] md:gap-3">
-                            <span>Name</span>
-                            <span>Trigger</span>
-                            <span>Status</span>
-                            <span>Last modified</span>
-                            <span className="text-right"> </span>
-                        </div>
-                        <ul className="divide-y divide-hairline">
-                            {workflows.map((workflow) => (
-                                <li
-                                    key={workflow.id}
-                                    className="grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_7rem_7rem_auto] md:items-center md:gap-3"
-                                >
-                                    <div className="min-w-0">
-                                        <p className="truncate font-medium text-ink">
-                                            {workflow.name}
-                                        </p>
-                                        <p className="mt-0.5 text-[12px] leading-4 text-mute">
-                                            {summarizeWorkflowRow(
-                                                workflow,
-                                                condition_fields,
-                                                stages,
-                                            )}
-                                        </p>
-                                    </div>
-                                    <div className="text-[13px] text-ink">
-                                        {triggerLabel(workflow.trigger)}
-                                        {workflow.trigger_stage
-                                            ? ` → ${workflow.trigger_stage}`
-                                            : ''}
-                                        {workflow.trigger_status_label
-                                            ? ` → ${workflow.trigger_status_label}`
-                                            : ''}
-                                    </div>
-                                    <div>
-                                        <Badge
-                                            variant={workflow.active ? 'default' : 'outline'}
-                                        >
-                                            {workflowStatusLabel(workflow.active)}
-                                        </Badge>
-                                    </div>
-                                    <div className="text-[13px] text-mute">
-                                        {formatWorkflowTimestamp(workflow.updated_at)}
-                                    </div>
-                                    <div className="flex flex-wrap justify-start gap-2 md:justify-end">
-                                        {canManage ? (
-                                            <>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    disabled={mutating}
-                                                    onClick={() => openEdit(workflow)}
-                                                >
-                                                    Edit
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    disabled={mutating}
-                                                    onClick={() => toggleWorkflow(workflow)}
-                                                >
-                                                    {workflow.active ? 'Turn off' : 'Turn on'}
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="text-brand"
-                                                    disabled={mutating}
-                                                    onClick={() => deleteWorkflow(workflow)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </>
-                                        ) : null}
-                                    </div>
-                                </li>
-                            ))}
-                            {workflows.length === 0 ? (
-                                <li className="px-4 py-6 text-mute">
-                                    No workflows yet. Use an Evo template or create one.
-                                </li>
-                            ) : null}
-                        </ul>
-                    </HairlinePanel>
-                    </>
                     )}
                 </div>
             </div>
@@ -493,16 +366,12 @@ export default function WorkflowsIndex({
             <CreateDrawer
                 open={editorOpen}
                 onOpenChange={requestClose}
-                title={editorTitle}
-                description="Save writes the structure. Enable is a separate action."
+                title={t(editorTitle)}
+                description={t('Save writes the structure. Enable is a separate action.')}
                 showFormLink={false}
                 className="sm:max-w-2xl"
             >
-                <form
-                    onSubmit={submitEditor}
-                    className="space-y-4"
-                    data-workflow="editor-form"
-                >
+                <form onSubmit={submitEditor} className="space-y-4" data-workflow="editor-form">
                     <WorkflowBuilder
                         draft={draft}
                         onChange={patchDraft}
@@ -517,29 +386,25 @@ export default function WorkflowsIndex({
                         disabled={!canManage || mutating}
                     />
                     <div
-                        className="rounded-md border border-hairline bg-canvas-soft px-3 py-2"
+                        className="rounded-md border border-hairline bg-[var(--evo-surface-subtle)] px-3 py-2"
                         data-workflow="review-configuration"
                     >
-                        <p className="text-[12px] font-medium text-ink">
+                        <p className="text-[12px] font-medium text-[var(--evo-ink)]">
                             Review configuration
                         </p>
-                        <p className="mt-1 text-[13px] text-ink">
+                        <p className="mt-1 text-[13px] text-[var(--evo-ink)]">
                             {summarizeWorkflow(draft, condition_fields, stages)}
                         </p>
-                        <p className="mt-1 text-[12px] text-mute">
+                        <p className="mt-1 text-[12px] text-[var(--evo-ink-muted)]">
                             This reviews the structure. It does not run the workflow.
                         </p>
                     </div>
                     <div className="flex justify-end gap-2 pt-2">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => requestClose(false)}
-                        >
-                            Cancel
+                        <Button type="button" variant="ghost" onClick={() => requestClose(false)}>
+                            {t('Cancel')}
                         </Button>
                         <Button type="submit" disabled={!canManage || mutating}>
-                            {mutating ? 'Saving…' : 'Save'}
+                            {mutating ? t('Saving…') : t('Save')}
                         </Button>
                     </div>
                 </form>

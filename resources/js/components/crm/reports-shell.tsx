@@ -2,6 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { RoomShell } from '@/components/crm/room-shell';
 import type { RoomTab } from '@/components/crm/room-shell';
+import { t } from '@/lib/i18n';
 
 type TabDef = RoomTab & { exact?: boolean; activePaths?: string[] };
 
@@ -43,16 +44,14 @@ const REPORTS_TABS: TabDef[] = [
 
 export function reportsTabs(pathname: string): RoomTab[] {
     return REPORTS_TABS.map((tab) => ({
-        label: tab.label,
+        label: t(tab.label),
         href: tab.href,
         active: tabActive(pathname, tab),
     }));
 }
 
 export function reportsBasePath(activeCategory: string): string {
-    return activeCategory === 'overview'
-        ? '/reports'
-        : `/reports/${activeCategory}`;
+    return activeCategory === 'overview' ? '/reports' : `/reports/${activeCategory}`;
 }
 
 export function ReportsShell({
@@ -78,31 +77,29 @@ export function ReportsShell({
 
     return (
         <>
-            <Head title={title} />
+            <Head title={t(title)} />
             <RoomShell title="Reports" tabs={reportsTabs(pathname)}>
-                <div className="h-full overflow-y-auto bg-canvas-soft">
+                <div className="h-full overflow-y-auto bg-[var(--evo-canvas)]">
                     <div className="px-4 py-3 md:px-5 md:py-4">
                         {hero}
                         <header className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
                             <div className="min-w-0">
                                 {showDashboardName ? (
-                                    <h2 className="text-[13px] font-semibold tracking-tight text-ink">
-                                        {innerTitle}
+                                    <h2 className="text-[13px] font-semibold tracking-tight text-[var(--evo-ink)]">
+                                        {t(innerTitle)}
                                     </h2>
                                 ) : null}
                                 {description ? (
-                                    <p className="mt-0.5 max-w-2xl text-[11px] leading-4 text-mute">
+                                    <p className="mt-0.5 max-w-2xl text-[11px] leading-4 text-[var(--evo-ink-muted)]">
                                         {description}
                                     </p>
                                 ) : null}
                             </div>
-                            {filters ? (
-                                <div className="shrink-0">{filters}</div>
-                            ) : null}
+                            {filters ? <div className="shrink-0">{filters}</div> : null}
                         </header>
                         {children}
                         {footer ? (
-                            <footer className="mt-4 border-t border-hairline pt-2.5 text-[11px] text-mute">
+                            <footer className="mt-4 border-t border-hairline pt-2.5 text-[11px] text-[var(--evo-ink-muted)]">
                                 {footer}
                             </footer>
                         ) : null}

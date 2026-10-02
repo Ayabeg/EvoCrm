@@ -5,6 +5,7 @@ import type { LabRoute } from './lib/routes';
 import { AccueilPage } from './pages/AccueilPage';
 import { AdsHubPage } from './pages/AdsHubPage';
 import { AgentsPage } from './pages/AgentsPage';
+import { AutomationLabPage } from './pages/AutomationLabPage';
 import { CampaignPage } from './pages/CampaignPage';
 import { ComponentsPage } from './pages/ComponentsPage';
 import { ContactDetailPage } from './pages/ContactDetailPage';
@@ -80,6 +81,8 @@ function renderRoute(route: LabRoute) {
             return <TicketsPage />;
         case 'reports':
             return <ReportsPage view={route.view} />;
+        case 'automation':
+            return <AutomationLabPage view={route.view} />;
         case 'segments':
             return <SegmentsPage />;
         case 'workflows':

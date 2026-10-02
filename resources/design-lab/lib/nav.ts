@@ -52,8 +52,17 @@ export const REPORT_CHILDREN: NavChild[] = [
     { id: 'desk', label: 'Desk', to: { name: 'reports', view: 'desk' } },
     { id: 'activity', label: 'Activité', to: { name: 'reports', view: 'activity' } },
     { id: 'dashboards', label: 'Dashboards', to: { name: 'reports', view: 'dashboards' } },
+    { id: 'funnels', label: 'Entonnoirs', to: { name: 'reports', view: 'funnels' } },
     { id: 'builder', label: 'Report Builder', to: { name: 'reports', view: 'builder' } },
+    { id: 'cross-object', label: 'Cross-objet', to: { name: 'reports', view: 'cross-object' } },
     { id: 'scheduled', label: 'Rapports planifiés', to: { name: 'reports', view: 'scheduled' } },
+];
+
+export const AUTOMATION_CHILDREN: NavChild[] = [
+    { id: 'workflows', label: 'Workflows', to: { name: 'automation', view: 'workflows' } },
+    { id: 'editor', label: 'QUAND / SI / ALORS', to: { name: 'automation', view: 'editor' } },
+    { id: 'segments', label: 'Règles de segment', to: { name: 'automation', view: 'segments' } },
+    { id: 'history', label: 'Historique', to: { name: 'automation', view: 'history' } },
 ];
 
 export const NAV_SECTIONS: NavSection[] = [
@@ -105,6 +114,12 @@ export const NAV_SECTIONS: NavSection[] = [
         id: 'automatiser',
         label: 'Automatiser',
         items: [
+            {
+                id: 'automation',
+                label: 'Automatisation',
+                to: { name: 'automation' },
+                children: AUTOMATION_CHILDREN,
+            },
             { id: 'segments', label: 'Segments', to: { name: 'segments' } },
             { id: 'workflows', label: 'Workflows', to: { name: 'workflows' } },
         ],

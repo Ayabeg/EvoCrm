@@ -9,4 +9,6 @@ export { ComposedChart, type ComposedSeries } from '@/evo/charts/composed-chart'
 export { SankeyChart, type SankeyChartData, type SankeyChartProps } from '@/evo/charts/sankey-chart';
 export { Sparkline, type SparklineProps } from '@/evo/charts/sparkline';
 export { FunnelChart, type FunnelChartProps, type FunnelStep } from '@/evo/charts/funnel-chart';
+export { DonutChart, type DonutChartProps, type DonutSlice } from '@/evo/charts/donut-chart';
+export { HorizontalBarChart } from '@/evo/charts/horizontal-bar-chart';
 export { CHART_HIGHLIGHT, CHART_SERIES, seriesColor } from '@/evo/charts/tokens';
