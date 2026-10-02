@@ -1,7 +1,6 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { MorphingForm } from '@/components/crm/morphing-form';
-import { SettingsPageHeader } from '@/components/settings/chrome';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
 import {
     HairlineRow,
@@ -14,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
+import { SettingsForm, SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type FillRate = {
     filled: number;
@@ -107,7 +108,7 @@ function DefinitionForm({
     const isEdit = Boolean(definition);
 
     return (
-        <Form
+        <SettingsForm
             action={
                 isEdit
                     ? `/settings/attributes/${definition!.id}`
@@ -214,7 +215,7 @@ function DefinitionForm({
                     </div>
                 </>
             )}
-        </Form>
+        </SettingsForm>
     );
 }
 
@@ -237,7 +238,7 @@ export default function AttributeSettings({
 
     return (
         <>
-            <Head title="Properties" />
+            <Head title={t('Properties')} />
 
             <div className="space-y-3">
                 <SettingsPageHeader
@@ -271,13 +272,13 @@ export default function AttributeSettings({
                                 <HairlineTable minWidth="36rem">
                                     <thead>
                                         <tr className="border-b border-hairline">
-                                            <HairlineTh>Label</HairlineTh>
-                                            <HairlineTh>Key</HairlineTh>
-                                            <HairlineTh>Group</HairlineTh>
-                                            <HairlineTh>Type</HairlineTh>
-                                            <HairlineTh>Fill</HairlineTh>
+                                            <HairlineTh>{t('Label')}</HairlineTh>
+                                            <HairlineTh>{t('Key')}</HairlineTh>
+                                            <HairlineTh>{t('Group')}</HairlineTh>
+                                            <HairlineTh>{t('Type')}</HairlineTh>
+                                            <HairlineTh>{t('Fill')}</HairlineTh>
                                             <HairlineTh align="right">
-                                                Actions
+                                                {t('Actions')}
                                             </HairlineTh>
                                         </tr>
                                     </thead>
@@ -350,8 +351,10 @@ export default function AttributeSettings({
                                                             onOpenChange={(open) => {
                                                                 if (open) {
                                                                     setEditing(definition);
+
                                                                     return;
                                                                 }
+
                                                                 if (editing?.id === definition.id) {
                                                                     setEditing(null);
                                                                 }
@@ -386,7 +389,7 @@ export default function AttributeSettings({
                                                                             definition={editing}
                                                                             onDone={() => setEditing(null)}
                                                                         />
-                                                                        <Form
+                                                                        <SettingsForm
                                                                             action={`/settings/attributes/${editing.id}`}
                                                                             method="delete"
                                                                         >
@@ -396,10 +399,10 @@ export default function AttributeSettings({
                                                                                     variant="secondary"
                                                                                     disabled={processing}
                                                                                 >
-                                                                                    Delete
+                                                                                    {t('Delete')}
                                                                                 </Button>
                                                                             )}
-                                                                        </Form>
+                                                                        </SettingsForm>
                                                                     </>
                                                                 ) : null}
                                                             </div>

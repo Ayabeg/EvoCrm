@@ -1,10 +1,12 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
     SettingsCard,
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 export default function WorkspaceSettings({
     simple_mode,
@@ -13,14 +15,14 @@ export default function WorkspaceSettings({
 }) {
     return (
         <>
-            <Head title="General" />
+            <Head title={t('General')} />
 
             <SettingsPageHeader
                 title="General"
                 description="Simple mode is the sellable launch surface. Turn it off to bring back tickets, ads, warmup, Ask Evo, and report builder."
             />
 
-            <Form action="/settings/workspace" method="put">
+            <SettingsForm action="/settings/workspace" method="put">
                 {({ processing }) => (
                     <SettingsCard
                         title="Preferences"
@@ -40,14 +42,14 @@ export default function WorkspaceSettings({
                                 className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px] text-ink"
                             >
                                 <option value="1">
-                                    On - Home, Contacts, Deals, Inbox, Quotes
+                                    {t('On - Home, Contacts, Deals, Inbox, Quotes')}
                                 </option>
-                                <option value="0">Off - full product</option>
+                                <option value="0">{t('Off - full product')}</option>
                             </select>
                         </SettingsFormRow>
                     </SettingsCard>
                 )}
-            </Form>
+            </SettingsForm>
         </>
     );
 }

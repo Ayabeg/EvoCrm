@@ -64,6 +64,21 @@ it('keeps the Design Lab token page behind the existing admin gate', function ()
     $this->get('/design-lab/tokens')->assertOk();
 });
 
+it('keeps the Design Lab settings family behind the existing admin gate', function () {
+    $routes = file_get_contents(resource_path('design-lab/lib/routes.ts'));
+    $page = file_get_contents(resource_path('design-lab/pages/SettingsLabPage.tsx'));
+
+    expect($routes)->toContain("name: 'settings'")
+        ->and($page)->toContain('Settings family')
+        ->and($page)->toContain('SettingsSaveBar')
+        ->and($page)->toContain('SettingsDangerZone')
+        ->and($page)->toContain('PhoneInput')
+        ->and($page)->toContain('MoneyInput')
+        ->and($page)->toContain('TimePicker');
+
+    $this->get('/design-lab/settings')->assertOk();
+});
+
 it('keeps the Design Lab shell page behind the existing admin gate', function () {
     $routes = file_get_contents(resource_path('design-lab/lib/routes.ts'));
     $page = file_get_contents(resource_path('design-lab/pages/ShellPage.tsx'));

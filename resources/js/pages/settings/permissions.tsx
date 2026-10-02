@@ -1,8 +1,9 @@
-import { Form, Head } from '@inertiajs/react';
-import { SettingsPageHeader } from '@/components/settings/chrome';
+import { Head } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { SettingsForm, SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type MatrixRow = {
     key: string;
@@ -31,7 +32,7 @@ export default function PermissionsSettings({
 }) {
     return (
         <>
-            <Head title="Permissions" />
+            <Head title={t('Permissions')} />
             <div className="space-y-6">
                 <SettingsPageHeader
                     title="Permissions"
@@ -42,10 +43,10 @@ export default function PermissionsSettings({
                     <table className="w-full text-left text-[13px]">
                         <thead className="bg-canvas-soft text-[11px] tracking-wide text-muted-foreground uppercase">
                             <tr>
-                                <th className="px-4 py-2">Capability</th>
-                                <th className="px-4 py-2">Owner</th>
-                                <th className="px-4 py-2">Admin</th>
-                                <th className="px-4 py-2">Member</th>
+                                <th className="px-4 py-2">{t('Capability')}</th>
+                                <th className="px-4 py-2">{t('Owner')}</th>
+                                <th className="px-4 py-2">{t('Admin')}</th>
+                                <th className="px-4 py-2">{t('Member')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,7 +67,7 @@ export default function PermissionsSettings({
 
                 <section>
                     <h2 className="mb-3 text-[14px] font-semibold">
-                        Member overrides
+                        {t('Member overrides')}
                     </h2>
                     <ul className="space-y-2">
                         {members.map((member) => (
@@ -93,7 +94,7 @@ export default function PermissionsSettings({
                                         <summary className="cursor-pointer text-xs font-medium">
                                             Edit additional grants
                                         </summary>
-                                        <Form
+                                        <SettingsForm
                                             action={`/settings/permissions/${member.id}`}
                                             method="put"
                                             className="mt-3 space-y-3"
@@ -151,7 +152,7 @@ export default function PermissionsSettings({
                                                     </Button>
                                                 </>
                                             )}
-                                        </Form>
+                                        </SettingsForm>
                                     </details>
                                 ) : (
                                     <p className="mt-2 text-[11px] text-muted-foreground">

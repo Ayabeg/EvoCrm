@@ -1,4 +1,4 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     CalendarBlank,
     EnvelopeSimple,
@@ -6,13 +6,15 @@ import {
 } from '@phosphor-icons/react';
 import { connectorStatusLabel } from '@/components/desk/connector-status';
 import { ChannelMark } from '@/components/desk/official-connect-panel';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     SettingsCard,
     SettingsEmptyState,
     SettingsPageHeader,
-} from '@/components/settings/chrome';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 import type { GoogleWorkspaceConnector, OfficialDeskConnector } from '@/types';
 
 function GoogleConnectorCard({
@@ -41,7 +43,7 @@ function GoogleConnectorCard({
                             : 'secondary'
                     }
                 >
-                    {connectorStatusLabel(connector.status)}
+                    {t(connectorStatusLabel(connector.status))}
                 </Badge>
             </div>
             <div className="space-y-3">
@@ -54,11 +56,11 @@ function GoogleConnectorCard({
                             canConfigure && connector.reconnect_url ? (
                                 <Button asChild size="sm">
                                     <a href={connector.reconnect_url}>
-                                        Reconnect Google
+                                        {t('Reconnect Google')}
                                     </a>
                                 </Button>
                             ) : canConfigure ? (
-                                <Form
+                                <SettingsForm
                                     action="/settings/connectors"
                                     method="post"
                                 >
@@ -75,11 +77,11 @@ function GoogleConnectorCard({
                                                     processing || !canConfigure
                                                 }
                                             >
-                                                Save {connector.name} intent
+                                                {t('Save :name intent', { name: connector.name })}
                                             </Button>
                                         </>
                                     )}
-                                </Form>
+                                </SettingsForm>
                             ) : undefined
                         }
                     />
@@ -88,7 +90,7 @@ function GoogleConnectorCard({
                 {connector.sync ? (
                     <div className="rounded-[4px] border border-hairline bg-canvas-soft p-3 text-[12px] text-mute">
                         <p className="font-medium text-ink">
-                            Sync {connector.sync.status}
+                            {t('Sync :status', { status: connector.sync.status })}
                         </p>
                         {connector.account_label ? (
                             <p className="min-w-0 truncate text-ink">
@@ -97,8 +99,8 @@ function GoogleConnectorCard({
                         ) : null}
                         <p>
                             {connector.sync.last_synced_at
-                                ? `Last sync ${connector.sync.last_synced_at}`
-                                : 'No sync run yet.'}
+                                ? t('Last sync :when', { when: connector.sync.last_synced_at })
+                                : t('No sync run yet.')}
                         </p>
                         {connector.sync.last_error ? (
                             <p className="text-destructive">
@@ -107,15 +109,15 @@ function GoogleConnectorCard({
                         ) : null}
                         <p>
                             {connector.sync.has_token
-                                ? 'Workspace token stored.'
-                                : 'No workspace token yet. Reconnect Google.'}
+                                ? t('Workspace token stored.')
+                                : t('No workspace token yet. Reconnect Google.')}
                         </p>
                     </div>
                 ) : null}
 
                 {!showReconnectEmpty && canConfigure ? (
                     <div className="flex flex-wrap items-center gap-2">
-                        <Form action="/settings/connectors" method="post">
+                        <SettingsForm action="/settings/connectors" method="post">
                             {({ processing }) => (
                                 <>
                                     <input
@@ -128,21 +130,21 @@ function GoogleConnectorCard({
                                         variant="outline"
                                         disabled={processing}
                                     >
-                                        Save {connector.name} intent
+                                        {t('Save :name intent', { name: connector.name })}
                                     </Button>
                                 </>
                             )}
-                        </Form>
+                        </SettingsForm>
                         {connector.reconnect_url ? (
                             <Button size="sm" asChild>
                                 <a href={connector.reconnect_url}>
-                                    Reconnect Google for {connector.name}
+                                    {t('Reconnect Google for :name', { name: connector.name })}
                                 </a>
                             </Button>
                         ) : null}
                         {connector.status === 'connected' ? (
                             <>
-                                <Form
+                                <SettingsForm
                                     action={`/settings/connectors/${connector.provider}/sync`}
                                     method="post"
                                 >
@@ -152,11 +154,11 @@ function GoogleConnectorCard({
                                             variant="outline"
                                             disabled={processing}
                                         >
-                                            Start sync
+                                            {t('Start sync')}
                                         </Button>
                                     )}
-                                </Form>
-                                <Form
+                                </SettingsForm>
+                                <SettingsForm
                                     action={`/settings/connectors/${connector.provider}/pause`}
                                     method="post"
                                 >
@@ -166,10 +168,10 @@ function GoogleConnectorCard({
                                             variant="outline"
                                             disabled={processing}
                                         >
-                                            Pause sync
+                                            {t('Pause sync')}
                                         </Button>
                                     )}
-                                </Form>
+                                </SettingsForm>
                             </>
                         ) : null}
                     </div>
@@ -200,7 +202,7 @@ export default function ConnectorsSettings({
 
     return (
         <>
-            <Head title="Connectors" />
+            <Head title={t('Connectors')} />
             <div className="space-y-4">
                 <SettingsPageHeader
                     title="Connectors"
@@ -209,18 +211,18 @@ export default function ConnectorsSettings({
 
                 <section className="space-y-3">
                     <h2 className="text-[13px] font-semibold tracking-wide text-ink uppercase">
-                        Google
+                        {t('Google')}
                     </h2>
                     <p className="text-[12px] text-mute">
-                        Authorized JavaScript origin{' '}
+                        {t('Authorized JavaScript origin')}{' '}
                         <code className="font-mono break-all text-brand">
                             {googleOrigin}
                         </code>
-                        . Redirect URI stays{' '}
+                        . {t('Redirect URI stays')}{' '}
                         <code className="font-mono break-all text-brand">
                             {googleCallback}
                         </code>
-                        . EvoSales does not send mail from these connectors.
+                        . {t('EvoSales does not send mail from these connectors.')}
                     </p>
                     {!googleEnabled ? (
                         <SettingsEmptyState
@@ -228,7 +230,7 @@ export default function ConnectorsSettings({
                             title="Google is not configured"
                             description="Set the existing Google OAuth client. Login stays the same."
                             action={
-                                <Form
+                                <SettingsForm
                                     action="/settings/connectors"
                                     method="post"
                                 >
@@ -242,11 +244,11 @@ export default function ConnectorsSettings({
                                                 }
                                             />
                                             <Button disabled={processing}>
-                                                Save Gmail intent
+                                                {t('Save Gmail intent')}
                                             </Button>
                                         </>
                                     )}
-                                </Form>
+                                </SettingsForm>
                             }
                         />
                     ) : (
@@ -263,15 +265,14 @@ export default function ConnectorsSettings({
 
                 <section className="space-y-3">
                     <h2 className="text-[13px] font-semibold tracking-wide text-ink uppercase">
-                        Official Desk channels
+                        {t('Official Desk channels')}
                     </h2>
                     <p className="text-[12px] text-mute">
-                        Connect from{' '}
+                        {t('Connect from')}{' '}
                         <Link href="/inbox" className="font-medium text-brand">
-                            My Inbox
+                            {t('My Inbox')}
                         </Link>
-                        . WhatsApp Cloud is Evolution Cloud API only.{' '}
-                        No Baileys.
+                        . {t('WhatsApp Cloud is Evolution Cloud API only. No Baileys.')}
                     </p>
                     <div className="grid gap-3">
                         {deskConnectors.map((connector) => (
@@ -295,7 +296,7 @@ export default function ConnectorsSettings({
                                                 {connector.name}
                                             </p>
                                             <p className="min-w-0 text-[12px] text-mute">
-                                                {connector.tagline}
+                                                {t(connector.tagline)}
                                             </p>
                                         </div>
                                     </div>
@@ -306,7 +307,7 @@ export default function ConnectorsSettings({
                                                 : 'secondary'
                                         }
                                     >
-                                        {connectorStatusLabel(connector.status)}
+                                        {t(connectorStatusLabel(connector.status))}
                                     </Badge>
                                 </div>
                             </SettingsCard>

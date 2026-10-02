@@ -1,14 +1,16 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     SettingsCard,
     SettingsEmptyState,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type Playbook = {
     id: number;
@@ -24,13 +26,13 @@ export default function PlaybookSettings({
 }) {
     return (
         <>
-            <Head title="Playbooks" />
+            <Head title={t('Playbooks')} />
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="Playbooks"
                     description="Short call and email scripts shown on contact and deal records."
                 />
-                <Form action="/settings/playbooks" method="post">
+                <SettingsForm action="/settings/playbooks" method="post">
                     <SettingsCard
                         title="New playbook"
                         required
@@ -70,7 +72,7 @@ export default function PlaybookSettings({
                             />
                         </div>
                     </SettingsCard>
-                </Form>
+                </SettingsForm>
                 <div className="space-y-3">
                     {playbooks.length === 0 ? (
                         <SettingsEmptyState
@@ -83,7 +85,7 @@ export default function PlaybookSettings({
                                 key={playbook.id}
                                 className="space-y-3 border-hairline p-4"
                             >
-                                <Form
+                                <SettingsForm
                                     action={`/settings/playbooks/${playbook.id}`}
                                     method="put"
                                     className="grid gap-3"
@@ -107,11 +109,11 @@ export default function PlaybookSettings({
                                     />
                                     <div className="flex gap-2">
                                         <Button type="submit" size="sm">
-                                            Update
+                                            {t('Update')}
                                         </Button>
                                     </div>
-                                </Form>
-                                <Form
+                                </SettingsForm>
+                                <SettingsForm
                                     action={`/settings/playbooks/${playbook.id}`}
                                     method="delete"
                                 >
@@ -121,9 +123,9 @@ export default function PlaybookSettings({
                                         size="sm"
                                         className="text-muted-foreground"
                                     >
-                                        Delete
+                                        {t('Delete')}
                                     </Button>
-                                </Form>
+                                </SettingsForm>
                             </Card>
                         ))
                     )}

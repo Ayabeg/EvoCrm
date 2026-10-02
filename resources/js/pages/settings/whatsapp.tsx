@@ -1,14 +1,16 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { ChatCircle } from '@phosphor-icons/react';
 import { useEffect } from 'react';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     SettingsCard,
     SettingsEmptyState,
     SettingsPageHeader,
-} from '@/components/settings/chrome';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type Channel = {
     available: boolean;
@@ -42,7 +44,7 @@ export default function WhatsAppSettings({
 
     return (
         <>
-            <Head title="WhatsApp" />
+            <Head title={t('WhatsApp')} />
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="WhatsApp"
@@ -79,7 +81,7 @@ export default function WhatsAppSettings({
                             <BrandConnectButtons facebookUrl={facebook_url} />
                         ) : null}
                         {can_configure && channel.connected ? (
-                            <Form
+                            <SettingsForm
                                 action="/settings/whatsapp"
                                 method="delete"
                                 onBefore={() =>
@@ -96,7 +98,7 @@ export default function WhatsAppSettings({
                                         Disconnect
                                     </Button>
                                 )}
-                            </Form>
+                            </SettingsForm>
                         ) : null}
                     </div>
                 </SettingsCard>

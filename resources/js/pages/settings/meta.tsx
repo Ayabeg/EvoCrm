@@ -1,16 +1,18 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Plugs } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
-import {
-    SettingsCard,
-    SettingsEmptyState,
-    SettingsPageHeader,
-} from '@/components/settings/chrome';
 import { SecretCallbackField } from '@/components/settings/secret-callback-field';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+    SettingsCard,
+    SettingsEmptyState,
+    SettingsPageHeader,
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type Mapping = { meta_field: string; crm_property: string };
 type ConversionConfig = {
@@ -122,7 +124,7 @@ export default function MetaSettings({
 
     return (
         <>
-            <Head title="Meta" />
+            <Head title={t('Meta')} />
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="Meta"
@@ -203,7 +205,7 @@ export default function MetaSettings({
 
                 {ad_accounts.length > 0 ? (
                     <SettingsCard title="Ad accounts">
-                        <Form action="/settings/meta/ad-account" method="put">
+                        <SettingsForm action="/settings/meta/ad-account" method="put">
                             {({ processing, errors }) => (
                                 <div className="space-y-3">
                                     <label
@@ -247,7 +249,7 @@ export default function MetaSettings({
                                     </Button>
                                 </div>
                             )}
-                        </Form>
+                        </SettingsForm>
                         <div className="grid gap-3 text-sm md:grid-cols-2">
                             <div>
                                 <p className="text-[11px] font-medium text-mute uppercase">
@@ -313,7 +315,7 @@ export default function MetaSettings({
                     title="Field mapping"
                     description="Map Meta form fields to EvoSales properties. Unmapped custom fields stay on the lead payload."
                 >
-                    <Form
+                    <SettingsForm
                         action="/settings/meta/mappings"
                         method="put"
                         transform={() => ({ mappings })}
@@ -383,14 +385,14 @@ export default function MetaSettings({
                                 </div>
                             </div>
                         )}
-                    </Form>
+                    </SettingsForm>
                 </SettingsCard>
 
                 <SettingsCard
                     title="Conversions API"
                     description="CRM lifecycle events map to Meta standard events. Email and phone are hashed before send."
                 >
-                    <Form action="/settings/meta/conversions" method="put">
+                    <SettingsForm action="/settings/meta/conversions" method="put">
                         {({ processing }) => (
                             <div className="space-y-3">
                                 <label
@@ -491,7 +493,7 @@ export default function MetaSettings({
                                 </Button>
                             </div>
                         )}
-                    </Form>
+                    </SettingsForm>
                 </SettingsCard>
 
                 <SettingsCard title="Sync">
@@ -502,7 +504,7 @@ export default function MetaSettings({
                             { kind: 'leads', label: 'Historical leads' },
                             { kind: 'all', label: 'Full sync' },
                         ].map((action) => (
-                            <Form
+                            <SettingsForm
                                 key={action.kind}
                                 action="/settings/meta/sync"
                                 method="post"
@@ -524,7 +526,7 @@ export default function MetaSettings({
                                         </Button>
                                     </>
                                 )}
-                            </Form>
+                            </SettingsForm>
                         ))}
                     </div>
                     <ul className="space-y-1 text-[12px] text-mute">

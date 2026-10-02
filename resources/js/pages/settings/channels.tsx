@@ -1,15 +1,17 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { PlugsConnected } from '@phosphor-icons/react';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
     SettingsCard,
     SettingsEmptyState,
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+    SettingsForm,
+} from '@/evo/patterns/settings';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import { t } from '@/lib/i18n';
 
 export default function ChannelSettings({
     channels,
@@ -31,7 +33,7 @@ export default function ChannelSettings({
 
     return (
         <>
-            <Head title="Channels" />
+            <Head title={t('Channels')} />
 
             <SettingsPageHeader
                 title="Channels"
@@ -39,7 +41,7 @@ export default function ChannelSettings({
             />
 
             <div className="grid gap-3">
-                <Form action="/settings/channels" method="post">
+                <SettingsForm action="/settings/channels" method="post">
                     {({ processing }) => (
                         <SettingsCard
                             title="Desk embed"
@@ -79,7 +81,7 @@ export default function ChannelSettings({
                             </SettingsFormRow>
                         </SettingsCard>
                     )}
-                </Form>
+                </SettingsForm>
 
                 {visibleChannels.length === 0 ? (
                     <SettingsEmptyState

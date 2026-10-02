@@ -1,11 +1,14 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 import {
     SettingsCard,
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
-import { Input } from '@/components/ui/input';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { MoneyInput } from '@/evo/ui/money-input';
+import { t } from '@/lib/i18n';
 
 type PersonQuota = {
     id: number;
@@ -13,6 +16,34 @@ type PersonQuota = {
     role: string;
     amount_dzd: number | null;
 };
+
+function QuotaMoneyField({
+    id,
+    name,
+    defaultValue,
+    placeholder,
+    className,
+}: {
+    id?: string;
+    name: string;
+    defaultValue: number | null;
+    placeholder?: string;
+    className?: string;
+}) {
+    const [value, setValue] = useState<number | null>(defaultValue);
+
+    return (
+        <div className={className}>
+            <MoneyInput
+                id={id}
+                value={value}
+                onValueChange={setValue}
+                aria-label={placeholder}
+            />
+            <input type="hidden" name={name} value={value ?? ''} />
+        </div>
+    );
+}
 
 export default function QuotaSettings({
     workspace_amount_dzd,
@@ -27,14 +58,14 @@ export default function QuotaSettings({
 }) {
     return (
         <>
-            <Head title="Quotas" />
+            <Head title={t('Quotas')} />
 
             <SettingsPageHeader
                 title="Quotas"
                 description={`Monthly closed-won target in DZD. Home compares ${month_label} against these numbers (${timezone}). Empty means no target.`}
             />
 
-            <Form action="/settings/quotas" method="put">
+            <SettingsForm action="/settings/quotas" method="put">
                 {({ processing }) => (
                     <SettingsCard
                         title="Monthly targets"
@@ -50,15 +81,11 @@ export default function QuotaSettings({
                             htmlFor="workspace-quota"
                             hint="Company number on Home. Not the sum of people below."
                         >
-                            <Input
+                            <QuotaMoneyField
                                 id="workspace-quota"
                                 name="workspace_amount_dzd"
-                                type="number"
-                                min={0}
-                                step={1}
-                                defaultValue={workspace_amount_dzd ?? ''}
+                                defaultValue={workspace_amount_dzd}
                                 placeholder="8000000"
-                                className="h-8"
                             />
                         </SettingsFormRow>
 
@@ -99,16 +126,11 @@ export default function QuotaSettings({
                                                 </span>
                                             </td>
                                             <td className="px-0 py-2 text-right">
-                                                <Input
+                                                <QuotaMoneyField
                                                     name={`people[${index}][amount_dzd]`}
-                                                    type="number"
-                                                    min={0}
-                                                    step={1}
-                                                    defaultValue={
-                                                        person.amount_dzd ?? ''
-                                                    }
-                                                    className="ml-auto h-8 max-w-[10rem] text-right"
+                                                    defaultValue={person.amount_dzd}
                                                     placeholder="-"
+                                                    className="ml-auto max-w-[10rem]"
                                                 />
                                             </td>
                                         </tr>
@@ -118,7 +140,7 @@ export default function QuotaSettings({
                         </div>
                     </SettingsCard>
                 )}
-            </Form>
+            </SettingsForm>
         </>
     );
 }

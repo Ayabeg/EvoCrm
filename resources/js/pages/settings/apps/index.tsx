@@ -13,13 +13,14 @@ import {
     WhatsAppMark,
 } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     SettingsCard,
     SettingsEmptyState,
     SettingsPageHeader,
-} from '@/components/settings/chrome';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 import type { MarketplaceApp } from '@/types';
 
 function AppLogo({ appKey }: { appKey: string }) {
@@ -231,7 +232,7 @@ export default function AppsMarketplace({
 
     return (
         <>
-            <Head title="Apps" />
+            <Head title={t('Apps')} />
             <SettingsPageHeader
                 title="Apps"
                 description="Product connections for this workspace. Status is Connected when a configuration exists — not a live health probe."

@@ -22,6 +22,16 @@ describe('design-lab token route', () => {
     });
 });
 
+describe('design-lab settings route', () => {
+    it('parses /design-lab/settings as the settings family page', () => {
+        expect(parseLabLocation('/design-lab/settings', '')).toEqual({
+            name: 'settings',
+        });
+        expect(routePath({ name: 'settings' })).toBe('/settings');
+        expect(labHref({ name: 'settings' })).toMatch(/settings/);
+    });
+});
+
 describe('design-lab shell route', () => {
     it('parses /design-lab/shell as the shell page', () => {
         expect(parseLabLocation('/design-lab/shell', '')).toEqual({

@@ -1,37 +1,65 @@
-import { Form } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+    SettingsForm,
+    SettingsFormRow,
+    SettingsSaveBar,
+    SettingsSection,
+} from '@/evo/patterns/settings';
+import { Input } from '@/evo/ui/input';
+import { TimePicker } from '@/evo/ui/time-picker';
+import { t } from '@/lib/i18n';
 
 export default function QuietHoursEdit({
     quietHours,
 }: {
     quietHours: { starts_at: string; ends_at: string; timezone: string; enabled: boolean };
 }) {
+    const [startsAt, setStartsAt] = useState(quietHours.starts_at);
+    const [endsAt, setEndsAt] = useState(quietHours.ends_at);
+
     return (
-        <OutboundShell title="Quiet hours">
+        <OutboundShell title="Heures calmes">
+            <Head title={t('Heures calmes')} />
             <OutboundPage
-                title="Quiet hours"
-                description="Automated outbound is blocked in this window. Default 21:00–08:00 Africa/Algiers."
+                title="Heures calmes"
+                description="L’outbound automatique est bloqué dans cette fenêtre. Défaut 21:00–08:00 Africa/Algiers."
             >
-                <section className="border-t border-hairline pt-3">
-                    <Form action="/outbound/quiet-hours" method="post" className="grid gap-3 md:grid-cols-2">
-                        {({ processing }) => (
-                            <>
-                                <div>
-                                    <Label>Starts at</Label>
-                                    <Input name="starts_at" defaultValue={quietHours.starts_at} required />
-                                </div>
-                                <div>
-                                    <Label>Ends at</Label>
-                                    <Input name="ends_at" defaultValue={quietHours.ends_at} required />
-                                </div>
-                                <div>
-                                    <Label>Timezone</Label>
-                                    <Input name="timezone" defaultValue={quietHours.timezone} required />
-                                </div>
-                                <div className="flex items-center gap-2 pt-6">
+                <SettingsForm action="/outbound/quiet-hours" method="post">
+                    {({ processing }) => (
+                        <SettingsSection
+                            title="Fenêtre"
+                            required
+                            footer={<SettingsSaveBar processing={processing} />}
+                        >
+                            <SettingsFormRow label="Début" htmlFor="starts_at" required>
+                                <TimePicker
+                                    id="starts_at"
+                                    name="starts_at"
+                                    value={startsAt}
+                                    onValueChange={(value) => setStartsAt(value ?? '')}
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow label="Fin" htmlFor="ends_at" required>
+                                <TimePicker
+                                    id="ends_at"
+                                    name="ends_at"
+                                    value={endsAt}
+                                    onValueChange={(value) => setEndsAt(value ?? '')}
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow label="Fuseau" htmlFor="timezone" required>
+                                <Input
+                                    id="timezone"
+                                    name="timezone"
+                                    size="sm"
+                                    defaultValue={quietHours.timezone}
+                                    required
+                                />
+                            </SettingsFormRow>
+                            <SettingsFormRow label="Actif" htmlFor="enabled">
+                                <label className="flex h-8 items-center gap-2 text-[13px] text-[var(--evo-ink)]">
                                     <input type="hidden" name="enabled" value="0" />
                                     <input
                                         id="enabled"
@@ -40,20 +68,17 @@ export default function QuietHoursEdit({
                                         value="1"
                                         defaultChecked={quietHours.enabled}
                                     />
-                                    <Label htmlFor="enabled">Enabled</Label>
-                                </div>
-                                <div>
-                                    <Button disabled={processing}>Save quiet hours</Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </section>
+                                    Activé
+                                </label>
+                            </SettingsFormRow>
+                        </SettingsSection>
+                    )}
+                </SettingsForm>
             </OutboundPage>
         </OutboundShell>
     );
 }
 
 QuietHoursEdit.layout = {
-    breadcrumbs: [{ title: 'Quiet hours', href: '/outbound/quiet-hours' }],
+    breadcrumbs: [{ title: 'Heures calmes', href: '/outbound/quiet-hours' }],
 };

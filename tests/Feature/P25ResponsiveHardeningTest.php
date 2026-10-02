@@ -83,7 +83,7 @@ it('does not leak integration secrets through Settings DOM strings', function ()
     $secret = file_get_contents(resource_path('js/components/settings/secret-callback-field.tsx'));
     $sms = file_get_contents(resource_path('js/pages/settings/sms.tsx'));
     $meta = file_get_contents(resource_path('js/pages/settings/meta.tsx'));
-    $settings = file_get_contents(resource_path('js/layouts/settings/layout.tsx'));
+    $settings = file_get_contents(resource_path('js/evo/patterns/settings/settings-layout.tsx'));
 
     expect($secret)->toContain('masked_url')
         ->and($secret)->toContain('can_reveal')

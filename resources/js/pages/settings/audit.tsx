@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Card } from '@/components/ui/card';
+import { SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type AuditRow = {
     id: number;
@@ -25,7 +26,7 @@ function stamp(value: string | null): string {
 export default function AuditSettings({ events }: { events: AuditRow[] }) {
     return (
         <>
-            <Head title="Audit trail" />
+            <Head title={t('Audit trail')} />
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="Audit trail"
@@ -35,10 +36,10 @@ export default function AuditSettings({ events }: { events: AuditRow[] }) {
                     <table className="w-full text-sm">
                         <thead className="bg-canvas-soft text-left text-[11px] tracking-wide text-muted-foreground uppercase">
                             <tr>
-                                <th className="px-4 py-2">When</th>
-                                <th className="px-4 py-2">Actor</th>
-                                <th className="px-4 py-2">Action</th>
-                                <th className="px-4 py-2">Summary</th>
+                                <th className="px-4 py-2">{t('When')}</th>
+                                <th className="px-4 py-2">{t('Actor')}</th>
+                                <th className="px-4 py-2">{t('Action')}</th>
+                                <th className="px-4 py-2">{t('Summary')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -48,7 +49,7 @@ export default function AuditSettings({ events }: { events: AuditRow[] }) {
                                         colSpan={4}
                                         className="px-4 py-8 text-center text-muted-foreground"
                                     >
-                                        No audit events yet.
+                                        {t('No audit events yet.')}
                                     </td>
                                 </tr>
                             ) : (
@@ -61,7 +62,7 @@ export default function AuditSettings({ events }: { events: AuditRow[] }) {
                                             {stamp(event.created_at)}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {event.actor ?? 'System'}
+                                            {event.actor ?? t('System')}
                                         </td>
                                         <td className="px-4 py-3 font-medium">
                                             {event.action}

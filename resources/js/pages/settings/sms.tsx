@@ -1,15 +1,18 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { ChatText } from '@phosphor-icons/react';
-import {
-    SettingsCard,
-    SettingsEmptyState,
-    SettingsFormRow,
-    SettingsPageHeader,
-    SettingsSaveBar,
-} from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+    SettingsCard,
+    SettingsDangerZone,
+    SettingsEmptyState,
+    SettingsForm,
+    SettingsFormRow,
+    SettingsPageHeader,
+    SettingsSaveBar,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type SmsSettingsProps = {
     connected: boolean;
@@ -44,7 +47,7 @@ export default function SmsSettings({
 }: SmsSettingsProps) {
     return (
         <>
-            <Head title="SMS" />
+            <Head title={t('SMS')} />
 
             <SettingsPageHeader
                 title="SMS"
@@ -71,7 +74,7 @@ export default function SmsSettings({
                     </SettingsCard>
                 )}
 
-                <Form action="/settings/sms" method="post">
+                <SettingsForm action="/settings/sms" method="post">
                     {({ processing }) => (
                         <SettingsCard
                             title="Workspace gateway"
@@ -231,10 +234,10 @@ export default function SmsSettings({
                             </p>
                         </SettingsCard>
                     )}
-                </Form>
+                </SettingsForm>
 
                 {connected ? (
-                    <Form
+                    <SettingsForm
                         action="/settings/sms"
                         method="delete"
                         onBefore={() =>
@@ -244,23 +247,22 @@ export default function SmsSettings({
                         }
                     >
                         {({ processing }) => (
-                            <SettingsCard title="Disconnect">
-                                <p className="text-[12px] text-mute">
-                                    Deletes the stored API key. Messages
-                                    already sent stay. This does not revoke
-                                    the aggregator account.
-                                </p>
+                            <SettingsDangerZone
+                                title="Disconnect"
+                                description="Deletes the stored API key. Messages already sent stay. This does not revoke the aggregator account."
+                            >
                                 <Button
                                     type="submit"
-                                    variant="outline"
+                                    variant="destructive"
                                     size="sm"
+                                    data-settings="danger"
                                     disabled={processing}
                                 >
                                     Disconnect
                                 </Button>
-                            </SettingsCard>
+                            </SettingsDangerZone>
                         )}
-                    </Form>
+                    </SettingsForm>
                 ) : null}
             </div>
         </>

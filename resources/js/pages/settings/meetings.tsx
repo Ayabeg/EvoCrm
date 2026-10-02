@@ -1,11 +1,15 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
 import {
     SettingsCard,
+    SettingsForm,
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
-import { Input } from '@/components/ui/input';
+    settingsCopy,
+} from '@/evo/patterns/settings';
+import { TimePicker } from '@/evo/ui/time-picker';
 import { t } from '@/lib/i18n';
 
 type Schedule = {
@@ -30,15 +34,7 @@ type WhatsAppTemplates = {
     language: string;
 };
 
-const DAYS: { value: number; label: string }[] = [
-    { value: 1, label: 'Mon' },
-    { value: 2, label: 'Tue' },
-    { value: 3, label: 'Wed' },
-    { value: 4, label: 'Thu' },
-    { value: 5, label: 'Fri' },
-    { value: 6, label: 'Sat' },
-    { value: 7, label: 'Sun' },
-];
+const DAYS = settingsCopy.weekdays;
 
 export default function MeetingSettings({
     schedule,
@@ -49,6 +45,9 @@ export default function MeetingSettings({
     whatsapp: WhatsAppTemplates;
     whatsapp_cloud_connected: boolean;
 }) {
+    const [workStart, setWorkStart] = useState(schedule.work_start);
+    const [workEnd, setWorkEnd] = useState(schedule.work_end);
+
     return (
         <>
             <Head title={t('Meetings')} />
@@ -76,7 +75,7 @@ export default function MeetingSettings({
                     </p>
                 </SettingsCard>
 
-                <Form action="/settings/meetings" method="put">
+                <SettingsForm action="/settings/meetings" method="put">
                     <SettingsCard
                         title="Availability"
                         required
@@ -110,7 +109,7 @@ export default function MeetingSettings({
                                 name="intro"
                                 defaultValue={schedule.intro ?? ''}
                                 className="h-8"
-                                placeholder="30 min discovery"
+                                placeholder={t('30 min discovery')}
                             />
                         </SettingsFormRow>
                         <SettingsFormRow
@@ -134,13 +133,11 @@ export default function MeetingSettings({
                                 htmlFor="meeting-start"
                                 required
                             >
-                                <Input
+                                <TimePicker
                                     id="meeting-start"
                                     name="work_start"
-                                    type="time"
-                                    required
-                                    defaultValue={schedule.work_start}
-                                    className="h-8"
+                                    value={workStart}
+                                    onValueChange={(value) => setWorkStart(value ?? '')}
                                 />
                             </SettingsFormRow>
                             <SettingsFormRow
@@ -148,13 +145,11 @@ export default function MeetingSettings({
                                 htmlFor="meeting-end"
                                 required
                             >
-                                <Input
+                                <TimePicker
                                     id="meeting-end"
                                     name="work_end"
-                                    type="time"
-                                    required
-                                    defaultValue={schedule.work_end}
-                                    className="h-8"
+                                    value={workEnd}
+                                    onValueChange={(value) => setWorkEnd(value ?? '')}
                                 />
                             </SettingsFormRow>
                         </div>
@@ -293,7 +288,7 @@ export default function MeetingSettings({
                             </div>
                         </div>
                     </SettingsCard>
-                </Form>
+                </SettingsForm>
             </div>
         </>
     );

@@ -1,12 +1,13 @@
 import { Head } from '@inertiajs/react';
 import AppearanceTabs from '@/components/appearance-tabs';
-import { SettingsCard, SettingsPageHeader } from '@/components/settings/chrome';
+import { SettingsCard, SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 import { edit as editAppearance } from '@/routes/appearance';
 
 export default function Appearance() {
     return (
         <>
-            <Head title="Appearance settings" />
+            <Head title={t('Appearance settings')} />
 
             <SettingsPageHeader
                 title="Appearance"

@@ -3,9 +3,12 @@
 use App\Models\User;
 
 it('rebuilds the settings shell as a Salesforce-density workspace on P02 tokens', function () {
-    $layout = file_get_contents(resource_path('js/layouts/settings/layout.tsx'));
+    $layout = file_get_contents(resource_path('js/evo/patterns/settings/settings-layout.tsx'));
     $ia = file_get_contents(resource_path('js/lib/settings/ia.ts'));
-    $chrome = file_get_contents(resource_path('js/components/settings/chrome.tsx'));
+    $chrome = file_get_contents(resource_path('js/evo/patterns/settings/settings-section.tsx'))
+        .file_get_contents(resource_path('js/evo/patterns/settings/save-bar.tsx'))
+        .file_get_contents(resource_path('js/evo/patterns/settings/empty-state.tsx'))
+        .file_get_contents(resource_path('js/evo/patterns/settings/copy.ts'));
 
     expect($layout)->toContain('data-settings="workspace"')
         ->and($layout)->toContain('data-settings="nav"')
@@ -42,10 +45,10 @@ it('rebuilds the settings shell as a Salesforce-density workspace on P02 tokens'
     expect($chrome)->toContain('data-settings="card"')
         ->and($chrome)->toContain('data-settings="save"')
         ->and($chrome)->toContain('data-settings="empty"')
-        ->and($chrome)->toContain('bg-white')
-        ->and($chrome)->toContain('bg-brand')
-        ->and($chrome)->toContain('Required information')
-        ->and($chrome)->toContain('Cancel')
+        ->and($chrome)->toContain('--evo-surface')
+        ->and($chrome)->toContain('Enregistrer')
+        ->and($chrome)->toContain('Annuler')
+        ->and($chrome)->toContain('Informations obligatoires')
         ->and($chrome)->not->toContain('#0176D3');
 });
 

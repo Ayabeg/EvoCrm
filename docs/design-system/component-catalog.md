@@ -18,6 +18,7 @@ Screens live next to the Lab route. Fill a row when the component is built in De
 | Dialog / AlertDialog / Sheet / Drawer / Popover / HoverCard / Dropdown / ContextMenu / Tooltip | Overlays | — | open / closed | viewport-capped | focus trap, Esc, French SR | shadcn + Radix MIT, no vaul | `/design-lab/components#overlays` | PR3 |
 | EmptyState / ErrorState / Skeleton / Spinner / Progress | Empty / error / loading | page / panel / banner | empty, error, loading | — | aria-busy, role=status | shadcn MIT | `/design-lab/components#states` | PR3 |
 | Form | RHF + zod kit | — | error messages FR | — | labelled fields | shadcn form MIT | `/design-lab/components#form` | PR3 |
+| SettingsPage family | Settings workspace: section nav, section/row, dirty SaveBar, unsaved guard, danger zone | clean / dirty / saving / error / success / danger | SaveBar announced; first invalid focused | 768 / 1280 / 1440 | labelled fields, aria-describedby, focus trap on danger | custom Evo on `evo/ui` + RHF/zod | `/design-lab/settings` | PR11 |
 | DataGrid | ONE grid | compact / standard | loading, empty, error, selected, bulk | 32–36 rows | sort, select, pagination | ReUI MIT (TanStack) | `/design-lab/data` | PR3 |
 | FilterBar / FilterBuilder / SavedViews | Filters (2-level AND/OR) | — | chips, builder open | — | labelled controls | ReUI MIT + custom views | `/design-lab/data` | PR3 |
 | RecordWorkspace | CRM records | — | — | — | — | custom Evo (PR5) | — | — |

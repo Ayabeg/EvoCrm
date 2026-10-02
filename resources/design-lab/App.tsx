@@ -5,15 +5,16 @@ import type { LabRoute } from './lib/routes';
 import { AccueilPage } from './pages/AccueilPage';
 import { AdsHubPage } from './pages/AdsHubPage';
 import { CampaignPage } from './pages/CampaignPage';
+import { ComponentsPage } from './pages/ComponentsPage';
 import { ContactDetailPage } from './pages/ContactDetailPage';
 import { ContactsListPage } from './pages/ContactsListPage';
+import { DataPage } from './pages/DataPage';
 import { DealPage } from './pages/DealPage';
 import { DealsListPage } from './pages/DealsListPage';
 import { DevisPage } from './pages/DevisPage';
 import { InboxPage } from './pages/InboxPage';
 import { ReportsPage } from './pages/ReportsPage';
-import { ComponentsPage } from './pages/ComponentsPage';
-import { DataPage } from './pages/DataPage';
+import { SettingsLabPage } from './pages/SettingsLabPage';
 import { ShellPage } from './pages/ShellPage';
 import { TokensPage } from './pages/TokensPage';
 import {
@@ -24,7 +25,6 @@ import {
     OutboundPage,
     QuotesListPage,
     SegmentsPage,
-    SettingsPage,
     TicketsPage,
     WorkflowsPage,
 } from './pages/WorkspacePages';
@@ -82,7 +82,7 @@ function renderRoute(route: LabRoute) {
         case 'workflows':
             return <WorkflowsPage />;
         case 'settings':
-            return <SettingsPage />;
+            return <SettingsLabPage />;
         default:
             return <AccueilPage />;
     }

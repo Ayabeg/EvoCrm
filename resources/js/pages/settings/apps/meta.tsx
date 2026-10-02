@@ -1,9 +1,10 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Check, Minus } from '@phosphor-icons/react';
-import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { SettingsForm, SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 import type { AppUnlock } from '@/types';
 
 type MetaIntegration = {
@@ -40,7 +41,7 @@ export default function MetaApp({
 }) {
     return (
         <>
-            <Head title="Meta" />
+            <Head title={t('Meta')} />
             <div className="space-y-6">
                 <div className="rounded-md border border-hairline bg-canvas p-4">
                     <ol className="flex flex-wrap gap-2 text-[12px]">
@@ -71,13 +72,13 @@ export default function MetaApp({
                         title="Meta"
                         description="Official Facebook Login OAuth. One connection, four surfaces."
                     >
-                        <Badge>Connected</Badge>
+                        <Badge>{t('Connected')}</Badge>
                     </SettingsPageHeader>
                 </div>
 
                 <Card className="space-y-2 border-hairline bg-canvas p-4 text-sm shadow-none">
                     <p>
-                        <span className="text-muted-foreground">Account:</span>{' '}
+                        <span className="text-muted-foreground">{t('Account:')}</span>{' '}
                         {integration.account_name ?? '-'}
                         {integration.account_email
                             ? ` (${integration.account_email})`
@@ -90,7 +91,7 @@ export default function MetaApp({
                         {formatDate(integration.connected_at)}
                     </p>
                     <p>
-                        <span className="text-muted-foreground">Token:</span>{' '}
+                        <span className="text-muted-foreground">{t('Token:')}</span>{' '}
                         {integration.long_lived
                             ? 'Configured · long-lived, stored encrypted'
                             : 'Configured · short-lived, stored encrypted'}
@@ -107,7 +108,7 @@ export default function MetaApp({
                 </Card>
 
                 <Card className="p-4">
-                    <h2 className="text-sm font-semibold">Unlocks</h2>
+                    <h2 className="text-sm font-semibold">{t('Unlocks')}</h2>
                     <div className="mt-3 grid gap-2">
                         {unlocks.map((unlock) => (
                             <div
@@ -203,7 +204,7 @@ export default function MetaApp({
                         app keeps its grant on Meta's side — revoke it there too
                         if needed.
                     </p>
-                    <Form
+                    <SettingsForm
                         action="/settings/apps/meta"
                         method="delete"
                         className="mt-3"
@@ -222,7 +223,7 @@ export default function MetaApp({
                                 Disconnect Meta
                             </Button>
                         )}
-                    </Form>
+                    </SettingsForm>
                 </Card>
             </div>
         </>

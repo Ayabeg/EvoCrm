@@ -1,9 +1,8 @@
-import { Form, Head, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import PeopleController from '@/actions/App/Http/Controllers/Settings/PeopleController';
 import { MorphingForm } from '@/components/crm/morphing-form';
 import InputError from '@/components/input-error';
-import { SettingsPageHeader } from '@/components/settings/chrome';
 import { HairlinePanel } from '@/components/surface/hairline-panel';
 import {
     HairlineRow,
@@ -25,6 +24,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
+import { SettingsForm, SettingsPageHeader } from '@/evo/patterns/settings';
+import { dateLocale, t } from '@/lib/i18n';
 import type { WorkspaceRole } from '@/types/auth';
 
 type PersonRow = {
@@ -52,13 +53,14 @@ function formatDate(iso: string | null): string {
 
     const date = new Date(iso);
 
-    return `${date.toLocaleDateString('en-GB', {
+    return `${date.toLocaleDateString(dateLocale(), {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
-    })}, ${date.toLocaleTimeString('en-GB', {
+    })}, ${date.toLocaleTimeString(dateLocale(), {
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
     })}`;
 }
 
@@ -100,7 +102,7 @@ export default function People({
 
     return (
         <>
-            <Head title="Members" />
+            <Head title={t('Members')} />
 
             <div className="space-y-3">
                 <SettingsPageHeader
@@ -118,15 +120,12 @@ export default function People({
                         {!hasEnabledMailbox ? (
                             <div className="mb-4 rounded-lg border border-hairline bg-brand/5 p-3">
                                 <p className="aurora-text-body-sm text-ink">
-                                    No enabled mailbox - the person is added as pending,
-                                    but the login email cannot leave until a mailbox is
-                                    enabled under Outbound → Mailboxes. You can resend
-                                    the invite from their row afterwards.
+                                    {t('No enabled mailbox - the person is added as pending, but the login email cannot leave until a mailbox is enabled under Outbound → Mailboxes. You can resend the invite from their row afterwards.')}
                                 </p>
                             </div>
                         ) : null}
 
-                        <Form
+                        <SettingsForm
                             {...PeopleController.store.form()}
                             options={{ preserveScroll: true }}
                             className="space-y-3"
@@ -137,19 +136,19 @@ export default function People({
                                 <>
                                     <div>
                                         <Label htmlFor="invite-name" className="mb-1 block">
-                                            Name
+                                            {t('Name')}
                                         </Label>
                                         <Input
                                             id="invite-name"
                                             name="name"
                                             required
-                                            placeholder="Full name"
+                                            placeholder={t('Full name')}
                                         />
                                         <InputError message={errors.name} />
                                     </div>
                                     <div>
                                         <Label htmlFor="invite-email" className="mb-1 block">
-                                            Email
+                                            {t('Email')}
                                         </Label>
                                         <Input
                                             id="invite-email"
@@ -162,15 +161,15 @@ export default function People({
                                     </div>
                                     <div>
                                         <Label htmlFor="invite-role" className="mb-1 block">
-                                            Role
+                                            {t('Role')}
                                         </Label>
                                         <NativeSelect
                                             id="invite-role"
                                             name="role"
                                             defaultValue="member"
                                         >
-                                            <option value="member">Member</option>
-                                            <option value="admin">Admin</option>
+                                            <option value="member">{t('Member')}</option>
+                                            <option value="admin">{t('Admin')}</option>
                                         </NativeSelect>
                                         <InputError message={errors.role} />
                                     </div>
@@ -180,18 +179,18 @@ export default function People({
                                             variant="ghost"
                                             onClick={() => setInviteOpen(false)}
                                         >
-                                            Cancel
+                                            {t('Cancel')}
                                         </Button>
                                         <Button
                                             disabled={processing}
                                             data-test="invite-person-button"
                                         >
-                                            Send invite
+                                            {t('Send invite')}
                                         </Button>
                                     </div>
                                 </>
                             )}
-                        </Form>
+                        </SettingsForm>
                     </MorphingForm>
                 </SettingsPageHeader>
 
@@ -199,12 +198,12 @@ export default function People({
                     <HairlineTable minWidth="40rem">
                         <thead>
                             <tr className="border-b border-hairline">
-                                <HairlineTh>Name</HairlineTh>
-                                <HairlineTh>Email</HairlineTh>
-                                <HairlineTh>Role</HairlineTh>
-                                <HairlineTh>Last login / invited</HairlineTh>
-                                <HairlineTh>Status</HairlineTh>
-                                <HairlineTh align="right">Actions</HairlineTh>
+                                <HairlineTh>{t('Name')}</HairlineTh>
+                                <HairlineTh>{t('Email')}</HairlineTh>
+                                <HairlineTh>{t('Role')}</HairlineTh>
+                                <HairlineTh>{t('Last login / invited')}</HairlineTh>
+                                <HairlineTh>{t('Status')}</HairlineTh>
+                                <HairlineTh align="right">{t('Actions')}</HairlineTh>
                             </tr>
                         </thead>
                         <tbody>
@@ -214,7 +213,7 @@ export default function People({
                                         {person.name}
                                         {person.is_self ? (
                                             <span className="aurora-text-caption ml-1 text-mute">
-                                                (you)
+                                                ({t('you')})
                                             </span>
                                         ) : null}
                                     </HairlineTd>
@@ -225,22 +224,22 @@ export default function People({
                                         <Badge
                                             variant={roleVariant(person.role)}
                                         >
-                                            {person.role}
+                                            {t(person.role === 'owner' ? 'Owner' : person.role === 'admin' ? 'Admin' : 'Member')}
                                         </Badge>
                                     </HairlineTd>
                                     <HairlineTd className="text-mute">
                                         {person.last_login_at
                                             ? formatDate(person.last_login_at)
-                                            : `Invited ${formatDate(person.invited_at)}`}
+                                            : t('Invited :when', { when: formatDate(person.invited_at) })}
                                     </HairlineTd>
                                     <HairlineTd>
                                         {person.status === 'active' ? (
                                             <Badge variant="default">
-                                                Active
+                                                {t('Active')}
                                             </Badge>
                                         ) : (
                                             <Badge variant="secondary">
-                                                Invite pending
+                                                {t('Invite pending')}
                                             </Badge>
                                         )}
                                     </HairlineTd>
@@ -262,12 +261,12 @@ export default function People({
                                                         )
                                                     }
                                                 >
-                                                    Resend
+                                                    {t('Resend')}
                                                 </Button>
                                             ) : null}
 
                                             <NativeSelect
-                                                aria-label={`Role for ${person.name}`}
+                                                aria-label={t('Role for :name', { name: person.name })}
                                                 className="h-8 w-[7.5rem]"
                                                 value={person.role}
                                                 disabled={!canTouchRow(person)}
@@ -288,14 +287,14 @@ export default function People({
                                             >
                                                 {person.role === 'owner' ? (
                                                     <option value="owner">
-                                                        Owner
+                                                        {t('Owner')}
                                                     </option>
                                                 ) : null}
                                                 <option value="admin">
-                                                    Admin
+                                                    {t('Admin')}
                                                 </option>
                                                 <option value="member">
-                                                    Member
+                                                    {t('Member')}
                                                 </option>
                                             </NativeSelect>
 
@@ -310,29 +309,22 @@ export default function People({
                                                             size="sm"
                                                             className="text-brand"
                                                         >
-                                                            Remove
+                                                            {t('Remove')}
                                                         </Button>
                                                     </DialogTrigger>
                                                     <DialogContent>
                                                         <DialogTitle>
-                                                            Remove {person.name}
-                                                            ?
+                                                            {t('Remove :name?', { name: person.name })}
                                                         </DialogTitle>
                                                         <DialogDescription>
-                                                            They lose access to
-                                                            this Evotechly
-                                                            workspace
-                                                            immediately. Their
-                                                            contacts and deals
-                                                            stay - they just
-                                                            become unassigned.
+                                                            {t('They lose access to this Evotechly workspace immediately. Their contacts and deals stay - they just become unassigned.')}
                                                         </DialogDescription>
                                                         <DialogFooter className="gap-2">
                                                             <DialogClose
                                                                 asChild
                                                             >
                                                                 <Button variant="secondary">
-                                                                    Cancel
+                                                                    {t('Cancel')}
                                                                 </Button>
                                                             </DialogClose>
                                                             <Button
@@ -348,7 +340,7 @@ export default function People({
                                                                     )
                                                                 }
                                                             >
-                                                                Remove person
+                                                                {t('Remove person')}
                                                             </Button>
                                                         </DialogFooter>
                                                     </DialogContent>

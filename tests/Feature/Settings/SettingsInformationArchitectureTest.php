@@ -11,7 +11,7 @@ function settingsIaSource(): string
 
 function settingsLayoutSource(): string
 {
-    return file_get_contents(resource_path('js/layouts/settings/layout.tsx'));
+    return file_get_contents(resource_path('js/evo/patterns/settings/settings-layout.tsx'));
 }
 
 function settingsOwner(): User

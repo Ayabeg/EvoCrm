@@ -161,3 +161,14 @@ Deferred (not copied): FileDropzone, RichTextEditor.
 | EmptyState | `evo/patterns/empty-state` | `ds/components/EmptyState` → `ui/empty-state` |
 | PageHeader | `ds/chrome/PageHeader` (1 consumer: DataWorkspace). `evo/patterns/page-header` re-exports it. | Design Lab has its own prototype header — not deleted |
 | KPI | `HomeKpiStrip` (home) + `CrmKpiStrip` (hubs). `EvoKpiCard` unused — no third card. | `evo/patterns/kpi` documents this |
+
+## PR11 copy log (2026-10-02)
+
+Settings family is custom Evo (no registry copy). Built on `evo/ui/*` + the PR3 form kit.
+
+| Component | Source | License | Destination | Notes |
+|---|---|---|---|---|
+| SettingsLayout / SettingsPage / SettingsSection / SettingsRow / SaveBar / DangerZone / SettingsForm | custom Evo | MIT (original) | `resources/js/evo/patterns/settings/` | Dirty SaveBar (Enregistrer / Annuler), unsaved guard, first-invalid focus, `disableWhileProcessing`. IA catalog stays in `lib/settings/ia`. |
+| Compatibility shims | — | — | `layouts/settings/layout.tsx`, `components/settings/chrome.tsx` | One-line re-exports after pages moved onto `@/evo/patterns/settings`. |
+
+No primitive rewrites in `evo/ui/*`.

@@ -109,7 +109,7 @@ it('normalizes listed surfaces without KPI counting, money tween, confetti, or f
     $ask = File::get(resource_path('js/components/crm/ask-evo-panel.tsx'));
     $askDrawer = File::get(resource_path('js/components/crm/ask-evo-drawer.tsx'));
     $activation = File::get(resource_path('js/components/dashboard/activation-checklist.tsx'));
-    $settings = File::get(resource_path('js/layouts/settings/layout.tsx'));
+    $settings = File::get(resource_path('js/evo/patterns/settings/settings-layout.tsx'));
     $secret = File::get(resource_path('js/components/settings/secret-callback-field.tsx'));
     $quotes = File::get(resource_path('js/pages/crm/quotes/quote-columns.tsx'));
     $builder = File::get(resource_path('js/lib/quote-builder.ts'));

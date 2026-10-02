@@ -1,7 +1,7 @@
 <?php
 
 it('ports the Astryx settings-dialog shell onto the existing settings catalog', function () {
-    $layout = file_get_contents(resource_path('js/layouts/settings/layout.tsx'));
+    $layout = file_get_contents(resource_path('js/evo/patterns/settings/settings-layout.tsx'));
     $css = file_get_contents(resource_path('css/settings-dialog.css'));
     $appCss = file_get_contents(resource_path('css/app.css'));
     $icons = file_get_contents(resource_path('js/lib/settings/icons.ts'));

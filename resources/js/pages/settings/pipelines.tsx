@@ -1,11 +1,12 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SettingsForm, SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type StageRow = {
     id: number;
@@ -63,7 +64,7 @@ function PipelineStages({
                             className="flex flex-wrap items-end gap-2 rounded border border-hairline p-2"
                         >
                             {canManage ? (
-                                <Form
+                                <SettingsForm
                                     action={`/settings/pipelines/${pipeline.id}/stages/${stage.id}`}
                                     method="post"
                                     className="flex flex-wrap items-end gap-2"
@@ -136,7 +137,7 @@ function PipelineStages({
                                     >
                                         Save
                                     </Button>
-                                </Form>
+                                </SettingsForm>
                             ) : (
                                 <span className="text-sm">
                                     {stage.name} ({stage.probability ?? '—'}%)
@@ -146,7 +147,7 @@ function PipelineStages({
                                 {stage.deals_count} deals
                             </span>
                             {canManage && stage.deals_count === 0 ? (
-                                <Form
+                                <SettingsForm
                                     action={`/settings/pipelines/${pipeline.id}/stages/${stage.id}`}
                                     method="post"
                                     className="inline"
@@ -163,18 +164,18 @@ function PipelineStages({
                                     >
                                         Delete
                                     </Button>
-                                </Form>
+                                </SettingsForm>
                             ) : null}
                         </div>
                     ))}
                     {canManage ? (
-                        <Form
+                        <SettingsForm
                             action={`/settings/pipelines/${pipeline.id}/stages`}
                             method="post"
                             className="flex flex-wrap items-end gap-2"
                         >
                             <div>
-                                <Label className="text-[10px]">New stage</Label>
+                                <Label className="text-[10px]">{t('New stage')}</Label>
                                 <Input
                                     name="name"
                                     required
@@ -183,7 +184,7 @@ function PipelineStages({
                                 />
                             </div>
                             <div>
-                                <Label className="text-[10px]">Win %</Label>
+                                <Label className="text-[10px]">{t('Win %')}</Label>
                                 <Input
                                     name="probability"
                                     type="number"
@@ -193,9 +194,9 @@ function PipelineStages({
                                 />
                             </div>
                             <Button type="submit" size="sm">
-                                Add stage
+                                {t('Add stage')}
                             </Button>
-                        </Form>
+                        </SettingsForm>
                     ) : null}
                 </div>
             ) : null}
@@ -214,7 +215,7 @@ export default function PipelineSettings({
 }) {
     return (
         <>
-            <Head title="Pipelines" />
+            <Head title={t('Pipelines')} />
             <div className="space-y-6">
                 <SettingsPageHeader
                     title="Deal pipelines"
@@ -223,14 +224,14 @@ export default function PipelineSettings({
 
                 {canManage ? (
                     <Card className="space-y-3 p-4">
-                        <h2 className="text-sm font-semibold">Add pipeline</h2>
-                        <Form
+                        <h2 className="text-sm font-semibold">{t('Add pipeline')}</h2>
+                        <SettingsForm
                             action="/settings/pipelines"
                             method="post"
                             className="grid gap-3 md:grid-cols-3"
                         >
                             <div>
-                                <Label htmlFor="pipeline-name">Name</Label>
+                                <Label htmlFor="pipeline-name">{t('Name')}</Label>
                                 <Input
                                     id="pipeline-name"
                                     name="name"
@@ -245,12 +246,12 @@ export default function PipelineSettings({
                                     name="is_default"
                                     value="1"
                                 />
-                                Set as default
+                                {t('Set as default')}
                             </label>
                             <div className="flex items-end">
-                                <Button type="submit">Create pipeline</Button>
+                                <Button type="submit">{t('Create pipeline')}</Button>
                             </div>
-                        </Form>
+                        </SettingsForm>
                     </Card>
                 ) : null}
 
@@ -264,17 +265,17 @@ export default function PipelineSettings({
                                     </span>
                                     {pipeline.is_default ? (
                                         <Badge variant="secondary">
-                                            Default
+                                            {t('Default')}
                                         </Badge>
                                     ) : null}
                                 </div>
-                                <div>{pipeline.stages_count} stages</div>
+                                <div>{t(':count stages', { count: pipeline.stages_count })}</div>
                                 <div className="flex items-center justify-between gap-2">
-                                    <span>{pipeline.deals_count} deals</span>
+                                    <span>{t(':count deals', { count: pipeline.deals_count })}</span>
                                     {canManage &&
                                     !pipeline.is_default &&
                                     pipeline.deals_count === 0 ? (
-                                        <Form
+                                        <SettingsForm
                                             action={`/settings/pipelines/${pipeline.id}`}
                                             method="post"
                                             className="inline"
@@ -289,12 +290,12 @@ export default function PipelineSettings({
                                                 variant="secondary"
                                                 size="sm"
                                             >
-                                                Delete
+                                                {t('Delete')}
                                             </Button>
-                                        </Form>
+                                        </SettingsForm>
                                     ) : null}
                                     {canManage && !pipeline.is_default ? (
-                                        <Form
+                                        <SettingsForm
                                             action={`/settings/pipelines/${pipeline.id}`}
                                             method="post"
                                             className="inline"
@@ -314,9 +315,9 @@ export default function PipelineSettings({
                                                 variant="secondary"
                                                 size="sm"
                                             >
-                                                Make default
+                                                {t('Make default')}
                                             </Button>
-                                        </Form>
+                                        </SettingsForm>
                                     ) : null}
                                 </div>
                             </div>

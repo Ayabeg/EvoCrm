@@ -2,13 +2,14 @@ import { Head, Link } from '@inertiajs/react';
 import { ChatCircle } from '@phosphor-icons/react';
 import { WhatsAppBusinessMark, WhatsAppMark } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     SettingsCard,
     SettingsEmptyState,
     SettingsPageHeader,
-} from '@/components/settings/chrome';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type Channel = {
     available: boolean;
@@ -32,7 +33,7 @@ export default function EvolutionSettings({
 }) {
     return (
         <>
-            <Head title="WhatsApp" />
+            <Head title={t('WhatsApp')} />
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="WhatsApp"

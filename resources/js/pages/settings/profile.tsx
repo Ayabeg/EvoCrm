@@ -1,14 +1,17 @@
-import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import InputError from '@/components/input-error';
+import { Input } from '@/components/ui/input';
 import {
     SettingsCard,
+    SettingsDangerZone,
+    SettingsForm,
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
-import { Input } from '@/components/ui/input';
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { Auth } from '@/types';
@@ -28,7 +31,7 @@ export default function Profile({
 
     return (
         <>
-            <Head title="Profile settings" />
+            <Head title={t('Profile settings')} />
 
             <SettingsPageHeader
                 title="Profile"
@@ -36,7 +39,7 @@ export default function Profile({
             />
 
             <div className="grid gap-3">
-                <Form
+                <SettingsForm
                     {...ProfileController.update.form()}
                     options={{
                         preserveScroll: true,
@@ -89,18 +92,17 @@ export default function Profile({
                             {mustVerifyEmail &&
                             auth.user.email_verified_at === null ? (
                                 <p className="text-[12px] text-mute">
-                                    Your email address is unverified.{' '}
+                                    {t('Your email address is unverified.')}{' '}
                                     <Link
                                         href={send()}
                                         as="button"
                                         className="text-brand underline decoration-brand/30 underline-offset-4 hover:decoration-brand"
                                     >
-                                        Re-send the verification email.
+                                        {t('Re-send the verification email.')}
                                     </Link>
                                     {status === 'verification-link-sent' ? (
                                         <span className="mt-1 block font-medium text-ink">
-                                            A new verification link has been
-                                            sent to your email address.
+                                            {t('A new verification link has been sent to your email address.')}
                                         </span>
                                     ) : null}
                                 </p>
@@ -112,14 +114,14 @@ export default function Profile({
                             />
                         </SettingsCard>
                     )}
-                </Form>
+                </SettingsForm>
 
-                <SettingsCard
+                <SettingsDangerZone
                     title="Delete account"
                     description="Delete your account and all of its resources"
                 >
                     <DeleteUser />
-                </SettingsCard>
+                </SettingsDangerZone>
             </div>
         </>
     );

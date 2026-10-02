@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import InputError from '@/components/input-error';
@@ -10,7 +10,9 @@ import {
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 import { edit } from '@/routes/security';
 
 type Props = {
@@ -23,7 +25,7 @@ export default function Security(props: Props) {
 
     return (
         <>
-            <Head title="Security settings" />
+            <Head title={t('Security settings')} />
 
             <SettingsPageHeader
                 title="Security"
@@ -31,7 +33,7 @@ export default function Security(props: Props) {
             />
 
             <div className="grid gap-3">
-                <Form
+                <SettingsForm
                     {...SecurityController.update.form()}
                     options={{
                         preserveScroll: true,
@@ -112,7 +114,7 @@ export default function Security(props: Props) {
                             </SettingsFormRow>
                         </SettingsCard>
                     )}
-                </Form>
+                </SettingsForm>
 
                 <SettingsCard title="Two-factor authentication">
                     <ManageTwoFactor

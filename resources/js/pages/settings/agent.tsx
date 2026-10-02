@@ -1,15 +1,17 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { StarFour } from '@phosphor-icons/react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     SettingsCard,
     SettingsEmptyState,
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type AgentStatus = 'disabled' | 'not_configured' | 'unhealthy' | 'ready';
 
@@ -76,7 +78,7 @@ export default function AgentSettings({
 }) {
     return (
         <>
-            <Head title="Agent" />
+            <Head title={t('Agent')} />
 
             <SettingsPageHeader
                 title="Agent"
@@ -108,7 +110,7 @@ export default function AgentSettings({
                     </SettingsCard>
                 )}
 
-                <Form action="/settings/agent" method="put">
+                <SettingsForm action="/settings/agent" method="put">
                     {({ processing }) => (
                         <SettingsCard
                             title="Onboarding"
@@ -174,14 +176,14 @@ export default function AgentSettings({
                             </p>
                         </SettingsCard>
                     )}
-                </Form>
+                </SettingsForm>
 
                 <SettingsCard
                     title="Health check"
                     description="Laravel probes the private runtime. A failed check never takes CRM down."
                     footer={
                         <div className="flex justify-end border-t border-hairline bg-white px-4 py-2">
-                            <Form action="/settings/agent/health" method="post">
+                            <SettingsForm action="/settings/agent/health" method="post">
                                 {({ processing }) => (
                                     <Button
                                         type="submit"
@@ -192,7 +194,7 @@ export default function AgentSettings({
                                         Check health
                                     </Button>
                                 )}
-                            </Form>
+                            </SettingsForm>
                         </div>
                     }
                 >
@@ -228,7 +230,7 @@ export default function AgentSettings({
                                         {plugin.description}
                                     </p>
                                 </div>
-                                <Form
+                                <SettingsForm
                                     action={`/settings/agent/plugins/${plugin.id}`}
                                     method="put"
                                 >
@@ -250,7 +252,7 @@ export default function AgentSettings({
                                             </Button>
                                         </>
                                     )}
-                                </Form>
+                                </SettingsForm>
                             </li>
                         ))}
                     </ul>
@@ -277,7 +279,7 @@ export default function AgentSettings({
                                 <p className="text-[12px] leading-4 text-mute">
                                     {connector.description}
                                 </p>
-                                <Form
+                                <SettingsForm
                                     action={`/settings/agent/connectors/${connector.id}`}
                                     method="put"
                                 >
@@ -329,9 +331,9 @@ export default function AgentSettings({
                                             </div>
                                         </div>
                                     )}
-                                </Form>
+                                </SettingsForm>
                                 {connector.enabled || connector.token_set ? (
-                                    <Form
+                                    <SettingsForm
                                         action={`/settings/agent/connectors/${connector.id}`}
                                         method="delete"
                                     >
@@ -346,7 +348,7 @@ export default function AgentSettings({
                                                 Disconnect
                                             </Button>
                                         )}
-                                    </Form>
+                                    </SettingsForm>
                                 ) : null}
                             </li>
                         ))}

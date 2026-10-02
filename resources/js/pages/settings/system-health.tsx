@@ -6,9 +6,10 @@ import {
     WarningCircle,
     XCircle,
 } from '@phosphor-icons/react';
-import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type CommandHealth = {
     command: string;
@@ -84,7 +85,7 @@ export default function SystemHealthSettings({
 }) {
     return (
         <>
-            <Head title="System health" />
+            <Head title={t('System health')} />
             <div className="space-y-4">
                 <SettingsPageHeader
                     title="System health"

@@ -8,8 +8,9 @@ import {
     RecordLayoutCustomizeButton,
     RecordLayoutEditor,
 } from '@/components/crm/record-layout-editor';
-import { SettingsPageHeader } from '@/components/settings/chrome';
 import { Button } from '@/components/ui/button';
+import { SettingsPageHeader } from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 import type { RecordLayoutState, RecordObjectType } from '@/lib/record-layout';
 import { cn } from '@/lib/utils';
 
@@ -68,7 +69,7 @@ export default function RecordLayoutsSettings({
 
     return (
         <>
-            <Head title="Record layouts" />
+            <Head title={t('Record layouts')} />
             <div className="space-y-3">
                 <SettingsPageHeader
                     title="Record layouts"

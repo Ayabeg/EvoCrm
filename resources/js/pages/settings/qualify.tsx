@@ -1,11 +1,13 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { Input } from '@/components/ui/input';
 import {
     SettingsCard,
     SettingsFormRow,
     SettingsPageHeader,
     SettingsSaveBar,
-} from '@/components/settings/chrome';
-import { Input } from '@/components/ui/input';
+    SettingsForm,
+} from '@/evo/patterns/settings';
+import { t } from '@/lib/i18n';
 
 type Thresholds = {
     hold: number;
@@ -22,14 +24,14 @@ export default function QualifySettings({
 }) {
     return (
         <>
-            <Head title="Qualification" />
+            <Head title={t('Qualification')} />
 
             <SettingsPageHeader
                 title="Qualification"
                 description="Formula lead score thresholds. Crossing qualify marks the lead. Crossing convert uses the existing convert path."
             />
 
-            <Form action="/settings/qualify" method="put">
+            <SettingsForm action="/settings/qualify" method="put">
                 {({ processing }) => (
                     <SettingsCard
                         title="Score thresholds"
@@ -93,7 +95,7 @@ export default function QualifySettings({
                         </p>
                     </SettingsCard>
                 )}
-            </Form>
+            </SettingsForm>
         </>
     );
 }
