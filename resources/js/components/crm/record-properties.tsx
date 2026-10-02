@@ -2,6 +2,7 @@ import { Form, Link } from '@inertiajs/react';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
 import { Label } from '@/evo/ui/label';
+import { t } from '@/lib/i18n';
 
 export type AttributeDefinition = {
     id: number;
@@ -58,7 +59,7 @@ function AttributeField({
                     required={required}
                     className="h-8 w-full rounded border border-hairline bg-canvas px-2 text-sm text-ink"
                 >
-                    <option value="">{required ? 'Choose…' : '—'}</option>
+                    <option value="">{required ? t('Choose…') : '—'}</option>
                     {(definition.options ?? []).map((option) => (
                         <option key={option} value={option}>
                             {option}
@@ -90,7 +91,7 @@ export default function RecordProperties({
     const values = attributes.values ?? {};
 
     const groups = definitions.reduce<Record<string, AttributeDefinition[]>>((acc, definition) => {
-        const name = definition.group?.trim() || 'General';
+        const name = definition.group?.trim() || t('General');
         acc[name] = acc[name] ?? [];
         acc[name].push(definition);
 
@@ -104,7 +105,7 @@ export default function RecordProperties({
                     href="/settings/attributes"
                     className="font-medium text-ink hover:underline"
                 >
-                    Manage attributes
+                    {t('Manage attributes')}
                 </Link>
             </p>
         );
@@ -113,9 +114,9 @@ export default function RecordProperties({
     return (
         <section className="text-sm">
             <div className="mb-2 flex items-center justify-between gap-2">
-                <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">Attributes</h3>
+                <h3 className="text-[11px] font-semibold tracking-wide text-mute uppercase">{t('Attributes')}</h3>
                 <Link href="/settings/attributes" className="text-[11px] text-ink hover:underline">
-                    Manage
+                    {t('Manage')}
                 </Link>
             </div>
             <Form action={action} method="put" className="space-y-3">
@@ -123,7 +124,7 @@ export default function RecordProperties({
                     <>
                         {Object.entries(groups).map(([group, fields]) => (
                             <div key={group} className="space-y-2">
-                                <p className="text-[11px] font-medium text-ink">{group}</p>
+                                <p className="text-[11px] font-medium text-ink">{t(group)}</p>
                                 <div className="grid grid-cols-2 gap-2">
                                     {fields.map((definition) => (
                                         <AttributeField
@@ -140,7 +141,7 @@ export default function RecordProperties({
                             className="h-8"
                             disabled={processing}
                         >
-                            Save attributes
+                            {t('Save attributes')}
                         </Button>
                     </>
                 )}

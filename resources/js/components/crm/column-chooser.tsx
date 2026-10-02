@@ -64,12 +64,12 @@ export default function ColumnChooser({
         >
             <DrawerTrigger asChild>
                 <Button type="button" variant="outline" size="sm" className="h-8 px-2.5 text-[12px]">
-                    Columns
+                    {t('Columns')}
                 </Button>
             </DrawerTrigger>
             <DrawerContent side="right" className="w-80">
                 <DrawerHeader>
-                    <DrawerTitle className="text-sm">Choose columns</DrawerTitle>
+                    <DrawerTitle className="text-sm">{t('Choose columns')}</DrawerTitle>
                 </DrawerHeader>
                 <div className="mt-4 space-y-2">
                     {ordered.map((column) => (
@@ -94,7 +94,7 @@ export default function ColumnChooser({
                 </div>
                 <div className="mt-4 flex gap-2">
                     <Button type="button" className="h-8 text-[12px]" onClick={apply}>
-                        Apply
+                        {t('Apply')}
                     </Button>
                 </div>
                 <input type="hidden" name="columns" value={JSON.stringify(draft)} />

@@ -68,7 +68,7 @@ export function SettingsRow({
             >
                 {t(label)}
                 {required ? (
-                    <span className="ml-0.5 text-[var(--evo-primary)]">*</span>
+                    <span className="ms-0.5 text-[var(--evo-primary)]">*</span>
                 ) : null}
             </Label>
             <div className="min-w-0">

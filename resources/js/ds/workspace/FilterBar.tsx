@@ -211,7 +211,7 @@ export function FilterBar({
                         }}
                     >
                         <MagnifyingGlass
-                            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-mute"
+                            className="pointer-events-none absolute top-1/2 start-3 size-4 -translate-y-1/2 text-mute"
                             weight="bold"
                             aria-hidden
                         />
@@ -220,14 +220,14 @@ export function FilterBar({
                             name="q"
                             defaultValue={searchKey}
                             placeholder={searchPlaceholder}
-                            className={desk ? 'h-8 pl-10 text-[13px]' : 'h-9 pl-10'}
+                            className={desk ? 'h-8 ps-10 text-[13px]' : 'h-9 ps-10'}
                             aria-label={searchLabel}
                         />
                     </form>
                 ) : null}
                 <div className={cn('flex min-w-0 flex-wrap items-center gap-2', desk && 'contents')}>
                     {quickFilters}
-                    {desk ? <div className="ml-auto flex shrink-0">{columnChooser}</div> : columnChooser}
+                    {desk ? <div className="ms-auto flex shrink-0">{columnChooser}</div> : columnChooser}
                 </div>
             </div>
             {queryEnabled && chips.length > 0 ? (

@@ -26,15 +26,15 @@ export function ChartFromPayload({ payload }: { payload: EvoVizPayload }) {
     return (
         <article className="rounded-[var(--evo-radius-standard)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-3">
             <div className="mb-2 flex items-baseline justify-between gap-2">
-                <h3 className="text-[13px] font-medium text-[var(--evo-ink)]">{payload.title}</h3>
+                <h3 className="text-[13px] font-medium text-[var(--evo-ink)]">{t(payload.title)}</h3>
                 {payload.total != null ? (
                     <p className="text-[13px] tabular-nums text-[var(--evo-ink-secondary)]">
                         {formatNumber(payload.total)}
-                        {payload.valueLabel ? ` ${payload.valueLabel}` : ''}
+                        {payload.valueLabel ? ` ${t(payload.valueLabel)}` : ''}
                     </p>
                 ) : null}
             </div>
-            <ChartFrame height={height} label={payload.title} empty={false}>
+            <ChartFrame height={height} label={t(payload.title)} empty={false}>
                 {kind === 'line' ? (
                     <LineChart data={cartesian.data} series={cartesian.series} height={height} showLegend={cartesian.series.length > 1} />
                 ) : null}

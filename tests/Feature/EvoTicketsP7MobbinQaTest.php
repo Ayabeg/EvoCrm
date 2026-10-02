@@ -21,7 +21,7 @@ it('§8.1 board columns match HubSpot Help Desk plus inactivity', function () {
         ->and($board)->toContain('Inactive for')
         ->and($board)->toContain('Create ticket')
         ->and($board)->toContain('PipelineKanban')
-        ->and($board)->not->toContain("My Team")
+        ->and($board)->not->toContain('My Team')
         ->and($board)->not->toContain('Mentions')
         ->and($board)->not->toContain('Copilot');
 });
@@ -81,7 +81,7 @@ it('§8.5 contact and deal records show the Tickets card', function () {
 
     expect($contact)->toContain('TicketsRelatedCard')
         ->and($deal)->toContain('TicketsRelatedCard')
-        ->and($card)->toContain('title="Tickets"')
+        ->and($card)->toContain("title={t('Tickets')}")
         ->and($card)->toContain('open')
         ->and($card)->not->toContain('Cases')
         ->and($contact)->not->toContain('Help Desk');

@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { LtrValue } from '@/components/ltr-value';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
 import { formatContactName } from '@/lib/contact-name';
 import type { DealAttention } from '@/lib/deal-attention';
@@ -138,7 +139,7 @@ export function DealIdentityCell({
                 {initials || '?'}
             </span>
             <span className="min-w-0">
-                <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" title={name}>
+                <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" dir="auto" title={name}>
                     {name}
                 </span>
                 {secondary ? <span className="sr-only">{secondary}</span> : null}
@@ -175,7 +176,7 @@ export function DealAmountCell({ cents }: { cents?: number | null }) {
             className="money block whitespace-nowrap tabular-nums text-[13px] leading-[18px] text-ink"
             title={label}
         >
-            {label}
+            <LtrValue>{label}</LtrValue>
         </span>
     );
 }
@@ -224,11 +225,11 @@ export function DealAttentionCell({
                 'block truncate text-[13px] leading-[18px]',
                 attentionToneClass(primary.severity),
             )}
-            title={primary.reason ?? primary.label}
+            title={t(primary.reason ?? primary.label)}
             data-attention={primary.type}
             data-attention-severity={primary.severity}
         >
-            {primary.label}
+            {t(primary.label)}
         </span>
     );
 }

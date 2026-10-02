@@ -42,7 +42,7 @@ export default function QuickRecordDrawerHarness({ samples }: { samples: Samples
 
                                 openRecord({ type, id }, { opener: event.currentTarget });
                             }}
-                            className="rounded-lg border border-[var(--evo-hairline)] bg-white px-4 py-3 text-left hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)] disabled:text-[var(--evo-ink-muted)]"
+                            className="rounded-lg border border-[var(--evo-hairline)] bg-white px-4 py-3 text-start hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)] disabled:text-[var(--evo-ink-muted)]"
                         >
                             <span className="block text-[13px] font-medium capitalize text-[var(--evo-ink)]">
                                 {type}

@@ -28,7 +28,7 @@ export function UserMenuContent({ user }: Props) {
     return (
         <>
             <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-2 text-left text-sm">
+                <div className="flex items-center gap-2 px-1 py-2 text-start text-sm">
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
@@ -41,7 +41,7 @@ export function UserMenuContent({ user }: Props) {
                         prefetch
                         onClick={cleanup}
                     >
-                        <GearSix className="mr-2 size-4" weight="regular" aria-hidden />
+                        <GearSix className="me-2 size-4" weight="regular" aria-hidden />
                         {t('Settings')}
                     </Link>
                 </DropdownMenuItem>
@@ -55,7 +55,7 @@ export function UserMenuContent({ user }: Props) {
                     onClick={handleLogout}
                     data-test="logout-button"
                 >
-                    <SignOut className="mr-2 size-4" weight="regular" aria-hidden />
+                    <SignOut className="me-2 size-4" weight="regular" aria-hidden />
                     {t('Log out')}
                 </Link>
             </DropdownMenuItem>

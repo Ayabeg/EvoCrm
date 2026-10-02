@@ -75,7 +75,7 @@ type StackType = "default" | "expanded" | "stacked";
  * static chart. `"none"` opts out entirely; it is also what a device with the
  * OS "reduce motion" preference falls back to automatically.
  */
-type AreaAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
+type AreaAnimationType = "none" | "start-to-right" | "end-to-left" | "center-out" | "edges-in";
 type RevealAnimationType = Exclude<AreaAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -162,7 +162,7 @@ export function EvilAreaChart<
   className,
   chartProps,
   curveType = "linear",
-  animationType = "left-to-right",
+  animationType = "start-to-right",
   stackType = "default",
   defaultSelectedDataKey = null,
   onSelectionChange,
@@ -645,8 +645,8 @@ const AnimatedDashedStroke = () => {
 // motion `originX` for each single-rect reveal — the edge the wipe grows from.
 // 0 = left edge, 1 = right edge, 0.5 = centre (grows outward to both edges).
 const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
-  "left-to-right": 0,
-  "right-to-left": 1,
+  "start-to-right": 0,
+  "end-to-left": 1,
   "center-out": 0.5,
 };
 
@@ -718,7 +718,7 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
 };
 
 /**
- * Horizontal left-to-right color gradient for a series. Always rendered — every
+ * Horizontal start-to-right color gradient for a series. Always rendered — every
  * fill variant, the stroke, and the dots all paint from this single gradient.
  */
 const ColorGradient = ({

@@ -41,7 +41,7 @@ export function ConversationRow({
             aria-current={selected ? 'true' : undefined}
             aria-label={conversationA11yName({ name, unread, selected })}
             className={cn(
-                'flex w-full items-start gap-2.5 border-b border-[var(--evo-hairline)] px-3 py-1.5 text-left',
+                'flex w-full items-start gap-2.5 border-b border-[var(--evo-hairline)] px-3 py-1.5 text-start',
                 MOTION_HOVER_CLASS,
                 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--evo-focus)]',
                 selected
@@ -72,7 +72,7 @@ export function ConversationRow({
                     {unread > 0 ? (
                         <Badge variant="default" className="h-4 min-w-4 px-1 font-mono text-[10px]">
                             {unread}
-                            <span className="sr-only"> unread</span>
+                            <span className="sr-only"> {t('unread')}</span>
                         </Badge>
                     ) : null}
                 </div>

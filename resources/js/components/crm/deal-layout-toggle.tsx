@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { ListBullets, SquaresFour } from '@phosphor-icons/react';
+import { t } from '@/lib/i18n';
 import {
     dealLayoutHrefFromFilters,
 } from '@/lib/list-query/deal-layout';
@@ -37,7 +38,7 @@ export default function DealLayoutToggle({
                 )}
             >
                 <ListBullets className="size-3.5" weight="bold" aria-hidden />
-                List
+                {t('List')}
             </Link>
             <Link
                 href={boardHref}
@@ -50,7 +51,7 @@ export default function DealLayoutToggle({
                 )}
             >
                 <SquaresFour className="size-3.5" weight="bold" aria-hidden />
-                Board
+                {t('Board')}
             </Link>
         </div>
     );

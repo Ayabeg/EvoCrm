@@ -37,13 +37,14 @@ export function DealCard({
                     <a
                         href={deal.href}
                         className="block min-w-0 truncate font-medium text-[var(--evo-ink)] hover:underline"
+                        dir="auto"
                     >
                         {deal.title}
                     </a>
                     {menu}
                 </div>
                 {deal.association ? (
-                    <p className="mt-0.5 truncate text-[11px] text-[var(--evo-ink-muted)]">
+                    <p className="mt-0.5 truncate text-[11px] text-[var(--evo-ink-muted)]" dir="auto">
                         {deal.association}
                     </p>
                 ) : null}
@@ -61,7 +62,7 @@ export function DealCard({
                 )}
                 {deal.attention ? (
                     <p className="mt-0.5 truncate text-[11px] text-[var(--evo-ink)]">
-                        {deal.attention}
+                        {t(deal.attention)}
                     </p>
                 ) : null}
                 {deal.nextActivity ? (

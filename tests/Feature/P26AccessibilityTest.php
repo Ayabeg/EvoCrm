@@ -35,7 +35,7 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($a11y)->not->toContain('jest-axe');
 
     expect($kanban)->toContain('aria-busy={busy || undefined}')
-        ->and($kanban)->toContain('aria-label="Pipeline board"')
+        ->and($kanban)->toContain("aria-label={t('Pipeline board')}")
         ->and($kanban)->toContain("event.key !== 'Enter' && event.key !== ' '")
         ->and($kanban)->not->toContain('aria-hidden={busy')
         ->and($kanban)->toContain('tabIndex={0}')
@@ -58,7 +58,8 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
     expect($inbox)->toContain('conversationA11yName')
         ->and($inbox)->toContain("aria-current={active ? 'true' : undefined}")
         ->and($inbox)->toContain('aria-label={conversationA11yName')
-        ->and($inbox)->toContain('<span className="sr-only"> unread</span>')
+        ->and($inbox)->toContain("t('unread')")
+        ->and($inbox)->toContain('unread')
         ->and($inbox)->toContain("aria-pressed={mode === 'reply'}")
         ->and($inbox)->toContain("aria-pressed={mode === 'note'}")
         ->and($inbox)->toContain('aria-label={')
@@ -98,8 +99,8 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($palette)->toContain('restoreFocus')
         ->and($palette)->toContain('data-a11y="focus-trap"')
         ->and($palette)->toContain('data-command="backdrop"')
-        ->and($palette)->toContain('aria-label="Palette de commandes"')
-        ->and($palette)->toContain('aria-label="Rechercher des commandes"');
+        ->and($palette)->toContain("t('Command palette')")
+        ->and($palette)->toContain("t('Search commands')");
 
     expect($motion)->toContain('@media (prefers-reduced-motion: reduce)')
         ->and($motion)->toContain("[data-command='os']")

@@ -6,7 +6,9 @@ namespace App\Models;
 use App\Enums\WorkspaceRole;
 use App\Notifications\QueuedResetPassword;
 use App\Notifications\QueuedVerifyEmail;
+use App\Support\Locale;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,9 +37,9 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Workspace|null $workspace
  * @property WorkspaceRole $role
  */
-#[Fillable(['workspace_id', 'name', 'email', 'password', 'role', 'permissions'])]
+#[Fillable(['workspace_id', 'name', 'email', 'password', 'role', 'permissions', 'preferences'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
@@ -69,9 +71,15 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => WorkspaceRole::class,
             'permissions' => 'array',
+            'preferences' => 'array',
             'two_factor_confirmed_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
+    }
+
+    public function preferredLocale(): string
+    {
+        return Locale::resolve($this);
     }
 
     public function workspace(): BelongsTo

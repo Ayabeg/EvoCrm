@@ -192,7 +192,7 @@ export function Composer({
                                             <button
                                                 type="button"
                                                 onClick={() => applyTemplate(template)}
-                                                className="w-full rounded-[var(--evo-radius-compact)] px-2 py-1.5 text-left text-[13px] hover:bg-[var(--evo-hover)]"
+                                                className="w-full rounded-[var(--evo-radius-compact)] px-2 py-1.5 text-start text-[13px] hover:bg-[var(--evo-hover)]"
                                             >
                                                 <span className="block font-medium">
                                                     {template.title}
@@ -215,7 +215,7 @@ export function Composer({
                                             <button
                                                 type="button"
                                                 onClick={() => applyTemplate(template)}
-                                                className="w-full rounded-[var(--evo-radius-compact)] px-2 py-1.5 text-left text-[13px] hover:bg-[var(--evo-hover)]"
+                                                className="w-full rounded-[var(--evo-radius-compact)] px-2 py-1.5 text-start text-[13px] hover:bg-[var(--evo-hover)]"
                                             >
                                                 <span className="block font-medium">
                                                     {template.title}

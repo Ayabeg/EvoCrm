@@ -320,7 +320,7 @@ export default function TicketShow({
                                                             ? 'bg-muted text-ink'
                                                             : message.direction ===
                                                                 'outbound'
-                                                              ? 'ml-auto border border-hairline bg-canvas text-ink'
+                                                              ? 'ms-auto border border-hairline bg-canvas text-ink'
                                                               : 'bg-canvas text-ink shadow-[var(--aurora-shadow-medium)]'
                                                     }`}
                                                 >

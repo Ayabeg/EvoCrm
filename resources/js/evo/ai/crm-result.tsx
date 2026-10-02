@@ -44,7 +44,7 @@ export function CrmResult({
                     )}
                 >
                     Ouvrir
-                    <ArrowSquareOut className="ml-1 inline size-3" weight="regular" aria-hidden />
+                    <ArrowSquareOut className="ms-1 inline size-3" weight="regular" aria-hidden />
                 </Link>
             ) : null}
         </div>

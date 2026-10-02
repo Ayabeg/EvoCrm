@@ -61,12 +61,12 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 <div data-chrome="menu" className="md:hidden">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <SidebarTrigger className="-ml-0.5 h-9 w-9 shrink-0 text-ink" />
+                            <SidebarTrigger className="-ms-0.5 h-9 w-9 shrink-0 text-ink" />
                         </TooltipTrigger>
                         <TooltipContent side="bottom">Toggle sidebar</TooltipContent>
                     </Tooltip>
                 </div>
-                <div className="relative ml-auto flex shrink-0 items-center gap-1" data-chrome="utilities">
+                <div className="relative ms-auto flex shrink-0 items-center gap-1" data-chrome="utilities">
                     <Button
                         type="button"
                         variant="ghost"

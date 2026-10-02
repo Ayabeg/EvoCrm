@@ -6,6 +6,7 @@ import {
     isNestedInteractiveTarget,
     resolveRowActivation,
 } from '@/ds/workspace/quick-record/row-peek';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 /**
@@ -34,7 +35,7 @@ export function PipelineKanban({
             )}
             data-testid="pipeline-kanban"
             role="region"
-            aria-label="Pipeline board"
+            aria-label={t('Pipeline board')}
             aria-busy={busy || undefined}
         >
             {children}
@@ -66,7 +67,7 @@ export function PipelineKanbanColumn({
             onDrop={onDrop}
             data-testid={testId}
             className={cn(
-                'flex h-full min-h-0 w-[280px] min-w-[260px] max-w-[320px] shrink-0 flex-col overflow-y-auto border-r border-hairline px-2.5 py-2 last:border-r-0',
+                'flex h-full min-h-0 w-[280px] min-w-[260px] max-w-[320px] shrink-0 flex-col overflow-y-auto border-e border-hairline px-2.5 py-2 last:border-e-0',
                 over &&
                     'bg-canvas-soft outline outline-1 outline-offset-[-1px] outline-[color-mix(in_srgb,var(--evosales-ink)_22%,var(--evosales-hairline))]',
                 className,
@@ -107,7 +108,7 @@ export function PipelineKanbanHeader({
                     {count}
                     <span className="sr-only">
                         {' '}
-                        {count === 1 ? unit : `${unit}s`}
+                        {count === 1 ? t(unit) : t(`${unit}s`)}
                     </span>
                 </span>
             </div>
@@ -142,12 +143,12 @@ export function PipelineKanbanFooter({
         <footer className="mt-auto border-t border-hairline px-0.5 pt-2 text-[11px] text-mute">
             {amount ? (
                 <p>
-                    Total: <span className="money text-ink">{amount}</span>
+                    {t('Total')}: <span className="money text-ink">{amount}</span>
                 </p>
             ) : null}
             {weighted ? (
                 <p className="mt-0.5">
-                    Weighted: <span className="money text-ink">{weighted}</span>
+                    {t('Weighted')}: <span className="money text-ink">{weighted}</span>
                     {probability != null ? ` · ${probability}%` : ''}
                 </p>
             ) : null}
@@ -317,7 +318,7 @@ export function PipelineKanbanEmpty({
                 'border border-dashed border-hairline px-2.5 py-3 text-center text-[11px] text-mute',
             )}
         >
-            {label}
+            {t(label)}
         </p>
     );
 }

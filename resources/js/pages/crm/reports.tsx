@@ -294,7 +294,7 @@ export default function Reports({
                                         <button
                                             type="button"
                                             onClick={() => removeWidget(widget.key)}
-                                            className="absolute top-2 right-2 z-10 rounded-[var(--evo-radius-compact)] border border-hairline bg-[var(--evo-surface)] px-2 py-0.5 text-[11px] text-[var(--evo-ink-muted)] hover:text-[var(--evo-ink)]"
+                                            className="absolute top-2 end-2 z-10 rounded-[var(--evo-radius-compact)] border border-hairline bg-[var(--evo-surface)] px-2 py-0.5 text-[11px] text-[var(--evo-ink-muted)] hover:text-[var(--evo-ink)]"
                                             aria-label={t('Remove :title', { title: widget.title })}
                                         >
                                             {t('Remove')}

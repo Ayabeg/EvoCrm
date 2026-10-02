@@ -301,6 +301,12 @@ No new npm dependencies. `@tanstack/react-virtual` and Tiptap stay in the PR1 / 
 
 AGPL leftover in `resources/js` after PR6: **zero**.
 
+## PR13 fonts (2026-10-02)
+
+| Item | Source | License | Destination | Notes |
+|---|---|---|---|---|
+| IBM Plex Sans Arabic 400/500/600 | `@fontsource/ibm-plex-sans-arabic` · https://github.com/IBM/plex · https://github.com/fontsource/font-files | SIL Open Font License 1.1 (OFL) | `resources/css/app.css` imports; `--font-ui-arabic` in `resources/js/evo/tokens/evo.css` | Self-hosted. Arabic UI only. Geist remains `--font-ui-latin`. Regular / medium / semibold. |
+
 ## PR12 removals
 
 | Package | Status |

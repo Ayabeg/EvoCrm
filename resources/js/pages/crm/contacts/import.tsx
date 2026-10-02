@@ -85,7 +85,7 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                             type="file"
                                             accept=".csv,text/csv"
                                             required
-                                            className="block w-full text-ui file:mr-3 file:rounded-sm file:border-0 file:bg-canvas-soft file:px-3 file:py-1.5"
+                                            className="block w-full text-ui file:me-3 file:rounded-sm file:border-0 file:bg-canvas-soft file:px-3 file:py-1.5"
                                         />
                                         {errors.file ? (
                                             <p className="mt-1 text-[12px] text-destructive">{errors.file}</p>
@@ -135,7 +135,7 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                                 <h2 className="text-[14px] font-semibold">{t('Column mapping')}</h2>
                                             </div>
                                             <div className="overflow-x-auto">
-                                                <table className="w-full text-left text-[13px]">
+                                                <table className="w-full text-start text-[13px]">
                                                     <thead className="text-[11px] uppercase tracking-wide text-muted-foreground">
                                                         <tr>
                                                             <th className="px-4 py-2">{t('CSV column')}</th>
@@ -179,7 +179,7 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                 <div className="border-b border-hairline bg-canvas-soft px-4 py-3">
                                     <h2 className="text-[14px] font-semibold">{t('Sample rows')}</h2>
                                 </div>
-                                <table className="w-full text-left text-[13px]">
+                                <table className="w-full text-start text-[13px]">
                                     <thead className="text-[11px] uppercase tracking-wide text-muted-foreground">
                                         <tr>
                                             <th className="px-4 py-2">{t('Row')}</th>

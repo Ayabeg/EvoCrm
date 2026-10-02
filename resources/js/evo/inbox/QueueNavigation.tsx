@@ -33,7 +33,7 @@ export function QueueNavigation({
                                 onClick={() => onSelect(item.key)}
                                 aria-current={active ? 'true' : undefined}
                                 className={cn(
-                                    'flex h-8 w-full items-center justify-between gap-2 px-2 text-left text-[12px]',
+                                    'flex h-8 w-full items-center justify-between gap-2 px-2 text-start text-[12px]',
                                     MOTION_HOVER_CLASS,
                                     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--evo-focus)]',
                                     active

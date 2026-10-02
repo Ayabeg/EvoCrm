@@ -38,7 +38,7 @@ export function ReasoningDisclosure({
         >
             <Collapsible.Trigger
                 className={cn(
-                    'flex min-h-8 w-full items-center justify-between gap-2 px-3 text-left text-[12px] font-medium text-evo-ink-secondary',
+                    'flex min-h-8 w-full items-center justify-between gap-2 px-3 text-start text-[12px] font-medium text-evo-ink-secondary',
                     evoFocus,
                 )}
             >

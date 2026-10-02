@@ -55,7 +55,7 @@ export function SkeletonList({ rows = 8 }: { rows?: number }) {
                 >
                     <div className="h-3 w-40 animate-pulse rounded bg-canvas-soft" />
                     <div className="hidden h-3 w-24 animate-pulse rounded bg-canvas-soft sm:block" />
-                    <div className="ml-auto h-3 w-16 animate-pulse rounded bg-canvas-soft" />
+                    <div className="ms-auto h-3 w-16 animate-pulse rounded bg-canvas-soft" />
                 </div>
             ))}
         </div>

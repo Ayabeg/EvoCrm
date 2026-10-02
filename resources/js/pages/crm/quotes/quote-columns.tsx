@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { LtrValue } from '@/components/ltr-value';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef } from '@/lib/list-view-config';
@@ -125,7 +126,7 @@ export function QuoteIdentityCell({
                 {initials || '?'}
             </span>
             <span className="min-w-0">
-                <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" title={name}>
+                <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" dir="auto" title={name}>
                     {name}
                 </span>
                 {secondary ? (
@@ -163,10 +164,10 @@ export function QuoteAmountCell({ cents }: { cents?: number | null }) {
 
     return (
         <span
-            className="money block min-w-0 max-w-full text-right break-words tabular-nums text-[13px] leading-[18px] text-ink"
+            className="money block min-w-0 max-w-full text-end break-words tabular-nums text-[13px] leading-[18px] text-ink"
             title={label}
         >
-            {label}
+            <LtrValue>{label}</LtrValue>
         </span>
     );
 }

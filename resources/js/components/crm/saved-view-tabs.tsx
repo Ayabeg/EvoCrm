@@ -1,6 +1,7 @@
 import { Form, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { crmListHref, filterFields } from '@/components/crm/list-query';
+import { CaretDown } from '@/evo/icons';
 import { Button } from '@/evo/ui/button';
 import {
     DropdownMenu,
@@ -9,7 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/evo/ui/dropdown-menu';
 import { Input } from '@/evo/ui/input';
-import { CaretDown } from '@/evo/icons';
+import { t } from '@/lib/i18n';
 import type {
     ListObjectType,
     ListViewColumn,
@@ -59,6 +60,7 @@ export default function SavedViewTabs({
     const fields = filterFields(activeFilters);
     const groups = filterGroups ?? filterGroupsFromActive(activeFilters);
     const nouns = OBJECT_NOUNS[entity];
+    const nounLabel = t(nouns.charAt(0).toUpperCase() + nouns.slice(1));
 
     const allHref = crmListHref(basePath, { ...fields, ...extraQuery }, {
         view: 'all',
@@ -98,28 +100,28 @@ export default function SavedViewTabs({
                 {entity === 'ticket' ? (
                     <>
                         <Link href={allHref} className={tabClass(view === 'all' && !filterId)}>
-                            All open
+                            {t('All open')}
                         </Link>
                         <Link href={myHref} className={tabClass(view === 'my' && !filterId)}>
-                            Assigned to me
+                            {t('Assigned to me')}
                         </Link>
                         <Link
                             href={unassignedHref}
                             className={tabClass(view === 'unassigned' && !filterId)}
                         >
-                            Unassigned
+                            {t('Unassigned')}
                         </Link>
                         <Link href={closedHref} className={tabClass(view === 'closed' && !filterId)}>
-                            Closed
+                            {t('Closed')}
                         </Link>
                     </>
                 ) : (
                     <>
                         <Link href={allHref} className={tabClass(view === 'all' && !filterId)}>
-                            All {nouns}
+                            {t('All :noun', { noun: nounLabel })}
                         </Link>
                         <Link href={myHref} className={tabClass(view === 'my' && !filterId)}>
-                            My {nouns}
+                            {t('My :noun', { noun: nounLabel })}
                         </Link>
                     </>
                 )}
@@ -130,10 +132,10 @@ export default function SavedViewTabs({
                         className={tabClass(filter.id === filterId)}
                         title={
                             filter.visibility === 'workspace'
-                                ? 'Shared with workspace'
+                                ? t('Shared with workspace')
                                 : filter.visibility === 'team'
-                                  ? 'Shared with team'
-                                  : 'Private view'
+                                  ? t('Shared with team')
+                                  : t('Private view')
                         }
                     >
                         {filter.name}
@@ -147,7 +149,7 @@ export default function SavedViewTabs({
                                 type="button"
                                 className={tabClass(overflow.some((filter) => filter.id === filterId))}
                             >
-                                All views
+                                {t('All views')}
                                 <CaretDown className="ms-0.5 inline size-3" />
                             </button>
                         </DropdownMenuTrigger>

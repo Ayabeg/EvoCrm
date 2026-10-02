@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import type { ListView } from '@/components/crm/list-chrome';
+import { LtrValue, looksLikeLtrValue } from '@/components/ltr-value';
 import { Avatar } from '@/evo/ui/avatar';
 import { Badge } from '@/evo/ui/badge';
 import { Button } from '@/evo/ui/button';
@@ -78,7 +79,7 @@ export function RecordHubHeader({
             {views.length > 0 ? (
                 <nav
                     className="mt-3 flex items-end gap-1 overflow-x-auto border-b border-hairline"
-                    aria-label="Layouts"
+                    aria-label={t('Layouts')}
                 >
                     {views.map((view) => {
                         const active = activeView === view.key;
@@ -138,7 +139,7 @@ export function RecordPageFrame({
         <div className={cn('h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink', PAGE_OVERFLOW_CLASS)}>
             <div className="relative shrink-0 border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6">
                 <span
-                    className="absolute inset-y-0 left-0 w-[3px] bg-brand"
+                    className="absolute inset-y-0 start-0 w-[3px] bg-brand"
                     aria-hidden
                 />
                 {header}
@@ -223,9 +224,12 @@ export function RecordFact({
         return null;
     }
 
+    const display = isEmptyFact(value) ? '—' : (value as string);
+    const isolate = money || looksLikeLtrValue(display);
+
     return (
         <div className="min-w-0">
-            <p className="text-[11px] text-mute">{label}</p>
+            <p className="text-[11px] text-mute">{t(label)}</p>
             <p
                 className={cn(
                     'text-[13px] text-ink',
@@ -233,7 +237,7 @@ export function RecordFact({
                     money && 'font-medium',
                 )}
             >
-                {isEmptyFact(value) ? '—' : value}
+                {isolate ? <LtrValue>{display}</LtrValue> : display}
             </p>
         </div>
     );
@@ -305,7 +309,7 @@ export function RecordTimelineItem({
         <article className="border-b border-hairline py-2.5 last:border-b-0">
             <div className="flex items-baseline justify-between gap-3">
                 <p className="text-[11px] font-medium tracking-wide text-mute capitalize">
-                    {type}
+                    {t(type.charAt(0).toUpperCase() + type.slice(1))}
                 </p>
                 {when ? (
                     <time className="shrink-0 text-[11px] text-mute" dateTime={at ?? undefined}>
@@ -339,11 +343,11 @@ export function RecordNextAction({
         <div className="flex items-start justify-between gap-3 border-b border-hairline pb-3">
             <div className="min-w-0">
                 <p className="text-[11px] font-medium tracking-wide text-mute uppercase">
-                    Next
+                    {t('Next')}
                 </p>
                 <p className="mt-0.5 text-[13px] font-medium text-ink">{title}</p>
                 {detail ? (
-                    <p className="text-[11px] text-mute">{detail}</p>
+                    <p className="text-[11px] text-mute">{t(detail)}</p>
                 ) : null}
             </div>
             {action}
@@ -372,7 +376,7 @@ export function RecordDisclose({
                 aria-expanded={open}
                 onClick={() => setOpen((current) => !current)}
             >
-                {open ? closeLabel : label}
+                {open ? t(closeLabel) : t(label)}
             </Button>
             {open ? children : null}
         </div>

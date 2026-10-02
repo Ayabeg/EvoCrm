@@ -108,7 +108,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(function T
                 {...props}
             />
             {showCount && maxLength ? (
-                <span className="pointer-events-none absolute bottom-1.5 right-2 text-[11px] text-[var(--evo-ink-muted)]">
+                <span className="pointer-events-none absolute bottom-1.5 end-2 text-[11px] text-[var(--evo-ink-muted)]">
                     {String(value ?? '').length}/{maxLength}
                 </span>
             ) : null}

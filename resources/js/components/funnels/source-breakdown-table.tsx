@@ -33,15 +33,15 @@ export function SourceBreakdownTable({ rows }: { rows: SourceBreakdownRow[] }) {
     return (
         <div className="overflow-hidden rounded-lg border border-hairline bg-canvas">
             <table className="w-full text-[13px]">
-                <thead className="bg-canvas-soft text-left text-[11px] tracking-wide text-muted-foreground uppercase">
+                <thead className="bg-canvas-soft text-start text-[11px] tracking-wide text-muted-foreground uppercase">
                     <tr>
                         <th className="px-3 py-2 font-medium">Source</th>
-                        <th className="px-3 py-2 text-right font-medium">Visits</th>
-                        <th className="px-3 py-2 text-right font-medium">Orders</th>
-                        <th className="px-3 py-2 text-right font-medium">Confirmed</th>
-                        <th className="px-3 py-2 text-right font-medium">Delivered</th>
-                        <th className="px-3 py-2 text-right font-medium">Spend</th>
-                        <th className="px-3 py-2 text-right font-medium">CPL</th>
+                        <th className="px-3 py-2 text-end font-medium">Visits</th>
+                        <th className="px-3 py-2 text-end font-medium">Orders</th>
+                        <th className="px-3 py-2 text-end font-medium">Confirmed</th>
+                        <th className="px-3 py-2 text-end font-medium">Delivered</th>
+                        <th className="px-3 py-2 text-end font-medium">Spend</th>
+                        <th className="px-3 py-2 text-end font-medium">CPL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,22 +50,22 @@ export function SourceBreakdownTable({ rows }: { rows: SourceBreakdownRow[] }) {
                             <td className="px-3 py-2 font-medium text-ink">
                                 {labelSource(row.source)}
                             </td>
-                            <td className="money px-3 py-2 text-right">
+                            <td className="money px-3 py-2 text-end">
                                 {row.visits.toLocaleString()}
                             </td>
-                            <td className="money px-3 py-2 text-right">
+                            <td className="money px-3 py-2 text-end">
                                 {row.orders_placed.toLocaleString()}
                             </td>
-                            <td className="money px-3 py-2 text-right">
+                            <td className="money px-3 py-2 text-end">
                                 {row.confirmed.toLocaleString()}
                             </td>
-                            <td className="money px-3 py-2 text-right">
+                            <td className="money px-3 py-2 text-end">
                                 {row.delivered.toLocaleString()}
                             </td>
-                            <td className="money px-3 py-2 text-right">
+                            <td className="money px-3 py-2 text-end">
                                 {formatDzd(row.spend_cents)}
                             </td>
-                            <td className="money px-3 py-2 text-right text-muted-foreground">
+                            <td className="money px-3 py-2 text-end text-muted-foreground">
                                 {row.cpl_cents !== null
                                     ? formatDzd(row.cpl_cents)
                                     : '—'}

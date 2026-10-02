@@ -85,7 +85,7 @@ function AskEvoBody({
             </p>
             <p className="line-clamp-4 text-[12px] leading-5 text-mute">{summary}</p>
             {insight?.answer ? (
-                <p className="border-l-2 border-brand/40 pl-2 text-[12px] leading-5">
+                <p className="border-s-2 border-brand/40 ps-2 text-[12px] leading-5">
                     {insight.question ? (
                         <span className="text-mute">{insight.question} — </span>
                     ) : null}

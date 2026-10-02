@@ -36,11 +36,11 @@ export function LineItems({
         <div className="overflow-x-auto" data-evo="line-items">
             <table className="w-full min-w-[28rem] border-collapse text-[13px]">
                 <thead>
-                    <tr className="text-left text-[11px] text-[var(--evo-ink-muted)]">
+                    <tr className="text-start text-[11px] text-[var(--evo-ink-muted)]">
                         <th className="pb-2 font-medium">{t('Item')}</th>
                         <th className="w-20 pb-2 font-medium">{t('Qty')}</th>
                         <th className="w-36 pb-2 font-medium">{t('Unit')}</th>
-                        <th className="w-32 pb-2 text-right font-medium">
+                        <th className="w-32 pb-2 text-end font-medium">
                             {t('Total')}
                         </th>
                     </tr>
@@ -56,7 +56,7 @@ export function LineItems({
                                 key={row.id ?? index}
                                 className="border-t border-[var(--evo-hairline)]"
                             >
-                                <td className="py-2 pr-2">
+                                <td className="py-2 pe-2">
                                     {editable ? (
                                         <Input
                                             name={`${namePrefix}[${index}][name]`}
@@ -73,7 +73,7 @@ export function LineItems({
                                         <span>{row.name || t('—')}</span>
                                     )}
                                 </td>
-                                <td className="py-2 pr-2">
+                                <td className="py-2 pe-2">
                                     {editable ? (
                                         <Input
                                             name={`${namePrefix}[${index}][quantity]`}
@@ -99,7 +99,7 @@ export function LineItems({
                                         </span>
                                     )}
                                 </td>
-                                <td className="py-2 pr-2">
+                                <td className="py-2 pe-2">
                                     {editable ? (
                                         <>
                                             <input
@@ -123,7 +123,7 @@ export function LineItems({
                                         </span>
                                     )}
                                 </td>
-                                <td className="py-2 text-right font-medium tabular-nums">
+                                <td className="py-2 text-end font-medium tabular-nums">
                                     {formatMoney(total)}
                                 </td>
                             </tr>

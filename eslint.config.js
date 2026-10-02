@@ -168,6 +168,24 @@ export default [
                     message:
                         'Raw hex belongs in resources/js/evo/tokens. Use a token or a Tailwind theme class.',
                 },
+                {
+                    selector:
+                        'Literal[value=/(?:^|[\\s"\'`])(?:[a-z0-9-]+:)*(?:-)?(?:ml|mr|pl|pr)-[a-z0-9]/]',
+                    message:
+                        'Use logical Tailwind classes (ms-/me-/ps-/pe-) instead of physical ml-/mr-/pl-/pr-.',
+                },
+                {
+                    selector:
+                        'Literal[value=/(?:^|[\\s"\'`])(?:[a-z0-9-]+:)*text-(?:left|right)\\b/]',
+                    message:
+                        'Use text-start / text-end instead of text-left / text-right.',
+                },
+                {
+                    selector:
+                        'Literal[value=/(?:^|[\\s"\'`])(?:[a-z0-9-]+:)*(?:-)?(?:left|right)-(?!1\\/2)[a-z0-9]/]',
+                    message:
+                        'Use start-/end- instead of physical left-/right- when direction matters.',
+                },
             ],
         },
     },
@@ -177,6 +195,7 @@ export default [
             'node_modules',
             'public',
             'bootstrap/ssr',
+            '.grok',
             'tailwind.config.js',
             'vite.config.ts',
             'resources/js/actions/**',

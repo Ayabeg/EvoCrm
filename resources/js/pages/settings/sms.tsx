@@ -50,19 +50,23 @@ export default function SmsSettings({
             <Head title={t('SMS')} />
 
             <SettingsPageHeader
-                title="SMS"
-                description="Sends only to Algerian mobiles (+213 05 Ooredoo, 06 Mobilis, 07 Djezzy). Landlines and foreign numbers are refused."
+                title={t('SMS')}
+                description={t(
+                    'Sends only to Algerian mobiles (+213 05 Ooredoo, 06 Mobilis, 07 Djezzy). Landlines and foreign numbers are refused.',
+                )}
             />
 
             <div className="grid gap-3">
                 {!connected ? (
                     <SettingsEmptyState
                         icon={<ChatText className="size-6" weight="regular" />}
-                        title="SMS gateway is disconnected"
-                        description="Save a workspace gateway below. Sequences never fake a send. Desk replies can stub locally."
+                        title={t('SMS gateway is disconnected')}
+                        description={t(
+                            'Save a workspace gateway below. Sequences never fake a send. Desk replies can stub locally.',
+                        )}
                     />
                 ) : (
-                    <SettingsCard title="Gateway status">
+                    <SettingsCard title={t('Gateway status')}>
                         <div className="flex flex-wrap items-center gap-2 text-[13px]">
                             <Badge variant="default">Workspace gateway</Badge>
                             <span className="text-mute">
@@ -77,25 +81,21 @@ export default function SmsSettings({
                 <SettingsForm action="/settings/sms" method="post">
                     {({ processing }) => (
                         <SettingsCard
-                            title="Workspace gateway"
+                            title={t('Workspace gateway')}
                             required
                             footer={
                                 <SettingsSaveBar
                                     processing={processing}
-                                    saveLabel="Save SMS gateway"
+                                    saveLabel={t('Save SMS gateway')}
                                 />
                             }
                         >
                             <p className="text-[12px] text-mute">
-                                Default driver is a local HTTP aggregator.
-                                Twilio is opt-in via{' '}
-                                <code className="font-mono">
-                                    SMS_DRIVER=twilio
-                                </code>
-                                . Quiet hours (Africa/Algiers 21:00-08:00) defer
-                                sequence SMS.
+                                {t(
+                                    'Default driver is a local HTTP aggregator. Twilio is opt-in via SMS_DRIVER=twilio. Quiet hours (Africa/Algiers 21:00-08:00) defer sequence SMS.',
+                                )}
                             </p>
-                            <SettingsFormRow label="Driver" htmlFor="driver">
+                            <SettingsFormRow label={t('Driver')} htmlFor="driver">
                                 <select
                                     id="driver"
                                     name="driver"
@@ -110,7 +110,7 @@ export default function SmsSettings({
                                     </option>
                                 </select>
                             </SettingsFormRow>
-                            <SettingsFormRow label="Gateway URL" htmlFor="url">
+                            <SettingsFormRow label={t('Gateway URL')} htmlFor="url">
                                 <Input
                                     id="url"
                                     name="url"
@@ -120,7 +120,7 @@ export default function SmsSettings({
                                     className="h-8"
                                 />
                             </SettingsFormRow>
-                            <SettingsFormRow label="Method" htmlFor="method">
+                            <SettingsFormRow label={t('Method')} htmlFor="method">
                                 <select
                                     id="method"
                                     name="method"
@@ -131,7 +131,7 @@ export default function SmsSettings({
                                     <option value="GET">GET</option>
                                 </select>
                             </SettingsFormRow>
-                            <SettingsFormRow label="Auth" htmlFor="auth">
+                            <SettingsFormRow label={t('Auth')} htmlFor="auth">
                                 <select
                                     id="auth"
                                     name="auth"
@@ -248,8 +248,10 @@ export default function SmsSettings({
                     >
                         {({ processing }) => (
                             <SettingsDangerZone
-                                title="Disconnect"
-                                description="Deletes the stored API key. Messages already sent stay. This does not revoke the aggregator account."
+                                title={t('Disconnect')}
+                                description={t(
+                                    'Deletes the stored API key. Messages already sent stay. This does not revoke the aggregator account.',
+                                )}
                             >
                                 <Button
                                     type="submit"

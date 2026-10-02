@@ -65,7 +65,7 @@ type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradi
  * NOTE: the intro is a per-frame animation, heavier than a static chart.
  * `"none"` opts out — as does a device with the OS "reduce motion" preference.
  */
-type ComposedAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
+type ComposedAnimationType = "none" | "start-to-right" | "end-to-left" | "center-out" | "edges-in";
 type RevealAnimationType = Exclude<ComposedAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -155,7 +155,7 @@ export function EvilComposedChart<
   className,
   chartProps,
   curveType = "linear",
-  animationType = "left-to-right",
+  animationType = "start-to-right",
   barGap,
   barCategoryGap,
   defaultSelectedDataKey = null,
@@ -900,7 +900,7 @@ const getBarGrowAnimation = (
   // How many bars this one waits behind before it starts growing
   let step: number;
   switch (animationType) {
-    case "right-to-left":
+    case "end-to-left":
       step = lastIndex - index;
       break;
     case "center-out":
@@ -909,7 +909,7 @@ const getBarGrowAnimation = (
     case "edges-in":
       step = center - Math.abs(index - center);
       break;
-    default: // left-to-right
+    default: // start-to-right
       step = index;
   }
 
@@ -938,8 +938,8 @@ const getBarGrowAnimation = (
 
 // motion `originX` for each single-rect line reveal — the edge the wipe grows from
 const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
-  "left-to-right": 0,
-  "right-to-left": 1,
+  "start-to-right": 0,
+  "end-to-left": 1,
   "center-out": 0.5,
 };
 
@@ -1061,7 +1061,7 @@ const VerticalColorGradient = ({ id, dataKey, config }: StyleProps & { config: C
   );
 };
 
-/** Horizontal left-to-right color gradient — the stroke source for a line series. */
+/** Horizontal start-to-right color gradient — the stroke source for a line series. */
 const HorizontalColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
   const colorsCount = getColorsCount(config[dataKey] ?? {});
 

@@ -51,15 +51,15 @@ export function SequenceStep({
                 transform: CSS.Transform.toString(transform),
                 transition,
             }}
-            className={cn('relative pl-8', isDragging && 'z-10 opacity-80')}
+            className={cn('relative ps-8', isDragging && 'z-10 opacity-80')}
         >
             {index < total - 1 ? (
                 <span
-                    className="absolute top-8 bottom-0 left-[11px] w-px bg-[var(--evo-hairline)]"
+                    className="absolute top-8 bottom-0 start-[11px] w-px bg-[var(--evo-hairline)]"
                     aria-hidden
                 />
             ) : null}
-            <span className="absolute top-3 left-0 flex size-6 items-center justify-center rounded-full border border-[var(--evo-hairline)] bg-[var(--evo-canvas)] text-[11px] font-medium text-[var(--evo-ink)]">
+            <span className="absolute top-3 start-0 flex size-6 items-center justify-center rounded-full border border-[var(--evo-hairline)] bg-[var(--evo-canvas)] text-[11px] font-medium text-[var(--evo-ink)]">
                 {step.position}
             </span>
             <div className="mb-4 rounded-[var(--evo-radius-standard)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] p-3">

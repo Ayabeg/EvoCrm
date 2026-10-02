@@ -132,7 +132,7 @@ function AssociationList({
                     <button
                         type="button"
                         onClick={() => onOpen(item.ref)}
-                        className="flex w-full min-w-0 items-center justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
+                        className="flex w-full min-w-0 items-center justify-between gap-3 rounded-md px-2 py-2 text-start hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                     >
                         <span className="min-w-0">
                             <span className="block truncate text-[13px] text-[var(--evo-ink)]">{item.label}</span>
@@ -263,7 +263,7 @@ export function QuickRecordDrawer() {
                 }}
                 className={cn(
                     'w-full max-sm:w-full sm:w-[min(92vw,520px)] lg:w-[480px]',
-                    'gap-0 border-l bg-surface p-0',
+                    'gap-0 border-s bg-surface p-0',
                     PAGE_OVERFLOW_CLASS,
                     MOTION_DRAWER_CLASS,
                     'motion-reduce:transition-none',

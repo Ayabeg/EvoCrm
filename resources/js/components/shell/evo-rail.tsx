@@ -8,16 +8,16 @@ import {
     visibleSections,
 } from '@/components/shell/product-nav';
 import type { NavItem } from '@/components/shell/product-nav';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from '@/evo/ui/dropdown-menu';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { CaretDown, CaretLeft, CaretRight } from '@/evo/icons';
 import { ShellModeSwitch } from '@/evo/shell/mode-switch';
 import type { ShellMode } from '@/evo/shell/mode-switch';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from '@/evo/ui/dropdown-menu';
 import { useInitials } from '@/hooks/use-initials';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { openAskEvo } from '@/lib/ask-evo';
@@ -39,14 +39,14 @@ import type {
     CommandResult,
     CommandSearchHit,
 } from '@/lib/command-os';
-import { t } from '@/lib/i18n';
+import { t, workspaceRoleLabel } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types/auth';
 
 export type RailMode = ShellMode;
 
 const rowClass =
-    'evo-nav-link flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-left text-[13px] text-shell-ink-2 transition-colors duration-[var(--evo-duration-micro)] hover:bg-[var(--evo-hover)] motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]';
+    'evo-nav-link flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-start text-[13px] text-shell-ink-2 transition-colors duration-[var(--evo-duration-micro)] hover:bg-[var(--evo-hover)] motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]';
 
 export function EvoRail({
     activeHotkeys = true,
@@ -302,11 +302,11 @@ export function EvoRail({
                                 <button
                                     type="button"
                                     className="grid size-8 shrink-0 place-items-center rounded-lg text-shell-muted hover:bg-[var(--evo-hover)] hover:text-shell-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]"
-                                    aria-label="Fermer le menu"
+                                    aria-label={t('Close menu')}
                                     onClick={onToggleCollapsed}
                                 >
                                     <CaretLeft
-                                        className="size-4"
+                                        className="size-4 rtl:rotate-180"
                                         weight="regular"
                                     />
                                 </button>
@@ -323,7 +323,7 @@ export function EvoRail({
                                 >
                                     {section.label ? (
                                         <h2 className="evo-nav-section-label mb-1 border-t border-shell-hairline px-2 pt-3 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                                            {section.label}
+                                            {t(section.label)}
                                         </h2>
                                     ) : null}
                                     <ul className="flex flex-col gap-0.5">
@@ -356,7 +356,7 @@ export function EvoRail({
                                 <DropdownMenuTrigger asChild>
                                     <button
                                         type="button"
-                                        className="mt-1 flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-left hover:bg-[var(--evo-hover)]"
+                                        className="mt-1 flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-start hover:bg-[var(--evo-hover)]"
                                         title={user.name}
                                         aria-label={t(':name account menu', {
                                             name: user.name,
@@ -370,7 +370,7 @@ export function EvoRail({
                                                 {user.name}
                                             </span>
                                             <span className="block truncate text-[12px] text-shell-muted">
-                                                {user.role}
+                                                {workspaceRoleLabel(user.role)}
                                             </span>
                                         </span>
                                     </button>
@@ -473,7 +473,7 @@ export function EvoRail({
                                         <button
                                             type="button"
                                             className={cn(
-                                                'w-full rounded-lg px-1 py-2 text-left',
+                                                'w-full rounded-lg px-1 py-2 text-start',
                                                 index === cursorIndex &&
                                                     'bg-[var(--evo-teal-soft)]',
                                             )}
@@ -521,7 +521,7 @@ function NavRow({
             href={item.href}
             prefetch
             aria-current={active ? 'page' : undefined}
-            aria-label={item.label}
+            aria-label={t(item.label)}
             className={cn(rowClass, active && 'font-medium')}
             onClick={onNavigate}
         >
@@ -530,7 +530,7 @@ function NavRow({
                 className="evo-nav-label min-w-0 flex-1 truncate"
                 data-active={active ? 'true' : 'false'}
             >
-                {item.label}
+                {t(item.label)}
             </span>
         </Link>
     );
@@ -573,14 +573,16 @@ function NavGroup({
                     className="grid size-7 shrink-0 place-items-center rounded-lg text-shell-muted hover:bg-[var(--evo-hover)] hover:text-shell-ink"
                     aria-expanded={open}
                     aria-label={
-                        open ? `Replier ${item.label}` : `Ouvrir ${item.label}`
+                        open
+                            ? t('Collapse :name', { name: t(item.label) })
+                            : t('Expand :name', { name: t(item.label) })
                     }
                     onClick={() => setOpened((current) => !current)}
                 >
                     {open ? (
                         <CaretDown className="size-3.5" />
                     ) : (
-                        <CaretRight className="size-3.5" />
+                        <CaretRight className="size-3.5 rtl:rotate-180" />
                     )}
                 </button>
             </div>
@@ -595,12 +597,12 @@ function NavGroup({
                                     activeId === child.id ? 'page' : undefined
                                 }
                                 className={cn(
-                                    'evo-nav-link flex h-8 items-center rounded-lg pr-2 pl-9 text-left text-[12px] text-shell-ink-2 hover:bg-[var(--evo-hover)]',
+                                    'evo-nav-link flex h-8 items-center rounded-lg pe-2 ps-9 text-start text-[12px] text-shell-ink-2 hover:bg-[var(--evo-hover)]',
                                     activeId === child.id && 'font-medium',
                                 )}
                                 onClick={onNavigate}
                             >
-                                <span className="truncate">{child.label}</span>
+                                <span className="truncate">{t(child.label)}</span>
                             </Link>
                         </li>
                     ))}

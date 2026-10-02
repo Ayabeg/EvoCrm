@@ -318,12 +318,12 @@ export default function LeadsBoard({
 
                 <div className="border-b border-hairline bg-canvas px-4 py-1.5 sm:px-6">
                     <div className="relative mb-1.5 max-w-md">
-                        <MagnifyingGlass className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-mute" />
+                        <MagnifyingGlass className="pointer-events-none absolute top-1/2 start-2 size-3.5 -translate-y-1/2 text-mute" />
                         <Input
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
                             placeholder={t('Search leads…')}
-                            className="h-8 pl-7 text-[12px]"
+                            className="h-8 ps-7 text-[12px]"
                             aria-label={t('Search leads')}
                         />
                     </div>

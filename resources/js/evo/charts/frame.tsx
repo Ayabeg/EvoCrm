@@ -12,6 +12,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/evo/lib/cn';
 import { EmptyState } from '@/evo/patterns/empty-state';
 import { Skeleton } from '@/evo/ui/skeleton';
+import { t } from '@/lib/i18n';
 
 export type ChartFrameProps = {
     children: ReactNode;
@@ -37,7 +38,7 @@ export function ChartFrame({
     return (
         <div
             data-slot="chart-frame"
-            aria-label={label}
+            aria-label={label ? t(label) : undefined}
             className={cn('relative w-full min-w-0', className)}
             style={{ height }}
         >
@@ -45,13 +46,17 @@ export function ChartFrame({
                 <Skeleton className="h-full w-full" aria-busy="true" />
             ) : empty ? (
                 <EmptyState
-                    title={emptyTitle ?? ''}
-                    description={emptyDescription}
+                    title={emptyTitle ? t(emptyTitle) : ''}
+                    description={
+                        emptyDescription ? t(emptyDescription) : undefined
+                    }
                     density="panel"
                     className="h-full"
                 />
             ) : (
-                <div className="h-full w-full">{children}</div>
+                <div className="h-full w-full" dir="ltr" data-chart-plot="ltr">
+                    {children}
+                </div>
             )}
         </div>
     );

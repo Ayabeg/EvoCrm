@@ -65,8 +65,8 @@ it('rebuilds the pipeline board cards and columns to HubSpot density', function 
         ->and($board)->not->toContain('#0176D3');
 
     expect($kanban)->toContain('uppercase')
-        ->and($kanban)->toContain('Total:')
-        ->and($kanban)->toContain('Weighted:')
+        ->and($kanban)->toContain("t('Total')")
+        ->and($kanban)->toContain("t('Weighted')")
         ->and($kanban)->toContain('bg-white')
         ->and($kanban)->toContain('No deals');
 });
@@ -82,13 +82,13 @@ it('rebuilds the deal record as a 3-pane hub with identity on the left', functio
         ->and($show)->toContain('RecordActivityPanel')
         ->and($show)->toContain('AskEvoPanel')
         ->and($show)->toContain('AskEvoTrigger')
-        ->and($show)->toContain('centerLabel="Activity"')
-        ->and($show)->toContain('title="Contact"')
-        ->and($show)->toContain('title="Company"')
-        ->and($show)->toContain('title="Quotes"')
-        ->and($show)->toContain('No contact linked')
-        ->and($show)->toContain('No company linked')
-        ->and($show)->toContain('No quotes yet')
+        ->and($show)->toContain("centerLabel={t('Activity')}")
+        ->and($show)->toContain("title={t('Contact')}")
+        ->and($show)->toContain("title={t('Company')}")
+        ->and($show)->toContain("title={t('Quotes')}")
+        ->and($show)->toContain("t('No contact linked')")
+        ->and($show)->toContain("t('No company linked')")
+        ->and($show)->toContain("t('No quotes yet')")
         ->and($show)->toContain('/crm/deals/')
         ->and($show)->toContain('/move')
         ->and($show)->not->toContain('Breeze')

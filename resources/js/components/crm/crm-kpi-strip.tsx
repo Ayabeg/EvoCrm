@@ -1,3 +1,5 @@
+import { LtrValue } from '@/components/ltr-value';
+import { t } from '@/lib/i18n';
 import { formatCompactDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -58,7 +60,7 @@ export function CrmKpiStrip({
 
     return (
         <section
-            aria-label="Key figures"
+            aria-label={t('Key figures')}
             className={cn(
                 'grid grid-cols-2 divide-hairline border-y border-hairline',
                 columnClass,
@@ -74,14 +76,14 @@ export function CrmKpiStrip({
                 const body = (
                     <article className="flex min-w-0 flex-col gap-0.5 px-2.5 py-2 md:px-3 md:py-2.5">
                         <p className="text-[11px] font-medium leading-4 text-mute">
-                            {kpi.label}
+                            {t(kpi.label)}
                         </p>
                         <p className="money text-[1.375rem] leading-none tracking-tight text-ink md:text-kpi">
-                            {value}
+                            {kpi.format === 'money' ? <LtrValue>{value}</LtrValue> : value}
                         </p>
                         {change || kpi.hint || kpi.changeLabel ? (
                             <p className="hidden truncate text-[11px] leading-4 text-mute sm:block">
-                                {[change, kpi.changeLabel, kpi.hint]
+                                {[change, kpi.changeLabel ? t(kpi.changeLabel) : null, kpi.hint ? t(kpi.hint) : null]
                                     .filter(Boolean)
                                     .join(' · ')}
                             </p>

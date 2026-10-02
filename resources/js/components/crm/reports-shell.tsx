@@ -91,7 +91,7 @@ export function ReportsShell({
                                 ) : null}
                                 {description ? (
                                     <p className="mt-0.5 max-w-2xl text-[11px] leading-4 text-[var(--evo-ink-muted)]">
-                                        {description}
+                                        {t(description)}
                                     </p>
                                 ) : null}
                             </div>

@@ -40,7 +40,7 @@ function SplitButton({
 }: SplitButtonProps) {
     return (
         <ButtonGroup>
-            <Button variant={variant} disabled={disabled} onClick={onClick} className="rounded-r-none">
+            <Button variant={variant} disabled={disabled} onClick={onClick} className="rounded-e-none">
                 {children}
             </Button>
             <DropdownMenu>
@@ -49,7 +49,7 @@ function SplitButton({
                         variant={variant}
                         disabled={disabled}
                         aria-label={menuLabel}
-                        className="rounded-l-none border-l-0 px-2"
+                        className="rounded-s-none border-s-0 px-2"
                     >
                         <CaretDown className="size-3.5" aria-hidden />
                     </Button>

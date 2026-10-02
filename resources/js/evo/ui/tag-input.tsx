@@ -61,7 +61,7 @@ function TagInput({
                     {tag}
                     <button
                         type="button"
-                        className="ml-0.5"
+                        className="ms-0.5"
                         aria-label={`${sr.remove} ${tag}`}
                         disabled={disabled}
                         onClick={() => onValueChange?.(value.filter((item) => item !== tag))}

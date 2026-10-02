@@ -3,13 +3,6 @@ import { DotsThree } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import type { BoardOptions } from '@/components/crm/board-options-sheet';
-import { Button } from '@/evo/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/evo/ui/dropdown-menu';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { DealCard } from '@/evo/crm/pipeline/DealCard';
 import { LostReasonDialog } from '@/evo/crm/pipeline/LostReasonDialog';
@@ -18,6 +11,13 @@ import type {
     LostReasonPending,
     PipelineColumnData,
 } from '@/evo/crm/pipeline/types';
+import { Button } from '@/evo/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/evo/ui/dropdown-menu';
 import type { DealAttention } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
@@ -126,7 +126,9 @@ function BoardDealCard({
                 association,
                 owner: compact ? null : (deal.owner_name ?? t('Unassigned')),
                 href: deal.url,
-                attention: deal.attention?.primary?.label ?? null,
+                attention: deal.attention?.primary?.label
+                    ? t(deal.attention.primary.label)
+                    : null,
                 attentionType: deal.attention?.primary?.type ?? '',
                 attentionSeverity: deal.attention?.primary?.severity ?? null,
                 nextActivity: nextLabel,
@@ -134,7 +136,7 @@ function BoardDealCard({
                     quoteCount > 0
                         ? quoteCount === 1
                             ? t('1 quote')
-                            : `${quoteCount} quotes`
+                            : t(':count quotes', { count: quoteCount })
                         : null,
                 inactive: inactiveLabel,
                 closeDate: deal.close_date

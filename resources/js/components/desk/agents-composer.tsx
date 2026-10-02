@@ -263,7 +263,7 @@ export function AgentsComposer({
 
             {panel ? (
                 <div
-                    className="absolute right-0 bottom-[calc(100%+8px)] left-0 z-30 max-h-[300px] overflow-hidden rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface text-evo-ink shadow-evo-modal"
+                    className="absolute end-0 bottom-[calc(100%+8px)] start-0 z-30 max-h-[300px] overflow-hidden rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface text-evo-ink shadow-evo-modal"
                     data-agents-composer-panel={panel}
                 >
                     {panel === 'attach' ? (
@@ -356,7 +356,7 @@ function RecordSearchPanel({
             </p>
             <label className="relative mt-3 block">
                 <MagnifyingGlass
-                    className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-evo-ink-muted"
+                    className="pointer-events-none absolute top-1/2 start-2.5 size-4 -translate-y-1/2 text-evo-ink-muted"
                     weight="regular"
                     aria-hidden
                 />
@@ -378,7 +378,7 @@ function RecordSearchPanel({
                     placeholder="Rechercher dans le CRM…"
                     aria-label="Rechercher dans le CRM"
                     className={cn(
-                        'h-9 w-full rounded-[var(--evo-radius-compact)] border border-evo-hairline bg-evo-canvas pr-3 pl-9 text-[12px] outline-none placeholder:text-evo-ink-faint focus:border-evo-teal',
+                        'h-9 w-full rounded-[var(--evo-radius-compact)] border border-evo-hairline bg-evo-canvas pe-3 ps-9 text-[12px] outline-none placeholder:text-evo-ink-faint focus:border-evo-teal',
                         evoFocus,
                     )}
                 />
@@ -413,7 +413,7 @@ function RecordSearchPanel({
                                     role="option"
                                     aria-selected={false}
                                     className={cn(
-                                        'flex min-h-9 w-full items-center justify-between gap-3 rounded-[var(--evo-radius-compact)] px-2 text-left text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                        'flex min-h-9 w-full items-center justify-between gap-3 rounded-[var(--evo-radius-compact)] px-2 text-start text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
                                         evoFocus,
                                     )}
                                     onClick={() => onSelect(hit)}
@@ -483,7 +483,7 @@ function TemplatesPanel({
                         <button
                             type="button"
                             className={cn(
-                                'flex min-h-9 w-full items-center gap-2 rounded-[var(--evo-radius-compact)] px-2 text-left text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                'flex min-h-9 w-full items-center gap-2 rounded-[var(--evo-radius-compact)] px-2 text-start text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
                                 evoFocus,
                             )}
                             onClick={() => onSelect(prompt)}

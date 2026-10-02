@@ -97,7 +97,7 @@ export function BotPicker({
 
             {open ? (
                 <div
-                    className="absolute bottom-[calc(100%+8px)] left-0 z-40 flex max-h-[340px] w-[260px] flex-col overflow-hidden rounded-lg border border-black/10 bg-white text-[var(--evo-ink)] shadow-[0_14px_32px_rgba(13,27,36,0.14)]"
+                    className="absolute bottom-[calc(100%+8px)] start-0 z-40 flex max-h-[340px] w-[260px] flex-col overflow-hidden rounded-lg border border-black/10 bg-white text-[var(--evo-ink)] shadow-[0_14px_32px_rgba(13,27,36,0.14)]"
                     data-bot-picker-panel
                 >
                     <div className="flex shrink-0 items-center justify-between border-b border-black/8 px-3 py-2.5">
@@ -270,7 +270,7 @@ function BotOption({
             role="option"
             aria-selected={selected}
             className={cn(
-                'flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-[12px] transition-colors hover:bg-[var(--evo-canvas)]',
+                'flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-start text-[12px] transition-colors hover:bg-[var(--evo-canvas)]',
                 selected && 'bg-[var(--evo-teal)]/[0.06]',
                 focusRing,
             )}

@@ -1,15 +1,15 @@
-Hi {{ $guestName }},
+{{ __('Hi :name,', ['name' => $guestName]) }}
 
-{{ $hostName }} confirmed your meeting.
+{{ __(':host confirmed your meeting.', ['host' => $hostName]) }}
 
 {{ $whenLabel }}
-Timezone: {{ $timezone }}
+{{ __('Timezone: :tz', ['tz' => $timezone]) }}
 @if ($locationNote)
 {{ $locationNote }}
 @endif
 
 @if ($note)
-Your note: {{ $note }}
+{{ __('Your note: :note', ['note' => $note]) }}
 @endif
 
 — EvoSales · Evotechly

@@ -139,19 +139,18 @@ export type NewBotInput = {
 };
 
 export const BOT_GROUP_LABEL: Record<BotGroup, string> = {
-    sales: 'Vente',
-    internal: 'Interne',
+    sales: 'Sales bots',
+    internal: 'Internal bots',
     evopulse: 'EvoPulse',
-    custom: 'Bot personnalisé',
+    custom: 'Custom bot',
 };
 
 export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'desk',
         name: 'Desk router',
-        job: 'oriente la demande vers le bon bureau',
-        description:
-            'Une porte d’entrée discrète pour le travail qui demande un spécialiste.',
+        job: 'Routes incoming work to the right desk.',
+        description: 'A quiet front door for work that needs a specialist.',
         group: 'internal',
         avatarTone: 'ink',
         avatarType: 'droid',
@@ -159,9 +158,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'closer',
         name: 'Closer',
-        job: 'transforme les opportunités actives en prochaines actions',
-        description:
-            'Maintient le rythme sur les conversations et affaires qualifiées.',
+        job: 'Turns active opportunities into next actions.',
+        description: 'Keeps pace on qualified conversations and deals.',
         group: 'sales',
         avatarTone: 'orange',
         avatarType: 'hexagon',
@@ -169,8 +167,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'qualifier',
         name: 'Qualifier',
-        job: 'qualifie les leads avec le contexte utile',
-        description: 'Sépare l’intention d’achat réelle du bruit.',
+        job: 'Qualifies leads with useful context.',
+        description: 'Separates real buying intent from noise.',
         group: 'sales',
         avatarTone: 'teal',
         avatarType: 'drop',
@@ -178,9 +176,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'quote-desk',
         name: 'Quote desk',
-        job: 'transforme les besoins en un chemin de devis clair',
-        description:
-            'Aide à préparer le prochain devis sans inventer de montants.',
+        job: 'Turns needs into a clear quote path.',
+        description: 'Helps prepare the next quote without inventing amounts.',
         group: 'sales',
         avatarTone: 'ink',
         avatarType: 'square',
@@ -188,9 +185,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'after-sale',
         name: 'After-sale',
-        job: 'fait avancer les clients après la passation',
-        description:
-            'Fait remonter les suivis, rendez-vous et signaux de renouvellement.',
+        job: 'Moves customers forward after handover.',
+        description: 'Surfaces follow-ups, meetings, and renewal signals.',
         group: 'sales',
         avatarTone: 'teal',
         avatarType: 'flower',
@@ -198,9 +194,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'evopulse-shell-ia',
         name: 'EvoPulse · Shell IA',
-        job: 'cartographie l’architecture d’information de l’espace de travail',
-        description:
-            'Intelligence produit interne pour la navigation et la structure.',
+        job: 'Maps the workspace information architecture.',
+        description: 'Internal product intelligence for navigation and structure.',
         group: 'evopulse',
         avatarTone: 'night',
         avatarType: 'mech',
@@ -208,9 +203,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'evopulse-pulse-ui',
         name: 'EvoPulse · Pulse UI',
-        job: 'transforme les signaux en une surface d’opération ciblée',
-        description:
-            'Intelligence produit interne pour des interfaces calmes et utiles.',
+        job: 'Turns signals into a focused operating surface.',
+        description: 'Internal product intelligence for calm, useful interfaces.',
         group: 'evopulse',
         avatarTone: 'teal',
         avatarType: 'cloud',
@@ -218,8 +212,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'evopulse-command-ui',
         name: 'EvoPulse · Command UI',
-        job: 'conçoit des flux de commande rapides et ancrés',
-        description: 'Intelligence produit interne pour la vitesse et la clarté.',
+        job: 'Designs fast, grounded command flows.',
+        description: 'Internal product intelligence for speed and clarity.',
         group: 'evopulse',
         avatarTone: 'orange',
         avatarType: 'star',
@@ -227,9 +221,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'night-shift',
         name: 'Night shift',
-        job: 'veille discrètement sur le travail de nuit',
-        description:
-            'Intelligence produit interne pour une surveillance à faible bruit.',
+        job: 'Watches night work quietly.',
+        description: 'Internal product intelligence for low-noise monitoring.',
         group: 'evopulse',
         avatarTone: 'ink',
         avatarType: 'ghost',

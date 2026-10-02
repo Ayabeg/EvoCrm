@@ -37,7 +37,7 @@ export function RecordPageFrame({
             {header ? (
                 <div className="relative shrink-0 border-b border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-2.5 sm:px-6">
                     <span
-                        className="absolute inset-y-0 left-0 w-[3px] bg-[var(--evo-teal)]"
+                        className="absolute inset-y-0 start-0 w-[3px] bg-[var(--evo-teal)]"
                         aria-hidden
                     />
                     {header}

@@ -1,5 +1,6 @@
 import { formatReportValue } from '@/evo/reports/format';
 import type { ReportTable } from '@/evo/reports/types';
+import { t } from '@/lib/i18n';
 
 export function BackingTable({ table }: { table: ReportTable }) {
     if (table.rows.length === 0) {
@@ -9,14 +10,14 @@ export function BackingTable({ table }: { table: ReportTable }) {
     return (
         <div className="overflow-x-auto border-t border-[var(--evo-hairline)]">
             <table className="w-full">
-                <thead className="bg-[var(--evo-surface-subtle)] text-left text-[11px] text-[var(--evo-ink-muted)]">
+                <thead className="bg-[var(--evo-surface-subtle)] text-start text-[11px] text-[var(--evo-ink-muted)]">
                     <tr>
                         {table.columns.map((column) => (
                             <th
                                 key={column.key}
-                                className={`px-4 py-2.5 font-medium ${column.align === 'right' ? 'text-right' : ''}`}
+                                className={`px-4 py-2.5 font-medium ${column.align === 'right' ? 'text-end' : ''}`}
                             >
-                                {column.label}
+                                {t(column.label)}
                             </th>
                         ))}
                     </tr>
@@ -31,7 +32,7 @@ export function BackingTable({ table }: { table: ReportTable }) {
                                 return (
                                     <td
                                         key={column?.key ?? j}
-                                        className={`px-4 py-2.5 text-[13px] ${right ? 'text-right tabular-nums' : ''} ${cell === null || cell === 0 ? 'text-[var(--evo-ink-muted)]' : 'text-[var(--evo-ink)]'}`}
+                                        className={`px-4 py-2.5 text-[13px] ${right ? 'text-end tabular-nums' : ''} ${cell === null || cell === 0 ? 'text-[var(--evo-ink-muted)]' : 'text-[var(--evo-ink)]'}`}
                                     >
                                         {typeof cell === 'number'
                                             ? formatReportValue(

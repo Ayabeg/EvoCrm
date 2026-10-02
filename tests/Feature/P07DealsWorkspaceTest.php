@@ -238,7 +238,7 @@ it('does not migrate Quotes Pipeline board or invent QuickRecordDrawer attention
         ->and($board)->not->toContain('WorkspaceBoard')
         ->and($board)->not->toContain('BoardDealDrawer');
 
-    expect($kanban)->toContain('Weighted:');
+    expect($kanban)->toContain("t('Weighted')");
 
     $pipelineBoard = file_get_contents(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
     expect($pipelineBoard)->toContain('/crm/deals/${dealId}/move');

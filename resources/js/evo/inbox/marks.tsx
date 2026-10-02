@@ -54,8 +54,8 @@ export function InboxStatusBanner({
     const host = configuredUrl ? safeHost(configuredUrl) : 'Desk';
     const title =
         embedState === 'blocked'
-            ? `${host} is not framed here`
-            : `${host} could not be reached`;
+            ? t(':host is not framed here', { host })
+            : t(':host could not be reached', { host });
 
     return (
         <div
@@ -65,7 +65,7 @@ export function InboxStatusBanner({
         >
             <p>
                 <span className="font-medium text-[var(--evo-ink)]">{title}.</span>{' '}
-                {embedReason ?? t('Showing the CRM inbox. Desk stays on this host.')}
+                {embedReason ? t(embedReason) : t('Showing the CRM inbox. Desk stays on this host.')}
             </p>
         </div>
     );
@@ -100,7 +100,7 @@ export function InboxEmbedSkeleton() {
             <div className="bg-[var(--evo-surface)] p-4">
                 <Skeleton className="mb-4 h-4 w-40" />
                 <Skeleton className="h-16 w-3/5" />
-                <Skeleton className="mt-3 ml-auto h-12 w-2/5" />
+                <Skeleton className="mt-3 ms-auto h-12 w-2/5" />
             </div>
         </div>
     );

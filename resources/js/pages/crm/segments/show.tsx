@@ -62,7 +62,7 @@ export default function SegmentShow({
                                 aria-label={t('Membership history')}
                             >
                                 <thead>
-                                    <tr className="border-b border-hairline bg-canvas-soft text-left">
+                                    <tr className="border-b border-hairline bg-canvas-soft text-start">
                                         <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:px-6">
                                             {t('Contact')}
                                         </th>
@@ -72,7 +72,7 @@ export default function SegmentShow({
                                         <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
                                             {t('Exited')}
                                         </th>
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pr-6">
+                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pe-6">
                                             {t('Status')}
                                         </th>
                                     </tr>
@@ -106,7 +106,7 @@ export default function SegmentShow({
                                             <td className="px-4 py-1.5 text-mute">
                                                 {row.exited_at ?? '—'}
                                             </td>
-                                            <td className="px-4 py-1.5 capitalize text-mute sm:pr-6">
+                                            <td className="px-4 py-1.5 capitalize text-mute sm:pe-6">
                                                 {t(row.status)}
                                             </td>
                                         </tr>

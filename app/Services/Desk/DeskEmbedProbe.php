@@ -37,7 +37,7 @@ class DeskEmbedProbe
         } catch (\Throwable) {
             return [
                 'state' => 'unreachable',
-                'reason' => 'The desk URL could not be reached from this server. Showing the native CRM desk.',
+                'reason' => __('The desk URL could not be reached from this server. Showing the native CRM desk.'),
             ];
         }
 
@@ -49,8 +49,9 @@ class DeskEmbedProbe
             if (str_contains($xfo, 'deny') || (str_contains($xfo, 'sameorigin') && ! $sameHost)) {
                 return [
                     'state' => 'blocked',
-                    'reason' => 'EvoDesk sends X-Frame-Options: '.$response->header('X-Frame-Options')
-                        .'. Allow-frame this CRM origin on the desk (or clear the desk URL). Showing the native CRM desk.',
+                    'reason' => __('EvoDesk sends X-Frame-Options: :header. Allow-frame this CRM origin on the desk (or clear the desk URL). Showing the native CRM desk.', [
+                        'header' => $response->header('X-Frame-Options'),
+                    ]),
                 ];
             }
         }
@@ -67,7 +68,7 @@ class DeskEmbedProbe
             if (! $allowed || str_contains($ancestors, "'none'")) {
                 return [
                     'state' => 'blocked',
-                    'reason' => 'EvoDesk CSP frame-ancestors does not include this CRM origin. Allow-frame it on the desk. Showing the native CRM desk.',
+                    'reason' => __('EvoDesk CSP frame-ancestors does not include this CRM origin. Allow-frame it on the desk. Showing the native CRM desk.'),
                 ];
             }
         }

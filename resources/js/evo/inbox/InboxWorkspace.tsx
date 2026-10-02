@@ -84,7 +84,7 @@ export function InboxWorkspace({
             data-evo="inbox-workspace"
         >
             {queues && onQueueChange ? (
-                <aside className="hidden w-[13.75rem] shrink-0 border-r border-[var(--evo-hairline)] bg-[var(--evo-surface)] lg:block">
+                <aside className="hidden w-[13.75rem] shrink-0 border-e border-[var(--evo-hairline)] bg-[var(--evo-surface)] lg:block">
                     <QueueNavigation
                         queues={queues}
                         activeKey={queueKey}
@@ -103,7 +103,7 @@ export function InboxWorkspace({
                 </div>
             ) : (
             <>
-            <div className="flex min-h-0 min-w-[17.5rem] w-[21.25rem] shrink-0 flex-col border-r border-[var(--evo-hairline)]">
+            <div className="flex min-h-0 min-w-[17.5rem] w-[21.25rem] shrink-0 flex-col border-e border-[var(--evo-hairline)]">
                 {onChannelChange && !onQueryChange ? (
                     <div className="border-b border-[var(--evo-hairline)] px-3 py-2">
                         <ChannelFilter value={channel} onChange={onChannelChange} />

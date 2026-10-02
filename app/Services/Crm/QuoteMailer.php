@@ -8,6 +8,8 @@ use App\Models\Quote;
 use App\Models\User;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Operations\AuditLogger;
+use App\Support\Locale;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -33,17 +35,25 @@ class QuoteMailer
         $html = (string) $quote->snapshot_html;
         $pdf = $this->documents->pdf($quote);
 
-        Mail::to($to)->send(new WorkspaceHtmlMail(
-            subjectLine: 'Quote #'.$quote->id.' from EvoSales',
-            htmlBody: $html,
-            fromAddress: $mailbox?->from_address,
-            fromName: $mailbox?->from_name,
-            fileAttachments: [[
-                'name' => 'quote-'.$quote->id.'.pdf',
-                'data' => $pdf,
-                'mime' => 'application/pdf',
-            ]],
-        ));
+        $locale = Locale::resolve($actor);
+        $previous = App::getLocale();
+        App::setLocale($locale);
+
+        try {
+            Mail::to($to)->send((new WorkspaceHtmlMail(
+                subjectLine: __('Quote #:id from EvoSales', ['id' => $quote->id]),
+                htmlBody: $html,
+                fromAddress: $mailbox?->from_address,
+                fromName: $mailbox?->from_name,
+                fileAttachments: [[
+                    'name' => 'quote-'.$quote->id.'.pdf',
+                    'data' => $pdf,
+                    'mime' => 'application/pdf',
+                ]],
+            ))->locale($locale));
+        } finally {
+            App::setLocale($previous);
+        }
 
         if (blank($quote->public_token)) {
             $quote->forceFill([

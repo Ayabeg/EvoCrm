@@ -3,10 +3,10 @@ import { toast } from 'sonner';
 import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import TicketLayoutToggle from '@/components/crm/ticket-layout-toggle';
-import { Button } from '@/evo/ui/button';
 import { Pipeline } from '@/evo/crm/pipeline/Pipeline';
 import { TicketCard } from '@/evo/crm/pipeline/TicketCard';
 import type { PipelineColumnData } from '@/evo/crm/pipeline/types';
+import { Button } from '@/evo/ui/button';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import { stageUnderlineColor } from '@/lib/stage-colors';
@@ -131,7 +131,7 @@ export default function TicketBoard({
                                             : 'bg-canvas text-mute hover:text-ink',
                                     )}
                                 >
-                                    All open
+                                    {t('All open')}
                                 </Link>
                                 <Link
                                     href="/crm/tickets/board?view=my"
@@ -145,7 +145,7 @@ export default function TicketBoard({
                                             : 'bg-canvas text-mute hover:text-ink',
                                     )}
                                 >
-                                    Assigned to me
+                                    {t('Assigned to me')}
                                 </Link>
                             </div>
                             <TicketLayoutToggle current="board" />

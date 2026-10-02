@@ -288,7 +288,7 @@ export default function AttributeSettings({
                                                 <HairlineTd className="font-medium">
                                                     {definition.label}
                                                     {definition.required ? (
-                                                        <Badge className="ml-2 border-transparent bg-brand/10 text-brand">
+                                                        <Badge className="ms-2 border-transparent bg-brand/10 text-brand">
                                                             required
                                                         </Badge>
                                                     ) : null}

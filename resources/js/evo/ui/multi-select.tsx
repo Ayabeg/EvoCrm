@@ -68,7 +68,7 @@ function MultiSelect({
                                         role="button"
                                         tabIndex={0}
                                         aria-label={`${sr.remove} ${option.label}`}
-                                        className="ml-0.5"
+                                        className="ms-0.5"
                                         onClick={(event) => {
                                             event.preventDefault();
                                             event.stopPropagation();

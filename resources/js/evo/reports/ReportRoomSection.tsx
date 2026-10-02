@@ -2,17 +2,18 @@ import { BackingTable } from '@/evo/reports/BackingTable';
 import { ChartFromPayload } from '@/evo/reports/ChartFromPayload';
 import { ReportKpiRow } from '@/evo/reports/ReportKpiRow';
 import type { ReportCategory } from '@/evo/reports/types';
+import { t } from '@/lib/i18n';
 
 export function ReportRoomSection({ category }: { category: ReportCategory }) {
     return (
-        <section aria-label={category.title} className="mt-6 first:mt-0">
+        <section aria-label={t(category.title)} className="mt-6 first:mt-0">
             <div className="mb-3">
                 <h2 className="text-[15px] font-semibold tracking-tight text-[var(--evo-ink)]">
-                    {category.title}
+                    {t(category.title)}
                 </h2>
                 {category.description ? (
                     <p className="mt-1 text-[12px] leading-5 text-[var(--evo-ink-muted)]">
-                        {category.description}
+                        {t(category.description)}
                     </p>
                 ) : null}
             </div>

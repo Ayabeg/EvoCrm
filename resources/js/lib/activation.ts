@@ -32,7 +32,7 @@ export type ActivationState = {
 };
 
 export function activationProgressLabel(progress: ActivationProgress): string {
-    return `${progress.completed} of ${progress.total}`;
+    return `${progress.completed} / ${progress.total}`;
 }
 
 export function activationProgressValue(progress: ActivationProgress): number {

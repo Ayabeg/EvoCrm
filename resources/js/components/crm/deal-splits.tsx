@@ -2,6 +2,7 @@ import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 import { RecordDisclose } from '@/components/crm/record-hub';
 import { Button } from '@/evo/ui/button';
+import { t } from '@/lib/i18n';
 
 type Member = { id: number; name: string };
 type Split = { user_id: number; percent: number; user?: { name: string } | null };
@@ -29,20 +30,20 @@ export default function DealSplits({
 
     return (
         <section className="text-sm">
-            <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">Deal splits</h3>
+            <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">{t('Deal splits')}</h3>
             {splits.length > 0 ? (
                 <ul className="mb-2 space-y-1 text-[12px]">
                     {splits.map((split) => (
                         <li key={split.user_id}>
-                            {split.user?.name ?? `User ${split.user_id}`} · {split.percent}%
+                            {split.user?.name ?? t('User :id', { id: split.user_id })} · {split.percent}%
                         </li>
                     ))}
                 </ul>
             ) : (
-                <p className="mb-2 text-[12px] text-mute">No split yet. Totals must equal 100%.</p>
+                <p className="mb-2 text-[12px] text-mute">{t('No split yet. Totals must equal 100%.')}</p>
             )}
             {canManage ? (
-                <RecordDisclose label={splits.length > 0 ? 'Edit splits' : 'Add split'}>
+                <RecordDisclose label={splits.length > 0 ? t('Edit splits') : t('Add split')}>
                 <Form action={`/crm/deals/${dealId}/splits`} method="put" className="space-y-2">
                     {rows.map((row, index) => (
                         <div key={index} className="grid grid-cols-[1fr_80px_auto] gap-1">
@@ -81,7 +82,7 @@ export default function DealSplits({
                                 className="h-7 px-2 text-[11px]"
                                 onClick={() => setRows(rows.filter((_, rowIndex) => rowIndex !== index))}
                             >
-                                Remove
+                                {t('Remove')}
                             </Button>
                         </div>
                     ))}
@@ -94,9 +95,9 @@ export default function DealSplits({
                                 setRows([...rows, { user_id: members[0] ? String(members[0].id) : '', percent: '0' }])
                             }
                         >
-                            Add teammate
+                            {t('Add teammate')}
                         </Button>
-                        <Button variant="outline" className="h-7 text-[11px]">Save splits</Button>
+                        <Button variant="outline" className="h-7 text-[11px]">{t('Save splits')}</Button>
                     </div>
                 </Form>
                 </RecordDisclose>

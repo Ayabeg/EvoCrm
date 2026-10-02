@@ -70,7 +70,7 @@ function StateBadge({ state }: { state: CommandHealth['state'] }) {
                     : 'secondary'
             }
         >
-            <Icon aria-hidden="true" className="mr-1 size-3" />
+            <Icon aria-hidden="true" className="me-1 size-3" />
             {stateLabels[state]}
         </Badge>
     );
@@ -110,7 +110,7 @@ export default function SystemHealthSettings({
                     </div>
 
                     <Card className="overflow-x-auto border-hairline p-0 shadow-none">
-                        <table className="w-full min-w-[760px] text-left text-[13px]">
+                        <table className="w-full min-w-[760px] text-start text-[13px]">
                             <thead className="bg-canvas-soft text-xs text-muted-foreground">
                                 <tr>
                                     <th className="px-4 py-3 font-medium">

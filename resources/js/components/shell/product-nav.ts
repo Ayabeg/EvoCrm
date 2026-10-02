@@ -52,7 +52,7 @@ export const NAV_SECTIONS: NavSection[] = [
         items: [
             {
                 id: 'home',
-                label: 'Accueil',
+                label: 'Home',
                 href: '/dashboard',
                 icon: House,
                 also: ['/'],
@@ -68,7 +68,7 @@ export const NAV_SECTIONS: NavSection[] = [
     },
     {
         id: 'sell',
-        label: 'Vendre',
+        label: 'Sales',
         items: [
             {
                 id: 'contacts',
@@ -78,26 +78,26 @@ export const NAV_SECTIONS: NavSection[] = [
             },
             {
                 id: 'companies',
-                label: 'Sociétés',
+                label: 'Companies',
                 href: '/crm/companies',
                 icon: Buildings,
             },
             { id: 'leads', label: 'Leads', href: '/crm/leads', icon: UserList },
             {
                 id: 'deals',
-                label: 'Affaires',
+                label: 'Deals',
                 href: '/crm/deals',
                 icon: Handshake,
             },
             {
                 id: 'quotes',
-                label: 'Devis',
+                label: 'Quotes',
                 href: '/crm/quotes',
                 icon: FileText,
             },
             {
                 id: 'activities',
-                label: 'Activités',
+                label: 'Activities',
                 href: '/crm/activities',
                 icon: CheckSquare,
             },
@@ -105,7 +105,7 @@ export const NAV_SECTIONS: NavSection[] = [
     },
     {
         id: 'prospect',
-        label: 'Prospecter',
+        label: 'Prospect',
         items: [
             {
                 id: 'outbound',
@@ -115,33 +115,33 @@ export const NAV_SECTIONS: NavSection[] = [
                 children: [
                     {
                         id: 'outbound-home',
-                        label: "Vue d'ensemble",
+                        label: 'Overview',
                         href: '/outbound',
                         exact: true,
                     },
                     {
                         id: 'outbound-campaigns',
-                        label: 'Campagnes',
+                        label: 'Campaigns',
                         href: '/outbound/campaigns',
                     },
                     {
                         id: 'outbound-sequences',
-                        label: 'Séquences',
+                        label: 'Sequences',
                         href: '/outbound/sequences',
                     },
                     {
                         id: 'outbound-mailboxes',
-                        label: 'Boîtes mail',
+                        label: 'Mailboxes',
                         href: '/outbound/mailboxes',
                     },
                     {
                         id: 'outbound-domains',
-                        label: 'Domaines',
+                        label: 'Domains',
                         href: '/outbound/domains',
                     },
                     {
                         id: 'outbound-templates',
-                        label: 'Modèles',
+                        label: 'Templates',
                         href: '/outbound/templates',
                     },
                     {
@@ -162,35 +162,35 @@ export const NAV_SECTIONS: NavSection[] = [
                     },
                     {
                         id: 'outbound-reports',
-                        label: 'Rapports',
+                        label: 'Reports',
                         href: '/reports/outbound',
                     },
                 ],
             },
             {
                 id: 'ads',
-                label: 'Pubs',
+                label: 'Ads',
                 href: '/ads',
                 icon: Megaphone,
                 feature: 'ads',
                 children: [
                     {
                         id: 'ads-home',
-                        label: "Vue d'ensemble",
+                        label: 'Overview',
                         href: '/ads',
                         exact: true,
                     },
                     {
                         id: 'ads-campaigns',
-                        label: 'Campagnes',
+                        label: 'Campaigns',
                         href: '/ads/campaigns',
                     },
                     {
                         id: 'ads-sets',
-                        label: 'Ensembles',
+                        label: 'Ad sets',
                         href: '/ads/ad-sets',
                     },
-                    { id: 'ads-ads', label: 'Publicités', href: '/ads/ads' },
+                    { id: 'ads-ads', label: 'Advertisements', href: '/ads/ads' },
                     {
                         id: 'ads-audiences',
                         label: 'Audiences',
@@ -207,7 +207,7 @@ export const NAV_SECTIONS: NavSection[] = [
     },
     {
         id: 'serve',
-        label: 'Servir',
+        label: 'Serve',
         items: [
             {
                 id: 'tickets',
@@ -220,17 +220,17 @@ export const NAV_SECTIONS: NavSection[] = [
     },
     {
         id: 'analyze',
-        label: 'Analyser',
+        label: 'Analyze',
         items: [
             {
                 id: 'reports',
-                label: 'Rapports',
+                label: 'Reports',
                 href: '/reports',
                 icon: ChartBar,
                 children: [
                     {
                         id: 'reports-home',
-                        label: "Vue d'ensemble",
+                        label: 'Overview',
                         href: '/reports',
                         exact: true,
                     },
@@ -249,7 +249,7 @@ export const NAV_SECTIONS: NavSection[] = [
                         label: 'Outbound',
                         href: '/reports/outbound',
                     },
-                    { id: 'reports-ads', label: 'Pubs', href: '/reports/ads' },
+                    { id: 'reports-ads', label: 'Ads', href: '/reports/ads' },
                     {
                         id: 'reports-builder',
                         label: 'Report Builder',
@@ -262,7 +262,7 @@ export const NAV_SECTIONS: NavSection[] = [
     },
     {
         id: 'automate',
-        label: 'Automatiser',
+        label: 'Automate',
         items: [
             {
                 id: 'segments',
@@ -283,7 +283,7 @@ export const NAV_SECTIONS: NavSection[] = [
 
 export const SETTINGS_NAV: NavItem = {
     id: 'settings',
-    label: 'Paramètres',
+    label: 'Settings',
     href: '/settings',
     icon: GearSix,
 };

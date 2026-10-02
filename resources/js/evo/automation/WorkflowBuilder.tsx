@@ -91,7 +91,7 @@ function Section({
                 {last ? null : (
                     <span
                         aria-hidden
-                        className="hidden h-full min-h-8 w-px bg-[var(--evo-hairline)] md:absolute md:top-7 md:bottom-[-1.25rem] md:left-[0.55rem] md:block"
+                        className="hidden h-full min-h-8 w-px bg-[var(--evo-hairline)] md:absolute md:top-7 md:bottom-[-1.25rem] md:start-[0.55rem] md:block"
                     />
                 )}
             </div>

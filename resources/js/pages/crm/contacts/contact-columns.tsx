@@ -98,7 +98,7 @@ export function ContactIdentityCell({
                 {initials || '?'}
             </span>
             <span className="min-w-0">
-                <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" title={name}>
+                <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" dir="auto" title={name}>
                     {name}
                 </span>
                 {secondary ? <span className="sr-only">{secondary}</span> : null}

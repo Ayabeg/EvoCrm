@@ -64,7 +64,7 @@ export function RichTextEditor({
         content: value || '',
         editorProps: {
             attributes: {
-                class: 'min-h-40 px-3 py-2 text-[13px] text-[var(--evo-ink)] outline-none [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5',
+                class: 'min-h-40 px-3 py-2 text-[13px] text-[var(--evo-ink)] outline-none [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ps-5 [&_ol]:list-decimal [&_ol]:ps-5',
                 'aria-label': t('Rich text editor'),
                 id: id ?? 'rich-text-editor',
             },

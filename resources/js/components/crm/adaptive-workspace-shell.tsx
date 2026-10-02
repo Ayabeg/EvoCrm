@@ -127,7 +127,7 @@ export function AdaptiveWorkspaceShell({
     const rightScroll = scrollPanels.right ?? true;
 
     const leftRegion = cn(
-        'border-hairline bg-canvas px-4 py-3 md:border-r md:px-4 md:py-4',
+        'border-hairline bg-canvas px-4 py-3 md:border-e md:px-4 md:py-4',
         leftClassName,
     );
     const centerRegion = cn(
@@ -135,7 +135,7 @@ export function AdaptiveWorkspaceShell({
         centerClassName,
     );
     const rightRegion = cn(
-        'border-hairline bg-canvas px-4 py-3 md:border-l md:px-4 md:py-4',
+        'border-hairline bg-canvas px-4 py-3 md:border-s md:px-4 md:py-4',
         rightClassName,
     );
 

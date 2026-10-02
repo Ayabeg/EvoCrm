@@ -20,10 +20,10 @@ import type {
     InboxFolder,
 } from '@/components/crm/inbox-chrome';
 import { DeskGlass } from '@/components/desk/desk-glass';
-import { Button } from '@/evo/ui/button';
-import { EmptyState } from '@/evo/patterns/empty-state';
 import { ConversationList } from '@/evo/inbox';
 import { deskThreadToConversation } from '@/evo/inbox/adapters';
+import { EmptyState } from '@/evo/patterns/empty-state';
+import { Button } from '@/evo/ui/button';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
 import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
@@ -213,12 +213,12 @@ function DeskEmbedWorkspace({
                     >
                         <div className="max-w-sm text-center">
                             <p className="text-[13px] font-medium text-ink">
-                                Desk could not be framed
+                                {t('Desk could not be framed')}
                             </p>
                             <p className="mt-1 text-[12px] leading-5 text-mute">
-                                The embed stayed on this host. Continue in the
-                                CRM inbox, or ask ops to allow this origin on
-                                the desk frame-ancestors list.
+                                {t(
+                                    'The embed stayed on this host. Continue in the CRM inbox, or ask ops to allow this origin on the desk frame-ancestors list.',
+                                )}
                             </p>
                             <Button
                                 type="button"
@@ -598,7 +598,7 @@ function FrontDesk({
                                     />
                                 </div>
                                 {contextOverlay ? (
-                                    <div className="absolute inset-y-0 right-0 z-20 w-[17.5rem] border-l border-hairline bg-white xl:hidden">
+                                    <div className="absolute inset-y-0 end-0 z-20 w-[17.5rem] border-s border-hairline bg-white xl:hidden">
                                         <InboxContactSidebar
                                             contact={selected.contact}
                                             context={liveContext}
@@ -630,7 +630,7 @@ function FrontDesk({
                             >
                                 <div className="max-w-xs text-center">
                                     <p className="text-[13px] font-medium text-ink">
-                                        Opening conversation
+                                        {t('Opening conversation')}
                                     </p>
                                 </div>
                             </div>

@@ -212,7 +212,7 @@ export default function People({
                                     <HairlineTd className="font-medium">
                                         {person.name}
                                         {person.is_self ? (
-                                            <span className="aurora-text-caption ml-1 text-mute">
+                                            <span className="aurora-text-caption ms-1 text-mute">
                                                 ({t('you')})
                                             </span>
                                         ) : null}

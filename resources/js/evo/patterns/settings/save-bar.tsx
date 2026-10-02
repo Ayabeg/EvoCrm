@@ -40,8 +40,8 @@ export function SettingsSaveBar({
                         'flex items-center justify-end gap-2 border-t border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-2',
                     )}
                 >
-                    <p className="mr-auto text-[12px] text-[var(--evo-ink-muted)]">
-                        {isProcessing ? settingsCopy.saving : settingsCopy.dirty}
+                    <p className="me-auto text-[12px] text-[var(--evo-ink-muted)]">
+                        {isProcessing ? t(settingsCopy.saving) : t(settingsCopy.dirty)}
                     </p>
                     {showCancel ? (
                         <Button
@@ -66,7 +66,7 @@ export function SettingsSaveBar({
                     </Button>
                 </div>
             ) : (
-                <span className="sr-only">{settingsCopy.saved}</span>
+                <span className="sr-only">{t(settingsCopy.saved)}</span>
             )}
         </div>
     );

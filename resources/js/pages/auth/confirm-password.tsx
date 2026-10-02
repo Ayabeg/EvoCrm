@@ -1,25 +1,26 @@
 import { Form, Head } from '@inertiajs/react';
 import PasswordInput from '@/components/password-input';
-import { FieldError } from '@/evo/ui/field';
 import { Button } from '@/evo/ui/button';
+import { FieldError } from '@/evo/ui/field';
 import { Label } from '@/evo/ui/label';
 import { Spinner } from '@/evo/ui/spinner';
+import { t } from '@/lib/i18n';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
     return (
         <>
-            <Head title="Confirm password" />
+            <Head title={t('Confirm password')} />
 
             <Form {...store.form()} resetOnSuccess={['password']}>
                 {({ processing, errors }) => (
                     <div className="grid gap-5">
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{t('Password')}</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"
-                                placeholder="Password"
+                                placeholder={t('Password')}
                                 autoComplete="current-password"
                                 autoFocus
                             />
@@ -34,7 +35,7 @@ export default function ConfirmPassword() {
                             data-test="confirm-password-button"
                         >
                             {processing && <Spinner />}
-                            Confirm password
+                            {t('Confirm password')}
                         </Button>
                     </div>
                 )}

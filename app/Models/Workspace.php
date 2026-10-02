@@ -31,6 +31,7 @@ use Illuminate\Support\Carbon;
     'lead_score_settings',
     'monthly_quota_cents',
     'meeting_wa_templates',
+    'preferences',
 ])]
 class Workspace extends Model
 {
@@ -45,6 +46,7 @@ class Workspace extends Model
             'lead_score_settings' => 'array',
             'monthly_quota_cents' => 'integer',
             'meeting_wa_templates' => 'array',
+            'preferences' => 'array',
         ];
     }
 

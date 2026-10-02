@@ -77,7 +77,16 @@ export const SETTINGS_DESTINATIONS: SettingsDestination[] = [
         href: '/settings/appearance',
         group: 'Personal',
         scope: 'ME',
-        keywords: ['theme', 'light', 'display'],
+        keywords: [
+            'theme',
+            'light',
+            'display',
+            'preferences',
+            'language',
+            'langue',
+            'locale',
+            'العربية',
+        ],
     },
     {
         title: 'General',

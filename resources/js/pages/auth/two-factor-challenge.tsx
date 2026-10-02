@@ -1,15 +1,16 @@
 import { Form, Head, setLayoutProps } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
-import { FieldError } from '@/evo/ui/field';
-import { Button } from '@/evo/ui/button';
-import { Input } from '@/evo/ui/input';
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { Button } from '@/evo/ui/button';
+import { FieldError } from '@/evo/ui/field';
+import { Input } from '@/evo/ui/input';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
+import { t } from '@/lib/i18n';
 import { store } from '@/routes/two-factor/login';
 
 export default function TwoFactorChallenge() {
@@ -23,18 +24,20 @@ export default function TwoFactorChallenge() {
     }>(() => {
         if (showRecoveryInput) {
             return {
-                title: 'Recovery code',
-                description:
+                title: t('Recovery code'),
+                description: t(
                     'Please confirm access to your account by entering one of your emergency recovery codes.',
-                toggleText: 'login using an authentication code',
+                ),
+                toggleText: t('login using an authentication code'),
             };
         }
 
         return {
-            title: 'Authentication code',
-            description:
+            title: t('Authentication code'),
+            description: t(
                 'Enter the authentication code provided by your authenticator application.',
-            toggleText: 'login using a recovery code',
+            ),
+            toggleText: t('login using a recovery code'),
         };
     }, [showRecoveryInput]);
 
@@ -51,7 +54,7 @@ export default function TwoFactorChallenge() {
 
     return (
         <>
-            <Head title="Two-factor authentication" />
+            <Head title={t('Two-factor authentication')} />
 
             <div className="flex flex-col gap-6">
                 <Form
@@ -67,7 +70,7 @@ export default function TwoFactorChallenge() {
                                     <Input
                                         name="recovery_code"
                                         type="text"
-                                        placeholder="Enter recovery code"
+                                        placeholder={t('Enter recovery code')}
                                         autoFocus={showRecoveryInput}
                                         required
                                     />
@@ -113,11 +116,11 @@ export default function TwoFactorChallenge() {
                                 className="w-full"
                                 disabled={processing}
                             >
-                                Continue
+                                {t('Continue')}
                             </Button>
 
                             <p className="text-center text-sm text-mute">
-                                <span>or you can </span>
+                                <span>{t('or you can')} </span>
                                 <button
                                     type="button"
                                     className="cursor-pointer text-brand underline decoration-brand/30 underline-offset-4 transition-colors duration-[var(--motion-duration-medium)] hover:decoration-brand"

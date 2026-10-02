@@ -107,8 +107,9 @@ function AppCard({
                             data-settings="disconnected"
                             className="mt-2 text-[12px] text-mute"
                         >
-                            Disconnected. Connect to unlock this app on the
-                            workspace.
+                            {t(
+                                'Disconnected. Connect to unlock this app on the workspace.',
+                            )}
                         </p>
                     ) : null}
 
@@ -185,7 +186,7 @@ function AppCard({
                             )}
                         {app.connected && app.manage_url && (
                             <Button size="sm" variant="outline" asChild>
-                                <Link href={app.manage_url}>Manage</Link>
+                                <Link href={app.manage_url}>{t('Manage')}</Link>
                             </Button>
                         )}
                         {app.key === 'smtp' && app.webmail_url && (
@@ -196,7 +197,7 @@ function AppCard({
                                     rel="noreferrer"
                                 >
                                     <ArrowSquareOut className="size-3.5" />
-                                    Open webmail
+                                    {t('Open webmail')}
                                 </a>
                             </Button>
                         )}
@@ -234,8 +235,10 @@ export default function AppsMarketplace({
         <>
             <Head title={t('Apps')} />
             <SettingsPageHeader
-                title="Apps"
-                description="Product connections for this workspace. Status is Connected when a configuration exists — not a live health probe."
+                title={t('Apps')}
+                description={t(
+                    'Product connections for this workspace. Status is Connected when a configuration exists — not a live health probe.',
+                )}
             >
                 <Button
                     asChild
@@ -249,20 +252,24 @@ export default function AppsMarketplace({
             {apps.length === 0 ? (
                 <SettingsEmptyState
                     icon={<Plugs className="size-6" weight="regular" />}
-                    title="No apps on this workspace"
-                    description="Apps appear here once the workspace marketplace is provisioned."
+                    title={t('No apps on this workspace')}
+                    description={t(
+                        'Apps appear here once the workspace marketplace is provisioned.',
+                    )}
                 />
             ) : (
                 <div className="grid gap-3">
                     {connectedCount === 0 ? (
                         <SettingsEmptyState
                             icon={<Plugs className="size-6" weight="regular" />}
-                            title="Nothing connected yet"
-                            description="Connect Meta, WhatsApp, Google, or mail to start using this workspace."
+                            title={t('Nothing connected yet')}
+                            description={t(
+                                'Connect Meta, WhatsApp, Google, or mail to start using this workspace.',
+                            )}
                             action={
                                 <Button size="sm" asChild>
                                     <Link href="/settings/setup">
-                                        Open setup
+                                        {t('Open setup')}
                                     </Link>
                                 </Button>
                             }

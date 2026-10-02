@@ -63,7 +63,7 @@ type BarLayout = "vertical" | "horizontal";
  * chart. `"none"` opts out entirely; it is also what a device with the OS
  * "reduce motion" preference falls back to automatically.
  */
-type BarAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
+type BarAnimationType = "none" | "start-to-right" | "end-to-left" | "center-out" | "edges-in";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared context
@@ -156,7 +156,7 @@ export function EvilBarChart<
   stackType = "default",
   layout = "vertical",
   barRadius = DEFAULT_BAR_RADIUS,
-  animationType = "left-to-right",
+  animationType = "start-to-right",
   barGap,
   barCategoryGap,
   backgroundVariant,
@@ -724,7 +724,7 @@ const getBarGrowAnimation = (
   // How many bars this one waits behind before it starts growing
   let step: number;
   switch (animationType) {
-    case "right-to-left":
+    case "end-to-left":
       step = lastIndex - index;
       break;
     case "center-out":
@@ -733,7 +733,7 @@ const getBarGrowAnimation = (
     case "edges-in":
       step = center - Math.abs(index - center);
       break;
-    default: // left-to-right
+    default: // start-to-right
       step = index;
   }
 

@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { hydrateI18n } from '@/lib/i18n';
 import {
+    NUMBERING_SYSTEM,
     WEEK_STARTS_ON,
     WEEKEND_DAYS,
+    formatDate,
     formatDateTime,
     formatMoney,
     formatMoneyCompact,
     formatMoneyFromCents,
+    formatNumber,
     formatPhone,
     formatTime,
     normalizePhone,
@@ -52,6 +56,54 @@ describe('evo/lib/format', () => {
         };
 
         expect(locale.weekInfo?.firstDay ?? WEEK_STARTS_ON).toBe(6);
+    });
+
+    it('keeps Latin digits for Arabic UI locale', () => {
+        hydrateI18n('ar', {});
+
+        const money = formatMoney(1_280_000);
+        const date = formatDate(new Date('2026-10-02T16:30:00+01:00'));
+        const number = formatNumber(1280000);
+
+        expect(NUMBERING_SYSTEM).toBe('latn');
+        expect(money).toMatch(/1/);
+        expect(money).not.toMatch(/[٠-٩۰-۹]/);
+        expect(date).not.toMatch(/[٠-٩۰-۹]/);
+        expect(number).not.toMatch(/[٠-٩۰-۹]/);
+        expect(formatPhone('+213550188001')).toBe('+213 550 18 80 01');
+
+        hydrateI18n('en', {});
+    });
+
+    it('keeps +213 at the start of phones in every UI locale', () => {
+        for (const locale of ['fr', 'en', 'ar'] as const) {
+            hydrateI18n(locale, {});
+
+            expect(formatPhone('+213550100002')).toBe('+213 550 10 00 02');
+            expect(formatPhone('+213550100002').startsWith('+213')).toBe(true);
+            expect(formatPhone('+213550100002')).not.toMatch(/213550100002\+/);
+        }
+
+        hydrateI18n('en', {});
+    });
+
+    it('prints DA — never DZD — in fr, en, and ar', () => {
+        for (const locale of ['fr', 'en', 'ar'] as const) {
+            hydrateI18n(locale, {});
+
+            const full = formatMoney(1_280_000);
+            const compact = formatMoney(2_285_000, { compact: true });
+            const fromCents = formatMoneyFromCents(62_000_000, { compact: true });
+
+            expect(full.replace(/\s/g, ' ')).toBe('1 280 000 DA');
+            expect(compact).toContain('DA');
+            expect(compact).not.toContain('DZD');
+            expect(fromCents).toContain('DA');
+            expect(fromCents).not.toContain('DZD');
+            expect(fromCents).not.toMatch(/K DZD|M DZD/);
+        }
+
+        hydrateI18n('en', {});
     });
 
     it('normalizes and formats +213 mobile numbers', () => {

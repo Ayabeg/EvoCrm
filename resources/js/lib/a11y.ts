@@ -1,3 +1,5 @@
+import { t } from '@/lib/i18n';
+
 /**
  * P26 — small a11y helpers. Prefer native HTML at the call site.
  * Do not import this from Inertia pages as a new widget kit.
@@ -15,7 +17,7 @@ export function unreadCountLabel(count: number): string {
         return '';
     }
 
-    return count === 1 ? '1 unread' : `${count} unread`;
+    return count === 1 ? t('1 unread') : t(':count unread', { count });
 }
 
 export function conversationA11yName(input: {
@@ -31,7 +33,7 @@ export function conversationA11yName(input: {
     }
 
     if (input.selected) {
-        parts.push('selected');
+        parts.push(t('selected'));
     }
 
     return parts.join(', ');

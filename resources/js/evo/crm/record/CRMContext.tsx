@@ -25,7 +25,7 @@ export function CRMContext({
     if (!record) {
         return (
             <aside
-                className="border-l border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-4"
+                className="border-s border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-4"
                 data-evo="crm-context"
                 aria-label={t('CRM context')}
             >
@@ -38,7 +38,7 @@ export function CRMContext({
 
     return (
         <aside
-            className="space-y-4 border-l border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-4"
+            className="space-y-4 border-s border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-4"
             data-evo="crm-context"
             aria-label={t('CRM context')}
         >

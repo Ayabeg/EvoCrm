@@ -50,15 +50,16 @@ import type {
     CommandResult,
     CommandSearchHit,
 } from '@/lib/command-os';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 const SECTION_LABELS: Record<string, string> = {
-    recent: 'Récent',
-    search: 'Recherche',
-    create: 'Créer',
-    act: 'Agir',
-    ask: 'Demander à Evo',
-    navigate: 'Naviguer',
+    recent: 'Recent',
+    search: 'Search',
+    create: 'Create',
+    act: 'Act',
+    ask: 'Ask Evo',
+    navigate: 'Navigate',
 };
 
 const SECTION_ORDER = [
@@ -397,14 +398,14 @@ export function CommandPalette({
         needle === ''
             ? undefined
             : searchFailed && hitsMatchCurrent
-              ? 'Recherche indisponible — navigation, création et actions restent disponibles'
+              ? t('Search unavailable — navigation, create, and actions stay available')
               : searching
-                ? 'Recherche…'
+                ? t('Searching…')
                 : undefined;
 
     const grouped = SECTION_ORDER.map((section) => ({
         id: section,
-        label: SECTION_LABELS[section] ?? section,
+        label: t(SECTION_LABELS[section] ?? section),
         items: results.filter((result) => result.section === section),
     })).filter((group) => group.items.length > 0);
 
@@ -430,21 +431,21 @@ export function CommandPalette({
                 type="button"
                 data-command="backdrop"
                 className="absolute inset-0 bg-[color-mix(in_srgb,var(--evo-ink)_45%,transparent)]"
-                aria-label="Fermer la palette de commandes"
+                aria-label={t('Close the command palette')}
                 onClick={() => handleOpenChange(false)}
             />
             <div
                 ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
-                aria-label="Palette de commandes"
+                aria-label={t('Command palette')}
                 data-command="os"
                 data-a11y="focus-trap"
                 className="absolute top-[18vh] left-1/2 w-[min(560px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-[12px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] text-[var(--evo-ink)] shadow-[var(--evo-shadow-modal)]"
                 onKeyDown={onDialogKeyDown}
             >
                 <Command
-                    label="Palette de commandes"
+                    label={t('Command palette')}
                     shouldFilter={false}
                     className="flex max-h-[min(28rem,60vh)] flex-col"
                     loop
@@ -461,8 +462,8 @@ export function CommandPalette({
                             setRemoteHits([]);
                             setHitsForQuery('');
                         }}
-                        placeholder="Rechercher, naviguer, créer ou agir"
-                        aria-label="Rechercher des commandes"
+                        placeholder={t('Search, navigate, create or act')}
+                        aria-label={t('Search commands')}
                         className="h-11 w-full border-b border-[var(--evo-hairline)] bg-transparent px-4 text-[14px] text-[var(--evo-ink)] outline-none placeholder:text-[var(--evo-ink-muted)]"
                     />
                     {statusText ? (
@@ -475,7 +476,7 @@ export function CommandPalette({
                     ) : null}
                     <Command.List className="evo-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-1.5">
                         <Command.Empty className="px-3 py-6 text-[13px] text-[var(--evo-ink-muted)]">
-                            Aucune commande.
+                            {t('No commands.')}
                         </Command.Empty>
                         {grouped.map((group) => (
                             <Command.Group

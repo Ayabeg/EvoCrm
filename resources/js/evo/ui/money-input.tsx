@@ -35,7 +35,7 @@ function MoneyInput({ value, onValueChange, disabled, id, name, className, 'aria
                 aria-label={ariaLabel ?? 'Montant en dinars'}
                 disabled={disabled}
                 value={text}
-                className="pr-10 tabular-nums"
+                className="pe-10 tabular-nums"
                 onChange={(event) => {
                     const next = event.target.value.replace(/[^\d\s]/g, '');
                     setText(next);
@@ -43,7 +43,7 @@ function MoneyInput({ value, onValueChange, disabled, id, name, className, 'aria
                     onValueChange?.(parsed === '' ? null : Number(parsed));
                 }}
             />
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[12px] text-[var(--evo-ink-muted)]">
+            <span className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-[12px] text-[var(--evo-ink-muted)]">
                 DA
             </span>
             {value != null ? <span className="sr-only">{formatMoney(value)}</span> : null}

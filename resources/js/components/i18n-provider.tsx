@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import { hydrateI18n } from '@/lib/i18n';
+import { applyDocumentLocale, hydrateI18n } from '@/lib/i18n';
 
 type I18nPageProps = {
     locale?: string;
@@ -13,6 +13,7 @@ type I18nPageProps = {
 export function HydrateI18n() {
     const { locale, translations } = usePage<I18nPageProps>().props;
     hydrateI18n(locale, translations);
+    applyDocumentLocale(locale);
 
     return null;
 }

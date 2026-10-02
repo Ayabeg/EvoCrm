@@ -132,14 +132,14 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
     return (
         <SelectPrimitive.Item
             className={cn(
-                'relative flex w-full cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 pl-8 pr-2 text-[13px] outline-none',
+                'relative flex w-full cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 ps-8 pe-2 text-[13px] outline-none',
                 'focus:bg-[var(--evo-teal-soft)] focus:text-[var(--evo-ink)]',
                 'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
                 className,
             )}
             {...props}
         >
-            <span className="absolute left-2 flex size-3.5 items-center justify-center">
+            <span className="absolute start-2 flex size-3.5 items-center justify-center">
                 <SelectPrimitive.ItemIndicator>
                     <Check className="size-3.5" aria-hidden />
                 </SelectPrimitive.ItemIndicator>

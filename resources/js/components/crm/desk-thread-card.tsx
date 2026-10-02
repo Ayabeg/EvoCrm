@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { AssociationCard } from '@/components/crm/record-chrome';
+import { t } from '@/lib/i18n';
 
 export type DeskThreadPreview = {
     id?: number;
@@ -23,14 +24,14 @@ export default function DeskThreadCard({
         : inboxHref;
 
     return (
-        <AssociationCard title="Desk + WhatsApp" addHref={href} addLabel="Open">
+        <AssociationCard title="Desk + WhatsApp" addHref={href} addLabel={t('Open')}>
             {thread?.last_message || thread?.subject ? (
                 <div>
                     <p className="text-[13px] text-ink">
                         {thread.last_message ?? thread.subject}
                     </p>
                     <p className="text-[11px] text-mute">
-                        {thread.direction === 'outbound' ? 'Sent' : 'Received'}
+                        {thread.direction === 'outbound' ? t('Sent') : t('Received')}
                         {thread.last_message_at
                             ? ` · ${String(thread.last_message_at).slice(0, 16)}`
                             : ''}
@@ -39,12 +40,12 @@ export default function DeskThreadCard({
                         href={href}
                         className="mt-1 inline-flex text-[12px] font-medium text-ink hover:underline"
                     >
-                        Continue on WhatsApp
+                        {t('Continue on WhatsApp')}
                     </Link>
                 </div>
             ) : (
                 <p className="text-mute">
-                    No Slack. Open Desk to start a WhatsApp Cloud thread.
+                    {t('No Slack. Open Desk to start a WhatsApp Cloud thread.')}
                 </p>
             )}
         </AssociationCard>

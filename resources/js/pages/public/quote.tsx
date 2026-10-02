@@ -78,10 +78,10 @@ export default function PublicQuote({
                     {items.length > 0 ? (
                         <table className="w-full border-collapse text-[13px]">
                             <thead>
-                                <tr className="border-b border-hairline text-left text-[11px] text-mute">
+                                <tr className="border-b border-hairline text-start text-[11px] text-mute">
                                     <th className="py-2 font-medium">{t('Item')}</th>
                                     <th className="py-2 font-medium">{t('Qty')}</th>
-                                    <th className="py-2 text-right font-medium">
+                                    <th className="py-2 text-end font-medium">
                                         {t('Amount')}
                                     </th>
                                 </tr>
@@ -96,7 +96,7 @@ export default function PublicQuote({
                                         <td className="money py-2 text-mute">
                                             {item.quantity}
                                         </td>
-                                        <td className="money py-2 text-right text-ink">
+                                        <td className="money py-2 text-end text-ink">
                                             {formatDzd(item.total_cents)}
                                         </td>
                                     </tr>

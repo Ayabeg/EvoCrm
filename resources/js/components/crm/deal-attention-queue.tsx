@@ -62,7 +62,7 @@ export default function DealAttentionQueue({
                         <button
                             type="button"
                             data-crm="deal-attention-row"
-                            className="flex w-full items-start justify-between gap-3 px-4 py-2 text-left hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+                            className="flex w-full items-start justify-between gap-3 px-4 py-2 text-start hover:bg-canvas-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
                             onClick={() =>
                                 openRecord(
                                     { type: 'deal', id: item.id },
@@ -74,6 +74,7 @@ export default function DealAttentionQueue({
                                 <a
                                     href={item.href}
                                     className="block truncate text-[13px] font-medium text-ink hover:underline"
+                                    dir="auto"
                                     onClick={(event) => event.stopPropagation()}
                                 >
                                     {item.title}
@@ -81,13 +82,13 @@ export default function DealAttentionQueue({
                                 <span
                                     className={`block truncate text-[12px] ${attentionToneClass(item.primary.severity)}`}
                                 >
-                                    {item.primary.reason || item.primary.label}
+                                    {t(item.primary.reason || item.primary.label)}
                                 </span>
                             </span>
                             <span
                                 className={`shrink-0 text-[12px] ${attentionToneClass(item.primary.severity)}`}
                             >
-                                {item.primary.label}
+                                {t(item.primary.label)}
                             </span>
                         </button>
                     </li>

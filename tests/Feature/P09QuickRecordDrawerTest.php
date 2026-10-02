@@ -418,7 +418,8 @@ it('preserves established DA quote amount formatting on the quote descriptor', f
         ->and($present)->toContain("if (currency === 'DZD')")
         ->and($present)->toContain('return formatDzd(amount)');
     expect($money)->toContain("Intl.NumberFormat('fr-DZ'")
-        ->and($money)->toContain("currency: 'DZD'");
+        ->and($money)->toContain("const CURRENCY_SUFFIX = 'DA'")
+        ->and($money)->not->toContain("currency: 'DZD'");
     expect($contract)->toContain('quote total uses formatDzd DA display not literal DZD substring')
         ->and($contract)->toContain('formatDzd(500_000)')
         ->and($contract)->toContain('total === formatted')

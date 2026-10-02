@@ -3,8 +3,8 @@ import { FilePdf } from '@phosphor-icons/react';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import { RecordBack } from '@/components/crm/record-chrome';
 import { RecordStatusBadge } from '@/components/crm/record-hub';
-import { Button } from '@/evo/ui/button';
 import { RecordPageFrame } from '@/evo/crm/record';
+import { Button } from '@/evo/ui/button';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import { quoteListHref, quotePreviewHref } from '@/lib/quote-builder';
@@ -64,7 +64,7 @@ export default function QuoteShow({ quote }: { quote: QuoteRecord }) {
                                     rel="noreferrer"
                                 >
                                     <FilePdf className="size-3.5" />
-                                    Preview PDF
+                                    {t('Preview PDF')}
                                 </a>
                             </Button>
                         </div>

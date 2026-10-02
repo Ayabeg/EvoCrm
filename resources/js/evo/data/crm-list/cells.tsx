@@ -5,7 +5,8 @@
 import { Link } from '@inertiajs/react';
 
 import LeadScorePill from '@/components/crm/lead-score-pill';
-import { formatDate, formatDateTime, formatMoneyFromCents } from '@/evo/lib/format';
+import { LtrValue, shouldIsolateColumn } from '@/components/ltr-value';
+import { formatDate, formatDateTime, formatMoneyFromCents, formatPhone } from '@/evo/lib/format';
 import { formatContactName } from '@/lib/contact-name';
 import { t } from '@/lib/i18n';
 import type { ListObjectType } from '@/lib/list-view-config';
@@ -162,7 +163,7 @@ export function renderListCell(entity: ListObjectType, columnId: string, row: Li
             case 'email':
                 return contact.email ?? '—';
             case 'phone':
-                return contact.phone_e164 ?? '—';
+                return contact.phone_e164 ? formatPhone(contact.phone_e164) : '—';
             case 'lead_status':
                 return titleCase(contact.lead_status);
             case 'company':
@@ -392,10 +393,12 @@ export function ListCell({
 
     const communicationHref = entity === 'contact' ? contactCommunicationHref(columnId, row as ContactRow) : null;
 
+    const display = shouldIsolateColumn(columnId) ? <LtrValue>{label}</LtrValue> : label;
+
     if (communicationHref) {
         return (
             <a href={communicationHref} className="hover:underline">
-                {label}
+                {display}
             </a>
         );
     }
@@ -403,14 +406,14 @@ export function ListCell({
     if (columnId === primaryColumnId(entity)) {
         return (
             <Link href={href} className="font-medium text-ink hover:underline">
-                {label}
+                {display}
             </Link>
         );
     }
 
     return (
-        <span className="block truncate" title={label !== '—' ? label : undefined}>
-            {label}
+        <span className="block truncate" dir="auto" title={label !== '—' ? label : undefined}>
+            {display}
         </span>
     );
 }

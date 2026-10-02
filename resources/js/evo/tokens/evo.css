@@ -63,7 +63,9 @@
     --evo-accent: var(--evo-primary);
     --evo-logo-orange: var(--evo-logo);
 
-    --evo-font-sans: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --font-ui-latin: 'Geist Sans', Geist, ui-sans-serif, system-ui, sans-serif;
+    --font-ui-arabic: 'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif;
+    --evo-font-sans: var(--font-ui-latin);
     --evo-font-mono: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
 
     --evo-text-11: 0.6875rem;
@@ -166,6 +168,11 @@
     --evo-shadow-pill: none;
     --evo-shadow-floating: none;
     --evo-shadow-modal: none;
+}
+
+html[dir='rtl'] {
+    --evo-font-sans: var(--font-ui-arabic), var(--font-ui-latin);
+    line-height: 1.65;
 }
 
 @media (prefers-reduced-motion: reduce) {

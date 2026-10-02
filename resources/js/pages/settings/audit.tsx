@@ -34,7 +34,7 @@ export default function AuditSettings({ events }: { events: AuditRow[] }) {
                 />
                 <Card className="overflow-hidden border-hairline bg-white">
                     <table className="w-full text-sm">
-                        <thead className="bg-canvas-soft text-left text-[11px] tracking-wide text-muted-foreground uppercase">
+                        <thead className="bg-canvas-soft text-start text-[11px] tracking-wide text-muted-foreground uppercase">
                             <tr>
                                 <th className="px-4 py-2">{t('When')}</th>
                                 <th className="px-4 py-2">{t('Actor')}</th>

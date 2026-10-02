@@ -12,6 +12,7 @@ use App\Models\QuietHours;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Funnels\ConversionFunnelProvisioner;
+use App\Support\Locale;
 use Illuminate\Support\Str;
 
 class WorkspaceProvisioner
@@ -26,6 +27,9 @@ class WorkspaceProvisioner
             'default_dial_code' => '213',
             'inbox_url' => config('evosales.inbox_url'),
             'simple_mode' => true,
+            'preferences' => app()->environment('testing')
+                ? null
+                : Locale::mergePreference(null, 'fr'),
         ]);
 
         $this->seedDefaults($workspace);

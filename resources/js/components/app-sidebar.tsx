@@ -24,21 +24,21 @@ import {
 } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import { Sidebar, useSidebar } from '@/components/ui/sidebar';
+import { UserMenuContent } from '@/components/user-menu-content';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/evo/ui/dropdown-menu';
-import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from '@/evo/ui/tooltip';
-import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
-import { t } from '@/lib/i18n';
+import { t, workspaceRoleLabel } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types';
 
@@ -474,7 +474,7 @@ function RailLink({
                         ? 'flex h-9 min-w-0 flex-1 items-center gap-2 px-3 text-[13px] leading-[18px]'
                         : 'flex h-9 w-full items-center justify-center',
                     active
-                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:bg-[var(--evo-primary)]'
+                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:start-0 before:w-0.5 before:bg-[var(--evo-primary)]'
                         : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                 )}
             >
@@ -603,7 +603,7 @@ function ObjectMenu({
                 aria-label={open ? `${t('Close')} ${t(item.label)}` : `${t('Open')} ${t(item.label)}`}
                 aria-expanded={open}
                 title={t(item.label)}
-                className="mr-1 grid size-7 place-items-center rounded-md text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                className="me-1 grid size-7 place-items-center rounded-md text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                 onClick={(event) => {
                     event.stopPropagation();
                     setOpen((current) => !current);
@@ -614,7 +614,7 @@ function ObjectMenu({
             {open ? (
                 <div
                     role="menu"
-                    className="absolute top-0 right-[calc(100%+8px)] z-[100] w-60 overflow-hidden rounded-[10px] border border-hairline bg-surface text-ink shadow-[var(--aurora-shadow-medium)]"
+                    className="absolute top-0 end-[calc(100%+8px)] z-[100] w-60 overflow-hidden rounded-[10px] border border-hairline bg-surface text-ink shadow-[var(--aurora-shadow-medium)]"
                 >
                     <Link
                         href={item.createHref ?? item.href}
@@ -735,7 +735,7 @@ function AppLauncher({
                     role="menu"
                     className={cn(
                         'absolute z-[100] w-60 overflow-hidden rounded-[10px] border border-hairline bg-surface p-1 text-ink shadow-[var(--aurora-shadow-medium)]',
-                        labeled ? 'top-full right-0 mt-2' : 'top-0 left-[calc(100%+8px)]',
+                        labeled ? 'top-full end-0 mt-2' : 'top-0 start-[calc(100%+8px)]',
                     )}
                 >
                     {APPS.map((app) => {
@@ -748,7 +748,7 @@ function AppLauncher({
                                 role="menuitem"
                                 aria-current={app.id === currentApp ? 'page' : undefined}
                                 className={cn(
-                                    'flex h-9 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+                                    'flex h-9 w-full items-center gap-2 rounded-lg px-2 text-start text-[13px] hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                                     app.id === currentApp && 'font-medium',
                                 )}
                                 onClick={() => {
@@ -782,7 +782,7 @@ function UserChip({ onNavigate }: { onNavigate?: () => void }) {
             <DropdownMenuTrigger asChild>
                 <button
                     type="button"
-                    className="mt-1 flex h-9 w-full items-center gap-2 rounded-lg px-2 text-left hover:bg-sidebar-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                    className="mt-1 flex h-9 w-full items-center gap-2 rounded-lg px-2 text-start hover:bg-sidebar-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                     title={user.name}
                     aria-label={t(':name account menu', { name: user.name })}
                 >
@@ -791,7 +791,7 @@ function UserChip({ onNavigate }: { onNavigate?: () => void }) {
                     </span>
                     <span className="min-w-0 leading-tight">
                         <span className="block truncate text-[13px] font-medium text-sidebar-ink">{user.name}</span>
-                        {user.role ? <span className="block truncate text-meta text-sidebar-mute">{user.role}</span> : null}
+                        {user.role ? <span className="block truncate text-meta text-sidebar-mute">{workspaceRoleLabel(user.role)}</span> : null}
                     </span>
                 </button>
             </DropdownMenuTrigger>
@@ -955,7 +955,7 @@ export function AppSidebar() {
                                         ? 'flex h-9 w-full items-center gap-2 px-3 text-[13px] leading-[18px]'
                                         : 'flex h-9 w-full items-center justify-center',
                                     moreOpen || plusActive
-                                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:bg-[var(--evo-primary)]'
+                                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:start-0 before:w-0.5 before:bg-[var(--evo-primary)]'
                                         : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                                 )}
                             >
@@ -970,7 +970,7 @@ export function AppSidebar() {
                                         'z-[100] overflow-hidden rounded-[10px] border border-hairline bg-surface text-ink shadow-[var(--aurora-shadow-medium)]',
                                         labeled
                                             ? 'relative mt-1 w-full'
-                                            : 'absolute top-0 left-[calc(100%+8px)] w-60',
+                                            : 'absolute top-0 start-[calc(100%+8px)] w-60',
                                     )}
                                 >
                                     <ul className="m-0 list-none p-1" data-nav="crm-objects">

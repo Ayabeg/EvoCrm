@@ -171,7 +171,7 @@ export function ExecutionHistory({
                         <label className="text-[12px] text-[var(--evo-ink-muted)]">
                             {t('Workflow')}
                             <NativeSelect
-                                className="ml-2 h-8 w-auto"
+                                className="ms-2 h-8 w-auto"
                                 value={filters.workflow_id ?? ''}
                                 onChange={(event) =>
                                     applyFilter({
@@ -191,7 +191,7 @@ export function ExecutionHistory({
                         <label className="text-[12px] text-[var(--evo-ink-muted)]">
                             {t('Status')}
                             <NativeSelect
-                                className="ml-2 h-8 w-auto"
+                                className="ms-2 h-8 w-auto"
                                 value={filters.status ?? ''}
                                 onChange={(event) =>
                                     applyFilter({

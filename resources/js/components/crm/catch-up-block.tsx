@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { t } from '@/lib/i18n';
 
 export type CatchUpItem = {
     id: string;
@@ -60,13 +61,13 @@ export default function CatchUpBlock({
     return (
         <section className={compact ? 'text-sm' : 'text-sm'}>
             <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">
-                Catch-up
+                {t('Catch-up')}
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">Inbound</p>
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">{t('Inbound')}</p>
                     {inbound.length === 0 ? (
-                        <p className="text-[13px] text-mute">Nothing inbound to catch up on.</p>
+                        <p className="text-[13px] text-mute">{t('Nothing inbound to catch up on.')}</p>
                     ) : (
                         <div className="divide-y divide-hairline">
                             {inbound.map((item) => (
@@ -76,9 +77,9 @@ export default function CatchUpBlock({
                     )}
                 </div>
                 <div>
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">Outbound</p>
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink">{t('Outbound')}</p>
                     {outbound.length === 0 ? (
-                        <p className="text-[13px] text-mute">No recent outbound from this record.</p>
+                        <p className="text-[13px] text-mute">{t('No recent outbound from this record.')}</p>
                     ) : (
                         <div className="divide-y divide-hairline">
                             {outbound.map((item) => (

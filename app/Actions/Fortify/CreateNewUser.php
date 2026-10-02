@@ -7,6 +7,7 @@ use App\Concerns\ProfileValidationRules;
 use App\Models\User;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Identity\WorkspaceProvisioner;
+use App\Support\Locale;
 use App\Support\SignupMode;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -41,6 +42,15 @@ class CreateNewUser implements CreatesNewUsers
         );
 
         $user = $user->fresh() ?? $user;
+
+        $signupLocale = Locale::normalize(request()->cookie(Locale::COOKIE));
+
+        if ($signupLocale !== null) {
+            $user->forceFill([
+                'preferences' => Locale::mergePreference($user->preferences, $signupLocale),
+            ])->save();
+        }
+
         $analytics = app(ProductAnalytics::class);
         $analytics->identify($user, $user->workspace);
         $analytics->capture(ProductAnalytics::USER_SIGNED_UP, [

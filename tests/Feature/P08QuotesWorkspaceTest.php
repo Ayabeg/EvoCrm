@@ -245,7 +245,7 @@ it('does not migrate Tickets Deals board or invent QuickRecordDrawer builder or 
 
     $pipelineBoard = file_get_contents(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
     expect($pipelineBoard)->toContain('/crm/deals/${dealId}/move')
-        ->and($kanban)->toContain('Weighted:');
+        ->and($kanban)->toContain("t('Weighted')");
 
     expect($routes)->toContain("Route::redirect('/leads', '/crm/deals/board')")
         ->and($routes)->toContain("Route::get('/crm/deals/board'");

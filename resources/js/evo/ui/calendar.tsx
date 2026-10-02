@@ -8,7 +8,7 @@
  * Modified: react-day-picker; fr locale; WEEK_STARTS_ON=6; teal selected; Evo tokens.
  */
 
-import { fr } from 'date-fns/locale';
+import { ar, enUS, fr } from 'date-fns/locale';
 import * as React from 'react';
 import { DayPicker  } from 'react-day-picker';
 import type {DayPickerProps} from 'react-day-picker';
@@ -17,6 +17,7 @@ import { CaretLeft, CaretRight } from '@/evo/icons';
 import { cn } from '@/evo/lib/cn';
 import { WEEK_STARTS_ON } from '@/evo/lib/format';
 import { buttonVariants } from '@/evo/ui/button';
+import { currentLocale } from '@/lib/i18n';
 
 import 'react-day-picker/style.css';
 
@@ -26,7 +27,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
     return (
         <DayPicker
             weekStartsOn={WEEK_STARTS_ON}
-            locale={fr}
+            locale={currentLocale() === 'ar' ? ar : currentLocale() === 'en' ? enUS : fr}
             showOutsideDays={showOutsideDays}
             className={cn('p-2', className)}
             classNames={{
@@ -53,12 +54,13 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
                 ...classNames,
             }}
             components={{
-                Chevron: ({ orientation }) =>
-                    orientation === 'left' ? (
-                        <CaretLeft className="size-4" aria-hidden />
-                    ) : (
-                        <CaretRight className="size-4" aria-hidden />
-                    ),
+                Chevron: ({ orientation }) => {
+                    const rtl = currentLocale() === 'ar';
+                    const back = orientation === 'left';
+                    const Icon = back !== rtl ? CaretLeft : CaretRight;
+
+                    return <Icon className="size-4" aria-hidden />;
+                },
             }}
             {...props}
         />

@@ -26,9 +26,9 @@ function ButtonGroup({
             className={cn(
                 'inline-flex items-stretch',
                 orientation === 'vertical' ? 'flex-col' : 'flex-row',
-                '[&_[data-slot=button]]:rounded-none [&_[data-slot=button]:first-child]:rounded-l-[var(--evo-radius-compact)] [&_[data-slot=button]:last-child]:rounded-r-[var(--evo-radius-compact)]',
+                '[&_[data-slot=button]]:rounded-none [&_[data-slot=button]:first-child]:rounded-s-[var(--evo-radius-compact)] [&_[data-slot=button]:last-child]:rounded-e-[var(--evo-radius-compact)]',
                 orientation === 'vertical' &&
-                    '[&_[data-slot=button]:first-child]:rounded-t-[var(--evo-radius-compact)] [&_[data-slot=button]:first-child]:rounded-l-none [&_[data-slot=button]:last-child]:rounded-b-[var(--evo-radius-compact)] [&_[data-slot=button]:last-child]:rounded-r-none',
+                    '[&_[data-slot=button]:first-child]:rounded-t-[var(--evo-radius-compact)] [&_[data-slot=button]:first-child]:rounded-s-none [&_[data-slot=button]:last-child]:rounded-b-[var(--evo-radius-compact)] [&_[data-slot=button]:last-child]:rounded-e-none',
                 className,
             )}
             {...props}

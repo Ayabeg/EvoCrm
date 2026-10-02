@@ -10,30 +10,49 @@ import { t } from '@/lib/i18n';
 
 export default function WorkspaceSettings({
     simple_mode,
+    workspace_locale,
 }: {
     simple_mode: boolean;
+    workspace_locale?: string | null;
 }) {
     return (
         <>
             <Head title={t('General')} />
 
             <SettingsPageHeader
-                title="General"
-                description="Simple mode is the sellable launch surface. Turn it off to bring back tickets, ads, warmup, Ask Evo, and report builder."
+                title={t('General')}
+                description={t('Simple mode is the sellable launch surface. Turn it off to bring back tickets, ads, warmup, Ask Evo, and report builder.')}
             />
 
             <SettingsForm action="/settings/workspace" method="put">
                 {({ processing }) => (
                     <SettingsCard
-                        title="Preferences"
+                        title={t('Preferences')}
                         required
                         footer={<SettingsSaveBar processing={processing} />}
                     >
                         <SettingsFormRow
-                            label="Simple mode"
+                            label={t('Language')}
+                            htmlFor="locale"
+                            hint={t('Workspace default when a teammate has not chosen a language.')}
+                        >
+                            <select
+                                id="locale"
+                                name="locale"
+                                defaultValue={workspace_locale ?? ''}
+                                className="h-8 w-full rounded-[4px] border border-hairline bg-white px-2 text-[13px] text-ink"
+                            >
+                                <option value="">{t('Use application default')}</option>
+                                <option value="fr">Français</option>
+                                <option value="en">English</option>
+                                <option value="ar">العربية</option>
+                            </select>
+                        </SettingsFormRow>
+                        <SettingsFormRow
+                            label={t('Simple mode')}
                             htmlFor="simple_mode"
                             required
-                            hint="On keeps Home, Contacts, Deals, Inbox, and Quotes. Off restores the full product."
+                            hint={t('On keeps Home, Contacts, Deals, Inbox, and Quotes. Off restores the full product.')}
                         >
                             <select
                                 id="simple_mode"
@@ -55,5 +74,5 @@ export default function WorkspaceSettings({
 }
 
 WorkspaceSettings.layout = {
-    breadcrumbs: [{ title: 'General', href: '/settings/workspace' }],
+    breadcrumbs: [{ title: t('General'), href: '/settings/workspace' }],
 };

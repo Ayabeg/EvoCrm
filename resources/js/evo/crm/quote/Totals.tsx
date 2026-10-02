@@ -11,7 +11,7 @@ import { t } from '@/lib/i18n';
 export function Totals({ totals }: { totals: QuoteTotalsValue }) {
     return (
         <dl
-            className="ml-auto w-full max-w-xs space-y-1 text-[13px]"
+            className="ms-auto w-full max-w-xs space-y-1 text-[13px]"
             data-evo="quote-totals"
         >
             <div className="flex justify-between gap-4">

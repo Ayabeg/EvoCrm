@@ -14,6 +14,7 @@ use App\Services\Activation\WorkspaceActivationService;
 use App\Services\Crm\ActivityWorkQueueQuery;
 use App\Services\Crm\DealAttentionEvaluator;
 use App\Support\Integrations;
+use App\Support\Locale;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Gate;
 
@@ -80,7 +81,7 @@ class HomeDashboardBuilder
 
         return [
             'name' => $first,
-            'date' => $now->copy()->locale('en')->isoFormat('dddd, D MMMM YYYY'),
+            'date' => Locale::formatDisplayDate($now),
             'timezone' => self::TZ,
         ];
     }
@@ -111,7 +112,7 @@ class HomeDashboardBuilder
         $openCount = (int) collect($stageRows)->sum('count');
         $pipelineCents = (int) collect($stageRows)->sum('amount_cents');
 
-        $monthLabel = $from->copy()->locale('en')->isoFormat('MMMM YYYY');
+        $monthLabel = Locale::formatMonthLabel($from);
 
         $trend = $this->trend($workspace, $pipeline, $now);
 
@@ -181,7 +182,7 @@ class HomeDashboardBuilder
             $to = $from->copy()->endOfMonth();
 
             $points[] = [
-                'label' => $from->copy()->locale(app()->getLocale())->isoFormat('MMM'),
+                'label' => Locale::formatMonthShort($from),
                 'won_cents' => $this->closedSum($workspace, $pipeline, true, $from, $to),
                 'created_cents' => (int) Deal::query()
                     ->forWorkspace($workspace)

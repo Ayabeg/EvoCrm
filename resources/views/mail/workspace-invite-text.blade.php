@@ -1,10 +1,10 @@
-You're invited, {{ $inviteeName }}
+{{ __('You\'re invited, :name', ['name' => $inviteeName]) }}
 
-{{ $inviterName }} added you to the {{ $workspaceName }} workspace on EvoSales — Evotechly's sales OS.
+{{ __(':inviter added you to the :workspace workspace on EvoSales — Evotechly\'s sales OS.', ['inviter' => $inviterName, 'workspace' => $workspaceName]) }}
 
-Set your password to activate your login (first-login link, single use):
+{{ __('Set your password to activate your login (first-login link, single use):') }}
 {{ $inviteUrl }}
 
-We never email you a password. If you weren't expecting this invite, you can ignore this email.
+{{ __('We never email you a password. If you weren\'t expecting this invite, you can ignore this email.') }}
 
 — EvoSales · Evotechly

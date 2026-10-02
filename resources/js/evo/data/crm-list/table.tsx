@@ -6,6 +6,7 @@ import { router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import LeadScorePill from '@/components/crm/lead-score-pill';
+import { LtrValue, shouldIsolateColumn } from '@/components/ltr-value';
 import { resolveRowActivation } from '@/ds/workspace/quick-record/row-peek';
 import type { RowPeekContext } from '@/ds/workspace/quick-record/row-peek';
 import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
@@ -15,9 +16,7 @@ import {
     contactCommunicationHref,
     ListCell,
     primaryColumnId,
-    renderListCell
-    
-    
+    renderListCell,
 } from '@/evo/data/crm-list/cells';
 import type {ContactRow, ListRow} from '@/evo/data/crm-list/cells';
 import type { EvoDataGridColumn } from '@/evo/data/data-grid';
@@ -326,7 +325,7 @@ export function CrmListTable<Row extends { id: RowId }>({
                         className={cn(
                             column.id === primaryId ? 'font-medium text-ink' : 'text-mute',
                             column.id === 'amount' && 'money tabular-nums text-ink',
-                            quoteTable && column.id === 'amount' && 'text-right',
+                            quoteTable && column.id === 'amount' && 'text-end',
                             dealTable && column.id === 'close_date' && 'whitespace-nowrap',
                             fixedTable && column.id !== 'amount' && 'overflow-hidden',
                             widthClass(entity, column.id),
@@ -563,9 +562,13 @@ export function CrmListTable<Row extends { id: RowId }>({
                                                     <dt className="text-muted-foreground">
                                                         {t(columnLabel(resolvedDefs, column.id))}
                                                     </dt>
-                                                    <dd className="truncate text-ink">
+                                                    <dd className="truncate text-ink" dir="auto">
                                                         {communicationHref ? (
-                                                            <a href={communicationHref}>{value}</a>
+                                                            <a href={communicationHref}>
+                                                                <LtrValue>{value}</LtrValue>
+                                                            </a>
+                                                        ) : shouldIsolateColumn(column.id) ? (
+                                                            <LtrValue>{value}</LtrValue>
                                                         ) : (
                                                             value
                                                         )}

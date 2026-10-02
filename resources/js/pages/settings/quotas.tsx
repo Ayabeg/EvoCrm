@@ -99,11 +99,11 @@ export default function QuotaSettings({
                             </p>
                             <table className="mt-3 w-full">
                                 <thead>
-                                    <tr className="border-b border-hairline text-left">
+                                    <tr className="border-b border-hairline text-start">
                                         <th className="px-0 py-1.5 text-[11px] font-medium text-mute">
                                             Person
                                         </th>
-                                        <th className="px-0 py-1.5 text-right text-[11px] font-medium text-mute">
+                                        <th className="px-0 py-1.5 text-end text-[11px] font-medium text-mute">
                                             Monthly target (DZD)
                                         </th>
                                     </tr>
@@ -121,16 +121,16 @@ export default function QuotaSettings({
                                                     value={person.id}
                                                 />
                                                 {person.name}
-                                                <span className="ml-2 text-[11px] text-mute">
+                                                <span className="ms-2 text-[11px] text-mute">
                                                     {person.role}
                                                 </span>
                                             </td>
-                                            <td className="px-0 py-2 text-right">
+                                            <td className="px-0 py-2 text-end">
                                                 <QuotaMoneyField
                                                     name={`people[${index}][amount_dzd]`}
                                                     defaultValue={person.amount_dzd}
                                                     placeholder="-"
-                                                    className="ml-auto max-w-[10rem]"
+                                                    className="ms-auto max-w-[10rem]"
                                                 />
                                             </td>
                                         </tr>

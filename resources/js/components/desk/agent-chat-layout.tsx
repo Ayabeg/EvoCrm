@@ -10,6 +10,7 @@ import {
 import { evoFocus } from '@/evo/ai/types';
 import { CaretDown } from '@/evo/icons';
 import { cn } from '@/evo/lib/cn';
+import { t } from '@/lib/i18n';
 import type { BotDefinition } from '@/lib/desk/bot-catalog';
 
 /**
@@ -135,7 +136,7 @@ function JumpToLatest() {
 
 export function AgentChatHeader({
     bot,
-    status = 'Disponible',
+    status = t('Available'),
     avatarState = 'idle',
 }: {
     bot: BotDefinition;

@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Outbound\MailerFactory;
 use App\Services\Outbound\SmtpMailboxMailer;
+use App\Support\Locale;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 
@@ -52,12 +54,13 @@ class WorkspaceInviteMailer
             return InviteSendResult::noMailbox();
         }
 
-        $mailable = new WorkspaceInviteMail(
+        $locale = Locale::resolve($invitee);
+        $mailable = (new WorkspaceInviteMail(
             inviteeName: $invitee->name,
             workspaceName: $workspace->name,
             inviterName: $inviter->name,
             inviteUrl: $this->setPasswordUrl($invitee),
-        );
+        ))->locale($locale);
 
         // Tests and the array mailer stay on send() so Mail::fake() can
         // assert the same mailable production Resend will send. Production
@@ -77,6 +80,8 @@ class WorkspaceInviteMailer
         }
 
         try {
+            $previous = App::getLocale();
+            App::setLocale($locale);
             $content = $mailable->content();
             $data = [
                 'inviteeName' => $mailable->inviteeName,
@@ -85,12 +90,16 @@ class WorkspaceInviteMailer
                 'inviteUrl' => $mailable->inviteUrl,
             ];
 
-            (new SmtpMailboxMailer($mailbox))->sendAdHoc(
-                $invitee->email,
-                $mailable->envelope()->subject ?? config('app.name'),
-                view($content->text ?? 'mail.workspace-invite-text', $data)->render(),
-                view($content->view ?? 'mail.workspace-invite', $data)->render(),
-            );
+            try {
+                (new SmtpMailboxMailer($mailbox))->sendAdHoc(
+                    $invitee->email,
+                    $mailable->envelope()->subject ?? config('app.name'),
+                    view($content->text ?? 'mail.workspace-invite-text', $data)->render(),
+                    view($content->view ?? 'mail.workspace-invite', $data)->render(),
+                );
+            } finally {
+                App::setLocale($previous);
+            }
         } catch (\Throwable $e) {
             return InviteSendResult::failed($e->getMessage());
         }

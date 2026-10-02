@@ -88,7 +88,7 @@ class ReportController extends Controller
             $this->adsCategory($workspace, $from, $to),
             $this->deskCategory($workspace, $from, $to),
             $this->activityCategory($workspace, $from, $to),
-        ])->filter()->values();
+        ])->filter()->map(fn (array $room) => $this->localizeChrome($room))->values();
 
         $keyMap = ['sales' => 'leads', 'pipeline' => 'pipeline', 'outbound' => 'outbound', 'ads' => 'ads'];
         if ($category !== null && isset($keyMap[$category])) {
@@ -212,7 +212,7 @@ class ReportController extends Controller
                 'data' => $openStages->map(fn ($stage) => (int) round($open->where('stage_id', $stage->id)->sum('amount_cents') / 100))->all(),
             ]],
             'total' => (int) round($open->sum('amount_cents') / 100),
-            'valueLabel' => 'DZD',
+            'valueLabel' => 'DA',
             'href' => '/leads',
         ]);
 
@@ -502,7 +502,7 @@ class ReportController extends Controller
             'labels' => $dayLabels,
             'series' => [['name' => 'Spend', 'data' => $spendData]],
             'total' => array_sum($spendData),
-            'valueLabel' => 'DZD',
+            'valueLabel' => 'DA',
             'href' => '/ads',
         ]);
 
@@ -518,7 +518,7 @@ class ReportController extends Controller
             'labels' => $perCampaign->take(6)->pluck('name')->all(),
             'series' => [['name' => 'Spend', 'data' => $perCampaign->take(6)->map(fn ($row) => (int) round($row['stats']->sum('spend_cents') / 100))->all()]],
             'total' => (int) round($spendCents / 100),
-            'valueLabel' => 'DZD',
+            'valueLabel' => 'DA',
             'href' => '/ads',
         ]);
 
@@ -737,6 +737,69 @@ class ReportController extends Controller
         return $hasSignal ? $payload : null;
     }
 
+    /**
+     * Product chrome only. Chart `labels` stay workspace data (stage names).
+     *
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function localizeChrome(array $payload): array
+    {
+        foreach (['title', 'description', 'label', 'hint', 'valueLabel'] as $field) {
+            if (isset($payload[$field]) && is_string($payload[$field]) && $payload[$field] !== '') {
+                $payload[$field] = __($payload[$field]);
+            }
+        }
+
+        if (isset($payload['kpis']) && is_array($payload['kpis'])) {
+            $payload['kpis'] = array_map(
+                fn ($kpi) => is_array($kpi) ? $this->localizeChrome($kpi) : $kpi,
+                $payload['kpis'],
+            );
+        }
+
+        if (isset($payload['charts']) && is_array($payload['charts'])) {
+            $payload['charts'] = array_map(
+                fn ($chart) => is_array($chart) ? $this->localizeChart($chart) : $chart,
+                $payload['charts'],
+            );
+        }
+
+        if (isset($payload['table']['columns']) && is_array($payload['table']['columns'])) {
+            $payload['table']['columns'] = array_map(
+                fn ($column) => is_array($column) ? $this->localizeChrome($column) : $column,
+                $payload['table']['columns'],
+            );
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @param  array<string, mixed>  $chart
+     * @return array<string, mixed>
+     */
+    private function localizeChart(array $chart): array
+    {
+        $chart = $this->localizeChrome($chart);
+
+        if (isset($chart['series']) && is_array($chart['series'])) {
+            $chart['series'] = array_map(function ($series) {
+                if (is_array($series) && isset($series['name']) && is_string($series['name'])) {
+                    $series['name'] = __($series['name']);
+                }
+
+                return $series;
+            }, $chart['series']);
+        }
+
+        if (($chart['labels'] ?? null) === ['Won', 'Lost']) {
+            $chart['labels'] = [__('Won'), __('Lost')];
+        }
+
+        return $chart;
+    }
+
     private function inWindow(?CarbonInterface $date, CarbonInterface $from, CarbonInterface $to): bool
     {
         return $date !== null && $date->betweenIncluded($from, $to);
@@ -775,7 +838,7 @@ class ReportController extends Controller
 
     private function dzd(int|float $cents): string
     {
-        return number_format($cents / 100, 0, '.', ' ').' DZD';
+        return number_format($cents / 100, 0, ',', ' ').' DA';
     }
 
     /**
@@ -834,7 +897,7 @@ class ReportController extends Controller
 
                 return [
                     'key' => $key,
-                    'title' => $meta['title'],
+                    'title' => __($meta['title']),
                     'room' => $meta['room'],
                     'chart' => $chartsByRoom[$meta['room']][$meta['id']] ?? null,
                 ];

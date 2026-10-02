@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureRegistrationIsOpen;
 use App\Http\Middleware\EnsureUserCanManageSettings;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PostHogRequestContext;
+use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SecurityHeaders;
 use App\Services\Analytics\ProductAnalytics;
 use App\Support\TrustedProxies;
@@ -27,7 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: TrustedProxies::at());
 
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        $middleware->encryptCookies(except: ['appearance', 'sidebar_state', 'locale']);
 
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
@@ -38,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             EnsureRegistrationIsOpen::class,
+            SetLocale::class,
             SecurityHeaders::class,
             EmbedSecurityHeaders::class,
             PostHogRequestContext::class,

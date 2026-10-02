@@ -1,4 +1,5 @@
 import { Form, Link } from '@inertiajs/react';
+import { t } from '@/lib/i18n';
 
 export type GraphNodeStatus = {
     key: string;
@@ -21,7 +22,7 @@ export type LeadOsGraphPayload = {
 };
 
 function nodeLabel(key: string): string {
-    return key.replaceAll('-', ' ');
+    return t(key.replaceAll('-', ' '));
 }
 
 function when(iso?: string | null): string {
@@ -47,12 +48,18 @@ export default function LeadOsGraphStatus({
             <header className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h2 className="text-[15px] font-semibold tracking-tight text-ink">
-                        Lead OS graph
+                        {t('Lead OS graph')}
                     </h2>
                     <p className="mt-1 text-[12px] text-mute">
                         {graph
-                            ? `Last ${graph.triggered_by} run · ${when(graph.started_at)} · ${graph.ok_count} ok · ${graph.skipped_count} skipped · ${graph.failed_count} failed`
-                            : 'No graph run yet. Run now to drain ads, enrich, score, research, health, and next-move.'}
+                            ? t('Last :by run · :when · :ok ok · :skipped skipped · :failed failed', {
+                                  by: graph.triggered_by,
+                                  when: when(graph.started_at),
+                                  ok: graph.ok_count,
+                                  skipped: graph.skipped_count,
+                                  failed: graph.failed_count,
+                              })
+                            : t('No graph run yet. Run now to drain ads, enrich, score, research, health, and next-move.')}
                     </p>
                 </div>
                 <Form action="/lead-os/graph" method="post">
@@ -60,7 +67,7 @@ export default function LeadOsGraphStatus({
                         type="submit"
                         className="h-8 rounded-md border border-hairline bg-canvas px-3 text-[12px] text-ink hover:border-brand"
                     >
-                        Run now
+                        {t('Run now')}
                     </button>
                 </Form>
             </header>
@@ -73,7 +80,7 @@ export default function LeadOsGraphStatus({
                             className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-canvas px-2 py-0.5 text-[11px] text-ink"
                         >
                             <span>{nodeLabel(node.key)}</span>
-                            <span className="tabular-nums">{node.status}</span>
+                            <span className="tabular-nums">{t(node.status)}</span>
                         </li>
                     ))}
                 </ol>
@@ -81,9 +88,9 @@ export default function LeadOsGraphStatus({
 
             {!compact ? (
                 <p className="mt-3 text-[11px] text-mute">
-                    Nightly at 02:15 Africa/Algiers.{' '}
+                    {t('Nightly at 02:15 Africa/Algiers.')}{' '}
                     <Link href="/reports" className="text-ink hover:underline">
-                        Reports
+                        {t('Reports')}
                     </Link>
                 </p>
             ) : null}

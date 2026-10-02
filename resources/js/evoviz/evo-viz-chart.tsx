@@ -305,7 +305,7 @@ function HorizontalBars({
                             }}
                         />
                     </span>
-                    <span className="money w-10 shrink-0 text-right text-[12px]">
+                    <span className="money w-10 shrink-0 text-end text-[12px]">
                         {formatValue(row.value)}
                     </span>
                 </li>
@@ -407,7 +407,7 @@ function DonutChart({ payload }: { payload: EvoVizPayload }) {
                             }}
                         />
                         <span className="truncate text-mute">{label}</span>
-                        <span className="money ml-auto pl-3">
+                        <span className="money ms-auto ps-3">
                             {formatValue(values[i])}
                         </span>
                     </li>
@@ -445,7 +445,7 @@ function KpiSpark({ payload }: { payload: EvoVizPayload }) {
             <p className="money text-kpi font-semibold tracking-tight text-ink">
                 {formatValue(total)}
                 {payload.valueLabel ? (
-                    <span className="ml-1 text-[12px] font-normal text-mute">
+                    <span className="ms-1 text-[12px] font-normal text-mute">
                         {payload.valueLabel}
                     </span>
                 ) : null}

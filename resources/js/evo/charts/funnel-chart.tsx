@@ -60,7 +60,7 @@ export function FunnelChart({ steps, compact = false, className }: FunnelChartPr
                                 />
                             ) : null}
                         </div>
-                        <div className="text-right text-[11px] whitespace-nowrap tabular-nums">
+                        <div className="text-end text-[11px] whitespace-nowrap tabular-nums">
                             <span className="font-medium text-[var(--evo-ink)]">
                                 {formatNumber(step.value)}
                             </span>{' '}

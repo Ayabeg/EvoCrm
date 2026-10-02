@@ -481,7 +481,7 @@ class RecordInsight
                 'error_pct' => null,
                 'within_15' => false,
                 'status' => 'insufficient_data',
-                'label' => 'Need 3+ closed deals',
+                'label' => __('Need 3+ closed deals'),
             ];
         }
 

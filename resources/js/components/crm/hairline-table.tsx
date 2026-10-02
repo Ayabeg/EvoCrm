@@ -37,14 +37,14 @@ export function HairlineTable({
                         style={{ minWidth }}
                     >
                         <thead>
-                            <tr className="border-b border-hairline bg-canvas-soft text-left">
+                            <tr className="border-b border-hairline bg-canvas-soft text-start">
                                 {columns.map((column) => (
                                     <th
                                         key={column.key}
                                         className={cn(
                                             'px-4 py-1.5 text-[11px] font-medium text-mute',
                                             column.align === 'right' &&
-                                                'text-right',
+                                                'text-end',
                                         )}
                                     >
                                         {column.header}
@@ -69,11 +69,12 @@ export function HairlineTable({
                                             {columns.map((column) => (
                                                 <td
                                                     key={column.key}
+                                                    dir="auto"
                                                     className={cn(
                                                         'px-4 py-1.5 align-middle',
                                                         column.align ===
                                                             'right' &&
-                                                            'text-right',
+                                                            'text-end',
                                                     )}
                                                 >
                                                     {row.cells[column.key]}
@@ -123,7 +124,7 @@ export function HairlineTable({
                                                 <dt className="text-mute">
                                                     {item.label}
                                                 </dt>
-                                                <dd className="truncate text-ink">
+                                                <dd className="truncate text-ink" dir="auto">
                                                     {item.value}
                                                 </dd>
                                             </div>

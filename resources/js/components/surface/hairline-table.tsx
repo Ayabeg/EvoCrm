@@ -32,7 +32,7 @@ export function HairlineTh({
         <th
             className={cn(
                 'aurora-text-eyebrow px-4 py-2 font-medium text-mute',
-                align === 'right' ? 'text-right' : 'text-left',
+                align === 'right' ? 'text-end' : 'text-start',
                 className,
             )}
             {...props}
@@ -54,7 +54,7 @@ export function HairlineTd({
         <td
             className={cn(
                 'aurora-text-body-sm px-4 py-2.5 text-ink',
-                align === 'right' ? 'text-right' : 'text-left',
+                align === 'right' ? 'text-end' : 'text-start',
                 className,
             )}
             {...props}

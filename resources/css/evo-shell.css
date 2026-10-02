@@ -60,11 +60,15 @@
 
     .evo-shell[data-collapsed='true'] .evo-rail-slot {
         width: 0;
-        border-right-width: 0;
+        border-inline-end-width: 0;
     }
 
     .evo-shell[data-collapsed='true'] .evo-rail-panel {
         transform: translateX(-100%);
+    }
+
+    [dir='rtl'] .evo-shell[data-collapsed='true'] .evo-rail-panel {
+        transform: translateX(100%);
     }
 
     .evo-shell[data-collapsed='true'] .evo-workspace {
@@ -169,10 +173,18 @@
     pointer-events: none;
 }
 
+[dir='rtl'] .evo-mode-off {
+    transform: translateX(-16px);
+}
+
 .evo-mode-exit-left {
     opacity: 0;
     transform: translateX(-12px);
     pointer-events: none;
+}
+
+[dir='rtl'] .evo-mode-exit-left {
+    transform: translateX(12px);
 }
 
 .evo-search-in {

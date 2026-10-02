@@ -52,7 +52,7 @@ function DropdownMenuItem({ className, inset, ...props }: DropdownMenuItemProps)
             className={cn(
                 'relative flex cursor-default items-center gap-2 rounded-[var(--evo-radius-compact)] px-2 py-1.5 outline-none',
                 'focus:bg-[var(--evo-teal-soft)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                inset && 'pl-8',
+                inset && 'ps-8',
                 className,
             )}
             {...props}
@@ -69,13 +69,13 @@ function DropdownMenuCheckboxItem({
     return (
         <DropdownMenuPrimitive.CheckboxItem
             className={cn(
-                'relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 pl-8 pr-2 outline-none focus:bg-[var(--evo-teal-soft)]',
+                'relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 ps-8 pe-2 outline-none focus:bg-[var(--evo-teal-soft)]',
                 className,
             )}
             checked={checked}
             {...props}
         >
-            <span className="absolute left-2 flex size-3.5 items-center justify-center">
+            <span className="absolute start-2 flex size-3.5 items-center justify-center">
                 <DropdownMenuPrimitive.ItemIndicator>
                     <Check className="size-3.5" aria-hidden />
                 </DropdownMenuPrimitive.ItemIndicator>
@@ -93,12 +93,12 @@ function DropdownMenuRadioItem({
     return (
         <DropdownMenuPrimitive.RadioItem
             className={cn(
-                'relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 pl-8 pr-2 outline-none focus:bg-[var(--evo-teal-soft)]',
+                'relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 ps-8 pe-2 outline-none focus:bg-[var(--evo-teal-soft)]',
                 className,
             )}
             {...props}
         >
-            <span className="absolute left-2 flex size-3.5 items-center justify-center">
+            <span className="absolute start-2 flex size-3.5 items-center justify-center">
                 <DropdownMenuPrimitive.ItemIndicator>
                     <Check className="size-3.5" aria-hidden />
                 </DropdownMenuPrimitive.ItemIndicator>
@@ -115,7 +115,7 @@ function DropdownMenuLabel({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & { inset?: boolean }) {
     return (
         <DropdownMenuPrimitive.Label
-            className={cn('px-2 py-1.5 text-[11px] font-medium text-[var(--evo-ink-muted)]', inset && 'pl-8', className)}
+            className={cn('px-2 py-1.5 text-[11px] font-medium text-[var(--evo-ink-muted)]', inset && 'ps-8', className)}
             {...props}
         />
     );
@@ -126,7 +126,7 @@ function DropdownMenuSeparator({ className, ...props }: React.ComponentProps<typ
 }
 
 function DropdownMenuShortcut({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
-    return <span className={cn('ml-auto text-[11px] text-[var(--evo-ink-muted)]', className)} {...props} />;
+    return <span className={cn('ms-auto text-[11px] text-[var(--evo-ink-muted)]', className)} {...props} />;
 }
 
 function DropdownMenuSubTrigger({
@@ -139,13 +139,13 @@ function DropdownMenuSubTrigger({
         <DropdownMenuPrimitive.SubTrigger
             className={cn(
                 'flex cursor-default items-center rounded-[var(--evo-radius-compact)] px-2 py-1.5 outline-none focus:bg-[var(--evo-teal-soft)]',
-                inset && 'pl-8',
+                inset && 'ps-8',
                 className,
             )}
             {...props}
         >
             {children}
-            <CaretRight className="ml-auto size-3.5" aria-hidden />
+            <CaretRight className="ms-auto size-3.5" aria-hidden />
         </DropdownMenuPrimitive.SubTrigger>
     );
 }

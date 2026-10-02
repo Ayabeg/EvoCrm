@@ -76,11 +76,11 @@ function Frame({
             }}
         >
             <span
-                className="absolute top-1 left-1 h-2 w-2 border-t border-l"
+                className="absolute top-1 start-1 h-2 w-2 border-t border-s"
                 style={{ borderColor: 'var(--color-accent)' }}
             />
             <span
-                className="absolute right-1 bottom-1 h-2 w-2 border-r border-b"
+                className="absolute end-1 bottom-1 h-2 w-2 border-e border-b"
                 style={{ borderColor: 'var(--color-accent)' }}
             />
             {children}
@@ -95,7 +95,7 @@ function ContactsMark({ size }: { size: 'sm' | 'md' }) {
         <span className="relative inline-flex">
             <AddressBook size={icon} weight="regular" />
             <span
-                className="absolute -right-2 -bottom-1.5 flex items-center justify-center bg-canvas"
+                className="absolute -end-2 -bottom-1.5 flex items-center justify-center bg-canvas"
                 style={{
                     width: size === 'sm' ? 16 : 20,
                     height: size === 'sm' ? 16 : 20,
@@ -161,7 +161,7 @@ function FilterMark({ size }: { size: 'sm' | 'md' }) {
             <MagnifyingGlass
                 size={size === 'sm' ? 12 : 16}
                 weight="bold"
-                className="absolute -right-2 -bottom-1 text-brand"
+                className="absolute -end-2 -bottom-1 text-brand"
             />
         </span>
     );

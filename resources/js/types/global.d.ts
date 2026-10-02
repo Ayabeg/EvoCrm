@@ -13,6 +13,8 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             locale: string;
+            dir: 'ltr' | 'rtl';
+            intlLocale: string;
             translations: Record<string, string>;
             auth: Auth;
             workspace: Workspace | null;

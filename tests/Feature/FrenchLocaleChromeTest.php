@@ -23,11 +23,11 @@ it('resolves day-1 chrome keys to French', function () {
 });
 
 it('shares French translations on login when locale is fr', function () {
-    App::setLocale('fr');
-
-    $this->get(route('login'))
+    $this->withUnencryptedCookie('locale', 'fr')
+        ->get(route('login'))
         ->assertOk()
         ->assertSee('lang="fr"', false)
+        ->assertSee('dir="ltr"', false)
         ->assertInertia(fn ($page) => $page
             ->component('auth/login')
             ->where('locale', 'fr')
@@ -37,9 +37,9 @@ it('shares French translations on login when locale is fr', function () {
 });
 
 it('serves French chrome on home and public book when locale is fr', function () {
-    App::setLocale('fr');
-
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'preferences' => ['locale' => 'fr'],
+    ]);
 
     $this->actingAs($user)
         ->get('/dashboard')
@@ -69,9 +69,11 @@ it('keeps English keys as the fallback when locale is en', function () {
     expect(__('Log in'))->toBe('Log in')
         ->and(__('A key that does not exist'))->toBe('A key that does not exist');
 
-    $this->get(route('login'))
+    $this->withUnencryptedCookie('locale', 'en')
+        ->get(route('login'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->where('locale', 'en')
-            ->where('translations', []));
+            ->where('translations.Log in', 'Log in')
+            ->where('translations.Home', 'Home'));
 });

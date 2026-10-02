@@ -14,7 +14,8 @@ it('keeps one 212px cabinet with modes as tablist and cmdk as the only command s
         ->and($css)->toContain('var(--evo-duration-micro)')
         ->and($css)->not->toContain('150ms ease')
         ->and($switch)->toContain('role="tablist"')
-        ->and($switch)->toContain('Recherche')
+        ->and($switch)->toContain("t(item.label)")
+        ->and($switch)->toContain("label: 'Search'")
         ->and($rail)->toContain('ShellModeSwitch')
         ->and($rail)->not->toContain('@astryxdesign')
         ->and($rail)->not->toContain('lucide-react')
@@ -22,10 +23,10 @@ it('keeps one 212px cabinet with modes as tablist and cmdk as the only command s
         ->and($shell)->toContain('useCommandPaletteShortcut')
         ->and($palette)->toContain("from 'cmdk'")
         ->and($palette)->toContain('trapTabKey')
-        ->and($palette)->toContain('Palette de commandes')
+        ->and($palette)->toContain("t('Command palette')")
         ->and($palette)->not->toContain('@/components/aurora/command-palette')
-        ->and($agents)->toContain('VOS AGENTS')
-        ->and($agents)->toContain('+ Nouvelle conversation')
+        ->and($agents)->toContain("t('Your agents')")
+        ->and($agents)->toContain("t('New conversation')")
         ->and($agents)->toContain('outline-[var(--evo-focus)]')
         ->and($agents)->not->toContain('outline-shell-orange');
 });

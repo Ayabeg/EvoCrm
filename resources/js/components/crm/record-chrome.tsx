@@ -113,15 +113,15 @@ export function RecordActions({
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                title="More actions"
-                                aria-label={`More actions for record ${entityId}`}
+                                title={t('More actions')}
+                                aria-label={t('More actions for record :id', { id: entityId })}
                                 className="h-8 px-2 text-[12px] font-medium"
                             >
                                 <DotsThree
                                     className="size-3.5"
                                     aria-hidden
                                 />
-                                More
+                                {t('More')}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
@@ -131,7 +131,7 @@ export function RecordActions({
                                         href={`/crm/deals?create=1&contact_id=${contactId}`}
                                     >
                                         <Handshake className="size-3.5" aria-hidden />
-                                        Create deal
+                                        {t('Create deal')}
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
@@ -139,7 +139,7 @@ export function RecordActions({
                                 <DropdownMenuItem asChild>
                                     <Link href="/crm/contacts?create=1">
                                         <UserPlus className="size-3.5" aria-hidden />
-                                        Add contact
+                                        {t('Add contact')}
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
@@ -147,7 +147,7 @@ export function RecordActions({
                                 <DropdownMenuItem asChild>
                                     <Link href="/outbound/sequences">
                                         <Lightning className="size-3.5" aria-hidden />
-                                        Enroll in sequence
+                                        {t('Enroll in sequence')}
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
@@ -155,7 +155,7 @@ export function RecordActions({
                                 <DropdownMenuItem asChild>
                                     <Link href="/outbound/campaigns">
                                         <PaperPlaneRight className="size-3.5" aria-hidden />
-                                        Add to campaign
+                                        {t('Add to campaign')}
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
@@ -163,7 +163,7 @@ export function RecordActions({
                                 <DropdownMenuItem asChild>
                                     <Link href="/crm/segments">
                                         <UsersThree className="size-3.5" aria-hidden />
-                                        View segments
+                                        {t('View segments')}
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
@@ -180,7 +180,7 @@ export function RecordActions({
                                             className="flex w-full items-center gap-2 px-2 py-1.5 text-sm"
                                         >
                                             <Envelope className="size-3.5" aria-hidden />
-                                            Draft email with Evo
+                                            {t('Draft email with Evo')}
                                         </button>
                                     </Form>
                                 </DropdownMenuItem>
@@ -189,7 +189,7 @@ export function RecordActions({
                                 <DropdownMenuItem asChild>
                                     <Link href="/inbox">
                                         <Tray className="size-3.5" aria-hidden />
-                                        Open in Desk
+                                        {t('Open in Desk')}
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
@@ -197,14 +197,14 @@ export function RecordActions({
                                 <DropdownMenuItem asChild>
                                     <Link href="/outbound">
                                         <PaperPlaneTilt className="size-3.5" aria-hidden />
-                                        Email via Outbound
+                                        {t('Email via Outbound')}
                                     </Link>
                                 </DropdownMenuItem>
                             ) : null}
                             <DropdownMenuItem asChild>
                                 <Link href="/crm/deals/board">
                                     <Handshake className="size-3.5" aria-hidden />
-                                    View deal board
+                                    {t('View deal board')}
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -340,7 +340,7 @@ export function ActivityTabs({
                         value={tab.key}
                         className="min-h-9 shrink-0 px-3 py-1.5 after:shadow-none data-[state=active]:after:shadow-none sm:min-h-8"
                     >
-                        {tab.label}
+                        {t(tab.label)}
                     </TabsTrigger>
                 ))}
             </TabsList>
@@ -371,21 +371,21 @@ export function AssociationCard({
                     as="h3"
                     className="text-[11px] font-semibold tracking-wide text-mute uppercase"
                 >
-                    {title}
+                    {t(title)}
                 </CardTitle>
                 {addHref ? (
                     <Link
                         href={addHref}
                         className="text-[12px] font-medium text-ink hover:underline"
                     >
-                        {addLabel}
+                        {t(addLabel)}
                     </Link>
                 ) : addLabel !== 'Add' ? (
-                    <span className="text-[12px] text-mute">{addLabel}</span>
+                    <span className="text-[12px] text-mute">{t(addLabel)}</span>
                 ) : null}
             </CardHeader>
             <CardContent className="space-y-1 px-0 pt-2 pb-0 text-[13px] leading-snug">
-                {children ?? <p className="text-mute">{empty ?? 'None'}</p>}
+                {children ?? <p className="text-mute">{t(empty ?? 'None')}</p>}
             </CardContent>
         </Card>
     );

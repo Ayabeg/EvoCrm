@@ -1,9 +1,11 @@
+import { intlLocale } from '@/lib/i18n';
 import { formatCompactDzd, formatDzd } from '@/lib/money';
 
 export const LOCALE = 'fr-DZ';
 export const TIMEZONE = 'Africa/Algiers';
 export const CURRENCY_SUFFIX = 'DA';
 export const DEFAULT_COUNTRY_CALLING_CODE = '213';
+export const NUMBERING_SYSTEM = 'latn' as const;
 
 /** Saturday. Intl `weekInfo.firstDay` for fr-DZ. Use with react-day-picker. */
 export const WEEK_STARTS_ON = 6 as const;
@@ -13,15 +15,32 @@ export const WEEKEND_DAYS = [5, 6] as const;
 
 export { formatCompactDzd, formatDzd };
 
-function groupFrDz(value: number): string {
+function activeIntlLocale(): string {
+    try {
+        return intlLocale();
+    } catch {
+        return LOCALE;
+    }
+}
+
+function moneyFormat(
+    value: number,
+    options: Intl.NumberFormatOptions = {},
+): string {
     return new Intl.NumberFormat(LOCALE, {
         maximumFractionDigits: 0,
+        numberingSystem: NUMBERING_SYSTEM,
+        ...options,
     }).format(value);
 }
 
+function groupFrDz(value: number): string {
+    return moneyFormat(value);
+}
+
 /**
- * Non-compact DZD: "1 280 000 DA" (narrow no-break group + NBSP before DA).
- * Do not use style:'currency' — fr-DZ currency prints a decimal DA form.
+ * Non-compact DA: "1 280 000 DA" (narrow no-break group + NBSP before DA).
+ * Same string in fr/en/ar. Do not use style:'currency' — that prints DZD.
  */
 export function formatMoney(amount: number, options?: { compact?: boolean }): string {
     if (options?.compact) {
@@ -39,12 +58,7 @@ export function formatMoneyFromCents(
 }
 
 export function formatMoneyCompact(amount: number): string {
-    const compact = new Intl.NumberFormat(LOCALE, {
-        notation: 'compact',
-        maximumFractionDigits: 1,
-    }).format(amount);
-
-    return `${compact}\u00A0${CURRENCY_SUFFIX}`;
+    return formatCompactDzd(amount * 100);
 }
 
 export function formatNumber(value: number): string {
@@ -59,11 +73,12 @@ export function formatDate(
     value: Date | string | number,
     options?: Intl.DateTimeFormatOptions,
 ): string {
-    return new Intl.DateTimeFormat(LOCALE, {
+    return new Intl.DateTimeFormat(activeIntlLocale(), {
         timeZone: TIMEZONE,
         day: 'numeric',
         month: 'short',
         year: 'numeric',
+        numberingSystem: NUMBERING_SYSTEM,
         ...options,
     }).format(asDate(value));
 }
@@ -72,11 +87,12 @@ export function formatTime(
     value: Date | string | number,
     options?: Intl.DateTimeFormatOptions,
 ): string {
-    return new Intl.DateTimeFormat(LOCALE, {
+    return new Intl.DateTimeFormat(activeIntlLocale(), {
         timeZone: TIMEZONE,
         hour: '2-digit',
         minute: '2-digit',
         hourCycle: 'h23',
+        numberingSystem: NUMBERING_SYSTEM,
         ...options,
     }).format(asDate(value));
 }
@@ -85,7 +101,7 @@ export function formatDateTime(
     value: Date | string | number,
     options?: Intl.DateTimeFormatOptions,
 ): string {
-    return new Intl.DateTimeFormat(LOCALE, {
+    return new Intl.DateTimeFormat(activeIntlLocale(), {
         timeZone: TIMEZONE,
         day: 'numeric',
         month: 'short',
@@ -93,6 +109,7 @@ export function formatDateTime(
         hour: '2-digit',
         minute: '2-digit',
         hourCycle: 'h23',
+        numberingSystem: NUMBERING_SYSTEM,
         ...options,
     }).format(asDate(value));
 }

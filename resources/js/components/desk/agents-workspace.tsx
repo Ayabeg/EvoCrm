@@ -25,6 +25,7 @@ import type {
     BotDefinition,
     ChatMessage,
 } from '@/lib/desk/bot-catalog';
+import { t } from '@/lib/i18n';
 
 type AgentWorkspaceProps = {
     profile: AgentProfile;
@@ -97,7 +98,7 @@ export function AgentsWorkspace({
                             ) : null}
                         </div>
                         <p className="mt-0.5 truncate text-[12px] text-evo-ink-muted">
-                            {chat ? profile.summary : profile.availability}
+                            {chat ? t(profile.summary) : t(profile.availability)}
                         </p>
                     </div>
                 </div>
@@ -117,7 +118,7 @@ export function AgentsWorkspace({
                                 weight="bold"
                                 aria-hidden
                             />
-                            Nouvelle conversation
+                            {t('New conversation')}
                         </button>
                     ) : (
                         <>
@@ -147,7 +148,7 @@ export function AgentsWorkspace({
                                         evoFocus,
                                     )}
                                 >
-                                    Contexte · {primaryContext.label}
+                                    {t('Context')} · {primaryContext.label}
                                 </Link>
                             ) : null}
                             <div className="relative">
@@ -157,7 +158,7 @@ export function AgentsWorkspace({
                                         'grid size-8 place-items-center rounded-[var(--evo-radius-compact)] text-evo-ink-muted transition-colors hover:bg-evo-surface-subtle hover:text-evo-ink motion-reduce:transition-none',
                                         evoFocus,
                                     )}
-                                    aria-label="Autres actions de conversation"
+                                    aria-label={t('More conversation actions')}
                                     aria-haspopup="menu"
                                     aria-expanded={moreOpen}
                                     onClick={() =>
@@ -178,14 +179,14 @@ export function AgentsWorkspace({
                                 {moreOpen ? (
                                     <div
                                         role="menu"
-                                        aria-label="Actions de conversation"
-                                        className="absolute top-[calc(100%+6px)] right-0 z-30 min-w-40 rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface p-1 shadow-evo-floating"
+                                        aria-label={t('Conversation actions')}
+                                        className="absolute top-[calc(100%+6px)] end-0 z-30 min-w-40 rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface p-1 shadow-evo-floating"
                                     >
                                         <button
                                             type="button"
                                             role="menuitem"
                                             className={cn(
-                                                'flex h-8 w-full items-center rounded-[var(--evo-radius-compact)] px-2 text-left text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                                'flex h-8 w-full items-center rounded-[var(--evo-radius-compact)] px-2 text-start text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
                                                 evoFocus,
                                             )}
                                             onClick={() => {
@@ -193,7 +194,7 @@ export function AgentsWorkspace({
                                                 onNewChat();
                                             }}
                                         >
-                                            Nouvelle conversation
+                                            {t('New conversation')}
                                         </button>
                                         <Link
                                             href={`/agents/bots/${profile.bot.id}`}
@@ -231,7 +232,7 @@ export function AgentsWorkspace({
                         {!hasMessages ? (
                             <div
                                 role="group"
-                                aria-label="Suggestions"
+                                aria-label={t('Suggestions')}
                                 className="mt-2.5 flex flex-wrap justify-center gap-1.5"
                             >
                                 {quickPrompts.map((prompt) => (
@@ -274,7 +275,7 @@ export function AgentsDirectoryHome({
 }) {
     return (
         <main
-            aria-label="Agents directory workspace"
+            aria-label={t('Agents directory workspace')}
             className="evo-agents light flex min-h-0 min-w-0 flex-1 flex-col"
             data-agents-page
             data-agents-home
@@ -283,10 +284,10 @@ export function AgentsDirectoryHome({
             <header className="flex min-h-[64px] shrink-0 items-center justify-between border-b border-evo-hairline bg-evo-surface px-5 sm:px-7">
                 <div>
                     <p className="text-[10px] font-semibold tracking-[0.12em] text-evo-teal uppercase">
-                        Opérations CRM
+                        {t('CRM operations')}
                     </p>
                     <h1 className="mt-0.5 text-[17px] font-semibold tracking-[-0.025em] text-evo-ink">
-                        Agents
+                        {t('Agents')}
                     </h1>
                 </div>
             </header>
@@ -300,41 +301,41 @@ export function AgentsDirectoryHome({
                         />
                     </div>
                     <h2 className="mt-5 max-w-[560px] text-[26px] leading-tight font-semibold tracking-[-0.04em] text-evo-ink sm:text-[30px]">
-                        Choisissez un agent pour démarrer.
+                        {t('Choose an agent to start.')}
                     </h2>
                     <p className="mt-3 max-w-[500px] text-[13px] leading-6 text-evo-ink-secondary">
-                        Chaque agent travaille avec le contexte CRM adapté à sa
-                        mission. Les conversations et les fiches restent dans
-                        EvoCRM.
+                        {t(
+                            'Each agent works with the CRM context that matches its job. Conversations and records stay in EvoCRM.',
+                        )}
                     </p>
                     <div className="mt-8 grid max-w-[620px] gap-2 sm:grid-cols-2">
                         {[
                             {
                                 id: 'closer',
-                                label: 'Closer',
-                                detail: 'Affaires et prochaines actions',
+                                label: t('Closer'),
+                                detail: t('Deals and next actions'),
                             },
                             {
                                 id: 'qualifier',
-                                label: 'Qualifier',
-                                detail: 'Leads et enrichissement',
+                                label: t('Qualifier'),
+                                detail: t('Leads and enrichment'),
                             },
                             {
                                 id: 'quote-desk',
-                                label: 'Quote desk',
-                                detail: 'Devis et tarification',
+                                label: t('Quote desk'),
+                                detail: t('Quotes and pricing'),
                             },
                             {
                                 id: 'after-sale',
-                                label: 'After-sale',
-                                detail: 'Suivi client',
+                                label: t('After-sale'),
+                                detail: t('Customer follow-up'),
                             },
                         ].map((item) => (
                             <button
                                 key={item.id}
                                 type="button"
                                 className={cn(
-                                    'flex min-h-[58px] items-center justify-between gap-3 rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface px-3.5 text-left transition-colors hover:border-evo-teal/25 hover:bg-evo-surface-subtle motion-reduce:transition-none',
+                                    'flex min-h-[58px] items-center justify-between gap-3 rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface px-3.5 text-start transition-colors hover:border-evo-teal/25 hover:bg-evo-surface-subtle motion-reduce:transition-none',
                                     evoFocus,
                                 )}
                                 onClick={() => onSelectAgent(item.id)}
@@ -488,7 +489,7 @@ function AssistantResponse({
             {message.crmActions && message.crmActions.length > 0 ? (
                 <section
                     className="w-full max-w-[650px] rounded-[var(--evo-radius-floating)] border border-evo-hairline bg-evo-surface p-3"
-                    aria-label="CRM actions"
+                    aria-label={t('CRM actions')}
                 >
                     <p className="text-[10px] font-semibold tracking-[0.1em] text-evo-ink-muted uppercase">
                         CRM
@@ -522,14 +523,14 @@ function isInternalHref(href: string): boolean {
 
 function actionLabel(id: string, fallback: string): string {
     const labels: Record<string, string> = {
-        'open-company': 'Ouvrir l’entreprise',
-        'open-contact': 'Ouvrir le contact',
-        'open-deal': 'Ouvrir l’affaire',
-        'open-quote': 'Ouvrir le devis',
-        'open-home': 'Ouvrir l’accueil',
-        'open-overdue': 'Voir les activités en retard',
-        'draft-email': 'Préparer un e-mail',
+        'open-company': t('Open company'),
+        'open-contact': t('Open contact'),
+        'open-deal': t('Open deal'),
+        'open-quote': t('Open quote'),
+        'open-home': t('Open home'),
+        'open-overdue': t('See overdue activities'),
+        'draft-email': t('Draft an email'),
     };
 
-    return labels[id] ?? fallback;
+    return labels[id] ?? t(fallback);
 }

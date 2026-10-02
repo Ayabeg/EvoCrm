@@ -44,7 +44,7 @@ function ContextMenuItem({
         <ContextMenuPrimitive.Item
             className={cn(
                 'relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] px-2 py-1.5 outline-none focus:bg-[var(--evo-teal-soft)]',
-                inset && 'pl-8',
+                inset && 'ps-8',
                 className,
             )}
             {...props}
@@ -60,11 +60,11 @@ function ContextMenuCheckboxItem({
 }: React.ComponentProps<typeof ContextMenuPrimitive.CheckboxItem>) {
     return (
         <ContextMenuPrimitive.CheckboxItem
-            className={cn('relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 pl-8 pr-2 outline-none focus:bg-[var(--evo-teal-soft)]', className)}
+            className={cn('relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 ps-8 pe-2 outline-none focus:bg-[var(--evo-teal-soft)]', className)}
             checked={checked}
             {...props}
         >
-            <span className="absolute left-2 flex size-3.5 items-center justify-center">
+            <span className="absolute start-2 flex size-3.5 items-center justify-center">
                 <ContextMenuPrimitive.ItemIndicator>
                     <Check className="size-3.5" aria-hidden />
                 </ContextMenuPrimitive.ItemIndicator>
@@ -81,10 +81,10 @@ function ContextMenuRadioItem({
 }: React.ComponentProps<typeof ContextMenuPrimitive.RadioItem>) {
     return (
         <ContextMenuPrimitive.RadioItem
-            className={cn('relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 pl-8 pr-2 outline-none focus:bg-[var(--evo-teal-soft)]', className)}
+            className={cn('relative flex cursor-default items-center rounded-[var(--evo-radius-compact)] py-1.5 ps-8 pe-2 outline-none focus:bg-[var(--evo-teal-soft)]', className)}
             {...props}
         >
-            <span className="absolute left-2 flex size-3.5 items-center justify-center">
+            <span className="absolute start-2 flex size-3.5 items-center justify-center">
                 <ContextMenuPrimitive.ItemIndicator>
                     <Check className="size-3.5" aria-hidden />
                 </ContextMenuPrimitive.ItemIndicator>
@@ -101,7 +101,7 @@ function ContextMenuLabel({
 }: React.ComponentProps<typeof ContextMenuPrimitive.Label> & { inset?: boolean }) {
     return (
         <ContextMenuPrimitive.Label
-            className={cn('px-2 py-1.5 text-[11px] font-medium text-[var(--evo-ink-muted)]', inset && 'pl-8', className)}
+            className={cn('px-2 py-1.5 text-[11px] font-medium text-[var(--evo-ink-muted)]', inset && 'ps-8', className)}
             {...props}
         />
     );
@@ -112,7 +112,7 @@ function ContextMenuSeparator({ className, ...props }: React.ComponentProps<type
 }
 
 function ContextMenuShortcut({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
-    return <span className={cn('ml-auto text-[11px] text-[var(--evo-ink-muted)]', className)} {...props} />;
+    return <span className={cn('ms-auto text-[11px] text-[var(--evo-ink-muted)]', className)} {...props} />;
 }
 
 function ContextMenuSubTrigger({
@@ -125,13 +125,13 @@ function ContextMenuSubTrigger({
         <ContextMenuPrimitive.SubTrigger
             className={cn(
                 'flex cursor-default items-center rounded-[var(--evo-radius-compact)] px-2 py-1.5 outline-none focus:bg-[var(--evo-teal-soft)]',
-                inset && 'pl-8',
+                inset && 'ps-8',
                 className,
             )}
             {...props}
         >
             {children}
-            <CaretRight className="ml-auto size-3.5" aria-hidden />
+            <CaretRight className="ms-auto size-3.5" aria-hidden />
         </ContextMenuPrimitive.SubTrigger>
     );
 }

@@ -26,8 +26,10 @@ import type { AttributeBag } from '@/components/crm/record-properties';
 import TicketsRelatedCard from '@/components/crm/tickets-related-card';
 import type { TicketsRelated } from '@/components/crm/tickets-related-card';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
+import { formatPhone } from '@/evo/lib/format';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
+import { t } from '@/lib/i18n';
 
 type Contact = {
     id: number;
@@ -113,7 +115,7 @@ export default function ContactShow({
                                 <div className="flex items-center justify-end">
                                     <RecordBack
                                         href="/crm/contacts"
-                                        label="Back to Contacts"
+                                        label={t('Back to Contacts')}
                                     />
                                     <div className="md:hidden">
                                         <AskEvoTrigger
@@ -125,7 +127,7 @@ export default function ContactShow({
                                 <RecordIdentity
                                     title={name}
                                     kind="Contact"
-                                    subtitle={company?.name ?? 'No company'}
+                                    subtitle={company?.name ?? t('No company')}
                                     badge={
                                         contact.lead_status ? (
                                             <RecordStatusBadge>
@@ -164,15 +166,15 @@ export default function ContactShow({
                         }
                     >
                         <RecordShell
-                            leftLabel="About"
-                            centerLabel="Activity"
-                            rightLabel="Related"
+                            leftLabel={t('About')}
+                            centerLabel={t('Activity')}
+                            rightLabel={t('Related')}
                             leftClassName="bg-white"
                             centerClassName="bg-white"
                             rightClassName="bg-white"
                             left={
                                 <div className="space-y-5">
-                                    <RecordSection title="About this contact">
+                                    <RecordSection title={t('About this contact')}>
                                         <RecordFactList>
                                             <RecordFact
                                                 label="Email"
@@ -180,7 +182,11 @@ export default function ContactShow({
                                             />
                                             <RecordFact
                                                 label="Phone"
-                                                value={contact.phone_e164}
+                                                value={
+                                                    contact.phone_e164
+                                                        ? formatPhone(contact.phone_e164)
+                                                        : null
+                                                }
                                             />
                                             <RecordFact
                                                 label="Company"
@@ -249,13 +255,13 @@ export default function ContactShow({
                                         }
                                     />
                                     <AssociationCard
-                                        title="Company"
+                                        title={t('Company')}
                                         addHref={
                                             company
                                                 ? `/crm/companies/${company.id}`
                                                 : '/crm/companies?create=1'
                                         }
-                                        addLabel={company ? 'View' : 'Add'}
+                                        addLabel={company ? t('View') : t('Add')}
                                     >
                                         {company ? (
                                             <RelatedRecordLink
@@ -265,17 +271,17 @@ export default function ContactShow({
                                             </RelatedRecordLink>
                                         ) : (
                                             <p className="text-mute">
-                                                No company linked
+                                                {t('No company linked')}
                                             </p>
                                         )}
                                     </AssociationCard>
                                     <AssociationCard
-                                        title="Deals"
+                                        title={t('Deals')}
                                         addHref={`/crm/deals?create=1&contact_id=${contact.id}`}
                                     >
                                         {deals.length === 0 ? (
                                             <p className="text-mute">
-                                                No deals yet
+                                                {t('No deals yet')}
                                             </p>
                                         ) : (
                                             deals.map((deal) => (

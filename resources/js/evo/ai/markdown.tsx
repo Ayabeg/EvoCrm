@@ -18,10 +18,10 @@ import { cn } from '@/evo/lib/cn';
 const components: Components = {
     p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
     ul: ({ children }) => (
-        <ul className="mb-3 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>
+        <ul className="mb-3 list-disc space-y-1 ps-5 last:mb-0">{children}</ul>
     ),
     ol: ({ children }) => (
-        <ol className="mb-3 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>
+        <ol className="mb-3 list-decimal space-y-1 ps-5 last:mb-0">{children}</ol>
     ),
     li: ({ children }) => <li className="leading-6">{children}</li>,
     a: ({ href, children }) => (
@@ -58,7 +58,7 @@ const components: Components = {
     },
     pre: ({ children }) => <pre className="mb-3 last:mb-0">{children}</pre>,
     blockquote: ({ children }) => (
-        <blockquote className="mb-3 border-l-2 border-evo-teal-soft pl-3 text-evo-ink-secondary last:mb-0">
+        <blockquote className="mb-3 border-s-2 border-evo-teal-soft ps-3 text-evo-ink-secondary last:mb-0">
             {children}
         </blockquote>
     ),

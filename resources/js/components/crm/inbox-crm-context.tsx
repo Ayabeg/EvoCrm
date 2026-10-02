@@ -118,7 +118,7 @@ function ActivityLine({
     return (
         <p className="truncate text-[13px] text-ink">
             {item.subject}
-            <span className="ml-1 text-[12px] text-mute">
+            <span className="ms-1 text-[12px] text-mute">
                 {item.type}
                 {item.at ? ` · ${formatContextWhen(item.at)}` : ''}
             </span>
@@ -149,7 +149,7 @@ function DealRow({
             <button
                 type="button"
                 onClick={() => onInspect(deal.id)}
-                className="block w-full truncate text-left text-[13px] font-medium text-ink hover:text-brand"
+                className="block w-full truncate text-start text-[13px] font-medium text-ink hover:text-brand"
             >
                 {deal.title}
             </button>

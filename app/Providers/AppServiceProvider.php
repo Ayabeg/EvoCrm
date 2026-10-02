@@ -35,6 +35,7 @@ use App\Services\Desk\TwilioSmsClient;
 use App\Services\Identity\WorkspaceProvisioner;
 use App\Services\Operations\AuditLogger;
 use App\Services\Operations\ScheduledTaskMonitor;
+use App\Support\Locale;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Login;
@@ -120,6 +121,14 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Login::class, function (Login $event): void {
             $user = $event->user;
             if ($user instanceof User) {
+                $cookieLocale = Locale::normalize(request()->cookie(Locale::COOKIE));
+
+                if ($cookieLocale !== null && Locale::fromPreferences($user->preferences) === null) {
+                    $user->forceFill([
+                        'preferences' => Locale::mergePreference($user->preferences, $cookieLocale),
+                    ]);
+                }
+
                 $user->forceFill(['last_login_at' => now()])->save();
                 $analytics = app(ProductAnalytics::class);
                 $analytics->identify($user, $user->workspace);

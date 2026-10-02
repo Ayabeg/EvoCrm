@@ -16,7 +16,7 @@ export type AgentProfile = {
     bot: BotDefinition;
     section: 'your' | 'system';
     summary: string;
-    availability: 'Disponible';
+    availability: 'Available';
     defaultAskPage: 'workspace' | 'dashboard';
     emptyMessage: string;
     placeholder: string;
@@ -41,8 +41,8 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('closer'),
         section: 'your',
-        summary: 'Opportunités actives → prochaines actions',
-        availability: 'Disponible',
+        summary: 'Turns active opportunities into next actions.',
+        availability: 'Available',
         defaultAskPage: 'dashboard',
         emptyMessage:
             'Transformez vos opportunités actives en prochaines actions.',
@@ -75,8 +75,8 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('qualifier'),
         section: 'your',
-        summary: 'Qualifie et enrichit les leads entrants',
-        availability: 'Disponible',
+        summary: 'Qualifies leads with useful context.',
+        availability: 'Available',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Évaluez le potentiel de vos nouveaux leads avec le contexte du CRM.',
@@ -106,8 +106,8 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('quote-desk'),
         section: 'your',
-        summary: 'Prépare et suit les devis',
-        availability: 'Disponible',
+        summary: 'Turns needs into a clear quote path.',
+        availability: 'Available',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Préparez la prochaine étape d’un devis à partir des données de l’affaire.',
@@ -135,8 +135,8 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('after-sale'),
         section: 'your',
-        summary: 'Suit les clients après la vente',
-        availability: 'Disponible',
+        summary: 'Moves customers forward after handover.',
+        availability: 'Available',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Suivez les clients après la vente, de l’accueil au support.',
@@ -165,8 +165,8 @@ export const AGENT_PROFILES: AgentProfile[] = [
     {
         bot: bot('desk'),
         section: 'system',
-        summary: 'Route les conversations Inbox',
-        availability: 'Disponible',
+        summary: 'Routes incoming work to the right desk.',
+        availability: 'Available',
         defaultAskPage: 'workspace',
         emptyMessage:
             'Trouvez le bon contexte CRM et la bonne équipe pour une conversation.',

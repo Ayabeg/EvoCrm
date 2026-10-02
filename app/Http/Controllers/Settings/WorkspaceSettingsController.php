@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Enums\WorkspaceRole;
 use App\Http\Controllers\Controller;
+use App\Support\Locale;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,8 +16,11 @@ class WorkspaceSettingsController extends Controller
     {
         abort_unless($request->user()?->role === WorkspaceRole::Owner, 403);
 
+        $workspace = $request->user()->workspace;
+
         return Inertia::render('settings/workspace', [
-            'simple_mode' => (bool) $request->user()->workspace?->simple_mode,
+            'simple_mode' => (bool) $workspace?->simple_mode,
+            'workspace_locale' => Locale::fromPreferences($workspace?->preferences),
         ]);
     }
 
@@ -26,10 +30,20 @@ class WorkspaceSettingsController extends Controller
 
         $request->validate([
             'simple_mode' => ['required', 'boolean'],
+            'locale' => ['nullable', 'in:fr,en,ar'],
         ]);
 
-        $request->user()->workspace->forceFill([
+        $workspace = $request->user()->workspace;
+        $locale = Locale::normalize($request->input('locale'));
+        $preferences = $workspace->preferences;
+
+        if ($locale !== null) {
+            $preferences = Locale::mergePreference($preferences, $locale);
+        }
+
+        $workspace->forceFill([
             'simple_mode' => $request->boolean('simple_mode'),
+            'preferences' => $preferences,
         ])->save();
 
         return redirect()->route('settings.workspace');

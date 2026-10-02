@@ -114,7 +114,7 @@ export function InlineProperty({
                 {onCommit && !disabled ? (
                     <button
                         type="button"
-                        className="block w-full truncate rounded-[var(--evo-radius-compact)] text-left hover:bg-[var(--evo-hover)] focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)] focus-visible:outline-none"
+                        className="block w-full truncate rounded-[var(--evo-radius-compact)] text-start hover:bg-[var(--evo-hover)] focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)] focus-visible:outline-none"
                         onClick={() => {
                             setDraft(property.value ?? '');
                             setEditing(true);

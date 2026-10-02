@@ -339,7 +339,7 @@ function EvoDataGridInner<TData>({
                                         <th
                                             key={header.id}
                                             className={cn(
-                                                'relative px-3 text-left text-[11px] font-medium text-[var(--evo-ink-muted)]',
+                                                'relative px-3 text-start text-[11px] font-medium text-[var(--evo-ink-muted)]',
                                                 widthClass,
                                             )}
                                             style={
@@ -391,7 +391,7 @@ function EvoDataGridInner<TData>({
                                                     aria-label={dataGridFr.resize}
                                                     onMouseDown={header.getResizeHandler()}
                                                     onTouchStart={header.getResizeHandler()}
-                                                    className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-[var(--evo-teal)]"
+                                                    className="absolute end-0 top-0 h-full w-1 cursor-col-resize hover:bg-[var(--evo-teal)]"
                                                 />
                                             ) : null}
                                         </th>
@@ -481,6 +481,7 @@ function EvoDataGridInner<TData>({
                                         return (
                                             <td
                                                 key={cell.id}
+                                                dir="auto"
                                                 className={cn('px-3 align-middle', widthClass)}
                                                 style={
                                                     embedded && !sized

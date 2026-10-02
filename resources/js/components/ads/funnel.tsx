@@ -97,7 +97,7 @@ export function FunnelBoard({ funnel, compact = false }: { funnel: FunnelCounts;
                                 />
                             ) : null}
                         </div>
-                        <div className="text-right text-[11px] whitespace-nowrap">
+                        <div className="text-end text-[11px] whitespace-nowrap">
                             <span className="font-medium text-ink">{stage.count.toLocaleString()}</span>{' '}
                             <span className="text-muted-foreground">
                                 {previous === null ? '' : pct(stage.count, previous)}

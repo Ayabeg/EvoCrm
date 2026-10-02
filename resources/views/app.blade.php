@@ -1,9 +1,11 @@
 @php
     $appearance = request()->cookie('appearance', 'system');
     $appearance = in_array($appearance, ['light', 'dark', 'system'], true) ? $appearance : 'system';
+    $htmlLocale = \App\Support\Locale::htmlLang(app()->getLocale());
+    $htmlDir = \App\Support\Locale::direction($htmlLocale);
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => $appearance === 'dark']) @if ($appearance === 'dark') data-theme="dark" @endif>
+<html lang="{{ $htmlLocale }}" dir="{{ $htmlDir }}" @class(['dark' => $appearance === 'dark']) @if ($appearance === 'dark') data-theme="dark" @endif>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

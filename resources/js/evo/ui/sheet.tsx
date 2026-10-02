@@ -62,8 +62,8 @@ function SheetContent({
                     'border-[var(--evo-hairline)] focus-visible:outline-none',
                     MOTION_DRAWER_CLASS,
                     'motion-reduce:animate-none',
-                    side === 'right' && 'inset-y-0 right-0 h-full w-full border-l sm:max-w-md',
-                    side === 'left' && 'inset-y-0 left-0 h-full w-full border-r sm:max-w-md',
+                    side === 'right' && 'inset-y-0 end-0 h-full w-full border-s sm:max-w-md',
+                    side === 'left' && 'inset-y-0 start-0 h-full w-full border-e sm:max-w-md',
                     side === 'top' && 'inset-x-0 top-0 border-b',
                     side === 'bottom' && 'inset-x-0 bottom-0 border-t',
                     className,
@@ -73,7 +73,7 @@ function SheetContent({
                 {children}
                 {hideClose ? null : (
                     <DialogPrimitive.Close
-                        className="absolute right-3 top-3 inline-flex size-8 items-center justify-center rounded-[var(--evo-radius-compact)] text-[var(--evo-ink-muted)] hover:bg-[var(--evo-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]"
+                        className="absolute end-3 top-3 inline-flex size-8 items-center justify-center rounded-[var(--evo-radius-compact)] text-[var(--evo-ink-muted)] hover:bg-[var(--evo-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]"
                         aria-label={sr.close}
                     >
                         <X className="size-4" aria-hidden />

@@ -45,7 +45,7 @@ export function FunnelStageBoard({ stages }: { stages: FunnelStageRow[] }) {
                                 />
                             ) : null}
                         </div>
-                        <div className="text-right text-[12px] whitespace-nowrap">
+                        <div className="text-end text-[12px] whitespace-nowrap">
                             <span className="money font-medium text-ink">
                                 {stage.count.toLocaleString()}
                             </span>{' '}

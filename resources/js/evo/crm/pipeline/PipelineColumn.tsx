@@ -54,7 +54,7 @@ export function PipelineColumn({
             ref={setNodeRef}
             data-testid={testId}
             className={cn(
-                'flex h-full min-h-0 w-[280px] max-w-[320px] min-w-[260px] shrink-0 flex-col overflow-hidden border-r border-[var(--evo-hairline)] px-2.5 py-2 last:border-r-0',
+                'flex h-full min-h-0 w-[280px] max-w-[320px] min-w-[260px] shrink-0 flex-col overflow-hidden border-e border-[var(--evo-hairline)] px-2.5 py-2 last:border-e-0',
                 (over || isOver) &&
                     'bg-[var(--evo-surface-subtle)] outline outline-1 outline-offset-[-1px] outline-[color-mix(in_srgb,var(--evo-ink)_22%,var(--evo-hairline))]',
                 className,
@@ -101,7 +101,7 @@ export function PipelineColumn({
                             {virtualizer.getVirtualItems().map((row) => (
                                 <div
                                     key={itemIds[row.index]}
-                                    className="absolute top-0 left-0 w-full pb-1.5"
+                                    className="absolute top-0 start-0 w-full pb-1.5"
                                     style={{
                                         transform: `translateY(${row.start}px)`,
                                     }}

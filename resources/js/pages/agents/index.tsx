@@ -18,7 +18,6 @@ import {
     Robot,
 } from '@/evo/icons';
 import { cn } from '@/evo/lib/cn';
-import { t } from '@/lib/i18n';
 import { resolveAgentProfile } from '@/lib/desk/agent-profiles';
 import {
     dispatchAgentsWorkspace,
@@ -41,6 +40,7 @@ import {
     setChatRecordContext,
     useBotDeskStore,
 } from '@/lib/desk/bot-catalog';
+import { t } from '@/lib/i18n';
 
 type PageProps = {
     chats?: AgentChat[];
@@ -262,7 +262,7 @@ export default function AgentsIndex() {
                             onClick={() => setCreateBotOpen(true)}
                         >
                             <Plus className="size-3.5" weight="bold" />
-                            Nouveau bot
+                            {t('New bot')}
                         </button>
                     </header>
                     <BotsView
@@ -342,20 +342,20 @@ function BotsView({
                         )}
                     >
                         <ArrowLeft className="size-3.5" weight="bold" />
-                        Tous les bots
+                        {t('All bots')}
                     </Link>
                     <div className="mt-8 flex flex-wrap items-start justify-between gap-5">
                         <div className="flex items-start gap-3">
                             <BotBadge bot={selectedBot} size="lg" />
                             <div>
                                 <p className="text-[10px] font-semibold tracking-[0.12em] text-evo-teal uppercase">
-                                    {BOT_GROUP_LABEL[selectedBot.group]}
+                                    {t(BOT_GROUP_LABEL[selectedBot.group])}
                                 </p>
                                 <h2 className="mt-1 text-[28px] font-semibold tracking-[-0.04em] text-evo-ink">
                                     {selectedBot.name}
                                 </h2>
                                 <p className="mt-2 text-[13px] leading-6 text-evo-ink-secondary">
-                                    {selectedBot.description}
+                                    {t(selectedBot.description)}
                                 </p>
                             </div>
                         </div>
@@ -368,25 +368,25 @@ function BotsView({
                             onClick={() => onStartChat(selectedBot)}
                         >
                             <ChatCircle className="size-3.5" weight="regular" />
-                            Nouvelle conversation
+                            {t('New conversation')}
                         </button>
                     </div>
                     <div className="mt-9 grid gap-3 sm:grid-cols-2">
                         <DetailPanel label={t('Mission')}>
                             <p className="text-[13px] leading-6 text-evo-ink">
-                                {selectedBot.job}
+                                {t(selectedBot.job)}
                             </p>
                         </DetailPanel>
                         <DetailPanel label={t('Mode')}>
                             <p className="text-[13px] leading-6 text-evo-ink">
-                                {selectedBot.custom
-                                    ? 'Instructions personnalisées'
-                                    : 'Catalogue EvoCRM'}
+                                    {selectedBot.custom
+                                        ? t('Custom instructions')
+                                        : t('EvoCRM catalogue')}
                             </p>
                         </DetailPanel>
                     </div>
                     {selectedBot.custom ? (
-                        <DetailPanel label="Outils" className="mt-3">
+                        <DetailPanel label={t('Tools')} className="mt-3">
                             <div className="flex flex-wrap gap-2">
                                 {(selectedBot.tools ?? []).length > 0 ? (
                                     selectedBot.tools?.map((tool) => (
@@ -403,7 +403,7 @@ function BotsView({
                                     ))
                                 ) : (
                                     <span className="text-[12px] text-evo-ink-muted">
-                                        Aucun outil sélectionné.
+                                        {t('No tool selected.')}
                                     </span>
                                 )}
                             </div>
@@ -424,36 +424,36 @@ function BotsView({
             <div className="mx-auto max-w-[900px]">
                 <div className="max-w-[620px]">
                     <p className="text-[13px] leading-6 text-evo-ink-secondary">
-                        Des opérateurs ciblés pour le travail qui fait avancer
-                        une équipe commerciale. Choisissez-en un pour ouvrir
-                        une conversation, ou créez un bot pour un métier
-                        répétitif.
+                        {t(
+                            'Targeted operators for the work that moves a sales team. Pick one to open a conversation, or create a bot for a repetitive job.',
+                        )}
                     </p>
                 </div>
                 <BotSection
-                    label="Vente"
+                    label={t('Sales bots')}
                     bots={salesBots}
                     onStartChat={onStartChat}
                 />
                 <BotSection
-                    label="Interne"
+                    label={t('Internal bots')}
                     bots={internalBots}
                     onStartChat={onStartChat}
                 />
                 {customBots.length > 0 ? (
                     <BotSection
-                        label="Personnalisés"
+                        label={t('Custom bots')}
                         bots={customBots}
                         onStartChat={onStartChat}
                     />
                 ) : (
                     <section className="mt-8 rounded-[var(--evo-radius-floating)] border border-dashed border-evo-hairline bg-evo-surface px-4 py-5">
                         <p className="text-[12px] font-medium text-evo-ink">
-                            Aucun bot personnalisé pour le moment.
+                            {t('No custom bot yet.')}
                         </p>
                         <p className="mt-1 text-[12px] leading-5 text-evo-ink-muted">
-                            Créez-en un lorsqu’un flux répétitif mérite son
-                            propre opérateur.
+                            {t(
+                                'Create one when a repetitive flow deserves its own operator.',
+                            )}
                         </p>
                         <button
                             type="button"
@@ -464,7 +464,7 @@ function BotsView({
                             onClick={onCreateBot}
                         >
                             <Plus className="size-3.5" weight="bold" />
-                            Créer un bot
+                            {t('Create a bot')}
                         </button>
                     </section>
                 )}
@@ -527,7 +527,7 @@ function BotCard({
                         />
                     </span>
                     <span className="mt-1 block text-[12px] leading-5 text-evo-ink-secondary">
-                        {bot.description}
+                        {t(bot.description)}
                     </span>
                 </span>
             </Link>
@@ -539,7 +539,7 @@ function BotCard({
                 )}
                 onClick={() => onStartChat(bot)}
             >
-                Démarrer <CaretRight className="size-3" weight="bold" />
+                {t('Start chat')} <CaretRight className="size-3" weight="bold" />
             </button>
         </article>
     );

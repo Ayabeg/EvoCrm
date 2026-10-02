@@ -40,7 +40,7 @@ export default function PermissionsSettings({
                 />
 
                 <Card className="overflow-hidden border-hairline p-0 shadow-none">
-                    <table className="w-full text-left text-[13px]">
+                    <table className="w-full text-start text-[13px]">
                         <thead className="bg-canvas-soft text-[11px] tracking-wide text-muted-foreground uppercase">
                             <tr>
                                 <th className="px-4 py-2">{t('Capability')}</th>

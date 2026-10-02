@@ -32,10 +32,12 @@ import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
 import TicketsRelatedCard from '@/components/crm/tickets-related-card';
 import type { TicketsRelated } from '@/components/crm/tickets-related-card';
-import { Button } from '@/evo/ui/button';
+import { LtrValue } from '@/components/ltr-value';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
+import { Button } from '@/evo/ui/button';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
+import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 
 type Deal = {
@@ -163,7 +165,7 @@ export default function DealShow({
                         >
                             <RecordBack
                                 href="/crm/deals"
-                                label="Back to Deals"
+                                label={t('Back to Deals')}
                             />
                             <div className="md:hidden">
                                 <AskEvoTrigger
@@ -175,9 +177,9 @@ export default function DealShow({
                     }
                 >
                     <RecordShell
-                        leftLabel="About"
-                        centerLabel="Activity"
-                        rightLabel="Related"
+                        leftLabel={t('About')}
+                        centerLabel={t('Activity')}
+                        rightLabel={t('Related')}
                         leftClassName="bg-white"
                         centerClassName="bg-white"
                         rightClassName="bg-white"
@@ -189,7 +191,7 @@ export default function DealShow({
                                     subtitle={
                                         <>
                                             <span className="money font-medium text-ink">
-                                                {formatDzd(deal.amount_cents)}
+                                                <LtrValue>{formatDzd(deal.amount_cents)}</LtrValue>
                                             </span>
                                             {deal.pipeline?.name
                                                 ? ` · ${deal.pipeline.name}`
@@ -232,7 +234,7 @@ export default function DealShow({
                                             : '/inbox'
                                     }
                                 />
-                                <RecordSection title="About this deal">
+                                <RecordSection title={t('About this deal')}>
                                     <RecordFactList>
                                         <RecordFact
                                             label="Amount"
@@ -274,7 +276,7 @@ export default function DealShow({
                                         />
                                     </RecordFactList>
                                 </RecordSection>
-                                <RecordSection title="Stage">
+                                <RecordSection title={t('Stage')}>
                                     <Form
                                         action={`/crm/deals/${deal.id}/move`}
                                         method="post"
@@ -302,7 +304,7 @@ export default function DealShow({
                                                     variant="outline"
                                                     className="h-8 text-[12px]"
                                                 >
-                                                    Move
+                                                    {t('Move')}
                                                 </Button>
                                                 {errors.stage_id ? (
                                                     <p className="w-full text-[12px] text-destructive">
@@ -317,25 +319,25 @@ export default function DealShow({
                                     <DealSuggestionCard
                                         dealId={deal.id}
                                         suggestion={nextMove}
-                                        title="Next move"
+                                        title={t('Next move')}
                                     />
                                 ) : null}
                                 {afterTouch ? (
                                     <DealSuggestionCard
                                         dealId={deal.id}
                                         suggestion={afterTouch}
-                                        title="After-touch draft"
+                                        title={t('After-touch draft')}
                                     />
                                 ) : null}
                                 {lostReason ? (
                                     <DealSuggestionCard
                                         dealId={deal.id}
                                         suggestion={lostReason}
-                                        title="Loss reason"
+                                        title={t('Loss reason')}
                                     />
                                 ) : null}
                                 {dealHealth?.factors?.length ? (
-                                    <RecordSection title="Health">
+                                    <RecordSection title={t('Health')}>
                                         {dealHealth.factors.map((factor) => (
                                             <p
                                                 key={factor.key}
@@ -388,12 +390,12 @@ export default function DealShow({
                                 companyId={deal.company_id}
                                 highlights={[
                                     {
-                                        label: 'Amount',
+                                        label: t('Amount'),
                                         value: formatDzd(deal.amount_cents),
                                     },
-                                    { label: 'Stage', value: deal.stage?.name },
-                                    { label: 'Contact', value: contactName },
-                                    { label: 'Company', value: company?.name },
+                                    { label: t('Stage'), value: deal.stage?.name },
+                                    { label: t('Contact'), value: contactName },
+                                    { label: t('Company'), value: company?.name },
                                 ]}
                             />
                         }
@@ -417,13 +419,13 @@ export default function DealShow({
                                     }
                                 />
                                 <AssociationCard
-                                    title="Contact"
+                                    title={t('Contact')}
                                     addHref={
                                         contact
                                             ? `/crm/contacts/${contact.id}`
                                             : '/crm/contacts?create=1'
                                     }
-                                    addLabel={contact ? 'View' : 'Add'}
+                                    addLabel={contact ? t('View') : t('Add')}
                                 >
                                     {contact && contactName ? (
                                         <RelatedRecordLink
@@ -433,18 +435,18 @@ export default function DealShow({
                                         </RelatedRecordLink>
                                     ) : (
                                         <p className="text-mute">
-                                            No contact linked
+                                            {t('No contact linked')}
                                         </p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard
-                                    title="Company"
+                                    title={t('Company')}
                                     addHref={
                                         company
                                             ? `/crm/companies/${company.id}`
                                             : '/crm/companies?create=1'
                                     }
-                                    addLabel={company ? 'View' : 'Add'}
+                                    addLabel={company ? t('View') : t('Add')}
                                 >
                                     {company ? (
                                         <RelatedRecordLink
@@ -454,20 +456,20 @@ export default function DealShow({
                                         </RelatedRecordLink>
                                     ) : (
                                         <p className="text-mute">
-                                            No company linked
+                                            {t('No company linked')}
                                         </p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard
-                                    title="Quotes"
+                                    title={t('Quotes')}
                                     addHref="/crm/quotes"
                                     addLabel={
-                                        quotes.length > 0 ? 'View' : 'Add'
+                                        quotes.length > 0 ? t('View') : t('Add')
                                     }
                                 >
                                     {quotes.length === 0 ? (
                                         <p className="text-mute">
-                                            No quotes yet
+                                            {t('No quotes yet')}
                                         </p>
                                     ) : (
                                         quotes.map((quote) => (
@@ -476,8 +478,8 @@ export default function DealShow({
                                                 href={`/crm/quotes/${quote.id}/preview`}
                                                 meta={quote.status}
                                             >
-                                                Quote #{quote.id} ·{' '}
-                                                {formatDzd(quote.total_cents)}
+                                                {t('Quote')} #{quote.id} ·{' '}
+                                                <LtrValue>{formatDzd(quote.total_cents)}</LtrValue>
                                             </RelatedRecordLink>
                                         ))
                                     )}

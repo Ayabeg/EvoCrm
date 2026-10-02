@@ -1,15 +1,15 @@
-Hi {{ $guestName }},
+{{ __('Hi :name,', ['name' => $guestName]) }}
 
-Reminder: your meeting with {{ $hostName }} is coming up.
+{{ __('Reminder: your meeting with :host is coming up.', ['host' => $hostName]) }}
 
 {{ $whenLabel }}
-Timezone: {{ $timezone }}
+{{ __('Timezone: :tz', ['tz' => $timezone]) }}
 @if ($locationNote)
 {{ $locationNote }}
 @endif
 
 @if ($note)
-Your note: {{ $note }}
+{{ __('Your note: :note', ['note' => $note]) }}
 @endif
 
 — EvoSales · Evotechly

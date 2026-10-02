@@ -70,7 +70,7 @@ export function TasksOverlay({
                 aria-label="Close tasks"
                 onClick={() => onOpenChange(false)}
             />
-            <aside className="flex h-full w-full max-w-md flex-col border-l border-hairline bg-canvas shadow-[var(--aurora-shadow-strong)]">
+            <aside className="flex h-full w-full max-w-md flex-col border-s border-hairline bg-canvas shadow-[var(--aurora-shadow-strong)]">
                 <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
                     <div>
                         <p className="text-[13px] font-semibold text-ink">Tasks</p>
@@ -97,7 +97,7 @@ export function TasksOverlay({
                             }
                         >
                             {id === 'today' ? 'Today' : id === 'overdue' ? 'Overdue' : 'Upcoming'}
-                            <span className="ml-1 tabular-nums">{grouped[id].length}</span>
+                            <span className="ms-1 tabular-nums">{grouped[id].length}</span>
                         </button>
                     ))}
                 </nav>

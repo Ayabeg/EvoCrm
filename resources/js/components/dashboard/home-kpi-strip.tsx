@@ -7,6 +7,7 @@ import {
 } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react';
 import type { KpiTile } from '@/components/crm/crm-kpi-strip';
+import { LtrValue } from '@/components/ltr-value';
 import {
     HOME_KPI_STRIP_TRACK_CLASS,
     HOME_KPI_VALUE_CLASS,
@@ -49,7 +50,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
     }
 
     return (
-        <section aria-label="Sales snapshot">
+        <section aria-label={t('Sales snapshot')}>
             <div className={HOME_KPI_STRIP_TRACK_CLASS}>
                 {kpis.map((kpi) => {
                     const value = formatKpiValue(kpi);
@@ -64,15 +65,17 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                                 <Icon className="size-6" weight="regular" aria-hidden />
                             </span>
                             <div className="min-w-0 flex-1">
-                                <p className="text-[12px] leading-4 text-[var(--home-muted)]">{kpi.label}</p>
-                                <p className={HOME_KPI_VALUE_CLASS}>{value}</p>
+                                <p className="text-[12px] leading-4 text-[var(--home-muted)]">{t(kpi.label)}</p>
+                                <p className={HOME_KPI_VALUE_CLASS}>
+                                    {kpi.format === 'money' ? <LtrValue>{value}</LtrValue> : value}
+                                </p>
                                 {kpi.hint ? (
                                     <p className="truncate text-[12px] leading-4 text-[var(--home-muted)]">
-                                        {kpi.hint}
+                                        {t(kpi.hint)}
                                     </p>
                                 ) : null}
                                 {change !== null ? (
-                                    <p className="mt-1.5 text-right text-[12px] leading-4">
+                                    <p className="mt-1.5 text-end text-[12px] leading-4">
                                         <span
                                             className={cn(
                                                 'font-semibold',

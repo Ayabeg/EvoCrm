@@ -215,7 +215,7 @@ export function AskEvoDrawer() {
                         <p className="text-[12px] text-mute">{context.note}</p>
                     ) : null}
                     {turns.map((turn, index) => (
-                        <p key={`${turn.question}-${index}`} className="border-l-2 border-brand/40 pl-2 text-[12px] leading-5">
+                        <p key={`${turn.question}-${index}`} className="border-s-2 border-brand/40 ps-2 text-[12px] leading-5">
                             <span className="text-mute">{turn.question} — </span>
                             {turn.answer}
                         </p>

@@ -142,8 +142,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--evo-canvas)]',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 sizeClass[size],
-                startAdornment && 'pl-8',
-                (endAdornment || showClear) && 'pr-8',
+                startAdornment && 'ps-8',
+                (endAdornment || showClear) && 'pe-8',
                 resolvedState && stateClass[resolvedState],
                 className,
             )}
@@ -158,7 +158,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
     return wrapField(
         <div className="relative w-full" data-slot="input-wrap">
             {startAdornment ? (
-                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5 text-[var(--evo-ink-muted)]">
+                <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-2.5 text-[var(--evo-ink-muted)]">
                     {startAdornment}
                 </span>
             ) : null}
@@ -166,7 +166,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
             {showClear ? (
                 <button
                     type="button"
-                    className="absolute inset-y-0 right-0 flex items-center px-2 text-[var(--evo-ink-muted)] hover:text-[var(--evo-ink)]"
+                    className="absolute inset-y-0 end-0 flex items-center px-2 text-[var(--evo-ink-muted)] hover:text-[var(--evo-ink)]"
                     aria-label={sr.clear}
                     onClick={() => {
                         if (onClear) {
@@ -184,7 +184,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
                     <X className="size-3.5" aria-hidden />
                 </button>
             ) : endAdornment ? (
-                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-[var(--evo-ink-muted)]">
+                <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-2.5 text-[var(--evo-ink-muted)]">
                     {endAdornment}
                 </span>
             ) : null}

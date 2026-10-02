@@ -4,6 +4,7 @@ import { Calendar, CheckSquare, Envelope, Note, Phone } from '@phosphor-icons/re
 import { useState } from 'react';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
+import { t } from '@/lib/i18n';
 
 export type ComposerType = 'note' | 'email' | 'call' | 'task' | 'meeting';
 
@@ -84,7 +85,7 @@ export function LogCallForm({
                 ownerId={ownerId}
             />
             <label className="grid gap-1 text-[11px] text-mute">
-                Outcome
+                {t('Outcome')}
                 <select
                     name="outcome"
                     defaultValue="Connected"
@@ -92,24 +93,24 @@ export function LogCallForm({
                 >
                     {CALL_OUTCOMES.map((outcome) => (
                         <option key={outcome} value={outcome}>
-                            {outcome}
+                            {t(outcome)}
                         </option>
                     ))}
                 </select>
             </label>
             <label className="grid gap-1 text-[11px] text-mute">
-                Direction
+                {t('Direction')}
                 <select
                     name="direction"
                     defaultValue="outbound"
                     className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[13px] text-ink"
                 >
-                    <option value="outbound">Outbound</option>
-                    <option value="inbound">Inbound</option>
+                    <option value="outbound">{t('Outbound')}</option>
+                    <option value="inbound">{t('Inbound')}</option>
                 </select>
             </label>
             <label className="grid gap-1 text-[11px] text-mute">
-                Date and time
+                {t('Date and time')}
                 <Input
                     name="logged_at"
                     type="datetime-local"
@@ -118,17 +119,17 @@ export function LogCallForm({
             </label>
             <Input
                 name="subject"
-                placeholder="Call subject"
+                placeholder={t('Call subject')}
                 className="h-8 bg-canvas"
             />
             <Input
                 name="body"
-                placeholder="Comment"
+                placeholder={t('Comment')}
                 className="h-8 bg-canvas"
             />
             <div className="flex gap-2">
                 <Button type="submit" size="sm">
-                    Log call
+                    {t('Log call')}
                 </Button>
                 {onCancel ? (
                     <Button
@@ -166,11 +167,11 @@ export default function ActivityComposer({
         <section
             data-testid="activity-composer"
             className="space-y-2"
-            aria-label="Activity composer"
+            aria-label={t('Activity composer')}
         >
             <div
                 role="toolbar"
-                aria-label="Log activity"
+                aria-label={t('Log activity')}
                 className="record-action-group"
             >
                 {ICONS.map((action) => {
@@ -183,11 +184,11 @@ export default function ActivityComposer({
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 gap-1.5 px-2 text-[12px] font-medium"
-                                title="Email via Outbound"
+                                title={t('Email via Outbound')}
                             >
                                 <Link href={emailHref}>
                                     <action.icon className="size-3.5" aria-hidden />
-                                    {action.label}
+                                    {t(action.label)}
                                 </Link>
                             </Button>
                         );
@@ -202,14 +203,14 @@ export default function ActivityComposer({
                             variant="ghost"
                             size="sm"
                             aria-pressed={selected}
-                            title={action.label}
+                            title={t(action.label)}
                             className="h-8 gap-1.5 px-2 text-[12px] font-medium"
                             onClick={() =>
                                 setActive(selected ? null : action.type)
                             }
                         >
                             <action.icon className="size-3.5" aria-hidden />
-                            {action.label}
+                            {t(action.label)}
                         </Button>
                     );
                 })}
@@ -240,13 +241,13 @@ export default function ActivityComposer({
                     />
                     <Input
                         name="subject"
-                        placeholder={`${active} subject`}
+                        placeholder={t(':type subject', { type: t(active.charAt(0).toUpperCase() + active.slice(1)) })}
                         required
                         className="h-8 bg-canvas"
                     />
                     <Input
                         name="body"
-                        placeholder="Details (optional)"
+                        placeholder={t('Details (optional)')}
                         className="h-8 bg-canvas"
                     />
                     {active === 'task' || active === 'meeting' ? (
@@ -258,7 +259,7 @@ export default function ActivityComposer({
                     ) : null}
                     <div className="flex gap-2">
                         <Button type="submit" size="sm">
-                            Save {active}
+                            {t('Save :type', { type: t(active.charAt(0).toUpperCase() + active.slice(1)) })}
                         </Button>
                         <Button
                             type="button"
@@ -266,7 +267,7 @@ export default function ActivityComposer({
                             size="sm"
                             onClick={() => setActive(null)}
                         >
-                            Cancel
+                            {t('Cancel')}
                         </Button>
                     </div>
                 </Form>

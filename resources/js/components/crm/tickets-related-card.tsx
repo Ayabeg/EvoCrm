@@ -3,6 +3,7 @@ import {
     RelatedRecordLink,
 } from '@/components/crm/record-chrome';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import { t } from '@/lib/i18n';
 
 export type RelatedTicket = {
     id: number;
@@ -36,13 +37,13 @@ export default function TicketsRelatedCard({
     }
 
     return (
-        <AssociationCard title="Tickets" addHref={addHref} addLabel="Add">
+        <AssociationCard title={t('Tickets')} addHref={addHref} addLabel={t('Add')}>
             {rows.length === 0 ? (
-                <p className="text-mute">No tickets</p>
+                <p className="text-mute">{t('No tickets')}</p>
             ) : (
                 <>
                     <p className="aurora-text-caption text-mute">
-                        {openCount} open
+                        {t(':count open', { count: String(openCount) })}
                     </p>
                     {rows.map((ticket) => (
                         <RelatedRecordLink

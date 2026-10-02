@@ -1,17 +1,17 @@
-<p>Hi {{ $guestName }},</p>
+<p>{{ __('Hi :name,', ['name' => $guestName]) }}</p>
 
-<p>Reminder: your meeting with {{ $hostName }} is coming up.</p>
+<p>{{ __('Reminder: your meeting with :host is coming up.', ['host' => $hostName]) }}</p>
 
 <p>
     <strong>{{ $whenLabel }}</strong><br>
-    Timezone: {{ $timezone }}
+    {{ __('Timezone: :tz', ['tz' => $timezone]) }}
     @if ($locationNote)
         <br>{{ $locationNote }}
     @endif
 </p>
 
 @if ($note)
-    <p>Your note: {{ $note }}</p>
+    <p>{{ __('Your note: :note', ['note' => $note]) }}</p>
 @endif
 
 <p>— EvoSales · Evotechly</p>

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -64,27 +65,27 @@ export default function DealForecastBar({
             data-testid="forecast-totals"
         >
             <ForecastFact
-                label="Pipeline"
+                label={t('Pipeline')}
                 value={formatDzd(forecast.amount_cents)}
                 money
             />
-            <ForecastFact label="Open deals" value={String(forecast.count)} />
+            <ForecastFact label={t('Open deals')} value={String(forecast.count)} />
             <ForecastFact
-                label="Weighted"
+                label={t('Weighted')}
                 value={formatDzd(forecast.weighted_cents)}
                 money
             />
             {typeof forecast.open_cents === 'number' ? (
                 <ForecastFact
-                    label="Open pipeline"
+                    label={t('Open pipeline')}
                     value={formatDzd(forecast.open_cents)}
                     money
                 />
             ) : null}
             {forecastBand ? (
-                <div className="min-w-0 shrink-0 border-l border-hairline pl-5">
+                <div className="min-w-0 shrink-0 border-s border-hairline ps-5">
                     <p className="text-[10px] leading-3 tracking-wide text-mute">
-                        Band · {forecastBand.band_label}
+                        {t('Band · :label', { label: t(forecastBand.band_label) })}
                     </p>
                     <p className="money mt-0.5 break-words text-[12px] tabular-nums text-mute">
                         {formatDzd(forecastBand.low_cents)} –{' '}
@@ -99,14 +100,14 @@ export default function DealForecastBar({
             ) : null}
             {forecastBacktest ? (
                 <div
-                    className="min-w-0 shrink-0 border-l border-hairline pl-5"
+                    className="min-w-0 shrink-0 border-s border-hairline ps-5"
                     data-testid="forecast-backtest"
                 >
                     <p className="text-[10px] leading-3 tracking-wide text-mute">
-                        Backtest · 90d
+                        {t('Backtest · 90d')}
                     </p>
                     <p className="mt-0.5 text-[13px] font-semibold text-ink">
-                        {forecastBacktest.label}
+                        {t(forecastBacktest.label)}
                     </p>
                 </div>
             ) : null}

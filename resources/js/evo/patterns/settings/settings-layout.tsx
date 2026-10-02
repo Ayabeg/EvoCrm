@@ -50,7 +50,7 @@ function SettingsNavLinks({
                             href={item.href}
                             aria-current={active ? 'page' : undefined}
                             className={cn(
-                                'flex h-8 min-w-0 items-center gap-2 border-l-2 px-2 text-[13px] leading-[18px]',
+                                'flex h-8 min-w-0 items-center gap-2 border-s-2 px-2 text-[13px] leading-[18px]',
                                 MOTION_HOVER_CLASS,
                                 active
                                     ? 'border-brand bg-[var(--color-accent-soft)] font-medium text-ink'
@@ -130,7 +130,7 @@ function SettingsSearchResults({
                                 aria-hidden
                             />
                             <span className={LONG_TEXT_CLASS}>{t(item.title)}</span>
-                            <span className="ml-auto shrink-0 text-[11px] text-mute">
+                            <span className="ms-auto shrink-0 text-[11px] text-mute">
                                 {t(item.group)}
                             </span>
                         </Link>
@@ -218,7 +218,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             <span className="sr-only">{t('Search settings')}</span>
             <span className="relative block">
                 <MagnifyingGlass
-                    className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-mute"
+                    className="pointer-events-none absolute top-1/2 start-3 size-3.5 -translate-y-1/2 text-mute"
                     weight="regular"
                     aria-hidden
                 />
@@ -242,7 +242,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                             ? `settings-search-result-${activeIndex}`
                             : undefined
                     }
-                    className="h-8 w-full appearance-none rounded-[4px] border border-hairline bg-white pr-2 pl-10 text-[13px] leading-[18px] text-ink placeholder:text-mute focus-visible:border-brand focus-visible:outline-none"
+                    className="h-8 w-full appearance-none rounded-[4px] border border-hairline bg-white pe-2 ps-10 text-[13px] leading-[18px] text-ink placeholder:text-mute focus-visible:border-brand focus-visible:outline-none"
                 />
             </span>
         </label>
@@ -382,7 +382,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         >
                             <aside
                                 data-settings="nav"
-                                className="shrink-0 border-b border-hairline bg-[var(--settings-canvas,var(--evo-canvas))] sm:flex sm:w-[16.25rem] sm:flex-col sm:border-r sm:border-b-0"
+                                className="shrink-0 border-b border-hairline bg-[var(--settings-canvas,var(--evo-canvas))] sm:flex sm:w-[16.25rem] sm:flex-col sm:border-e sm:border-b-0"
                             >
                                 <div className="flex items-center gap-2 px-3 pt-3 pb-2">
                                     <AppLogoIcon className="size-6" alt={t('EvoCrm')} />
@@ -397,7 +397,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                     </Dialog.Description>
                                     <Dialog.Close
                                         className={cn(
-                                            'ml-auto grid size-8 place-content-center rounded-[4px] text-mute hover:bg-white hover:text-ink sm:hidden',
+                                            'ms-auto grid size-8 place-content-center rounded-[4px] text-mute hover:bg-white hover:text-ink sm:hidden',
                                             MOTION_HOVER_CLASS,
                                         )}
                                         aria-label={t('Close settings')}

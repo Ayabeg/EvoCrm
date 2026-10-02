@@ -112,7 +112,7 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                     <p className="mt-6 text-[12px] text-mute">{t('No notes.')}</p>
                 )}
 
-                <p className={`${QUOTE_MONEY_CLASS} mt-6 text-right text-[20px] font-semibold tracking-tight text-ink`}>
+                <p className={`${QUOTE_MONEY_CLASS} mt-6 text-end text-[20px] font-semibold tracking-tight text-ink`}>
                     {formatDzd(quote.total_cents)}
                 </p>
             </div>
@@ -391,11 +391,11 @@ function LineTable({
         <div className={LOCAL_SCROLL_X_CLASS}>
             <table className="w-full min-w-[28rem] border-collapse text-[13px]">
             <thead>
-                <tr className="border-b border-hairline text-left text-[11px] text-mute">
+                <tr className="border-b border-hairline text-start text-[11px] text-mute">
                     <th className="py-1.5 font-medium">{t('Item')}</th>
                     <th className="py-1.5 font-medium">{t('Qty')}</th>
-                    <th className="py-1.5 text-right font-medium">{t('Unit')}</th>
-                    <th className="py-1.5 text-right font-medium">{t('Total')}</th>
+                    <th className="py-1.5 text-end font-medium">{t('Unit')}</th>
+                    <th className="py-1.5 text-end font-medium">{t('Total')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -429,7 +429,7 @@ function LineTable({
                                 item.quantity
                             )}
                         </td>
-                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-right text-mute`}>
+                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-end text-mute`}>
                             {editable ? (
                                 <Input
                                     name={`items[${index}][unit_dzd]`}
@@ -438,14 +438,14 @@ function LineTable({
                                     step="0.01"
                                     required
                                     defaultValue={quoteUnitDzd(item.unit_cents)}
-                                    className="ml-auto h-8 w-28 text-right"
+                                    className="ms-auto h-8 w-28 text-end"
                                     aria-label={t('Amount (DZD)')}
                                 />
                             ) : (
                                 formatDzd(item.unit_cents)
                             )}
                         </td>
-                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-right text-ink`}>
+                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-end text-ink`}>
                             {formatDzd(
                                 item.total_cents ??
                                     item.quantity * item.unit_cents,

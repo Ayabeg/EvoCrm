@@ -173,13 +173,13 @@ export function SavedViews({
                         className={viewClass(String(view.id) === activeViewId)}
                         title={
                             view.visibility === 'workspace'
-                                ? 'Shared with workspace'
+                                ? t('Shared with workspace')
                                 : view.visibility === 'team'
-                                  ? 'Shared with team'
-                                  : 'Private view'
+                                  ? t('Shared with team')
+                                  : t('Private view')
                         }
                     >
-                        {view.name}
+                        {t(view.name)}
                         {view.is_workspace_default ? ' ★' : ''}
                     </Link>
                 ))}
@@ -202,7 +202,7 @@ export function SavedViews({
                                     <Link
                                         href={savedHref(view.id)}
                                     >
-                                        {view.name}
+                                        {t(view.name)}
                                         {typeof view.record_count === 'number'
                                             ? ` · ${view.record_count}`
                                             : ''}

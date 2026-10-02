@@ -1,7 +1,7 @@
 import { Form, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import ActivityComposer from '@/components/crm/activity-composer';
+import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import CatchUpBlock from '@/components/crm/catch-up-block';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
 import { MeetingAttendanceButtons } from '@/components/crm/meeting-attendance';
@@ -18,6 +18,7 @@ import {
     RecordTimelineItem,
 } from '@/components/crm/record-hub';
 import { Button } from '@/evo/ui/button';
+import { t } from '@/lib/i18n';
 
 const ACTIVITY_CHIPS = [
     { key: 'all', label: 'All' },
@@ -51,6 +52,7 @@ export default function RecordActivityPanel({
     const [chip, setChip] = useState('all');
     const items = useMemo(() => {
         const filtered = filterRecordActivity(timeline, tab);
+
         if (tab !== 'activities' || chip === 'all') {
             return filtered;
         }
@@ -78,7 +80,7 @@ export default function RecordActivityPanel({
                                     size="sm"
                                     className="h-7 text-[11px]"
                                 >
-                                    Mark done
+                                    {t('Mark done')}
                                 </Button>
                             </Form>
                         ) : next.href ? (
@@ -86,7 +88,7 @@ export default function RecordActivityPanel({
                                 href={next.href}
                                 className="shrink-0 text-[12px] font-medium text-ink hover:underline"
                             >
-                                Open
+                                {t('Open')}
                             </Link>
                         ) : null
                     }
@@ -108,14 +110,13 @@ export default function RecordActivityPanel({
                 <div className="space-y-2">
                     <p className="text-[13px] text-ink">
                         {insight?.summary ??
-                            'Ask Evo in the right rail. Context is this record, not a generic agent.'}
+                            t('Ask Evo in the right rail. Context is this record, not a generic agent.')}
                     </p>
                     {insight?.answer ? (
                         <p className="text-[13px] text-mute">{insight.answer}</p>
                     ) : (
                         <p className="text-[13px] text-mute">
-                            No generated note yet. Use Ask Evo — source chip
-                            stays “This record”.
+                            {t('No generated note yet. Use Ask Evo — source chip stays “This record”.')}
                         </p>
                     )}
                 </div>
@@ -128,7 +129,7 @@ export default function RecordActivityPanel({
                                 .map((item) => (
                                     <div key={item.label}>
                                         <dt className="text-[11px] text-mute">
-                                            {item.label}
+                                            {t(item.label)}
                                         </dt>
                                         <dd className="text-[13px] text-ink">
                                             {item.value}
@@ -161,7 +162,7 @@ export default function RecordActivityPanel({
                                     className="h-7 text-[11px]"
                                     onClick={() => setChip(item.key)}
                                 >
-                                    {item.label}
+                                    {t(item.label)}
                                 </Button>
                             ))}
                             </div>
@@ -170,8 +171,8 @@ export default function RecordActivityPanel({
                     {items.length === 0 ? (
                         <p className="py-2 text-[13px] text-mute">
                             {tab === 'overview'
-                                ? 'No recent activity yet.'
-                                : 'No activities yet.'}
+                                ? t('No recent activity yet.')
+                                : t('No activities yet.')}
                         </p>
                     ) : (
                         items.map((item) => (
@@ -192,8 +193,8 @@ export default function RecordActivityPanel({
                                 {item.type === 'call' && item.meta?.outcome ? (
                                     <p className="mt-0.5 text-[12px] text-mute">
                                         {item.meta.direction === 'inbound'
-                                            ? 'Inbound'
-                                            : 'Outbound'}
+                                            ? t('Inbound')
+                                            : t('Outbound')}
                                         {' · '}
                                         {item.meta.outcome}
                                     </p>
@@ -209,7 +210,7 @@ export default function RecordActivityPanel({
                                             size="sm"
                                             className="mt-1.5 h-7 text-[11px]"
                                         >
-                                            Mark done
+                                            {t('Mark done')}
                                         </Button>
                                     </Form>
                                 ) : null}

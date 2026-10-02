@@ -29,17 +29,17 @@ export default function PlaybookSettings({
             <Head title={t('Playbooks')} />
             <div className="space-y-3">
                 <SettingsPageHeader
-                    title="Playbooks"
-                    description="Short call and email scripts shown on contact and deal records."
+                    title={t('Playbooks')}
+                    description={t('Short call and email scripts shown on contact and deal records.')}
                 />
                 <SettingsForm action="/settings/playbooks" method="post">
                     <SettingsCard
-                        title="New playbook"
+                        title={t('New playbook')}
                         required
-                        footer={<SettingsSaveBar saveLabel="Save playbook" />}
+                        footer={<SettingsSaveBar saveLabel={t('Save playbook')} />}
                     >
                         <div>
-                            <Label htmlFor="playbook-name">Name</Label>
+                            <Label htmlFor="playbook-name">{t('Name')}</Label>
                             <Input
                                 id="playbook-name"
                                 name="name"
@@ -49,19 +49,19 @@ export default function PlaybookSettings({
                             />
                         </div>
                         <div>
-                            <Label htmlFor="playbook-entity">Record</Label>
+                            <Label htmlFor="playbook-entity">{t('Record')}</Label>
                             <select
                                 id="playbook-entity"
                                 name="entity"
                                 className="mt-1 h-9 w-full rounded-md border border-hairline bg-canvas px-2 text-sm"
                                 defaultValue="contact"
                             >
-                                <option value="contact">Contact</option>
-                                <option value="deal">Deal</option>
+                                <option value="contact">{t('Contact')}</option>
+                                <option value="deal">{t('Deal')}</option>
                             </select>
                         </div>
                         <div>
-                            <Label htmlFor="playbook-body">Script</Label>
+                            <Label htmlFor="playbook-body">{t('Script')}</Label>
                             <textarea
                                 id="playbook-body"
                                 name="body"
@@ -76,8 +76,8 @@ export default function PlaybookSettings({
                 <div className="space-y-3">
                     {playbooks.length === 0 ? (
                         <SettingsEmptyState
-                            title="No playbooks yet"
-                            description="Save a short call or email script to show it on contact and deal records."
+                            title={t('No playbooks yet')}
+                            description={t('Save a short call or email script to show it on contact and deal records.')}
                         />
                     ) : (
                         playbooks.map((playbook) => (

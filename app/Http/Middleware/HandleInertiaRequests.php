@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Activity;
 use App\Support\Integrations;
+use App\Support\Locale;
 use App\Support\SignupMode;
 use App\Support\SimpleMode;
 use Illuminate\Http\Request;
@@ -46,6 +47,8 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'locale' => app()->getLocale(),
+            'dir' => Locale::direction(app()->getLocale()),
+            'intlLocale' => Locale::intl(app()->getLocale()),
             'translations' => $this->chromeTranslations(),
             'auth' => [
                 'user' => $user,
@@ -111,19 +114,14 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Flat day-1 chrome dictionary for Inertia. English keys are the
-     * fallback, so an empty bag (en) leaves the UI on the source strings.
+     * Flat chrome dictionary for the active locale. Missing keys fall
+     * back to the English source string in t().
      *
      * @return array<string, string>
      */
     private function chromeTranslations(): array
     {
-        $locale = app()->getLocale();
-
-        if ($locale === 'en') {
-            return [];
-        }
-
+        $locale = Locale::normalize(app()->getLocale()) ?? Locale::applicationDefault();
         $path = lang_path($locale.'.json');
 
         if (! is_file($path)) {

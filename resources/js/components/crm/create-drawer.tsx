@@ -35,16 +35,16 @@ export function CreateDrawer({
                 side="right"
                 data-aurora="drawer"
                 className={cn(
-                    'w-full gap-0 border-l border-hairline bg-canvas p-0 sm:max-w-md',
+                    'w-full gap-0 border-s border-hairline bg-canvas p-0 sm:max-w-md',
                     className,
                 )}
             >
-                <DrawerHeader className="relative border-b border-hairline px-5 py-3 text-left">
+                <DrawerHeader className="relative border-b border-hairline px-5 py-3 text-start">
                     <span
-                        className="absolute inset-y-0 left-0 w-[3px] bg-brand"
+                        className="absolute inset-y-0 start-0 w-[3px] bg-brand"
                         aria-hidden
                     />
-                    <div className="flex items-start justify-between gap-3 pr-6">
+                    <div className="flex items-start justify-between gap-3 pe-6">
                         <div>
                             <DrawerTitle className="text-[15px] font-semibold tracking-tight text-ink">
                                 {t(title)}

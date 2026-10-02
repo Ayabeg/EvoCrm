@@ -140,7 +140,7 @@ export function EvoSidebar({
                                 value={item.value}
                             >
                                 <Icon className="size-4" strokeWidth={1.75} />
-                                <span className="sr-only group-data-active:not-sr-only group-data-active:ml-1.5">
+                                <span className="sr-only group-data-active:not-sr-only group-data-active:ms-1.5">
                                     {item.label}
                                 </span>
                             </TabsTab>
@@ -258,7 +258,7 @@ export function EvoSidebar({
                     {hits.map((hit) => (
                         <li key={hit.id}>
                             <button
-                                className="evo-row flex h-8 w-full items-center gap-2 rounded-[8px] text-left text-[13px] text-shell-ink-2"
+                                className="evo-row flex h-8 w-full items-center gap-2 rounded-[8px] text-start text-[13px] text-shell-ink-2"
                                 onClick={() => onPickHit(hit)}
                                 type="button"
                             >
@@ -315,9 +315,9 @@ function NavButton({
         <button
             aria-current={active ? 'page' : undefined}
             className={cn(
-                'evo-row relative flex h-8 w-full items-center gap-2 overflow-hidden rounded-[8px] text-left text-[13px] text-shell-ink-2',
+                'evo-row relative flex h-8 w-full items-center gap-2 overflow-hidden rounded-[8px] text-start text-[13px] text-shell-ink-2',
                 active
-                    ? 'bg-shell-teal-soft text-shell-teal before:pointer-events-none before:absolute before:top-2.5 before:bottom-2.5 before:left-px before:w-0.5 before:rounded-full before:bg-shell-orange'
+                    ? 'bg-shell-teal-soft text-shell-teal before:pointer-events-none before:absolute before:top-2.5 before:bottom-2.5 before:start-px before:w-0.5 before:rounded-full before:bg-shell-orange'
                     : 'hover:bg-shell-teal-soft',
             )}
             onClick={() => onSelect(item.id)}

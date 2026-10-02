@@ -39,7 +39,7 @@ export function MessageBubble({ message }: { message: InboxMessage }) {
                 note
                     ? 'border border-dashed border-[var(--evo-hairline-strong)] bg-[var(--evo-surface-subtle)] text-[var(--evo-ink)]'
                     : outbound
-                      ? 'ml-auto border border-[var(--evo-hairline)] bg-[var(--evo-surface)] text-[var(--evo-ink)]'
+                      ? 'ms-auto border border-[var(--evo-hairline)] bg-[var(--evo-surface)] text-[var(--evo-ink)]'
                       : 'bg-[var(--evo-surface)] text-[var(--evo-ink)]',
             )}
         >
@@ -48,7 +48,9 @@ export function MessageBubble({ message }: { message: InboxMessage }) {
                     {t('Private note, only visible to agents')}
                 </p>
             ) : null}
-            <p className="whitespace-pre-wrap">{message.body}</p>
+            <p className="whitespace-pre-wrap" dir="auto">
+                {message.body}
+            </p>
             {message.attachments?.length ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                     {message.attachments.map((file) => (
@@ -140,7 +142,7 @@ export function MessageThread({
                             key={item.id}
                             data-index={row.index}
                             ref={virtualizer.measureElement}
-                            className="absolute top-0 left-0 w-full pb-1.5"
+                            className="absolute top-0 start-0 w-full pb-1.5"
                             style={{ transform: `translateY(${row.start}px)` }}
                         >
                             {item.type === 'day' ? (

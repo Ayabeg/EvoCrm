@@ -4,6 +4,7 @@ import { RecordDisclose } from '@/components/crm/record-hub';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
 import { canCreateQuote } from '@/lib/command-os';
+import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 
 type QuoteItem = {
@@ -40,15 +41,15 @@ export default function DealQuotes({
 
     return (
         <section className="text-sm">
-            <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">Quotes</h3>
+            <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-mute uppercase">{t('Quotes')}</h3>
             {quotes.length === 0 ? (
-                <p className="mb-2 text-[12px] text-mute">No quotes yet.</p>
+                <p className="mb-2 text-[12px] text-mute">{t('No quotes yet.')}</p>
             ) : (
                 <div className="mb-3 space-y-3">
                     {quotes.map((quote) => (
                         <div key={quote.id} className="rounded border border-hairline p-2">
                             <p className="text-[12px] font-medium">
-                                Quote #{quote.id} · {quote.status} · {formatDzd(quote.total_cents)}
+                                {t('Quote #:id', { id: quote.id })} · {t(quote.status.charAt(0).toUpperCase() + quote.status.slice(1))} · {formatDzd(quote.total_cents)}
                             </p>
                             {(quote.items ?? []).map((item, index) => (
                                 <p key={item.id ?? index} className="text-[11px] text-mute">
@@ -58,12 +59,12 @@ export default function DealQuotes({
                             <div className="mt-2 flex flex-wrap gap-2">
                                 <Button asChild variant="outline" className="h-7 text-[11px]">
                                     <a href={`/crm/quotes/${quote.id}/preview`} target="_blank" rel="noreferrer">
-                                        Preview PDF
+                                        {t('Preview PDF')}
                                     </a>
                                 </Button>
                                 <Form action={`/crm/quotes/${quote.id}/send`} method="post" className="flex gap-1">
-                                    <Input name="to" type="email" placeholder="Customer email" className="h-7 w-44" />
-                                    <Button variant="outline" className="h-7 text-[11px]">Email quote</Button>
+                                    <Input name="to" type="email" placeholder={t('Customer email')} className="h-7 w-44" />
+                                    <Button variant="outline" className="h-7 text-[11px]">{t('Email quote')}</Button>
                                 </Form>
                             </div>
                         </div>
@@ -71,23 +72,23 @@ export default function DealQuotes({
                 </div>
             )}
             {canCreateQuote(capabilities) ? (
-                <RecordDisclose label="Create quote">
+                <RecordDisclose label={t('Create quote')}>
                     <Form action={`/crm/deals/${dealId}/quotes`} method="post" className="grid gap-1" resetOnSuccess>
                         <select name="items[0][product_id]" className="h-7 rounded border border-hairline bg-canvas px-1 text-[11px]">
-                            <option value="">Ad hoc item</option>
+                            <option value="">{t('Ad hoc item')}</option>
                             {catalog.map((product) => (
                                 <option key={product.id} value={product.id}>
                                     {product.name}
                                 </option>
                             ))}
                         </select>
-                        <Input name="items[0][name]" placeholder="Line name" className="h-7" />
+                        <Input name="items[0][name]" placeholder={t('Line name')} className="h-7" />
                         <div className="grid grid-cols-2 gap-1">
                             <Input name="items[0][quantity]" type="number" min={1} defaultValue={1} className="h-7" />
-                            <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder="DZD" className="h-7" />
+                            <Input name="items[0][unit_dzd]" type="number" min={0} step="0.01" placeholder={t('DA')} className="h-7" />
                         </div>
-                        <Input name="notes" placeholder="Notes" className="h-7" />
-                        <Button variant="outline" className="h-7 text-[11px]">Create quote</Button>
+                        <Input name="notes" placeholder={t('Notes')} className="h-7" />
+                        <Button variant="outline" className="h-7 text-[11px]">{t('Create quote')}</Button>
                     </Form>
                 </RecordDisclose>
             ) : null}

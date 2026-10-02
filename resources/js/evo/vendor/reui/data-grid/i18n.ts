@@ -4,37 +4,47 @@
  * Upstream: https://github.com/keenthemes/reui @ 6e433ddaba3a4be38182c8c8883b6cc335183c42
  * License: MIT (LICENSE.md, verified 2026-10-01)
  * Copied: 2026-10-01
- * Modified: all strings French; no English library defaults.
+ * Modified: English keys via t(); no English library defaults left untranslated.
  */
 
-export const dataGridFr = {
-    selectAll: 'Tout sélectionner',
-    selectRow: 'Sélectionner la ligne',
-    sortAsc: 'Trier croissant',
-    sortDesc: 'Trier décroissant',
-    clearSort: 'Annuler le tri',
-    columns: 'Colonnes',
-    showColumns: 'Afficher les colonnes',
-    hideColumn: 'Masquer la colonne',
-    pinLeft: 'Épingler à gauche',
-    pinRight: 'Épingler à droite',
-    unpin: 'Désépingler',
-    resize: 'Redimensionner la colonne',
-    rowsSelected: ':count sélectionné(s)',
+import { t } from '@/lib/i18n';
+
+export const dataGridKeys = {
+    selectAll: 'Select all',
+    selectRow: 'Select row',
+    sortAsc: 'Sort ascending',
+    sortDesc: 'Sort descending',
+    clearSort: 'Clear sort',
+    columns: 'Columns',
+    showColumns: 'Show columns',
+    hideColumn: 'Hide column',
+    pinLeft: 'Pin to start',
+    pinRight: 'Pin to end',
+    unpin: 'Unpin',
+    resize: 'Resize column',
+    rowsSelected: ':count selected',
     page: 'Page',
-    of: 'sur',
-    rowsPerPage: 'Lignes par page',
-    first: 'Première page',
-    previous: 'Page précédente',
-    next: 'Page suivante',
-    last: 'Dernière page',
-    noResults: 'Aucun résultat',
-    loading: 'Chargement du tableau…',
-    error: 'Impossible de charger le tableau',
-    retry: 'Réessayer',
-    bulk: 'Actions groupées',
-    clearSelection: 'Effacer la sélection',
-    rowActions: 'Actions de la ligne',
+    of: 'of',
+    rowsPerPage: 'Rows per page',
+    first: 'First page',
+    previous: 'Previous page',
+    next: 'Next page',
+    last: 'Last page',
+    noResults: 'No results',
+    loading: 'Loading table…',
+    error: 'Could not load the table',
+    retry: 'Retry',
+    bulk: 'Bulk actions',
+    clearSelection: 'Clear selection',
+    rowActions: 'Row actions',
 } as const;
 
-export type DataGridI18n = typeof dataGridFr;
+export type DataGridI18n = typeof dataGridKeys;
+
+export const dataGridFr: DataGridI18n = new Proxy(dataGridKeys, {
+    get(target, property) {
+        const key = target[property as keyof typeof target];
+
+        return typeof key === 'string' ? t(key) : key;
+    },
+}) as DataGridI18n;

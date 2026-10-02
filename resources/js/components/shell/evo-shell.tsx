@@ -11,6 +11,7 @@ import {
     useCommandPaletteShortcut,
 } from '@/evo/patterns/command-palette';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { t } from '@/lib/i18n';
 
 let shellHydrated = false;
 
@@ -91,7 +92,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
         >
             <aside
                 data-shell="production"
-                className="evo-rail-slot evo-cabinet hidden h-dvh shrink-0 overflow-hidden border-r border-shell-hairline md:block"
+                className="evo-rail-slot evo-cabinet hidden h-dvh shrink-0 overflow-hidden border-e border-shell-hairline md:block"
             >
                 <div className="evo-rail-panel h-full">
                     <EvoRail
@@ -123,9 +124,9 @@ export function EvoShell({ children }: { children: ReactNode }) {
             <div className="evo-workspace relative flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
                 <button
                     type="button"
-                    className="evo-rail-reopen absolute top-3 left-3 z-30 hidden size-8 place-items-center rounded-lg bg-[var(--evo-surface)] text-[var(--evo-ink)] hover:bg-[var(--evo-surface-raised)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)] md:grid"
-                    aria-label="Ouvrir le menu"
-                    title="Ouvrir le menu"
+                    className="evo-rail-reopen absolute top-3 start-3 z-30 hidden size-8 place-items-center rounded-lg bg-[var(--evo-surface)] text-[var(--evo-ink)] hover:bg-[var(--evo-surface-raised)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)] md:grid"
+                    aria-label={t('Open menu')}
+                    title={t('Open menu')}
                     tabIndex={collapsed ? 0 : -1}
                     aria-hidden={collapsed ? undefined : true}
                     onClick={() =>

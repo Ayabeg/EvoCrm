@@ -28,7 +28,9 @@ class WorkspaceInviteMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "You're invited to {$this->workspaceName} on EvoSales",
+            subject: __("You're invited to :workspace on EvoSales", [
+                'workspace' => $this->workspaceName,
+            ]),
         );
     }
 

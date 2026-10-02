@@ -3,6 +3,8 @@ import { ActivationChecklist } from '@/components/dashboard/activation-checklist
 import { DashboardPipeline } from '@/components/dashboard/dashboard-pipeline';
 import { HomeKpiStrip } from '@/components/dashboard/home-kpi-strip';
 import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
+import { LtrValue } from '@/components/ltr-value';
+import { formatDate } from '@/evo/lib/format';
 import { EVO_CHART_STAGE, EVO_CHART_TRACK } from '@/evo/tokens/literal-hex';
 import type { ActivationState } from '@/lib/activation';
 import type {
@@ -11,8 +13,7 @@ import type {
     DashboardRecentDeal,
     DashboardContext,
 } from '@/lib/dashboard-operating-home';
-import { DASHBOARD_TIMEZONE } from '@/lib/dashboard-operating-home';
-import { dateLocale, t } from '@/lib/i18n';
+import { t } from '@/lib/i18n';
 import { formatCompactDzd } from '@/lib/money';
 import type { Auth } from '@/types';
 
@@ -32,12 +33,7 @@ function formatCreated(iso: string | null): string {
     }
 
     try {
-        return new Intl.DateTimeFormat(dateLocale(), {
-            timeZone: DASHBOARD_TIMEZONE,
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-        }).format(new Date(iso));
+        return formatDate(iso);
     } catch {
         return iso.slice(0, 10);
     }
@@ -119,7 +115,7 @@ export default function Home({
                                         {t('Deal evolution')}
                                     </h2>
                                     <p className="mt-1 text-[11px] text-[var(--home-muted)]">
-                                        {t('Deal value (DZD)')}
+                                        {t('Deal value (DA)')}
                                     </p>
                                 </div>
                                 <span className="inline-flex h-8 items-center rounded-[7px] border border-[var(--home-line)] bg-[var(--home-paper)] px-2.5 text-[11px] text-[var(--home-ink)]">
@@ -198,9 +194,10 @@ export default function Home({
                                     <div className="absolute inset-[34px] rounded-full bg-[var(--home-paper)]" />
                                     <div className="relative text-center">
                                         <p className="text-[18px] leading-none font-semibold tracking-tight">
-                                            {formatCompactDzd(pipeline.amount_cents).replace(' DZD', '')}
+                                            <LtrValue>
+                                                {formatCompactDzd(pipeline.amount_cents)}
+                                            </LtrValue>
                                         </p>
-                                        <p className="mt-1 text-[10px] text-[var(--home-muted)]">DZD</p>
                                     </div>
                                 </div>
                                 <ul className="w-full min-w-0 flex-1">
@@ -225,8 +222,11 @@ export default function Home({
                                                     }}
                                                 />
                                                 <span className="font-semibold">{stage.name}</span>
-                                                <span className="ml-auto text-[var(--home-muted)]">
-                                                    {formatCompactDzd(stage.amount_cents)} ({share}%)
+                                                <span className="ms-auto text-[var(--home-muted)]">
+                                                    <LtrValue>
+                                                        {formatCompactDzd(stage.amount_cents)}
+                                                    </LtrValue>{' '}
+                                                    ({share}%)
                                                 </span>
                                             </li>
                                         );
@@ -267,11 +267,15 @@ export default function Home({
                                             href={deal.href}
                                             className="grid min-w-[520px] grid-cols-[1.35fr_0.75fr_0.6fr_0.7fr_0.9fr] items-center border-b border-[var(--home-line-soft)] py-2 text-[11px] text-[var(--home-ink)] last:border-0 hover:bg-[var(--home-wash)]"
                                         >
-                                            <span className="truncate pr-2 font-semibold">{deal.title}</span>
-                                            <span className="truncate pr-2 text-[var(--home-muted)]">
+                                            <span className="truncate pe-2 font-semibold" dir="auto">{deal.title}</span>
+                                            <span className="truncate pe-2 text-[var(--home-muted)]" dir="auto">
                                                 {deal.company ?? '—'}
                                             </span>
-                                            <span>{formatCompactDzd(deal.amount_cents)}</span>
+                                            <span>
+                                                <LtrValue>
+                                                    {formatCompactDzd(deal.amount_cents)}
+                                                </LtrValue>
+                                            </span>
                                             <span>
                                                 <span className="inline-flex rounded-full bg-[var(--home-chip)] px-2 py-0.5 text-[10px] font-semibold">
                                                     {deal.stage ?? '—'}

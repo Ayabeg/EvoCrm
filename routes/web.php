@@ -42,6 +42,7 @@ use App\Http\Controllers\Desk\AgentsController;
 use App\Http\Controllers\Desk\DeskConnectorController;
 use App\Http\Controllers\Desk\InboxController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Outbound\CampaignController;
 use App\Http\Controllers\Outbound\DomainController;
 use App\Http\Controllers\Outbound\EnrollmentController;
@@ -101,6 +102,8 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 // local/manual probes. CSRF is excepted for this path in bootstrap/app.php.
 Route::match(['get', 'post'], '/auth/apple/callback', [AppleController::class, 'callback'])
     ->name('auth.apple.callback');
+
+Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
 Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');

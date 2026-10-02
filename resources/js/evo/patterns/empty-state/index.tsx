@@ -61,7 +61,7 @@ export function EmptyState({
             className={cn(
                 'text-[var(--evo-ink)]',
                 banner
-                    ? 'flex items-start gap-3 px-4 py-3 text-left sm:px-6'
+                    ? 'flex items-start gap-3 px-4 py-3 text-start sm:px-6'
                     : 'flex flex-col items-center justify-center text-center',
                 density === 'page' && 'gap-4 px-6 py-12',
                 density === 'panel' && 'gap-3 px-3 py-4',

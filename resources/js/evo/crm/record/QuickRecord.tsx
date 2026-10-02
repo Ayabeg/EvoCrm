@@ -192,7 +192,7 @@ export function QuickRecord({
                     state?.opener?.focus();
                 }}
             >
-                <SheetHeader className="border-b border-[var(--evo-hairline)] pr-10">
+                <SheetHeader className="border-b border-[var(--evo-hairline)] pe-10">
                     <div className="flex items-center gap-2">
                         {canBack && back ? (
                             <Button
@@ -348,7 +348,7 @@ export function QuickRecord({
                                                 >
                                                     <button
                                                         type="button"
-                                                        className="block w-full truncate rounded-[var(--evo-radius-compact)] px-1 py-1 text-left text-[13px] hover:bg-[var(--evo-hover)]"
+                                                        className="block w-full truncate rounded-[var(--evo-radius-compact)] px-1 py-1 text-start text-[13px] hover:bg-[var(--evo-hover)]"
                                                         onClick={() =>
                                                             openRecord?.(
                                                                 item.ref,

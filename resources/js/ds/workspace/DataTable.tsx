@@ -29,7 +29,7 @@ export function DataTable<Row extends { id: RowId }>({
         <div className="min-h-0 flex-1 overflow-auto" data-ds="data-table">
             <table className="w-full min-w-[640px] border-collapse text-[13px]">
                 <thead>
-                    <tr className="border-b border-hairline bg-canvas-soft text-left">
+                    <tr className="border-b border-hairline bg-canvas-soft text-start">
                         {onToggle ? (
                             <th className="w-10 px-4 md:px-8">
                                 <input

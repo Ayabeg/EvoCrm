@@ -41,13 +41,13 @@ export default function AppearanceToggleTab({
                     >
                         <Icon
                             className={cn(
-                                '-ml-1 h-4 w-4',
+                                '-ms-1 h-4 w-4',
                                 appearance === value && 'text-brand',
                             )}
                             weight="regular"
                             aria-hidden
                         />
-                        <span className="ml-1.5 text-sm">{t(label)}</span>
+                        <span className="ms-1.5 text-sm">{t(label)}</span>
                     </button>
                 ))}
             </div>

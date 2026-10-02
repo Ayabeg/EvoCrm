@@ -69,7 +69,7 @@ export default function ContactMerge({
                                 <input type="hidden" name="absorbed_id" value={absorbed.id} />
 
                                 <div className="overflow-hidden rounded-md border border-hairline">
-                                    <table className="w-full text-left text-[13px]">
+                                    <table className="w-full text-start text-[13px]">
                                         <thead className="bg-canvas-soft text-[11px] uppercase tracking-wide text-muted-foreground">
                                             <tr>
                                                 <th className="px-4 py-2">{t('Field')}</th>

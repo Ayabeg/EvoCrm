@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import { LanguageSelector } from '@/components/language-selector';
 import { t } from '@/lib/i18n';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
@@ -68,7 +69,7 @@ export default function AuthScreen({
                                 <img
                                     src="/brand/evocrm/logo.svg"
                                     alt=""
-                                    className="pointer-events-none absolute -top-8 -right-6 size-56 opacity-[0.22] sm:size-64"
+                                    className="pointer-events-none absolute -top-8 -end-6 size-56 opacity-[0.22] sm:size-64"
                                 />
                                 <div className="relative">
                                     <h2 className="login-split-brand-name">
@@ -83,6 +84,9 @@ export default function AuthScreen({
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="mt-6">
+                    <LanguageSelector compact />
                 </div>
                 <p className="login-split-legal">
                     {t('By clicking continue, you agree to our')}{' '}

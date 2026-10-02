@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
+import { LtrValue } from '@/components/ltr-value';
 import type { DashboardPipeline } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
 import { formatCompactDzd } from '@/lib/money';
@@ -19,12 +20,14 @@ export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline })
     const total = Math.max(pipeline.amount_cents, 1);
     let largestId = pipeline.stages[0]?.id ?? 0;
     let largestAmount = pipeline.stages[0]?.amount_cents ?? 0;
+
     for (const stage of pipeline.stages) {
         if (stage.amount_cents > largestAmount) {
             largestId = stage.id;
             largestAmount = stage.amount_cents;
         }
     }
+
     const distributed = pipeline.stages.filter((stage) => stage.amount_cents > 0);
 
     if (empty) {
@@ -102,7 +105,9 @@ export function DashboardPipeline({ pipeline }: { pipeline: DashboardPipeline })
                                 <span className="money shrink-0 text-[12px] leading-4 text-mute">
                                     {stage.count}
                                     {' · '}
-                                    {formatCompactDzd(stage.amount_cents)}
+                                    <LtrValue>
+                                        {formatCompactDzd(stage.amount_cents)}
+                                    </LtrValue>
                                     {share > 0 ? ` · ${share}%` : ''}
                                 </span>
                             </Link>

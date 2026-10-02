@@ -15,7 +15,7 @@ export function RecordLayoutCustomizeButton() {
 
     return (
         <Button type="button" variant="secondary" className="h-7 text-[11px]" onClick={() => setEditorOpen(true)}>
-            <Columns className="mr-1 size-3.5" aria-hidden />
+            <Columns className="me-1 size-3.5" aria-hidden />
             Customize layout
         </Button>
     );
@@ -97,7 +97,7 @@ export function RecordLayoutEditor() {
                     ))}
                     <div className="flex gap-2">
                         <Button type="button" variant="secondary" onClick={resetLayout}>
-                            <ArrowCounterClockwise className="mr-1 size-3.5" aria-hidden />
+                            <ArrowCounterClockwise className="me-1 size-3.5" aria-hidden />
                             Reset
                         </Button>
                         <Button type="button" onClick={() => setEditorOpen(false)}>

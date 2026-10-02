@@ -49,7 +49,7 @@ export function DashboardAttention({
                         <button
                             type="button"
                             className={cn(
-                                'flex w-full items-start justify-between gap-4 rounded-[10px] px-2 py-3 text-left',
+                                'flex w-full items-start justify-between gap-4 rounded-[10px] px-2 py-3 text-start',
                                 '-mx-2 hover:bg-subtle',
                                 MOTION_HOVER_CLASS,
                                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',

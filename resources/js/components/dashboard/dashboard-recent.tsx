@@ -49,7 +49,8 @@ export function DashboardRecent({
                             <RecordLink
                                 record={item.recordRef}
                                 mode="drawer"
-                                className="block truncate text-left text-[14px] leading-5 font-medium text-ink hover:underline"
+                                className="block truncate text-start text-[14px] leading-5 font-medium text-ink hover:underline"
+                                dir="auto"
                             >
                                 {item.subject}
                             </RecordLink>
@@ -57,6 +58,7 @@ export function DashboardRecent({
                             <Link
                                 href={recent.view_all_href}
                                 className="block truncate text-[14px] leading-5 font-medium text-ink hover:underline focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                                dir="auto"
                             >
                                 {item.subject}
                             </Link>
