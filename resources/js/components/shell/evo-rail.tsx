@@ -3,9 +3,11 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import {
-    SETTINGS_NAV,
+    activeParentId,
     activeNavId,
+    isNavigationChildActive,
     visibleSections,
+    visibleSettings,
 } from '@/components/shell/product-nav';
 import type { NavItem } from '@/components/shell/product-nav';
 import { UserMenuContent } from '@/components/user-menu-content';
@@ -74,7 +76,7 @@ export function EvoRail({
     const rawCapabilities = page.props.auth?.capabilities;
     const capabilities = useMemo(
         () =>
-            Array.isArray(rawCapabilities) ? (rawCapabilities as string[]) : [],
+            Array.isArray(rawCapabilities) ? (rawCapabilities as string[]) : null,
         [rawCapabilities],
     );
     const [uncontrolledMode, setUncontrolledMode] = useState<RailMode>('menu');
@@ -105,13 +107,28 @@ export function EvoRail({
     const searchId = useId();
 
     const allowed = simpleMode ? new Set(nav.map((item) => item.id)) : null;
-    const sections = visibleSections(simpleMode, allowed, features);
+    const sections = visibleSections(
+        simpleMode,
+        allowed,
+        features,
+        capabilities ? new Set(capabilities) : null,
+    );
     const activeId = activeNavId(path, sections);
+    const activeGroupId = activeParentId(path, sections);
     const settingsActive =
         path === '/settings' || path.startsWith('/settings/');
+    const settingsItem = visibleSettings(
+        capabilities ? new Set(capabilities) : null,
+    );
+    const [manualOpenGroupId, setManualOpenGroupId] = useState<string | null>(
+        null,
+    );
+    // A deep link always wins over the last manually opened group. This keeps
+    // the active context visible without an effect-driven render pass.
+    const openGroupId = activeGroupId ?? (settingsActive ? settingsItem.id : manualOpenGroupId);
 
     const catalog = useMemo(
-        () => buildCommandCatalog({ capabilities, features }),
+        () => buildCommandCatalog({ capabilities: capabilities ?? [], features }),
         [capabilities, features],
     );
     const availableIds = useMemo(
@@ -318,12 +335,12 @@ export function EvoRail({
                                 <section
                                     key={section.id}
                                     className={
-                                        section.label ? 'mt-3' : undefined
+                                        section.labelKey ? 'mt-3' : undefined
                                     }
                                 >
-                                    {section.label ? (
+                                    {section.labelKey ? (
                                         <h2 className="evo-nav-section-label mb-1 border-t border-shell-hairline px-2 pt-3 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                                            {t(section.label)}
+                                            {t(section.labelKey)}
                                         </h2>
                                     ) : null}
                                     <ul className="flex flex-col gap-0.5">
@@ -336,6 +353,15 @@ export function EvoRail({
                                                             ? undefined
                                                             : activeId
                                                     }
+                                                    path={path}
+                                                    open={openGroupId === item.id}
+                                                    onToggle={() =>
+                                                        setManualOpenGroupId((current) =>
+                                                            current === item.id
+                                                                ? null
+                                                                : item.id,
+                                                        )
+                                                    }
                                                     onNavigate={onNavigate}
                                                 />
                                             </li>
@@ -346,11 +372,22 @@ export function EvoRail({
                         </div>
                     </div>
                     <footer className="shrink-0 border-t border-shell-hairline px-2 py-2">
-                        <NavRow
-                            item={SETTINGS_NAV}
-                            active={settingsActive}
-                            onNavigate={onNavigate}
-                        />
+                        <div className="evo-scroll max-h-[min(28rem,50dvh)] overflow-y-auto">
+                            <NavGroup
+                                item={settingsItem}
+                                active={settingsActive}
+                                path={path}
+                                open={openGroupId === settingsItem.id}
+                                onToggle={() =>
+                                    setManualOpenGroupId((current) =>
+                                        current === settingsItem.id
+                                            ? null
+                                            : settingsItem.id,
+                                    )
+                                }
+                                onNavigate={onNavigate}
+                            />
+                        </div>
                         {user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -521,7 +558,7 @@ function NavRow({
             href={item.href}
             prefetch
             aria-current={active ? 'page' : undefined}
-            aria-label={t(item.label)}
+            aria-label={t(item.labelKey)}
             className={cn(rowClass, active && 'font-medium')}
             onClick={onNavigate}
         >
@@ -530,7 +567,7 @@ function NavRow({
                 className="evo-nav-label min-w-0 flex-1 truncate"
                 data-active={active ? 'true' : 'false'}
             >
-                {t(item.label)}
+                {t(item.labelKey)}
             </span>
         </Link>
     );
@@ -539,16 +576,24 @@ function NavRow({
 function NavGroup({
     item,
     activeId,
+    active = false,
+    path,
+    open,
+    onToggle,
     onNavigate,
 }: {
     item: NavItem;
     activeId?: string;
+    active?: boolean;
+    path: string;
+    open: boolean;
+    onToggle: () => void;
     onNavigate?: () => void;
 }) {
-    const childActive =
-        item.children?.some((child) => child.id === activeId) ?? false;
-    const [opened, setOpened] = useState(false);
-    const open = opened || childActive;
+    const childActive = item.children?.some((child) =>
+        isNavigationChildActive(path, child),
+    ) ?? false;
+    const parentActive = active || activeId === item.id || childActive;
 
     if (!item.children?.length) {
         return (
@@ -560,34 +605,57 @@ function NavGroup({
         );
     }
 
+    const childrenId = `nav-children-${item.id}`;
+
     return (
         <div>
-            <div className="flex items-center">
-                <NavRow
-                    item={item}
-                    active={activeId === item.id}
-                    onNavigate={onNavigate}
+            <button
+                type="button"
+                className={cn(
+                    rowClass,
+                    'group',
+                    parentActive && 'bg-[var(--evo-teal-soft)] font-medium',
+                )}
+                aria-expanded={open}
+                aria-controls={childrenId}
+                onClick={onToggle}
+            >
+                <item.icon
+                    aria-hidden
+                    className={cn(
+                        'size-5 shrink-0',
+                        parentActive
+                            ? 'text-[var(--evo-teal-ink)]'
+                            : 'text-[var(--evo-ink-secondary)]',
+                    )}
+                    weight="regular"
                 />
-                <button
-                    type="button"
-                    className="grid size-7 shrink-0 place-items-center rounded-lg text-shell-muted hover:bg-[var(--evo-hover)] hover:text-shell-ink"
-                    aria-expanded={open}
-                    aria-label={
-                        open
-                            ? t('Collapse :name', { name: t(item.label) })
-                            : t('Expand :name', { name: t(item.label) })
-                    }
-                    onClick={() => setOpened((current) => !current)}
+                <span className="evo-nav-label min-w-0 flex-1 truncate">
+                    {t(item.labelKey)}
+                </span>
+                <span
+                    aria-hidden
+                    className="grid size-5 shrink-0 place-items-center text-shell-muted transition-transform duration-180 ease-[var(--evo-ease)] motion-reduce:transition-none"
+                    data-open={open ? 'true' : 'false'}
                 >
                     {open ? (
                         <CaretDown className="size-3.5" />
                     ) : (
                         <CaretRight className="size-3.5 rtl:rotate-180" />
                     )}
-                </button>
-            </div>
-            {open ? (
-                <ul className="mt-0.5 flex flex-col gap-0.5">
+                </span>
+            </button>
+            <ul
+                id={childrenId}
+                className={cn(
+                    'evo-nav-children mt-0.5 flex flex-col gap-0.5 overflow-hidden ps-3 transition-[max-height,opacity,transform] duration-180 ease-[var(--evo-ease)] motion-reduce:transition-none',
+                    open
+                        ? 'max-h-[28rem] opacity-100'
+                        : 'pointer-events-none max-h-0 -translate-y-1 opacity-0',
+                )}
+                aria-hidden={!open}
+                inert={!open}
+            >
                     {item.children.map((child) => (
                         <li key={child.id}>
                             <Link
@@ -597,17 +665,17 @@ function NavGroup({
                                     activeId === child.id ? 'page' : undefined
                                 }
                                 className={cn(
-                                    'evo-nav-link flex h-8 items-center rounded-lg pe-2 ps-9 text-start text-[12px] text-shell-ink-2 hover:bg-[var(--evo-hover)]',
-                                    activeId === child.id && 'font-medium',
+                                    'evo-nav-link relative flex h-8 items-center rounded-lg pe-2 ps-9 text-start text-[12px] text-shell-ink-2 hover:bg-[var(--evo-hover)]',
+                                    isNavigationChildActive(path, child) &&
+                                        'bg-[var(--evo-teal-soft)] font-medium text-[var(--evo-teal-ink)] before:pointer-events-none before:absolute before:inset-y-1.5 before:start-0 before:w-0.5 before:rounded-full before:bg-[var(--evo-teal-ink)]',
                                 )}
                                 onClick={onNavigate}
                             >
-                                <span className="truncate">{t(child.label)}</span>
+                                <span className="truncate">{t(child.labelKey)}</span>
                             </Link>
                         </li>
                     ))}
                 </ul>
-            ) : null}
         </div>
     );
 }
