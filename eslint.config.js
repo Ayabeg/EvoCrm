@@ -113,13 +113,28 @@ export default [
         ],
         rules: {
             'no-restricted-imports': [
-                'warn',
+                'error',
                 {
                     paths: [
                         {
                             name: 'lucide-react',
                             message:
-                                'Phosphor is the Evo icon set. Import from @/evo/icons. Existing lucide usage is frozen until PR2–PR12.',
+                                'Phosphor is the Evo icon set. Import from @/evo/icons.',
+                        },
+                        {
+                            name: '@astryxdesign/core',
+                            message:
+                                '@astryxdesign was removed. Use Evo primitives.',
+                        },
+                        {
+                            name: '@astryxdesign/theme-neutral',
+                            message:
+                                '@astryxdesign was removed. Use Evo tokens.',
+                        },
+                        {
+                            name: 'radix-ui',
+                            message:
+                                'Import @radix-ui/react-* packages, not the radix-ui umbrella.',
                         },
                     ],
                     patterns: [
@@ -131,15 +146,16 @@ export default [
                                 '@/components/aurora/*',
                                 '**/components/ui/aurora/*',
                                 '**/components/aurora/*',
+                                '@astryxdesign/*',
                             ],
                             message:
-                                'Aurora (AGPL-3.0-only) was removed. Do not import components/aurora or components/ui/aurora.',
+                                'Aurora (AGPL-3.0-only) and Astryx were removed. Use @/evo/*.',
                         },
                     ],
                 },
             ],
             'no-restricted-syntax': [
-                'warn',
+                'error',
                 {
                     selector:
                         'Literal[raw=/#[0-9A-Fa-f]{3,8}\\b/]',

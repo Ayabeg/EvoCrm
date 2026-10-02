@@ -1,18 +1,13 @@
 <?php
 
 it('keeps Evo Button as the only product button primitive', function () {
-    $ds = file_get_contents(resource_path('js/ds/components/Button.tsx'));
-    $adapter = file_get_contents(resource_path('js/components/ui/button.tsx'));
     $bridge = file_get_contents(resource_path('js/lib/aurora/shadcn-bridge.ts'));
     $evo = file_get_contents(resource_path('js/evo/ui/button.tsx'));
 
-    expect($ds)->toContain("from '@/evo/ui/button'")
-        ->and($ds)->not->toContain('@/components/ui/aurora')
-        ->and($ds)->not->toContain('PremiumButton')
-        ->and($ds)->not->toContain('GlassButton')
-        ->and($adapter)->toContain("from '@/ds/components/Button'")
-        ->and($adapter)->not->toContain('PremiumButton')
-        ->and($adapter)->not->toContain('GlassButton')
+    expect($evo)->toContain("export const buttonVariants")
+        ->and($evo)->not->toContain('@/components/ui/aurora')
+        ->and($evo)->not->toContain('PremiumButton')
+        ->and($evo)->not->toContain('GlassButton')
         ->and($bridge)->toContain("return { variant: 'default', filled: true }")
         ->and($evo)->toContain('export type ButtonVariant')
         ->and($evo)->toContain('asChild');

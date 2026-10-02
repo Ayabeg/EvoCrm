@@ -10,8 +10,8 @@ import {
     HairlineTd,
     HairlineTh,
 } from '@/components/surface/hairline-table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -20,10 +20,10 @@ import {
     DialogFooter,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+} from '@/evo/ui/dialog';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
+import { NativeSelect } from '@/evo/ui/native-select';
 import { SettingsForm, SettingsPageHeader } from '@/evo/patterns/settings';
 import { dateLocale, t } from '@/lib/i18n';
 import type { WorkspaceRole } from '@/types/auth';

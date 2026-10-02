@@ -13,8 +13,8 @@ import {
     WhatsAppMark,
 } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
 import {
     SettingsCard,
     SettingsEmptyState,
@@ -89,10 +89,10 @@ function AppCard({
                             }
                         >
                             {app.status === 'needs_attention'
-                                ? 'Needs attention'
+                                ? t('Needs attention')
                                 : app.connected
-                                  ? 'Connected'
-                                  : 'Not connected'}
+                                  ? t('Connected')
+                                  : t('Not connected')}
                         </Badge>
                     </div>
                     <p className="mt-1 text-[13px] text-mute">{app.tagline}</p>
@@ -242,7 +242,7 @@ export default function AppsMarketplace({
                     size="sm"
                     className="bg-brand text-white hover:bg-brand-hover"
                 >
-                    <Link href="/settings/setup">Get started</Link>
+                    <Link href="/settings/setup">{t('Get started')}</Link>
                 </Button>
             </SettingsPageHeader>
 

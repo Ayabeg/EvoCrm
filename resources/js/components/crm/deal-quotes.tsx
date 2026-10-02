@@ -1,8 +1,8 @@
 import { Form, usePage } from '@inertiajs/react';
 import type { CatalogProduct } from '@/components/crm/deal-line-items';
 import { RecordDisclose } from '@/components/crm/record-hub';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
 import { canCreateQuote } from '@/lib/command-os';
 import { formatDzd } from '@/lib/money';
 

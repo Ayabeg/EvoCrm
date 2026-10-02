@@ -76,7 +76,7 @@ export function HomeKpiStrip({ kpis }: { kpis: KpiTile[] }) {
                                         <span
                                             className={cn(
                                                 'font-semibold',
-                                                change < 0 ? 'text-[#f04438]' : 'text-[#17a85b]',
+                                                change < 0 ? 'text-[var(--evo-danger)]' : 'text-[var(--evo-success)]',
                                             )}
                                         >
                                             {change < 0 ? '↓' : '↑'} {change > 0 ? '+' : ''}

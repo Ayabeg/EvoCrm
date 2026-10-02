@@ -70,7 +70,7 @@ it('keeps Contacts row identity href columns and selection on the shared contrac
     expect($table)->toContain('ContactNameCell')
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($table)->toContain("target.closest('a, input, button, label')")
-        ->and($table)->toContain('aria-label="Select page"')
+        ->and($table)->toContain("aria-label={t('Select page')}")
         ->and($table)->toContain('aria-checked={')
         ->and($table)->toContain("'mixed'")
         ->and($table)->toContain('aria-label={`Select ${row.id}`}');

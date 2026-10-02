@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { Button } from '@/evo/ui/button';
+import { Checkbox } from '@/evo/ui/checkbox';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/evo/ui/drawer';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListViewColumn } from '@/lib/list-view-config';
 

@@ -5,8 +5,8 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { toast } from 'sonner';
 import ActivityComposer from '@/components/crm/activity-composer';
 import { MeetingAttendanceButtons } from '@/components/crm/meeting-attendance';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
 import { RecordLink } from '@/ds/workspace/quick-record/RecordLink';
 import {
     ACTIVITY_QUEUE_TYPES,

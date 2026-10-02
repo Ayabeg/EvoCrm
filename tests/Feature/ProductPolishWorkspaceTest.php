@@ -64,7 +64,7 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
     $list = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
 
-    expect($reports)->toContain('title="Reports"')
+    expect($reports)->toContain("title={t('Reports')}")
         ->and($reports)->not->toContain('text-page-title')
         ->and($reports)->toContain('px-4 py-3 md:px-5 md:py-4')
         ->and($reports)->not->toContain('max-w-7xl')
@@ -72,6 +72,7 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
         ->and($outbound)->toContain('space-y-4 px-4 py-3')
         ->and($outbound)->not->toContain('max-w-7xl')
         ->and($index)->not->toContain('from \'@/components/ui/card\'')
+        ->and($index)->not->toContain("from '@/evo/ui/card'")
         ->and($index)->not->toContain('text-brand')
         ->and($page)->not->toContain('rounded-2xl')
         ->and($page)->not->toContain('mb-8')
@@ -83,7 +84,7 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
 it('keeps Reports room identity singular and destacks leftover rooms', function () {
     $shell = file_get_contents(resource_path('js/components/crm/reports-shell.tsx'));
 
-    expect($shell)->toContain('title="Reports"')
+    expect($shell)->toContain("title={t('Reports')}")
         ->and($shell)->not->toContain('text-page-title')
         ->and($shell)->toContain("innerTitle !== 'Reports'");
 });
@@ -101,6 +102,7 @@ it('destacks leftover Reports charts, Outbound rooms, and extra orange primaries
         ->and($campaigns)->toContain('OutboundPage')
         ->and($campaigns)->not->toContain('PageHeader')
         ->and($campaigns)->not->toContain("from '@/components/ui/card'")
+        ->and($campaigns)->not->toContain("from '@/evo/ui/card'")
         ->and($templates)->toContain('OutboundPage')
         ->and($templates)->not->toContain('PageHeader')
         ->and($outbox)->toContain('OutboundPage')

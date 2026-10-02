@@ -1,8 +1,8 @@
 import { Form, Head } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
 import { dateLocale, t } from '@/lib/i18n';
 
 type Slot = {

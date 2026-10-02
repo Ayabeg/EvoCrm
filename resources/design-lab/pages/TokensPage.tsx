@@ -115,7 +115,7 @@ export function TokensPage() {
                         </p>
                         <p className="mt-2 text-[13px] text-[var(--evo-ink-secondary)]">
                             Un seul bouton plein par vue. Libellé en encre
-                            sombre — le blanc sur #EC6025 échoue AA (3.35:1).
+                            sombre — le blanc sur var(--evo-primary) échoue AA (3.35:1).
                         </p>
                         <button
                             type="button"
@@ -156,7 +156,7 @@ export function TokensPage() {
             <section className="mt-10">
                 <h2 className="text-[16px] font-semibold">Palette claire</h2>
                 <p className="mt-1 text-[13px] text-[var(--evo-ink-muted)]">
-                    Toile #F7F8F5, surface blanche, encre #0D1B24. #D9500F reste
+                    Toile var(--evo-canvas), surface blanche, encre var(--evo-ink). var(--evo-logo) reste
                     sur le logo.
                 </p>
                 <div className="mt-4">
@@ -167,7 +167,7 @@ export function TokensPage() {
             <section className="mt-10">
                 <h2 className="text-[16px] font-semibold">Cabinet sombre</h2>
                 <p className="mt-1 text-[13px] text-[var(--evo-ink-muted)]">
-                    Une seule échelle : #0A0A0A / #121212 / #1C1C1C. Pas de
+                    Une seule échelle : var(--evo-canvas) / var(--evo-on-primary) / var(--evo-surface-subtle). Pas de
                     blanc pur, pas de glow, pas de verre.
                 </p>
                 <div className="mt-4">

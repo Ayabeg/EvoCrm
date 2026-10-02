@@ -1,6 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -8,8 +8,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@/evo/ui/dialog';
+import { Input } from '@/evo/ui/input';
 
 export default function LeadEditDialog({
     leadId,

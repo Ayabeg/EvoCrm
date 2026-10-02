@@ -28,13 +28,13 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/evo/ui/dropdown-menu';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@/evo/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
@@ -474,7 +474,7 @@ function RailLink({
                         ? 'flex h-9 min-w-0 flex-1 items-center gap-2 px-3 text-[13px] leading-[18px]'
                         : 'flex h-9 w-full items-center justify-center',
                     active
-                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:bg-[#E8530E]'
+                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:bg-[var(--evo-primary)]'
                         : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                 )}
             >
@@ -955,7 +955,7 @@ export function AppSidebar() {
                                         ? 'flex h-9 w-full items-center gap-2 px-3 text-[13px] leading-[18px]'
                                         : 'flex h-9 w-full items-center justify-center',
                                     moreOpen || plusActive
-                                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:bg-[#E8530E]'
+                                        ? 'bg-sidebar-accent font-medium text-sidebar-ink before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:bg-[var(--evo-primary)]'
                                         : 'text-sidebar-mute hover:bg-sidebar-hover hover:text-sidebar-ink',
                                 )}
                             >

@@ -5,7 +5,7 @@ import {
     DrawerContent,
     DrawerDescription,
     DrawerTitle,
-} from '@/components/ui/drawer';
+} from '@/evo/ui/drawer';
 import { useQuickRecord } from '@/ds/workspace/quick-record/context';
 import type {
     KeyProperty,
@@ -34,10 +34,10 @@ const SECTION_LABELS: Record<SectionId, string> = {
 };
 
 const TONE_CLASS: Record<RecordStatusTone, string> = {
-    neutral: 'bg-[#F1F1EF] text-[#666666]',
-    success: 'bg-[#E8F5EF] text-[#24845B]',
-    warning: 'bg-[#FFF6E8] text-[#C77A11]',
-    danger: 'bg-[#FDECEC] text-[#D92D20]',
+    neutral: 'bg-[var(--evo-surface-subtle)] text-[var(--evo-ink-secondary)]',
+    success: 'bg-[var(--evo-success-soft)] text-[var(--evo-success)]',
+    warning: 'bg-[var(--evo-warning-soft)] text-[var(--evo-warning)]',
+    danger: 'bg-[var(--evo-danger-soft)] text-[var(--evo-danger)]',
 };
 
 function visibleSections(capabilities: RecordCapabilities | undefined): SectionId[] {
@@ -82,8 +82,8 @@ function StatusPill({ label, tone }: { label: string; tone?: RecordStatusTone })
 function PropertyRow({ property }: { property: KeyProperty }) {
     return (
         <div className="grid grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-3 py-1.5">
-            <dt className="text-[12px] text-[#666666]">{property.label}</dt>
-            <dd className="min-w-0 truncate text-[13px] text-[#161616]" title={property.value ?? undefined}>
+            <dt className="text-[12px] text-[var(--evo-ink-secondary)]">{property.label}</dt>
+            <dd className="min-w-0 truncate text-[13px] text-[var(--evo-ink)]" title={property.value ?? undefined}>
                 {property.value ?? EMPTY_VALUE}
             </dd>
         </div>
@@ -92,20 +92,20 @@ function PropertyRow({ property }: { property: KeyProperty }) {
 
 function ActivityList({ items, empty }: { items: RecordActivityItem[]; empty: string }) {
     if (items.length === 0) {
-        return <p className="text-[13px] text-[#929292]">{empty}</p>;
+        return <p className="text-[13px] text-[var(--evo-ink-muted)]">{empty}</p>;
     }
 
     return (
         <ul className="space-y-3">
             {items.map((item) => (
-                <li key={item.id} className="min-w-0 border-b border-[#F1F1EF] pb-3 last:border-0 last:pb-0">
-                    <p className="truncate text-[13px] font-medium text-[#161616]" title={item.title}>
+                <li key={item.id} className="min-w-0 border-b border-[var(--evo-surface-subtle)] pb-3 last:border-0 last:pb-0">
+                    <p className="truncate text-[13px] font-medium text-[var(--evo-ink)]" title={item.title}>
                         {item.title}
                     </p>
                     {item.body ? (
-                        <p className="mt-0.5 line-clamp-2 text-[12px] text-[#666666]">{item.body}</p>
+                        <p className="mt-0.5 line-clamp-2 text-[12px] text-[var(--evo-ink-secondary)]">{item.body}</p>
                     ) : null}
-                    <p className="mt-1 text-[11px] text-[#929292]">
+                    <p className="mt-1 text-[11px] text-[var(--evo-ink-muted)]">
                         {[item.type, item.owner].filter(Boolean).join(' · ')}
                     </p>
                 </li>
@@ -122,7 +122,7 @@ function AssociationList({
     onOpen: (ref: RecordAssociation['ref']) => void;
 }) {
     if (items.length === 0) {
-        return <p className="text-[13px] text-[#929292]">{t('No associations')}</p>;
+        return <p className="text-[13px] text-[var(--evo-ink-muted)]">{t('No associations')}</p>;
     }
 
     return (
@@ -132,11 +132,11 @@ function AssociationList({
                     <button
                         type="button"
                         onClick={() => onOpen(item.ref)}
-                        className="flex w-full min-w-0 items-center justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-[#F7F7F5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]"
+                        className="flex w-full min-w-0 items-center justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                     >
                         <span className="min-w-0">
-                            <span className="block truncate text-[13px] text-[#161616]">{item.label}</span>
-                            <span className="block text-[11px] capitalize text-[#929292]">
+                            <span className="block truncate text-[13px] text-[var(--evo-ink)]">{item.label}</span>
+                            <span className="block text-[11px] capitalize text-[var(--evo-ink-muted)]">
                                 {item.hint ?? item.ref.type}
                             </span>
                         </span>
@@ -151,22 +151,22 @@ function DrawerSkeleton() {
     return (
         <div className="space-y-4" aria-hidden>
             <div className="flex items-center gap-3">
-                <div className="size-10 rounded-full bg-[#F1F1EF]" />
+                <div className="size-10 rounded-full bg-[var(--evo-surface-subtle)]" />
                 <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 rounded bg-[#F1F1EF]" />
-                    <div className="h-3 w-1/3 rounded bg-[#F1F1EF]" />
+                    <div className="h-4 w-2/3 rounded bg-[var(--evo-surface-subtle)]" />
+                    <div className="h-3 w-1/3 rounded bg-[var(--evo-surface-subtle)]" />
                 </div>
             </div>
             <div className="flex gap-2">
-                <div className="h-7 w-20 rounded-full bg-[#F1F1EF]" />
-                <div className="h-7 w-16 rounded-full bg-[#F1F1EF]" />
-                <div className="h-7 w-24 rounded-full bg-[#F1F1EF]" />
+                <div className="h-7 w-20 rounded-full bg-[var(--evo-surface-subtle)]" />
+                <div className="h-7 w-16 rounded-full bg-[var(--evo-surface-subtle)]" />
+                <div className="h-7 w-24 rounded-full bg-[var(--evo-surface-subtle)]" />
             </div>
             <div className="space-y-2">
-                <div className="h-3 w-full rounded bg-[#F1F1EF]" />
-                <div className="h-3 w-5/6 rounded bg-[#F1F1EF]" />
-                <div className="h-3 w-4/6 rounded bg-[#F1F1EF]" />
-                <div className="h-3 w-3/5 rounded bg-[#F1F1EF]" />
+                <div className="h-3 w-full rounded bg-[var(--evo-surface-subtle)]" />
+                <div className="h-3 w-5/6 rounded bg-[var(--evo-surface-subtle)]" />
+                <div className="h-3 w-4/6 rounded bg-[var(--evo-surface-subtle)]" />
+                <div className="h-3 w-3/5 rounded bg-[var(--evo-surface-subtle)]" />
             </div>
         </div>
     );
@@ -176,10 +176,10 @@ function HeaderIdentity({ descriptor }: { descriptor: RecordDescriptor | null })
     if (!descriptor) {
         return (
             <div>
-                <DrawerTitle className="text-[16px] font-semibold tracking-tight text-[#161616]">
+                <DrawerTitle className="text-[16px] font-semibold tracking-tight text-[var(--evo-ink)]">
                     {t('Record')}
                 </DrawerTitle>
-                <DrawerDescription className="text-[12px] text-[#666666]">{t('Loading')}</DrawerDescription>
+                <DrawerDescription className="text-[12px] text-[var(--evo-ink-secondary)]">{t('Loading')}</DrawerDescription>
             </div>
         );
     }
@@ -187,16 +187,16 @@ function HeaderIdentity({ descriptor }: { descriptor: RecordDescriptor | null })
     return (
         <div className="flex min-w-0 items-start gap-3">
             <div
-                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#F1F1EF] text-[12px] font-medium text-[#161616]"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--evo-surface-subtle)] text-[12px] font-medium text-[var(--evo-ink)]"
                 aria-hidden
             >
                 {descriptor.avatar?.initials ?? '?'}
             </div>
             <div className="min-w-0">
-                <DrawerTitle className="truncate text-[16px] font-semibold tracking-tight text-[#161616]">
+                <DrawerTitle className="truncate text-[16px] font-semibold tracking-tight text-[var(--evo-ink)]">
                     {descriptor.title}
                 </DrawerTitle>
-                <DrawerDescription className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[#666666]">
+                <DrawerDescription className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[var(--evo-ink-secondary)]">
                     {descriptor.subtitle ? <span className="truncate">{descriptor.subtitle}</span> : null}
                     {descriptor.status ? (
                         <StatusPill label={descriptor.status.label} tone={descriptor.status.tone} />
@@ -254,10 +254,10 @@ export function QuickRecordDrawer() {
                     }
                 }}
                 style={{
-                    background: '#FFFFFF',
-                    borderColor: '#E3E3DF',
+                    background: 'var(--evo-surface)',
+                    borderColor: 'var(--evo-hairline)',
                     boxShadow: 'none',
-                    color: '#161616',
+                    color: 'var(--evo-ink)',
                     transitionTimingFunction: 'var(--motion-ease-out, cubic-bezier(.2,.8,.2,1))',
                     transitionDuration: 'var(--motion-duration-drawer, 200ms)',
                 }}
@@ -269,14 +269,14 @@ export function QuickRecordDrawer() {
                     'motion-reduce:transition-none',
                 )}
             >
-                <header className="sticky top-0 z-10 shrink-0 border-b border-[#E3E3DF] bg-[#FFFFFF] px-4 py-3">
+                <header className="sticky top-0 z-10 shrink-0 border-b border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-3">
                     <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
                             {history.length > 0 ? (
                                 <button
                                     type="button"
                                     onClick={back}
-                                    className="mb-2 inline-flex items-center gap-1 text-[12px] text-[#666666] hover:text-[#161616] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]"
+                                    className="mb-2 inline-flex items-center gap-1 text-[12px] text-[var(--evo-ink-secondary)] hover:text-[var(--evo-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                                 >
                                     <ArrowLeft className="size-3.5" aria-hidden />
                                     {t('Back')}
@@ -289,7 +289,7 @@ export function QuickRecordDrawer() {
                                 type="button"
                                 onClick={openFull}
                                 disabled={!descriptor?.fullRecordHref && !error?.fullRecordHref}
-                                className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-[12px] font-medium text-[#161616] hover:bg-[#F7F7F5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E] disabled:text-[#929292]"
+                                className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-[12px] font-medium text-[var(--evo-ink)] hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)] disabled:text-[var(--evo-ink-muted)]"
                                 aria-label={t('Open full record')}
                             >
                                 {t('Open full')}
@@ -299,7 +299,7 @@ export function QuickRecordDrawer() {
                                 type="button"
                                 data-drawer-close
                                 onClick={close}
-                                className="inline-flex size-8 items-center justify-center rounded-md text-[#666666] hover:bg-[#F7F7F5] hover:text-[#161616] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]"
+                                className="inline-flex size-8 items-center justify-center rounded-md text-[var(--evo-ink-secondary)] hover:bg-[var(--evo-canvas)] hover:text-[var(--evo-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                                 aria-label={t('Close')}
                             >
                                 <X className="size-4" aria-hidden />
@@ -314,10 +314,10 @@ export function QuickRecordDrawer() {
                                     type="button"
                                     onClick={() => setSection(id)}
                                     className={cn(
-                                        'shrink-0 rounded-full px-2.5 py-1 text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]',
+                                        'shrink-0 rounded-full px-2.5 py-1 text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]',
                                         section === id
-                                            ? 'bg-[#161616] text-white'
-                                            : 'text-[#666666] hover:bg-[#F7F7F5]',
+                                            ? 'bg-[var(--evo-ink)] text-white'
+                                            : 'text-[var(--evo-ink-secondary)] hover:bg-[var(--evo-canvas)]',
                                     )}
                                     aria-pressed={section === id}
                                 >
@@ -328,17 +328,17 @@ export function QuickRecordDrawer() {
                     ) : null}
                 </header>
 
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[#FFFFFF] px-4 py-4">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[var(--evo-surface)] px-4 py-4">
                     {status === 'loading' ? <DrawerSkeleton /> : null}
 
                     {status === 'error' && error ? (
                         <div className="space-y-3">
-                            <p className="text-[14px] text-[#161616]">{error.message}</p>
+                            <p className="text-[14px] text-[var(--evo-ink)]">{error.message}</p>
                             <div className="flex flex-wrap gap-2">
                                 <button
                                     type="button"
                                     onClick={close}
-                                    className="rounded-md border border-[#E3E3DF] px-3 py-1.5 text-[12px] text-[#161616] hover:bg-[#F7F7F5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]"
+                                    className="rounded-md border border-[var(--evo-hairline)] px-3 py-1.5 text-[12px] text-[var(--evo-ink)] hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                                 >
                                     {t('Close')}
                                 </button>
@@ -346,7 +346,7 @@ export function QuickRecordDrawer() {
                                     <button
                                         type="button"
                                         onClick={retry}
-                                        className="rounded-md border border-[#E3E3DF] px-3 py-1.5 text-[12px] text-[#161616] hover:bg-[#F7F7F5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]"
+                                        className="rounded-md border border-[var(--evo-hairline)] px-3 py-1.5 text-[12px] text-[var(--evo-ink)] hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                                     >
                                         {t('Retry')}
                                     </button>
@@ -355,7 +355,7 @@ export function QuickRecordDrawer() {
                                     <button
                                         type="button"
                                         onClick={openFull}
-                                        className="rounded-md bg-[#161616] px-3 py-1.5 text-[12px] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]"
+                                        className="rounded-md bg-[var(--evo-ink)] px-3 py-1.5 text-[12px] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                                     >
                                         {t('Open full')}
                                     </button>
@@ -377,7 +377,7 @@ export function QuickRecordDrawer() {
                                         >
                                             <h3
                                                 id="drawer-attention-heading"
-                                                className="text-[12px] font-medium text-[#161616]"
+                                                className="text-[12px] font-medium text-[var(--evo-ink)]"
                                             >
                                                 {t('Needs attention')}
                                             </h3>
@@ -390,7 +390,7 @@ export function QuickRecordDrawer() {
                                                         <p className="text-[13px] font-medium">
                                                             {signal.label}
                                                         </p>
-                                                        <p className="text-[12px] text-[#929292]">
+                                                        <p className="text-[12px] text-[var(--evo-ink-muted)]">
                                                             {signal.reason}
                                                         </p>
                                                     </li>
@@ -413,7 +413,7 @@ export function QuickRecordDrawer() {
                             ) : null}
                             {section === 'notes' ? (
                                 <div className="space-y-3">
-                                    <p className="text-[12px] text-[#929292]">
+                                    <p className="text-[12px] text-[var(--evo-ink-muted)]">
                                         {t('Notes are read-only in the drawer. Add or edit on the full record.')}
                                     </p>
                                     <ActivityList items={descriptor.notes} empty={t('No notes')} />
@@ -421,7 +421,7 @@ export function QuickRecordDrawer() {
                             ) : null}
                             {section === 'tasks' ? (
                                 <div className="space-y-3">
-                                    <p className="text-[12px] text-[#929292]">
+                                    <p className="text-[12px] text-[var(--evo-ink-muted)]">
                                         {t('Tasks are read-only in the drawer. Create or complete them on the full record.')}
                                     </p>
                                     <ActivityList items={descriptor.tasks} empty={t('No tasks')} />
@@ -432,14 +432,14 @@ export function QuickRecordDrawer() {
                             ) : null}
 
                             {descriptor.capabilities.actions && descriptor.actions.length > 0 ? (
-                                <div className="mt-6 flex flex-wrap gap-2 border-t border-[#F1F1EF] pt-4">
+                                <div className="mt-6 flex flex-wrap gap-2 border-t border-[var(--evo-surface-subtle)] pt-4">
                                     {descriptor.actions
                                         .filter((action) => action.id !== 'open_full')
                                         .map((action) => (
                                             <a
                                                 key={action.id}
                                                 href={action.href}
-                                                className="rounded-md border border-[#E3E3DF] px-3 py-1.5 text-[12px] text-[#161616] hover:bg-[#F7F7F5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8530E]"
+                                                className="rounded-md border border-[var(--evo-hairline)] px-3 py-1.5 text-[12px] text-[var(--evo-ink)] hover:bg-[var(--evo-canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-primary)]"
                                             >
                                                 {t(action.label)}
                                             </a>

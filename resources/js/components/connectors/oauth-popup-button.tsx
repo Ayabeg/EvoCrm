@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import { cn } from '@/lib/utils';
 
 const MESSAGE_TYPE = 'evosales:oauth';

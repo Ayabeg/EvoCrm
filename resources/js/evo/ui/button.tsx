@@ -5,7 +5,7 @@
  * Upstream: https://github.com/shadcn-ui/ui @ d75a96ab781f3d659be1ad287347d5887ce9f2fc
  * License: MIT (LICENSE.md, verified 2026-10-01)
  * Copied: 2026-10-01
- * Modified: --evo-* tokens only; 32/36 density; orange primary with #121212 labels;
+ * Modified: --evo-* tokens only; 32/36 density; orange primary with var(--evo-on-primary) labels;
  * teal focus; Phosphor spinner; Aurora variant aliases for leftover AGPL files;
  * stripped source visual identity.
  */

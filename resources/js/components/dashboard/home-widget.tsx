@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { EmptyKind } from '@/components/ui/empty-illustration';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState } from '@/evo/patterns/empty-state';
 import { cn } from '@/lib/utils';
 
 export function HomeWidget({

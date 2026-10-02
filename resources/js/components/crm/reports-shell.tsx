@@ -78,7 +78,7 @@ export function ReportsShell({
     return (
         <>
             <Head title={t(title)} />
-            <RoomShell title="Reports" tabs={reportsTabs(pathname)}>
+            <RoomShell title={t('Reports')} tabs={reportsTabs(pathname)}>
                 <div className="h-full overflow-y-auto bg-[var(--evo-canvas)]">
                     <div className="px-4 py-3 md:px-5 md:py-4">
                         {hero}

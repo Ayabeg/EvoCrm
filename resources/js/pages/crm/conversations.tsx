@@ -11,8 +11,8 @@ import {
     inboxContactName,
 } from '@/components/crm/inbox-chrome';
 import type { InboxContact } from '@/components/crm/inbox-chrome';
-import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Button } from '@/evo/ui/button';
+import { EmptyState } from '@/evo/patterns/empty-state';
 import { ConversationList } from '@/evo/inbox';
 import { deskThreadToConversation } from '@/evo/inbox/adapters';
 import { t } from '@/lib/i18n';
@@ -72,7 +72,7 @@ export default function ConversationHistory({ threads, selected }: Props) {
                 ) : (
                     <div className="grid min-h-0 flex-1 gap-px overflow-hidden bg-hairline lg:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
                         <section
-                            aria-label="Conversations"
+                            aria-label={t('Conversations')}
                             className="flex min-h-0 flex-col bg-white"
                         >
                             <div className="flex items-center justify-between border-b border-hairline px-3 py-1.5">
@@ -106,7 +106,7 @@ export default function ConversationHistory({ threads, selected }: Props) {
                         </section>
 
                         <section
-                            aria-label="Conversation"
+                            aria-label={t('Conversation')}
                             className="flex min-h-0 min-w-0 bg-white"
                         >
                             {selected ? (

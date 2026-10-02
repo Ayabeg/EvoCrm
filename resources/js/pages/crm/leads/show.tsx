@@ -27,6 +27,7 @@ import { RecordPath } from '@/components/crm/record-path';
 import type { PathStep } from '@/components/crm/record-path';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { t } from '@/lib/i18n';
 
 type LeadContact = {
     id: number;
@@ -486,7 +487,7 @@ export default function LeadShow({
                                             </RelatedRecordLink>
                                         ))
                                     ) : (
-                                        <p className="text-mute">No deal</p>
+                                        <p className="text-mute">{t('No deal')}</p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard
@@ -505,7 +506,7 @@ export default function LeadShow({
                                             {contactName || 'Contact'}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">No contact</p>
+                                        <p className="text-mute">{t('No contact')}</p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard title="Company">
@@ -516,7 +517,7 @@ export default function LeadShow({
                                             {company.name}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">No company</p>
+                                        <p className="text-mute">{t('No company')}</p>
                                     )}
                                 </AssociationCard>
                                 {enrollments.length > 0 ? (

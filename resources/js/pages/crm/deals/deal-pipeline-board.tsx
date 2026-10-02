@@ -3,13 +3,13 @@ import { DotsThree } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import type { BoardOptions } from '@/components/crm/board-options-sheet';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/evo/ui/dropdown-menu';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { DealCard } from '@/evo/crm/pipeline/DealCard';
 import { LostReasonDialog } from '@/evo/crm/pipeline/LostReasonDialog';
@@ -111,8 +111,10 @@ function BoardDealCard({
     const inactiveLabel =
         options.show_activity && !nextLabel
             ? deal.inactive_days && deal.inactive_days >= 1
-                ? `No activity for ${deal.inactive_days} day${deal.inactive_days === 1 ? '' : 's'}`
-                : 'No activity'
+                ? deal.inactive_days === 1
+                    ? t('No activity for :count day', { count: deal.inactive_days })
+                    : t('No activity for :count days', { count: deal.inactive_days })
+                : t('No activity')
             : null;
 
     return (

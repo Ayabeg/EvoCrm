@@ -2,14 +2,14 @@ import { Form } from '@inertiajs/react';
 import { ArrowClockwise, Eye, EyeSlash, Lock } from '@phosphor-icons/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from '@/components/alert-error';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card';
+} from '@/evo/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 
 type Props = {

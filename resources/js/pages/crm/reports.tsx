@@ -203,7 +203,15 @@ export default function Reports({
             <ReportsShell
                 title={title}
                 pageTitle={title}
-                description={`${window.from} → ${window.to} · ${window.days} days · ${window.timezone}. Real rows only. Empty categories stay hidden.`}
+                description={t(
+                    ':from → :to · :days days · :timezone. Real rows only. Empty categories stay hidden.',
+                    {
+                        from: window.from,
+                        to: window.to,
+                        days: window.days,
+                        timezone: window.timezone,
+                    },
+                )}
                 filters={
                     <ReportsFilters
                         from={from}
@@ -263,7 +271,7 @@ export default function Reports({
                                     onClick={() => setPickerOpen(true)}
                                     className="bg-brand h-8 rounded-md px-3 text-[13px] font-medium text-[var(--evo-on-primary)]"
                                 >
-                                    Add widget
+                                    {t('Add widget')}
                                 </button>
                                 <Button type="button" size="sm" variant="outline" onClick={deleteDashboard}>
                                     {t('Delete')}

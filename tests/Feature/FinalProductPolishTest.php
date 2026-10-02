@@ -3,7 +3,7 @@
 it('gives Reports one room identity instead of a stacked page title', function () {
     $shell = file_get_contents(resource_path('js/components/crm/reports-shell.tsx'));
 
-    expect($shell)->toContain('<RoomShell title="Reports"')
+    expect($shell)->toContain("<RoomShell title={t('Reports')}")
         ->and($shell)->not->toContain('text-page-title')
         ->and($shell)->toContain("innerTitle !== 'Reports'");
 });
@@ -25,6 +25,7 @@ it('brings Lead show onto record grammar', function () {
         ->and($show)->toContain('AskEvoPanel')
         ->and($show)->not->toContain('PageHeader')
         ->and($show)->not->toContain("from '@/components/ui/card'")
+        ->and($show)->not->toContain("from '@/evo/ui/card'")
         ->and($show)->not->toContain('className="text-brand"');
 });
 
@@ -37,6 +38,7 @@ it('brings Segments and Capture inbox onto CRM list grammar', function () {
         ->and($index)->toContain('CrmObjectHeader')
         ->and($index)->not->toContain('PageHeader')
         ->and($index)->not->toContain("from '@/components/ui/card'")
+        ->and($index)->not->toContain("from '@/evo/ui/card'")
         ->and($index)->not->toContain('bg-brand');
 
     expect($history)->toContain('chrome="workspace"')

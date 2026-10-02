@@ -300,3 +300,13 @@ Inbox / Desk / Outbound replies share one conversation system. Custom Evo on `ev
 No new npm dependencies. `@tanstack/react-virtual` and Tiptap stay in the PR1 / PR8 logs. PR5 `CRMContext` is imported, not forked.
 
 AGPL leftover in `resources/js` after PR6: **zero**.
+
+## PR12 removals
+
+| Package | Status |
+|---|---|
+| `lucide-react` | Removed. Phosphor via `@/evo/icons` only. ESLint bans the import. |
+| `tw-animate-css` | Removed. Enter/exit utilities live in `resources/js/evo/tokens/motion-utilities.css` on `--evo-duration-normal` / `--evo-ease`. |
+| `@fontsource/inter` | Already absent before PR12. Geist is the only product face. |
+
+Upstream registry rows that listed `lucide-react` as a source dependency were ported to Phosphor; the npm package is gone.

@@ -43,13 +43,13 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
     $listTable = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $dealsShow = file_get_contents(resource_path('js/pages/crm/deals/show.tsx'));
 
-    expect($hub)->toContain('@/components/ui/avatar')
-        ->and($hub)->toContain('@/components/ui/card')
+    expect($hub)->toContain('@/evo/ui/avatar')
+        ->and($hub)->toContain('@/evo/ui/card')
         ->and($hub)->toContain('RECORD_HUB_RADIUS = 12')
         ->and($hub)->toContain('variant="outline"')
         ->and($chrome)->toContain('AdaptiveWorkspaceShell')
-        ->and($chrome)->toContain('@/ds/components/Tabs')
-        ->and($chrome)->toContain('@/components/ui/card')
+        ->and($chrome)->toContain('@/evo/ui/tabs')
+        ->and($chrome)->toContain('@/evo/ui/card')
         ->and($chrome)->toContain('record-action-group')
         ->and($chrome)->toContain("label: 'Note'")
         ->and($chrome)->not->toContain('shape="pill"')

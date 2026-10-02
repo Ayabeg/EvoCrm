@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 

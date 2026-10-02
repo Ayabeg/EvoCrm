@@ -1,7 +1,8 @@
 import { Form, Link } from '@inertiajs/react';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { RecordBack } from '@/components/crm/record-chrome';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
+import { t } from '@/lib/i18n';
 
 type MergeContact = {
     id: number;
@@ -52,10 +53,12 @@ export default function ContactMerge({
                 <div className="mx-auto max-w-4xl space-y-6 px-6 py-6">
                     <RecordBack href="/crm/contacts/duplicates" label="Duplicates" />
                     <div>
-                        <h1 className="text-page-title text-ink">Merge contacts</h1>
+                        <h1 className="text-page-title text-ink">{t('Merge contacts')}</h1>
                         <p className="mt-1 text-ui text-muted-foreground">
-                            {absorbed.display_name} will be merged into {survivor.display_name}. Choose the
-                            values that should remain.
+                            {t(':absorbed will be merged into :survivor. Choose the values that should remain.', {
+                                absorbed: absorbed.display_name,
+                                survivor: survivor.display_name,
+                            })}
                         </p>
                     </div>
 
@@ -69,7 +72,7 @@ export default function ContactMerge({
                                     <table className="w-full text-left text-[13px]">
                                         <thead className="bg-canvas-soft text-[11px] uppercase tracking-wide text-muted-foreground">
                                             <tr>
-                                                <th className="px-4 py-2">Field</th>
+                                                <th className="px-4 py-2">{t('Field')}</th>
                                                 <th className="px-4 py-2">{survivor.display_name}</th>
                                                 <th className="px-4 py-2">{absorbed.display_name}</th>
                                             </tr>
@@ -87,7 +90,7 @@ export default function ContactMerge({
 
                                                 return (
                                                     <tr key={field.key} className="border-t border-hairline">
-                                                        <td className="px-4 py-3 font-medium">{field.label}</td>
+                                                        <td className="px-4 py-3 font-medium">{t(field.label)}</td>
                                                         <td className="px-4 py-3">
                                                             <label className="inline-flex items-start gap-2">
                                                                 <input
@@ -118,9 +121,9 @@ export default function ContactMerge({
                                 </div>
 
                                 <div className="flex flex-wrap gap-2">
-                                    <Button disabled={processing}>Merge contacts</Button>
+                                    <Button disabled={processing}>{t('Merge contacts')}</Button>
                                     <Button asChild variant="outline">
-                                        <Link href="/crm/contacts/duplicates">Cancel</Link>
+                                        <Link href="/crm/contacts/duplicates">{t('Cancel')}</Link>
                                     </Button>
                                 </div>
                             </>

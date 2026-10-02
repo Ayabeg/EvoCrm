@@ -1,20 +1,19 @@
 /**
- * @deprecated P02 — leftover Laravel starter-kit header (Lucide).
+ * @deprecated P02 — leftover Laravel starter-kit header.
  * Unused by `AppLayout`. Canonical chrome is `AppSidebarHeader`.
  * Do not import. Delete in P28 after zero imports and tests allow.
  */
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/evo/ui/avatar';
+import { Button } from '@/evo/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/evo/ui/dropdown-menu';
 import {
     NavigationMenu,
     NavigationMenuItem,
@@ -27,13 +26,14 @@ import {
     SheetHeader,
     SheetTitle,
     SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@/evo/ui/sheet';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@/evo/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
+import { BookOpen, Folder, List, MagnifyingGlass, SquaresFour } from '@/evo/icons';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
@@ -48,7 +48,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
-        icon: LayoutGrid,
+        icon: SquaresFour,
     },
 ];
 
@@ -86,7 +86,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     size="icon"
                                     className="mr-2 h-[34px] w-[34px]"
                                 >
-                                    <Menu className="h-5 w-5" />
+                                    <List className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent
@@ -187,7 +187,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 size="icon"
                                 className="group h-9 w-9 cursor-pointer"
                             >
-                                <Search className="!size-5 opacity-80 group-hover:opacity-100" />
+                                <MagnifyingGlass className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (

@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react';
 import { PencilSimple } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/evo/ui/input';
 
 export function InlineRecordField({
     label,

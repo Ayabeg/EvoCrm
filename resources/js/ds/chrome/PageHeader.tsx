@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import { t } from '@/lib/i18n';
 import { LONG_TEXT_CLASS, LONG_TEXT_WRAP_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';

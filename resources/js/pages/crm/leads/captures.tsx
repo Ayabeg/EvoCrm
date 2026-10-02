@@ -7,10 +7,11 @@ import {
 } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { HairlinePanel, HairlineTable } from '@/components/crm/hairline-table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 type Capture = {
@@ -92,10 +93,10 @@ export default function LeadCapturesIndex({
             >
                 <CrmObjectHeader
                     title="Capture inbox"
-                    description="Inbound identities from Meta forms, CSV, a public URL, or a maps search you ran. Same phone or email merges onto one Lead."
+                    description={t("Inbound identities from Meta forms, CSV, a public URL, or a maps search you ran. Same phone or email merges onto one Lead.")}
                     secondary={
                         <CrmObjectSecondaryLink href="/crm/leads">
-                            Leads list
+                            {t('Leads list')}
                         </CrmObjectSecondaryLink>
                     }
                 />
@@ -106,7 +107,7 @@ export default function LeadCapturesIndex({
                         <FilterChip
                             href={filterHref({ source: '' })}
                             active={filters.source === ''}
-                            label="All sources"
+                            label={t("All sources")}
                         />
                         {sources.map((source) => (
                             <FilterChip
@@ -116,14 +117,14 @@ export default function LeadCapturesIndex({
                                         filters.source === source ? '' : source,
                                 })}
                                 active={filters.source === source}
-                                label={SOURCE_LABELS[source] ?? source}
+                                label={t(SOURCE_LABELS[source] ?? source)}
                             />
                         ))}
                         <span className="mx-1 h-4 w-px bg-hairline" />
                         <FilterChip
                             href={filterHref({ status: '' })}
                             active={filters.status === ''}
-                            label="All statuses"
+                            label={t("All statuses")}
                         />
                         {statuses.map((status) => (
                             <FilterChip
@@ -133,15 +134,15 @@ export default function LeadCapturesIndex({
                                         filters.status === status ? '' : status,
                                 })}
                                 active={filters.status === status}
-                                label={STATUS_LABELS[status] ?? status}
+                                label={t(STATUS_LABELS[status] ?? status)}
                             />
                         ))}
                     </div>
 
                     <div className="grid gap-4 xl:grid-cols-3">
                         <HairlinePanel
-                            title="CSV upload"
-                            description="Name, phone, email, company, wilaya. Header aliases are accepted."
+                            title={t("CSV upload")}
+                            description={t("Name, phone, email, company, wilaya. Header aliases are accepted.")}
                         >
                             <Form
                                 action="/crm/leads/captures/csv"
@@ -154,7 +155,7 @@ export default function LeadCapturesIndex({
                                     <>
                                         <div className="space-y-1.5">
                                             <Label htmlFor="capture-csv">
-                                                CSV file
+                                                {t('CSV file')}
                                             </Label>
                                             <Input
                                                 id="capture-csv"
@@ -170,7 +171,7 @@ export default function LeadCapturesIndex({
                                             variant="outline"
                                             disabled={processing}
                                         >
-                                            Upload CSV
+                                            {t('Upload CSV')}
                                         </Button>
                                     </>
                                 )}
@@ -178,8 +179,8 @@ export default function LeadCapturesIndex({
                         </HairlinePanel>
 
                         <HairlinePanel
-                            title="Public URL"
-                            description="One URL becomes one capture of what is publicly visible. Emails are never invented."
+                            title={t("Public URL")}
+                            description={t("One URL becomes one capture of what is publicly visible. Emails are never invented.")}
                         >
                             <Form
                                 action="/crm/leads/captures/url"
@@ -191,7 +192,7 @@ export default function LeadCapturesIndex({
                                     <>
                                         <div className="space-y-1.5">
                                             <Label htmlFor="capture-url">
-                                                Public URL
+                                                {t('Public URL')}
                                             </Label>
                                             <Input
                                                 id="capture-url"
@@ -208,7 +209,7 @@ export default function LeadCapturesIndex({
                                             variant="outline"
                                             disabled={processing}
                                         >
-                                            Capture URL
+                                            {t('Capture URL')}
                                         </Button>
                                     </>
                                 )}
@@ -216,8 +217,8 @@ export default function LeadCapturesIndex({
                         </HairlinePanel>
 
                         <HairlinePanel
-                            title="Maps search"
-                            description="You run the search. We store the query, wilaya, and the results you chose."
+                            title={t("Maps search")}
+                            description={t("You run the search. We store the query, wilaya, and the results you chose.")}
                         >
                             <Form
                                 action="/crm/leads/captures/maps"
@@ -231,7 +232,7 @@ export default function LeadCapturesIndex({
                                         <div className="grid gap-3 sm:grid-cols-2">
                                             <div className="space-y-1.5">
                                                 <Label htmlFor="maps-query">
-                                                    Query
+                                                    {t('Query')}
                                                 </Label>
                                                 <Input
                                                     id="maps-query"
@@ -242,7 +243,7 @@ export default function LeadCapturesIndex({
                                             </div>
                                             <div className="space-y-1.5">
                                                 <Label htmlFor="maps-wilaya">
-                                                    Wilaya
+                                                    {t('Wilaya')}
                                                 </Label>
                                                 <Input
                                                     id="maps-wilaya"
@@ -259,14 +260,13 @@ export default function LeadCapturesIndex({
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <p className="text-ui text-mute">
-                                                        Chosen result{' '}
-                                                        {index + 1}
+                                                        {t('Chosen result :n', { n: index + 1 })}
                                                     </p>
                                                     {results.length > 1 ? (
                                                         <button
                                                             type="button"
                                                             className="text-mute hover:text-ink"
-                                                            aria-label={`Remove result ${index + 1}`}
+                                                            aria-label={t('Remove result :n', { n: index + 1 })}
                                                             onClick={() =>
                                                                 setResults(
                                                                     results.filter(
@@ -296,7 +296,7 @@ export default function LeadCapturesIndex({
                                                             event.target.value,
                                                         )
                                                     }
-                                                    placeholder="Name"
+                                                    placeholder={t('Name')}
                                                 />
                                                 <Input
                                                     name={`results[${index}][phone]`}
@@ -310,7 +310,7 @@ export default function LeadCapturesIndex({
                                                             event.target.value,
                                                         )
                                                     }
-                                                    placeholder="Phone +213"
+                                                    placeholder={t('Phone +213')}
                                                 />
                                                 <Input
                                                     name={`results[${index}][email]`}
@@ -324,7 +324,7 @@ export default function LeadCapturesIndex({
                                                             event.target.value,
                                                         )
                                                     }
-                                                    placeholder="Email if you saw one"
+                                                    placeholder={t('Email if you saw one')}
                                                 />
                                                 <Input
                                                     name={`results[${index}][company]`}
@@ -338,7 +338,7 @@ export default function LeadCapturesIndex({
                                                             event.target.value,
                                                         )
                                                     }
-                                                    placeholder="Company"
+                                                    placeholder={t('Company')}
                                                 />
                                             </div>
                                         ))}
@@ -355,7 +355,7 @@ export default function LeadCapturesIndex({
                                                 }
                                             >
                                                 <Plus className="size-3.5" aria-hidden />
-                                                Add result
+                                                {t('Add result')}
                                             </Button>
                                             <Button
                                                 type="submit"
@@ -363,7 +363,7 @@ export default function LeadCapturesIndex({
                                                 variant="outline"
                                                 disabled={processing}
                                             >
-                                                Store search
+                                                {t('Store search')}
                                             </Button>
                                         </div>
                                     </>
@@ -375,23 +375,22 @@ export default function LeadCapturesIndex({
                     {captures.length === 0 ? (
                         <div className="border-t border-hairline py-8">
                             <p className="text-[13px] font-medium text-ink">
-                                No captures in this filter
+                                {t('No captures in this filter')}
                             </p>
                             <p className="mt-1 text-[12px] text-mute">
-                                Upload a CSV, paste a public URL, or store
-                                results from a maps search you ran.
+                                {t('Upload a CSV, paste a public URL, or store results from a maps search you ran.')}
                             </p>
                         </div>
                     ) : (
                         <HairlineTable
                             minWidth={880}
-                            empty="No captures in this filter."
+                            empty={t('No captures in this filter.')}
                             columns={[
-                                { key: 'identity', header: 'Identity' },
-                                { key: 'source', header: 'Source' },
-                                { key: 'status', header: 'Status' },
-                                { key: 'lead', header: 'Merged into' },
-                                { key: 'actions', header: 'Actions' },
+                                { key: 'identity', header: t('Identity') },
+                                { key: 'source', header: t('Source') },
+                                { key: 'status', header: t('Status') },
+                                { key: 'lead', header: t('Merged into') },
+                                { key: 'actions', header: t('Actions') },
                             ]}
                             rows={captures.map((capture) => ({
                                 id: capture.id,
@@ -399,30 +398,28 @@ export default function LeadCapturesIndex({
                                     capture.name ||
                                     capture.phone ||
                                     capture.email ||
-                                    'Capture',
+                                    t('Capture'),
                                 mobileMeta: [
                                     {
-                                        label: 'Source',
+                                        label: t('Source'),
                                         value:
-                                            SOURCE_LABELS[capture.source] ??
-                                            capture.source,
+                                            t(SOURCE_LABELS[capture.source] ?? capture.source),
                                     },
                                     {
-                                        label: 'Status',
+                                        label: t('Status'),
                                         value:
-                                            STATUS_LABELS[capture.status] ??
-                                            capture.status,
+                                            t(STATUS_LABELS[capture.status] ?? capture.status),
                                     },
                                     {
-                                        label: 'Phone',
-                                        value: capture.phone || 'None',
+                                        label: t('Phone'),
+                                        value: capture.phone || t('None'),
                                     },
                                 ],
                                 cells: {
                                     identity: (
                                         <div>
                                             <p className="font-medium text-ink">
-                                                {capture.name || 'Unnamed'}
+                                                {capture.name || t('Unnamed')}
                                             </p>
                                             <p className="aurora-text-body-sm text-mute">
                                                 {[
@@ -442,8 +439,7 @@ export default function LeadCapturesIndex({
                                         </div>
                                     ),
                                     source:
-                                        SOURCE_LABELS[capture.source] ??
-                                        capture.source,
+                                        t(SOURCE_LABELS[capture.source] ?? capture.source),
                                     status: (
                                         <Badge
                                             variant={
@@ -455,8 +451,7 @@ export default function LeadCapturesIndex({
                                                       : 'outline'
                                             }
                                         >
-                                            {STATUS_LABELS[capture.status] ??
-                                                capture.status}
+                                            {t(STATUS_LABELS[capture.status] ?? capture.status)}
                                         </Badge>
                                     ),
                                     lead: capture.matched_lead_id ? (
@@ -469,7 +464,7 @@ export default function LeadCapturesIndex({
                                         </Link>
                                     ) : (
                                         <span className="text-mute">
-                                            Not merged
+                                            {t('Not merged')}
                                         </span>
                                     ),
                                     actions:
@@ -484,7 +479,7 @@ export default function LeadCapturesIndex({
                                                         )
                                                     }
                                                 >
-                                                    Accept
+                                                    {t('Accept')}
                                                 </Button>
                                                 <Button
                                                     type="button"
@@ -496,12 +491,12 @@ export default function LeadCapturesIndex({
                                                         )
                                                     }
                                                 >
-                                                    Reject
+                                                    {t('Reject')}
                                                 </Button>
                                             </div>
                                         ) : (
                                             <span className="text-mute">
-                                                {STATUS_LABELS[capture.status]}
+                                                {t(STATUS_LABELS[capture.status] ?? capture.status)}
                                             </span>
                                         ),
                                 },

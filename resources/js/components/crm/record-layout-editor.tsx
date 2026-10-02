@@ -1,7 +1,7 @@
 import { ArrowCounterClockwise, CaretDown, CaretUp, Columns } from '@phosphor-icons/react';
 import { useRecordLayoutContext } from '@/components/crm/record-layout-context';
-import { Button } from '@/components/ui/button';
-import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Button } from '@/evo/ui/button';
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/evo/ui/drawer';
 import { cardsForObject  } from '@/lib/record-layout';
 import type {RecordColumn} from '@/lib/record-layout';
 

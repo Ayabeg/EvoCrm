@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { RoomShell } from '@/components/crm/room-shell';
 import type { RoomTab } from '@/components/crm/room-shell';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
+import { t } from '@/lib/i18n';
 
 const CRM_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
     {
@@ -68,7 +69,7 @@ export function crmTabs(pathname: string, simpleMode = false): RoomTab[] {
         : CRM_TABS;
 
     return tabs.map(({ label, href, match }) => ({
-        label,
+        label: t(label),
         href,
         active: match ? match(pathname) : pathname === href || pathname.startsWith(`${href}/`),
     }));
@@ -89,8 +90,8 @@ export function CrmShell({
 
     return (
         <>
-            <Head title={title} />
-            <RoomShell title="CRM" tabs={crmTabs(pathname, simpleMode)}>
+            <Head title={t(title)} />
+            <RoomShell title={t('CRM')} tabs={crmTabs(pathname, simpleMode)}>
                 <div
                     className={
                         chrome === 'workspace'

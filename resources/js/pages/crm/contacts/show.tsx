@@ -135,8 +135,8 @@ export default function ContactShow({
                                     }
                                     meta={
                                         contactEngagement ? (
-                                            <p className="text-[12px] leading-snug text-[#697080]">
-                                                <span className="font-medium text-[#151820]">
+                                            <p className="text-[12px] leading-snug text-[var(--evo-ink-secondary)]">
+                                                <span className="font-medium text-[var(--evo-ink)]">
                                                     {contactEngagement.label}
                                                 </span>{' '}
                                                 ({contactEngagement.score}/100)

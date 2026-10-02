@@ -1,7 +1,7 @@
 import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/evo/ui/skeleton';
 import { PageHeader, PageHeaderAction } from '@/ds/chrome/PageHeader';
 import { AdvancedFilterDrawer } from '@/ds/workspace/AdvancedFilterDrawer';
 import { ListDataTable } from '@/ds/workspace/DataTable';
@@ -168,7 +168,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
                             onClick={primaryAction.onClick}
                             className={
                                 object === 'quote'
-                                    ? 'h-8 border-[#E8530E] bg-[#E8530E] px-3 text-[13px] text-white hover:bg-[#d44b0c]'
+                                    ? 'h-8 border-[var(--evo-primary)] bg-[var(--evo-primary)] px-3 text-[13px] text-[var(--evo-on-primary)] hover:bg-[var(--evo-primary-hover)]'
                                     : undefined
                             }
                         />

@@ -18,6 +18,7 @@ import {
     Robot,
 } from '@/evo/icons';
 import { cn } from '@/evo/lib/cn';
+import { t } from '@/lib/i18n';
 import { resolveAgentProfile } from '@/lib/desk/agent-profiles';
 import {
     dispatchAgentsWorkspace,
@@ -230,9 +231,9 @@ export default function AgentsIndex() {
     if (isBotsRoute) {
         return (
             <>
-                <Head title="Bots · Agents" />
+                <Head title={t('Bots · Agents')} />
                 <main
-                    aria-label="Agents workspace"
+                    aria-label={t('Agents workspace')}
                     className="evo-agents light flex min-h-0 min-w-0 flex-1 flex-col bg-evo-canvas text-evo-ink"
                     data-agents-page
                     data-agents-route={path}
@@ -241,7 +242,7 @@ export default function AgentsIndex() {
                     <header className="flex shrink-0 items-center justify-between gap-4 border-b border-evo-hairline bg-evo-surface px-5 py-4 sm:px-7">
                         <div>
                             <p className="text-[10px] font-semibold tracking-[0.12em] text-evo-teal uppercase">
-                                Agents
+                                {t('Agents')}
                             </p>
                             <h1 className="mt-1 flex items-center gap-2 text-[20px] font-semibold tracking-[-0.03em] text-evo-ink">
                                 <Robot
@@ -249,7 +250,7 @@ export default function AgentsIndex() {
                                     weight="regular"
                                     aria-hidden
                                 />
-                                Bots
+                                {t('Bots')}
                             </h1>
                         </div>
                         <button
@@ -282,7 +283,7 @@ export default function AgentsIndex() {
 
     return (
         <>
-            <Head title={`${selectedBot.name} · Agents`} />
+            <Head title={`${selectedBot.name} · ${t('Agents')}`} />
             {workspace.view === 'agent' ? (
                 <AgentsWorkspace
                     profile={profile}
@@ -371,12 +372,12 @@ function BotsView({
                         </button>
                     </div>
                     <div className="mt-9 grid gap-3 sm:grid-cols-2">
-                        <DetailPanel label="Mission">
+                        <DetailPanel label={t('Mission')}>
                             <p className="text-[13px] leading-6 text-evo-ink">
                                 {selectedBot.job}
                             </p>
                         </DetailPanel>
-                        <DetailPanel label="Mode">
+                        <DetailPanel label={t('Mode')}>
                             <p className="text-[13px] leading-6 text-evo-ink">
                                 {selectedBot.custom
                                     ? 'Instructions personnalisées'

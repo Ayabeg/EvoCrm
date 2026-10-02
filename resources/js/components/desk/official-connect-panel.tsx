@@ -5,8 +5,8 @@ import {
     InstagramLogo,
 } from '@phosphor-icons/react';
 import { connectorStatusLabel } from '@/components/desk/connector-status';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
 import type { OfficialDeskConnector } from '@/types';
 
 export function ChannelMark({

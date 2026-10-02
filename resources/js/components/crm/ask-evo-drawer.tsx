@@ -1,15 +1,15 @@
 import { router, usePage } from '@inertiajs/react';
 import { Sparkle } from '@phosphor-icons/react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     Drawer,
     DrawerContent,
     DrawerDescription,
     DrawerHeader,
     DrawerTitle,
-} from '@/components/ui/drawer';
-import { Input } from '@/components/ui/input';
+} from '@/evo/ui/drawer';
+import { Input } from '@/evo/ui/input';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import {

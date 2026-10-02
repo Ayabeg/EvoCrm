@@ -7,7 +7,7 @@ import type { BotDefinition } from '@/lib/desk/bot-catalog';
 import { cn } from '@/lib/utils';
 
 const focusRing =
-    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E8530E]';
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-primary)]';
 
 type PickerProps = {
     selectedBot: BotDefinition;
@@ -64,7 +64,7 @@ export function BotPicker({
                 ref={triggerRef}
                 type="button"
                 className={cn(
-                    'inline-flex h-7 max-w-[190px] items-center gap-2 rounded-md px-1.5 text-[12px] font-medium text-[#0D1B24] transition-colors hover:bg-[#F7F8F5] motion-reduce:transition-none',
+                    'inline-flex h-7 max-w-[190px] items-center gap-2 rounded-md px-1.5 text-[12px] font-medium text-[var(--evo-ink)] transition-colors hover:bg-[var(--evo-canvas)] motion-reduce:transition-none',
                     focusRing,
                 )}
                 aria-haspopup="listbox"
@@ -87,7 +87,7 @@ export function BotPicker({
                 <span className="truncate">{selectedBot.name}</span>
                 <CaretDown
                     className={cn(
-                        'size-3.5 shrink-0 text-[#0D1B24]/55 transition-transform',
+                        'size-3.5 shrink-0 text-[var(--evo-ink)]/55 transition-transform',
                         open && 'rotate-180',
                     )}
                     weight="bold"
@@ -97,22 +97,22 @@ export function BotPicker({
 
             {open ? (
                 <div
-                    className="absolute bottom-[calc(100%+8px)] left-0 z-40 flex max-h-[340px] w-[260px] flex-col overflow-hidden rounded-lg border border-black/10 bg-white text-[#0D1B24] shadow-[0_14px_32px_rgba(13,27,36,0.14)]"
+                    className="absolute bottom-[calc(100%+8px)] left-0 z-40 flex max-h-[340px] w-[260px] flex-col overflow-hidden rounded-lg border border-black/10 bg-white text-[var(--evo-ink)] shadow-[0_14px_32px_rgba(13,27,36,0.14)]"
                     data-bot-picker-panel
                 >
                     <div className="flex shrink-0 items-center justify-between border-b border-black/8 px-3 py-2.5">
                         <div>
-                            <p className="text-[11px] font-semibold tracking-[0.08em] text-[#0D1B24]/55 uppercase">
+                            <p className="text-[11px] font-semibold tracking-[0.08em] text-[var(--evo-ink)]/55 uppercase">
                                 Choose agent
                             </p>
-                            <p className="mt-0.5 text-[12px] text-[#0D1B24]/65">
+                            <p className="mt-0.5 text-[12px] text-[var(--evo-ink)]/65">
                                 One agent per chat
                             </p>
                         </div>
                         <button
                             type="button"
                             className={cn(
-                                'grid size-7 place-items-center rounded-md text-[#0D1B24]/55 hover:bg-[#F7F8F5] hover:text-[#0D1B24]',
+                                'grid size-7 place-items-center rounded-md text-[var(--evo-ink)]/55 hover:bg-[var(--evo-canvas)] hover:text-[var(--evo-ink)]',
                                 focusRing,
                             )}
                             aria-label="Create a new agent"
@@ -158,7 +158,7 @@ export function BotPicker({
                             }
                         }}
                     >
-                        <p className="px-2 pb-1 text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
+                        <p className="px-2 pb-1 text-[9px] font-semibold tracking-[0.12em] text-[var(--evo-ink)]/45 uppercase">
                             Your agents
                         </p>
                         {AGENT_PROFILES.filter(
@@ -182,7 +182,7 @@ export function BotPicker({
                             role="separator"
                         >
                             <span className="h-px flex-1 bg-black/8" />
-                            <span className="text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
+                            <span className="text-[9px] font-semibold tracking-[0.12em] text-[var(--evo-ink)]/45 uppercase">
                                 System
                             </span>
                             <span className="h-px flex-1 bg-black/8" />
@@ -207,7 +207,7 @@ export function BotPicker({
                             <div className="mt-2">
                                 <div className="my-2 flex items-center gap-2 px-2">
                                     <span className="h-px flex-1 bg-black/8" />
-                                    <span className="text-[9px] font-semibold tracking-[0.12em] text-[#0D1B24]/45 uppercase">
+                                    <span className="text-[9px] font-semibold tracking-[0.12em] text-[var(--evo-ink)]/45 uppercase">
                                         Custom
                                     </span>
                                     <span className="h-px flex-1 bg-black/8" />
@@ -231,7 +231,7 @@ export function BotPicker({
                     <button
                         type="button"
                         className={cn(
-                            'flex h-9 shrink-0 items-center gap-2 border-t border-black/8 px-3 text-[12px] font-medium text-[#E8530E] hover:bg-[#E8530E]/[0.05]',
+                            'flex h-9 shrink-0 items-center gap-2 border-t border-black/8 px-3 text-[12px] font-medium text-[var(--evo-primary)] hover:bg-[var(--evo-primary)]/[0.05]',
                             focusRing,
                         )}
                         onClick={() => {
@@ -270,8 +270,8 @@ function BotOption({
             role="option"
             aria-selected={selected}
             className={cn(
-                'flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-[12px] transition-colors hover:bg-[#F7F8F5]',
-                selected && 'bg-[#0F4C5C]/[0.06]',
+                'flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-[12px] transition-colors hover:bg-[var(--evo-canvas)]',
+                selected && 'bg-[var(--evo-teal)]/[0.06]',
                 focusRing,
             )}
             onFocus={() => onFocus(optionIndex)}
@@ -286,7 +286,7 @@ function BotOption({
             <span className="min-w-0 flex-1 truncate">{bot.name}</span>
             {selected ? (
                 <Check
-                    className="size-3.5 shrink-0 text-[#0F4C5C]"
+                    className="size-3.5 shrink-0 text-[var(--evo-teal)]"
                     weight="bold"
                 />
             ) : null}

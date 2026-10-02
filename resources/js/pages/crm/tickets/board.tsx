@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import TicketLayoutToggle from '@/components/crm/ticket-layout-toggle';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import { Pipeline } from '@/evo/crm/pipeline/Pipeline';
 import { TicketCard } from '@/evo/crm/pipeline/TicketCard';
 import type { PipelineColumnData } from '@/evo/crm/pipeline/types';
@@ -40,7 +40,9 @@ function BoardTicketCard({ ticket }: { ticket: BoardTicket }) {
         ticket.company_name || ticket.contact_name || t('No company');
     const inactiveLabel =
         ticket.inactive_days && ticket.inactive_days >= 1
-            ? `Inactive for ${ticket.inactive_days} day${ticket.inactive_days === 1 ? '' : 's'}`
+            ? ticket.inactive_days === 1
+                ? t('Inactive for :count day', { count: ticket.inactive_days })
+                : t('Inactive for :count days', { count: ticket.inactive_days })
             : null;
     const showSla =
         ticket.status !== 'closed' &&

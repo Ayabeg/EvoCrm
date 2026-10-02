@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { MorphingForm } from '@/components/crm/morphing-form';
 import { hasActiveListFilters } from '@/components/crm/list-query';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {

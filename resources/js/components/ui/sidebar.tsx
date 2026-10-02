@@ -4,22 +4,22 @@ import { cva } from "class-variance-authority"
 import { Sidebar as SidebarIcon } from "@phosphor-icons/react"
 import * as React from "react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { Button } from "@/evo/ui/button"
+import { Input } from "@/evo/ui/input"
+import { Separator } from "@/evo/ui/separator"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/evo/ui/sheet"
+import { Skeleton } from "@/evo/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/evo/ui/tooltip"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 

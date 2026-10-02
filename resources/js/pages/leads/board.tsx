@@ -1,5 +1,4 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
-import { CalendarClock, Ellipsis, Plus, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { toast } from 'sonner';
@@ -13,14 +12,16 @@ import {
     PipelineKanbanHeader,
     PipelineKanbanStack,
 } from '@/components/crm/pipeline-kanban';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/evo/ui/dropdown-menu';
+import { Input } from '@/evo/ui/input';
+import { Clock, DotsThree, MagnifyingGlass, Plus } from '@/evo/icons';
+import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 import { stageUnderlineColor } from '@/lib/stage-colors';
 import { cn } from '@/lib/utils';
@@ -159,7 +160,7 @@ function DealCard({
                             aria-label={`Move ${deal.title}`}
                             className="grid size-6 shrink-0 place-content-center rounded text-mute opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 hover:bg-muted"
                         >
-                            <Ellipsis className="size-4" aria-hidden />
+                            <DotsThree className="size-4" aria-hidden />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -202,7 +203,7 @@ function DealCard({
                               : 'text-mute',
                     )}
                 >
-                    <CalendarClock className="size-3.5 shrink-0" />
+                    <Clock className="size-3.5 shrink-0" />
                     <span className="truncate">{deal.next_task.subject}</span>
                     <span className="shrink-0 tabular-nums">
                         · {dueLabel(deal.next_task)}
@@ -210,7 +211,7 @@ function DealCard({
                 </p>
             ) : (
                 <p className="mt-1.5 flex items-center gap-1.5 text-xs text-mute/70">
-                    <CalendarClock className="size-3.5 shrink-0" />
+                    <Clock className="size-3.5 shrink-0" />
                     No task
                 </p>
             )}
@@ -317,13 +318,13 @@ export default function LeadsBoard({
 
                 <div className="border-b border-hairline bg-canvas px-4 py-1.5 sm:px-6">
                     <div className="relative mb-1.5 max-w-md">
-                        <Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-mute" />
+                        <MagnifyingGlass className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-mute" />
                         <Input
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
-                            placeholder="Search leads..."
+                            placeholder={t('Search leads…')}
                             className="h-8 pl-7 text-[12px]"
-                            aria-label="Search leads"
+                            aria-label={t('Search leads')}
                         />
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5">

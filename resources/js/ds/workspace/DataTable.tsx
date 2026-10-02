@@ -69,7 +69,7 @@ export function DataTable<Row extends { id: RowId }>({
                                             }
                                         });
                                     }}
-                                    aria-label="Select page"
+                                    aria-label={t('Select page')}
                                     aria-checked={
                                         somePageSelected
                                             ? 'mixed'

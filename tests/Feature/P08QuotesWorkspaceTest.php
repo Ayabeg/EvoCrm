@@ -115,10 +115,10 @@ it('keeps Quotes row identity customer status money validity deal and selection 
         ->and($table)->toContain('applyQuoteColumnContract')
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($table)->toContain("target.closest('a, input, button, label')")
-        ->and($table)->toContain("title: 'w-[28%]'")
-        ->and($table)->toContain("status: 'w-[10%]'")
-        ->and($table)->toContain("amount: 'w-[14%]'")
-        ->and($table)->toContain('table-fixed min-w-[60rem]');
+        ->and($table)->toContain("title: 'w-[26%] min-w-[12rem]'")
+        ->and($table)->toContain("status: 'w-[10%] min-w-[6.5rem]'")
+        ->and($table)->toContain("amount: 'w-[16%] min-w-[8.5rem]'")
+        ->and($table)->toContain('table-fixed min-w-[64rem]');
 
     expect($selection)->toContain('Select-all = current rendered page only')
         ->and($selection)->toContain('togglePageSelectedIds')

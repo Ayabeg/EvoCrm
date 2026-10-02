@@ -27,12 +27,11 @@ it('composes desk and connectors empty states as icon, short copy, and one brand
     $inbox = file_get_contents(resource_path('js/pages/desk/inbox.tsx'));
     $conversations = file_get_contents(resource_path('js/pages/crm/conversations.tsx'));
     $connectors = file_get_contents(resource_path('js/pages/settings/connectors.tsx'));
-    $empty = file_get_contents(resource_path('js/components/ui/empty-state.tsx'));
-    $dsEmpty = file_get_contents(resource_path('js/ds/components/EmptyState.tsx'));
+    $empty = file_get_contents(resource_path('js/evo/patterns/empty-state/index.tsx'));
 
-    expect($empty)->toContain('ds/components/EmptyState');
-    expect($dsEmpty)->toContain('evo/patterns/empty-state');
-    expect($dsEmpty)->not->toContain('aurora/empty-state');
+    expect($empty)->toContain('export function EmptyState');
+    expect($empty)->toContain('EmptyIllustration');
+    expect($empty)->not->toContain('aurora/empty-state');
 
     expect($inbox)
         ->toContain('EmptyState')

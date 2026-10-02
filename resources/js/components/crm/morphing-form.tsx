@@ -4,7 +4,7 @@ import {
     MorphingPopoverContent,
     MorphingPopoverTrigger,
 } from '@/components/ui/morphing-popover';
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/evo/ui/button';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 

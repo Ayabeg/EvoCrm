@@ -18,10 +18,11 @@ import {
 import { RecordPath } from '@/components/crm/record-path';
 import type { PathStep } from '@/components/crm/record-path';
 import { DeskGlass } from '@/components/desk/desk-glass';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/evo/ui/button';
+import { Textarea } from '@/evo/ui/textarea';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { t } from '@/lib/i18n';
 
 type TicketRecord = {
     id: number;
@@ -513,7 +514,7 @@ export default function TicketShow({
                                             {deal.title}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">No deal</p>
+                                        <p className="text-mute">{t('No deal')}</p>
                                     )}
                                 </AssociationCard>
                                 {quotes.length > 0 ? (

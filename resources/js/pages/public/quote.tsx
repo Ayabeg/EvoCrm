@@ -1,6 +1,6 @@
 import { CheckCircle, FileText } from '@phosphor-icons/react';
 import { Form, Head } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import { dateLocale, t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 

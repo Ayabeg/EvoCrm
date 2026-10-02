@@ -8,7 +8,7 @@ import {
     RecordLayoutCustomizeButton,
     RecordLayoutEditor,
 } from '@/components/crm/record-layout-editor';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import { SettingsPageHeader } from '@/evo/patterns/settings';
 import { t } from '@/lib/i18n';
 import type { RecordLayoutState, RecordObjectType } from '@/lib/record-layout';

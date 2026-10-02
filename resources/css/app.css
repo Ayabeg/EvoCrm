@@ -3,7 +3,7 @@
 @import '../js/evo/tokens/evo.css';
 @import '../js/evo/tokens/tailwind-theme.css';
 
-@import 'tw-animate-css';
+@import '../js/evo/tokens/motion-utilities.css';
 
 @import '@fontsource/geist-sans/400.css';
 @import '@fontsource/geist-sans/500.css';

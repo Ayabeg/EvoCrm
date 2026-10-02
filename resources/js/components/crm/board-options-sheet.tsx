@@ -1,12 +1,12 @@
 import { Form, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     Drawer,
     DrawerContent,
     DrawerHeader,
     DrawerTitle,
-} from '@/components/ui/drawer';
+} from '@/evo/ui/drawer';
 import { cn } from '@/lib/utils';
 
 export type BoardOptions = {

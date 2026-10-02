@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ds/components/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/evo/ui/tabs';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 

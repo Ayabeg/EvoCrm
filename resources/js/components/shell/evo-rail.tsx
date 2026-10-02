@@ -12,7 +12,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/evo/ui/dropdown-menu';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
 import { CaretDown, CaretLeft, CaretRight } from '@/evo/icons';

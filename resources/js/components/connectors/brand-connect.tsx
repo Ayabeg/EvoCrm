@@ -1,5 +1,6 @@
 import { FacebookMark } from '@/components/brand/marks';
 import { OAuthPopupButton } from '@/components/connectors/oauth-popup-button';
+import { t } from '@/lib/i18n';
 
 export function BrandConnectButtons({
     facebookUrl,
@@ -13,7 +14,7 @@ export function BrandConnectButtons({
             className="gap-2"
         >
             <FacebookMark className="size-4" />
-            Continue with Facebook
+            {t('Continue with Facebook')}
         </OAuthPopupButton>
     );
 }

@@ -1,7 +1,7 @@
 /**
  * Canonical icon entry. New UI imports from `@/evo/icons`.
  * Named Phosphor exports only — do not barrel-re-export the whole set.
- * Existing lucide-react imports stay until PR2–PR12 migrate them.
+ * lucide-react was removed in PR12.
  */
 export type { Icon } from '@phosphor-icons/react';
 export {
@@ -13,9 +13,11 @@ export {
     ArrowUpRight,
     ArrowUp,
     ArrowsDownUp,
+    BookOpen,
     BookmarkSimple,
     Buildings,
     CalendarBlank,
+    ChartBar,
     CaretDown,
     CaretLeft,
     CaretRight,
@@ -39,6 +41,7 @@ export {
     EnvelopeSimple,
     FacebookLogo,
     FileText,
+    Folder,
     FloppyDisk,
     FlowArrow,
     Funnel,
@@ -50,10 +53,12 @@ export {
     InstagramLogo,
     Ticket,
     Info,
+    Lifebuoy,
     LinkSimple,
     List,
     ListNumbers,
     MagnifyingGlass,
+    Megaphone,
     MessengerLogo,
     Minus,
     Moon,
@@ -65,6 +70,7 @@ export {
     Path,
     PencilSimple,
     Phone,
+    Plug,
     Plus,
     PushPin,
     Robot,
@@ -83,6 +89,8 @@ export {
     Tray,
     UploadSimple,
     User,
+    UserPlus,
+    Users,
     WhatsappLogo,
     Warning,
     WarningCircle,

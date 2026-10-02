@@ -1,7 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 import { RecordDisclose } from '@/components/crm/record-hub';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 
 type Member = { id: number; name: string };
 type Split = { user_id: number; percent: number; user?: { name: string } | null };

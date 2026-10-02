@@ -1,14 +1,14 @@
 import { Link } from '@inertiajs/react';
 import {
-    Inbox,
     Megaphone,
-    Send,
+    PaperPlaneTilt,
+    Plug,
+    Tray,
+    User,
     Users,
-    UserCircle,
-    Plug
-    
-} from 'lucide-react';
-import type {LucideIcon} from 'lucide-react';
+} from '@/evo/icons';
+import type { Icon } from '@/evo/icons';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 type Department = {
@@ -20,12 +20,12 @@ type Department = {
     connected?: boolean;
 };
 
-const ICONS: Record<string, LucideIcon> = {
-    inbox: Inbox,
+const ICONS: Record<string, Icon> = {
+    inbox: Tray,
     leads: Megaphone,
-    contacts: UserCircle,
+    contacts: User,
     ads: Megaphone,
-    outbound: Send,
+    outbound: PaperPlaneTilt,
     integrations: Plug,
     companies: Users,
 };
@@ -62,10 +62,10 @@ export function QuickLaunchGrid({
                             </span>
                             <span className="mt-0.5 block text-[12px] text-muted-foreground">
                                 {disconnected
-                                    ? 'Not connected — set up in Settings'
+                                    ? t('Not connected — set up in Settings')
                                     : department.value_label
                                       ? `${department.value ?? 0} ${department.value_label}`
-                                      : 'Open module'}
+                                      : t('Open module')}
                             </span>
                         </span>
                     </Link>

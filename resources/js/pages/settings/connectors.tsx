@@ -6,8 +6,8 @@ import {
 } from '@phosphor-icons/react';
 import { connectorStatusLabel } from '@/components/desk/connector-status';
 import { ChannelMark } from '@/components/desk/official-connect-panel';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
 import {
     SettingsCard,
     SettingsEmptyState,

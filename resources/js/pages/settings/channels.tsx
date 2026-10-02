@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { PlugsConnected } from '@phosphor-icons/react';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/evo/ui/badge';
+import { Input } from '@/evo/ui/input';
 import {
     SettingsCard,
     SettingsEmptyState,
@@ -91,8 +91,10 @@ export default function ChannelSettings({
                                 weight="regular"
                             />
                         }
-                        title="No channels yet"
-                        description="Connect WhatsApp from Integrations when Evolution is ready. SMS appears when simple mode is off."
+                        title={t('No channels yet')}
+                        description={t(
+                            'Connect WhatsApp from Integrations when Evolution is ready. SMS appears when simple mode is off.',
+                        )}
                     />
                 ) : (
                     <SettingsCard title="Connected channels">

@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { GoogleMark, MetaMark } from '@/components/brand/marks';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
 import { SetupStepper } from '@/components/setup/stepper';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
+import { Card } from '@/evo/ui/card';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
+import { t } from '@/lib/i18n';
 import type { AppUnlock } from '@/types';
 
 type Step = {
@@ -85,12 +86,11 @@ function MetaFinishStep({
         return (
             <Card className="space-y-3 p-4">
                 <p className="text-sm text-muted-foreground">
-                    Meta is not connected yet. Go back to the Connect step and
-                    use Continue with Facebook.
+                    {t('Meta is not connected yet. Go back to the Connect step and use Continue with Facebook.')}
                 </p>
                 <Button asChild>
                     <Link href={stepHref(provider, 'connect')}>
-                        Connect Facebook
+                        {t('Connect Facebook')}
                     </Link>
                 </Button>
             </Card>
@@ -101,11 +101,11 @@ function MetaFinishStep({
         <div className="space-y-4">
             <Card className="space-y-3 p-4">
                 <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-semibold">Installed</h3>
-                    <Badge>Connected</Badge>
+                    <h3 className="text-sm font-semibold">{t('Installed')}</h3>
+                    <Badge>{t('Connected')}</Badge>
                     {metaState.account_name ? (
                         <span className="text-sm text-muted-foreground">
-                            as {metaState.account_name}
+                            {t('as :name', { name: metaState.account_name })}
                         </span>
                     ) : null}
                 </div>
@@ -128,7 +128,7 @@ function MetaFinishStep({
                                         : 'text-muted-foreground'
                                 }
                             >
-                                {unlock.label}
+                                {t(unlock.label)}
                             </span>
                         </div>
                     ))}
@@ -138,7 +138,7 @@ function MetaFinishStep({
             {metaState.pages.length > 0 ? (
                 <Card className="space-y-3 p-4">
                     <h3 className="text-sm font-semibold">
-                        Default Facebook Page
+                        {t('Default Facebook Page')}
                     </h3>
                     <Form
                         action="/settings/setup/meta/page"
@@ -146,7 +146,7 @@ function MetaFinishStep({
                         className="flex flex-wrap items-end gap-2"
                     >
                         <label className="grid flex-1 gap-1 text-xs text-muted-foreground">
-                            Page
+                            {t('Page')}
                             <select
                                 name="page_id"
                                 value={pageId}
@@ -163,38 +163,36 @@ function MetaFinishStep({
                             </select>
                         </label>
                         <Button type="submit" size="sm">
-                            Save page
+                            {t('Save page')}
                         </Button>
                     </Form>
                     {metaState.selected_page_name ? (
                         <p className="text-xs text-muted-foreground">
-                            Current: {metaState.selected_page_name}
+                            {t('Current: :name', { name: metaState.selected_page_name })}
                         </p>
                     ) : null}
                 </Card>
             ) : (
                 <Card className="p-4 text-sm text-muted-foreground">
-                    No Facebook Pages discovered on this grant. Reconnect with{' '}
-                    <code className="font-mono">pages_show_list</code> scope.
+                    {t('No Facebook Pages discovered on this grant. Reconnect with pages_show_list scope.')}
                 </Card>
             )}
 
             <div className="flex flex-wrap gap-2">
                 <Button asChild>
-                    <Link href="/settings/apps/meta">Manage connection</Link>
+                    <Link href="/settings/apps/meta">{t('Manage connection')}</Link>
                 </Button>
                 <Button variant="outline" asChild>
-                    <Link href={appsUrl}>Back to Apps</Link>
+                    <Link href={appsUrl}>{t('Back to Apps')}</Link>
                 </Button>
             </div>
 
             <Card className="p-4">
                 <h3 className="text-sm font-semibold text-destructive">
-                    Uninstall
+                    {t('Uninstall')}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                    Disconnect Meta from this workspace. Tokens are deleted
-                    locally; revoke the app in Meta if needed.
+                    {t('Disconnect Meta from this workspace. Tokens are deleted locally; revoke the app in Meta if needed.')}
                 </p>
                 <Form
                     action="/settings/apps/meta"
@@ -202,7 +200,7 @@ function MetaFinishStep({
                     className="mt-3"
                     onBefore={() =>
                         window.confirm(
-                            'Disconnect Meta from this workspace?',
+                            t('Disconnect Meta from this workspace?'),
                         )
                     }
                 >
@@ -212,7 +210,7 @@ function MetaFinishStep({
                             className="text-destructive"
                             disabled={processing}
                         >
-                            Disconnect Meta
+                            {t('Disconnect Meta')}
                         </Button>
                     )}
                 </Form>
@@ -244,23 +242,21 @@ function StepBody({
                         <MetaMark className="size-7" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold">Meta</h3>
+                        <h3 className="text-sm font-semibold">{t('Meta')}</h3>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            One OAuth unlocks Facebook Page messaging,
-                            Instagram, WhatsApp Cloud API, and Ads insights for
-                            EvoSales.
+                            {t('One OAuth unlocks Facebook Page messaging, Instagram, WhatsApp Cloud API, and Ads insights for EvoSales.')}
                         </p>
                         <ul className="mt-3 list-inside list-disc text-sm text-muted-foreground">
-                            <li>Official Facebook Login — no unofficial paths</li>
-                            <li>Tokens stored encrypted on your workspace</li>
-                            <li>Scopes granted individually during consent</li>
+                            <li>{t('Official Facebook Login — no unofficial paths')}</li>
+                            <li>{t('Tokens stored encrypted on your workspace')}</li>
+                            <li>{t('Scopes granted individually during consent')}</li>
                         </ul>
                     </div>
                 </Card>
                 <div className="flex justify-end">
                     <Button asChild>
                         <Link href={stepHref(provider, 'connect')}>
-                            Continue
+                            {t('Continue')}
                         </Link>
                     </Button>
                 </div>
@@ -275,7 +271,7 @@ function StepBody({
                     {metaState?.connected ? (
                         <>
                             <div className="flex items-center gap-2">
-                                <Badge>Already connected</Badge>
+                                <Badge>{t('Already connected')}</Badge>
                                 {metaState.account_name ? (
                                     <span className="text-sm text-muted-foreground">
                                         {metaState.account_name}
@@ -284,15 +280,14 @@ function StepBody({
                             </div>
                             <Button asChild>
                                 <Link href={stepHref(provider, 'finish')}>
-                                    Continue to finish
+                                    {t('Continue to finish')}
                                 </Link>
                             </Button>
                         </>
                     ) : (
                         <>
                             <p className="text-sm text-muted-foreground">
-                                Log in with Facebook. You do not need an App ID
-                                or token.
+                                {t('Log in with Facebook. You do not need an App ID or token.')}
                             </p>
                             <BrandConnectButtons facebookUrl={connectUrl} />
                         </>
@@ -300,12 +295,12 @@ function StepBody({
                 </Card>
                 <div className="flex justify-between">
                     <Button variant="outline" asChild>
-                        <Link href={stepHref(provider, 'select_app')}>Back</Link>
+                        <Link href={stepHref(provider, 'select_app')}>{t('Back')}</Link>
                     </Button>
                     {!metaState?.connected ? (
                         <Button variant="outline" asChild>
                             <Link href={stepHref(provider, 'finish')}>
-                                Skip to finish
+                                {t('Skip to finish')}
                             </Link>
                         </Button>
                     ) : null}
@@ -324,7 +319,7 @@ function StepBody({
                 />
                 <div className="flex justify-start">
                     <Button variant="outline" asChild>
-                        <Link href={stepHref(provider, 'connect')}>Back</Link>
+                        <Link href={stepHref(provider, 'connect')}>{t('Back')}</Link>
                     </Button>
                 </div>
             </div>
@@ -343,7 +338,7 @@ function StepBody({
 
     return (
         <Card className="p-4 text-sm text-muted-foreground">
-            Step content for {provider} / {currentStep} is not configured yet.
+            {t('Step content for :provider / :step is not configured yet.', { provider, step: currentStep })}
         </Card>
     );
 }
@@ -386,38 +381,35 @@ function StartStepBody({
                         </div>
                         <div>
                             <h3 className="text-sm font-semibold">
-                                Google Calendar
+                                {t('Google Calendar')}
                             </h3>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                Public booking writes the slot onto the host
-                                calendar. Same Google OAuth client as sign-in —
-                                extra Calendar scopes only.
+                                {t('Public booking writes the slot onto the host calendar. Same Google OAuth client as sign-in — extra Calendar scopes only.')}
                             </p>
                         </div>
                     </div>
                     {startState.google.connected ? (
-                        <Badge>Already connected</Badge>
+                        <Badge>{t('Already connected')}</Badge>
                     ) : startState.google.connect_url ? (
                         <Button asChild>
                             <a href={startState.google.connect_url}>
-                                Continue with Google
+                                {t('Continue with Google')}
                             </a>
                         </Button>
                     ) : (
                         <p className="text-sm text-muted-foreground">
-                            Google is not configured on this install yet. Skip
-                            and connect later from Connectors.
+                            {t('Google is not configured on this install yet. Skip and connect later from Connectors.')}
                         </p>
                     )}
                 </Card>
                 <div className="flex justify-end gap-2">
                     <Button variant="outline" asChild>
-                        <Link href={stepHref('start', 'whatsapp')}>Skip</Link>
+                        <Link href={stepHref('start', 'whatsapp')}>{t('Skip')}</Link>
                     </Button>
                     {startState.google.connected ? (
                         <Button asChild>
                             <Link href={stepHref('start', 'whatsapp')}>
-                                Continue
+                                {t('Continue')}
                             </Link>
                         </Button>
                     ) : null}
@@ -431,11 +423,10 @@ function StartStepBody({
             <div className="space-y-4">
                 <Card className="space-y-3 p-4">
                     <p className="text-sm text-muted-foreground">
-                        Continue with Facebook. WhatsApp Business connects on
-                        the same grant — no App ID or phone-number ID to type.
+                        {t('Continue with Facebook. WhatsApp Business connects on the same grant — no App ID or phone-number ID to type.')}
                     </p>
                     {startState.whatsapp.connected ? (
-                        <Badge>Already connected</Badge>
+                        <Badge>{t('Already connected')}</Badge>
                     ) : (
                         <BrandConnectButtons
                             facebookUrl={startState.whatsapp.connect_url}
@@ -444,7 +435,7 @@ function StartStepBody({
                 </Card>
                 <div className="flex justify-between">
                     <Button variant="outline" asChild>
-                        <Link href={stepHref('start', 'google')}>Back</Link>
+                        <Link href={stepHref('start', 'google')}>{t('Back')}</Link>
                     </Button>
                     <Button
                         variant={
@@ -454,8 +445,8 @@ function StartStepBody({
                     >
                         <Link href={stepHref('start', 'sms')}>
                             {startState.whatsapp.connected
-                                ? 'Continue'
-                                : 'Skip'}
+                                ? t('Continue')
+                                : t('Skip')}
                         </Link>
                     </Button>
                 </div>
@@ -468,12 +459,10 @@ function StartStepBody({
             <div className="space-y-4">
                 <Card className="space-y-3 p-4">
                     <p className="text-sm text-muted-foreground">
-                        Local HTTP aggregator. Sends only to Algerian mobiles
-                        (+213 05 / 06 / 07). The key is stored encrypted and
-                        never shown again.
+                        {t('Local HTTP aggregator. Sends only to Algerian mobiles (+213 05 / 06 / 07). The key is stored encrypted and never shown again.')}
                     </p>
                     {startState.sms.connected ? (
-                        <Badge>Gateway saved</Badge>
+                        <Badge>{t('Gateway saved')}</Badge>
                     ) : null}
                     <Form
                         action="/settings/sms"
@@ -487,7 +476,7 @@ function StartStepBody({
                                 <input type="hidden" name="method" value="POST" />
                                 <input type="hidden" name="auth" value="form" />
                                 <div>
-                                    <Label htmlFor="sms-url">Gateway URL</Label>
+                                    <Label htmlFor="sms-url">{t('Gateway URL')}</Label>
                                     <Input
                                         id="sms-url"
                                         name="url"
@@ -496,7 +485,7 @@ function StartStepBody({
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="sms-key">API key</Label>
+                                    <Label htmlFor="sms-key">{t('API key')}</Label>
                                     <Input
                                         id="sms-key"
                                         name="api_key"
@@ -504,13 +493,13 @@ function StartStepBody({
                                         autoComplete="off"
                                         placeholder={
                                             startState.sms.key_set
-                                                ? 'Saved — paste to replace'
-                                                : 'Aggregator token'
+                                                ? t('Saved — paste to replace')
+                                                : t('Aggregator token')
                                         }
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="sms-sender">Sender</Label>
+                                    <Label htmlFor="sms-sender">{t('Sender')}</Label>
                                     <Input
                                         id="sms-sender"
                                         name="sender"
@@ -519,7 +508,7 @@ function StartStepBody({
                                     />
                                 </div>
                                 <Button type="submit" disabled={processing}>
-                                    Save SMS key
+                                    {t('Save SMS key')}
                                 </Button>
                             </>
                         )}
@@ -527,10 +516,10 @@ function StartStepBody({
                 </Card>
                 <div className="flex justify-between">
                     <Button variant="outline" asChild>
-                        <Link href={stepHref('start', 'whatsapp')}>Back</Link>
+                        <Link href={stepHref('start', 'whatsapp')}>{t('Back')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href={stepHref('start', 'finish')}>Skip</Link>
+                        <Link href={stepHref('start', 'finish')}>{t('Skip')}</Link>
                     </Button>
                 </div>
             </div>
@@ -542,23 +531,23 @@ function StartStepBody({
             <Card className="space-y-3 p-4">
                 <StatusRow
                     ok={startState.google.connected}
-                    label="Google Calendar"
+                    label={t('Google Calendar')}
                 />
                 <StatusRow
                     ok={startState.whatsapp.connected}
-                    label="WhatsApp"
+                    label={t('WhatsApp')}
                 />
-                <StatusRow ok={startState.sms.connected} label="Algeria SMS" />
+                <StatusRow ok={startState.sms.connected} label={t('Algeria SMS')} />
             </Card>
             <div className="flex flex-wrap gap-2">
                 <Button asChild>
-                    <Link href="/dashboard">Go to Home</Link>
+                    <Link href="/dashboard">{t('Go to Home')}</Link>
                 </Button>
                 <Button variant="outline" asChild>
-                    <Link href={appsUrl}>Apps</Link>
+                    <Link href={appsUrl}>{t('Apps')}</Link>
                 </Button>
                 <Button variant="outline" asChild>
-                    <Link href={stepHref('start', 'sms')}>Back</Link>
+                    <Link href={stepHref('start', 'sms')}>{t('Back')}</Link>
                 </Button>
             </div>
         </div>
@@ -582,7 +571,7 @@ export default function OAuthSetupWizard({
 
     return (
         <>
-            <Head title={`Setup ${providerName}`} />
+            <Head title={t('Setup :name', { name: providerName })} />
             <div className="space-y-6">
                 <div>
                     <Link
@@ -590,13 +579,13 @@ export default function OAuthSetupWizard({
                         className="mb-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                     >
                         <ArrowLeft className="size-3" aria-hidden />
-                        Apps
+                        {t('Apps')}
                     </Link>
                     <h1 className="text-xl font-semibold">
-                        Connect {providerName}
+                        {t('Connect :name', { name: providerName })}
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        {tagline}
+                        {t(tagline)}
                     </p>
                 </div>
 
@@ -607,7 +596,7 @@ export default function OAuthSetupWizard({
                         id="setup-step-title"
                         className="mb-3 text-sm font-medium text-ink"
                     >
-                        {active?.title}
+                        {active?.title ? t(active.title) : null}
                     </h2>
                     <StepBody
                         provider={provider}
@@ -622,7 +611,7 @@ export default function OAuthSetupWizard({
                 {troubleshooting.length > 0 ? (
                     <Card className="p-4">
                         <h3 className="text-sm font-semibold">
-                            Troubleshooting
+                            {t('Troubleshooting')}
                         </h3>
                         <ul className="mt-2 space-y-2">
                             {troubleshooting.map((link) => (
@@ -633,7 +622,7 @@ export default function OAuthSetupWizard({
                                         rel="noreferrer"
                                         className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
                                     >
-                                        {link.label}
+                                        {t(link.label)}
                                         <ArrowSquareOut className="size-3.5" aria-hidden />
                                     </a>
                                 </li>

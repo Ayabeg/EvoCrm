@@ -1,7 +1,7 @@
 <?php
 
 /**
- * P01 — Phosphor-only product chrome; overlays import canonical drawers/dialogs.
+ * P01 — Phosphor-only product chrome; overlays import canonical @/evo/ui drawers/dialogs.
  * Does not own Command OS, /home→/dashboard, or leftover app-header deletion.
  */
 
@@ -56,21 +56,24 @@ it('routes active product overlays through canonical drawer or dialog barrels', 
 
     foreach ($drawers as $file) {
         $src = file_get_contents(resource_path($file));
-        expect($src)->toContain("@/components/ui/drawer")
+        expect($src)->toContain("@/evo/ui/drawer")
             ->and($src)->not->toContain("@/components/ui/sheet")
+            ->and($src)->not->toContain("@/evo/ui/sheet")
             ->and($src)->not->toContain('@/components/ui/aurora/');
     }
 
-    expect(file_get_contents(resource_path('js/components/ui/drawer.tsx')))
-        ->toContain('@/ds/components/Drawer');
-    expect(file_get_contents(resource_path('js/components/ui/dialog.tsx')))
-        ->toContain('@/ds/components/Modal');
-    expect(file_get_contents(resource_path('js/ds/components/Drawer.tsx')))
-        ->toContain('@/evo/ui/drawer');
+    $drawer = file_get_contents(resource_path('js/evo/ui/drawer.tsx'));
+    expect($drawer)->toContain('DrawerContent')
+        ->and($drawer)->toContain("from '@/evo/ui/sheet'")
+        ->and($drawer)->toContain("side = 'right'");
+
+    $dialog = file_get_contents(resource_path('js/evo/ui/dialog.tsx'));
+    expect($dialog)->toContain('DialogContent')
+        ->and($dialog)->toContain('data-slot="dialog-content"');
 
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
     expect($sidebar)->toContain('<SheetContent')
-        ->and($sidebar)->toContain("@/components/ui/sheet");
+        ->and($sidebar)->toContain("@/evo/ui/sheet");
 });
 
 it('does not delete leftover header files or change Inertia contracts', function () {
@@ -78,7 +81,8 @@ it('does not delete leftover header files or change Inertia contracts', function
     expect(resource_path('js/layouts/app/app-header-layout.tsx'))->toBeFile();
 
     $header = file_get_contents(resource_path('js/components/app-header.tsx'));
-    expect($header)->toContain('lucide-react');
+    expect($header)->not->toContain('lucide-react')
+        ->and($header)->toContain('@/evo/icons');
 
     $palette = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
     expect($palette)->toContain("'navigate'")

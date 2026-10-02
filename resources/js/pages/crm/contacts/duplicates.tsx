@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { RecordBack } from '@/components/crm/record-chrome';
+import { t } from '@/lib/i18n';
 
 type DuplicateContact = {
     id: number;
@@ -24,15 +25,15 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
                 <div className="mx-auto max-w-5xl space-y-6 px-6 py-6">
                     <RecordBack href="/crm/contacts" label="Contacts" />
                     <div>
-                        <h1 className="text-page-title text-ink">Duplicate contacts</h1>
+                        <h1 className="text-page-title text-ink">{t('Duplicate contacts')}</h1>
                         <p className="mt-1 text-[13px] text-mute">
-                            Groups share a normalized email, phone, or imported external ID.
+                            {t('Groups share a normalized email, phone, or imported external ID.')}
                         </p>
                     </div>
 
                     {groups.length === 0 ? (
                         <p className="rounded-md border border-hairline px-4 py-6 text-[13px] text-mute">
-                            No duplicate groups in this workspace.
+                            {t('No duplicate groups in this workspace.')}
                         </p>
                     ) : (
                         <ul className="space-y-4">
@@ -42,7 +43,7 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
                                 return (
                                     <li key={group.key} className="rounded-md border border-hairline">
                                         <div className="border-b border-hairline bg-canvas-soft px-4 py-2 text-[12px] text-mute">
-                                            Same {group.reasons.join(', ')}
+                                            {t('Same :reasons', { reasons: group.reasons.map((reason) => t(reason)).join(', ') })}
                                         </div>
                                         <ul className="divide-y divide-hairline">
                                             {group.contacts.map((contact) => (
@@ -64,11 +65,11 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
                                                         <p className="text-[12px] text-mute">
                                                             {[contact.email, contact.phone_e164, contact.company]
                                                                 .filter(Boolean)
-                                                                .join(' · ') || 'No identity details'}
+                                                                .join(' · ') || t('No identity details')}
                                                         </p>
                                                     </div>
                                                     <Link href={`/crm/contacts/${contact.id}`} className="text-[12px] font-medium text-ink hover:underline">
-                                                        Open
+                                                        {t('Open contact')}
                                                     </Link>
                                                 </li>
                                             ))}
@@ -81,7 +82,10 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
                                                         href={`/crm/contacts/merge/${survivor.id}/${absorbed.id}`}
                                                         className="text-[13px] font-medium text-brand"
                                                     >
-                                                        Merge {absorbed.display_name} into {survivor.display_name}
+                                                        {t('Merge :absorbed into :survivor', {
+                                                            absorbed: absorbed.display_name,
+                                                            survivor: survivor.display_name,
+                                                        })}
                                                     </Link>
                                                 ))}
                                             </div>

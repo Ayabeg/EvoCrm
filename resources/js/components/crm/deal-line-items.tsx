@@ -1,7 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { RecordDisclose } from '@/components/crm/record-hub';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
 import { formatDzd } from '@/lib/money';
 
 export type CatalogProduct = {

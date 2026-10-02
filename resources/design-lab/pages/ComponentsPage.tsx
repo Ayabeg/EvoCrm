@@ -203,7 +203,7 @@ export function ComponentsPage() {
                         </h1>
                         <p className="mt-2 max-w-[46rem] text-[13px] text-[var(--evo-ink-muted)]">
                             Surface de régression des primitifs Evo. Contrôles 32 / 36, échelle 11–32,
-                            focus sarcelle, primaire orange #EC6025 avec libellé #121212. FileDropzone
+                            focus sarcelle, primaire orange var(--evo-primary) avec libellé var(--evo-on-primary). FileDropzone
                             et RichTextEditor sont différés.
                         </p>
                     </div>

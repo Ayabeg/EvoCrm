@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import type { DashboardContext } from '@/lib/dashboard-operating-home';
 import { t } from '@/lib/i18n';
 import { LONG_TEXT_CLASS } from '@/lib/responsive';

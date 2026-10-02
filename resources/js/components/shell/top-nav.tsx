@@ -14,7 +14,7 @@ import {
     Path,
     Tray,
 } from '@phosphor-icons/react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/evo/ui/tooltip';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';

@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/evo/ui/input';
 import {
     SettingsCard,
     SettingsForm,
@@ -197,8 +197,12 @@ export default function MeetingSettings({
                                 </p>
                                 <p className="mt-1 text-[12px] text-mute">
                                     {whatsapp_cloud_connected
-                                        ? 'WhatsApp Business is connected. Names must match templates approved in Meta.'
-                                        : 'Connect WhatsApp Business to send Cloud templates. Phone WhatsApp still sends free text.'}
+                                        ? t(
+                                              'WhatsApp Business is connected. Names must match templates approved in Meta.',
+                                          )
+                                        : t(
+                                              'Connect WhatsApp Business to send Cloud templates. Phone WhatsApp still sends free text.',
+                                          )}
                                 </p>
                             </div>
                             <SettingsFormRow

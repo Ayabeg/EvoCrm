@@ -1,9 +1,9 @@
 import { Link } from '@inertiajs/react';
 import { CaretDown } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import type { EmptyKind } from '@/components/ui/empty-illustration';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState } from '@/evo/patterns/empty-state';
 import { t } from '@/lib/i18n';
 
 export type ListView = {

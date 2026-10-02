@@ -7,19 +7,19 @@ import { Bell, Plus, Sparkle, Sun } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { TasksOverlay } from '@/components/crm/tasks-overlay';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/evo/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@/evo/ui/tooltip';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { openAskEvo } from '@/lib/ask-evo';

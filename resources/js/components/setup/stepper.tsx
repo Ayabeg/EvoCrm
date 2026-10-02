@@ -1,3 +1,5 @@
+import { t } from '@/lib/i18n';
+
 type Step = {
     key: string;
     label: string;
@@ -12,7 +14,7 @@ export function SetupStepper({
     currentIndex: number;
 }) {
     return (
-        <ol className="flex flex-wrap items-center gap-2" aria-label="Setup progress">
+        <ol className="flex flex-wrap items-center gap-2" aria-label={t('Setup progress')}>
             {steps.map((step, index) => {
                 const done = index < currentIndex;
                 const active = index === currentIndex;
@@ -37,7 +39,7 @@ export function SetupStepper({
                             >
                                 {done ? '✓' : index + 1}
                             </span>
-                            {step.label}
+                            {t(step.label)}
                         </div>
                         {index < steps.length - 1 ? (
                             <span

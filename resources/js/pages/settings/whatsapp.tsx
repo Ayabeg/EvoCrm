@@ -2,8 +2,8 @@ import { Head, router } from '@inertiajs/react';
 import { ChatCircle } from '@phosphor-icons/react';
 import { useEffect } from 'react';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
 import {
     SettingsCard,
     SettingsEmptyState,

@@ -3,6 +3,7 @@ import { ActivationChecklist } from '@/components/dashboard/activation-checklist
 import { DashboardPipeline } from '@/components/dashboard/dashboard-pipeline';
 import { HomeKpiStrip } from '@/components/dashboard/home-kpi-strip';
 import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
+import { EVO_CHART_STAGE, EVO_CHART_TRACK } from '@/evo/tokens/literal-hex';
 import type { ActivationState } from '@/lib/activation';
 import type {
     DashboardMetrics,
@@ -23,7 +24,7 @@ type Props = {
     activation?: ActivationState | null;
 };
 
-const STAGE_COLORS = ['#E8530E', '#ff7a3d', '#ffc6a8', '#d6d7d9', '#afb1b5', '#9aa0ab'];
+const STAGE_COLORS = EVO_CHART_STAGE;
 
 function formatCreated(iso: string | null): string {
     if (!iso) {
@@ -46,7 +47,7 @@ function donutBackground(pipeline: PipelinePayload): string {
     const total = pipeline.amount_cents;
 
     if (total <= 0) {
-        return '#ededeb';
+        return EVO_CHART_TRACK;
     }
 
     let cursor = 0;

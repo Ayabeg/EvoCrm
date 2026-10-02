@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/evo/ui/button';
+import { Card } from '@/evo/ui/card';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
 import {
     SettingsCard,
     SettingsEmptyState,

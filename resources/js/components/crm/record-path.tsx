@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 
 export type PathStep = {
     key: string;

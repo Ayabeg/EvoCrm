@@ -1,0 +1,125 @@
+/*
+ * Token-driven enter/exit utilities that replace tw-animate-css.
+ * Durations and easing come from --evo-duration-* / --evo-ease.
+ */
+
+@property --tw-enter-opacity {
+    syntax: '*';
+    inherits: false;
+    initial-value: 1;
+}
+@property --tw-enter-scale {
+    syntax: '*';
+    inherits: false;
+    initial-value: 1;
+}
+@property --tw-enter-translate-x {
+    syntax: '*';
+    inherits: false;
+    initial-value: 0;
+}
+@property --tw-enter-translate-y {
+    syntax: '*';
+    inherits: false;
+    initial-value: 0;
+}
+@property --tw-exit-opacity {
+    syntax: '*';
+    inherits: false;
+    initial-value: 1;
+}
+@property --tw-exit-scale {
+    syntax: '*';
+    inherits: false;
+    initial-value: 1;
+}
+@property --tw-exit-translate-x {
+    syntax: '*';
+    inherits: false;
+    initial-value: 0;
+}
+@property --tw-exit-translate-y {
+    syntax: '*';
+    inherits: false;
+    initial-value: 0;
+}
+
+@theme inline {
+    --animate-in: evo-enter var(--evo-duration-normal, 200ms) var(--evo-ease) both;
+    --animate-out: evo-exit var(--evo-duration-normal, 200ms) var(--evo-ease) both;
+    --animate-caret-blink: evo-caret-blink 1.25s ease-out infinite;
+
+    @keyframes evo-enter {
+        from {
+            opacity: var(--tw-enter-opacity, 1);
+            transform: translate3d(
+                    var(--tw-enter-translate-x, 0),
+                    var(--tw-enter-translate-y, 0),
+                    0
+                )
+                scale3d(
+                    var(--tw-enter-scale, 1),
+                    var(--tw-enter-scale, 1),
+                    var(--tw-enter-scale, 1)
+                );
+        }
+    }
+
+    @keyframes evo-exit {
+        to {
+            opacity: var(--tw-exit-opacity, 1);
+            transform: translate3d(
+                    var(--tw-exit-translate-x, 0),
+                    var(--tw-exit-translate-y, 0),
+                    0
+                )
+                scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1));
+        }
+    }
+
+    @keyframes evo-caret-blink {
+        0%,
+        70%,
+        100% {
+            opacity: 1;
+        }
+        20%,
+        50% {
+            opacity: 0;
+        }
+    }
+}
+
+@utility fade-in {
+    --tw-enter-opacity: 0;
+}
+@utility fade-in-0 {
+    --tw-enter-opacity: 0;
+}
+@utility fade-out {
+    --tw-exit-opacity: 0;
+}
+@utility fade-out-0 {
+    --tw-exit-opacity: 0;
+}
+@utility zoom-in-90 {
+    --tw-enter-scale: 0.9;
+}
+@utility zoom-in-95 {
+    --tw-enter-scale: 0.95;
+}
+@utility zoom-out-95 {
+    --tw-exit-scale: 0.95;
+}
+@utility slide-in-from-right-52 {
+    --tw-enter-translate-x: 13rem;
+}
+@utility slide-in-from-left-52 {
+    --tw-enter-translate-x: -13rem;
+}
+@utility slide-out-to-right-52 {
+    --tw-exit-translate-x: 13rem;
+}
+@utility slide-out-to-left-52 {
+    --tw-exit-translate-x: -13rem;
+}

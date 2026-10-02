@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/evo/ui/input';
 import {
     SettingsCard,
     SettingsFormRow,

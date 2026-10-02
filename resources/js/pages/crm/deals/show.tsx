@@ -32,7 +32,7 @@ import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
 import TicketsRelatedCard from '@/components/crm/tickets-related-card';
 import type { TicketsRelated } from '@/components/crm/tickets-related-card';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';

@@ -3,9 +3,9 @@ import { Plugs } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { BrandConnectButtons } from '@/components/connectors/brand-connect';
 import { SecretCallbackField } from '@/components/settings/secret-callback-field';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
 import {
     SettingsCard,
     SettingsEmptyState,
@@ -151,10 +151,10 @@ export default function MetaSettings({
                             }
                         >
                             {status === 'needs_attention'
-                                ? 'Needs attention'
+                                ? t('Needs attention')
                                 : connected
-                                  ? 'Connected'
-                                  : 'Not connected'}
+                                  ? t('Connected')
+                                  : t('Not connected')}
                         </Badge>
                         {account_label ? (
                             <span className="min-w-0 truncate text-[13px] text-mute">
@@ -531,7 +531,7 @@ export default function MetaSettings({
                     </div>
                     <ul className="space-y-1 text-[12px] text-mute">
                         {sync_runs.length === 0 ? (
-                            <li>No sync runs yet.</li>
+                            <li>{t('No sync runs yet.')}</li>
                         ) : null}
                         {sync_runs.map((run) => (
                             <li key={run.id}>

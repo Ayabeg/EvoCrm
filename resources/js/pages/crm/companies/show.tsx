@@ -21,10 +21,11 @@ import {
 } from '@/components/crm/record-hub';
 import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { t } from '@/lib/i18n';
 
 type Company = {
     id: number;
@@ -286,7 +287,7 @@ export default function CompanyShow({
                                     addHref="/crm/contacts?create=1"
                                 >
                                     {contacts.length === 0 ? (
-                                        <p className="text-mute">No contacts</p>
+                                        <p className="text-mute">{t('No contacts')}</p>
                                     ) : (
                                         contacts.map((contact) => (
                                             <RelatedRecordLink
@@ -301,7 +302,7 @@ export default function CompanyShow({
                                 </AssociationCard>
                                 <AssociationCard title="Deals">
                                     {deals.length === 0 ? (
-                                        <p className="text-mute">No deals</p>
+                                        <p className="text-mute">{t('No deals')}</p>
                                     ) : (
                                         deals.map((deal) => (
                                             <RelatedRecordLink

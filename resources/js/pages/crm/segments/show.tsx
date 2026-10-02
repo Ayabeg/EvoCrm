@@ -5,6 +5,7 @@ import {
 } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { t } from '@/lib/i18n';
 
 type HistoryRow = {
     id: number;
@@ -36,14 +37,14 @@ export default function SegmentShow({
             >
                 <CrmObjectHeader
                     title={segment.name}
-                    description="Membership history for this segment. Current members stay on the filtered list."
+                    description={t('Membership history for this segment. Current members stay on the filtered list.')}
                     secondary={
                         <>
                             <CrmObjectSecondaryLink href="/crm/segments">
-                                All segments
+                                {t('All segments')}
                             </CrmObjectSecondaryLink>
                             <CrmObjectSecondaryLink href={listHref}>
-                                Current members
+                                {t('Current members')}
                             </CrmObjectSecondaryLink>
                         </>
                     }
@@ -51,28 +52,28 @@ export default function SegmentShow({
                 <div className="flex min-h-0 flex-1 flex-col bg-canvas">
                     {history.length === 0 ? (
                         <CrmEmptyState
-                            title="No history yet"
-                            line="No enter or exit history for this segment."
+                            title={t('No history yet')}
+                            line={t('No enter or exit history for this segment.')}
                         />
                     ) : (
                         <div className="min-h-0 flex-1 overflow-auto">
                             <table
                                 className="w-full min-w-[480px] border-collapse text-[13px]"
-                                aria-label="Membership history"
+                                aria-label={t('Membership history')}
                             >
                                 <thead>
                                     <tr className="border-b border-hairline bg-canvas-soft text-left">
                                         <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:px-6">
-                                            Contact
+                                            {t('Contact')}
                                         </th>
                                         <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
-                                            Entered
+                                            {t('Entered')}
                                         </th>
                                         <th className="px-4 py-1.5 text-[11px] font-medium text-mute">
-                                            Exited
+                                            {t('Exited')}
                                         </th>
                                         <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pr-6">
-                                            Status
+                                            {t('Status')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -106,7 +107,7 @@ export default function SegmentShow({
                                                 {row.exited_at ?? '—'}
                                             </td>
                                             <td className="px-4 py-1.5 capitalize text-mute sm:pr-6">
-                                                {row.status}
+                                                {t(row.status)}
                                             </td>
                                         </tr>
                                     ))}

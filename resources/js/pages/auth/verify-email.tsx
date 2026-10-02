@@ -1,7 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@/evo/ui/button';
+import { Spinner } from '@/evo/ui/spinner';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 import AuthStatus from './auth-status';

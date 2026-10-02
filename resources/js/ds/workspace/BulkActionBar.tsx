@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import type { BulkAction, BulkActionBarProps, DataWorkspaceEntity } from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
 import { PAGE_OVERFLOW_CLASS } from '@/lib/responsive';

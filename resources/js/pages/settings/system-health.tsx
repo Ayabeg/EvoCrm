@@ -6,8 +6,8 @@ import {
     WarningCircle,
     XCircle,
 } from '@phosphor-icons/react';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@/evo/ui/badge';
+import { Card } from '@/evo/ui/card';
 import { SettingsPageHeader } from '@/evo/patterns/settings';
 import { t } from '@/lib/i18n';
 

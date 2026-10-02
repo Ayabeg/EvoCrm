@@ -91,7 +91,7 @@ it('builds one QuickRecordDrawer shell with typed adapters instead of five drawe
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
     expect($drawer)->toContain('data-ds="quick-record-drawer"')
-        ->and($drawer)->toContain('@/components/ui/drawer')
+        ->and($drawer)->toContain('@/evo/ui/drawer')
         ->and($drawer)->toContain('Open full')
         ->and($drawer)->toContain('lg:w-[480px]')
         ->and($drawer)->toContain('sm:w-[min(92vw,520px)]')
@@ -100,9 +100,9 @@ it('builds one QuickRecordDrawer shell with typed adapters instead of five drawe
         ->and($drawer)->toContain('onCloseAutoFocus')
         ->and($drawer)->toContain('state.opener?.focus()')
         ->and($drawer)->toContain('overscroll-contain')
-        ->and($drawer)->toContain('#FFFFFF')
-        ->and($drawer)->toContain('#E3E3DF')
-        ->and($drawer)->toContain('#161616')
+        ->and($drawer)->toContain('var(--evo-surface)')
+        ->and($drawer)->toContain('var(--evo-hairline)')
+        ->and($drawer)->toContain('var(--evo-ink)')
         ->and($drawer)->not->toContain('ContactDrawer')
         ->and($drawer)->not->toContain('CompanyDrawer')
         ->and($drawer)->not->toContain('LeadDrawer')

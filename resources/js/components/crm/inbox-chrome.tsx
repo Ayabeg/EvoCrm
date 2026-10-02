@@ -148,7 +148,7 @@ export function InboxContactSidebar({
             ) : null}
             {!contextPending && !contextError && renderContext && context ? (
                 <>
-                    <CRMContext record={record} empty="No CRM context" />
+                    <CRMContext record={record} empty={t('No CRM context')} />
                     <InboxCrmContext context={context} />
                 </>
             ) : null}

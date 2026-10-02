@@ -42,7 +42,7 @@ it('rebuilds the inbox as HubSpot-dense chrome around the Desk embed', function 
         ->and($chrome)->not->toContain('#00A4BD')
         ->and($chrome)->not->toContain('#0176D3');
 
-    expect($shell)->toContain('title="Inbox"')
+    expect($shell)->toContain("title={t('Inbox')}")
         ->and($shell)->toContain("label: 'Inbox'");
 
     expect($workspace)->toContain('desktopGridClassName')
@@ -61,6 +61,7 @@ it('rebuilds conversation history as a native inbox list on the same chrome', fu
         ->and($conversations)->toContain('InboxContactSidebar')
         ->and($conversations)->not->toContain('max-w-6xl')
         ->and($conversations)->not->toContain("from '@/components/ui/card'")
+        ->and($conversations)->not->toContain("from '@/evo/ui/card'")
         ->and($conversations)->not->toContain('HubSpot')
         ->and($conversations)->not->toContain('#00A4BD')
         ->and($conversations)->not->toContain('#0176D3');

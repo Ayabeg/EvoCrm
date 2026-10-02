@@ -1,5 +1,5 @@
 import { WarningCircle } from '@phosphor-icons/react';
-import { Callout } from '@/components/ui/callout';
+import { Callout } from '@/evo/ui/callout';
 
 /**
  * Product form-error surface.

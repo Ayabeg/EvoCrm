@@ -1,6 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import { Check } from '@phosphor-icons/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     activationProgressLabel,
     activationProgressValue,

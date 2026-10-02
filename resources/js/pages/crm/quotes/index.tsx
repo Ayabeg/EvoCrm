@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { MorphingForm } from '@/components/crm/morphing-form';
 import { hasActiveListFilters } from '@/components/crm/list-query';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
@@ -66,7 +66,7 @@ export default function QuotesIndex({
                                 title="Create quote"
                                 open={drawer}
                                 onOpenChange={setDrawer}
-                                triggerClassName="h-8 border-[#E8530E] bg-[#E8530E] px-3 text-[13px] text-white hover:bg-[#d44b0c]"
+                                triggerClassName="h-8 border-[var(--evo-primary)] bg-[var(--evo-primary)] px-3 text-[13px] text-white hover:bg-[var(--evo-primary-hover)]"
                             >
                                 {deals.length === 0 ? (
                                     <div className="space-y-3 text-[13px]">

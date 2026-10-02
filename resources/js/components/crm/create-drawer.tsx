@@ -6,7 +6,7 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-} from '@/components/ui/drawer';
+} from '@/evo/ui/drawer';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 

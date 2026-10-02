@@ -13,6 +13,8 @@ import * as React from 'react';
 import { X } from '@/evo/icons';
 import { sr } from '@/evo/lib/a11y';
 import { cn } from '@/evo/lib/cn';
+import { FieldError } from '@/evo/ui/field';
+import { Label } from '@/evo/ui/label';
 
 export type InputState = 'error' | 'warn' | 'success';
 export type InputSize = 'sm' | 'default' | 'lg';
@@ -21,7 +23,9 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
     startAdornment?: React.ReactNode;
     endAdornment?: React.ReactNode;
     state?: InputState;
-    error?: boolean;
+    error?: boolean | string;
+    label?: string;
+    hint?: string;
     size?: InputSize;
     clearable?: boolean;
     onClear?: () => void;
@@ -48,6 +52,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
         endAdornment,
         state,
         error,
+        label,
+        hint,
         size = 'default',
         clearable,
         onClear,
@@ -55,14 +61,53 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
         disabled,
         value,
         onChange,
+        id,
         ...props
     },
     ref,
 ) {
-    const resolvedState = state ?? (error ? 'error' : undefined);
+    const generatedId = React.useId();
+    const errorMessage = typeof error === 'string' ? error : undefined;
+    const hasError = Boolean(error);
+    const inputId = id ?? (label ? generatedId : undefined);
+    const resolvedState = state ?? (hasError ? 'error' : undefined);
+    const describedBy = errorMessage
+        ? `${inputId}-error`
+        : hint
+          ? `${inputId}-hint`
+          : undefined;
+
+    const wrapField = (control: React.ReactElement) => {
+        if (!label && !hint && !errorMessage) {
+            return control;
+        }
+
+        return (
+            <div className="grid w-full gap-2" data-slot="input-field">
+                {label ? (
+                    <Label htmlFor={inputId} className="text-foreground">
+                        {label}
+                    </Label>
+                ) : null}
+                {control}
+                {hint && !errorMessage ? (
+                    <p
+                        id={inputId ? `${inputId}-hint` : undefined}
+                        className="text-muted-foreground text-[length:var(--text-meta)] leading-[var(--text-meta-line)]"
+                        data-slot="input-hint"
+                    >
+                        {hint}
+                    </p>
+                ) : null}
+                {errorMessage ? (
+                    <FieldError id={inputId ? `${inputId}-error` : undefined}>{errorMessage}</FieldError>
+                ) : null}
+            </div>
+        );
+    };
 
     if (unstyled) {
-        return (
+        return wrapField(
             <input
                 ref={ref}
                 type={type}
@@ -70,8 +115,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
                 disabled={disabled}
                 value={value}
                 onChange={onChange}
+                id={inputId}
                 {...props}
-            />
+            />,
         );
     }
 
@@ -81,9 +127,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
         <input
             ref={ref}
             type={type}
+            id={inputId}
             data-slot="input"
             data-size={size}
             aria-invalid={resolvedState === 'error' || undefined}
+            aria-describedby={describedBy}
             disabled={disabled}
             value={value}
             onChange={onChange}
@@ -104,10 +152,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
     );
 
     if (!startAdornment && !endAdornment && !showClear) {
-        return field;
+        return wrapField(field);
     }
 
-    return (
+    return wrapField(
         <div className="relative w-full" data-slot="input-wrap">
             {startAdornment ? (
                 <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5 text-[var(--evo-ink-muted)]">

@@ -56,7 +56,12 @@ export default function ConversionFunnels({ funnels, report, custom }: Props) {
         <ReportsShell
             title="Conversion funnels"
             pageTitle="Conversion funnels"
-            description={`${report.window.from} → ${report.window.to} · ${report.window.days} days · ${report.window.timezone}.`}
+            description={t(':from → :to · :days days · :timezone', {
+                from: report.window.from,
+                to: report.window.to,
+                days: report.window.days,
+                timezone: report.window.timezone,
+            })}
             filters={
                 <ReportsFilters
                     from={from}

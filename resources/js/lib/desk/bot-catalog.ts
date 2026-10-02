@@ -1,6 +1,7 @@
 import type { BotAvatarType } from 'bot-avatars';
 import { useSyncExternalStore } from 'react';
 import type { AgentApproval, AgentToolCall } from '@/evo/ai/types';
+import { AVATAR_TONE_HEX } from '@/evo/tokens/literal-hex';
 import type { AskEvoAction, AskEvoContextPayload } from '@/lib/ask-evo';
 
 export type AvatarTone = 'ink' | 'teal' | 'orange' | 'night';
@@ -82,17 +83,15 @@ export function avatarTypeForBotId(
 
 export function avatarColorForTone(tone: AvatarTone): string {
     /* bot-avatars requires a paint hex, not a CSS custom property. */
-    /* eslint-disable no-restricted-syntax -- avatar paint hex */
     if (tone === 'orange') {
-        return '#E8530E';
+        return AVATAR_TONE_HEX.orange;
     }
 
     if (tone === 'teal') {
-        return '#0F4C5C';
+        return AVATAR_TONE_HEX.teal;
     }
 
-    return '#0D1B24';
-    /* eslint-enable no-restricted-syntax */
+    return AVATAR_TONE_HEX.ink;
 }
 
 export type ConnectorDefinition = {

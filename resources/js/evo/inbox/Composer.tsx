@@ -172,8 +172,8 @@ export function Composer({
                     ))}
                 </div>
             ) : null}
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-1.5">
+            <div className="mt-2 flex flex-nowrap items-center justify-between gap-2">
+                <div className="flex min-w-0 flex-nowrap items-center gap-1.5">
                     <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
                         <PopoverTrigger asChild>
                             <Button type="button" variant="outline" size="sm">
@@ -255,7 +255,7 @@ export function Composer({
                         <span>{t('Press Enter to send. Shift+Enter for a new line.')}</span>
                     </span>
                 </div>
-                <div className="flex flex-wrap justify-end gap-2">
+                <div className="flex shrink-0 flex-nowrap justify-end gap-2">
                     {mode === 'reply' ? (
                         <>
                             {allowResolve ? (

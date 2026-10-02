@@ -53,7 +53,7 @@ it('opens advanced filters in a right Drawer and keeps list-query plus /crm/filt
     $bar = file_get_contents(resource_path('js/ds/workspace/FilterBar.tsx'));
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
 
-    expect($drawer)->toContain("from '@/components/ui/drawer'")
+    expect($drawer)->toContain("from '@/evo/ui/drawer'")
         ->and($drawer)->toContain('side="right"')
         ->and($drawer)->toContain('Advanced filters')
         ->and($drawer)->toContain("from '@/evo/data/filters'")

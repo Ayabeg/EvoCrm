@@ -1,7 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { filterFields } from '@/components/crm/list-query';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     Drawer,
     DrawerContent,
@@ -9,7 +9,7 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-} from '@/components/ui/drawer';
+} from '@/evo/ui/drawer';
 import type { DataWorkspaceEntity, DataWorkspaceFilterContext } from '@/ds/workspace/types';
 import { FilterBuilder } from '@/evo/data/filters';
 import { t } from '@/lib/i18n';

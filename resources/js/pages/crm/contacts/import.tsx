@@ -2,8 +2,9 @@ import { Form, Link, router } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { RecordBack } from '@/components/crm/record-chrome';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/evo/ui/button';
+import { Label } from '@/evo/ui/label';
+import { t } from '@/lib/i18n';
 
 type PreviewCounts = {
     created: number;
@@ -59,10 +60,9 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                 <div className="mx-auto max-w-5xl space-y-6 px-6 py-6">
                     <RecordBack href="/crm/contacts" label="Contacts" />
                     <div>
-                        <h1 className="text-page-title text-ink">Import contacts</h1>
+                        <h1 className="text-page-title text-ink">{t('Import contacts')}</h1>
                         <p className="mt-1 text-ui text-muted-foreground">
-                            Upload a CSV, confirm the column mapping, then import. Matching uses
-                            external ID, then email, then phone.
+                            {t('Upload a CSV, confirm the column mapping, then import. Matching uses external ID, then email, then phone.')}
                         </p>
                     </div>
 
@@ -77,7 +77,7 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                 <>
                                     <div>
                                         <Label htmlFor="file" className="mb-1 block text-[12px]">
-                                            CSV file
+                                            {t('CSV file')}
                                         </Label>
                                         <input
                                             id="file"
@@ -91,11 +91,11 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                             <p className="mt-1 text-[12px] text-destructive">{errors.file}</p>
                                         ) : (
                                             <p className="mt-1 text-[12px] text-muted-foreground">
-                                                HubSpot exports are supported. Maximum 10 MB.
+                                                {t('HubSpot exports are supported. Maximum 10 MB.')}
                                             </p>
                                         )}
                                     </div>
-                                    <Button disabled={processing}>Preview import</Button>
+                                    <Button disabled={processing}>{t('Preview import')}</Button>
                                 </>
                             )}
                         </Form>
@@ -105,19 +105,22 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                 <div>
                                     <p className="text-ui font-medium text-ink">{batch.filename}</p>
                                     <p className="text-[12px] text-muted-foreground">
-                                        {batch.preview.total} rows · {batch.status}
+                                        {t(':total rows · :status', {
+                                            total: batch.preview.total,
+                                            status: t(batch.status),
+                                        })}
                                     </p>
                                 </div>
                                 <Link href="/crm/contacts/import" className="text-ui font-medium text-brand">
-                                    Upload another file
+                                    {t('Upload another file')}
                                 </Link>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                                <Count label="Create" value={batch.status === 'completed' ? batch.progress.created : batch.preview.created} />
-                                <Count label="Update" value={batch.status === 'completed' ? batch.progress.updated : batch.preview.updated} />
-                                <Count label="Skip" value={batch.status === 'completed' ? batch.progress.skipped : batch.preview.skipped} />
-                                <Count label="Errors" value={batch.status === 'completed' ? batch.progress.errors : batch.preview.errors} />
+                                <Count label={t('Create')} value={batch.status === 'completed' ? batch.progress.created : batch.preview.created} />
+                                <Count label={t('Update')} value={batch.status === 'completed' ? batch.progress.updated : batch.preview.updated} />
+                                <Count label={t('Skip')} value={batch.status === 'completed' ? batch.progress.skipped : batch.preview.skipped} />
+                                <Count label={t('Errors')} value={batch.status === 'completed' ? batch.progress.errors : batch.preview.errors} />
                             </div>
 
                             {batch.status !== 'completed' && batch.status !== 'processing' ? (
@@ -129,14 +132,14 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                     {({ processing }) => (
                                         <>
                                             <div className="border-b border-hairline bg-canvas-soft px-4 py-3">
-                                                <h2 className="text-[14px] font-semibold">Column mapping</h2>
+                                                <h2 className="text-[14px] font-semibold">{t('Column mapping')}</h2>
                                             </div>
                                             <div className="overflow-x-auto">
                                                 <table className="w-full text-left text-[13px]">
                                                     <thead className="text-[11px] uppercase tracking-wide text-muted-foreground">
                                                         <tr>
-                                                            <th className="px-4 py-2">CSV column</th>
-                                                            <th className="px-4 py-2">EvoSales field</th>
+                                                            <th className="px-4 py-2">{t('CSV column')}</th>
+                                                            <th className="px-4 py-2">{t('EvoSales field')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -149,10 +152,10 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                                                         defaultValue={batch.mapping[header] ?? ''}
                                                                         className="h-8 w-full max-w-xs rounded-md border border-hairline bg-background px-2 text-sm"
                                                                     >
-                                                                        <option value="">Ignore</option>
+                                                                        <option value="">{t('Ignore')}</option>
                                                                         {Object.entries(batch.fields).map(([value, label]) => (
                                                                             <option key={value} value={value}>
-                                                                                {label}
+                                                                                {t(label)}
                                                                             </option>
                                                                         ))}
                                                                     </select>
@@ -164,7 +167,7 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                                             </div>
                                             <div className="flex flex-wrap gap-2 px-4 pb-4">
                                                 <Button type="submit" variant="outline" disabled={processing}>
-                                                    Update preview
+                                                    {t('Update preview')}
                                                 </Button>
                                             </div>
                                         </>
@@ -174,17 +177,17 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
 
                             <div className="overflow-hidden rounded-md border border-hairline">
                                 <div className="border-b border-hairline bg-canvas-soft px-4 py-3">
-                                    <h2 className="text-[14px] font-semibold">Sample rows</h2>
+                                    <h2 className="text-[14px] font-semibold">{t('Sample rows')}</h2>
                                 </div>
                                 <table className="w-full text-left text-[13px]">
                                     <thead className="text-[11px] uppercase tracking-wide text-muted-foreground">
                                         <tr>
-                                            <th className="px-4 py-2">Row</th>
-                                            <th className="px-4 py-2">Action</th>
-                                            <th className="px-4 py-2">Name</th>
-                                            <th className="px-4 py-2">Email</th>
-                                            <th className="px-4 py-2">Phone</th>
-                                            <th className="px-4 py-2">Company</th>
+                                            <th className="px-4 py-2">{t('Row')}</th>
+                                            <th className="px-4 py-2">{t('Action')}</th>
+                                            <th className="px-4 py-2">{t('Name')}</th>
+                                            <th className="px-4 py-2">{t('Email')}</th>
+                                            <th className="px-4 py-2">{t('Phone')}</th>
+                                            <th className="px-4 py-2">{t('Company')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -204,11 +207,14 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
 
                             {batch.errors.length > 0 ? (
                                 <div className="rounded-md border border-hairline px-4 py-3">
-                                    <h2 className="mb-2 text-[14px] font-semibold">Row errors</h2>
+                                    <h2 className="mb-2 text-[14px] font-semibold">{t('Row errors')}</h2>
                                     <ul className="space-y-1 text-[13px] text-muted-foreground">
                                         {batch.errors.map((error) => (
                                             <li key={error.row_number}>
-                                                Row {error.row_number}: {error.message}
+                                                {t('Row :number: :message', {
+                                                    number: error.row_number,
+                                                    message: error.message ?? '',
+                                                })}
                                             </li>
                                         ))}
                                     </ul>
@@ -218,21 +224,24 @@ export default function ContactImport({ batch }: { batch: ImportBatchPayload | n
                             {batch.status === 'completed' ? (
                                 <div className="flex flex-wrap gap-2">
                                     <Button asChild>
-                                        <Link href="/crm/contacts">View contacts</Link>
+                                        <Link href="/crm/contacts">{t('View contacts')}</Link>
                                     </Button>
                                     <Button asChild variant="outline">
-                                        <Link href="/crm/contacts/import">Import another file</Link>
+                                        <Link href="/crm/contacts/import">{t('Import another file')}</Link>
                                     </Button>
                                 </div>
                             ) : batch.status === 'processing' ? (
                                 <p className="text-ui text-muted-foreground">
-                                    Import is running ({batch.progress.processed} of {batch.progress.total} rows).
+                                    {t('Import is running (:processed of :total rows).', {
+                                        processed: batch.progress.processed,
+                                        total: batch.progress.total,
+                                    })}
                                 </p>
                             ) : (
                                 <Form action={`/crm/contacts/import/${batch.id}/commit`} method="post">
                                     {({ processing }) => (
                                         <Button disabled={processing || batch.preview.created + batch.preview.updated === 0}>
-                                            Import contacts
+                                            {t('Import contacts')}
                                         </Button>
                                     )}
                                 </Form>

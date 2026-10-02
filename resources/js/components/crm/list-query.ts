@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { listQueryObjectFromPath } from '@/lib/list-query/adapters';
 import { writeListHref } from '@/lib/list-query/href';
 import { hrefFromActiveFilters } from '@/lib/list-query/serialize';
@@ -88,12 +89,12 @@ export function listFilterChips(
     const owner = fields.owner == null ? '' : String(fields.owner);
 
     if (owner === 'unassigned') {
-        chips.push({ key: 'owner', label: 'Owner', value: 'Unassigned' });
+        chips.push({ key: 'owner', label: t('Owner'), value: t('Unassigned') });
     } else if (owner) {
         const member = members.find((row) => String(row.id) === owner);
         chips.push({
             key: 'owner',
-            label: 'Owner',
+            label: t('Owner'),
             value: member?.name ?? owner,
         });
     }
@@ -102,8 +103,8 @@ export function listFilterChips(
         const key = String(fields.created);
         chips.push({
             key: 'created',
-            label: 'Created',
-            value: CREATED_LABELS[key] ?? key,
+            label: t('Created'),
+            value: t(CREATED_LABELS[key] ?? key),
         });
     }
 
@@ -111,15 +112,15 @@ export function listFilterChips(
         const key = String(fields.last_activity);
         chips.push({
             key: 'last_activity',
-            label: 'Last activity',
-            value: ACTIVITY_LABELS[key] ?? key,
+            label: t('Last activity'),
+            value: t(ACTIVITY_LABELS[key] ?? key),
         });
     }
 
     if (fields.status) {
         chips.push({
             key: 'status',
-            label: 'Status',
+            label: t('Status'),
             value: String(fields.status).replace(/_/g, ' '),
         });
     }
@@ -127,7 +128,7 @@ export function listFilterChips(
     if (fields.priority) {
         chips.push({
             key: 'priority',
-            label: 'Priority',
+            label: t('Priority'),
             value: String(fields.priority),
         });
     }
@@ -135,7 +136,7 @@ export function listFilterChips(
     if (fields.channel) {
         chips.push({
             key: 'channel',
-            label: 'Channel',
+            label: t('Channel'),
             value: String(fields.channel).replace(/_/g, ' '),
         });
     }
@@ -144,20 +145,20 @@ export function listFilterChips(
         const key = String(fields.attention);
         chips.push({
             key: 'attention',
-            label: 'Attention',
+            label: t('Attention'),
             value:
                 key === 'needs_attention'
-                    ? 'Needs attention'
+                    ? t('Needs attention')
                     : key === 'no_next_action'
-                      ? 'No next action'
+                      ? t('No next action')
                       : key === 'overdue'
-                        ? 'Overdue'
+                        ? t('Overdue')
                         : key,
         });
     }
 
     if (fields.stage) {
-        chips.push({ key: 'stage', label: 'Stage', value: String(fields.stage) });
+        chips.push({ key: 'stage', label: t('Stage'), value: String(fields.stage) });
     }
 
     if (fields.city) {

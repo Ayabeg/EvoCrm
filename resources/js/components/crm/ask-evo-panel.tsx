@@ -1,7 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { CaretDown, CaretUp, Sparkle } from '@phosphor-icons/react';
 import { useId, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     Drawer,
     DrawerContent,
@@ -9,8 +9,8 @@ import {
     DrawerHeader,
     DrawerTitle,
     DrawerTrigger,
-} from '@/components/ui/drawer';
-import { Input } from '@/components/ui/input';
+} from '@/evo/ui/drawer';
+import { Input } from '@/evo/ui/input';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import type { AskEvoSuggestion } from '@/lib/ask-evo';
 import { MOTION_HOVER_CLASS } from '@/lib/motion';

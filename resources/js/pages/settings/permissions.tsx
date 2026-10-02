@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
+import { Card } from '@/evo/ui/card';
 import { SettingsForm, SettingsPageHeader } from '@/evo/patterns/settings';
 import { t } from '@/lib/i18n';
 

@@ -1,15 +1,15 @@
 import { Form, Link, usePage } from '@inertiajs/react';
-import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { crmListHref, filterFields } from '@/components/crm/list-query';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/evo/ui/dropdown-menu';
+import { Input } from '@/evo/ui/input';
+import { CaretDown } from '@/evo/icons';
 import type {
     ListObjectType,
     ListViewColumn,
@@ -148,7 +148,7 @@ export default function SavedViewTabs({
                                 className={tabClass(overflow.some((filter) => filter.id === filterId))}
                             >
                                 All views
-                                <ChevronDown className="ms-0.5 inline size-3" />
+                                <CaretDown className="ms-0.5 inline size-3" />
                             </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="w-56">

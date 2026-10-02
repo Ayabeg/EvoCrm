@@ -1,5 +1,6 @@
 import { EVOVIZ_IDS } from '@/evoviz/contract';
 import type { EvoVizId } from '@/evoviz/contract';
+import { t } from '@/lib/i18n';
 
 /**
  * Add-widget picker — lists the existing EvoViz charts already drawn
@@ -54,7 +55,7 @@ export function WidgetPicker({
     }, []);
 
     return (
-        <div className="grid gap-4" aria-label="Add widget">
+        <div className="grid gap-4" aria-label={t('Add widget')}>
             {rooms.map((group) => (
                 <section key={group.room} aria-label={group.title}>
                     <h3 className="mb-2 text-[11px] tracking-wide text-muted-foreground uppercase">
@@ -83,7 +84,7 @@ export function WidgetPicker({
                                         onClick={() => onAdd(item.key)}
                                         className="h-8 shrink-0 rounded-md bg-brand px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-default disabled:bg-hairline disabled:text-muted-foreground disabled:opacity-100"
                                     >
-                                        {added ? 'Added' : 'Add'}
+                                        {added ? t('Added') : t('Add')}
                                     </button>
                                 </li>
                             );

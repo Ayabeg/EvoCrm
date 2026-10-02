@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { DeskShell } from '@/components/crm/desk-shell';
 import {
-    InboxCaughtUpMark,
     InboxComposer,
     InboxContactSidebar,
     InboxEmbedSkeleton,
@@ -21,9 +20,8 @@ import type {
     InboxFolder,
 } from '@/components/crm/inbox-chrome';
 import { DeskGlass } from '@/components/desk/desk-glass';
-import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
-import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Button } from '@/evo/ui/button';
+import { EmptyState } from '@/evo/patterns/empty-state';
 import { ConversationList } from '@/evo/inbox';
 import { deskThreadToConversation } from '@/evo/inbox/adapters';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
@@ -110,7 +108,7 @@ function ConnectWhatsAppCta({
                         value={whatsapp?.provider ?? 'whatsapp_cloud'}
                     />
                     <Button disabled={processing}>
-                        Connect WhatsApp Cloud
+                        {t('Connect WhatsApp Cloud')}
                     </Button>
                 </>
             )}
@@ -137,7 +135,6 @@ function InboxEmpty({
                 configuredUrl={configuredUrl}
             />
             <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-10">
-                <InboxCaughtUpMark />
                 <EmptyState
                     as="h2"
                     icon={<Tray className="size-6" weight="regular" />}
@@ -149,10 +146,6 @@ function InboxEmpty({
                     className="border-0"
                 />
             </div>
-            <OfficialConnectPanel
-                connectors={officialConnectors}
-                hidePrimaryCta
-            />
         </div>
     );
 }
@@ -187,9 +180,9 @@ function DeskEmbedWorkspace({
         >
             <header className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline bg-white px-4 py-2">
                 <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-ink">Inbox</p>
+                    <p className="text-[13px] font-medium text-ink">{t('Inbox')}</p>
                     <p className="text-[11px] text-mute">
-                        Desk framed on this host · {host}
+                        {t('Desk framed on this host')} · {host}
                     </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -197,7 +190,7 @@ function DeskEmbedWorkspace({
                         href="/conversations"
                         className="text-[12px] text-mute underline-offset-2 hover:text-ink hover:underline"
                     >
-                        Conversation history
+                        {t('Conversation history')}
                     </Link>
                     {officialConnectors.some(
                         (connector) => connector.status !== 'connected',
@@ -206,7 +199,7 @@ function DeskEmbedWorkspace({
                             href="/settings/channels"
                             className="text-[12px] text-mute underline-offset-2 hover:text-ink hover:underline"
                         >
-                            Channels
+                            {t('Channels')}
                         </Link>
                     ) : null}
                 </div>
@@ -239,7 +232,7 @@ function DeskEmbedWorkspace({
                     </div>
                 ) : null}
                 <iframe
-                    title="EvoDesk inbox"
+                    title={t('EvoDesk inbox')}
                     src={embedUrl}
                     className="min-h-0 h-full w-full flex-1 border-0 bg-white"
                     allow="clipboard-write; microphone; camera"
@@ -271,7 +264,7 @@ export default function DeskInbox({
 
     if (embedUrl && !useNative) {
         return (
-            <DeskShell title="Inbox">
+            <DeskShell title={t('Inbox')}>
                 <DeskEmbedWorkspace
                     embedUrl={embedUrl}
                     officialConnectors={officialConnectors}
@@ -288,7 +281,7 @@ export default function DeskInbox({
         (folderCounts.all ?? threads.length) === 0;
 
     return (
-        <DeskShell title="Inbox">
+        <DeskShell title={t('Inbox')}>
             <div
                 className="flex h-full min-h-0 flex-col overflow-x-hidden bg-canvas-soft text-[13px] text-ink"
                 data-crm="inbox-workspace"
@@ -477,9 +470,9 @@ function FrontDesk({
         >
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
                 <AdaptiveWorkspaceShell
-                    leftLabel="Folders"
-                    centerLabel="Inbox"
-                    rightLabel="Conversation"
+                    leftLabel={t('Folders')}
+                    centerLabel={t('Inbox')}
+                    rightLabel={t('Conversation')}
                     defaultPanel="center"
                     left={
                         <InboxFolderRail

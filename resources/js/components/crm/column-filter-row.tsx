@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { filterFields } from '@/components/crm/list-query';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import type { ListObjectType, ListViewFilters } from '@/lib/list-view-config';
 
 type Member = { id: number; name: string };

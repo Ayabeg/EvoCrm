@@ -1,24 +1,3 @@
-import {
-    BarChart3,
-    Bot,
-    Building2,
-    Calendar,
-    FileText,
-    Handshake,
-    House,
-    Inbox,
-    LayoutGrid,
-    LifeBuoy,
-    Megaphone,
-    MessageCircle,
-    Search,
-    Send,
-    Settings,
-    UserPlus,
-    Users,
-    Waypoints,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { useEffect, useId, useMemo, useRef } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import {
@@ -33,35 +12,56 @@ import type {
     ShellNavItem,
 } from '@/components/shell/shell-data';
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/shell/tabs';
+import type { Icon } from '@/evo/icons';
+import {
+    Buildings,
+    CalendarBlank,
+    ChartBar,
+    ChatCircle,
+    FileText,
+    GearSix,
+    Handshake,
+    House,
+    Lifebuoy,
+    MagnifyingGlass,
+    Megaphone,
+    PaperPlaneTilt,
+    Path,
+    Robot,
+    SquaresFour,
+    Tray,
+    UserPlus,
+    Users,
+} from '@/evo/icons';
 import { cn } from '@/lib/utils';
 
-const MODES: { value: ShellMode; label: string; icon: LucideIcon }[] = [
-    { value: 'menu', label: 'Menu', icon: LayoutGrid },
-    { value: 'agents', label: 'Agents', icon: Bot },
-    { value: 'search', label: 'Search', icon: Search },
+const MODES: { value: ShellMode; label: string; icon: Icon }[] = [
+    { value: 'menu', label: 'Menu', icon: SquaresFour },
+    { value: 'agents', label: 'Agents', icon: Robot },
+    { value: 'search', label: 'Search', icon: MagnifyingGlass },
 ];
 
-const NAV_ICONS: Record<string, LucideIcon> = {
+const NAV_ICONS: Record<string, Icon> = {
     home: House,
-    inbox: Inbox,
-    companies: Building2,
+    inbox: Tray,
+    companies: Buildings,
     contacts: Users,
     leads: UserPlus,
     deals: Handshake,
-    'lead-os': Waypoints,
-    tickets: LifeBuoy,
-    meetings: Calendar,
+    'lead-os': Path,
+    tickets: Lifebuoy,
+    meetings: CalendarBlank,
     quotes: FileText,
-    outbound: Send,
-    whatsapp: MessageCircle,
+    outbound: PaperPlaneTilt,
+    whatsapp: ChatCircle,
     adhub: Megaphone,
-    reports: BarChart3,
-    settings: Settings,
+    reports: ChartBar,
+    settings: GearSix,
 };
 
-const HIT_ICONS: Record<SearchHit['kind'], LucideIcon> = {
+const HIT_ICONS: Record<SearchHit['kind'], Icon> = {
     Deal: Handshake,
-    Company: Building2,
+    Company: Buildings,
     Contact: Users,
     Lead: UserPlus,
 };
@@ -220,10 +220,10 @@ export function EvoSidebar({
                             className="flex h-8 items-center gap-2 rounded-[8px]"
                             key={agent.id}
                         >
-                            <Bot
+                            <Robot
                                 aria-hidden
                                 className="size-4 shrink-0 text-shell-ink-2/88"
-                                strokeWidth={1.75}
+                                weight="regular"
                             />
                             <span className="min-w-0 flex-1 truncate text-[13px] text-shell-ink">
                                 {agent.name}

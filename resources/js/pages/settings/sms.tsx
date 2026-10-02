@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
 import { ChatText } from '@phosphor-icons/react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
 import {
     SettingsCard,
     SettingsDangerZone,

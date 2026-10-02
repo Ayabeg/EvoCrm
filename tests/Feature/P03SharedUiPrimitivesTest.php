@@ -1,21 +1,20 @@
 <?php
 
 /**
- * P03 — DS primitives live in resources/js/ds/components/*.
- * @/components/ui/* re-exports so existing product imports keep working.
+ * P03 — Canonical primitives live in resources/js/evo/ui/*.
+ * Product imports @/evo/ui/* (sidebar/sonner/empty-illustration stay as implementations).
  * Does not own AppShell / rail width.
  */
 
 it('keeps product buttons on the Evo adapter with a 36px default control', function () {
-    $ds = file_get_contents(resource_path('js/ds/components/Button.tsx'));
-    $adapter = file_get_contents(resource_path('js/components/ui/button.tsx'));
     $bridge = file_get_contents(resource_path('js/lib/aurora/shadcn-bridge.ts'));
     $product = file_get_contents(resource_path('css/app.css'));
     $evo = file_get_contents(resource_path('js/evo/ui/button.tsx'));
 
-    expect($ds)->toContain("from '@/evo/ui/button'")
-        ->and($ds)->not->toContain('@/components/ui/aurora')
-        ->and($adapter)->toContain("from '@/ds/components/Button'")
+    expect($evo)->not->toContain('@/components/ui/aurora')
+        ->and($evo)->not->toContain('PremiumButton')
+        ->and($evo)->not->toContain('GlassButton')
+        ->and($evo)->toContain('data-slot="button"')
         ->and($bridge)->toContain("return { variant: 'default', filled: true }")
         ->and($evo)->toContain('evo-btn')
         ->and($evo)->toContain('h-9')
@@ -26,7 +25,7 @@ it('keeps product buttons on the Evo adapter with a 36px default control', funct
         ->and($product)->toContain('background: var(--primary)');
 });
 
-it('exposes the locked primitives on a single @/components/ui import path', function () {
+it('exposes the locked primitives on a single @/evo/ui import path', function () {
     $public = [
         'button',
         'input',
@@ -40,7 +39,6 @@ it('exposes the locked primitives on a single @/components/ui import path', func
         'dialog',
         'sheet',
         'drawer',
-        'sonner',
         'toast',
         'skeleton',
         'label',
@@ -50,59 +48,51 @@ it('exposes the locked primitives on a single @/components/ui import path', func
         'popover',
         'field',
         'callout',
-        'empty-state',
     ];
 
     foreach ($public as $name) {
-        expect(resource_path("js/components/ui/{$name}.tsx"))->toBeFile();
+        expect(resource_path("js/evo/ui/{$name}.tsx"))->toBeFile();
     }
 
-    $dsToUi = [
-        'Button' => 'button',
-        'Input' => 'input',
-        'Select' => 'select',
-        'Tabs' => 'tabs',
-        'Badge' => 'badge',
-        'Avatar' => 'avatar',
-        'Checkbox' => 'checkbox',
-        'Dropdown' => 'dropdown-menu',
-        'Tooltip' => 'tooltip',
-        'Modal' => 'dialog',
-        'Drawer' => 'drawer',
-        'Toast' => 'toast',
-        'Skeleton' => 'skeleton',
-        'EmptyState' => 'empty-state',
+    expect(resource_path('js/components/ui/sonner.tsx'))->toBeFile();
+    expect(resource_path('js/evo/patterns/empty-state/index.tsx'))->toBeFile();
+
+    $pages = [
+        'js/pages/auth/login.tsx' => '@/evo/ui/field',
+        'js/pages/auth/auth-status.tsx' => '@/evo/ui/callout',
+        'js/components/crm/create-drawer.tsx' => '@/evo/ui/drawer',
+        'js/components/crm/record-hub.tsx' => '@/evo/ui/card',
     ];
 
-    foreach ($dsToUi as $ds => $ui) {
-        $dsPath = resource_path("js/ds/components/{$ds}.tsx");
-        $uiPath = resource_path("js/components/ui/{$ui}.tsx");
-        expect($dsPath)->toBeFile();
-        expect(file_get_contents($uiPath))->toContain("@/ds/components/{$ds}");
-        expect(file_get_contents($dsPath))->not->toContain("@/components/ui/{$ui}'");
+    foreach ($pages as $file => $import) {
+        expect(file_get_contents(resource_path($file)))->toContain($import);
+    }
+
+    foreach ($public as $name) {
+        $src = file_get_contents(resource_path("js/evo/ui/{$name}.tsx"));
+        expect($src)->not->toContain("@/components/ui/{$name}'");
+        expect($src)->not->toContain("@/ds/components/");
     }
 });
 
 it('lets Input and Select accept a label above and an error string below', function () {
-    $input = file_get_contents(resource_path('js/ds/components/Input.tsx'));
-    $select = file_get_contents(resource_path('js/ds/components/Select.tsx'));
+    $input = file_get_contents(resource_path('js/evo/ui/input.tsx'));
+    $select = file_get_contents(resource_path('js/evo/ui/select.tsx'));
 
     expect($input)->toContain('label?:')
         ->and($input)->toContain('hint?:')
-        ->and($input)->toContain("error?: boolean | string")
+        ->and($input)->toContain('error?: boolean | string')
         ->and($input)->toContain('FieldError')
-        ->and($input)->toContain("from '@/evo/ui/input'")
         ->and($select)->toContain('label?:')
         ->and($select)->toContain('hint?:')
-        ->and($select)->toContain("error?: boolean | string")
-        ->and($select)->toContain('FieldError')
-        ->and($select)->toContain("from '@/evo/ui/select'");
+        ->and($select)->toContain('error?: boolean | string')
+        ->and($select)->toContain('FieldError');
 });
 
 it('does not introduce a third theme or Wave hex in public primitives', function () {
     $files = array_merge(
         glob(resource_path('js/components/ui/*.tsx')) ?: [],
-        glob(resource_path('js/ds/components/*.tsx')) ?: [],
+        glob(resource_path('js/evo/ui/*.tsx')) ?: [],
     );
 
     expect($files)->not->toBeEmpty();
@@ -134,6 +124,7 @@ it('uses Phosphor inside public-facing primitives that render icons', function (
         'js/evo/ui/sheet.tsx',
         'js/evo/ui/dropdown-menu.tsx',
         'js/evo/ui/badge.tsx',
+        'js/evo/ui/button.tsx',
     ];
 
     foreach ($files as $file) {
@@ -144,11 +135,11 @@ it('uses Phosphor inside public-facing primitives that render icons', function (
 
     expect(file_get_contents(resource_path('js/components/ui/breadcrumb.tsx')))
         ->toContain('@phosphor-icons/react');
-    expect(file_get_contents(resource_path('js/ds/components/Button.tsx')))
+    expect(file_get_contents(resource_path('js/evo/ui/button.tsx')))
         ->not->toContain('lucide-react');
-    expect(file_get_contents(resource_path('js/ds/components/Input.tsx')))
+    expect(file_get_contents(resource_path('js/evo/ui/input.tsx')))
         ->not->toContain('lucide-react');
-    expect(file_get_contents(resource_path('js/ds/components/Select.tsx')))
+    expect(file_get_contents(resource_path('js/evo/ui/select.tsx')))
         ->not->toContain('lucide-react');
 });
 
@@ -170,9 +161,9 @@ it('routes product FieldError and Callout through the public ui barrels', functi
     }
 
     expect(file_get_contents(resource_path('js/pages/auth/login.tsx')))
-        ->toContain("@/components/ui/field");
+        ->toContain("@/evo/ui/field");
     expect(file_get_contents(resource_path('js/pages/auth/auth-status.tsx')))
-        ->toContain("@/components/ui/callout");
+        ->toContain("@/evo/ui/callout");
 });
 
 it('locks control radius to 8px for Aurora inputs without a third palette', function () {

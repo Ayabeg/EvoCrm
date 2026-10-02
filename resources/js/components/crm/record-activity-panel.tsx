@@ -17,7 +17,7 @@ import {
     RecordNextAction,
     RecordTimelineItem,
 } from '@/components/crm/record-hub';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 
 const ACTIVITY_CHIPS = [
     { key: 'all', label: 'All' },

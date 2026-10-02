@@ -46,7 +46,7 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($list)->toContain('focus-visible:outline-[color:var(--color-focus-ring)]')
         ->and($list)->toContain('aria-label={`Select ${row.id}`}');
 
-    expect($table)->toContain('aria-label="Select page"')
+    expect($table)->toContain("aria-label={t('Select page')}")
         ->and($table)->toContain('aria-selected={onToggle ? selected : undefined}');
 
     expect($bulk)->toContain('aria-live="polite"')

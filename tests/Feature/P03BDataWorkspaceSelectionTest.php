@@ -131,7 +131,7 @@ it('preserves select-all as the current rendered page and marks indeterminate', 
         ->and($table)->toContain('element.indeterminate = somePageSelected')
         ->and($table)->toContain('aria-checked={')
         ->and($table)->toContain("'mixed'")
-        ->and($table)->toContain('aria-label="Select page"')
+        ->and($table)->toContain("aria-label={t('Select page')}")
         ->and($table)->toContain('aria-label={`Select ${row.id}`}')
         ->and($dataTable)->toContain('element.indeterminate = somePageSelected')
         ->and($dataTable)->toContain('onTogglePage()')

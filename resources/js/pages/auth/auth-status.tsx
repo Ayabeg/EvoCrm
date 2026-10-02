@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Callout } from '@/components/ui/callout';
+import { Callout } from '@/evo/ui/callout';
 
 export default function AuthStatus({ children }: { children: ReactNode }) {
     return (

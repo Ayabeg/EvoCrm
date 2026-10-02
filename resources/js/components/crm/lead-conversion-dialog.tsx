@@ -1,6 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/evo/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/evo/ui/dialog';
 
 type PipelineOption = {
     id: number;

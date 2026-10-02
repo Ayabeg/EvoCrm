@@ -1,9 +1,9 @@
 import { Form, Head, setLayoutProps } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
-import { FieldError } from '@/components/ui/field';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { FieldError } from '@/evo/ui/field';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
 import {
     InputOTP,
     InputOTPGroup,

@@ -92,6 +92,17 @@ export function InboxWorkspace({
                     />
                 </aside>
             ) : null}
+            {conversations.length === 0 ? (
+                <div className="grid min-h-0 min-w-0 flex-1 place-items-center px-5 py-10">
+                    <EmptyState
+                        density="page"
+                        icon={<Tray className="size-6" />}
+                        title={empty?.title ?? t('No open conversations here')}
+                        description={empty?.description ?? t("You're all caught up.")}
+                    />
+                </div>
+            ) : (
+            <>
             <div className="flex min-h-0 min-w-[17.5rem] w-[21.25rem] shrink-0 flex-col border-r border-[var(--evo-hairline)]">
                 {onChannelChange && !onQueryChange ? (
                     <div className="border-b border-[var(--evo-hairline)] px-3 py-2">
@@ -166,8 +177,10 @@ export function InboxWorkspace({
                 )}
             </section>
             <div className="hidden min-h-0 w-[17.5rem] shrink-0 overflow-y-auto bg-[var(--evo-surface)] xl:block">
-                <CRMContext record={context} empty="No CRM context" />
+                <CRMContext record={context} empty={t('No CRM context')} />
             </div>
+            </>
+            )}
         </div>
     );
 }

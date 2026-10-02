@@ -129,12 +129,21 @@ const DEAL_COLUMN_WIDTHS: Record<string, string> = {
 };
 
 const QUOTE_COLUMN_WIDTHS: Record<string, string> = {
-    title: 'w-[28%]',
-    amount: 'w-[14%]',
-    status: 'w-[10%]',
-    owner: 'w-[16%]',
-    created_at: 'w-[16%]',
-    expires_at: 'w-[16%]',
+    title: 'w-[26%] min-w-[12rem]',
+    amount: 'w-[16%] min-w-[8.5rem]',
+    status: 'w-[10%] min-w-[6.5rem]',
+    owner: 'w-[16%] min-w-[8rem]',
+    created_at: 'w-[16%] min-w-[8rem]',
+    expires_at: 'w-[16%] min-w-[8rem]',
+};
+
+const TICKET_COLUMN_WIDTHS: Record<string, string> = {
+    subject: 'min-w-[16rem]',
+    ticket: 'min-w-[16rem]',
+    status: 'min-w-[7rem]',
+    priority: 'min-w-[6.5rem]',
+    owner: 'min-w-[8rem]',
+    company: 'min-w-[8rem]',
 };
 
 function companyColumnWidth(columnId: string): string {
@@ -150,7 +159,11 @@ function dealColumnWidth(columnId: string): string {
 }
 
 function quoteColumnWidth(columnId: string): string {
-    return QUOTE_COLUMN_WIDTHS[columnId] ?? 'w-[14%]';
+    return QUOTE_COLUMN_WIDTHS[columnId] ?? 'w-[14%] min-w-[7rem]';
+}
+
+function ticketColumnWidth(columnId: string): string {
+    return TICKET_COLUMN_WIDTHS[columnId] ?? 'min-w-[7rem]';
 }
 
 function widthClass(entity: ListObjectType, columnId: string): string | undefined {
@@ -168,6 +181,10 @@ function widthClass(entity: ListObjectType, columnId: string): string | undefine
 
     if (entity === 'quote') {
         return quoteColumnWidth(columnId);
+    }
+
+    if (entity === 'ticket') {
+        return ticketColumnWidth(columnId);
     }
 
     return undefined;
@@ -242,8 +259,9 @@ export function CrmListTable<Row extends { id: RowId }>({
 
     const dealTable = entity === 'deal';
     const quoteTable = entity === 'quote';
+    const ticketTable = entity === 'ticket';
     const fixedTable =
-        entity === 'company' || entity === 'lead' || dealTable || quoteTable;
+        entity === 'company' || entity === 'lead' || dealTable || quoteTable || ticketTable;
 
     const gridColumns = useMemo<EvoDataGridColumn<Row>[]>(() => {
         const selectColumn: EvoDataGridColumn<Row>[] = selectable
@@ -263,7 +281,7 @@ export function CrmListTable<Row extends { id: RowId }>({
                                   }
                               }}
                               onChange={onTogglePage}
-                              aria-label="Select page"
+                              aria-label={t('Select page')}
                               aria-checked={
                                   somePageSelected
                                       ? 'mixed'
@@ -286,7 +304,7 @@ export function CrmListTable<Row extends { id: RowId }>({
                                           : selectedIds.length + 1,
                                   );
                               }}
-                              aria-label={`Select ${row.original.id}`}
+                              aria-label={t('Select :id', { id: String(row.original.id) })}
                           />
                       ),
                   } satisfies ColumnDef<Row, unknown> & { id: string },
@@ -370,10 +388,12 @@ export function CrmListTable<Row extends { id: RowId }>({
                         dealTable
                             ? 'table-fixed min-w-[68rem]'
                             : quoteTable
-                              ? 'table-fixed min-w-[60rem]'
-                              : fixedTable
-                                ? 'table-fixed min-w-[52rem]'
-                                : 'min-w-[640px]',
+                              ? 'table-fixed min-w-[64rem]'
+                              : ticketTable
+                                ? 'table-fixed min-w-[56rem]'
+                                : fixedTable
+                                  ? 'table-fixed min-w-[52rem]'
+                                  : 'min-w-[640px]',
                     )}
                     rowClassName={cn(
                         'h-9',
@@ -388,7 +408,11 @@ export function CrmListTable<Row extends { id: RowId }>({
                             'aria-selected': selectable ? selected : undefined,
                             'data-row-peek': onRowPeek ? 'true' : undefined,
                             'aria-label': onRowPeek
-                                ? `Inspect ${renderListCell(entity, primaryId, asListRow(row))}`
+                                ? t('Inspect :label', {
+                                      label: String(
+                                          renderListCell(entity, primaryId, asListRow(row)),
+                                      ),
+                                  })
                                 : undefined,
                             tabIndex: onRowPeek ? 0 : 0,
                             className: selected ? 'bg-[var(--evo-teal-soft)]' : undefined,

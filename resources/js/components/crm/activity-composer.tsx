@@ -2,8 +2,8 @@ import { Form, Link } from '@inertiajs/react';
 import type { Icon } from '@phosphor-icons/react';
 import { Calendar, CheckSquare, Envelope, Note, Phone } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
 
 export type ComposerType = 'note' | 'email' | 'call' | 'task' | 'meeting';
 

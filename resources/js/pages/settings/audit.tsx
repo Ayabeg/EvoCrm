@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/evo/ui/card';
 import { SettingsPageHeader } from '@/evo/patterns/settings';
 import { t } from '@/lib/i18n';
 

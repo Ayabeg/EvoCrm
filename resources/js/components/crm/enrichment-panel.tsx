@@ -1,8 +1,8 @@
 import { Form } from '@inertiajs/react';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { RecordSection } from '@/components/crm/record-hub';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/evo/ui/badge';
+import { Button } from '@/evo/ui/button';
 
 export type EnrichmentRunRow = {
     id: number;

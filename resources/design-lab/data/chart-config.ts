@@ -4,50 +4,50 @@ export const evoChartConfig = {
     revenue: {
         label: 'CA gagné',
         colors: {
-            light: ['#0F4C5C'],
-            dark: ['#0F4C5C'],
+            light: ['var(--evo-teal)'],
+            dark: ['var(--evo-teal)'],
         },
     },
     pipeline: {
         label: 'Pipeline',
         colors: {
-            light: ['#0D1B24'],
-            dark: ['#0D1B24'],
+            light: ['var(--evo-ink)'],
+            dark: ['var(--evo-ink)'],
         },
     },
     spend: {
         label: 'Dépensé',
         colors: {
-            light: ['#0D1B24'],
-            dark: ['#0D1B24'],
+            light: ['var(--evo-ink)'],
+            dark: ['var(--evo-ink)'],
         },
     },
     leads: {
         label: 'Leads Inbox',
         colors: {
-            light: ['#0F4C5C'],
-            dark: ['#0F4C5C'],
+            light: ['var(--evo-teal)'],
+            dark: ['var(--evo-teal)'],
         },
     },
     value: {
         label: 'Volume',
         colors: {
-            light: ['#0D1B24'],
-            dark: ['#0D1B24'],
+            light: ['var(--evo-ink)'],
+            dark: ['var(--evo-ink)'],
         },
     },
     cumulative: {
         label: 'CA cumulé',
         colors: {
-            light: ['#0F4C5C'],
-            dark: ['#0F4C5C'],
+            light: ['var(--evo-teal)'],
+            dark: ['var(--evo-teal)'],
         },
     },
     won: {
         label: 'CA gagné',
         colors: {
-            light: ['#0F4C5C'],
-            dark: ['#0F4C5C'],
+            light: ['var(--evo-teal)'],
+            dark: ['var(--evo-teal)'],
         },
     },
 } satisfies ChartConfig;
@@ -85,34 +85,34 @@ export const campaignCompareChartConfig = {
 export const sankeyChartConfig = {
     'WA Cliniques Alger': {
         label: 'WA Cliniques Alger',
-        colors: { light: ['#0F4C5C'], dark: ['#0F4C5C'] },
+        colors: { light: ['var(--evo-teal)'], dark: ['var(--evo-teal)'] },
     },
     'Devis CRM Santé': {
         label: 'Devis CRM Santé',
-        colors: { light: ['#0D1B24'], dark: ['#0D1B24'] },
+        colors: { light: ['var(--evo-ink)'], dark: ['var(--evo-ink)'] },
     },
     'Retargeting Devis': {
         label: 'Retargeting Devis',
-        colors: { light: ['#5B6B73'], dark: ['#5B6B73'] },
+        colors: { light: ['var(--evo-ink-muted)'], dark: ['var(--evo-ink-muted)'] },
     },
     'Prospecting Oran': {
         label: 'Prospecting Oran',
-        colors: { light: ['#8A969C'], dark: ['#8A969C'] },
+        colors: { light: ['var(--evo-ink-muted)'], dark: ['var(--evo-ink-muted)'] },
     },
     'Sources organiques': {
         label: 'Sources organiques',
-        colors: { light: ['#1A2C36'], dark: ['#1A2C36'] },
+        colors: { light: ['var(--evo-ink)'], dark: ['var(--evo-ink)'] },
     },
     'Pipeline ouvert': {
         label: 'Pipeline ouvert',
-        colors: { light: ['#0D1B24'], dark: ['#0D1B24'] },
+        colors: { light: ['var(--evo-ink)'], dark: ['var(--evo-ink)'] },
     },
     Gagné: {
         label: 'Gagné',
-        colors: { light: ['#0F4C5C'], dark: ['#0F4C5C'] },
+        colors: { light: ['var(--evo-teal)'], dark: ['var(--evo-teal)'] },
     },
     Perdu: {
         label: 'Perdu',
-        colors: { light: ['#5B6B73'], dark: ['#5B6B73'] },
+        colors: { light: ['var(--evo-ink-muted)'], dark: ['var(--evo-ink-muted)'] },
     },
 } satisfies ChartConfig;

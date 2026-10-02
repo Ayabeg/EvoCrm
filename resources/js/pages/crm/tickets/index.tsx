@@ -5,9 +5,9 @@ import { hasActiveListFilters } from '@/components/crm/list-query';
 import { MorphingForm } from '@/components/crm/morphing-form';
 import type { StagePill } from '@/components/crm/stage-pills';
 import TicketLayoutToggle from '@/components/crm/ticket-layout-toggle';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {
