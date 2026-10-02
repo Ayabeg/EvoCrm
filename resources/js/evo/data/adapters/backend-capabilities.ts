@@ -16,7 +16,7 @@
  * CANNOT / gaps:
  * - Nested groups deeper than 2 levels — silently dropped by parseFilterGroups
  * - Unknown operators are no-ops
- * - Deal board still uses `applyToDeals` (PR5)
+ * - Deal board calls `apply('deal')` so two-level `filter_groups` execute (PR5)
  *
  * UI rule: FilterBuilder exposes only two levels. Nested ReUI trees are flattened
  * by `flattenToWorkspaceFilters` before URL / Inertia serialization.

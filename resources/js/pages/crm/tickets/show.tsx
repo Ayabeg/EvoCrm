@@ -2,27 +2,25 @@ import { Form, Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
-import { DeskGlass } from '@/components/desk/desk-glass';
 import { SkeletonRecord } from '@/components/crm/empty-room';
 import { InlineRecordField } from '@/components/crm/inline-record-field';
 import {
     AssociationCard,
     RecordBack,
-    RecordShell,
     RelatedRecordLink,
 } from '@/components/crm/record-chrome';
 import {
     RecordFact,
     RecordFactList,
-    RecordIdentity,
-    RecordPageFrame,
     RecordSection,
     RecordStatusBadge,
 } from '@/components/crm/record-hub';
 import { RecordPath } from '@/components/crm/record-path';
 import type { PathStep } from '@/components/crm/record-path';
+import { DeskGlass } from '@/components/desk/desk-glass';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 
 type TicketRecord = {
@@ -39,7 +37,11 @@ type TicketRecord = {
     sla_label?: string | null;
     sla_breached?: boolean;
     thread_id?: number | null;
-    contact?: { id: number; first_name: string; last_name?: string | null } | null;
+    contact?: {
+        id: number;
+        first_name: string;
+        last_name?: string | null;
+    } | null;
     company?: { id: number; name: string } | null;
     owner?: { id: number; name: string } | null;
     deal?: { id: number; title: string } | null;
@@ -93,7 +95,11 @@ export default function TicketShow({
         } | null;
         company?: { id: number; name: string } | null;
         deal?: { id: number; title: string } | null;
-        quotes?: { id: number; status?: string | null; total_cents?: number | null }[];
+        quotes?: {
+            id: number;
+            status?: string | null;
+            total_cents?: number | null;
+        }[];
     };
 }) {
     const loading = useInertiaLoading();
@@ -134,21 +140,28 @@ export default function TicketShow({
                 <RecordPageFrame
                     header={
                         <>
-                            <RecordBack href="/crm/tickets" label="Back to Tickets" />
+                            <RecordBack
+                                href="/crm/tickets"
+                                label="Back to Tickets"
+                            />
                             <RecordIdentity
                                 title={ticket.subject}
                                 kind={ticket.number}
                                 subtitle={
                                     <>
                                         {contactName}
-                                        {company?.name ? ` · ${company.name}` : ''}
+                                        {company?.name
+                                            ? ` · ${company.name}`
+                                            : ''}
                                         {ticket.owner?.name
                                             ? ` · ${ticket.owner.name}`
                                             : ' · Unassigned'}
                                     </>
                                 }
                                 badge={
-                                    <RecordStatusBadge>{ticket.status_label}</RecordStatusBadge>
+                                    <RecordStatusBadge>
+                                        {ticket.status_label}
+                                    </RecordStatusBadge>
                                 }
                                 actions={
                                     <div className="md:hidden">
@@ -178,7 +191,10 @@ export default function TicketShow({
                             <div className="space-y-4">
                                 <RecordSection title="About">
                                     <RecordFactList>
-                                        <RecordFact label="Number" value={ticket.number} />
+                                        <RecordFact
+                                            label="Number"
+                                            value={ticket.number}
+                                        />
                                         <RecordFact
                                             label="Status"
                                             value={ticket.status_label}
@@ -209,14 +225,24 @@ export default function TicketShow({
                                                 onChange={(event) =>
                                                     router.put(
                                                         action,
-                                                        { priority: event.target.value },
-                                                        { preserveScroll: true },
+                                                        {
+                                                            priority:
+                                                                event.target
+                                                                    .value,
+                                                        },
+                                                        {
+                                                            preserveScroll: true,
+                                                        },
                                                     )
                                                 }
                                             >
                                                 <option value="low">Low</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="high">High</option>
+                                                <option value="medium">
+                                                    Medium
+                                                </option>
+                                                <option value="high">
+                                                    High
+                                                </option>
                                             </select>
                                         </label>
                                         <label className="block">
@@ -229,14 +255,25 @@ export default function TicketShow({
                                                 onChange={(event) =>
                                                     router.put(
                                                         action,
-                                                        { owner_id: event.target.value },
-                                                        { preserveScroll: true },
+                                                        {
+                                                            owner_id:
+                                                                event.target
+                                                                    .value,
+                                                        },
+                                                        {
+                                                            preserveScroll: true,
+                                                        },
                                                     )
                                                 }
                                             >
-                                                <option value="">Unassigned</option>
+                                                <option value="">
+                                                    Unassigned
+                                                </option>
                                                 {members.map((member) => (
-                                                    <option key={member.id} value={member.id}>
+                                                    <option
+                                                        key={member.id}
+                                                        value={member.id}
+                                                    >
                                                         {member.name}
                                                     </option>
                                                 ))}
@@ -270,7 +307,8 @@ export default function TicketShow({
                                     <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-canvas-soft p-3">
                                         {messages.length === 0 ? (
                                             <p className="text-[13px] text-mute">
-                                                Thread is attached. Reply on WhatsApp below.
+                                                Thread is attached. Reply on
+                                                WhatsApp below.
                                             </p>
                                         ) : (
                                             messages.map((message) => (
@@ -279,7 +317,8 @@ export default function TicketShow({
                                                     className={`max-w-[80%] rounded-[18px] px-3.5 py-2.5 ${
                                                         message.type === 'note'
                                                             ? 'bg-muted text-ink'
-                                                            : message.direction === 'outbound'
+                                                            : message.direction ===
+                                                                'outbound'
                                                               ? 'ml-auto border border-hairline bg-canvas text-ink'
                                                               : 'bg-canvas text-ink shadow-[var(--aurora-shadow-medium)]'
                                                     }`}
@@ -289,7 +328,9 @@ export default function TicketShow({
                                                             Private note
                                                         </p>
                                                     ) : null}
-                                                    <p className="text-[13px]">{message.body}</p>
+                                                    <p className="text-[13px]">
+                                                        {message.body}
+                                                    </p>
                                                 </div>
                                             ))
                                         )}
@@ -300,11 +341,16 @@ export default function TicketShow({
                                         resetOnSuccess={['body']}
                                     >
                                         {({ processing }) => (
-                                            <DeskGlass as="footer" className="border-t p-3">
+                                            <DeskGlass
+                                                as="footer"
+                                                className="border-t p-3"
+                                            >
                                                 <div className="mb-2 flex gap-3">
                                                     <button
                                                         type="button"
-                                                        onClick={() => setMode('reply')}
+                                                        onClick={() =>
+                                                            setMode('reply')
+                                                        }
                                                         className={
                                                             mode === 'reply'
                                                                 ? 'border-b-2 border-brand pb-1 text-[13px] font-medium'
@@ -315,7 +361,9 @@ export default function TicketShow({
                                                     </button>
                                                     <button
                                                         type="button"
-                                                        onClick={() => setMode('note')}
+                                                        onClick={() =>
+                                                            setMode('note')
+                                                        }
                                                         className={
                                                             mode === 'note'
                                                                 ? 'border-b-2 border-brand pb-1 text-[13px] font-medium'
@@ -343,7 +391,9 @@ export default function TicketShow({
                                                     className="min-h-20"
                                                 />
                                                 <div className="mt-2 flex justify-end">
-                                                    <Button disabled={processing}>
+                                                    <Button
+                                                        disabled={processing}
+                                                    >
                                                         {mode === 'note'
                                                             ? 'Add note'
                                                             : 'Send on WhatsApp'}
@@ -360,48 +410,58 @@ export default function TicketShow({
                                             Open WhatsApp / attach thread
                                         </p>
                                         <p className="mt-1 text-[12px] text-mute">
-                                            A ticket needs a Desk thread, not an empty
-                                            conversation. Contact is already {contactName}.
+                                            A ticket needs a Desk thread, not an
+                                            empty conversation. Contact is
+                                            already {contactName}.
                                         </p>
                                         <div className="mt-3 flex flex-wrap gap-2">
                                             <Button asChild size="sm">
-                                                <Link href="/inbox">Open WhatsApp</Link>
+                                                <Link href="/inbox">
+                                                    Open WhatsApp
+                                                </Link>
                                             </Button>
                                         </div>
                                         {attachableThreads.length > 0 ? (
                                             <ul className="mt-4 space-y-2">
-                                                {attachableThreads.map((row) => (
-                                                    <li
-                                                        key={row.id}
-                                                        className="flex items-center justify-between gap-2 border-b border-hairline py-1.5"
-                                                    >
-                                                        <span className="truncate text-[13px] text-ink">
-                                                            {row.subject ?? `Thread ${row.id}`}
-                                                        </span>
-                                                        <Form
-                                                            action={`/crm/tickets/${ticket.id}/thread`}
-                                                            method="post"
+                                                {attachableThreads.map(
+                                                    (row) => (
+                                                        <li
+                                                            key={row.id}
+                                                            className="flex items-center justify-between gap-2 border-b border-hairline py-1.5"
                                                         >
-                                                            <input
-                                                                type="hidden"
-                                                                name="thread_id"
-                                                                value={row.id}
-                                                            />
-                                                            <Button
-                                                                type="submit"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="h-7 px-2 text-[12px]"
+                                                            <span className="truncate text-[13px] text-ink">
+                                                                {row.subject ??
+                                                                    `Thread ${row.id}`}
+                                                            </span>
+                                                            <Form
+                                                                action={`/crm/tickets/${ticket.id}/thread`}
+                                                                method="post"
                                                             >
-                                                                Attach thread
-                                                            </Button>
-                                                        </Form>
-                                                    </li>
-                                                ))}
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="thread_id"
+                                                                    value={
+                                                                        row.id
+                                                                    }
+                                                                />
+                                                                <Button
+                                                                    type="submit"
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="h-7 px-2 text-[12px]"
+                                                                >
+                                                                    Attach
+                                                                    thread
+                                                                </Button>
+                                                            </Form>
+                                                        </li>
+                                                    ),
+                                                )}
                                             </ul>
                                         ) : (
                                             <p className="mt-3 text-[12px] text-mute">
-                                                No Desk thread on this contact yet.
+                                                No Desk thread on this contact
+                                                yet.
                                             </p>
                                         )}
                                     </div>
@@ -410,7 +470,10 @@ export default function TicketShow({
                         }
                         right={
                             <div className="space-y-3">
-                                <AskEvoPanel action={askAction} insight={askEvo} />
+                                <AskEvoPanel
+                                    action={askAction}
+                                    insight={askEvo}
+                                />
                                 <AssociationCard
                                     title="Contact"
                                     addHref={
@@ -427,7 +490,9 @@ export default function TicketShow({
                                             {contactName}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">Required contact missing</p>
+                                        <p className="text-mute">
+                                            Required contact missing
+                                        </p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard
@@ -442,7 +507,9 @@ export default function TicketShow({
                                     addLabel={deal ? 'View' : 'Add'}
                                 >
                                     {deal ? (
-                                        <RelatedRecordLink href={`/crm/deals/${deal.id}`}>
+                                        <RelatedRecordLink
+                                            href={`/crm/deals/${deal.id}`}
+                                        >
                                             {deal.title}
                                         </RelatedRecordLink>
                                     ) : (
@@ -452,9 +519,14 @@ export default function TicketShow({
                                 {quotes.length > 0 ? (
                                     <AssociationCard title="Quotes">
                                         {quotes.map((quote) => (
-                                            <p key={quote.id} className="text-[13px] text-ink">
+                                            <p
+                                                key={quote.id}
+                                                className="text-[13px] text-ink"
+                                            >
                                                 Quote #{quote.id}
-                                                {quote.status ? ` · ${quote.status}` : ''}
+                                                {quote.status
+                                                    ? ` · ${quote.status}`
+                                                    : ''}
                                             </p>
                                         ))}
                                     </AssociationCard>
@@ -476,7 +548,8 @@ export default function TicketShow({
                                         </RelatedRecordLink>
                                     ) : (
                                         <p className="text-mute">
-                                            Open WhatsApp / attach a Desk thread.
+                                            Open WhatsApp / attach a Desk
+                                            thread.
                                         </p>
                                     )}
                                 </AssociationCard>

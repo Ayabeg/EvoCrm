@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\Quote;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -121,7 +122,8 @@ it('builds one QuickRecordDrawer shell with typed adapters instead of five drawe
         ->and($adapters)->toContain('adaptCompany')
         ->and($adapters)->toContain('adaptLead')
         ->and($adapters)->toContain('adaptDeal')
-        ->and($adapters)->toContain('adaptQuote');
+        ->and($adapters)->toContain('adaptQuote')
+        ->and($adapters)->toContain('adaptTicket');
 
     expect($layout)->toContain('QuickRecordProvider')
         ->and($layout)->toContain('QuickRecordDrawer');
@@ -150,7 +152,7 @@ it('locks RecordRef descriptors adapters history stale protection and the P10 in
     $contact = file_get_contents(resource_path('js/ds/workspace/record-adapters/contact.ts'));
     $present = file_get_contents(resource_path('js/ds/workspace/record-adapters/present.ts'));
 
-    expect($types)->toContain("'contact', 'company', 'lead', 'deal', 'quote'")
+    expect($types)->toContain("'contact', 'company', 'lead', 'deal', 'quote', 'ticket'")
         ->and($types)->toContain('export type RecordRef')
         ->and($types)->toContain('export type RecordDescriptor')
         ->and($types)->toContain('fullRecordHref')
@@ -161,7 +163,8 @@ it('locks RecordRef descriptors adapters history stale protection and the P10 in
         ->and($ref)->toContain("contact: '/crm/contacts'")
         ->and($ref)->toContain("lead: '/crm/leads'")
         ->and($ref)->toContain("deal: '/crm/deals'")
-        ->and($ref)->toContain("quote: '/crm/quotes'");
+        ->and($ref)->toContain("quote: '/crm/quotes'")
+        ->and($ref)->toContain("ticket: '/crm/tickets'");
 
     expect($url)->toContain("export const PEEK_QUERY_KEY = 'peek'")
         ->and($url)->toContain('P09 does not sync it on production lists')
@@ -347,8 +350,20 @@ it('scopes peek to the workspace and follows real update permissions', function 
         ->getJson('/crm/records/contact/999999/peek')
         ->assertNotFound();
 
+    $ticket = Ticket::factory()->create([
+        'workspace_id' => $owner->workspace_id,
+        'contact_id' => $contact->id,
+        'subject' => 'Scialytique en panne',
+    ]);
+
     $this->actingAs($owner)
-        ->getJson('/crm/records/ticket/1/peek')
+        ->getJson("/crm/records/ticket/{$ticket->id}/peek")
+        ->assertOk()
+        ->assertJsonPath('type', 'ticket')
+        ->assertJsonPath('record.subject', 'Scialytique en panne');
+
+    $this->actingAs($owner)
+        ->getJson('/crm/records/ticket/999999/peek')
         ->assertNotFound();
 });
 

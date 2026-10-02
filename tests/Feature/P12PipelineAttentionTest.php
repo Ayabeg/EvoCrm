@@ -80,7 +80,8 @@ it('locks P12 one evaluator two shipped signals and no invented engines', functi
     $adapter = File::get(resource_path('js/lib/list-query/adapters.ts'));
     $keys = File::get(resource_path('js/lib/list-query/keys.ts'));
     $queue = File::get(resource_path('js/components/crm/deal-attention-queue.tsx'));
-    $board = File::get(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'));
+    $board = File::get(resource_path('js/pages/crm/deals/deal-pipeline-board.tsx'))
+        .File::get(resource_path('js/evo/crm/pipeline/DealCard.tsx'));
     $columns = File::get(resource_path('js/pages/crm/deals/deal-columns.tsx'));
     $drawer = File::get(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
     $url = File::get(resource_path('js/ds/workspace/quick-record/url.ts'));

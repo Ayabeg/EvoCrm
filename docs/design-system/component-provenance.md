@@ -266,3 +266,20 @@ Reports + Automation reuse PR3 FilterBuilder / DataGrid and PR9 Recharts wrapper
 Compatibility shims: `components/crm/workflow-builder.tsx`, `workflow-execution-history.tsx`, `segment-filter-form.tsx`.
 
 No new npm dependencies. Recharts / Phosphor licenses already listed.
+
+## PR5 copy log (2026-10-02)
+
+Record / pipeline / quote families are custom Evo on `evo/ui/*`. Pipeline reuses PR8 dnd-kit (do not re-add). ForecastBar reuses PR9 `evo/charts` FunnelChart. No new npm. No AGPL, no Aurora, no lucide-react.
+
+| Component | Source | License | Destination | Notes |
+|---|---|---|---|---|
+| RecordWorkspace / Identity / Actions / Path / Properties / Associations / Related / Timeline / Composer / NextAction / CRMContext / QuickRecord | custom Evo | MIT (original) | `resources/js/evo/crm/record/` | 3-pane CRM record; tokens only; French `t()`. |
+| Pipeline / Column / Card / DealCard / TicketCard / DragOverlay / LostReasonDialog | custom Evo (ReUI kanban as visual reference) + dnd-kit | MIT | `resources/js/evo/crm/pipeline/` | KeyboardSensor + French announcements. Reuses PR8 dnd-kit versions. |
+| ForecastBar | custom Evo on PR9 `evo/charts` | MIT | `evo/crm/pipeline/ForecastBar.tsx` | FunnelChart for stage distribution. Production board keeps `DealForecastBar`. |
+| QuoteWorkspace / LineItems / MoneyEditor / Totals / PDFPreview / QuoteLifecycle | custom Evo | MIT (original) | `resources/js/evo/crm/quote/` | MoneyInput DA; production show keeps QuoteSplitBuilder. |
+| Design Lab `/record` `/pipeline` `/quote` | custom Evo | MIT (original) | `resources/design-lab/pages/{Record,Pipeline,Quote}LabPage.tsx` | Clinique El Djazair · Équipement bloc opératoire · 1 280 000 DA. |
+| Ticket peek adapter | custom Evo | MIT | `ds/workspace/record-adapters/ticket.ts` + `TicketPolicy` | Workspace view; no auth weaken. |
+
+No new npm dependencies. dnd-kit rows stay in the PR8 log. Recharts / evo/charts stay in the PR9 log. PR10 Donut / HorizontalBar wrappers stay in the PR10 log.
+
+AGPL leftover in `resources/js`: **zero**.

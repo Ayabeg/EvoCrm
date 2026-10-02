@@ -216,7 +216,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/ask-evo/context', [AskEvoController::class, 'context'])->name('ask-evo.context');
     Route::post('/ask-evo', [AskEvoController::class, 'ask'])->name('ask-evo');
     Route::get('/crm/records/{type}/{id}/peek', [QuickRecordController::class, 'peek'])
-        ->whereIn('type', ['contact', 'company', 'lead', 'deal', 'quote'])
+        ->whereIn('type', ['contact', 'company', 'lead', 'deal', 'quote', 'ticket'])
         ->whereNumber('id')
         ->name('crm.records.peek');
 

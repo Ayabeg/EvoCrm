@@ -20,14 +20,11 @@ import {
     AssociationCard,
     RecordActions,
     RecordBack,
-    RecordShell,
     RelatedRecordLink,
 } from '@/components/crm/record-chrome';
 import {
     RecordFact,
     RecordFactList,
-    RecordIdentity,
-    RecordPageFrame,
     RecordSection,
     RecordStatusBadge,
 } from '@/components/crm/record-hub';
@@ -36,6 +33,7 @@ import type { AttributeBag } from '@/components/crm/record-properties';
 import TicketsRelatedCard from '@/components/crm/tickets-related-card';
 import type { TicketsRelated } from '@/components/crm/tickets-related-card';
 import { Button } from '@/components/ui/button';
+import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
 import { formatDzd } from '@/lib/money';
@@ -286,7 +284,9 @@ export default function DealShow({
                                             <>
                                                 <select
                                                     name="stage_id"
-                                                    defaultValue={deal.stage?.id ?? ''}
+                                                    defaultValue={
+                                                        deal.stage?.id ?? ''
+                                                    }
                                                     className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
                                                 >
                                                     {stages.map((stage) => (
@@ -408,7 +408,8 @@ export default function DealShow({
                                         catchUp?.inbound?.[0]
                                             ? {
                                                   id: thread?.id,
-                                                  subject: catchUp.inbound[0].label,
+                                                  subject:
+                                                      catchUp.inbound[0].label,
                                                   last_message:
                                                       catchUp.inbound[0].label,
                                               }
@@ -460,7 +461,9 @@ export default function DealShow({
                                 <AssociationCard
                                     title="Quotes"
                                     addHref="/crm/quotes"
-                                    addLabel={quotes.length > 0 ? 'View' : 'Add'}
+                                    addLabel={
+                                        quotes.length > 0 ? 'View' : 'Add'
+                                    }
                                 >
                                     {quotes.length === 0 ? (
                                         <p className="text-mute">

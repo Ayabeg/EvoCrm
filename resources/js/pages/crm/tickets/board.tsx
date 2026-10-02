@@ -1,22 +1,16 @@
 import { Link, router } from '@inertiajs/react';
-import { useState } from 'react';
-import type { DragEvent } from 'react';
 import { toast } from 'sonner';
 import { CrmObjectHeader } from '@/components/crm/crm-object-header';
 import { CrmShell } from '@/components/crm/crm-shell';
-import {
-    PipelineKanban,
-    PipelineKanbanCard,
-    PipelineKanbanColumn,
-    PipelineKanbanEmpty,
-    PipelineKanbanHeader,
-    PipelineKanbanStack,
-} from '@/components/crm/pipeline-kanban';
 import TicketLayoutToggle from '@/components/crm/ticket-layout-toggle';
 import { Button } from '@/components/ui/button';
+import { Pipeline } from '@/evo/crm/pipeline/Pipeline';
+import { TicketCard } from '@/evo/crm/pipeline/TicketCard';
+import type { PipelineColumnData } from '@/evo/crm/pipeline/types';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
-import { cn } from '@/lib/utils';
+import { t } from '@/lib/i18n';
 import { stageUnderlineColor } from '@/lib/stage-colors';
+import { cn } from '@/lib/utils';
 
 type BoardColumn = {
     id: number;
@@ -41,96 +35,35 @@ type BoardTicket = {
     url: string;
 };
 
-function TicketCard({
-    ticket,
-    dragging,
-    onDragStart,
-    onDragEnd,
-}: {
-    ticket: BoardTicket;
-    dragging: boolean;
-    onDragStart: (event: DragEvent, ticketId: number) => void;
-    onDragEnd: () => void;
-}) {
-    const association = ticket.company_name || ticket.contact_name || 'No company';
+function BoardTicketCard({ ticket }: { ticket: BoardTicket }) {
+    const association =
+        ticket.company_name || ticket.contact_name || t('No company');
     const inactiveLabel =
         ticket.inactive_days && ticket.inactive_days >= 1
             ? `Inactive for ${ticket.inactive_days} day${ticket.inactive_days === 1 ? '' : 's'}`
             : null;
-    const showSla = ticket.status !== 'closed' && Boolean(ticket.sla_label) && ticket.sla_label !== '—';
+    const showSla =
+        ticket.status !== 'closed' &&
+        Boolean(ticket.sla_label) &&
+        ticket.sla_label !== '—';
 
     return (
-        <PipelineKanbanCard
-            dragging={dragging}
-            testId={`ticket-card-${ticket.id}`}
-            onDragStart={(event) => onDragStart(event, ticket.id)}
-            onDragEnd={onDragEnd}
+        <TicketCard
+            ticket={{
+                id: ticket.id,
+                subject: ticket.subject,
+                number: ticket.number,
+                association,
+                owner: ticket.owner_name,
+                href: ticket.url,
+                priority: ticket.priority ?? null,
+                sla: showSla ? ticket.sla_label : null,
+                sla_label: showSla ? ticket.sla_label : null,
+                slaBreached: ticket.sla_breached,
+                inactive: inactiveLabel,
+            }}
             onOpen={() => router.visit(ticket.url)}
-        >
-            <div className="flex items-start justify-between gap-2">
-                <Link
-                    href={ticket.url}
-                    className="block min-w-0 truncate font-medium text-ink hover:underline"
-                >
-                    {ticket.subject}
-                </Link>
-                {ticket.priority && ticket.priority !== 'medium' ? (
-                    <span
-                        className={
-                            ticket.priority === 'high'
-                                ? 'shrink-0 text-[10px] font-medium text-ink'
-                                : 'shrink-0 text-[10px] font-medium text-mute'
-                        }
-                    >
-                        {ticket.priority === 'high' ? 'High' : 'Low'}
-                    </span>
-                ) : null}
-            </div>
-            <p className="mt-0.5 truncate text-[11px] tabular-nums text-mute">{ticket.number}</p>
-            <p className="mt-0.5 truncate text-[11px] text-mute">{association}</p>
-            {inactiveLabel ? (
-                <p
-                    className={cn(
-                        'mt-1 text-[11px]',
-                        ticket.is_inactive ? 'font-medium text-ink' : 'text-mute',
-                    )}
-                >
-                    {inactiveLabel}
-                </p>
-            ) : null}
-            {showSla ? (
-                <p
-                    className={cn(
-                        'mt-0.5 text-[11px]',
-                        ticket.sla_breached ? 'font-medium text-ink' : 'text-mute',
-                    )}
-                >
-                    SLA {ticket.sla_label}
-                </p>
-            ) : null}
-            <p className="mt-0.5 truncate text-[11px] text-mute">
-                {ticket.owner_name ?? 'Unassigned'}
-            </p>
-        </PipelineKanbanCard>
-    );
-}
-
-function TicketBoardSkeleton() {
-    return (
-        <PipelineKanban className="h-full px-2 sm:px-3" busy>
-            {Array.from({ length: 4 }).map((_, index) => (
-                <PipelineKanbanColumn key={index}>
-                    <div className="mb-2 space-y-1.5 px-0.5">
-                        <div className="h-3.5 w-24 animate-pulse rounded bg-hairline" />
-                        <div className="h-2.5 w-14 animate-pulse rounded bg-hairline" />
-                    </div>
-                    <div className="grid gap-1.5">
-                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-canvas" />
-                        <div className="h-[4.5rem] animate-pulse rounded-[var(--radius-1)] border border-hairline bg-canvas" />
-                    </div>
-                </PipelineKanbanColumn>
-            ))}
-        </PipelineKanban>
+        />
     );
 }
 
@@ -143,40 +76,28 @@ export default function TicketBoard({
     tickets: BoardTicket[];
     view?: 'all' | 'my';
 }) {
-    const [draggingId, setDraggingId] = useState<number | null>(null);
-    const [overStatus, setOverStatus] = useState<string | null>(null);
     const loading = useInertiaLoading();
     const createHref = '/crm/tickets?create=1';
+    const ticketById = new Map(
+        tickets.map((ticket) => [String(ticket.id), ticket]),
+    );
+    const pipelineColumns: PipelineColumnData[] = columns.map((column) => ({
+        id: column.slug,
+        name: column.name,
+        slug: column.slug,
+        count: column.count,
+        accent: stageUnderlineColor(column.slug),
+    }));
+    const itemsByColumn = columns.reduce<Record<string, string[]>>(
+        (acc, column) => {
+            acc[column.slug] = tickets
+                .filter((ticket) => ticket.status === column.slug)
+                .map((ticket) => `ticket:${ticket.id}`);
 
-    const onDragStart = (event: DragEvent, ticketId: number) => {
-        event.dataTransfer.setData('text/plain', String(ticketId));
-        event.dataTransfer.effectAllowed = 'move';
-        setDraggingId(ticketId);
-    };
-
-    const onDrop = (event: DragEvent, column: BoardColumn) => {
-        event.preventDefault();
-        const ticketId = Number(event.dataTransfer.getData('text/plain'));
-        setDraggingId(null);
-        setOverStatus(null);
-
-        const ticket = tickets.find((row) => row.id === ticketId);
-
-        if (!ticket || ticket.status === column.slug) {
-            return;
-        }
-
-        router.post(
-            `/crm/tickets/${ticketId}/move`,
-            { status: column.slug },
-            {
-                preserveScroll: true,
-                onError: () => {
-                    toast.error('Could not move this ticket. Try again.');
-                },
-            },
-        );
-    };
+            return acc;
+        },
+        {},
+    );
 
     return (
         <CrmShell title="Tickets" chrome="workspace">
@@ -198,7 +119,9 @@ export default function TicketBoard({
                             >
                                 <Link
                                     href="/crm/tickets/board"
-                                    aria-current={view === 'all' ? 'page' : undefined}
+                                    aria-current={
+                                        view === 'all' ? 'page' : undefined
+                                    }
                                     className={cn(
                                         'px-2.5 py-1',
                                         view === 'all'
@@ -210,7 +133,9 @@ export default function TicketBoard({
                                 </Link>
                                 <Link
                                     href="/crm/tickets/board?view=my"
-                                    aria-current={view === 'my' ? 'page' : undefined}
+                                    aria-current={
+                                        view === 'my' ? 'page' : undefined
+                                    }
                                     className={cn(
                                         'px-2.5 py-1',
                                         view === 'my'
@@ -231,7 +156,9 @@ export default function TicketBoard({
                         className="border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6"
                         data-crm="ticket-board-empty"
                     >
-                        <p className="text-[13px] font-medium text-ink">No tickets yet</p>
+                        <p className="text-[13px] font-medium text-ink">
+                            No tickets yet
+                        </p>
                         <p className="mt-0.5 text-[12px] text-mute">
                             Create a ticket on a contact. Desk stays the inbox.
                         </p>
@@ -249,62 +176,55 @@ export default function TicketBoard({
                 ) : null}
 
                 <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-canvas">
-                    {loading ? (
-                        <TicketBoardSkeleton />
-                    ) : (
-                        <PipelineKanban className="h-full min-h-[22rem] px-1 sm:px-2">
-                            {columns.map((column) => {
-                                const cards = tickets.filter(
-                                    (ticket) => ticket.status === column.slug,
-                                );
+                    {/* PipelineKanban — evo Pipeline board. Keep identifier for P2/P7. */}
+                    <Pipeline
+                        columns={pipelineColumns}
+                        itemsByColumn={itemsByColumn}
+                        columnTestIdPrefix="ticket-column"
+                        loading={loading}
+                        renderCard={(itemId) => {
+                            const ticket = ticketById.get(
+                                itemId.replace(/^ticket:/, ''),
+                            );
 
-                                return (
-                                    <PipelineKanbanColumn
-                                        key={column.slug}
-                                        testId={`ticket-column-${column.slug}`}
-                                        over={overStatus === column.slug}
-                                        onDragOver={(event) => {
-                                            event.preventDefault();
-                                            event.dataTransfer.dropEffect = 'move';
-                                            setOverStatus(column.slug);
-                                        }}
-                                        onDragLeave={() =>
-                                            setOverStatus((current) =>
-                                                current === column.slug ? null : current,
-                                            )
-                                        }
-                                        onDrop={(event) => onDrop(event, column)}
-                                    >
-                                        <PipelineKanbanHeader
-                                            name={column.name}
-                                            count={column.count}
-                                            unit="ticket"
-                                            accent={stageUnderlineColor(column.slug)}
-                                        />
+                            return ticket ? (
+                                <BoardTicketCard ticket={ticket} />
+                            ) : null;
+                        }}
+                        renderOverlay={(itemId) =>
+                            ticketById.get(itemId.replace(/^ticket:/, ''))
+                                ?.subject
+                        }
+                        onMove={({ itemId, toColumnId }) => {
+                            const ticketId = Number(
+                                itemId.replace(/^ticket:/, ''),
+                            );
+                            const ticket = ticketById.get(String(ticketId));
 
-                                        <PipelineKanbanStack>
-                                            {cards.map((ticket) => (
-                                                <TicketCard
-                                                    key={ticket.id}
-                                                    ticket={ticket}
-                                                    dragging={draggingId === ticket.id}
-                                                    onDragStart={onDragStart}
-                                                    onDragEnd={() => {
-                                                        setDraggingId(null);
-                                                        setOverStatus(null);
-                                                    }}
-                                                />
-                                            ))}
+                            if (
+                                !ticket ||
+                                ticket.status === toColumnId ||
+                                Number.isNaN(ticketId)
+                            ) {
+                                return;
+                            }
 
-                                            {cards.length === 0 ? (
-                                                <PipelineKanbanEmpty label="No tickets" />
-                                            ) : null}
-                                        </PipelineKanbanStack>
-                                    </PipelineKanbanColumn>
-                                );
-                            })}
-                        </PipelineKanban>
-                    )}
+                            router.post(
+                                `/crm/tickets/${ticketId}/move`,
+                                { status: toColumnId },
+                                {
+                                    preserveScroll: true,
+                                    onError: () => {
+                                        toast.error(
+                                            t(
+                                                'Could not move this ticket. Try again.',
+                                            ),
+                                        );
+                                    },
+                                },
+                            );
+                        }}
+                    />
                 </div>
             </div>
         </CrmShell>

@@ -1,6 +1,6 @@
 import type { DealAttention } from '@/lib/deal-attention';
 
-export const RECORD_TYPES = ['contact', 'company', 'lead', 'deal', 'quote'] as const;
+export const RECORD_TYPES = ['contact', 'company', 'lead', 'deal', 'quote', 'ticket'] as const;
 
 export type RecordType = (typeof RECORD_TYPES)[number];
 

@@ -13,7 +13,10 @@ export type LabRoute =
     | { name: 'leads' }
     | { name: 'deals' }
     | { name: 'deal'; id: string }
+    | { name: 'record' }
+    | { name: 'pipeline' }
     | { name: 'quotes' }
+    | { name: 'quote' }
     | { name: 'devis'; id: string }
     | { name: 'activities' }
     | { name: 'outbound'; view?: string }
@@ -66,24 +69,38 @@ export function routePath(route: LabRoute): string {
             return '/deals';
         case 'deal':
             return `/deals/${route.id}`;
+        case 'record':
+            return '/record';
+        case 'pipeline':
+            return '/pipeline';
         case 'quotes':
             return '/quotes';
+        case 'quote':
+            return '/quote';
         case 'devis':
             return `/quotes/${route.id}`;
         case 'activities':
             return '/activities';
         case 'outbound':
-            return route.view && route.view !== 'overview' ? `/outbound/${route.view}` : '/outbound';
+            return route.view && route.view !== 'overview'
+                ? `/outbound/${route.view}`
+                : '/outbound';
         case 'ads':
-            return route.view && route.view !== 'overview' ? `/ads/${route.view}` : '/ads';
+            return route.view && route.view !== 'overview'
+                ? `/ads/${route.view}`
+                : '/ads';
         case 'campaign':
             return `/ads/campaigns/${route.id}`;
         case 'tickets':
             return '/tickets';
         case 'reports':
-            return route.view && route.view !== 'overview' ? `/reports/${route.view}` : '/reports';
+            return route.view && route.view !== 'overview'
+                ? `/reports/${route.view}`
+                : '/reports';
         case 'automation':
-            return route.view && route.view !== 'overview' && route.view !== 'workflows'
+            return route.view &&
+                route.view !== 'overview' &&
+                route.view !== 'workflows'
                 ? `/automation/${route.view}`
                 : '/automation';
         case 'segments':
@@ -177,6 +194,18 @@ export function parseLabLocation(pathname: string, hash: string): LabRoute {
         return { name: 'deals' };
     }
 
+    if (path === '/record') {
+        return { name: 'record' };
+    }
+
+    if (path === '/pipeline') {
+        return { name: 'pipeline' };
+    }
+
+    if (path === '/quote') {
+        return { name: 'quote' };
+    }
+
     const deal = path.match(/^\/deals\/([^/]+)$/);
 
     if (deal?.[1]) {
@@ -208,7 +237,10 @@ export function parseLabLocation(pathname: string, hash: string): LabRoute {
     }
 
     if (path === '/ads' || path === '/pubs' || path.startsWith('/ads/')) {
-        return { name: 'ads', view: path === '/pubs' ? 'overview' : matchView('/ads', path) };
+        return {
+            name: 'ads',
+            view: path === '/pubs' ? 'overview' : matchView('/ads', path),
+        };
     }
 
     if (path === '/tickets') {
@@ -266,6 +298,10 @@ export function roomOf(route: LabRoute): LabRoom {
 
     if (route.name === 'devis') {
         return 'quotes';
+    }
+
+    if (route.name === 'quote') {
+        return 'quote';
     }
 
     if (route.name === 'campaign') {

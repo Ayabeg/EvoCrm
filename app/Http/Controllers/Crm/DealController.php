@@ -170,7 +170,7 @@ class DealController extends Controller
             $pipeline,
             $options,
             function ($query) use ($filter, $filters): void {
-                $filter->applyToDeals($query, $filters);
+                $filter->apply('deal', $query, $filters);
             },
         );
 
@@ -180,7 +180,7 @@ class DealController extends Controller
                 ->where('pipeline_id', $pipeline->id);
             $countFilters = $filters;
             unset($countFilters['stage']);
-            $filter->applyToDeals($countQuery, $countFilters);
+            $filter->apply('deal', $countQuery, $countFilters);
 
             return [
                 'id' => $stage->id,

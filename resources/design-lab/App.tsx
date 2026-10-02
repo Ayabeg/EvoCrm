@@ -16,6 +16,9 @@ import { DealsListPage } from './pages/DealsListPage';
 import { DevisPage } from './pages/DevisPage';
 import { InboxPage } from './pages/InboxPage';
 import { OutboundLabPage } from './pages/OutboundLabPage';
+import { PipelineLabPage } from './pages/PipelineLabPage';
+import { QuoteLabPage } from './pages/QuoteLabPage';
+import { RecordLabPage } from './pages/RecordLabPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsLabPage } from './pages/SettingsLabPage';
 import { ShellPage } from './pages/ShellPage';
@@ -65,6 +68,12 @@ function renderRoute(route: LabRoute) {
             return <DealsListPage />;
         case 'deal':
             return <DealPage id={route.id} />;
+        case 'record':
+            return <RecordLabPage />;
+        case 'pipeline':
+            return <PipelineLabPage />;
+        case 'quote':
+            return <QuoteLabPage />;
         case 'quotes':
             return <QuotesListPage />;
         case 'devis':

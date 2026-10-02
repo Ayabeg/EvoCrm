@@ -23,6 +23,7 @@ use App\Policies\ContactPolicy;
 use App\Policies\DealPolicy;
 use App\Policies\LeadPolicy;
 use App\Policies\QuotePolicy;
+use App\Policies\TicketPolicy;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Connectors\FakeGoogleApiClient;
 use App\Services\Connectors\GoogleApiClient;
@@ -85,6 +86,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Lead::class, LeadPolicy::class);
         Gate::policy(Deal::class, DealPolicy::class);
         Gate::policy(Quote::class, QuotePolicy::class);
+        Gate::policy(Ticket::class, TicketPolicy::class);
         Gate::policy(Activity::class, ActivityPolicy::class);
 
         Company::observe(CompanyObserver::class);

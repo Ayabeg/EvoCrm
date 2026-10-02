@@ -1,5 +1,5 @@
-import { RECORD_TYPES   } from '@/ds/workspace/quick-record/types';
-import type {RecordRef, RecordType} from '@/ds/workspace/quick-record/types';
+import { RECORD_TYPES } from '@/ds/workspace/quick-record/types';
+import type { RecordRef, RecordType } from '@/ds/workspace/quick-record/types';
 
 export function isRecordType(value: string): value is RecordType {
     return (RECORD_TYPES as readonly string[]).includes(value);
@@ -29,6 +29,7 @@ const SHOW_PATHS: Record<RecordType, string> = {
     lead: '/crm/leads',
     deal: '/crm/deals',
     quote: '/crm/quotes',
+    ticket: '/crm/tickets',
 };
 
 export function fullRecordHref(ref: RecordRef): string {

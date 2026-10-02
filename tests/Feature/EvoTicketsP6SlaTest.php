@@ -128,7 +128,8 @@ it('resets the SLA clock on reopen and on unanswered priority change', function 
 });
 
 it('keeps the Help Desk inactivity line and Algiers SLA, not a second clock', function () {
-    $board = file_get_contents(resource_path('js/pages/crm/tickets/board.tsx'));
+    $board = file_get_contents(resource_path('js/pages/crm/tickets/board.tsx'))
+        .file_get_contents(resource_path('js/evo/crm/pipeline/TicketCard.tsx'));
     $show = file_get_contents(resource_path('js/pages/crm/tickets/show.tsx'));
     $sla = file_get_contents(app_path('Support/TicketSla.php'));
 

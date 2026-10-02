@@ -2,8 +2,8 @@ import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
-import { SkeletonRecord } from '@/components/crm/empty-room';
 import DeskThreadCard from '@/components/crm/desk-thread-card';
+import { SkeletonRecord } from '@/components/crm/empty-room';
 import EnrichmentPanel from '@/components/crm/enrichment-panel';
 import type { EnrichmentRunRow } from '@/components/crm/enrichment-panel';
 import type { RecordActivity } from '@/components/crm/record-activity';
@@ -12,20 +12,18 @@ import {
     AssociationCard,
     RecordActions,
     RecordBack,
-    RecordShell,
     RelatedRecordLink,
 } from '@/components/crm/record-chrome';
 import {
     RecordFact,
     RecordFactList,
-    RecordIdentity,
-    RecordPageFrame,
     RecordSection,
 } from '@/components/crm/record-hub';
 import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 
 type Company = {
@@ -97,7 +95,11 @@ export default function CompanyShow({
                                 title={company.name}
                                 kind="Company"
                                 subtitle={
-                                    [company.domain, location, company.owner?.name]
+                                    [
+                                        company.domain,
+                                        location,
+                                        company.owner?.name,
+                                    ]
                                         .filter(Boolean)
                                         .join(' · ') || undefined
                                 }
@@ -113,10 +115,14 @@ export default function CompanyShow({
                                                     size="sm"
                                                     aria-expanded={editing}
                                                     onClick={() =>
-                                                        setEditing((open) => !open)
+                                                        setEditing(
+                                                            (open) => !open,
+                                                        )
                                                     }
                                                 >
-                                                    {editing ? 'Close edit' : 'Edit'}
+                                                    {editing
+                                                        ? 'Close edit'
+                                                        : 'Edit'}
                                                 </Button>
                                                 <div className="md:hidden">
                                                     <AskEvoTrigger

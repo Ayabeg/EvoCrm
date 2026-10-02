@@ -157,7 +157,7 @@ it('preserves Deal query adapter pipeline saved views filters bulk and create wi
     expect($controller)->toContain("Inertia::render('crm/deals/index'")
         ->and($controller)->toContain("Inertia::render('crm/deals/board'")
         ->and($controller)->toContain("\$filter->resolve(\$request, \$workspace, 'deal')")
-        ->and($controller)->toContain('applyToDeals')
+        ->and($controller)->toContain("apply('deal'")
         ->and($controller)->toContain("'activeFilters' => \$filters")
         ->and($controller)->toContain("'savedFilters' => \$hub->filters(\$workspace, 'deal'")
         ->and($controller)->toContain("'bulk' => [")

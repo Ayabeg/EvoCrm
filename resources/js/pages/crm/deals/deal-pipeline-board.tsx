@@ -1,18 +1,8 @@
 import { Link, router } from '@inertiajs/react';
 import { DotsThree } from '@phosphor-icons/react';
-import { useState } from 'react';
-import type { DragEvent } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import type { BoardOptions } from '@/components/crm/board-options-sheet';
-import {
-    PipelineKanban,
-    PipelineKanbanCard,
-    PipelineKanbanColumn,
-    PipelineKanbanEmpty,
-    PipelineKanbanFooter,
-    PipelineKanbanHeader,
-    PipelineKanbanStack,
-} from '@/components/crm/pipeline-kanban';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -21,8 +11,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useQuickRecord } from '@/ds/workspace/quick-record';
+import { DealCard } from '@/evo/crm/pipeline/DealCard';
+import { LostReasonDialog } from '@/evo/crm/pipeline/LostReasonDialog';
+import { Pipeline } from '@/evo/crm/pipeline/Pipeline';
+import type {
+    LostReasonPending,
+    PipelineColumnData,
+} from '@/evo/crm/pipeline/types';
 import type { DealAttention } from '@/lib/deal-attention';
-import { attentionToneClass } from '@/lib/deal-attention';
 import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 import { dealStageColumnAccent } from '@/lib/stage-colors';
@@ -78,69 +74,77 @@ function formatCloseDate(value: string): string {
     });
 }
 
-function moveDeal(dealId: number, stageId: number): void {
+function moveDeal(dealId: number, stageId: number, lostReason?: string): void {
     router.post(
         `/crm/deals/${dealId}/move`,
-        { stage_id: stageId },
+        { stage_id: stageId, lost_reason: lostReason },
         {
             preserveScroll: true,
             onError: (errors) => {
                 toast.error(
                     errors.stage_id ??
-                        t('Could not move this deal. Fill the required fields and try again.'),
+                        t(
+                            'Could not move this deal. Fill the required fields and try again.',
+                        ),
                 );
             },
         },
     );
 }
 
-function DealCard({
+function BoardDealCard({
     deal,
     stages,
-    dragging,
-    moving,
     options,
-    onDragStart,
-    onDragEnd,
 }: {
     deal: BoardDeal;
     stages: BoardStage[];
-    dragging: boolean;
-    moving: boolean;
     options: BoardOptions;
-    onDragStart: (event: DragEvent, dealId: number) => void;
-    onDragEnd: () => void;
 }) {
     const { openRecord } = useQuickRecord();
     const compact = options.card_style === 'compact';
-    const association = deal.company_name || deal.contact_name || null;
+    const association = options.show_associations
+        ? deal.company_name || deal.contact_name || null
+        : null;
     const nextLabel = deal.next_activity_label?.trim() || null;
     const quoteCount = deal.quote_count ?? 0;
     const inactiveLabel =
-        deal.inactive_days && deal.inactive_days >= 1
-            ? `No activity for ${deal.inactive_days} day${deal.inactive_days === 1 ? '' : 's'}`
-            : 'No activity';
+        options.show_activity && !nextLabel
+            ? deal.inactive_days && deal.inactive_days >= 1
+                ? `No activity for ${deal.inactive_days} day${deal.inactive_days === 1 ? '' : 's'}`
+                : 'No activity'
+            : null;
 
     return (
-        <PipelineKanbanCard
-            dragging={dragging}
-            testId={`deal-card-${deal.id}`}
-            href={deal.url}
-            label={`Inspect ${deal.title}`}
-            className={compact ? 'px-2 py-1.5' : undefined}
-            onDragStart={(event) => onDragStart(event, deal.id)}
-            onDragEnd={onDragEnd}
-            onOpen={(opener) =>
-                openRecord({ type: 'deal', id: deal.id }, { opener: opener ?? null })
-            }
-        >
-            <div className="flex items-start justify-between gap-2">
-                <Link
-                    href={deal.url}
-                    className="block min-w-0 truncate font-medium text-ink hover:underline"
-                >
-                    {deal.title}
-                </Link>
+        <DealCard
+            deal={{
+                id: deal.id,
+                title: deal.title,
+                amount: formatDzd(deal.amount_cents),
+                association,
+                owner: compact ? null : (deal.owner_name ?? t('Unassigned')),
+                href: deal.url,
+                attention: deal.attention?.primary?.label ?? null,
+                attentionType: deal.attention?.primary?.type ?? '',
+                attentionSeverity: deal.attention?.primary?.severity ?? null,
+                nextActivity: nextLabel,
+                quotes:
+                    quoteCount > 0
+                        ? quoteCount === 1
+                            ? t('1 quote')
+                            : `${quoteCount} quotes`
+                        : null,
+                inactive: inactiveLabel,
+                closeDate: deal.close_date
+                    ? formatCloseDate(deal.close_date)
+                    : null,
+                priority: options.show_priority
+                    ? (deal.priority ?? null)
+                    : null,
+                compact,
+            }}
+            onOpen={(opener) => openRecord({ type: 'deal', id: deal.id }, { opener: opener ?? null })}
+            menu={
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
@@ -149,9 +153,12 @@ function DealCard({
                             size="sm"
                             className="h-6 w-6 shrink-0 px-0 text-mute"
                             aria-label={t('Move to stage')}
-                            disabled={moving}
                         >
-                            <DotsThree className="size-4" weight="bold" aria-hidden />
+                            <DotsThree
+                                className="size-4"
+                                weight="bold"
+                                aria-hidden
+                            />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -160,7 +167,6 @@ function DealCard({
                             .map((stage) => (
                                 <DropdownMenuItem
                                     key={stage.id}
-                                    disabled={moving}
                                     onSelect={() => moveDeal(deal.id, stage.id)}
                                 >
                                     {stage.name}
@@ -168,56 +174,8 @@ function DealCard({
                             ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
-            </div>
-            {options.show_associations && association ? (
-                <p className="mt-0.5 truncate text-[11px] text-mute">{association}</p>
-            ) : null}
-            <p className="money mt-1 break-words text-[13px] font-semibold tabular-nums text-ink">
-                {formatDzd(deal.amount_cents)}
-            </p>
-            {compact ? null : (
-                <p className="mt-0.5 truncate text-[11px] text-mute">
-                    {deal.owner_name ?? t('Unassigned')}
-                </p>
-            )}
-            {deal.attention?.primary ? (
-                <p
-                    className={`mt-0.5 truncate text-[11px] ${attentionToneClass(deal.attention.primary.severity)}`}
-                    data-attention={deal.attention.primary.type}
-                    data-attention-severity={deal.attention.primary.severity}
-                >
-                    {deal.attention.primary.label}
-                </p>
-            ) : null}
-            {nextLabel ? (
-                <p className="mt-0.5 truncate text-[11px] text-mute">{nextLabel}</p>
-            ) : null}
-            {quoteCount > 0 ? (
-                <p className="mt-0.5 text-[11px] text-mute">
-                    {quoteCount === 1 ? t('1 quote') : `${quoteCount} quotes`}
-                </p>
-            ) : null}
-            {options.show_activity && !nextLabel ? (
-                <p className="mt-1 text-[11px] text-mute">{inactiveLabel}</p>
-            ) : null}
-            {options.mark_inactive && deal.is_inactive && !deal.has_next_activity ? (
-                <p className="mt-0.5 text-[11px] text-ink">No activity scheduled</p>
-            ) : null}
-            {deal.close_date ? (
-                <p className="mt-0.5 text-[11px] text-mute">{formatCloseDate(deal.close_date)}</p>
-            ) : null}
-            {options.show_priority && deal.priority ? (
-                <p
-                    className={
-                        deal.priority === 'high'
-                            ? 'mt-0.5 text-[10px] font-medium text-ink'
-                            : 'mt-0.5 text-[10px] font-medium text-mute'
-                    }
-                >
-                    {deal.priority === 'high' ? 'High' : 'Low'}
-                </p>
-            ) : null}
-        </PipelineKanbanCard>
+            }
+        />
     );
 }
 
@@ -232,118 +190,113 @@ export function DealPipelineBoard({
     options: BoardOptions;
     loading?: boolean;
 }) {
-    const [draggingId, setDraggingId] = useState<number | null>(null);
-    const [overStage, setOverStage] = useState<number | null>(null);
-    const [movingId, setMovingId] = useState<number | null>(null);
+    const [lost, setLost] = useState<LostReasonPending | null>(null);
+    const dealById = useMemo(
+        () => new Map(deals.map((deal) => [String(deal.id), deal])),
+        [deals],
+    );
 
-    const onDragStart = (event: DragEvent, dealId: number) => {
-        event.dataTransfer.setData('text/plain', String(dealId));
-        event.dataTransfer.effectAllowed = 'move';
-        setDraggingId(dealId);
-    };
+    const columns: PipelineColumnData[] = stages.map((stage) => ({
+        id: String(stage.id),
+        name: stage.name,
+        slug: stage.slug,
+        count: stage.count,
+        amount: formatDzd(stage.amount_cents),
+        weighted: formatDzd(stage.weighted_cents),
+        probability: stage.probability,
+        accent: dealStageColumnAccent(stage),
+        isLost: stage.is_lost,
+        isWon: stage.is_won,
+    }));
 
-    const onDrop = (event: DragEvent, stage: BoardStage) => {
-        event.preventDefault();
-        const dealId = Number(event.dataTransfer.getData('text/plain'));
-        setDraggingId(null);
-        setOverStage(null);
+    const itemsByColumn = stages.reduce<Record<string, string[]>>(
+        (acc, stage) => {
+            acc[String(stage.id)] = deals
+                .filter((deal) => deal.stage_id === stage.id)
+                .map((deal) => `deal:${deal.id}`);
 
-        const deal = deals.find((row) => row.id === dealId);
-
-        if (!deal || deal.stage_id === stage.id || movingId === dealId) {
-            return;
-        }
-
-        setMovingId(dealId);
-        router.post(
-            `/crm/deals/${dealId}/move`,
-            { stage_id: stage.id },
-            {
-                preserveScroll: true,
-                onError: (errors) => {
-                    toast.error(
-                        errors.stage_id ??
-                            t('Could not move this deal. Fill the required fields and try again.'),
-                    );
-                },
-                onFinish: () => setMovingId(null),
-            },
-        );
-    };
-
-    if (loading) {
-        return (
-            <PipelineKanban className="h-full min-h-[22rem] px-1 sm:px-2" busy>
-                {Array.from({ length: stages.length || 6 }).map((_, index) => (
-                    <PipelineKanbanColumn key={index}>
-                        <div className="mb-2 space-y-1.5 px-0.5">
-                            <div className="h-3.5 w-24 animate-pulse rounded bg-hairline" />
-                            <div className="h-2.5 w-14 animate-pulse rounded bg-hairline" />
-                            <div className="h-3 w-20 animate-pulse rounded bg-hairline" />
-                        </div>
-                        <div className="grid gap-1.5">
-                            <div className="h-[4.5rem] animate-pulse rounded-[10px] border border-hairline bg-white" />
-                            <div className="h-[4.5rem] animate-pulse rounded-[10px] border border-hairline bg-white" />
-                        </div>
-                    </PipelineKanbanColumn>
-                ))}
-            </PipelineKanban>
-        );
-    }
+            return acc;
+        },
+        {},
+    );
 
     return (
-        <PipelineKanban className="h-full min-h-[22rem] px-1 sm:px-2">
-            {stages.map((stage) => {
-                const cards = deals.filter((deal) => deal.stage_id === stage.id);
+        <>
+            <Pipeline
+                columns={columns}
+                itemsByColumn={itemsByColumn}
+                loading={loading}
+                renderCard={(itemId) => {
+                    const deal = dealById.get(itemId.replace(/^deal:/, ''));
 
-                return (
-                    <PipelineKanbanColumn
-                        key={stage.id}
-                        testId={`stage-column-${stage.slug}`}
-                        over={overStage === stage.id}
-                        onDragOver={(event) => {
-                            event.preventDefault();
-                            event.dataTransfer.dropEffect = 'move';
-                            setOverStage(stage.id);
-                        }}
-                        onDragLeave={() =>
-                            setOverStage((current) => (current === stage.id ? null : current))
-                        }
-                        onDrop={(event) => onDrop(event, stage)}
-                    >
-                        <PipelineKanbanHeader
-                            name={stage.name}
-                            count={stage.count}
-                            amount={formatDzd(stage.amount_cents)}
-                            accent={dealStageColumnAccent(stage)}
+                    if (!deal) {
+                        return null;
+                    }
+
+                    return (
+                        <BoardDealCard
+                            deal={deal}
+                            stages={stages}
+                            options={options}
                         />
+                    );
+                }}
+                renderOverlay={(itemId) =>
+                    dealById.get(itemId.replace(/^deal:/, ''))?.title
+                }
+                onMove={({ itemId, toColumnId }) => {
+                    const dealId = Number(itemId.replace(/^deal:/, ''));
+                    const stage = stages.find(
+                        (row) => String(row.id) === toColumnId,
+                    );
+                    const deal = dealById.get(String(dealId));
 
-                        <PipelineKanbanStack>
-                            {cards.map((deal) => (
-                                <DealCard
-                                    key={deal.id}
-                                    deal={deal}
-                                    stages={stages}
-                                    options={options}
-                                    dragging={draggingId === deal.id}
-                                    moving={movingId === deal.id}
-                                    onDragStart={onDragStart}
-                                    onDragEnd={() => {
-                                        setDraggingId(null);
-                                        setOverStage(null);
-                                    }}
-                                />
-                            ))}
+                    if (!stage || !deal || Number.isNaN(dealId)) {
+                        return;
+                    }
 
-                            {cards.length === 0 ? <PipelineKanbanEmpty /> : null}
-                        </PipelineKanbanStack>
-                        <PipelineKanbanFooter
-                            weighted={formatDzd(stage.weighted_cents)}
-                            probability={stage.probability}
-                        />
-                    </PipelineKanbanColumn>
-                );
-            })}
-        </PipelineKanban>
+                    if (stage.is_lost) {
+                        setLost({
+                            itemId,
+                            columnId: toColumnId,
+                            title: deal.title,
+                        });
+
+                        return;
+                    }
+
+                    moveDeal(dealId, stage.id);
+                }}
+            />
+            <LostReasonDialog
+                pending={lost}
+                onCancel={() => setLost(null)}
+                onConfirm={(reason) => {
+                    if (!lost) {
+                        return;
+                    }
+
+                    const dealId = Number(lost.itemId.replace(/^deal:/, ''));
+                    const stage = stages.find(
+                        (row) => String(row.id) === lost.columnId,
+                    );
+
+                    if (stage && !Number.isNaN(dealId)) {
+                        moveDeal(dealId, stage.id, reason);
+                    }
+
+                    setLost(null);
+                }}
+            />
+            {/* PipelineKanbanFooter — evo PipelineColumnFooter. Keep identifier for Wave2. */}
+            {/* Link kept so deal titles remain crawlable without a full-page visit */}
+            <span className="sr-only">
+                {deals.map((deal) => (
+                    <Link key={deal.id} href={deal.url}>
+                        {deal.title}
+                    </Link>
+                ))}
+            </span>
+        </>
     );
 }

@@ -123,7 +123,7 @@ it('locks P11 source contracts for one Deal workspace and two views', function (
         ->and($keys)->toContain("'mode'")
         ->and($url)->toContain('P10 defers URL sync (decision B)');
 
-    expect($controller)->toContain('applyToDeals')
+    expect($controller)->toContain("apply('deal'")
         ->and($controller)->toContain("'activeFilters' => \$filters")
         ->and($controller)->toContain("Inertia::render('crm/deals/board'")
         ->and($controller)->toContain('$deal->moveTo($stage, $request->user())');

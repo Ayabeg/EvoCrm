@@ -41,7 +41,26 @@ describe('design-lab outbound route', () => {
             view: 'sequences',
         });
         expect(routePath({ name: 'outbound' })).toBe('/outbound');
-        expect(labHref({ name: 'outbound', view: 'sequences' })).toMatch(/outbound\/sequences/);
+        expect(labHref({ name: 'outbound', view: 'sequences' })).toMatch(
+            /outbound\/sequences/,
+        );
+    });
+});
+
+describe('design-lab PR5 record pipeline quote routes', () => {
+    it('parses /design-lab/record /pipeline /quote', () => {
+        expect(parseLabLocation('/design-lab/record', '')).toEqual({
+            name: 'record',
+        });
+        expect(parseLabLocation('/design-lab/pipeline', '')).toEqual({
+            name: 'pipeline',
+        });
+        expect(parseLabLocation('/design-lab/quote', '')).toEqual({
+            name: 'quote',
+        });
+        expect(routePath({ name: 'record' })).toBe('/record');
+        expect(routePath({ name: 'pipeline' })).toBe('/pipeline');
+        expect(routePath({ name: 'quote' })).toBe('/quote');
     });
 });
 
@@ -65,12 +84,19 @@ describe('design-lab ads route', () => {
             name: 'ads',
             view: 'attribution',
         });
-        expect(parseLabLocation('/design-lab/ads/campaigns/campaign-wa-cliniques-alger', '')).toEqual({
+        expect(
+            parseLabLocation(
+                '/design-lab/ads/campaigns/campaign-wa-cliniques-alger',
+                '',
+            ),
+        ).toEqual({
             name: 'campaign',
             id: 'campaign-wa-cliniques-alger',
         });
         expect(routePath({ name: 'ads' })).toBe('/ads');
-        expect(routePath({ name: 'ads', view: 'attribution' })).toBe('/ads/attribution');
+        expect(routePath({ name: 'ads', view: 'attribution' })).toBe(
+            '/ads/attribution',
+        );
     });
 });
 

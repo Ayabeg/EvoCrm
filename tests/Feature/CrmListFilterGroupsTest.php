@@ -126,6 +126,65 @@ it('executes filter_groups on the deal index and isolates workspaces', function 
         );
 });
 
+it('executes filter_groups on the deal board and isolates workspaces', function () {
+    $user = User::factory()->create();
+    $foreign = User::factory()->create();
+    $pipeline = $user->workspace->defaultPipeline();
+    $foreignPipeline = $foreign->workspace->defaultPipeline();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $foreignContact = Contact::factory()->create(['workspace_id' => $foreign->workspace_id]);
+
+    $kept = Deal::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stageBySlug('new')->id,
+        'owner_id' => null,
+        'title' => 'Équipement bloc opératoire',
+    ]);
+    Deal::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stageBySlug('new')->id,
+        'owner_id' => $user->id,
+        'title' => 'Owned deal',
+    ]);
+    Deal::factory()->create([
+        'workspace_id' => $foreign->workspace_id,
+        'contact_id' => $foreignContact->id,
+        'pipeline_id' => $foreignPipeline->id,
+        'stage_id' => $foreignPipeline->stageBySlug('new')->id,
+        'owner_id' => null,
+        'title' => 'Foreign unassigned',
+    ]);
+
+    $groups = listFilterGroups([[
+        'logic' => 'and',
+        'rules' => [
+            ['field' => 'unassigned', 'operator' => 'is_true'],
+        ],
+    ]]);
+
+    $this->actingAs($user)
+        ->get('/crm/deals/board?'.http_build_query(['filter_groups' => $groups]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/deals/board')
+            ->has('deals', 1)
+            ->where('deals.0.id', $kept->id)
+        );
+
+    $this->actingAs($foreign)
+        ->get('/crm/deals/board?'.http_build_query(['filter_groups' => $groups]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/deals/board')
+            ->has('deals', 1)
+            ->where('deals.0.title', 'Foreign unassigned')
+        );
+});
+
 it('executes filter_groups on the ticket index and isolates workspaces', function () {
     $user = User::factory()->create();
     $foreign = User::factory()->create();

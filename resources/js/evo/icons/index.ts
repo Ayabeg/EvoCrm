@@ -45,6 +45,7 @@ export {
     GlobeSimple,
     Handshake,
     House,
+    Ticket,
     Info,
     LinkSimple,
     List,

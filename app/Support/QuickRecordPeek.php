@@ -8,6 +8,7 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Lead;
 use App\Models\Quote;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Crm\DealAttentionEvaluator;
@@ -24,7 +25,7 @@ use Illuminate\Support\Facades\Gate;
  */
 class QuickRecordPeek
 {
-    public const TYPES = ['contact', 'company', 'lead', 'deal', 'quote'];
+    public const TYPES = ['contact', 'company', 'lead', 'deal', 'quote', 'ticket'];
 
     public function __construct(private CrmHub $hub) {}
 
@@ -53,6 +54,7 @@ class QuickRecordPeek
             'lead' => $this->lead($user, $record),
             'deal' => $this->deal($user, $record),
             'quote' => $this->quote($user, $record),
+            'ticket' => $this->ticket($user, $record),
             default => abort(404),
         };
     }
@@ -65,6 +67,7 @@ class QuickRecordPeek
             'lead' => Lead::query()->forWorkspace($workspace)->find($id),
             'deal' => Deal::query()->forWorkspace($workspace)->find($id),
             'quote' => Quote::query()->forWorkspace($workspace)->find($id),
+            'ticket' => Ticket::query()->forWorkspace($workspace)->find($id),
             default => null,
         };
     }
@@ -296,6 +299,52 @@ class QuickRecordPeek
             activity: [],
             user: $user,
             model: $quote,
+            supportsActivity: false,
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function ticket(User $user, Ticket $ticket): array
+    {
+        $ticket->loadMissing([
+            'contact:id,first_name,last_name,email,phone_e164',
+            'company:id,name',
+            'deal:id,title',
+            'owner:id,name',
+        ]);
+
+        return $this->envelope(
+            type: 'ticket',
+            id: (int) $ticket->id,
+            record: [
+                'subject' => $ticket->subject,
+                'number' => $ticket->number,
+                'status' => $ticket->status,
+                'priority' => $ticket->priority,
+                'channel' => $ticket->channel,
+                'sla_label' => $ticket->present()['sla_label'] ?? null,
+                'contact_id' => $ticket->contact_id,
+                'contact_name' => $ticket->contact?->displayName(),
+                'contact_email' => $ticket->contact?->email,
+                'contact_phone_e164' => $ticket->contact?->phone_e164,
+                'company_id' => $ticket->company_id,
+                'company_name' => $ticket->company?->name,
+                'deal_id' => $ticket->deal_id,
+                'deal_title' => $ticket->deal?->title,
+                'owner_id' => $ticket->owner_id,
+                'owner_name' => $ticket->owner?->name,
+                'created_at' => $ticket->created_at?->toIso8601String(),
+            ],
+            associations: $this->compactRefs([
+                $ticket->company ? ['type' => 'company', 'id' => $ticket->company->id, 'label' => $ticket->company->name] : null,
+                $ticket->contact ? ['type' => 'contact', 'id' => $ticket->contact->id, 'label' => $ticket->contact->displayName()] : null,
+                $ticket->deal ? ['type' => 'deal', 'id' => $ticket->deal->id, 'label' => $ticket->deal->title] : null,
+            ]),
+            activity: [],
+            user: $user,
+            model: $ticket,
             supportsActivity: false,
         );
     }

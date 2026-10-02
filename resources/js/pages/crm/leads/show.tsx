@@ -14,20 +14,18 @@ import type { LeadScorePayload } from '@/components/crm/lead-score-pill';
 import {
     AssociationCard,
     RecordBack,
-    RecordShell,
     RelatedRecordLink,
 } from '@/components/crm/record-chrome';
 import {
     RecordFact,
     RecordFactList,
-    RecordIdentity,
-    RecordPageFrame,
     RecordSection,
     RecordStatusBadge,
     formatRecordWhen,
 } from '@/components/crm/record-hub';
 import { RecordPath } from '@/components/crm/record-path';
 import type { PathStep } from '@/components/crm/record-path';
+import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 
 type LeadContact = {
@@ -92,14 +90,26 @@ export default function LeadShow({
         company?: { id: number; name: string } | null;
         deal?: { id: number; title: string } | null;
         threads?: { id: number; subject?: string | null }[];
-        enrollments?: { id: number; sequence?: { name?: string | null } | null }[];
-        deals?: { id: number; title: string; stage?: { name?: string } | string | null }[];
+        enrollments?: {
+            id: number;
+            sequence?: { name?: string | null } | null;
+        }[];
+        deals?: {
+            id: number;
+            title: string;
+            stage?: { name?: string } | string | null;
+        }[];
     };
     pipelines?: {
         id: number;
         name: string;
         is_default?: boolean;
-        stages: { id: number; name: string; slug: string; pipeline_id: number }[];
+        stages: {
+            id: number;
+            name: string;
+            slug: string;
+            pipeline_id: number;
+        }[];
     }[];
     members?: { id: number; name: string }[];
     contactDeals?: { id: number; title: string; stage?: string | null }[];
@@ -124,9 +134,7 @@ export default function LeadShow({
     const phone = contact?.phone_e164 || contact?.phone || null;
     const address = [contact?.city, contact?.wilaya].filter(Boolean).join(', ');
     const converted = path.complete || lead.status === 'qualified';
-    const contactAction = contact
-        ? `/crm/contacts/${contact.id}`
-        : leadAction;
+    const contactAction = contact ? `/crm/contacts/${contact.id}` : leadAction;
     const contactExtra = contact
         ? {
               first_name: contact.first_name ?? '',
@@ -142,6 +150,7 @@ export default function LeadShow({
             if (!converted) {
                 setConvertOpen(true);
             }
+
             return;
         }
 
@@ -169,7 +178,10 @@ export default function LeadShow({
                 <RecordPageFrame
                     header={
                         <>
-                            <RecordBack href="/crm/leads" label="Back to Leads" />
+                            <RecordBack
+                                href="/crm/leads"
+                                label="Back to Leads"
+                            />
                             <RecordIdentity
                                 title={lead.title}
                                 kind="Lead"
@@ -242,7 +254,9 @@ export default function LeadShow({
                                 current={path.current}
                                 disabled={converted}
                                 onSelect={selectPath}
-                                onComplete={converted ? undefined : markComplete}
+                                onComplete={
+                                    converted ? undefined : markComplete
+                                }
                             />
                         </>
                     }
@@ -271,7 +285,10 @@ export default function LeadShow({
                                         <InlineRecordField
                                             label="Name"
                                             name="first_name"
-                                            value={contact?.first_name ?? contactName}
+                                            value={
+                                                contact?.first_name ??
+                                                contactName
+                                            }
                                             action={contactAction}
                                             extra={contactExtra}
                                         />

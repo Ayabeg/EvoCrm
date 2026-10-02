@@ -22,7 +22,10 @@ Screens live next to the Lab route. Fill a row when the component is built in De
 | DataGrid | ONE grid | compact / standard / embedded CRM lists | loading, empty, error, selected, bulk | 32–36 rows | sort, select, pagination, aria-sort, FR selection | ReUI MIT (TanStack) | `/design-lab/data` + CRM indexes | PR3 lab / PR4 production |
 | FilterBar / FilterBuilder / SavedViews | Filters (2-level AND/OR) | groups on when backend executes | chips, builder open | — | labelled controls | ReUI MIT + custom views | `/design-lab/data` + CRM indexes | PR3 lab / PR4 production |
 | CrmListTable | Production CRM list (DataGrid + mobile cards) | contact / company / deal / lead / quote / ticket | loading via workspace, empty, selected | 32–36; cards <480 | peek, keyboard, select page | custom wrap of DataGrid | Contacts–Tickets + Segments | PR4 |
-| RecordWorkspace | CRM records | — | — | — | — | custom Evo (PR5) | — | — |
+| RecordWorkspace | CRM records | deal / contact / company / lead / ticket / quote peek | loading / empty / 3-pane | 768 / 1024 / 1440 | pane tabs, focus, FR | custom Evo (PR5) | `/design-lab/record` | PR5 1440×900 |
+| Pipeline | Deal / ticket board | compact / default cards | dragging / over / empty / lost dialog | 1440 overflow-x | dnd-kit keyboard + FR SR | custom Evo + dnd-kit (PR8) | `/design-lab/pipeline` | PR5 1440×900 |
+| ForecastBar | Pipeline totals | facts + FunnelChart | empty stages | 1440 | not color-only | custom Evo on `evo/charts` (PR9) | `/design-lab/pipeline` | PR5 |
+| QuoteWorkspace | Quote document | draft / sent / accepted | immutable sent | 1440 split | labelled money / lines | custom Evo (PR5) | `/design-lab/quote` | PR5 1440×900 |
 | AgentConversation / UserMessage / AgentMessage | Agent thread | user / assistant | streaming, empty, error | 760px column, 32/36 | live region, Enter send, Shift+Enter newline | Prompt Kit MIT | `/design-lab/agents` · `/agents` | PR7 1440×900 |
 | AgentComposer / PromptSuggestion | Prompt input | idle / sending | disabled, context chip | 32/36, orange send only | Enter / Shift+Enter, IME-safe | Prompt Kit MIT | `/design-lab/agents` · `/agents` | PR7 |
 | StreamingState / ThinkingState / ReasoningDisclosure | Loaders + reasoning | — | running, reduced-motion | — | aria-live | Prompt Kit loader + PastaUI MIT | `/design-lab/agents` | PR7 |

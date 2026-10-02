@@ -125,16 +125,17 @@ export function assertP09DrawerProofs(): void {
 }
 
 export const P09_DRAWER_PROOFS = {
-    'canonical RecordType is contact|company|lead|deal|quote':
+    'canonical RecordType is contact|company|lead|deal|quote|ticket':
         parseRecordRef('contact', 1)?.type === 'contact' &&
-        parseRecordRef('ticket', 1) === null,
+        parseRecordRef('ticket', 1)?.type === 'ticket',
     'RecordRef parse rejects malformed ids': parseRecordRef('contact', 'abc') === null,
     'fullRecordHref uses existing show routes':
         fullRecordHref({ type: 'contact', id: 11 }) === '/crm/contacts/11' &&
         fullRecordHref({ type: 'company', id: 4 }) === '/crm/companies/4' &&
         fullRecordHref({ type: 'lead', id: 8 }) === '/crm/leads/8' &&
         fullRecordHref({ type: 'deal', id: 22 }) === '/crm/deals/22' &&
-        fullRecordHref({ type: 'quote', id: 9 }) === '/crm/quotes/9',
+        fullRecordHref({ type: 'quote', id: 9 }) === '/crm/quotes/9' &&
+        fullRecordHref({ type: 'ticket', id: 3 }) === '/crm/tickets/3',
     'peek token is type:id':
         serializePeekRef({ type: 'deal', id: 22 }) === 'deal:22' &&
         parsePeekToken('quote:9')?.type === 'quote',
