@@ -19,6 +19,7 @@ import type {
     AgentPrompt,
 } from '@/lib/desk/agent-profiles';
 import type { AgentRecordContext, BotDefinition } from '@/lib/desk/bot-catalog';
+import { t } from '@/lib/i18n';
 
 type AgentComposerProps = {
     selectedBot: BotDefinition;
@@ -176,7 +177,7 @@ export function AgentsComposer({
             onSubmit={submit}
             isLoading={sending}
             disabled={sending}
-            aria-label="Message à l’agent"
+            aria-label={t('Message to the agent')}
             data-agents-composer
         >
             <div className="flex min-h-8 flex-wrap items-center gap-2 px-0.5 pb-2">
@@ -197,7 +198,9 @@ export function AgentsComposer({
                                 'grid size-4 shrink-0 place-items-center rounded text-evo-teal/70 hover:bg-evo-teal-soft hover:text-evo-teal',
                                 evoFocus,
                             )}
-                            aria-label={`Retirer le contexte ${selectedContext.label}`}
+                            aria-label={t('Remove :label context', {
+                                label: selectedContext.label,
+                            })}
                             onClick={() => onSelectContext(null)}
                         >
                             <X className="size-3" weight="bold" aria-hidden />
@@ -207,12 +210,12 @@ export function AgentsComposer({
             </div>
 
             <label className="sr-only" htmlFor="agent-message-input">
-                Votre message
+                {t('Your message')}
             </label>
             <PromptInputTextarea
                 id="agent-message-input"
                 placeholder={profile.placeholder}
-                aria-label="Votre message"
+                aria-label={t('Your message')}
                 maxLength={240}
                 rows={3}
             />
@@ -227,17 +230,17 @@ export function AgentsComposer({
                                 aria-hidden
                             />
                         }
-                        label="Joindre"
+                        label={t('Attach')}
                         active={panel === 'attach' || Boolean(selectedContext)}
                         onClick={() => togglePanel('attach')}
                     />
                     <ComposerToolButton
-                        label="Contexte"
+                        label={t('Context')}
                         active={panel === 'context'}
                         onClick={() => togglePanel('context')}
                     />
                     <ComposerToolButton
-                        label="Modèles"
+                        label={t('Templates')}
                         active={panel === 'templates'}
                         onClick={() => togglePanel('templates')}
                     />
@@ -246,13 +249,13 @@ export function AgentsComposer({
                     type="button"
                     size="sm"
                     disabled={!canSend}
-                    aria-label="Envoyer le message"
+                    aria-label={t('Send message')}
                     onClick={(event) => {
                         event.stopPropagation();
                         submit();
                     }}
                 >
-                    {sending ? 'Envoi…' : 'Envoyer'}
+                    {sending ? t('Sending…') : t('Send')}
                     <PaperPlaneRight
                         className="size-3.5"
                         weight="fill"
@@ -350,9 +353,9 @@ function RecordSearchPanel({
 }) {
     return (
         <div className="p-3">
-            <p className="text-[12px] font-semibold">Joindre une fiche CRM</p>
+            <p className="text-[12px] font-semibold">{t('Attach a CRM record')}</p>
             <p className="mt-0.5 text-[11px] text-evo-ink-muted">
-                Recherchez une affaire, un lead, un contact, une entreprise ou un devis.
+                {t('Search deals, leads, contacts, companies, or quotes.')}
             </p>
             <label className="relative mt-3 block">
                 <MagnifyingGlass
@@ -375,8 +378,8 @@ function RecordSearchPanel({
                             onSelect(hits[0]);
                         }
                     }}
-                    placeholder="Rechercher dans le CRM…"
-                    aria-label="Rechercher dans le CRM"
+                    placeholder={t('Search CRM records...')}
+                    aria-label={t('Search CRM records')}
                     className={cn(
                         'h-9 w-full rounded-[var(--evo-radius-compact)] border border-evo-hairline bg-evo-canvas pe-3 ps-9 text-[12px] outline-none placeholder:text-evo-ink-faint focus:border-evo-teal',
                         evoFocus,
@@ -386,25 +389,25 @@ function RecordSearchPanel({
             <div className="evo-scroll mt-2 max-h-[150px] overflow-y-auto">
                 {searching ? (
                     <p className="px-2 py-2 text-[12px] text-evo-ink-muted">
-                        Recherche CRM…
+                        {t('Searching CRM…')}
                     </p>
                 ) : failed ? (
                     <p className="px-2 py-2 text-[12px] text-evo-danger">
-                        La recherche CRM est indisponible pour le moment.
+                        {t('CRM search is unavailable right now.')}
                     </p>
                 ) : query.trim().length < 2 ? (
                     <p className="px-2 py-2 text-[12px] text-evo-ink-muted">
-                        Saisissez au moins deux caractères.
+                        {t('Enter at least two characters.')}
                     </p>
                 ) : hits.length === 0 ? (
                     <p className="px-2 py-2 text-[12px] text-evo-ink-muted">
-                        Aucune fiche CRM correspondante.
+                        {t('No matching CRM records.')}
                     </p>
                 ) : (
                     <ul
                         className="space-y-0.5"
                         role="listbox"
-                        aria-label="Résultats CRM"
+                        aria-label={t('CRM search results')}
                     >
                         {hits.map((hit) => (
                             <li key={`${hit.type}:${hit.id}`}>
@@ -443,9 +446,9 @@ function ContextPanel({
 }) {
     return (
         <div className="p-3">
-            <p className="text-[12px] font-semibold">Ouvrir le contexte CRM</p>
+            <p className="text-[12px] font-semibold">{t('Open CRM context')}</p>
             <p className="mt-0.5 text-[11px] text-evo-ink-muted">
-                Continuer dans un espace lié à cet agent.
+                {t('Continue in a workspace linked to this agent.')}
             </p>
             <ul className="mt-2 grid grid-cols-2 gap-1">
                 {contexts.map((context) => (
@@ -476,7 +479,7 @@ function TemplatesPanel({
 }) {
     return (
         <div className="p-3">
-            <p className="text-[12px] font-semibold">Modèles de message</p>
+            <p className="text-[12px] font-semibold">{t('Message templates')}</p>
             <ul className="mt-2 space-y-0.5">
                 {prompts.map((prompt) => (
                     <li key={prompt.label}>
@@ -492,7 +495,7 @@ function TemplatesPanel({
                                 {prompt.label}
                             </span>
                             <span className="text-[10px] text-evo-ink-muted">
-                                Utiliser
+                                {t('Use')}
                             </span>
                         </button>
                     </li>
@@ -525,13 +528,13 @@ function toRecordContext(hit: CommandSearchHit): AgentRecordContext | null {
 }
 
 function recordTypeLabel(type: string): string {
-    const labels: Record<string, string> = {
-        company: 'Entreprise',
+    const keys: Record<string, string> = {
+        company: 'Company',
         contact: 'Contact',
-        deal: 'Affaire',
+        deal: 'Deal',
         lead: 'Lead',
-        quote: 'Devis',
+        quote: 'Quote',
     };
 
-    return labels[type] ?? type;
+    return keys[type] ? t(keys[type]) : type;
 }
