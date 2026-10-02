@@ -1,16 +1,15 @@
 /**
- * shadcn New York → Aurora variant map.
+ * shadcn New York → Evo variant map (PR3).
  *
- * Public product API is `@/components/ui/*`. Aurora implements the controls;
- * this file is the only variant translation. Color comes from the P02
- * semantic tokens in `resources/css/app.css` (`--color-accent`, `--color-bg`, …).
- * Do not add a parallel palette here.
+ * Public product API is `@/components/ui/*` → `ds/components` → `@/evo/ui/*`.
+ * Color comes from the P02 semantic tokens in `resources/css/app.css`.
+ * Aurora primitives were deleted (AGPL-3.0-only).
  *
- * Mapped here: Button, Badge. Other primitives re-export Aurora 1:1
- * (Input, Select, Tabs, Dialog, Sheet/Drawer, …) or Sonner for Toast.
+ * Mapped here: Button, Badge. Other primitives re-export Evo 1:1
+ * or Sonner for Toast.
  */
-import type { BadgeFill, BadgeTone } from '@/components/ui/aurora/badge';
-import type { ButtonSize as AuroraButtonSize, ButtonVariant as AuroraButtonVariant } from '@/components/ui/aurora/button';
+import type { BadgeFill, BadgeTone } from '@/evo/ui/badge';
+import type { ButtonSize as EvoButtonSize, ButtonVariant as EvoButtonVariant } from '@/evo/ui/button';
 
 export type ShadcnButtonVariant =
     | 'default'
@@ -26,36 +25,36 @@ export type ShadcnButtonSize = 'default' | 'sm' | 'lg' | 'icon' | null | undefin
 
 export function mapButtonVariant(
     variant?: ShadcnButtonVariant,
-): { variant: AuroraButtonVariant; filled?: boolean } {
+): { variant: EvoButtonVariant; filled?: boolean } {
     switch (variant) {
         case 'destructive':
             return { variant: 'destructive', filled: true };
         case 'outline':
-            return { variant: 'neutral', filled: false };
+            return { variant: 'outline', filled: false };
         case 'secondary':
-            return { variant: 'neutral', filled: false };
+            return { variant: 'secondary', filled: false };
         case 'ghost':
             return { variant: 'ghost' };
         case 'link':
-            return { variant: 'plain' };
+            return { variant: 'link' };
         case 'default':
         default:
-            return { variant: 'aurora', filled: true };
+            return { variant: 'default', filled: true };
     }
 }
 
-export function mapButtonSize(size?: ShadcnButtonSize): AuroraButtonSize {
+export function mapButtonSize(size?: ShadcnButtonSize): EvoButtonSize {
     if (size === 'sm') {
-return 'sm';
-}
+        return 'sm';
+    }
 
     if (size === 'lg') {
-return 'lg';
-}
+        return 'lg';
+    }
 
     if (size === 'icon') {
-return 'icon';
-}
+        return 'icon';
+    }
 
     return 'default';
 }

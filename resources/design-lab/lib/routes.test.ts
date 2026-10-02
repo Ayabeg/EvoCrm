@@ -9,6 +9,17 @@ describe('design-lab token route', () => {
         expect(routePath({ name: 'tokens' })).toBe('/tokens');
         expect(labHref({ name: 'tokens' })).toMatch(/tokens/);
     });
+
+    it('parses /design-lab/components and /design-lab/data', () => {
+        expect(parseLabLocation('/design-lab/components', '')).toEqual({
+            name: 'components',
+        });
+        expect(parseLabLocation('/design-lab/data', '')).toEqual({
+            name: 'data',
+        });
+        expect(routePath({ name: 'components' })).toBe('/components');
+        expect(routePath({ name: 'data' })).toBe('/data');
+    });
 });
 
 describe('design-lab shell route', () => {

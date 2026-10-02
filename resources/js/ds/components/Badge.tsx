@@ -1,27 +1,10 @@
 import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
-import { Badge as AuroraBadge } from '@/components/ui/aurora/badge';
-import {
-    mapBadgeVariant,
-    type ShadcnBadgeVariant,
-} from '@/lib/aurora/shadcn-bridge';
+import type { BadgeProps } from '@/evo/ui/badge';
+import { Badge as EvoBadge, badgeVariants } from '@/evo/ui/badge';
 import { cn } from '@/lib/utils';
-
-const badgeVariants = cva('inline-flex', {
-    variants: {
-        variant: {
-            default: '',
-            secondary: '',
-            destructive: '',
-            outline: '',
-        },
-    },
-    defaultVariants: {
-        variant: 'default',
-    },
-});
 
 function Badge({
     className,
@@ -31,10 +14,8 @@ function Badge({
 }: React.ComponentProps<'span'> &
     VariantProps<typeof badgeVariants> & {
         asChild?: boolean;
-        variant?: ShadcnBadgeVariant;
+        variant?: BadgeProps['variant'];
     }) {
-    const mapped = mapBadgeVariant(variant);
-
     if (asChild) {
         return (
             <Slot
@@ -45,15 +26,7 @@ function Badge({
         );
     }
 
-    return (
-        <AuroraBadge
-            data-slot="badge"
-            tone={mapped.tone}
-            fill={mapped.fill}
-            className={cn(className)}
-            {...props}
-        />
-    );
+    return <EvoBadge data-slot="badge" variant={variant} className={className} {...props} />;
 }
 
 export { Badge, badgeVariants };

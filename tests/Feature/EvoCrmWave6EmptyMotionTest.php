@@ -1,7 +1,7 @@
 <?php
 
 it('composes shared empty states with an illustration slot and line-art kinds', function () {
-    $empty = file_get_contents(resource_path('js/components/ui/aurora/empty-state.tsx'));
+    $empty = file_get_contents(resource_path('js/evo/patterns/empty-state/index.tsx'));
     $art = file_get_contents(resource_path('js/components/ui/empty-illustration.tsx'));
     $lists = file_get_contents(resource_path('js/components/crm/list-chrome.tsx'));
     $home = file_get_contents(resource_path('js/components/dashboard/home-widget.tsx'));
@@ -52,7 +52,7 @@ it('wires Home, Contacts, and Deals empties through the shared components', func
 it('applies MOTION 3 press, rail, drawer, and toast without page hijacks', function () {
     $motion = file_get_contents(resource_path('css/aurora-motion.css'));
     $app = file_get_contents(resource_path('css/app.css'));
-    $sheet = file_get_contents(resource_path('js/components/ui/aurora/sheet.tsx'));
+    $sheet = file_get_contents(resource_path('js/evo/ui/sheet.tsx'));
     $drawer = file_get_contents(resource_path('js/components/crm/create-drawer.tsx'));
     $toast = file_get_contents(resource_path('js/components/ui/sonner.tsx'));
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));

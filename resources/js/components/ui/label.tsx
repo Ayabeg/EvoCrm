@@ -1,1 +1,1 @@
-export { Label } from '@/components/ui/aurora/label';
+export { Label, type LabelProps } from '@/evo/ui/label';

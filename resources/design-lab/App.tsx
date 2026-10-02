@@ -12,6 +12,8 @@ import { DealsListPage } from './pages/DealsListPage';
 import { DevisPage } from './pages/DevisPage';
 import { InboxPage } from './pages/InboxPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { ComponentsPage } from './pages/ComponentsPage';
+import { DataPage } from './pages/DataPage';
 import { ShellPage } from './pages/ShellPage';
 import { TokensPage } from './pages/TokensPage';
 import {
@@ -39,6 +41,10 @@ function renderRoute(route: LabRoute) {
             return <TokensPage />;
         case 'shell':
             return <ShellPage />;
+        case 'components':
+            return <ComponentsPage />;
+        case 'data':
+            return <DataPage />;
         case 'inbox':
             return <InboxPage />;
         case 'contacts':

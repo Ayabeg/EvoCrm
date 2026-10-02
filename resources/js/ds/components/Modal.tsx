@@ -23,4 +23,4 @@ export {
     DialogTrigger as ModalTrigger,
     type DialogContentProps,
     type DialogContentProps as ModalContentProps,
-} from '@/components/ui/aurora/dialog';
+} from '@/evo/ui/dialog';

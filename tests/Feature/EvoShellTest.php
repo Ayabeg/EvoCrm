@@ -40,9 +40,9 @@ it('switches sidebar modes with the Evo tablist — Astryx SegmentedControl reti
     $switch = file_get_contents(resource_path('js/evo/shell/mode-switch.tsx'));
     $css = file_get_contents(resource_path('css/evo-shell.css'));
     $appCss = file_get_contents(resource_path('css/app.css'));
-    $local = file_get_contents(resource_path('js/components/ui/segmented-control.tsx'));
     $agentsState = file_get_contents(resource_path('js/lib/desk/agents-workspace-state.ts'));
 
+    expect(file_exists(resource_path('js/components/ui/segmented-control.tsx')))->toBeFalse();
     expect($rail)->toContain("from '@/evo/shell/mode-switch'")
         ->and($rail)->toContain('ShellModeSwitch')
         ->and($rail)->not->toContain('@astryxdesign')
@@ -54,7 +54,6 @@ it('switches sidebar modes with the Evo tablist — Astryx SegmentedControl reti
         ->and($rail)->not->toContain("from '@/components/ui/segmented-control'")
         ->and($css)->not->toContain('.evo-mode-capsule')
         ->and($appCss)->not->toContain('@astryxdesign')
-        ->and($local)->toContain('Local Astryx SegmentedControl fallback')
         ->and($rail)->toContain('data-shell-mode="agents"')
         ->and($rail)->toContain('{agentsContent}')
         ->and($agentsState)->toContain('selectedChatByAgent');

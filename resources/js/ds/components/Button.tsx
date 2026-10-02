@@ -1,31 +1,26 @@
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
-import { Button as AuroraButton } from '@/components/ui/aurora/button';
-import {
-    mapButtonSize,
-    mapButtonVariant,
-    type ShadcnButtonSize,
-    type ShadcnButtonVariant,
-} from '@/lib/aurora/shadcn-bridge';
-import { cn } from '@/lib/utils';
+import type { ButtonProps } from '@/evo/ui/button';
+import { Button as CanonicalButton, buttonVariants as evoButtonVariants } from '@/evo/ui/button';
 
 /** Compatibility export for legacy tailwind composition. */
-const buttonVariants = cva('aurora-btn', {
+const buttonVariants = cva('evo-btn', {
     variants: {
         variant: {
-            default: 'aurora-btn--aurora aurora-btn--filled',
-            destructive: 'aurora-btn--destructive aurora-btn--filled',
-            outline: 'aurora-btn--neutral',
-            secondary: 'aurora-btn--neutral',
-            ghost: 'aurora-btn--ghost',
-            link: 'aurora-btn--plain',
+            default: '',
+            destructive: '',
+            outline: '',
+            secondary: '',
+            ghost: '',
+            link: '',
         },
         size: {
             default: '',
-            sm: 'aurora-btn--sm',
-            lg: 'aurora-btn--lg',
-            icon: 'aurora-btn--icon',
+            sm: '',
+            lg: '',
+            icon: '',
         },
     },
     defaultVariants: {
@@ -34,34 +29,10 @@ const buttonVariants = cva('aurora-btn', {
     },
 });
 
-function Button({
-    className,
-    variant,
-    size,
-    asChild = false,
-    shape,
-    ...props
-}: React.ComponentProps<'button'> &
-    VariantProps<typeof buttonVariants> & {
-        asChild?: boolean;
-        variant?: ShadcnButtonVariant;
-        size?: ShadcnButtonSize;
-        shape?: 'default' | 'pill';
-    }) {
-    const mapped = mapButtonVariant(variant);
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps & VariantProps<typeof buttonVariants>>(
+    function Button(props, ref) {
+        return <CanonicalButton ref={ref} data-slot="button" {...props} />;
+    },
+);
 
-    return (
-        <AuroraButton
-            data-slot="button"
-            variant={mapped.variant}
-            filled={mapped.filled}
-            size={mapButtonSize(size)}
-            asChild={asChild}
-            shape={shape}
-            className={cn(className)}
-            {...props}
-        />
-    );
-}
-
-export { Button, buttonVariants };
+export { Button, buttonVariants, evoButtonVariants };

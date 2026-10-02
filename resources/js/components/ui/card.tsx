@@ -6,4 +6,5 @@ export {
     CardFooter,
     CardHeader,
     CardTitle,
-} from '@/components/ui/aurora/card';
+} from '@/evo/ui/card';
+export { default } from '@/evo/ui/card';

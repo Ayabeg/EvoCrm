@@ -1,1 +1,1 @@
-export { Checkbox, type CheckboxProps } from '@/components/ui/aurora/checkbox';
+export { Checkbox, type CheckboxProps } from '@/evo/ui/checkbox';

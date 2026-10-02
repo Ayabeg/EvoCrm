@@ -31,7 +31,8 @@ it('composes desk and connectors empty states as icon, short copy, and one brand
     $dsEmpty = file_get_contents(resource_path('js/ds/components/EmptyState.tsx'));
 
     expect($empty)->toContain('ds/components/EmptyState');
-    expect($dsEmpty)->toContain('aurora/empty-state');
+    expect($dsEmpty)->toContain('evo/patterns/empty-state');
+    expect($dsEmpty)->not->toContain('aurora/empty-state');
 
     expect($inbox)
         ->toContain('EmptyState')

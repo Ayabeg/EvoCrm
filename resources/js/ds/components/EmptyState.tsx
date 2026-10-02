@@ -2,7 +2,7 @@ export {
     EmptyState,
     type EmptyStateDensity,
     type EmptyStateProps,
-} from '@/components/ui/aurora/empty-state';
+} from '@/evo/patterns/empty-state';
 export {
     EmptyIllustration,
     inferEmptyKind,

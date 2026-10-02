@@ -14,9 +14,9 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
     $activation = File::get(resource_path('js/components/dashboard/activation-checklist.tsx'));
     $filters = File::get(resource_path('js/ds/workspace/FilterBar.tsx'));
     $views = File::get(resource_path('js/ds/workspace/SavedViews.tsx'));
-    $dialog = File::get(resource_path('js/components/ui/aurora/dialog.tsx'));
-    $sheet = File::get(resource_path('js/components/ui/aurora/sheet.tsx'));
-    $palette = File::get(resource_path('js/components/aurora/command-palette.tsx'));
+    $dialog = File::get(resource_path('js/evo/ui/dialog.tsx'));
+    $sheet = File::get(resource_path('js/evo/ui/sheet.tsx'));
+    $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $motion = File::get(resource_path('css/aurora-motion.css'));
     $leads = File::get(resource_path('js/pages/leads/board.tsx'));
     $advanced = File::get(resource_path('js/ds/workspace/AdvancedFilterDrawer.tsx'));
@@ -86,16 +86,17 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($views)->toContain("aria-current={String(view.id) === activeViewId ? 'page' : undefined}");
 
     expect($dialog)->toContain('motion-reduce:animate-none')
-        ->and($dialog)->toContain('aria-label="Close"')
+        ->and($dialog)->toContain('sr.close')
         ->and($sheet)->toContain('motion-reduce:animate-none')
-        ->and($sheet)->toContain('aria-label="Close"');
+        ->and($sheet)->toContain('sr.close');
+    expect(file_get_contents(resource_path('js/evo/lib/a11y.ts')))->toContain("close: 'Fermer'");
 
     expect($palette)->toContain('trapTabKey')
         ->and($palette)->toContain('restoreFocus')
         ->and($palette)->toContain('data-a11y="focus-trap"')
         ->and($palette)->toContain('data-command="backdrop"')
-        ->and($palette)->toContain('aria-label="Command palette"')
-        ->and($palette)->toContain('aria-label="Search commands"');
+        ->and($palette)->toContain('aria-label="Palette de commandes"')
+        ->and($palette)->toContain('aria-label="Rechercher des commandes"');
 
     expect($motion)->toContain("@media (prefers-reduced-motion: reduce)")
         ->and($motion)->toContain("[data-command='os']")

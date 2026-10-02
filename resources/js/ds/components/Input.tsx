@@ -1,18 +1,14 @@
 import * as React from 'react';
 
-import {
-    Input as AuroraInput,
-    type InputProps as AuroraInputProps,
-    type InputSize,
-    type InputState,
-} from '@/components/ui/aurora/input';
-import { FieldError } from '@/components/ui/field';
-import { Label } from '@/components/ui/label';
+import { FieldError } from '@/evo/ui/field';
+import { Input as EvoInput    } from '@/evo/ui/input';
+import type {InputProps as EvoInputProps, InputSize, InputState} from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
 import { cn } from '@/lib/utils';
 
 export type { InputSize, InputState };
 
-export type InputProps = Omit<AuroraInputProps, 'error'> & {
+export type InputProps = Omit<EvoInputProps, 'error'> & {
     label?: string;
     hint?: string;
     error?: boolean | string;
@@ -33,18 +29,14 @@ function Input({
     const hasError = Boolean(error);
 
     const control = (
-        <AuroraInput
+        <EvoInput
             ref={ref}
             id={inputId}
             error={hasError}
             className={cn(className)}
             aria-invalid={hasError || undefined}
             aria-describedby={
-                errorMessage
-                    ? `${inputId}-error`
-                    : hint
-                      ? `${inputId}-hint`
-                      : undefined
+                errorMessage ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
             }
             {...props}
         />
@@ -72,9 +64,7 @@ function Input({
                 </p>
             ) : null}
             {errorMessage ? (
-                <FieldError id={inputId ? `${inputId}-error` : undefined}>
-                    {errorMessage}
-                </FieldError>
+                <FieldError id={inputId ? `${inputId}-error` : undefined}>{errorMessage}</FieldError>
             ) : null}
         </div>
     );

@@ -13,6 +13,7 @@
 @import './settings-dialog.css';
 
 @source '../views';
+@source '../js/evo/**/*.{ts,tsx}';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -278,10 +279,9 @@
     --sidebar-online: var(--evo-success);
 }
 
-/* Aurora Design System — registry primitives + component CSS */
-@import '../js/components/aurora.css';
+/* Aurora token aliases (leftover AGPL chrome) + Evo motion.
+ * Vendored aurora.css / aurora-components.css removed in PR3 (AGPL-3.0-only). */
 @import './aurora-evotechly-bridge.css';
-@import '../js/components/aurora-components.css';
 @import './aurora-motion.css';
 
 /*
@@ -583,56 +583,43 @@
 
 /*
  * EvoCrm button composition.
- * Unlayered so it wins over @layer aurora-components.
- * Tailwind declares `utilities` before this file can insert aurora-components,
- * so a utilities-layer restyle loses to Aurora's glass shadows at runtime.
+ * Unlayered so it wins over leftover layered chrome.
+ * Tailwind declares `utilities` before this file.
  * P03 locks default control height (36px) and radius (8px) here.
- * Dialogs, popovers, and dropdowns keep Aurora overlay elevation.
+ * Dialogs, popovers, and dropdowns keep overlay elevation.
  */
-.aurora-btn {
-    height: 36px;
-    border-radius: 8px;
-    border-color: var(--color-border);
+.evo-btn,
+[data-slot='button'] {
     box-shadow: none;
 }
 
-.aurora-btn--sm {
+.evo-btn[data-size='default'],
+.evo-btn:not([data-size]) {
+    height: 36px;
+    border-radius: 8px;
+}
+
+.evo-btn[data-size='sm'] {
     height: 32px;
     border-radius: 8px;
 }
 
-.aurora-btn--lg {
-    height: 40px;
+.evo-btn[data-size='lg'] {
+    height: 36px;
     border-radius: 8px;
 }
 
-.aurora-btn--icon {
+.evo-btn[data-size='icon'] {
     width: 36px;
     height: 36px;
 }
 
-.aurora-btn--sm.aurora-btn--icon {
-    width: 32px;
-    height: 32px;
-}
-
-.aurora-btn--lg.aurora-btn--icon {
-    width: 40px;
-    height: 40px;
-}
-
-.aurora-btn--unstyled {
-    height: auto;
-    width: auto;
-    border-radius: 0;
-}
-
-.aurora-btn:hover,
-.aurora-btn:active {
+.evo-btn:hover,
+.evo-btn:active {
     box-shadow: none;
 }
 
-.aurora-btn:focus-visible {
+.evo-btn:focus-visible {
     box-shadow:
         0 0 0 1px color-mix(in srgb, var(--color-focus-ring) 45%, transparent),
         0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 22%, transparent);
@@ -642,91 +629,28 @@
     outline-color: var(--color-focus-ring);
 }
 
-.aurora-btn--neutral,
-.aurora-btn--aurora:not(.aurora-btn--filled),
-.aurora-btn--rose:not(.aurora-btn--filled),
-.aurora-btn--success:not(.aurora-btn--filled),
-.aurora-btn--warn:not(.aurora-btn--filled),
-.aurora-btn--destructive:not(.aurora-btn--filled) {
-    background: transparent;
-    box-shadow: none;
-}
-
-.aurora-btn--neutral:hover,
-.aurora-btn--aurora:not(.aurora-btn--filled):hover,
-.aurora-btn--rose:not(.aurora-btn--filled):hover,
-.aurora-btn--success:not(.aurora-btn--filled):hover,
-.aurora-btn--warn:not(.aurora-btn--filled):hover,
-.aurora-btn--destructive:not(.aurora-btn--filled):hover {
-    background: var(--aurora-hover-bg);
-    box-shadow: none;
-}
-
-.aurora-btn--aurora:not(.aurora-btn--filled) {
-    color: var(--evosales-ink);
-    border-color: var(--evosales-hairline);
-}
-
-.aurora-btn--filled.aurora-btn--aurora {
+.evo-btn[data-variant='default'] {
     background: var(--primary);
     border-color: var(--primary);
     color: var(--evo-on-primary);
     box-shadow: none;
 }
 
-.dark .aurora-btn--filled.aurora-btn--aurora {
+.dark .evo-btn[data-variant='default'] {
     color: var(--evo-on-primary);
 }
 
-.aurora-btn--filled.aurora-btn--aurora:hover {
+.evo-btn[data-variant='default']:hover {
     background: var(--evosales-mark-hover);
     border-color: var(--evosales-mark-hover);
     color: var(--evo-on-primary);
     box-shadow: none;
 }
 
-.aurora-btn--filled.aurora-btn--aurora:active {
+.evo-btn[data-variant='default']:active {
     background: var(--evosales-mark-pressed);
     border-color: var(--evosales-mark-pressed);
     color: var(--evo-on-primary);
-    box-shadow: none;
-}
-
-.aurora-btn--filled.aurora-btn--rose,
-.aurora-btn--filled.aurora-btn--success,
-.aurora-btn--filled.aurora-btn--warn,
-.aurora-btn--filled.aurora-btn--destructive {
-    box-shadow: none;
-}
-
-.aurora-btn--ghost,
-.aurora-btn--plain {
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-}
-
-.aurora-btn--ghost:hover {
-    color: var(--evosales-ink);
-    background: var(--aurora-hover-bg);
-    box-shadow: none;
-}
-
-.aurora-btn--plain:hover {
-    background: transparent;
-    box-shadow: none;
-}
-
-.aurora-btn--unstyled {
-    box-shadow: none;
-    background: transparent;
-    border-color: transparent;
-}
-
-.aurora-btn.bg-ink {
-    background: var(--evosales-ink);
-    border-color: var(--evosales-ink);
-    color: var(--evosales-canvas);
     box-shadow: none;
 }
 
@@ -743,13 +667,15 @@
     background: transparent;
 }
 
-.record-action-group .aurora-btn {
+.record-action-group .evo-btn,
+.record-action-group [data-slot='button'] {
     border-color: transparent;
     background: transparent;
     box-shadow: none;
 }
 
-.record-action-group .aurora-btn[aria-pressed='true'] {
+.record-action-group .evo-btn[aria-pressed='true'],
+.record-action-group [data-slot='button'][aria-pressed='true'] {
     background: var(--aurora-hover-bg);
     color: var(--evosales-mark);
 }

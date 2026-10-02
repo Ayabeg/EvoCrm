@@ -12,8 +12,8 @@ import {
   X,
 } from "lucide-react"
 import * as React from "react"
-import { Button } from "@/components/ui/aurora/button"
-import { Textarea } from "@/components/ui/aurora/textarea"
+import { Button } from "@/evo/ui/button"
+import { Textarea } from "@/evo/ui/textarea"
 
 export interface Attachment {
   id: string

@@ -5,6 +5,7 @@
  * See docs/motion/P27-CONTRACT.md
  */
 
+.evo-btn,
 .aurora-btn {
     transition:
         transform var(--motion-duration-page, 150ms)
@@ -19,6 +20,7 @@
             var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
 }
 
+.evo-btn:active:not(:disabled):not([aria-disabled='true']),
 .aurora-btn:active:not(:disabled):not([aria-disabled='true']) {
     transform: scale(0.98);
 }
@@ -75,6 +77,16 @@
         var(--motion-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
 }
 
+@keyframes aurora-backdrop-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 @keyframes evocrm-command-in {
     from {
         opacity: 0;
@@ -86,6 +98,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .evo-btn,
     .aurora-btn,
     .app-rail-item {
         transition: none !important;

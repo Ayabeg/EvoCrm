@@ -1,1 +1,1 @@
-export { Skeleton, SkeletonRow, type SkeletonProps } from '@/components/ui/aurora/skeleton';
+export { Skeleton, SkeletonRow, type SkeletonProps } from '@/evo/ui/skeleton';

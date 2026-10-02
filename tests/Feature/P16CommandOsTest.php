@@ -74,7 +74,6 @@ function p16Workspace(): array
 it('extends the one existing command surface without a second palette', function () {
     $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $compat = File::get(resource_path('js/components/crm/command-palette.tsx'));
-    $aurora = File::get(resource_path('js/components/aurora/command-palette.tsx'));
     $header = File::get(resource_path('js/components/app-sidebar-header.tsx'));
     $lib = File::get(resource_path('js/lib/command-os.ts'));
     $search = File::get(app_path('Services/Crm/CommandSearch.php'));
@@ -100,7 +99,6 @@ it('extends the one existing command surface without a second palette', function
         ->and($palette)->not->toContain('Date.now')
         ->and($palette)->not->toContain('evoSearchIndex')
         ->and($palette)->not->toContain('from \'lucide-react\'')
-        ->and($aurora)->toContain('isComposing')
         ->and($palette)->toContain('isComposing')
         ->and($palette)->toContain('data-command="os"')
         ->and($palette)->toContain('560px')

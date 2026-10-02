@@ -9,4 +9,4 @@ export {
     SheetTitle,
     SheetTrigger,
     type SheetContentProps,
-} from '@/components/ui/aurora/sheet';
+} from '@/evo/ui/sheet';

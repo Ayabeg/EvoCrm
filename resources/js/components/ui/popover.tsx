@@ -6,4 +6,6 @@ export {
     PopoverHeader,
     PopoverTitle,
     PopoverTrigger,
-} from '@/components/ui/aurora/popover';
+    type PopoverContentProps,
+    type PopoverTriggerProps,
+} from '@/evo/ui/popover';

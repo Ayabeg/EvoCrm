@@ -6,20 +6,22 @@
  * Does not own AppShell / rail width.
  */
 
-it('keeps product buttons on the Aurora adapter with a 36px default control', function () {
+it('keeps product buttons on the Evo adapter with a 36px default control', function () {
     $ds = file_get_contents(resource_path('js/ds/components/Button.tsx'));
     $adapter = file_get_contents(resource_path('js/components/ui/button.tsx'));
     $bridge = file_get_contents(resource_path('js/lib/aurora/shadcn-bridge.ts'));
     $product = file_get_contents(resource_path('css/app.css'));
+    $evo = file_get_contents(resource_path('js/evo/ui/button.tsx'));
 
-    expect($ds)->toContain("from '@/components/ui/aurora/button'")
-        ->and($ds)->toContain('aurora-btn--aurora aurora-btn--filled')
+    expect($ds)->toContain("from '@/evo/ui/button'")
+        ->and($ds)->not->toContain('@/components/ui/aurora')
         ->and($adapter)->toContain("from '@/ds/components/Button'")
-        ->and($bridge)->toContain("return { variant: 'aurora', filled: true }")
+        ->and($bridge)->toContain("return { variant: 'default', filled: true }")
+        ->and($evo)->toContain('evo-btn')
+        ->and($evo)->toContain('h-9')
         ->and($product)->toContain('height: 36px')
-        ->and($product)->toContain('.aurora-btn {')
+        ->and($product)->toContain('.evo-btn')
         ->and($product)->toContain('border-radius: 8px')
-        ->and($product)->toContain('.aurora-btn--filled.aurora-btn--aurora')
         ->and($product)->toContain('color: var(--evo-on-primary)')
         ->and($product)->toContain('background: var(--primary)');
 });
@@ -89,12 +91,12 @@ it('lets Input and Select accept a label above and an error string below', funct
         ->and($input)->toContain('hint?:')
         ->and($input)->toContain("error?: boolean | string")
         ->and($input)->toContain('FieldError')
-        ->and($input)->toContain("from '@/components/ui/aurora/input'")
+        ->and($input)->toContain("from '@/evo/ui/input'")
         ->and($select)->toContain('label?:')
         ->and($select)->toContain('hint?:')
         ->and($select)->toContain("error?: boolean | string")
         ->and($select)->toContain('FieldError')
-        ->and($select)->toContain("from '@/components/ui/aurora/select'");
+        ->and($select)->toContain("from '@/evo/ui/select'");
 });
 
 it('does not introduce a third theme or Wave hex in public primitives', function () {
@@ -113,8 +115,8 @@ it('does not introduce a third theme or Wave hex in public primitives', function
             ->and($src)->not->toContain('PremiumButton');
     }
 
-    $alert = file_get_contents(resource_path('js/components/ui/alert.tsx'));
-    expect($alert)->toContain('var(--color-')
+    $alert = file_get_contents(resource_path('js/evo/ui/alert.tsx'));
+    expect($alert)->toContain('var(--evo-')
         ->and($alert)->not->toContain('--evosales-canvas')
         ->and($alert)->not->toContain('--evosales-ink');
 });
@@ -124,14 +126,14 @@ it('uses Phosphor inside public-facing primitives that render icons', function (
         'js/components/ui/breadcrumb.tsx',
         'js/components/ui/input-otp.tsx',
         'js/components/ui/navigation-menu.tsx',
-        'js/components/ui/aurora/input.tsx',
-        'js/components/ui/aurora/select.tsx',
-        'js/components/ui/aurora/native-select.tsx',
-        'js/components/ui/aurora/checkbox.tsx',
-        'js/components/ui/aurora/dialog.tsx',
-        'js/components/ui/aurora/sheet.tsx',
-        'js/components/ui/aurora/dropdown-menu.tsx',
-        'js/components/ui/aurora/badge.tsx',
+        'js/evo/ui/input.tsx',
+        'js/evo/ui/select.tsx',
+        'js/evo/ui/native-select.tsx',
+        'js/evo/ui/checkbox.tsx',
+        'js/evo/ui/dialog.tsx',
+        'js/evo/ui/sheet.tsx',
+        'js/evo/ui/dropdown-menu.tsx',
+        'js/evo/ui/badge.tsx',
     ];
 
     foreach ($files as $file) {

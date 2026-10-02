@@ -8,7 +8,7 @@ Rules: one row per external item. Every vendored file must carry a header matchi
 
 | Item | Why | Action |
 |---|---|---|
-| Vendored Aurora (`components/ui/aurora/*`, `components/aurora/*`) | **AGPL-3.0-only** (`SOURCE.json`, `dinglebear-ai/aurora`). Load-bearing for Button/Dialog and ~14 primitives. | Frozen. No new imports (ESLint warn). Delete in PR3. |
+| Vendored Aurora (`components/ui/aurora/*`) | **AGPL-3.0-only** (`dinglebear-ai/aurora`). | **Deleted in PR3.** Gate: no `components/ui/aurora` import. Leftover AGPL: `components/aurora/prompt-input` (PR7). Command palette deleted after PR2 cut over to `evo/patterns/command-palette`. |
 | `reui.io/blocks/*` | ReUI Pro (paid) | Banned. MIT `reui.io/components/*` only. |
 | Coss | Root LICENSE AGPL-3.0 | Excluded |
 | Formcn | No LICENSE in repo root | Excluded |
@@ -120,3 +120,44 @@ Rules: one row per external item. Every vendored file must carry a header matchi
 | `@phosphor-icons/react` | MIT | Already installed; `@/evo/icons` is the entry. |
 
 Not installed in PR1 (deferred): `@dnd-kit/*`, `react-day-picker`, `date-fns`, `react-dropzone`, `react-phone-number-input`, `@tiptap/*`, `use-stick-to-bottom`.
+
+## PR3 copy log (2026-10-01)
+
+Pins: shadcn/ui `d75a96ab781f3d659be1ad287347d5887ce9f2fc` · ReUI `6e433ddaba3a4be38182c8c8883b6cc335183c42`. License verified from each upstream LICENSE.md. Commercial use: yes (MIT). Visual identity stripped; `--evo-*` only.
+
+| Component | Shoogle result | Registry | Source URL | License | Commercial use | Dependencies | Files copied | Files modified | Evo destination | Date verified |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Button / IconButton | ui.shadcn.com button | shadcn/ui — button | https://ui.shadcn.com/docs/components/radix/button | MIT (LICENSE.md) | Yes | @radix-ui/react-slot, cva | adapted from registry button | tokens, 32/36, orange primary, Phosphor spinner, Aurora aliases | `evo/ui/button.tsx`, `icon-button.tsx` | 2026-10-01 |
+| SplitButton / ButtonGroup | ui.shadcn.com button-group | shadcn/ui — button-group | https://ui.shadcn.com/docs/components/radix/button-group | MIT | Yes | button, dropdown-menu | adapted | Evo tokens | `evo/ui/split-button.tsx`, `button-group.tsx` | 2026-10-01 |
+| Input / Textarea / SearchInput | ui.shadcn.com input | shadcn/ui — input / textarea / input-group | https://github.com/shadcn-ui/ui | MIT | Yes | none | adapted | 32/36, adornments, Phosphor | `evo/ui/input.tsx`, `textarea.tsx`, `search-input.tsx` | 2026-10-01 |
+| NumberInput / MoneyInput | reui.io number-field | ReUI — number-field | https://reui.io/components/number-field | MIT (components only) | Yes | none (no Base UI) | trimmed stepper | fr-DZ / DA suffix | `evo/ui/number-input.tsx`, `money-input.tsx` | 2026-10-01 |
+| PhoneInput | reui.io phone-input | ReUI — phone-input | https://reui.io/components/phone-input | MIT | Yes | `evo/lib/format` (+213) | not the full ReUI dump | DZ default | `evo/ui/phone-input.tsx` | 2026-10-01 |
+| Select / Combobox / MultiSelect / TagInput / RecordPicker | ui.shadcn.com select / combobox | shadcn/ui | https://ui.shadcn.com | MIT | Yes | Radix select, cmdk, popover | adapted | cmdk Command primitive only (palette is PR2) | `evo/ui/select.tsx`, `combobox.tsx`, `command.tsx`, `multi-select.tsx`, `tag-input.tsx`, `record-picker.tsx` | 2026-10-01 |
+| Checkbox / Radio / Switch / Segmented | ui.shadcn.com | shadcn/ui | https://github.com/shadcn-ui/ui | MIT | Yes | matching @radix-ui/react-* | adapted | teal checked | `evo/ui/checkbox.tsx`, `radio-group.tsx`, `switch.tsx`, `segmented-control.tsx` | 2026-10-01 |
+| DatePicker / DateRangePicker / TimePicker | ui.shadcn.com calendar · reui date-selector | shadcn + ReUI | https://ui.shadcn.com/docs/components/radix/calendar · https://reui.io/components/date-selector | MIT | Yes | react-day-picker, date-fns | calendar + trimmed range | fr locale, week starts Saturday, 24h | `evo/ui/calendar.tsx`, `date-picker.tsx`, `date-range-picker.tsx`, `time-picker.tsx` | 2026-10-01 |
+| Overlays (Dialog, AlertDialog, Sheet, Drawer, Popover, HoverCard, Dropdown, ContextMenu, Tooltip) | ui.shadcn.com | shadcn/ui + Radix | https://ui.shadcn.com | MIT | Yes | matching Radix packages | adapted | no vaul; P27 motion; French SR | `evo/ui/{dialog,alert-dialog,sheet,drawer,popover,hover-card,dropdown-menu,context-menu,tooltip}.tsx` | 2026-10-01 |
+| Feedback (Badge, Status, Alert, Callout, Toast, Skeleton, Spinner, Progress, Empty, Error, Kbd) | shadcn + ReUI | mixed MIT | see headers | MIT | Yes | sonner only for toast | adapted | Phosphor, Evo tokens | `evo/ui/*` + `evo/patterns/empty-state`, `error-state` | 2026-10-01 |
+| Form kit | ui.shadcn.com form | shadcn/ui — form | https://ui.shadcn.com/docs/components/radix/form | MIT | Yes | react-hook-form, @hookform/resolvers, zod | adapted | French Zod map | `evo/ui/form.tsx`, `evo/lib/form-messages.ts` | 2026-10-01 |
+| DataGrid | reui.io data-grid | ReUI — data-grid | https://reui.io/components/data-grid | MIT (components only) | Yes | @tanstack/react-table, @tanstack/react-virtual | architecture + i18n (not 383KB dump) | no cell selection / row DnD; French; 32/36 | `evo/vendor/reui/data-grid` → `evo/data/data-grid` | 2026-10-01 |
+| Filters | reui.io filters | ReUI — filters | https://reui.io/components/filters | MIT (components only) | Yes | none extra | two-level builder + i18n (not 377KB dump) | no nested groups; adapter to `ds/workspace` | `evo/vendor/reui/filters` → `evo/data/filters` | 2026-10-01 |
+| SavedViews | n/a | custom Evo | — | MIT (original) | Yes | none | original | — | `evo/data/saved-views` | 2026-10-01 |
+
+### npm added in PR3 (LICENSE file read)
+
+| Package | License | Used |
+|---|---|---|
+| `react-hook-form` | MIT | Form kit |
+| `@hookform/resolvers` | MIT | zodResolver |
+| `react-day-picker` | MIT | Calendar / date pickers |
+| `date-fns` | MIT | day-picker locale |
+| `react-phone-number-input` | — | **not added** — PhoneInput uses `evo/lib/format` (+213) |
+
+Deferred (not copied): FileDropzone, RichTextEditor.
+
+### Duplicate owners (PR3)
+
+| Pattern | Canonical | Shims / leftovers |
+|---|---|---|
+| EmptyState | `evo/patterns/empty-state` | `ds/components/EmptyState` → `ui/empty-state` |
+| PageHeader | `ds/chrome/PageHeader` (1 consumer: DataWorkspace). `evo/patterns/page-header` re-exports it. | Design Lab has its own prototype header — not deleted |
+| KPI | `HomeKpiStrip` (home) + `CrmKpiStrip` (hubs). `EvoKpiCard` unused — no third card. | `evo/patterns/kpi` documents this |

@@ -14,4 +14,4 @@ export {
     DropdownMenuSubContent,
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
-} from '@/components/ui/aurora/dropdown-menu';
+} from '@/evo/ui/dropdown-menu';

@@ -61,12 +61,13 @@ it('locks P27 timing tokens without a new motion framework', function () {
 });
 
 it('normalizes overlay open/close to the P27 contract and keeps P26 reduce strings', function () {
-    $dialog = File::get(resource_path('js/components/ui/aurora/dialog.tsx'));
-    $sheet = File::get(resource_path('js/components/ui/aurora/sheet.tsx'));
-    $dropdown = File::get(resource_path('js/components/ui/aurora/dropdown-menu.tsx'));
-    $popover = File::get(resource_path('js/components/ui/aurora/popover.tsx'));
+    $dialog = File::get(resource_path('js/evo/ui/dialog.tsx'));
+    $sheet = File::get(resource_path('js/evo/ui/sheet.tsx'));
+    $dropdown = File::get(resource_path('js/evo/ui/dropdown-menu.tsx'));
+    $popover = File::get(resource_path('js/evo/ui/popover.tsx'));
     $qrd = File::get(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
-    $palette = File::get(resource_path('js/components/aurora/command-palette.tsx'));
+    $palette = File::get(resource_path('js/evo/patterns/command-palette/index.tsx'));
+    $motionCss = File::get(resource_path('css/aurora-motion.css'));
 
     expect($dialog)->toContain('MOTION_MODAL_CLASS')
         ->and($dialog)->toContain('motion-reduce:animate-none')
@@ -89,11 +90,13 @@ it('normalizes overlay open/close to the P27 contract and keeps P26 reduce strin
         ->and($qrd)->toContain('sm:w-[min(92vw,520px)]')
         ->and($qrd)->toContain('--motion-duration-drawer');
 
-    expect($palette)->toContain('var(--motion-duration-modal)')
-        ->and($palette)->toContain('var(--motion-ease-out)')
-        ->and($palette)->toContain('maxWidth: "calc(100vw - 32px)"')
-        ->and($palette)->toContain('trapTabKey')
+    expect($palette)->toContain('trapTabKey')
+        ->and($palette)->toContain('min(560px,calc(100vw-2rem))')
+        ->and($palette)->toContain("data-command=\"os\"")
         ->and($palette)->not->toContain('cubic-bezier(0.16, 1, 0.3, 1)');
+    expect($motionCss)->toContain("[data-command='os']")
+        ->and($motionCss)->toContain('var(--motion-duration-modal')
+        ->and($motionCss)->toContain('var(--motion-ease-out');
 });
 
 it('normalizes listed surfaces without KPI counting, money tween, confetti, or fake Ask Evo latency', function () {

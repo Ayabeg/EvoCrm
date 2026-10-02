@@ -1,1 +1,2 @@
-export { Callout, type CalloutVariant } from '@/components/ui/aurora/callout';
+export { Callout, type CalloutProps, type CalloutVariant } from '@/evo/ui/callout';
+export { default } from '@/evo/ui/callout';

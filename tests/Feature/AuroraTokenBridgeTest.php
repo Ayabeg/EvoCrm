@@ -79,18 +79,45 @@ it('keeps Home application chrome on Brand Book tokens rather than raw --aurora-
     }
 });
 
-it('pins the vendored Aurora source revision next to the primitives', function () {
-    $pin = file_get_contents(resource_path('js/components/ui/aurora/SOURCE.json'));
+it('removes vendored Aurora primitives (AGPL) and lists leftover AGPL chrome', function () {
+    expect(is_dir(resource_path('js/components/ui/aurora')))->toBeFalse();
+    expect(file_exists(resource_path('js/components/aurora.css')))->toBeFalse();
+    expect(file_exists(resource_path('js/components/aurora-components.css')))->toBeFalse();
 
-    expect($pin)->toBeString();
+    $app = file_get_contents(resource_path('css/app.css'));
+    expect($app)->not->toContain('../js/components/aurora.css')
+        ->and($app)->not->toContain('../js/components/aurora-components.css');
 
-    $data = json_decode($pin, true);
+    expect(file_exists(resource_path('js/components/aurora/command-palette.tsx')))->toBeFalse();
+    expect(resource_path('js/components/aurora/prompt-input.tsx'))->toBeFile();
 
-    expect($data)->toBeArray();
-    expect($data['repository'])->toBe('https://github.com/dinglebear-ai/aurora');
-    expect($data['revision'])->toMatch('/^[0-9a-f]{40}$/');
-    expect($data['vendoredPaths'])->toContain('resources/js/components/aurora.css');
-    expect($data['vendoredPaths'])->toContain('resources/js/components/ui/aurora/');
+    $hits = [];
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(resource_path('js'), FilesystemIterator::SKIP_DOTS),
+    );
+
+    foreach ($iterator as $file) {
+        if (! $file->isFile()) {
+            continue;
+        }
+
+        $path = $file->getPathname();
+
+        if (! preg_match('/\.(ts|tsx|js|jsx)$/', $path)) {
+            continue;
+        }
+
+        $src = file_get_contents($path);
+
+        if ($src !== false && (
+            str_contains($src, "@/components/ui/aurora")
+            || str_contains($src, "components/ui/aurora/")
+        )) {
+            $hits[] = $path;
+        }
+    }
+
+    expect($hits)->toBeEmpty();
 });
 
 it('re-asserts Brand identity after Aurora defaults, including the unused .light selector', function () {

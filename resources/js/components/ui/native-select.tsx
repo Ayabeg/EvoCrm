@@ -1,4 +1,2 @@
-export {
-    NativeSelect,
-    type NativeSelectProps,
-} from '@/components/ui/aurora/native-select';
+export { NativeSelect, type NativeSelectProps } from '@/evo/ui/native-select';
+export { default } from '@/evo/ui/native-select';

@@ -7,6 +7,9 @@
 @import '../css/evo-shell.css';
 
 @source './**/*.{ts,tsx,html}';
+@source '../js/evo/**/*.{ts,tsx}';
+@source '../js/ds/components/**/*.{ts,tsx}';
+@source '../js/lib/motion.ts';
 
 :root {
     color-scheme: light;

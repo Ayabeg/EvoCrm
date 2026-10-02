@@ -32,7 +32,7 @@ it('keeps listed product chrome off lucide-react', function () {
         'js/pages/settings/setup/wizard.tsx',
         'js/pages/crm/leads/captures.tsx',
         'js/pages/outbound/domains/index.tsx',
-        'js/components/aurora/command-palette.tsx',
+        'js/evo/patterns/command-palette/index.tsx',
     ];
 
     foreach ($files as $file) {
@@ -66,7 +66,7 @@ it('routes active product overlays through canonical drawer or dialog barrels', 
     expect(file_get_contents(resource_path('js/components/ui/dialog.tsx')))
         ->toContain('@/ds/components/Modal');
     expect(file_get_contents(resource_path('js/ds/components/Drawer.tsx')))
-        ->toContain('@/components/ui/aurora/sheet');
+        ->toContain('@/evo/ui/drawer');
 
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
     expect($sidebar)->toContain('<SheetContent')

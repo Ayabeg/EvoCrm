@@ -1,21 +1,15 @@
 /**
- * Product avatar wrapper.
- *
- * Authority: Aurora (`ui/aurora/avatar`) owns the primitive — sizes, status,
- * tone, a11y. This file is the EvoSales compound adapter so existing
- * `<Avatar><AvatarImage /><AvatarFallback /></Avatar>` call sites keep
- * working. Default chrome stays Brand Book muted (ink tone, no Aurora
- * accent ring). Pass Aurora props (`size`, `status`, `tone`, `ring`)
- * through when a surface needs the full primitive.
+ * Product avatar wrapper. Canonical primitive is `@/evo/ui/avatar`.
  */
 import * as React from 'react';
 import {
-    Avatar as AuroraAvatar,
-    AvatarFallback as AuroraAvatarFallback,
+    Avatar as EvoAvatar,
+    AvatarFallback as EvoAvatarFallback,
     AvatarGroup,
-    AvatarImage as AuroraAvatarImage,
-    type AvatarProps as AuroraAvatarProps,
-} from '@/components/ui/aurora/avatar';
+    AvatarImage as EvoAvatarImage
+    
+} from '@/evo/ui/avatar';
+import type {AvatarProps} from '@/evo/ui/avatar';
 
 function isElement(
     child: React.ReactNode,
@@ -23,11 +17,7 @@ function isElement(
     return React.isValidElement(child);
 }
 
-function Avatar({
-    className,
-    children,
-    ...props
-}: AuroraAvatarProps) {
+function Avatar({ className, children, ...props }: AvatarProps) {
     let src = props.src;
     let alt = props.alt ?? '';
     let initials = props.initials ?? props.fallback;
@@ -44,6 +34,7 @@ function Avatar({
 
         if (child.type === AvatarFallback) {
             const label = child.props.children;
+
             if (typeof label === 'string' && label.length > 0) {
                 initials = label;
             }
@@ -51,33 +42,24 @@ function Avatar({
     });
 
     return (
-        <AuroraAvatar
+        <EvoAvatar
             {...props}
             src={src}
             alt={alt}
             initials={initials}
             fallback={initials}
             size={props.size ?? 'md'}
-            tone={props.tone ?? 'var(--color-text)'}
-            ring={props.ring ?? false}
             className={className}
-            style={{ boxShadow: 'none', ...props.style }}
         />
     );
 }
 
-function AvatarImage({
-    className,
-    ...props
-}: React.ComponentProps<typeof AuroraAvatarImage>) {
-    return <AuroraAvatarImage className={className} {...props} />;
+function AvatarImage({ className, ...props }: React.ComponentProps<typeof EvoAvatarImage>) {
+    return <EvoAvatarImage className={className} {...props} />;
 }
 
-function AvatarFallback({
-    className,
-    ...props
-}: React.ComponentProps<typeof AuroraAvatarFallback>) {
-    return <AuroraAvatarFallback className={className} {...props} />;
+function AvatarFallback({ className, ...props }: React.ComponentProps<typeof EvoAvatarFallback>) {
+    return <EvoAvatarFallback className={className} {...props} />;
 }
 
 export { Avatar, AvatarFallback, AvatarGroup, AvatarImage };

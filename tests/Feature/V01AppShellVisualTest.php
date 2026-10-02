@@ -57,16 +57,16 @@ it('keeps the topbar as quiet utility chrome with a labeled Create control', fun
 });
 
 it('restyles Command OS presentation without a second palette', function () {
-    $aurora = file_get_contents(resource_path('js/components/aurora/command-palette.tsx'));
     $product = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $compat = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
 
-    expect($aurora)->toContain('560px')
-        ->and($aurora)->toContain('var(--aurora-radius-3)')
-        ->and($aurora)->toContain('minHeight: "36px"')
-        ->and($aurora)->toContain('var(--color-accent-soft)')
-        ->and($aurora)->toContain('unstyled')
-        ->and($aurora)->not->toContain('fontSize: "10px"')
+    expect(file_exists(resource_path('js/components/aurora/command-palette.tsx')))->toBeFalse();
+    expect($product)->toContain('560px')
+        ->and($product)->toContain('min(560px,calc(100vw-2rem))')
+        ->and($product)->toContain('h-11')
+        ->and($product)->toContain('rounded-[12px]')
+        ->and($product)->toContain('data-[selected=true]:bg-[var(--evo-teal-soft)]')
+        ->and($product)->not->toContain('fontSize: "10px"')
         ->and($product)->toContain('buildCommandCatalog')
         ->and($product)->toContain('composeCommandResults')
         ->and($compat)->toContain("from '@/evo/patterns/command-palette'");
@@ -81,12 +81,12 @@ it('maps shared Badge default away from Aurora cyan', function () {
 });
 
 it('paints elevated menus at radius 10', function () {
-    $dropdown = file_get_contents(resource_path('js/components/ui/aurora/dropdown-menu.tsx'));
-    $select = file_get_contents(resource_path('js/components/ui/aurora/select.tsx'));
+    $dropdown = file_get_contents(resource_path('js/evo/ui/dropdown-menu.tsx'));
+    $select = file_get_contents(resource_path('js/evo/ui/select.tsx'));
 
-    expect($dropdown)->toContain('rounded-[var(--aurora-radius-2)]')
+    expect($dropdown)->toContain('rounded-[var(--evo-radius-standard)]')
         ->and($dropdown)->toContain('sideOffset = 8')
-        ->and($select)->toContain('rounded-[var(--aurora-radius-2)]');
+        ->and($select)->toContain('rounded-[var(--evo-radius-standard)]');
 });
 
 it('demotes RoomShell to contextual navigation without dropping tabs', function () {

@@ -1,43 +1,40 @@
 <?php
 
-it('keeps Aurora Button as the only product button primitive', function () {
+it('keeps Evo Button as the only product button primitive', function () {
     $ds = file_get_contents(resource_path('js/ds/components/Button.tsx'));
     $adapter = file_get_contents(resource_path('js/components/ui/button.tsx'));
     $bridge = file_get_contents(resource_path('js/lib/aurora/shadcn-bridge.ts'));
-    $aurora = file_get_contents(resource_path('js/components/ui/aurora/button.tsx'));
+    $evo = file_get_contents(resource_path('js/evo/ui/button.tsx'));
 
-    expect($ds)->toContain("from '@/components/ui/aurora/button'")
-        ->and($ds)->toContain('aurora-btn--aurora aurora-btn--filled')
-        ->and($ds)->not->toContain('EvoButton')
+    expect($ds)->toContain("from '@/evo/ui/button'")
+        ->and($ds)->not->toContain('@/components/ui/aurora')
         ->and($ds)->not->toContain('PremiumButton')
         ->and($ds)->not->toContain('GlassButton')
         ->and($adapter)->toContain("from '@/ds/components/Button'")
-        ->and($adapter)->not->toContain('EvoButton')
         ->and($adapter)->not->toContain('PremiumButton')
         ->and($adapter)->not->toContain('GlassButton')
-        ->and($bridge)->toContain("return { variant: 'aurora', filled: true }")
-        ->and($aurora)->toContain('export type ButtonVariant')
-        ->and($aurora)->toContain('asChild');
+        ->and($bridge)->toContain("return { variant: 'default', filled: true }")
+        ->and($evo)->toContain('export type ButtonVariant')
+        ->and($evo)->toContain('asChild');
 });
 
-it('restyles Aurora buttons at the EvoCrm layer without rewriting Aurora CSS', function () {
+it('restyles Evo buttons at the EvoCrm layer without Aurora glass CSS', function () {
     $product = file_get_contents(resource_path('css/app.css'));
-    $aurora = file_get_contents(resource_path('js/components/aurora-components.css'));
 
-    expect($aurora)->toContain('box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.34), 0 2px 6px rgba(0,0,0,0.16)')
-        ->and($product)->toContain('EvoCrm button composition')
-        ->and($product)->toContain('Unlayered so it wins over @layer aurora-components')
-        ->and($product)->toContain('.aurora-btn {')
+    expect($product)->toContain('EvoCrm button composition')
+        ->and($product)->toContain('Unlayered so it wins over leftover layered chrome')
+        ->and($product)->toContain('.evo-btn')
         ->and($product)->toContain('box-shadow: none')
-        ->and($product)->toContain('.aurora-btn--filled.aurora-btn--aurora')
         ->and($product)->toContain('color: var(--evo-on-primary)')
         ->and($product)->toContain('background: var(--primary)')
-        ->and($product)->toContain('.record-action-group');
+        ->and($product)->toContain('.record-action-group')
+        ->and($product)->not->toContain('../js/components/aurora.css')
+        ->and($product)->not->toContain('../js/components/aurora-components.css');
 
-    $beforeComposition = strstr($product, 'Unlayered so it wins over @layer aurora-components', true);
+    $beforeComposition = strstr($product, 'Unlayered so it wins over leftover layered chrome', true);
     expect($beforeComposition)->toBeString()
         ->and($beforeComposition)->toContain('@layer utilities')
-        ->and($beforeComposition)->not->toContain('.aurora-btn {');
+        ->and($beforeComposition)->not->toContain('.evo-btn[data-variant=\'default\']');
 });
 
 it('keeps record actions as a quiet grouped toolbar instead of floating cards', function () {

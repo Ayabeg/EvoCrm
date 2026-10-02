@@ -39,11 +39,11 @@ it('contains DataWorkspace, FilterBar, and list money so wide tables cannot H-ov
 });
 
 it('caps overlays to the viewport without rewriting Dialog/Drawer semantics', function () {
-    $dialog = file_get_contents(resource_path('js/components/ui/aurora/dialog.tsx'));
-    $dropdown = file_get_contents(resource_path('js/components/ui/aurora/dropdown-menu.tsx'));
-    $popover = file_get_contents(resource_path('js/components/ui/aurora/popover.tsx'));
+    $dialog = file_get_contents(resource_path('js/evo/ui/dialog.tsx'));
+    $dropdown = file_get_contents(resource_path('js/evo/ui/dropdown-menu.tsx'));
+    $popover = file_get_contents(resource_path('js/evo/ui/popover.tsx'));
     $qrd = file_get_contents(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
-    $command = file_get_contents(resource_path('js/components/aurora/command-palette.tsx'));
+    $command = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
 
     expect($dialog)->toContain('max-w-[min(32rem,calc(100vw-2rem))]')
         ->and($dialog)->toContain('max-w-[min(56rem,calc(100vw-2rem))]')
@@ -51,7 +51,7 @@ it('caps overlays to the viewport without rewriting Dialog/Drawer semantics', fu
         ->and($popover)->toContain('max-w-[calc(100vw-1rem)]')
         ->and($qrd)->toContain('PAGE_OVERFLOW_CLASS')
         ->and($qrd)->toContain('sm:w-[min(92vw,520px)]')
-        ->and($command)->toContain('maxWidth: "calc(100vw - 32px)"');
+        ->and($command)->toContain('min(560px,calc(100vw-2rem))');
 });
 
 it('keeps P17 KPI 2×2, inbox native/embed, and quote money unclipped', function () {
