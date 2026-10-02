@@ -89,7 +89,8 @@ it('removes vendored Aurora primitives (AGPL) and lists leftover AGPL chrome', f
         ->and($app)->not->toContain('../js/components/aurora-components.css');
 
     expect(file_exists(resource_path('js/components/aurora/command-palette.tsx')))->toBeFalse();
-    expect(resource_path('js/components/aurora/prompt-input.tsx'))->toBeFile();
+    expect(file_exists(resource_path('js/components/aurora/prompt-input.tsx')))->toBeFalse();
+    expect(is_dir(resource_path('js/components/aurora')))->toBeFalse();
 
     $hits = [];
     $iterator = new RecursiveIteratorIterator(
@@ -110,8 +111,10 @@ it('removes vendored Aurora primitives (AGPL) and lists leftover AGPL chrome', f
         $src = file_get_contents($path);
 
         if ($src !== false && (
-            str_contains($src, "@/components/ui/aurora")
-            || str_contains($src, "components/ui/aurora/")
+            str_contains($src, '@/components/ui/aurora')
+            || str_contains($src, 'components/ui/aurora/')
+            || str_contains($src, '@/components/aurora')
+            || str_contains($src, "from '@/components/aurora")
         )) {
             $hits[] = $path;
         }

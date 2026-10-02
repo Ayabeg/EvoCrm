@@ -83,7 +83,7 @@ Resolved by aliasing production names onto the canonical layer:
 
 Verified against `main` @ `595c84e`:
 
-- Lucide usage is **7 files**, not UNVERIFIED: `types/navigation.ts`, `pages/leads/board.tsx` (legacy unreachable), `crm/quick-launch-grid.tsx`, `crm/saved-view-tabs.tsx`, `app-header.tsx` (dead), `shell/evo-sidebar.tsx` (legacy), `aurora/prompt-input.tsx`. Plus a comment in `ui/aurora/badge.tsx`.
+- Lucide usage is **6 files**, not UNVERIFIED: `types/navigation.ts`, `pages/leads/board.tsx` (legacy unreachable), `crm/quick-launch-grid.tsx`, `crm/saved-view-tabs.tsx`, `app-header.tsx` (dead), `shell/evo-sidebar.tsx` (legacy). `aurora/prompt-input.tsx` deleted in PR7. Plus a comment in `ui/aurora/badge.tsx`.
 - `formatDzd` already exists in `resources/js/lib/money.ts` (currency style, centimes). Design Lab already had `formatDa`. PR1 adds `evo/lib/format.ts` rather than replacing production `formatDzd`.
 - `composer ci:check` runs Pest only. JS gates are `npm run types:check`, `lint:check`, `test`, `build`.
 - Design Lab already imported Geist and a near-canonical light palette; it now aliases `evo.css` instead of redeclaring hex.

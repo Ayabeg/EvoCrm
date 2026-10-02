@@ -4,6 +4,7 @@ import { parseLabLocation } from './lib/routes';
 import type { LabRoute } from './lib/routes';
 import { AccueilPage } from './pages/AccueilPage';
 import { AdsHubPage } from './pages/AdsHubPage';
+import { AgentsPage } from './pages/AgentsPage';
 import { CampaignPage } from './pages/CampaignPage';
 import { ComponentsPage } from './pages/ComponentsPage';
 import { ContactDetailPage } from './pages/ContactDetailPage';
@@ -45,6 +46,8 @@ function renderRoute(route: LabRoute) {
             return <ComponentsPage />;
         case 'data':
             return <DataPage />;
+        case 'agents':
+            return <AgentsPage />;
         case 'inbox':
             return <InboxPage />;
         case 'contacts':

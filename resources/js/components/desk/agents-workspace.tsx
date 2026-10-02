@@ -1,23 +1,30 @@
 import { Link } from '@inertiajs/react';
-import { ArrowUpRight, DotsThree, Plus, StarFour } from '@phosphor-icons/react';
 import { useState } from 'react';
-import {
-    AgentChatLayout,
-    AgentChatMessage,
-} from '@/components/desk/agent-chat-layout';
+import { AgentChatLayout } from '@/components/desk/agent-chat-layout';
 import { AgentsComposer } from '@/components/desk/agents-composer';
 import { BloubAvatar } from '@/components/desk/bloub-avatar';
+import {
+    AgentMessage,
+    ApprovalCard,
+    CrmResult,
+    PromptSuggestion,
+    ReasoningDisclosure,
+    ThinkingState,
+    ToolCall,
+    ToolResult,
+    UserMessage,
+} from '@/evo/ai';
+import { evoFocus } from '@/evo/ai/types';
+import { ArrowUpRight, DotsThree, Plus, StarFour } from '@/evo/icons';
+import { cn } from '@/evo/lib/cn';
 import type { AgentProfile } from '@/lib/desk/agent-profiles';
+import { setChatMessageApproval } from '@/lib/desk/bot-catalog';
 import type {
     AgentChat,
     AgentRecordContext,
     BotDefinition,
     ChatMessage,
 } from '@/lib/desk/bot-catalog';
-import { cn } from '@/lib/utils';
-
-const focusRing =
-    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EC6025]';
 
 type AgentWorkspaceProps = {
     profile: AgentProfile;
@@ -60,7 +67,7 @@ export function AgentsWorkspace({
             data-theme="light"
         >
             <header
-                className="flex min-h-[64px] shrink-0 items-center justify-between gap-4 border-b border-black/[0.08] bg-white px-5 py-3 sm:px-7"
+                className="flex min-h-[64px] shrink-0 items-center justify-between gap-4 border-b border-evo-hairline bg-evo-surface px-5 py-3 sm:px-7"
                 data-agent-chat-header
             >
                 <div className="flex min-w-0 items-center gap-3">
@@ -72,24 +79,24 @@ export function AgentsWorkspace({
                     />
                     <div className="min-w-0">
                         <div className="flex min-w-0 items-center gap-2">
-                            <h1 className="truncate text-[17px] font-semibold tracking-[-0.025em] text-[#0D1B24]">
+                            <h1 className="truncate text-[17px] font-semibold tracking-[-0.025em] text-evo-ink">
                                 {profile.bot.name}
                             </h1>
                             {chat ? (
                                 <>
                                     <span
                                         aria-hidden="true"
-                                        className="text-[13px] text-[#8A969A]"
+                                        className="text-[13px] text-evo-ink-muted"
                                     >
                                         /
                                     </span>
-                                    <span className="truncate text-[13px] font-medium text-[#42545B]">
+                                    <span className="truncate text-[13px] font-medium text-evo-ink-secondary">
                                         {chat.title}
                                     </span>
                                 </>
                             ) : null}
                         </div>
-                        <p className="mt-0.5 truncate text-[12px] text-[#69777C]">
+                        <p className="mt-0.5 truncate text-[12px] text-evo-ink-muted">
                             {chat ? profile.summary : profile.availability}
                         </p>
                     </div>
@@ -100,8 +107,8 @@ export function AgentsWorkspace({
                         <button
                             type="button"
                             className={cn(
-                                'inline-flex h-8 items-center gap-1.5 rounded-md bg-[#EC6025] px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#D8511E] motion-reduce:transition-none',
-                                focusRing,
+                                'evo-agents-primary-btn inline-flex h-8 items-center gap-1.5 rounded-[var(--evo-radius-compact)] text-[12px] font-semibold transition-colors duration-[var(--evo-duration-micro)] ease-evo motion-reduce:transition-none',
+                                evoFocus,
                             )}
                             onClick={onNewChat}
                         >
@@ -110,7 +117,7 @@ export function AgentsWorkspace({
                                 weight="bold"
                                 aria-hidden
                             />
-                            New chat
+                            Nouvelle conversation
                         </button>
                     ) : (
                         <>
@@ -118,8 +125,8 @@ export function AgentsWorkspace({
                                 <Link
                                     href={chat.recordContext.href}
                                     className={cn(
-                                        'inline-flex h-8 max-w-[190px] items-center gap-1.5 truncate rounded-md border border-black/[0.09] px-2.5 text-[11px] font-medium text-[#42545B] transition-colors hover:bg-[#F7F8F5] motion-reduce:transition-none',
-                                        focusRing,
+                                        'inline-flex h-8 max-w-[190px] items-center gap-1.5 truncate rounded-[var(--evo-radius-compact)] border border-evo-hairline px-2.5 text-[11px] font-medium text-evo-ink-secondary transition-colors hover:bg-evo-surface-subtle motion-reduce:transition-none',
+                                        evoFocus,
                                     )}
                                     title={chat.recordContext.label}
                                 >
@@ -136,21 +143,21 @@ export function AgentsWorkspace({
                                 <Link
                                     href={primaryContext.href}
                                     className={cn(
-                                        'hidden h-8 items-center rounded-md border border-black/[0.09] px-2.5 text-[11px] font-medium text-[#42545B] transition-colors hover:bg-[#F7F8F5] motion-reduce:transition-none sm:inline-flex',
-                                        focusRing,
+                                        'hidden h-8 items-center rounded-[var(--evo-radius-compact)] border border-evo-hairline px-2.5 text-[11px] font-medium text-evo-ink-secondary transition-colors hover:bg-evo-surface-subtle motion-reduce:transition-none sm:inline-flex',
+                                        evoFocus,
                                     )}
                                 >
-                                    Context · {primaryContext.label}
+                                    Contexte · {primaryContext.label}
                                 </Link>
                             ) : null}
                             <div className="relative">
                                 <button
                                     type="button"
                                     className={cn(
-                                        'grid size-8 place-items-center rounded-md text-[#59686F] transition-colors hover:bg-[#F2F4F0] hover:text-[#0D1B24] motion-reduce:transition-none',
-                                        focusRing,
+                                        'grid size-8 place-items-center rounded-[var(--evo-radius-compact)] text-evo-ink-muted transition-colors hover:bg-evo-surface-subtle hover:text-evo-ink motion-reduce:transition-none',
+                                        evoFocus,
                                     )}
-                                    aria-label="More conversation actions"
+                                    aria-label="Autres actions de conversation"
                                     aria-haspopup="menu"
                                     aria-expanded={moreOpen}
                                     onClick={() =>
@@ -171,33 +178,33 @@ export function AgentsWorkspace({
                                 {moreOpen ? (
                                     <div
                                         role="menu"
-                                        aria-label="Conversation actions"
-                                        className="absolute top-[calc(100%+6px)] right-0 z-30 min-w-40 rounded-lg border border-[#E6E8E3] bg-white p-1 shadow-[0_10px_24px_rgba(13,27,36,0.1)]"
+                                        aria-label="Actions de conversation"
+                                        className="absolute top-[calc(100%+6px)] right-0 z-30 min-w-40 rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface p-1 shadow-evo-floating"
                                     >
                                         <button
                                             type="button"
                                             role="menuitem"
                                             className={cn(
-                                                'flex h-8 w-full items-center rounded-md px-2 text-left text-[12px] text-[#0D1B24] hover:bg-[#F3F5F1]',
-                                                focusRing,
+                                                'flex h-8 w-full items-center rounded-[var(--evo-radius-compact)] px-2 text-left text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                                evoFocus,
                                             )}
                                             onClick={() => {
                                                 setMoreOpen(false);
                                                 onNewChat();
                                             }}
                                         >
-                                            Start a new chat
+                                            Nouvelle conversation
                                         </button>
                                         <Link
                                             href={`/agents/bots/${profile.bot.id}`}
                                             role="menuitem"
                                             className={cn(
-                                                'flex h-8 items-center rounded-md px-2 text-[12px] text-[#0D1B24] hover:bg-[#F3F5F1]',
-                                                focusRing,
+                                                'flex h-8 items-center rounded-[var(--evo-radius-compact)] px-2 text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                                evoFocus,
                                             )}
                                             onClick={() => setMoreOpen(false)}
                                         >
-                                            Agent settings
+                                            Paramètres de l’agent
                                         </Link>
                                     </div>
                                 ) : null}
@@ -224,18 +231,13 @@ export function AgentsWorkspace({
                         {!hasMessages ? (
                             <div
                                 role="group"
-                                aria-label="Suggested agent actions"
+                                aria-label="Suggestions"
                                 className="mt-2.5 flex flex-wrap justify-center gap-1.5"
                             >
                                 {quickPrompts.map((prompt) => (
-                                    <button
+                                    <PromptSuggestion
                                         key={prompt.label}
-                                        type="button"
                                         disabled={sending}
-                                        className={cn(
-                                            'min-h-7 rounded-md px-2.5 text-[11px] text-[#52636A] transition-colors hover:bg-white hover:text-[#0F4C5C] disabled:cursor-not-allowed disabled:opacity-55 motion-reduce:transition-none',
-                                            focusRing,
-                                        )}
                                         onClick={() =>
                                             onSend(
                                                 prompt.prompt,
@@ -244,7 +246,7 @@ export function AgentsWorkspace({
                                         }
                                     >
                                         {prompt.label}
-                                    </button>
+                                    </PromptSuggestion>
                                 ))}
                             </div>
                         ) : null}
@@ -252,9 +254,10 @@ export function AgentsWorkspace({
                 }
                 scrollKey={`${chat?.id ?? 'empty'}:${messages.length}`}
             >
-                {hasMessages ? (
+                {hasMessages && chat ? (
                     <Conversation
                         agentName={profile.bot.name}
+                        chatId={chat.id}
                         messages={messages}
                         sending={sending}
                     />
@@ -277,29 +280,29 @@ export function AgentsDirectoryHome({
             data-agents-home
             data-theme="light"
         >
-            <header className="flex min-h-[64px] shrink-0 items-center justify-between border-b border-black/[0.08] bg-white px-5 sm:px-7">
+            <header className="flex min-h-[64px] shrink-0 items-center justify-between border-b border-evo-hairline bg-evo-surface px-5 sm:px-7">
                 <div>
-                    <p className="text-[10px] font-semibold tracking-[0.12em] text-[#0F4C5C] uppercase">
-                        CRM operations
+                    <p className="text-[10px] font-semibold tracking-[0.12em] text-evo-teal uppercase">
+                        Opérations CRM
                     </p>
-                    <h1 className="mt-0.5 text-[17px] font-semibold tracking-[-0.025em] text-[#0D1B24]">
+                    <h1 className="mt-0.5 text-[17px] font-semibold tracking-[-0.025em] text-evo-ink">
                         Agents
                     </h1>
                 </div>
             </header>
             <div className="evo-scroll min-h-0 flex-1 overflow-y-auto">
                 <section className="mx-auto flex min-h-full w-full max-w-[760px] flex-col justify-center px-6 py-12 sm:px-10">
-                    <div className="grid size-11 place-items-center rounded-xl border border-[#0F4C5C]/15 bg-[#0F4C5C]/[0.06] text-[#0F4C5C]">
+                    <div className="grid size-11 place-items-center rounded-[var(--evo-radius-standard)] border border-evo-teal/15 bg-evo-teal-soft text-evo-teal">
                         <StarFour
                             className="size-5"
                             weight="regular"
                             aria-hidden
                         />
                     </div>
-                    <h2 className="mt-5 max-w-[560px] text-[26px] leading-tight font-semibold tracking-[-0.04em] text-[#0D1B24] sm:text-[30px]">
+                    <h2 className="mt-5 max-w-[560px] text-[26px] leading-tight font-semibold tracking-[-0.04em] text-evo-ink sm:text-[30px]">
                         Choisissez un agent pour démarrer.
                     </h2>
-                    <p className="mt-3 max-w-[500px] text-[13px] leading-6 text-[#5D6B71]">
+                    <p className="mt-3 max-w-[500px] text-[13px] leading-6 text-evo-ink-secondary">
                         Chaque agent travaille avec le contexte CRM adapté à sa
                         mission. Les conversations et les fiches restent dans
                         EvoCRM.
@@ -309,43 +312,43 @@ export function AgentsDirectoryHome({
                             {
                                 id: 'closer',
                                 label: 'Closer',
-                                detail: 'Deals and next steps',
+                                detail: 'Affaires et prochaines actions',
                             },
                             {
                                 id: 'qualifier',
                                 label: 'Qualifier',
-                                detail: 'Leads and enrichment',
+                                detail: 'Leads et enrichissement',
                             },
                             {
                                 id: 'quote-desk',
                                 label: 'Quote desk',
-                                detail: 'Quotes and pricing',
+                                detail: 'Devis et tarification',
                             },
                             {
                                 id: 'after-sale',
                                 label: 'After-sale',
-                                detail: 'Customer follow-up',
+                                detail: 'Suivi client',
                             },
                         ].map((item) => (
                             <button
                                 key={item.id}
                                 type="button"
                                 className={cn(
-                                    'flex min-h-[58px] items-center justify-between gap-3 rounded-lg border border-[#E6E8E3] bg-white px-3.5 text-left transition-colors hover:border-[#0F4C5C]/25 hover:bg-[#FBFCF9] motion-reduce:transition-none',
-                                    focusRing,
+                                    'flex min-h-[58px] items-center justify-between gap-3 rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface px-3.5 text-left transition-colors hover:border-evo-teal/25 hover:bg-evo-surface-subtle motion-reduce:transition-none',
+                                    evoFocus,
                                 )}
                                 onClick={() => onSelectAgent(item.id)}
                             >
                                 <span>
-                                    <span className="block text-[13px] font-medium text-[#0D1B24]">
+                                    <span className="block text-[13px] font-medium text-evo-ink">
                                         {item.label}
                                     </span>
-                                    <span className="mt-0.5 block text-[11px] text-[#69777C]">
+                                    <span className="mt-0.5 block text-[11px] text-evo-ink-muted">
                                         {item.detail}
                                     </span>
                                 </span>
                                 <ArrowUpRight
-                                    className="size-4 shrink-0 text-[#7B898E]"
+                                    className="size-4 shrink-0 text-evo-ink-muted"
                                     weight="regular"
                                     aria-hidden
                                 />
@@ -367,10 +370,10 @@ function AgentEmptyState({ profile }: { profile: AgentProfile }) {
                 size={42}
                 state="idle"
             />
-            <h2 className="mt-3 text-[18px] font-semibold tracking-[-0.02em] text-[#0D1B24]">
+            <h2 className="mt-3 text-[18px] font-semibold tracking-[-0.02em] text-evo-ink">
                 {profile.bot.name}
             </h2>
-            <p className="mt-1.5 max-w-[420px] text-[13px] leading-6 text-[#596A71]">
+            <p className="mt-1.5 max-w-[420px] text-[13px] leading-6 text-evo-ink-secondary">
                 {profile.emptyMessage}
             </p>
         </div>
@@ -379,10 +382,12 @@ function AgentEmptyState({ profile }: { profile: AgentProfile }) {
 
 function Conversation({
     agentName,
+    chatId,
     messages,
     sending,
 }: {
     agentName: string;
+    chatId: string;
     messages: ChatMessage[];
     sending: boolean;
 }) {
@@ -391,81 +396,101 @@ function Conversation({
             className="flex flex-col gap-5 pb-3"
             role="log"
             aria-live="polite"
+            aria-relevant="additions"
             aria-label={`${agentName} conversation`}
         >
             {messages.map((message) => (
-                <AgentChatMessage
-                    key={message.id}
-                    align={message.role === 'user' ? 'end' : 'start'}
-                >
+                <div key={message.id}>
                     {message.role === 'user' ? (
-                        <div className="max-w-[min(100%,610px)]">
-                            <div className="rounded-xl bg-[#0D1B24] px-4 py-3 text-[13px] leading-6 whitespace-pre-wrap text-white">
-                                {message.body}
-                            </div>
+                        <div className="flex w-full flex-col items-end gap-2">
+                            <UserMessage>{message.body}</UserMessage>
                             {message.recordContext ? (
-                                <RecordContextCard
-                                    context={message.recordContext}
+                                <CrmResult
+                                    type={message.recordContext.type}
+                                    label={message.recordContext.label}
+                                    href={message.recordContext.href}
                                 />
                             ) : null}
                         </div>
                     ) : (
-                        <AssistantResponse message={message} />
+                        <AssistantResponse
+                            chatId={chatId}
+                            message={message}
+                        />
                     )}
-                </AgentChatMessage>
+                </div>
             ))}
             {sending ? (
-                <AgentChatMessage align="start">
-                    <div
-                        className="flex items-center gap-2 text-[12px] text-[#5C6B71]"
-                        role="status"
-                    >
-                        <span className="size-1.5 animate-pulse rounded-full bg-[#0F4C5C] motion-reduce:animate-none" />
-                        {agentName} consulte le contexte CRM…
-                    </div>
-                </AgentChatMessage>
+                <ThinkingState
+                    label={`${agentName} consulte le contexte CRM…`}
+                />
             ) : null}
         </div>
     );
 }
 
-function RecordContextCard({ context }: { context: AgentRecordContext }) {
+function AssistantResponse({
+    chatId,
+    message,
+}: {
+    chatId: string;
+    message: ChatMessage;
+}) {
     return (
-        <div className="mt-2 flex max-w-[330px] items-center gap-2 rounded-lg border border-[#E2E8E4] bg-white px-3 py-2 text-left">
-            <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[#0F4C5C]/[0.07] text-[10px] font-semibold tracking-[0.04em] text-[#0F4C5C] uppercase">
-                {context.type.slice(0, 2)}
-            </span>
-            <div className="min-w-0 flex-1">
-                <p className="text-[9px] font-semibold tracking-[0.1em] text-[#69777C] uppercase">
-                    {recordTypeLabel(context.type)}
-                </p>
-                <p className="truncate text-[11px] font-medium text-[#0D1B24]">
-                    {context.label}
-                </p>
-            </div>
-            <Link
-                href={context.href}
-                className={cn(
-                    'rounded px-1.5 py-1 text-[10px] font-medium text-[#0F4C5C] hover:bg-[#0F4C5C]/[0.06]',
-                    focusRing,
-                )}
-            >
-                Ouvrir
-            </Link>
-        </div>
-    );
-}
-
-function AssistantResponse({ message }: { message: ChatMessage }) {
-    return (
-        <div className="max-w-[min(100%,650px)] text-[13px] leading-6 text-[#0D1B24]">
-            <div className="whitespace-pre-wrap">{message.body}</div>
+        <div className="flex w-full flex-col items-start gap-2">
+            {message.reasoning ? (
+                <ReasoningDisclosure defaultOpen={Boolean(message.streaming)}>
+                    {message.reasoning}
+                </ReasoningDisclosure>
+            ) : null}
+            {message.toolCalls?.map((call) => (
+                <div key={call.id} className="w-full max-w-[650px] space-y-1.5">
+                    <ToolCall call={call} />
+                    {call.output && call.status === 'done' ? (
+                        <ToolResult title={`Résultat · ${call.name}`}>
+                            {call.output}
+                        </ToolResult>
+                    ) : null}
+                </div>
+            ))}
+            {message.approval ? (
+                <div className="w-full max-w-[650px]">
+                    <ApprovalCard
+                        approval={message.approval}
+                        onApprove={(approval) => {
+                            setChatMessageApproval(
+                                chatId,
+                                message.id,
+                                'approved',
+                            );
+                            void approval;
+                        }}
+                        onDeny={(approval) => {
+                            setChatMessageApproval(
+                                chatId,
+                                message.id,
+                                'denied',
+                            );
+                            void approval;
+                        }}
+                    />
+                </div>
+            ) : null}
+            {message.error ? (
+                <AgentMessage markdown={false}>
+                    <p className="rounded-[var(--evo-radius-standard)] border border-evo-danger/20 bg-[var(--evo-danger-soft)] px-3 py-2 text-evo-danger">
+                        {message.body}
+                    </p>
+                </AgentMessage>
+            ) : (
+                <AgentMessage>{message.body}</AgentMessage>
+            )}
             {message.crmActions && message.crmActions.length > 0 ? (
                 <section
-                    className="mt-3 rounded-xl border border-[#E1E7E3] bg-white p-3"
+                    className="w-full max-w-[650px] rounded-[var(--evo-radius-floating)] border border-evo-hairline bg-evo-surface p-3"
                     aria-label="CRM actions"
                 >
-                    <p className="text-[10px] font-semibold tracking-[0.1em] text-[#52636A] uppercase">
+                    <p className="text-[10px] font-semibold tracking-[0.1em] text-evo-ink-muted uppercase">
                         CRM
                     </p>
                     <ul className="mt-2 flex flex-wrap gap-2">
@@ -475,8 +500,8 @@ function AssistantResponse({ message }: { message: ChatMessage }) {
                                     <Link
                                         href={action.href}
                                         className={cn(
-                                            'inline-flex min-h-8 items-center rounded-md border border-[#DDE5E1] bg-white px-2.5 text-[11px] font-medium text-[#0F4C5C] transition-colors hover:bg-[#F7FAF8] motion-reduce:transition-none',
-                                            focusRing,
+                                            'inline-flex min-h-8 items-center rounded-[var(--evo-radius-compact)] border border-evo-hairline bg-evo-surface px-2.5 text-[11px] font-medium text-evo-teal transition-colors hover:bg-evo-teal-soft motion-reduce:transition-none',
+                                            evoFocus,
                                         )}
                                     >
                                         {actionLabel(action.id, action.label)}
@@ -493,18 +518,6 @@ function AssistantResponse({ message }: { message: ChatMessage }) {
 
 function isInternalHref(href: string): boolean {
     return href.startsWith('/') && !href.startsWith('//');
-}
-
-function recordTypeLabel(type: string): string {
-    const labels: Record<string, string> = {
-        company: 'Entreprise',
-        contact: 'Contact',
-        deal: 'Affaire',
-        lead: 'Lead',
-        quote: 'Devis',
-    };
-
-    return labels[type] ?? 'CRM';
 }
 
 function actionLabel(id: string, fallback: string): string {

@@ -20,6 +20,14 @@ describe('design-lab token route', () => {
         expect(routePath({ name: 'components' })).toBe('/components');
         expect(routePath({ name: 'data' })).toBe('/data');
     });
+
+    it('parses /design-lab/agents as the agents states page', () => {
+        expect(parseLabLocation('/design-lab/agents', '')).toEqual({
+            name: 'agents',
+        });
+        expect(routePath({ name: 'agents' })).toBe('/agents');
+        expect(labHref({ name: 'agents' })).toMatch(/agents/);
+    });
 });
 
 describe('design-lab settings route', () => {

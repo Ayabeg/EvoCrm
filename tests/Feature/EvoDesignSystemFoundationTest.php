@@ -93,6 +93,19 @@ it('keeps the Design Lab shell page behind the existing admin gate', function ()
     $this->get('/design-lab/shell')->assertOk();
 });
 
+it('keeps the Design Lab agents page behind the existing admin gate', function () {
+    $routes = file_get_contents(resource_path('design-lab/lib/routes.ts'));
+    $page = file_get_contents(resource_path('design-lab/pages/AgentsPage.tsx'));
+
+    expect($routes)->toContain("name: 'agents'")
+        ->and($page)->toContain('data-lab-page="agents"')
+        ->and($page)->toContain('id="approval"')
+        ->and($page)->toContain('StreamingState')
+        ->and($page)->toContain('ApprovalCard');
+
+    $this->get('/design-lab/agents')->assertOk();
+});
+
 it('ships provenance, token, catalog and icon docs', function () {
     $provenance = file_get_contents(base_path('docs/design-system/component-provenance.md'));
     $tokens = file_get_contents(base_path('docs/design-system/tokens.md'));

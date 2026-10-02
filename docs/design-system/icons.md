@@ -14,7 +14,7 @@ Canonical entry: `@/evo/icons` (Phosphor, named exports only).
 | `resources/js/components/crm/saved-view-tabs.tsx` | `ChevronDown` | Live list views |
 | `resources/js/components/app-header.tsx` | `BookOpen`, `Folder`, `LayoutGrid`, `Menu`, `Search` | Dead starter header |
 | `resources/js/components/shell/evo-sidebar.tsx` | `BarChart3`, `Bot`, `Building2`, `Calendar`, `FileText`, `Handshake`, `House`, `Inbox`, `LayoutGrid`, `LifeBuoy`, `Megaphone`, `MessageCircle`, `Search`, `Send`, `Settings`, `UserPlus`, `Users`, `Waypoints` + `LucideIcon` | Legacy sidebar |
-| `resources/js/components/aurora/prompt-input.tsx` | `AtSign`, `ChevronDown`, `Command`, `FileText`, `Folder`, `Paperclip`, `Send`, `Sparkles`, `Square`, `UserRound`, `X` | Vendored Aurora (AGPL), removed in PR3/PR7 |
+| `resources/js/components/aurora/prompt-input.tsx` | — | **Deleted in PR7** (last AGPL Aurora file) |
 | `resources/js/components/ui/aurora/badge.tsx` | comment only | Aurora |
 
 No other icon families (`react-icons`, Heroicons, Tabler, Radix icons) are imported in `resources/js`.

@@ -1,14 +1,16 @@
 import { Link } from '@inertiajs/react';
-import {
-    MagnifyingGlass,
-    PaperPlaneRight,
-    Plus,
-    X,
-} from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
-import type { FormEvent, KeyboardEvent } from 'react';
-import type { ReactNode, RefObject } from 'react';
+import type { KeyboardEvent, ReactNode, RefObject } from 'react';
 import { BotPicker } from '@/components/desk/bot-picker';
+import {
+    PromptInput,
+    PromptInputActions,
+    PromptInputTextarea,
+} from '@/evo/ai/prompt-input';
+import { evoFocus } from '@/evo/ai/types';
+import { MagnifyingGlass, PaperPlaneRight, Plus, X } from '@/evo/icons';
+import { cn } from '@/evo/lib/cn';
+import { Button } from '@/evo/ui/button';
 import { isCommandRecordType } from '@/lib/command-os';
 import type { CommandSearchHit } from '@/lib/command-os';
 import type {
@@ -17,10 +19,6 @@ import type {
     AgentPrompt,
 } from '@/lib/desk/agent-profiles';
 import type { AgentRecordContext, BotDefinition } from '@/lib/desk/bot-catalog';
-import { cn } from '@/lib/utils';
-
-const focusRing =
-    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EC6025]';
 
 type AgentComposerProps = {
     selectedBot: BotDefinition;
@@ -120,26 +118,13 @@ export function AgentsComposer({
         };
     }, [panel, recordQuery]);
 
-    function submit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-
+    function submit() {
         if (!canSend) {
             return;
         }
 
         onSend(draft.trim(), selectedContext);
         setDraft('');
-    }
-
-    function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-        if (
-            event.key === 'Enter' &&
-            !event.shiftKey &&
-            !event.nativeEvent.isComposing
-        ) {
-            event.preventDefault();
-            event.currentTarget.form?.requestSubmit();
-        }
     }
 
     function togglePanel(next: Exclude<ComposerPanel, null>) {
@@ -184,11 +169,15 @@ export function AgentsComposer({
     }
 
     return (
-        <form
-            className="relative rounded-xl border border-[#E6E8E3] bg-white p-3"
+        <PromptInput
+            className="relative"
+            value={draft}
+            onValueChange={setDraft}
+            onSubmit={submit}
+            isLoading={sending}
+            disabled={sending}
             aria-label="Message à l’agent"
             data-agents-composer
-            onSubmit={submit}
         >
             <div className="flex min-h-8 flex-wrap items-center gap-2 px-0.5 pb-2">
                 <BotPicker
@@ -197,20 +186,18 @@ export function AgentsComposer({
                     onCreateBot={onCreateBot}
                 />
                 {selectedContext ? (
-                    <span className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-[#0F4C5C]/[0.07] px-2 py-1 text-[11px] font-medium text-[#0F4C5C]">
-                        <span className="uppercase">
-                            {selectedContext.type}
-                        </span>
+                    <span className="inline-flex max-w-full items-center gap-1.5 rounded-[var(--evo-radius-compact)] bg-evo-teal-soft px-2 py-1 text-[11px] font-medium text-evo-teal">
+                        <span className="uppercase">{selectedContext.type}</span>
                         <span className="max-w-[220px] truncate">
                             {selectedContext.label}
                         </span>
                         <button
                             type="button"
                             className={cn(
-                                'grid size-4 shrink-0 place-items-center rounded text-[#0F4C5C]/70 hover:bg-[#0F4C5C]/10 hover:text-[#0F4C5C]',
-                                focusRing,
+                                'grid size-4 shrink-0 place-items-center rounded text-evo-teal/70 hover:bg-evo-teal-soft hover:text-evo-teal',
+                                evoFocus,
                             )}
-                            aria-label={`Remove ${selectedContext.label} context`}
+                            aria-label={`Retirer le contexte ${selectedContext.label}`}
                             onClick={() => onSelectContext(null)}
                         >
                             <X className="size-3" weight="bold" aria-hidden />
@@ -222,22 +209,15 @@ export function AgentsComposer({
             <label className="sr-only" htmlFor="agent-message-input">
                 Votre message
             </label>
-            <textarea
+            <PromptInputTextarea
                 id="agent-message-input"
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={handleKeyDown}
-                className={cn(
-                    'block min-h-[72px] w-full resize-none border-0 bg-transparent px-1 py-1.5 text-[13px] leading-5 text-[#0D1B24] outline-none placeholder:text-[#69777C]',
-                    focusRing,
-                )}
                 placeholder={profile.placeholder}
                 aria-label="Votre message"
                 maxLength={240}
                 rows={3}
             />
 
-            <div className="mt-1 flex min-h-9 items-center justify-between gap-2 border-t border-[#E6E8E3] pt-2">
+            <PromptInputActions className="mt-1 min-h-9 border-t border-evo-hairline pt-2">
                 <div className="flex min-w-0 items-center gap-1">
                     <ComposerToolButton
                         icon={
@@ -247,45 +227,43 @@ export function AgentsComposer({
                                 aria-hidden
                             />
                         }
-                        label="Attach"
+                        label="Joindre"
                         active={panel === 'attach' || Boolean(selectedContext)}
                         onClick={() => togglePanel('attach')}
                     />
                     <ComposerToolButton
-                        label="Context"
+                        label="Contexte"
                         active={panel === 'context'}
                         onClick={() => togglePanel('context')}
                     />
                     <ComposerToolButton
-                        label="Templates"
+                        label="Modèles"
                         active={panel === 'templates'}
                         onClick={() => togglePanel('templates')}
                     />
                 </div>
-                <button
-                    type="submit"
+                <Button
+                    type="button"
+                    size="sm"
                     disabled={!canSend}
-                    className={cn(
-                        'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-3 text-[12px] font-semibold transition-colors disabled:cursor-not-allowed',
-                        canSend
-                            ? 'bg-[#EC6025] text-white hover:bg-[#D8511E]'
-                            : 'bg-[#E8EBE7] text-[#6B777B]',
-                        focusRing,
-                    )}
-                    aria-label="Send message"
+                    aria-label="Envoyer le message"
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        submit();
+                    }}
                 >
-                    {sending ? 'Sending…' : 'Send'}
+                    {sending ? 'Envoi…' : 'Envoyer'}
                     <PaperPlaneRight
                         className="size-3.5"
                         weight="fill"
                         aria-hidden
                     />
-                </button>
-            </div>
+                </Button>
+            </PromptInputActions>
 
             {panel ? (
                 <div
-                    className="absolute right-0 bottom-[calc(100%+8px)] left-0 z-30 max-h-[300px] overflow-hidden rounded-lg border border-[#E6E8E3] bg-white text-[#0D1B24] shadow-[0_12px_30px_rgba(13,27,36,0.1)]"
+                    className="absolute right-0 bottom-[calc(100%+8px)] left-0 z-30 max-h-[300px] overflow-hidden rounded-[var(--evo-radius-standard)] border border-evo-hairline bg-evo-surface text-evo-ink shadow-evo-modal"
                     data-agents-composer-panel={panel}
                 >
                     {panel === 'attach' ? (
@@ -316,7 +294,7 @@ export function AgentsComposer({
                     ) : null}
                 </div>
             ) : null}
-        </form>
+        </PromptInput>
     );
 }
 
@@ -335,14 +313,17 @@ function ComposerToolButton({
         <button
             type="button"
             className={cn(
-                'inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-[11px] font-medium transition-colors motion-reduce:transition-none',
+                'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[var(--evo-radius-compact)] px-2 text-[11px] font-medium transition-colors duration-[var(--evo-duration-micro)] ease-evo motion-reduce:transition-none',
                 active
-                    ? 'bg-[#0F4C5C]/[0.08] text-[#0F4C5C]'
-                    : 'text-[#59686F] hover:bg-[#F3F5F1] hover:text-[#0D1B24]',
-                focusRing,
+                    ? 'bg-evo-teal-soft text-evo-teal'
+                    : 'text-evo-ink-muted hover:bg-evo-surface-subtle hover:text-evo-ink',
+                evoFocus,
             )}
             aria-expanded={active}
-            onClick={onClick}
+            onClick={(event) => {
+                event.stopPropagation();
+                onClick();
+            }}
         >
             {icon}
             {label}
@@ -369,13 +350,13 @@ function RecordSearchPanel({
 }) {
     return (
         <div className="p-3">
-            <p className="text-[12px] font-semibold">Attach a CRM record</p>
-            <p className="mt-0.5 text-[11px] text-[#69777C]">
-                Search deals, leads, contacts, companies, or quotes.
+            <p className="text-[12px] font-semibold">Joindre une fiche CRM</p>
+            <p className="mt-0.5 text-[11px] text-evo-ink-muted">
+                Recherchez une affaire, un lead, un contact, une entreprise ou un devis.
             </p>
             <label className="relative mt-3 block">
                 <MagnifyingGlass
-                    className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-[#69777C]"
+                    className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-evo-ink-muted"
                     weight="regular"
                     aria-hidden
                 />
@@ -384,7 +365,7 @@ function RecordSearchPanel({
                     type="search"
                     value={query}
                     onChange={(event) => onQueryChange(event.target.value)}
-                    onKeyDown={(event) => {
+                    onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
                         if (event.key === 'Escape') {
                             event.currentTarget.blur();
                         }
@@ -394,36 +375,36 @@ function RecordSearchPanel({
                             onSelect(hits[0]);
                         }
                     }}
-                    placeholder="Search CRM records..."
-                    aria-label="Search CRM records"
+                    placeholder="Rechercher dans le CRM…"
+                    aria-label="Rechercher dans le CRM"
                     className={cn(
-                        'h-9 w-full rounded-md border border-[#E6E8E3] bg-[#F7F8F5] pr-3 pl-9 text-[12px] outline-none placeholder:text-[#7A8589] focus:border-[#0F4C5C]/45',
-                        focusRing,
+                        'h-9 w-full rounded-[var(--evo-radius-compact)] border border-evo-hairline bg-evo-canvas pr-3 pl-9 text-[12px] outline-none placeholder:text-evo-ink-faint focus:border-evo-teal',
+                        evoFocus,
                     )}
                 />
             </label>
             <div className="evo-scroll mt-2 max-h-[150px] overflow-y-auto">
                 {searching ? (
-                    <p className="px-2 py-2 text-[12px] text-[#69777C]">
-                        Searching CRM…
+                    <p className="px-2 py-2 text-[12px] text-evo-ink-muted">
+                        Recherche CRM…
                     </p>
                 ) : failed ? (
-                    <p className="px-2 py-2 text-[12px] text-[#9C3F28]">
-                        CRM search is unavailable right now.
+                    <p className="px-2 py-2 text-[12px] text-evo-danger">
+                        La recherche CRM est indisponible pour le moment.
                     </p>
                 ) : query.trim().length < 2 ? (
-                    <p className="px-2 py-2 text-[12px] text-[#69777C]">
-                        Enter at least two characters.
+                    <p className="px-2 py-2 text-[12px] text-evo-ink-muted">
+                        Saisissez au moins deux caractères.
                     </p>
                 ) : hits.length === 0 ? (
-                    <p className="px-2 py-2 text-[12px] text-[#69777C]">
-                        No matching CRM records.
+                    <p className="px-2 py-2 text-[12px] text-evo-ink-muted">
+                        Aucune fiche CRM correspondante.
                     </p>
                 ) : (
                     <ul
                         className="space-y-0.5"
                         role="listbox"
-                        aria-label="CRM search results"
+                        aria-label="Résultats CRM"
                     >
                         {hits.map((hit) => (
                             <li key={`${hit.type}:${hit.id}`}>
@@ -432,15 +413,15 @@ function RecordSearchPanel({
                                     role="option"
                                     aria-selected={false}
                                     className={cn(
-                                        'flex min-h-9 w-full items-center justify-between gap-3 rounded-md px-2 text-left text-[12px] text-[#0D1B24] hover:bg-[#F3F5F1]',
-                                        focusRing,
+                                        'flex min-h-9 w-full items-center justify-between gap-3 rounded-[var(--evo-radius-compact)] px-2 text-left text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                        evoFocus,
                                     )}
                                     onClick={() => onSelect(hit)}
                                 >
                                     <span className="min-w-0 truncate font-medium">
                                         {hit.label}
                                     </span>
-                                    <span className="shrink-0 text-[10px] text-[#69777C]">
+                                    <span className="shrink-0 text-[10px] text-evo-ink-muted">
                                         {recordTypeLabel(hit.type)}
                                     </span>
                                 </button>
@@ -462,9 +443,9 @@ function ContextPanel({
 }) {
     return (
         <div className="p-3">
-            <p className="text-[12px] font-semibold">Open CRM context</p>
-            <p className="mt-0.5 text-[11px] text-[#69777C]">
-                Continue in a workspace linked to this agent.
+            <p className="text-[12px] font-semibold">Ouvrir le contexte CRM</p>
+            <p className="mt-0.5 text-[11px] text-evo-ink-muted">
+                Continuer dans un espace lié à cet agent.
             </p>
             <ul className="mt-2 grid grid-cols-2 gap-1">
                 {contexts.map((context) => (
@@ -472,8 +453,8 @@ function ContextPanel({
                         <Link
                             href={context.href}
                             className={cn(
-                                'flex min-h-8 items-center rounded-md px-2 text-[12px] text-[#0D1B24] hover:bg-[#F3F5F1]',
-                                focusRing,
+                                'flex min-h-8 items-center rounded-[var(--evo-radius-compact)] px-2 text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                evoFocus,
                             )}
                             onClick={onNavigate}
                         >
@@ -495,23 +476,23 @@ function TemplatesPanel({
 }) {
     return (
         <div className="p-3">
-            <p className="text-[12px] font-semibold">Message templates</p>
+            <p className="text-[12px] font-semibold">Modèles de message</p>
             <ul className="mt-2 space-y-0.5">
                 {prompts.map((prompt) => (
                     <li key={prompt.label}>
                         <button
                             type="button"
                             className={cn(
-                                'flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-[12px] text-[#0D1B24] hover:bg-[#F3F5F1]',
-                                focusRing,
+                                'flex min-h-9 w-full items-center gap-2 rounded-[var(--evo-radius-compact)] px-2 text-left text-[12px] text-evo-ink hover:bg-evo-surface-subtle',
+                                evoFocus,
                             )}
                             onClick={() => onSelect(prompt)}
                         >
                             <span className="min-w-0 flex-1 truncate">
                                 {prompt.label}
                             </span>
-                            <span className="text-[10px] text-[#69777C]">
-                                Use
+                            <span className="text-[10px] text-evo-ink-muted">
+                                Utiliser
                             </span>
                         </button>
                     </li>
@@ -545,11 +526,11 @@ function toRecordContext(hit: CommandSearchHit): AgentRecordContext | null {
 
 function recordTypeLabel(type: string): string {
     const labels: Record<string, string> = {
-        company: 'Company',
+        company: 'Entreprise',
         contact: 'Contact',
-        deal: 'Deal',
+        deal: 'Affaire',
         lead: 'Lead',
-        quote: 'Quote',
+        quote: 'Devis',
     };
 
     return labels[type] ?? type;

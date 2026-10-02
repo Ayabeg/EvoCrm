@@ -109,7 +109,6 @@ export default [
         ],
         ignores: [
             'resources/js/evo/tokens/**',
-            'resources/js/components/aurora/**',
             'resources/js/components/evilcharts/**',
         ],
         rules: {
@@ -134,7 +133,7 @@ export default [
                                 '**/components/aurora/*',
                             ],
                             message:
-                                'Aurora UI primitives were removed in PR3 (AGPL-3.0-only). Leftover command-palette / prompt-input are PR2 / PR7.',
+                                'Aurora (AGPL-3.0-only) was removed. Do not import components/aurora or components/ui/aurora.',
                         },
                     ],
                 },

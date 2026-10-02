@@ -22,6 +22,11 @@ Screens live next to the Lab route. Fill a row when the component is built in De
 | DataGrid | ONE grid | compact / standard | loading, empty, error, selected, bulk | 32–36 rows | sort, select, pagination | ReUI MIT (TanStack) | `/design-lab/data` | PR3 |
 | FilterBar / FilterBuilder / SavedViews | Filters (2-level AND/OR) | — | chips, builder open | — | labelled controls | ReUI MIT + custom views | `/design-lab/data` | PR3 |
 | RecordWorkspace | CRM records | — | — | — | — | custom Evo (PR5) | — | — |
+| AgentConversation / UserMessage / AgentMessage | Agent thread | user / assistant | streaming, empty, error | 760px column, 32/36 | live region, Enter send, Shift+Enter newline | Prompt Kit MIT | `/design-lab/agents` · `/agents` | PR7 1440×900 |
+| AgentComposer / PromptSuggestion | Prompt input | idle / sending | disabled, context chip | 32/36, orange send only | Enter / Shift+Enter, IME-safe | Prompt Kit MIT | `/design-lab/agents` · `/agents` | PR7 |
+| StreamingState / ThinkingState / ReasoningDisclosure | Loaders + reasoning | — | running, reduced-motion | — | aria-live | Prompt Kit loader + PastaUI MIT | `/design-lab/agents` | PR7 |
+| ToolCall / ToolResult / AgentTask | Tool timeline | running / done / error | — | — | status text, not color-only | PastaUI MIT | `/design-lab/agents` | PR7 |
+| ApprovalCard / AgentPlan / AgentProgress | HITL + plan | pending / approved / denied | never auto-executes | 32/36 | Approuver / Refuser | Tool UI MIT | `/design-lab/agents` | PR7 |
 | FileDropzone | Uploads | — | — | — | — | deferred | — | — |
 | RichTextEditor | Composer | — | — | — | — | deferred | — | — |
 

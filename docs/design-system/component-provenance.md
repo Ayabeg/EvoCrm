@@ -8,7 +8,7 @@ Rules: one row per external item. Every vendored file must carry a header matchi
 
 | Item | Why | Action |
 |---|---|---|
-| Vendored Aurora (`components/ui/aurora/*`) | **AGPL-3.0-only** (`dinglebear-ai/aurora`). | **Deleted in PR3.** Gate: no `components/ui/aurora` import. Leftover AGPL: `components/aurora/prompt-input` (PR7). Command palette deleted after PR2 cut over to `evo/patterns/command-palette`. |
+| Vendored Aurora (`components/ui/aurora/*`) | **AGPL-3.0-only** (`dinglebear-ai/aurora`). | **Deleted in PR3.** Last leftover `components/aurora/prompt-input.tsx` **deleted in PR7**. Gate: no `components/aurora` or `components/ui/aurora` import. AGPL leftover in `resources/js`: **zero**. |
 | `reui.io/blocks/*` | ReUI Pro (paid) | Banned. MIT `reui.io/components/*` only. |
 | Coss | Root LICENSE AGPL-3.0 | Excluded |
 | Formcn | No LICENSE in repo root | Excluded |
@@ -102,7 +102,7 @@ Rules: one row per external item. Every vendored file must carry a header matchi
 | @base-ui/react | MIT | https://github.com/mui/base-ui |
 | sonner | MIT | https://github.com/emilkowalski/sonner |
 | @phosphor-icons/react | MIT | https://github.com/phosphor-icons/react |
-| react-markdown / remark-gfm / remark-breaks / marked | MIT | UNVERIFIED repo URL in this file — confirm at install |
+| react-markdown / remark-gfm / remark-breaks | MIT (LICENSE files read 2026-10-02) | https://github.com/remarkjs/react-markdown · https://github.com/remarkjs/remark-gfm · https://github.com/remarkjs/remark-breaks |
 
 ### Installed in PR1 (LICENSE file read in `node_modules` after install)
 
@@ -172,3 +172,40 @@ Settings family is custom Evo (no registry copy). Built on `evo/ui/*` + the PR3 
 | Compatibility shims | — | — | `layouts/settings/layout.tsx`, `components/settings/chrome.tsx` | One-line re-exports after pages moved onto `@/evo/patterns/settings`. |
 
 No primitive rewrites in `evo/ui/*`.
+
+## PR7 copy log (2026-10-02)
+
+Pins: Prompt Kit `5a9496635cc0e1bf7679fe2a9e35d9b36b99c08a` · PastaUI `d6a8b1b8eeed2f25acac8eb24abcc35651374705` · Tool UI `49a870286facdbf28160cd647f0d337ebdc9b275`. LICENSE files re-read 2026-10-02. Commercial use: yes (MIT). Visual identity stripped; `--evo-*` only; Phosphor; Geist; 32/36; teal focus; orange only on send/CTA.
+
+| Component | Registry | Source URL | License | Files copied | Files modified | Evo destination | Date verified |
+|---|---|---|---|---|---|---|---|
+| AgentConversation / ChatContainer | Prompt Kit — chat-container | https://github.com/ibelick/prompt-kit | MIT (LICENCE.md) | architecture (not verbatim dump) | use-stick-to-bottom; role=log aria-live; reduced-motion instant scroll | `evo/ai/chat-container.tsx` | 2026-10-02 |
+| UserMessage / AgentMessage / Markdown | Prompt Kit — message | https://github.com/ibelick/prompt-kit | MIT (LICENCE.md) | architecture | shiki dropped; lazy react-markdown + gfm + breaks; no raw HTML | `evo/ai/message.tsx`, `markdown.tsx` | 2026-10-02 |
+| AgentComposer / PromptInput | Prompt Kit — prompt-input | https://github.com/ibelick/prompt-kit | MIT (LICENCE.md) | architecture | IME-safe Enter / Shift+Enter; 32/36; teal focus | `evo/ai/prompt-input.tsx` · `desk/agents-composer.tsx` | 2026-10-02 |
+| PromptSuggestion | Prompt Kit — prompt-suggestion | https://github.com/ibelick/prompt-kit | MIT (LICENCE.md) | architecture | lucide unused; Evo chips | `evo/ai/prompt-suggestion.tsx` | 2026-10-02 |
+| StreamingState | Prompt Kit — loader | https://github.com/ibelick/prompt-kit | MIT (LICENCE.md) | trimmed loader | reduced-motion; French | `evo/ai/streaming-state.tsx` | 2026-10-02 |
+| SourceCitation | Prompt Kit — source | https://github.com/ibelick/prompt-kit | MIT (LICENCE.md) | architecture | HoverCard + Phosphor | `evo/ai/source-citation.tsx` | 2026-10-02 |
+| ThinkingState | PastaUI — thinking-shimmer | https://github.com/syeddhasnainn/pastaui | MIT (LICENSE) | architecture | Solar → Phosphor; `--evo-*` | `evo/ai/thinking-state.tsx` | 2026-10-02 |
+| ReasoningDisclosure | PastaUI — reasoning-text | https://github.com/syeddhasnainn/pastaui | MIT (LICENSE) | architecture | CSS module → Tailwind tokens | `evo/ai/reasoning-disclosure.tsx` | 2026-10-02 |
+| ToolCall | PastaUI — tool-timeline | https://github.com/syeddhasnainn/pastaui | MIT (LICENSE) | architecture | French status; Phosphor | `evo/ai/tool-call.tsx` | 2026-10-02 |
+| ToolResult | PastaUI — tool-result | https://github.com/syeddhasnainn/pastaui | MIT (LICENSE) | architecture | Collapsible + tokens | `evo/ai/tool-result.tsx` | 2026-10-02 |
+| AgentTask | PastaUI — todo-list | https://github.com/syeddhasnainn/pastaui | MIT (LICENSE) | architecture | Phosphor checks | `evo/ai/agent-task.tsx` | 2026-10-02 |
+| ApprovalCard | Tool UI — approval-card | https://github.com/assistant-ui/tool-ui | MIT (LICENSE.md) | architecture (not 26KB dump) | lucide → Phosphor; **never auto-executes** | `evo/ai/approval-card.tsx` | 2026-10-02 |
+| AgentPlan | Tool UI — plan | https://github.com/assistant-ui/tool-ui | MIT (LICENSE.md) | architecture | Phosphor; French | `evo/ai/agent-plan.tsx` | 2026-10-02 |
+| AgentProgress | Tool UI — progress-tracker | https://github.com/assistant-ui/tool-ui | MIT (LICENSE.md) | architecture | evo Progress | `evo/ai/agent-progress.tsx` | 2026-10-02 |
+| CrmResult | custom Evo | — | MIT (original) | original | record peek card | `evo/ai/crm-result.tsx` | 2026-10-02 |
+
+LICENSE copies: `evo/vendor/prompt-kit/LICENCE.md`, `evo/vendor/pastaui/LICENSE`, `evo/vendor/tool-ui/LICENSE.md`.
+
+### npm added in PR7 (LICENSE file read)
+
+| Package | License | Used |
+|---|---|---|
+| `use-stick-to-bottom` | MIT | ChatContainer stick-to-bottom |
+| `react-markdown` | MIT | Agent markdown (lazy) |
+| `remark-gfm` | MIT | GFM tables / lists |
+| `remark-breaks` | MIT | Soft line breaks |
+
+AGPL leftover in `resources/js`: **zero**. `components/aurora/prompt-input.tsx` deleted.
+
+Deferred: OpenManus streaming UI (backend still fail-closed; Ask Evo remains the production send path). Settings/agent page is PR11. No new backend features.

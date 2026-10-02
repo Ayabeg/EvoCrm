@@ -101,6 +101,7 @@ it('uses the chat layout regions for the agent conversation surface', function (
 it('keeps StarFour on Agents and Robot on the Bots listing header', function () {
     $sidebar = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
     $page = file_get_contents(resource_path('js/pages/agents/index.tsx'));
+    $catalog = file_get_contents(resource_path('js/lib/desk/bot-catalog.ts'));
     $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
 
     expect($sidebar)
@@ -113,8 +114,31 @@ it('keeps StarFour on Agents and Robot on the Bots listing header', function () 
         ->toContain('<Robot')
         ->toContain('Bots')
         ->toContain('evo-agents-primary-btn')
+        ->toContain('BOT_GROUP_LABEL')
+        ->toContain('Tous les bots')
+        ->toContain('Nouveau bot')
         ->not->toContain('bg-[#E8530E] text-white')
+        ->and($catalog)
+        ->toContain("sales: 'Vente'")
+        ->toContain("internal: 'Interne'")
+        ->not->toContain('Keeps momentum')
+        ->not->toContain("label: 'Sales'")
         ->and($table)
         ->toContain("column.id === 'close_date'")
         ->toContain('whitespace-nowrap');
+});
+
+it('keeps the user bubble from inverting to a white chip in dark mode', function () {
+    $message = file_get_contents(resource_path('js/evo/ai/message.tsx'));
+
+    expect($message)
+        ->toContain('evo-ai-user-chip');
+
+    $chip = file_get_contents(resource_path('js/evo/ai/message.css'));
+
+    expect($chip)
+        ->toContain('.evo-ai-user-chip')
+        ->toContain('.dark .evo-ai-user-chip')
+        ->toContain('#1c1c1c')
+        ->not->toContain('bg-evo-ink');
 });

@@ -1,5 +1,6 @@
 import type { BotAvatarType } from 'bot-avatars';
 import { useSyncExternalStore } from 'react';
+import type { AgentApproval, AgentToolCall } from '@/evo/ai/types';
 import type { AskEvoAction, AskEvoContextPayload } from '@/lib/ask-evo';
 
 export type AvatarTone = 'ink' | 'teal' | 'orange' | 'night';
@@ -80,6 +81,8 @@ export function avatarTypeForBotId(
 }
 
 export function avatarColorForTone(tone: AvatarTone): string {
+    /* bot-avatars requires a paint hex, not a CSS custom property. */
+    /* eslint-disable no-restricted-syntax -- avatar paint hex */
     if (tone === 'orange') {
         return '#E8530E';
     }
@@ -89,6 +92,7 @@ export function avatarColorForTone(tone: AvatarTone): string {
     }
 
     return '#0D1B24';
+    /* eslint-enable no-restricted-syntax */
 }
 
 export type ConnectorDefinition = {
@@ -105,6 +109,11 @@ export type ChatMessage = {
     body: string;
     recordContext?: AgentRecordContext | null;
     crmActions?: AskEvoAction[];
+    streaming?: boolean;
+    reasoning?: string;
+    toolCalls?: AgentToolCall[];
+    approval?: AgentApproval;
+    error?: boolean;
 };
 
 export type AgentRecordContext = {
@@ -130,12 +139,20 @@ export type NewBotInput = {
     avatarTone: AvatarTone;
 };
 
+export const BOT_GROUP_LABEL: Record<BotGroup, string> = {
+    sales: 'Vente',
+    internal: 'Interne',
+    evopulse: 'EvoPulse',
+    custom: 'Bot personnalisé',
+};
+
 export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'desk',
         name: 'Desk router',
-        job: 'routes the request to the right desk',
-        description: 'A quiet front door for work that needs a specialist.',
+        job: 'oriente la demande vers le bon bureau',
+        description:
+            'Une porte d’entrée discrète pour le travail qui demande un spécialiste.',
         group: 'internal',
         avatarTone: 'ink',
         avatarType: 'droid',
@@ -143,8 +160,9 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'closer',
         name: 'Closer',
-        job: 'turns active opportunities into next steps',
-        description: 'Keeps momentum on qualified conversations and deals.',
+        job: 'transforme les opportunités actives en prochaines actions',
+        description:
+            'Maintient le rythme sur les conversations et affaires qualifiées.',
         group: 'sales',
         avatarTone: 'orange',
         avatarType: 'hexagon',
@@ -152,8 +170,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'qualifier',
         name: 'Qualifier',
-        job: 'qualifies leads with useful context',
-        description: 'Separates real buying intent from noise.',
+        job: 'qualifie les leads avec le contexte utile',
+        description: 'Sépare l’intention d’achat réelle du bruit.',
         group: 'sales',
         avatarTone: 'teal',
         avatarType: 'drop',
@@ -161,8 +179,9 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'quote-desk',
         name: 'Quote desk',
-        job: 'turns requirements into a clear quote path',
-        description: 'Helps shape the next quote without inventing numbers.',
+        job: 'transforme les besoins en un chemin de devis clair',
+        description:
+            'Aide à préparer le prochain devis sans inventer de montants.',
         group: 'sales',
         avatarTone: 'ink',
         avatarType: 'square',
@@ -170,8 +189,9 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'after-sale',
         name: 'After-sale',
-        job: 'keeps customers moving after the handoff',
-        description: 'Surfaces follow-ups, meetings, and renewal signals.',
+        job: 'fait avancer les clients après la passation',
+        description:
+            'Fait remonter les suivis, rendez-vous et signaux de renouvellement.',
         group: 'sales',
         avatarTone: 'teal',
         avatarType: 'flower',
@@ -179,9 +199,9 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'evopulse-shell-ia',
         name: 'EvoPulse · Shell IA',
-        job: 'maps the workspace information architecture',
+        job: 'cartographie l’architecture d’information de l’espace de travail',
         description:
-            'Internal product intelligence for navigation and structure.',
+            'Intelligence produit interne pour la navigation et la structure.',
         group: 'evopulse',
         avatarTone: 'night',
         avatarType: 'mech',
@@ -189,9 +209,9 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'evopulse-pulse-ui',
         name: 'EvoPulse · Pulse UI',
-        job: 'turns signals into a focused operating surface',
+        job: 'transforme les signaux en une surface d’opération ciblée',
         description:
-            'Internal product intelligence for calm, useful interfaces.',
+            'Intelligence produit interne pour des interfaces calmes et utiles.',
         group: 'evopulse',
         avatarTone: 'teal',
         avatarType: 'cloud',
@@ -199,8 +219,8 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'evopulse-command-ui',
         name: 'EvoPulse · Command UI',
-        job: 'shapes fast, grounded command flows',
-        description: 'Internal product intelligence for speed and clarity.',
+        job: 'conçoit des flux de commande rapides et ancrés',
+        description: 'Intelligence produit interne pour la vitesse et la clarté.',
         group: 'evopulse',
         avatarTone: 'orange',
         avatarType: 'star',
@@ -208,8 +228,9 @@ export const BOT_CATALOG: BotDefinition[] = [
     {
         id: 'night-shift',
         name: 'Night shift',
-        job: 'keeps a quiet watch on overnight work',
-        description: 'Internal product intelligence for low-noise monitoring.',
+        job: 'veille discrètement sur le travail de nuit',
+        description:
+            'Intelligence produit interne pour une surveillance à faible bruit.',
         group: 'evopulse',
         avatarTone: 'ink',
         avatarType: 'ghost',
@@ -223,13 +244,13 @@ export const BOT_GROUPS: Array<{
 }> = [
     {
         key: 'sales',
-        label: 'Sales',
+        label: BOT_GROUP_LABEL.sales,
         ids: ['closer', 'qualifier', 'quote-desk', 'after-sale'],
     },
-    { key: 'internal', label: 'Internal', ids: ['desk'] },
+    { key: 'internal', label: BOT_GROUP_LABEL.internal, ids: ['desk'] },
     {
         key: 'evopulse',
-        label: 'EvoPulse',
+        label: BOT_GROUP_LABEL.evopulse,
         ids: [
             'evopulse-shell-ia',
             'evopulse-pulse-ui',
@@ -331,9 +352,10 @@ export function createCustomBot(input: NewBotInput): BotDefinition {
     const bot: BotDefinition = {
         id,
         name: input.name.trim(),
-        job: 'works from your instructions and selected tools',
+        job: 'travaille à partir de vos instructions et des outils sélectionnés',
         description:
-            input.instructions.trim() || 'A custom bot for this workspace.',
+            input.instructions.trim() ||
+            'Un bot personnalisé pour cet espace de travail.',
         group: 'custom',
         avatarTone: input.avatarTone,
         avatarType: avatarTypeForBotId(id),
@@ -353,7 +375,7 @@ export function createChat(botId: string): AgentChat {
     const chat: AgentChat = {
         id: `chat-${Date.now()}-${chatSequence++}`,
         botId: bot.id,
-        title: 'Nouveau chat',
+        title: 'Nouvelle conversation',
         relativeTime: 'Aujourd’hui',
         messages: [],
         recordContext: null,
@@ -406,7 +428,7 @@ export function addUserChatMessage(
     };
 
     chat.messages = [...chat.messages, userMessage];
-    chat.title = prompt.trim().slice(0, 48) || 'Nouveau chat';
+    chat.title = prompt.trim().slice(0, 48) || 'Nouvelle conversation';
     chat.relativeTime = 'Aujourd’hui';
     chats = [chat, ...chats.filter((item) => item.id !== chat.id)];
     publish();
@@ -418,6 +440,7 @@ export function addAssistantChatMessage(
     chatId: string,
     answer: string,
     context?: AskEvoContextPayload,
+    extras?: Pick<ChatMessage, 'error' | 'reasoning' | 'toolCalls' | 'approval'>,
 ): AgentChat | undefined {
     const chat = getChatById(chatId);
 
@@ -430,11 +453,41 @@ export function addAssistantChatMessage(
         role: 'assistant',
         body: answer,
         crmActions: context?.actions ?? [],
+        error: extras?.error,
+        reasoning: extras?.reasoning,
+        toolCalls: extras?.toolCalls,
+        approval: extras?.approval,
     };
 
     chat.messages = [...chat.messages, assistantMessage];
     chat.relativeTime = 'Aujourd’hui';
     chats = [chat, ...chats.filter((item) => item.id !== chat.id)];
+    publish();
+
+    return chat;
+}
+
+export function setChatMessageApproval(
+    chatId: string,
+    messageId: string,
+    status: AgentApproval['status'],
+): AgentChat | undefined {
+    const chat = getChatById(chatId);
+
+    if (!chat) {
+        return undefined;
+    }
+
+    chat.messages = chat.messages.map((message) => {
+        if (message.id !== messageId || !message.approval) {
+            return message;
+        }
+
+        return {
+            ...message,
+            approval: { ...message.approval, status },
+        };
+    });
     publish();
 
     return chat;

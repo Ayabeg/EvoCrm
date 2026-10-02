@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -21,24 +21,25 @@ function walk(dir: string, acc: string[] = []): string[] {
 }
 
 describe('Aurora AGPL removal gate', () => {
-    it('has no import of components/ui/aurora', () => {
+    it('has deleted the last Aurora AGPL file', () => {
+        const auroraDir = join(process.cwd(), 'resources/js/components/aurora');
+
+        expect(existsSync(join(auroraDir, 'prompt-input.tsx'))).toBe(false);
+        expect(existsSync(auroraDir)).toBe(false);
+    });
+
+    it('has no import of components/ui/aurora or components/aurora', () => {
         const root = join(process.cwd(), 'resources/js');
         const hits = walk(root).filter((file) => {
             const src = readFileSync(file, 'utf8');
 
-            const banned = ['@/components/ui', 'aurora'].join('/');
-            const bannedPath = ['components/ui', 'aurora/'].join('/');
-
-            return src.includes(banned) || src.includes(bannedPath);
+            return (
+                src.includes(['@/components/ui', 'aurora'].join('/')) ||
+                src.includes(['components/ui', 'aurora/'].join('/')) ||
+                src.includes(['@/components', 'aurora'].join('/')) ||
+                src.includes(['from \'@/components', 'aurora'].join('/'))
+            );
         });
-
-        expect(hits).toEqual([]);
-    });
-
-    it('has no leftover aurora command palette import', () => {
-        const root = join(process.cwd(), 'resources/js');
-        const banned = ['@/components/aurora', 'command-palette'].join('/');
-        const hits = walk(root).filter((file) => readFileSync(file, 'utf8').includes(banned));
 
         expect(hits).toEqual([]);
     });
