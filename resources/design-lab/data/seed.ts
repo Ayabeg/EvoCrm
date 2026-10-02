@@ -6,3 +6,11 @@ export * from './evocrm-demo-data';
 export * from './selectors';
 export * from './outbound';
 export { PR5_STORY, getPr5Story } from './pr5-story';
+export {
+    INBOX_NOW,
+    cliniqueEmail,
+    inboxStoryContext,
+    inboxStoryConversations,
+    inboxStoryQueues,
+    pharmacieWhatsapp,
+} from './inbox-story';

@@ -40,7 +40,12 @@ function p13Thread(User $user, array $overrides = []): Thread
 
 it('locks P13 native four-pane inbox without a third implementation', function () {
     $inbox = File::get(resource_path('js/pages/desk/inbox.tsx'));
-    $chrome = File::get(resource_path('js/components/crm/inbox-chrome.tsx'));
+    $chrome = File::get(resource_path('js/components/crm/inbox-chrome.tsx'))
+        .File::get(resource_path('js/evo/inbox/Composer.tsx'))
+        .File::get(resource_path('js/evo/inbox/ConversationRow.tsx'))
+        .File::get(resource_path('js/evo/inbox/QueueNavigation.tsx'))
+        .File::get(resource_path('js/evo/inbox/MessageThread.tsx'))
+        .File::get(resource_path('js/evo/inbox/marks.tsx'));
     $workspace = File::get(resource_path('js/lib/inbox-workspace.ts'));
     $controller = File::get(app_path('Http/Controllers/Desk/InboxController.php'));
     $shell = File::get(resource_path('js/components/crm/adaptive-workspace-shell.tsx'));

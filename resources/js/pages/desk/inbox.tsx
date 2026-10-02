@@ -7,14 +7,11 @@ import {
     InboxCaughtUpMark,
     InboxComposer,
     InboxContactSidebar,
-    InboxConversationRow,
     InboxEmbedSkeleton,
     InboxFolderRail,
-    InboxListHeader,
     InboxMessageThread,
     InboxPersonMark,
     InboxStatusBanner,
-    formatInboxWhen,
     inboxContactName,
     inboxInitials,
 } from '@/components/crm/inbox-chrome';
@@ -27,6 +24,8 @@ import { DeskGlass } from '@/components/desk/desk-glass';
 import { OfficialConnectPanel } from '@/components/desk/official-connect-panel';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ConversationList } from '@/evo/inbox';
+import { deskThreadToConversation } from '@/evo/inbox/adapters';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
 import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
@@ -490,61 +489,16 @@ function FrontDesk({
                         />
                     }
                     center={
-                        <div
-                            className="flex min-h-0 flex-1 flex-col"
-                            data-inbox-pane="list"
-                            data-inbox="conversation-list"
-                        >
-                            <InboxListHeader
-                                query={draftQuery}
-                                count={threads.length}
-                                onQueryChange={onQueryChange}
-                            />
-                            {threads.length === 0 ? (
-                                <div className="grid flex-1 place-items-center px-4 py-10">
-                                    <div className="max-w-xs text-center">
-                                        <p className="text-[13px] font-medium text-ink">
-                                            No open conversations here
-                                        </p>
-                                        <p className="mt-1 text-[12px] text-mute">
-                                            You&apos;re all caught up.
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="min-h-0 flex-1 overflow-y-auto">
-                                    {threads.map((thread) => (
-                                        <InboxConversationRow
-                                            key={thread.id}
-                                            name={inboxContactName(
-                                                thread.contact,
-                                            )}
-                                            initials={inboxInitials(
-                                                thread.contact,
-                                            )}
-                                            when={formatInboxWhen(
-                                                thread.last_message_at,
-                                            )}
-                                            preview={
-                                                thread.messages?.[0]?.body ??
-                                                thread.subject ??
-                                                'No preview'
-                                            }
-                                            channel={inboxChannelLabel(
-                                                thread.channel,
-                                            )}
-                                            unread={thread.unread_count ?? 0}
-                                            selected={
-                                                requestedThreadId === thread.id
-                                            }
-                                            onSelect={() =>
-                                                selectThread(thread.id)
-                                            }
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        <ConversationList
+                            conversations={threads.map(deskThreadToConversation)}
+                            selectedId={requestedThreadId}
+                            onSelect={(id) => selectThread(Number(id))}
+                            query={draftQuery}
+                            onQueryChange={onQueryChange}
+                            showFilters={false}
+                            emptyTitle={t('No open conversations here')}
+                            emptyDescription={t("You're all caught up.")}
+                        />
                     }
                     right={
                         selectedMatchesRequest && selected ? (

@@ -101,7 +101,9 @@ it('normalizes overlay open/close to the P27 contract and keeps P26 reduce strin
 
 it('normalizes listed surfaces without KPI counting, money tween, confetti, or fake Ask Evo latency', function () {
     $kpi = File::get(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
-    $inbox = File::get(resource_path('js/components/crm/inbox-chrome.tsx'));
+    $inbox = File::get(resource_path('js/components/crm/inbox-chrome.tsx'))
+        .File::get(resource_path('js/evo/inbox/ConversationRow.tsx'))
+        .File::get(resource_path('js/evo/inbox/QueueNavigation.tsx'));
     $list = File::get(resource_path('js/evo/data/crm-list/table.tsx')).File::get(resource_path('js/evo/data/crm-list/cells.tsx'));
     $table = File::get(resource_path('js/ds/workspace/DataTable.tsx'));
     $workspace = File::get(resource_path('js/ds/workspace/DataWorkspace.tsx'));

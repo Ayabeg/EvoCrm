@@ -1,7 +1,12 @@
-import { Form, Link } from '@inertiajs/react';
-import { OutboundPage, OutboundShell } from '@/components/crm/outbound-shell';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Form, router } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
+import { OutboundShell } from '@/components/crm/outbound-shell';
+import type { CRMContextRecord } from '@/evo/crm/record';
+import { InboxWorkspace } from '@/evo/inbox';
+import { outboundReplyToConversation } from '@/evo/inbox/adapters';
+import { Button } from '@/evo/ui/button';
+import { Status } from '@/evo/ui/status';
+import { t } from '@/lib/i18n';
 
 type Lead = { id: number; title: string; status: string };
 type Reply = {
@@ -17,83 +22,111 @@ type Reply = {
         leads?: Lead[];
     } | null;
     mailbox?: { id: number; name: string } | null;
-    parent?: { id: number; subject?: string | null } | null;
+    parent?: { id: number; subject?: string | null; body?: string | null; sent_at?: string | null } | null;
 };
 
 function primaryLead(contact: NonNullable<Reply['contact']>): Lead | null {
     if (!contact.leads?.length) {
-return null;
+        return null;
+    }
+
+    return contact.leads.find((lead) => lead.status !== 'qualified') ?? contact.leads[0] ?? null;
 }
 
-    return contact.leads.find((l) => l.status !== 'qualified') ?? contact.leads[0] ?? null;
+function replyContext(reply: Reply): CRMContextRecord | null {
+    if (!reply.contact) {
+        return null;
+    }
+
+    const lead = primaryLead(reply.contact);
+    const name = `${reply.contact.first_name} ${reply.contact.last_name ?? ''}`.trim();
+
+    return {
+        ref: { type: 'contact', id: reply.contact.id },
+        title: name,
+        subtitle: reply.contact.email ?? undefined,
+        status: lead
+            ? {
+                  label: lead.status === 'qualified' ? t('Qualified') : lead.title,
+                  tone: lead.status === 'qualified' ? 'success' : 'neutral',
+              }
+            : undefined,
+        fullRecordHref: `/crm/contacts/${reply.contact.id}`,
+        keyProperties: [
+            { id: 'email', label: t('Email'), value: reply.contact.email ?? null },
+            { id: 'subject', label: t('Subject'), value: reply.subject ?? null },
+            {
+                id: 'lead',
+                label: t('Lead'),
+                value: lead?.title ?? null,
+                href: lead ? `/crm/leads/${lead.id}` : undefined,
+            },
+        ],
+        associations: lead
+            ? [{ ref: { type: 'lead', id: lead.id }, label: lead.title }]
+            : [],
+    };
 }
 
-export default function Replies({ replies, imapNote }: { replies: Reply[]; imapNote: string }) {
+export default function Replies({
+    replies,
+    imapNote,
+}: {
+    replies: Reply[];
+    imapNote: string;
+}) {
+    const conversations = useMemo(
+        () => replies.map(outboundReplyToConversation),
+        [replies],
+    );
+    const [selectedId, setSelectedId] = useState<string | number | null>(
+        conversations[0]?.id ?? null,
+    );
+    const selectedReply = replies.find((row) => String(row.id) === String(selectedId)) ?? null;
+    const lead = selectedReply?.contact ? primaryLead(selectedReply.contact) : null;
+
     return (
-        <OutboundShell title="Replies">
-            <OutboundPage title="Replies" description={imapNote}>
-                <section className="overflow-x-auto border-t border-hairline">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-left">
-                            <tr>
-                                <th className="px-4 py-2">From</th>
-                                <th className="px-4 py-2">Subject</th>
-                                <th className="px-4 py-2">Lead</th>
-                                <th className="px-4 py-2">Received</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {replies.map((reply) => {
-                                const lead = reply.contact ? primaryLead(reply.contact) : null;
-
-                                return (
-                                    <tr key={reply.id} className="border-t border-hairline align-top">
-                                        <td className="px-4 py-2">
-                                            {reply.contact ? (
-                                                <Link href={`/crm/contacts/${reply.contact.id}`} className="text-ink hover:underline">
-                                                    {reply.contact.first_name} {reply.contact.last_name ?? ''}
-                                                </Link>
-                                            ) : (
-                                                '—'
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-2">{reply.subject ?? '—'}</td>
-                                        <td className="px-4 py-2">
-                                            {lead ? (
-                                                <div className="flex items-center gap-2">
-                                                    <Link href={`/crm/leads/${lead.id}`} className="text-ink hover:underline">
-                                                        {lead.title}
-                                                    </Link>
-                                                    {lead.status !== 'qualified' ? (
-                                                        <Form
-                                                            action={`/crm/leads/${lead.id}/qualify`}
-                                                            method="post"
-                                                            options={{ preserveScroll: true }}
-                                                        >
-                                                            <Button type="submit" variant="outline" className="h-6 px-2 text-[11px]">
-                                                                Qualify
-                                                            </Button>
-                                                        </Form>
-                                                    ) : (
-                                                        <Badge variant="secondary" className="text-[10px]">
-                                                            Qualified
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                '—'
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-2 text-xs text-muted-foreground">{reply.created_at}</td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </section>
-            </OutboundPage>
+        <OutboundShell title={t('Replies')}>
+            <div className="flex h-full min-h-0 flex-col">
+                <p className="border-b border-[var(--evo-hairline)] px-4 py-2 text-[12px] text-[var(--evo-ink-muted)]">
+                    {t(imapNote)}
+                </p>
+                <InboxWorkspace
+                    conversations={conversations}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                    context={selectedReply ? replyContext(selectedReply) : null}
+                    allowResolve={false}
+                    empty={{
+                        title: t('Replies'),
+                        description: t(imapNote),
+                    }}
+                    headerExtra={
+                        lead ? (
+                            lead.status !== 'qualified' ? (
+                                <Form
+                                    action={`/crm/leads/${lead.id}/qualify`}
+                                    method="post"
+                                    options={{ preserveScroll: true }}
+                                >
+                                    <Button type="submit" variant="outline" size="sm">
+                                        {t('Qualify')}
+                                    </Button>
+                                </Form>
+                            ) : (
+                                <Status tone="success" label={t('Qualified')} />
+                            )
+                        ) : null
+                    }
+                    onCompose={() => {
+                        if (selectedReply?.contact) {
+                            router.visit(`/crm/contacts/${selectedReply.contact.id}`);
+                        }
+                    }}
+                />
+            </div>
         </OutboundShell>
     );
 }
 
-Replies.layout = { breadcrumbs: [{ title: 'Replies', href: '/outbound/replies' }] };
+Replies.layout = { breadcrumbs: [{ title: t('Replies'), href: '/outbound/replies' }] };

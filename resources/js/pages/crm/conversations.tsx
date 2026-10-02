@@ -1,22 +1,21 @@
-import { Form, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Tray } from '@phosphor-icons/react';
+import { useState } from 'react';
 import { DeskShell } from '@/components/crm/desk-shell';
 import {
     InboxCaughtUpMark,
+    InboxComposer,
     InboxContactSidebar,
-    InboxPersonMark,
+    InboxMessageThread,
     formatInboxWhen,
     inboxContactName,
-    inboxInitials,
 } from '@/components/crm/inbox-chrome';
 import type { InboxContact } from '@/components/crm/inbox-chrome';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Input } from '@/components/ui/input';
+import { ConversationList } from '@/evo/inbox';
+import { deskThreadToConversation } from '@/evo/inbox/adapters';
 import { t } from '@/lib/i18n';
-import { MOTION_HOVER_CLASS } from '@/lib/motion';
-import { cn } from '@/lib/utils';
 
 type Contact = InboxContact & {
     deals?: { id: number; title: string; stage?: { name: string } }[];
@@ -46,6 +45,8 @@ type Props = {
 };
 
 export default function ConversationHistory({ threads, selected }: Props) {
+    const [mode, setMode] = useState<'reply' | 'note'>('reply');
+
     return (
         <DeskShell title="Conversations">
             <div
@@ -72,7 +73,7 @@ export default function ConversationHistory({ threads, selected }: Props) {
                     <div className="grid min-h-0 flex-1 gap-px overflow-hidden bg-hairline lg:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
                         <section
                             aria-label="Conversations"
-                            className="min-h-0 overflow-y-auto bg-white"
+                            className="flex min-h-0 flex-col bg-white"
                         >
                             <div className="flex items-center justify-between border-b border-hairline px-3 py-1.5">
                                 <p className="text-[12px] font-medium text-ink">
@@ -90,68 +91,18 @@ export default function ConversationHistory({ threads, selected }: Props) {
                                     </span>
                                 </div>
                             </div>
-                            <ul>
-                                {threads.map((thread) => (
-                                    <li key={thread.id}>
-                                        <button
-                                            type="button"
-                                            className={cn(
-                                                'flex w-full items-start gap-2.5 border-b border-hairline px-3 py-2 text-left',
-                                                MOTION_HOVER_CLASS,
-                                                selected?.id === thread.id
-                                                    ? 'bg-canvas-soft'
-                                                    : 'hover:bg-canvas-soft',
-                                            )}
-                                            onClick={() =>
-                                                router.get(
-                                                    '/conversations',
-                                                    { thread: thread.id },
-                                                    { preserveState: true },
-                                                )
-                                            }
-                                        >
-                                            <InboxPersonMark
-                                                name={inboxContactName(
-                                                    thread.contact,
-                                                )}
-                                                initials={inboxInitials(
-                                                    thread.contact,
-                                                )}
-                                            />
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex items-baseline justify-between gap-2">
-                                                    <span className="truncate text-[13px] font-medium text-ink">
-                                                        {inboxContactName(
-                                                            thread.contact,
-                                                        )}
-                                                    </span>
-                                                    {(thread.unread_count ??
-                                                        0) > 0 ? (
-                                                        <Badge
-                                                            variant="secondary"
-                                                            className="h-4 rounded-none px-1 font-mono text-[10px]"
-                                                        >
-                                                            {
-                                                                thread.unread_count
-                                                            }
-                                                        </Badge>
-                                                    ) : null}
-                                                </div>
-                                                <p className="truncate text-[11px] text-mute">
-                                                    {thread.contact.company
-                                                        ?.name ?? 'No company'}
-                                                </p>
-                                                <p className="mt-0.5 truncate text-[12px] text-mute">
-                                                    {thread.messages?.[0]
-                                                        ?.body ??
-                                                        thread.subject ??
-                                                        'No preview'}
-                                                </p>
-                                            </div>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                            <ConversationList
+                                conversations={threads.map(deskThreadToConversation)}
+                                selectedId={selected?.id}
+                                onSelect={(id) =>
+                                    router.get(
+                                        '/conversations',
+                                        { thread: id },
+                                        { preserveState: true },
+                                    )
+                                }
+                                showFilters={false}
+                            />
                         </section>
 
                         <section
@@ -178,49 +129,18 @@ export default function ConversationHistory({ threads, selected }: Props) {
                                                     : ''}
                                             </p>
                                         </header>
-                                        <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-canvas-soft p-3">
-                                            {(selected.messages ?? []).map(
-                                                (message) => (
-                                                    <div
-                                                        key={message.id}
-                                                        className="bg-white px-3 py-2"
-                                                    >
-                                                        <p className="font-mono text-[10px] tracking-[0.04em] text-mute uppercase">
-                                                            {message.direction}{' '}
-                                                            · {message.status}
-                                                            {message.failure_reason
-                                                                ? ` · ${message.failure_reason}`
-                                                                : ''}
-                                                        </p>
-                                                        <p className="mt-1 text-[13px] leading-5 text-ink">
-                                                            {message.body}
-                                                        </p>
-                                                    </div>
-                                                ),
-                                            )}
-                                        </div>
-                                        <Form
-                                            action={`/desk/threads/${selected.id}/reply`}
-                                            method="post"
-                                            className="flex gap-2 border-t border-hairline bg-white p-3"
-                                            resetOnSuccess={['body']}
-                                        >
-                                            {({ processing }) => (
-                                                <>
-                                                    <Input
-                                                        name="body"
-                                                        placeholder="Log a session reply"
-                                                        required
-                                                        className="h-8 rounded-none"
-                                                    />
-                                                    <Button
-                                                        disabled={processing}
-                                                    >
-                                                        Send
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </Form>
+                                        <InboxMessageThread
+                                            threadId={selected.id}
+                                            messages={selected.messages ?? []}
+                                        />
+                                        <p className="sr-only">
+                                            Log a session reply
+                                        </p>
+                                        <InboxComposer
+                                            threadId={selected.id}
+                                            mode={mode}
+                                            onModeChange={setMode}
+                                        />
                                         <div className="border-t border-hairline px-3 py-2 text-[12px]">
                                             <p className="font-medium text-ink">
                                                 Open deal

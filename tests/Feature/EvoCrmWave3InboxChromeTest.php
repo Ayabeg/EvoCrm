@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Http;
 
 it('rebuilds the inbox as HubSpot-dense chrome around the Desk embed', function () {
     $inbox = file_get_contents(resource_path('js/pages/desk/inbox.tsx'));
-    $chrome = file_get_contents(resource_path('js/components/crm/inbox-chrome.tsx'));
+    $chrome = file_get_contents(resource_path('js/components/crm/inbox-chrome.tsx'))
+        .file_get_contents(resource_path('js/evo/inbox/QueueNavigation.tsx'));
     $shell = file_get_contents(resource_path('js/components/crm/desk-shell.tsx'));
     $workspace = file_get_contents(resource_path('js/components/crm/adaptive-workspace-shell.tsx'));
 

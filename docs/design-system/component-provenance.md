@@ -283,3 +283,20 @@ Record / pipeline / quote families are custom Evo on `evo/ui/*`. Pipeline reuses
 No new npm dependencies. dnd-kit rows stay in the PR8 log. Recharts / evo/charts stay in the PR9 log. PR10 Donut / HorizontalBar wrappers stay in the PR10 log.
 
 AGPL leftover in `resources/js`: **zero**.
+
+## PR6 copy log (2026-10-02)
+
+Inbox / Desk / Outbound replies share one conversation system. Custom Evo on `evo/ui/*` + PR3 TanStack Virtual + PR5 `CRMContext` (import only). Attachment is a custom chip using row 34 as visual reference (not a registry dump). No new npm. No AGPL, no Aurora, no lucide-react, no Tiptap Pro.
+
+| Component | Source | License | Destination | Notes |
+|---|---|---|---|---|
+| ConversationList / ConversationRow / ChannelChip / ChannelFilter / QueueNavigation | custom Evo + `@tanstack/react-virtual` (MIT, already in tree) | MIT (original) | `resources/js/evo/inbox/` | Virtualized list; WhatsApp / email / web / Meta chips; assignment; unread named for a11y. |
+| MessageThread / MessageBubble | custom Evo + `@tanstack/react-virtual` | MIT (original) | `resources/js/evo/inbox/MessageThread.tsx` | Day separators fr-DZ 24h; attachments; delivery status; internal notes. |
+| Composer | custom Evo | MIT (original) | `resources/js/evo/inbox/Composer.tsx` | Reply / note toggle; canned + WhatsApp templates; Enter to send; attachments. |
+| Attachment | shadcn/ui attachment as visual reference | MIT | `resources/js/evo/inbox/Attachment.tsx` | Custom chip; Phosphor; tokens; French `t()`. |
+| InboxWorkspace | custom Evo + PR5 `CRMContext` | MIT (original) | `resources/js/evo/inbox/InboxWorkspace.tsx` | Shared `/inbox` `/desk` `/outbound/replies` `/conversations` / Design Lab. |
+| Design Lab `/inbox` | custom Evo + seed | MIT (original) | `resources/design-lab/pages/InboxPage.tsx` + `data/inbox-story.ts` | Pharmacie Centrale WhatsApp · Clinique El Djazair email · +213. |
+
+No new npm dependencies. `@tanstack/react-virtual` and Tiptap stay in the PR1 / PR8 logs. PR5 `CRMContext` is imported, not forked.
+
+AGPL leftover in `resources/js` after PR6: **zero**.

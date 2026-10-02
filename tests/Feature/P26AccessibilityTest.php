@@ -8,7 +8,10 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
     $list = File::get(resource_path('js/evo/data/crm-list/table.tsx')).File::get(resource_path('js/evo/data/crm-list/cells.tsx'));
     $table = File::get(resource_path('js/ds/workspace/DataTable.tsx'));
     $bulk = File::get(resource_path('js/ds/workspace/BulkActionBar.tsx'));
-    $inbox = File::get(resource_path('js/components/crm/inbox-chrome.tsx'));
+    $inbox = File::get(resource_path('js/components/crm/inbox-chrome.tsx'))
+        .File::get(resource_path('js/evo/inbox/ConversationRow.tsx'))
+        .File::get(resource_path('js/evo/inbox/QueueNavigation.tsx'))
+        .File::get(resource_path('js/evo/inbox/Composer.tsx'));
     $askPanel = File::get(resource_path('js/components/crm/ask-evo-panel.tsx'));
     $askDrawer = File::get(resource_path('js/components/crm/ask-evo-drawer.tsx'));
     $activation = File::get(resource_path('js/components/dashboard/activation-checklist.tsx'));

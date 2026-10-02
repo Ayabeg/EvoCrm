@@ -102,7 +102,8 @@ it('locks one InboxCrmContext composition without a QRD fork or fake primary', f
     $composer = File::get(app_path('Services/Desk/InboxCrmContextComposer.php'));
     $controller = File::get(app_path('Http/Controllers/Desk/InboxController.php'));
     $inbox = File::get(resource_path('js/pages/desk/inbox.tsx'));
-    $chrome = File::get(resource_path('js/components/crm/inbox-chrome.tsx'));
+    $chrome = File::get(resource_path('js/components/crm/inbox-chrome.tsx'))
+        .File::get(resource_path('js/evo/inbox/Composer.tsx'));
     $context = File::get(resource_path('js/components/crm/inbox-crm-context.tsx'));
     $lib = File::get(resource_path('js/lib/inbox-crm-context.ts'));
     $js = File::get(base_path('tests/js/p14-inbox-crm-context.ts'));
@@ -418,7 +419,8 @@ it('does not attach crmContext to the conversation list payload', function () {
 
 it('keeps P13 P12 P11 P09 and P10 inbox source locks', function () {
     $inbox = File::get(resource_path('js/pages/desk/inbox.tsx'));
-    $chrome = File::get(resource_path('js/components/crm/inbox-chrome.tsx'));
+    $chrome = File::get(resource_path('js/components/crm/inbox-chrome.tsx'))
+        .File::get(resource_path('js/evo/inbox/Composer.tsx'));
     $composer = File::get(app_path('Services/Desk/InboxCrmContextComposer.php'));
 
     expect($inbox)->toContain('data-inbox="native"')
