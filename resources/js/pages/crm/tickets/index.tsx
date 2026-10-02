@@ -1,12 +1,8 @@
-import { Form } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
+import { hasActiveListFilters } from '@/components/crm/list-query';
 import { MorphingForm } from '@/components/crm/morphing-form';
-import { CrmShell } from '@/components/crm/crm-shell';
-import { SkeletonList } from '@/components/crm/empty-room';
-import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
-import { hasActiveListFilters, listPageHref } from '@/components/crm/list-query';
-import ListViewTable from '@/components/crm/list-view-table';
 import type { StagePill } from '@/components/crm/stage-pills';
 import TicketLayoutToggle from '@/components/crm/ticket-layout-toggle';
 import { Button } from '@/components/ui/button';
@@ -14,22 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
-
-type TicketRow = {
-    id: number;
-    number: string;
-    subject: string;
-    status: string;
-    status_label?: string;
-    priority?: string | null;
-    channel?: string | null;
-    channel_label?: string | null;
-    created_at?: string | null;
-    sla_due_at?: string | null;
-    contact?: { first_name: string; last_name?: string | null } | null;
-    company?: { name: string } | null;
-    owner?: { id: number; name: string } | null;
-};
+import {
+    ticketEmptyState,
+    ticketRowHref,
+} from '@/pages/crm/tickets/ticket-columns';
+import type { TicketListRow } from '@/pages/crm/tickets/ticket-columns';
 
 type Contact = { id: number; first_name: string; last_name?: string | null };
 
@@ -46,7 +31,7 @@ export default function TicketsIndex({
     createOpen,
     createDefaults,
 }: {
-    tickets: TicketRow[];
+    tickets: TicketListRow[];
     stagePills: StagePill[];
     contacts: Contact[];
     members: { id: number; name: string }[];
@@ -63,8 +48,13 @@ export default function TicketsIndex({
 
     return (
         <>
-            <CrmShell title="Tickets" chrome="workspace">
+            <Head title="Tickets" />
+            <div
+                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                data-crm="tickets-workspace"
+            >
                 <CrmListShell
+                    resultMode="shared-table"
                     title="Tickets"
                     entity="ticket"
                     basePath="/crm/tickets"
@@ -162,67 +152,18 @@ export default function TicketsIndex({
                     contacts={contacts}
                     stagePills={stagePills}
                     layoutToggle={<TicketLayoutToggle current="list" />}
-                >
-                    {(columns) => (
-                        <>
-                            {loading ? (
-                                <SkeletonList />
-                            ) : tickets.length === 0 ? (
-                                <CrmEmptyState
-                                    title={
-                                        hasActiveListFilters(activeFilters)
-                                            ? 'No tickets match these filters'
-                                            : 'No tickets yet'
-                                    }
-                                    line={
-                                        hasActiveListFilters(activeFilters)
-                                            ? 'Clear filters or pick another status to see records.'
-                                            : 'Create a ticket on a contact. Desk stays the inbox.'
-                                    }
-                                    actionLabel={
-                                        hasActiveListFilters(activeFilters)
-                                            ? undefined
-                                            : 'Create ticket'
-                                    }
-                                    onAction={
-                                        hasActiveListFilters(activeFilters)
-                                            ? undefined
-                                            : () => setDrawer(true)
-                                    }
-                                />
-                            ) : (
-                                <div className="min-h-0 flex-1 overflow-auto">
-                                    <ListViewTable
-                                        entity="ticket"
-                                        rows={tickets}
-                                        columnDefs={listView.columnDefs}
-                                        columns={columns}
-                                        basePath="/crm/tickets"
-                                    />
-                                </div>
-                            )}
-                            <CrmListFooter
-                                count={tickets.length}
-                                total={recordCount}
-                                noun="tickets"
-                                page={paginator?.page}
-                                lastPage={paginator?.last_page}
-                                perPage={paginator?.per_page}
-                                prevHref={
-                                    paginator && paginator.page > 1
-                                        ? listPageHref('/crm/tickets', activeFilters, paginator.page - 1)
-                                        : null
-                                }
-                                nextHref={
-                                    paginator && paginator.page < paginator.last_page
-                                        ? listPageHref('/crm/tickets', activeFilters, paginator.page + 1)
-                                        : null
-                                }
-                            />
-                        </>
-                    )}
-                </CrmListShell>
-            </CrmShell>
+                    rows={tickets}
+                    rowHref={ticketRowHref}
+                    empty={ticketEmptyState(hasActiveListFilters(activeFilters))}
+                    paginator={paginator}
+                    loading={loading}
+                    selection={{
+                        mode: 'uncontrolled',
+                        selectable: false,
+                        pageIds: tickets.map((ticket) => ticket.id),
+                    }}
+                />
+            </div>
         </>
     );
 }

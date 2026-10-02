@@ -2,6 +2,7 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { BulkAction, BulkActionBarProps, DataWorkspaceEntity } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
 import { PAGE_OVERFLOW_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
@@ -75,7 +76,7 @@ export function BulkActionBar({
             data-ds="bulk-action-bar"
         >
             <p className="text-[13px] font-medium text-ink" aria-live="polite">
-                {selectedIds.length} selected
+                {t(':count selected', { count: selectedIds.length })}
             </p>
             <select
                 value={action}
@@ -85,7 +86,7 @@ export function BulkActionBar({
             >
                 {actions.map((item) => (
                     <option key={item} value={item}>
-                        {ACTION_LABELS[item]}
+                        {t(ACTION_LABELS[item])}
                     </option>
                 ))}
             </select>
@@ -141,7 +142,7 @@ export function BulkActionBar({
                     onClick={submit}
                     disabled={selectedIds.length === 0}
                 >
-                    Apply
+                    {t('Apply')}
                 </Button>
             ) : null}
             <button
@@ -149,7 +150,7 @@ export function BulkActionBar({
                 onClick={onClear}
                 className="h-9 text-[13px] text-mute hover:text-ink"
             >
-                Clear
+                {t('Clear')}
             </button>
         </div>
     );

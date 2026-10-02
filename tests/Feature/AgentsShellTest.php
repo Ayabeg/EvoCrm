@@ -102,7 +102,7 @@ it('keeps StarFour on Agents and Robot on the Bots listing header', function () 
     $sidebar = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
     $page = file_get_contents(resource_path('js/pages/agents/index.tsx'));
     $catalog = file_get_contents(resource_path('js/lib/desk/bot-catalog.ts'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
 
     expect($sidebar)
         ->toContain('StarFour')

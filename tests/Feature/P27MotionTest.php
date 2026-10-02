@@ -38,7 +38,7 @@ it('locks P27 timing tokens without a new motion framework', function () {
         ->and($motion)->toContain('--motion-duration-modal')
         ->and($motion)->toContain('scale(0.98)')
         ->and($motion)->toContain('scale(0.97)')
-        ->and($motion)->toContain("@media (prefers-reduced-motion: reduce)")
+        ->and($motion)->toContain('@media (prefers-reduced-motion: reduce)')
         ->and($motion)->toContain("[data-command='os']")
         ->and($motion)->toContain("[data-command='backdrop']")
         ->and($motion)->toContain('.animate-pulse')
@@ -92,7 +92,7 @@ it('normalizes overlay open/close to the P27 contract and keeps P26 reduce strin
 
     expect($palette)->toContain('trapTabKey')
         ->and($palette)->toContain('min(560px,calc(100vw-2rem))')
-        ->and($palette)->toContain("data-command=\"os\"")
+        ->and($palette)->toContain('data-command="os"')
         ->and($palette)->not->toContain('cubic-bezier(0.16, 1, 0.3, 1)');
     expect($motionCss)->toContain("[data-command='os']")
         ->and($motionCss)->toContain('var(--motion-duration-modal')
@@ -102,7 +102,7 @@ it('normalizes overlay open/close to the P27 contract and keeps P26 reduce strin
 it('normalizes listed surfaces without KPI counting, money tween, confetti, or fake Ask Evo latency', function () {
     $kpi = File::get(resource_path('js/components/dashboard/home-kpi-strip.tsx'));
     $inbox = File::get(resource_path('js/components/crm/inbox-chrome.tsx'));
-    $list = File::get(resource_path('js/components/crm/list-view-table.tsx'));
+    $list = File::get(resource_path('js/evo/data/crm-list/table.tsx')).File::get(resource_path('js/evo/data/crm-list/cells.tsx'));
     $table = File::get(resource_path('js/ds/workspace/DataTable.tsx'));
     $workspace = File::get(resource_path('js/ds/workspace/DataWorkspace.tsx'));
     $kanban = File::get(resource_path('js/components/crm/pipeline-kanban.tsx'));
@@ -128,7 +128,7 @@ it('normalizes listed surfaces without KPI counting, money tween, confetti, or f
     expect($list)->toContain('MOTION_HOVER_CLASS')
         ->and($list)->toContain('LOCAL_SCROLL_X_CLASS')
         ->and($table)->toContain('MOTION_HOVER_CLASS')
-        ->and($workspace)->toContain("data-p27=\"loading\"")
+        ->and($workspace)->toContain('data-p27="loading"')
         ->and($workspace)->toContain('aria-busy="true"')
         ->and($workspace)->not->toContain('setTimeout');
 

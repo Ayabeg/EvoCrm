@@ -7,11 +7,14 @@ use App\Models\Contact;
 use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
 use App\Models\Deal;
+use App\Models\Lead;
+use App\Models\Quote;
 use App\Models\SavedFilter;
 use App\Models\Ticket;
 use App\Models\Workspace;
 use App\Support\ListViewConfig;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -65,7 +68,10 @@ class CrmFilter
         $fromSaved = $saved?->filters ?? [];
 
         $view = (string) $request->input('view', $fromSaved['view'] ?? 'all');
-        if (! in_array($view, ['all', 'my'], true)) {
+        $allowedViews = $entity === 'ticket'
+            ? ['all', 'my', 'unassigned', 'closed']
+            : ['all', 'my'];
+        if (! in_array($view, $allowedViews, true)) {
             $view = 'all';
         }
 
@@ -99,6 +105,8 @@ class CrmFilter
             'has_company' => $request->boolean('has_company') || (($fromSaved['has_company'] ?? null) === true || ($fromSaved['has_company'] ?? null) === '1'),
             'has_associated_company' => $request->boolean('has_associated_company') || (($fromSaved['has_associated_company'] ?? null) === true || ($fromSaved['has_associated_company'] ?? null) === '1'),
             'deal_min_amount' => $request->input('deal_min_amount', $fromSaved['deal_min_amount'] ?? null),
+            'priority' => $request->input('priority', $fromSaved['priority'] ?? null),
+            'channel' => $request->input('channel', $fromSaved['channel'] ?? null),
             'view' => $view,
             'filter_id' => $saved?->id,
             'filter_groups' => $filterGroups,
@@ -115,17 +123,7 @@ class CrmFilter
     {
         if ($this->hasFilterGroups($filters)) {
             $this->applyFilterGroups($entity, $query, $filters['filter_groups']);
-
-            // Advanced FilterBuilder always posts filter_groups. Top-level
-            // P03C city / wilaya / q must still apply for companies so the
-            // dedicated Advanced selects and toolbar quick filters survive.
-            if ($entity === 'company') {
-                $this->applyCompanyUrlFilters($query, $filters);
-            }
-
-            if ($entity === 'deal') {
-                $this->applyDealAttention($query, $filters['attention'] ?? null);
-            }
+            $this->applyGroupUrlOverlays($entity, $query, $filters);
 
             return $query;
         }
@@ -134,6 +132,9 @@ class CrmFilter
             'contact' => $this->applyToContacts($query, $filters),
             'deal' => $this->applyToDeals($query, $filters),
             'company' => $this->applyToCompanies($query, $filters),
+            'ticket' => $this->applyToTickets($query, $filters),
+            'quote' => $this->applyToQuotes($query, $filters),
+            'lead' => $this->applyToLeads($query, $filters),
             default => $query,
         };
     }
@@ -156,6 +157,9 @@ class CrmFilter
             'contact' => $this->applyContactSort($query, $field, $direction),
             'deal' => $this->applyDealSort($query, $field, $direction),
             'company' => $this->applyCompanySort($query, $field, $direction),
+            'ticket', 'quote', 'lead' => in_array($field, ['created_at', 'status', 'subject'], true)
+                ? $query->orderBy($field, $direction)
+                : $query,
             default => $query,
         };
     }
@@ -169,7 +173,7 @@ class CrmFilter
      * @template TModel of Model
      *
      * @param  Builder<TModel>  $query
-     * @return array{0: \Illuminate\Database\Eloquent\Collection<int, TModel>, 1: array{page: int, per_page: int, total: int, last_page: int}}
+     * @return array{0: Collection<int, TModel>, 1: array{page: int, per_page: int, total: int, last_page: int}}
      */
     public function paginate(Builder $query, Request $request, int $perPage = 25): array
     {
@@ -199,6 +203,8 @@ class CrmFilter
             'deal' => Deal::query()->forWorkspace($workspace),
             'company' => Company::query()->forWorkspace($workspace),
             'ticket' => Ticket::query()->forWorkspace($workspace),
+            'quote' => Quote::query()->forWorkspace($workspace),
+            'lead' => Lead::query()->forWorkspace($workspace),
             default => null,
         };
 
@@ -278,6 +284,9 @@ class CrmFilter
                     'contact' => $this->applyToContacts($inner, $flat),
                     'deal' => $this->applyToDeals($inner, $flat),
                     'company' => $this->applyToCompanies($inner, $flat),
+                    'ticket' => $this->applyToTickets($inner, $flat),
+                    'quote' => $this->applyToQuotes($inner, $flat),
+                    'lead' => $this->applyToLeads($inner, $flat),
                     default => null,
                 };
 
@@ -299,6 +308,9 @@ class CrmFilter
                 'contact' => $this->applyContactTextContains($query, $field, $like),
                 'deal' => $this->applyDealTextContains($query, $field, $like),
                 'company' => $this->applyCompanyTextContains($query, $field, $like),
+                'ticket' => $this->applyTicketTextContains($query, $field, $like),
+                'quote' => $this->applyQuoteTextContains($query, $field, $like),
+                'lead' => $this->applyLeadTextContains($query, $field, $like),
                 default => null,
             };
 
@@ -738,6 +750,192 @@ class CrmFilter
     }
 
     /**
+     * Toolbar / URL filters that must still AND with Advanced groups.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyGroupUrlOverlays(string $entity, Builder $query, array $filters): void
+    {
+        match ($entity) {
+            'company' => $this->applyCompanyUrlFilters($query, $filters),
+            'contact' => $this->applyContactUrlFilters($query, $filters),
+            'deal' => $this->applyDealUrlFilters($query, $filters),
+            'ticket' => $this->applyTicketUrlFilters($query, $filters),
+            'quote' => $this->applyQuoteUrlFilters($query, $filters),
+            'lead' => $this->applyLeadUrlFilters($query, $filters),
+            default => null,
+        };
+    }
+
+    /**
+     * @param  Builder<Contact>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyContactUrlFilters(Builder $query, array $filters): void
+    {
+        $this->applySearch($query, 'contact', $filters['q'] ?? null);
+
+        if (filled($filters['city'] ?? null)) {
+            $query->where(function (Builder $inner) use ($filters) {
+                $inner->where('city', $filters['city'])
+                    ->orWhereHas('company', fn (Builder $company) => $company->where('city', $filters['city']));
+            });
+        }
+
+        if (filled($filters['wilaya'] ?? null)) {
+            $query->where(function (Builder $inner) use ($filters) {
+                $inner->where('wilaya', $filters['wilaya'])
+                    ->orWhereHas('company', fn (Builder $company) => $company->where('wilaya', $filters['wilaya']));
+            });
+        }
+    }
+
+    /**
+     * @param  Builder<Deal>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyDealUrlFilters(Builder $query, array $filters): void
+    {
+        $this->applySearch($query, 'deal', $filters['q'] ?? null);
+        $this->applyDealAttention($query, $filters['attention'] ?? null);
+    }
+
+    /**
+     * @param  Builder<Ticket>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function applyToTickets(Builder $query, array $filters): Builder
+    {
+        $this->applySearch($query, 'ticket', $filters['q'] ?? null);
+        $this->applyTicketStatusView($query, $filters);
+
+        if (($filters['view'] ?? 'all') === 'my' && filled($filters['owner'] ?? null)) {
+            $query->where('owner_id', $filters['owner']);
+        } elseif (filled($filters['owner'] ?? null) && ($filters['owner'] ?? '') !== 'unassigned') {
+            $query->where('owner_id', $filters['owner']);
+        }
+
+        if (
+            ($filters['view'] ?? null) === 'unassigned'
+            || ! empty($filters['unassigned'])
+            || ($filters['owner'] ?? null) === 'unassigned'
+        ) {
+            $query->whereNull('owner_id');
+        }
+
+        if (filled($filters['priority'] ?? null) && in_array($filters['priority'], [Ticket::PRIORITY_LOW, Ticket::PRIORITY_MEDIUM, Ticket::PRIORITY_HIGH], true)) {
+            $query->where('priority', $filters['priority']);
+        }
+
+        if (filled($filters['channel'] ?? null) && in_array($filters['channel'], [Ticket::CHANNEL_WHATSAPP_CLOUD, Ticket::CHANNEL_EMAIL, Ticket::CHANNEL_MANUAL], true)) {
+            $query->where('channel', $filters['channel']);
+        }
+
+        if (! empty($filters['unanswered'])) {
+            $query->whereNull('first_response_at');
+        }
+
+        $this->applyCreated($query, $filters['created'] ?? null);
+
+        return $query;
+    }
+
+    /**
+     * @param  Builder<Ticket>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyTicketUrlFilters(Builder $query, array $filters): void
+    {
+        $this->applySearch($query, 'ticket', $filters['q'] ?? null);
+        $this->applyTicketStatusView($query, $filters);
+    }
+
+    /**
+     * @param  Builder<Ticket>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyTicketStatusView(Builder $query, array $filters): void
+    {
+        $status = (string) ($filters['status'] ?? '');
+        $view = (string) ($filters['view'] ?? 'all');
+
+        if ($status !== '' && in_array($status, Ticket::STATUSES, true)) {
+            $query->where('status', $status);
+
+            return;
+        }
+
+        if ($view === 'closed') {
+            $query->where('status', Ticket::STATUS_CLOSED);
+
+            return;
+        }
+
+        $query->where('status', '!=', Ticket::STATUS_CLOSED);
+    }
+
+    /**
+     * @param  Builder<Quote>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function applyToQuotes(Builder $query, array $filters): Builder
+    {
+        $this->applySearch($query, 'quote', $filters['q'] ?? null);
+
+        $status = (string) ($filters['status'] ?? '');
+        if (in_array($status, ['draft', 'sent', 'accepted'], true)) {
+            $query->where('status', $status);
+        }
+
+        if (($filters['view'] ?? 'all') === 'my' && filled($filters['owner'] ?? null)) {
+            $query->whereHas('deal', fn (Builder $deal) => $deal->where('owner_id', $filters['owner']));
+        } elseif (($filters['owner'] ?? null) === 'unassigned') {
+            $query->whereHas('deal', fn (Builder $deal) => $deal->whereNull('owner_id'));
+        } elseif (filled($filters['owner'] ?? null) && is_numeric($filters['owner'])) {
+            $query->whereHas('deal', fn (Builder $deal) => $deal->where('owner_id', (int) $filters['owner']));
+        }
+
+        $this->applyCreated($query, $filters['created'] ?? null);
+
+        return $query;
+    }
+
+    /**
+     * @param  Builder<Quote>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyQuoteUrlFilters(Builder $query, array $filters): void
+    {
+        $this->applySearch($query, 'quote', $filters['q'] ?? null);
+    }
+
+    /**
+     * @param  Builder<Lead>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function applyToLeads(Builder $query, array $filters): Builder
+    {
+        $this->applySearch($query, 'lead', $filters['q'] ?? null);
+
+        if (filled($filters['status'] ?? null)) {
+            $query->where('status', $filters['status']);
+        }
+
+        $this->applyCreated($query, $filters['created'] ?? null);
+
+        return $query;
+    }
+
+    /**
+     * @param  Builder<Lead>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    protected function applyLeadUrlFilters(Builder $query, array $filters): void
+    {
+        $this->applySearch($query, 'lead', $filters['q'] ?? null);
+    }
+
+    /**
      * @param  array<string, mixed>  $filters
      * @return array{count: int, members: array<int, array<string, mixed>>}
      */
@@ -862,8 +1060,16 @@ class CrmFilter
         $like = '%'.addcslashes($term, '%_\\').'%';
 
         match ($entity) {
-            'deal' => $query->where('title', 'like', $like),
+            'deal', 'lead' => $query->where('title', 'like', $like),
             'company' => $query->where('name', 'like', $like),
+            'ticket' => $query->where(function (Builder $inner) use ($like): void {
+                $inner->where('subject', 'like', $like)
+                    ->orWhere('number', 'like', $like);
+            }),
+            'quote' => $query->where(function (Builder $inner) use ($like, $term): void {
+                $inner->where('id', $term)
+                    ->orWhereHas('deal', fn (Builder $deal) => $deal->where('title', 'like', $like));
+            }),
             default => $query->where(function (Builder $inner) use ($like): void {
                 $inner->where('first_name', 'like', $like)
                     ->orWhere('last_name', 'like', $like)
@@ -1000,6 +1206,37 @@ class CrmFilter
             'wilaya' => $query->where('wilaya', 'like', $like),
             default => null,
         };
+    }
+
+    /**
+     * @param  Builder<Ticket>  $query
+     */
+    protected function applyTicketTextContains(Builder $query, string $field, string $like): void
+    {
+        match ($field) {
+            'subject', 'title' => $query->where('subject', 'like', $like),
+            'number' => $query->where('number', 'like', $like),
+            default => $query->where(function (Builder $inner) use ($like): void {
+                $inner->where('subject', 'like', $like)
+                    ->orWhere('number', 'like', $like);
+            }),
+        };
+    }
+
+    /**
+     * @param  Builder<Quote>  $query
+     */
+    protected function applyQuoteTextContains(Builder $query, string $field, string $like): void
+    {
+        $query->whereHas('deal', fn (Builder $deal) => $deal->where('title', 'like', $like));
+    }
+
+    /**
+     * @param  Builder<Lead>  $query
+     */
+    protected function applyLeadTextContains(Builder $query, string $field, string $like): void
+    {
+        $query->where('title', 'like', $like);
     }
 
     /**

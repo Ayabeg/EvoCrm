@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
 import type { ListColumnDef } from '@/lib/list-view-config';
 
 /**
@@ -36,15 +37,15 @@ export function companyRowHref(row: { id: number | string }): string {
 export function companyEmptyState(filtered: boolean): DataWorkspaceEmpty {
     if (filtered) {
         return {
-            title: 'No companies match these filters',
-            body: 'Clear filters or save a different view to see records.',
+            title: t('No companies match these filters'),
+            body: t('Clear filters or save a different view to see records.'),
         };
     }
 
     return {
-        title: 'No companies yet',
-        body: 'Create a company to keep accounts next to their contacts and deals. One company counts as CRM data.',
-        actionLabel: 'Create company',
+        title: t('No companies yet'),
+        body: t('Create a company to keep accounts next to their contacts and deals. One company counts as CRM data.'),
+        actionLabel: t('Create company'),
     };
 }
 

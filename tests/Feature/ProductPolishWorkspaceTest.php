@@ -61,7 +61,7 @@ it('destacks Outbound and Reports chrome without inventing a second system', fun
     $outbound = file_get_contents(resource_path('js/components/crm/outbound-shell.tsx'));
     $index = file_get_contents(resource_path('js/pages/outbound/index.tsx'));
     $page = file_get_contents(resource_path('js/pages/crm/reports.tsx'));
-    $list = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $list = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
 
     expect($reports)->toContain('title="Reports"')

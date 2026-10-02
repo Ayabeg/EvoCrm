@@ -26,11 +26,13 @@ class QuoteController extends Controller
         $user = $request->user();
         $workspace = $user->workspace;
 
+        $filters = $filter->resolve($request, $workspace, 'quote');
+
         $query = Quote::query()
             ->forWorkspace($workspace)
             ->with(['deal:id,title,owner_id,contact_id', 'deal.owner:id,name', 'deal.contact:id,first_name,last_name']);
 
-        $this->constrain($query, $request);
+        $filter->apply('quote', $query, $filters);
         $query->latest('id');
         [$rows, $paginator] = $filter->paginate($query, $request);
 
@@ -41,14 +43,8 @@ class QuoteController extends Controller
                 ->orderBy('title')
                 ->get(['id', 'title']),
             'members' => $hub->members($workspace),
-            'savedFilters' => [],
-            'activeFilters' => [
-                'view' => $request->input('view', 'all'),
-                'status' => $request->input('status'),
-                'owner' => $request->input('owner'),
-                'created' => $request->input('created'),
-                'q' => $request->input('q'),
-            ],
+            'savedFilters' => $hub->filters($workspace, 'quote', $user),
+            'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('quote'),
             'recordCount' => $paginator['total'],
             'paginator' => $paginator,

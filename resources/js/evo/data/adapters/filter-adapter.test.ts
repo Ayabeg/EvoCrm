@@ -64,14 +64,14 @@ describe('filter adapter', () => {
         expect(flattenToWorkspaceFilters(workspaceFiltersToTree(filters))).toEqual(filters);
     });
 
-    it('does not offer filter groups on indexes the backend does not execute', () => {
+    it('offers two-level filter groups on every CRM list index PR4 wired', () => {
         expect(LIST_PAGES_EXECUTE_FILTER_GROUPS.company).toBe(true);
         expect(shouldOfferFilterGroups('company')).toBe(true);
-        expect(shouldOfferFilterGroups('contact')).toBe(false);
-        expect(shouldOfferFilterGroups('deal')).toBe(false);
-        expect(shouldOfferFilterGroups('ticket')).toBe(false);
-        expect(shouldOfferFilterGroups('quote')).toBe(false);
-        expect(shouldOfferFilterGroups('lead')).toBe(false);
+        expect(shouldOfferFilterGroups('contact')).toBe(true);
+        expect(shouldOfferFilterGroups('deal')).toBe(true);
+        expect(shouldOfferFilterGroups('ticket')).toBe(true);
+        expect(shouldOfferFilterGroups('quote')).toBe(true);
+        expect(shouldOfferFilterGroups('lead')).toBe(true);
 
         const tree = workspaceFiltersToTree({
             logic: 'or',
@@ -85,8 +85,7 @@ describe('filter adapter', () => {
         expect(company.groups).toHaveLength(2);
 
         const contact = flattenToWorkspaceFilters(tree, { resource: 'contact' });
-        expect(contact.logic).toBe('and');
-        expect(contact.groups).toHaveLength(1);
-        expect(contact.groups[0]?.rules).toHaveLength(2);
+        expect(contact.logic).toBe('or');
+        expect(contact.groups).toHaveLength(2);
     });
 });

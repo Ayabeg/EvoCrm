@@ -63,7 +63,7 @@ it('activates the reserved onRowPeek seam once instead of five object peek APIs'
     $workspace = File::get(resource_path('js/ds/workspace/DataWorkspace.tsx'));
     $types = File::get(resource_path('js/ds/workspace/types.ts'));
     $table = File::get(resource_path('js/ds/workspace/DataTable.tsx'));
-    $list = File::get(resource_path('js/components/crm/list-view-table.tsx'));
+    $list = File::get(resource_path('js/evo/data/crm-list/table.tsx')).File::get(resource_path('js/evo/data/crm-list/cells.tsx'));
     $shell = File::get(resource_path('js/components/crm/crm-list-shell.tsx'));
     $contacts = File::get(resource_path('js/pages/crm/contacts/index.tsx'));
     $companies = File::get(resource_path('js/pages/crm/companies/index.tsx'));
@@ -104,7 +104,7 @@ it('keeps rowHref as full-record navigation and identity links as the escape hat
     $leads = File::get(resource_path('js/pages/crm/leads/index.tsx'));
     $deals = File::get(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = File::get(resource_path('js/pages/crm/quotes/index.tsx'));
-    $list = File::get(resource_path('js/components/crm/list-view-table.tsx'));
+    $list = File::get(resource_path('js/evo/data/crm-list/table.tsx')).File::get(resource_path('js/evo/data/crm-list/cells.tsx'));
     $contactColumns = File::get(resource_path('js/pages/crm/contacts/contact-columns.tsx'));
     $companyColumns = File::get(resource_path('js/pages/crm/companies/company-columns.tsx'));
     $leadColumns = File::get(resource_path('js/pages/crm/leads/lead-columns.tsx'));
@@ -211,7 +211,7 @@ it('does not write peek into the list URL and keeps peek classified unsafe', fun
 
 it('does not remount DataWorkspace on peek and does not mutate selection from the row handler', function () {
     $workspace = File::get(resource_path('js/ds/workspace/DataWorkspace.tsx'));
-    $list = File::get(resource_path('js/components/crm/list-view-table.tsx'));
+    $list = File::get(resource_path('js/evo/data/crm-list/table.tsx')).File::get(resource_path('js/evo/data/crm-list/cells.tsx'));
     $selection = File::get(resource_path('js/ds/workspace/selection.ts'));
     $drawer = File::get(resource_path('js/ds/workspace/QuickRecordDrawer.tsx'));
 

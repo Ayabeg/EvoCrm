@@ -52,7 +52,7 @@ it('moves Companies onto DataWorkspace shared-table without a domain children pa
 it('keeps Companies row identity href columns and selection on the shared contracts', function () {
     $companies = file_get_contents(resource_path('js/pages/crm/companies/index.tsx'));
     $columns = file_get_contents(resource_path('js/pages/crm/companies/company-columns.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $selection = file_get_contents(resource_path('js/ds/workspace/selection.ts'));
     $contract = file_get_contents(resource_path('js/pages/crm/companies/company-columns-contract.ts'));
 
@@ -85,7 +85,7 @@ it('keeps Companies row identity href columns and selection on the shared contra
         ->and($table)->toContain('resolveRowHref(row, rowHref, basePath)')
         ->and($table)->toContain("target.closest('a, input, button, label')")
         ->and($table)->toContain("'table-fixed min-w-[52rem]'")
-        ->and($table)->toContain('const companyTable = entity === \'company\'')
+        ->and($table)->toContain("entity === 'company' || entity === 'lead' || dealTable || quoteTable")
         ->and($table)->toContain("name: 'w-[36%]'")
         ->and($table)->toContain("owner: 'w-[18%]'");
 

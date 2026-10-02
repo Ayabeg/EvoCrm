@@ -57,7 +57,7 @@ it('moves Leads onto DataWorkspace shared-table without a domain children path',
 it('keeps Leads row identity href columns and selection on the shared contracts', function () {
     $leads = file_get_contents(resource_path('js/pages/crm/leads/index.tsx'));
     $columns = file_get_contents(resource_path('js/pages/crm/leads/lead-columns.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $selection = file_get_contents(resource_path('js/ds/workspace/selection.ts'));
     $contract = file_get_contents(resource_path('js/pages/crm/leads/lead-columns-contract.ts'));
 
@@ -135,18 +135,17 @@ it('preserves Lead create capture inbox and refuses invented query bulk and draw
         ->and($leads)->not->toContain('name="q"');
 
     expect($controller)->toContain("Inertia::render('crm/leads/index'")
-        ->and($controller)->toContain("->limit(100)")
-        ->and($controller)->toContain("listViewMeta('lead')")
-        ->and($controller)->not->toContain("\$filter->resolve")
-        ->and($controller)->not->toContain("apply('lead'")
-        ->and($controller)->not->toContain("'activeFilters'")
-        ->and($controller)->not->toContain("'savedFilters'");
+        ->and($controller)->toContain("listViewMeta('lead'")
+        ->and($controller)->toContain('$filter->resolve')
+        ->and($controller)->toContain("apply('lead'")
+        ->and($controller)->toContain("'activeFilters'")
+        ->and($controller)->toContain("'savedFilters'");
 
     expect($adapters)->toContain("object: 'lead'")
-        ->and($adapters)->toContain('supportsQuery: false');
+        ->and($adapters)->toContain('supportsQuery: true');
 
     expect($filterBar)->toContain('listQueryAdapter(object).supportsQuery')
-        ->and($filterBar)->not->toContain("t('Search leads…')");
+        ->and($filterBar)->toContain("t('Search leads…')");
 
     expect($workspace)->toContain('listQueryAdapter(object as ListQueryObject).supportsQuery')
         ->and($workspace)->toContain('onRowPeek is reserved for P09')
@@ -159,12 +158,12 @@ it('preserves Lead create capture inbox and refuses invented query bulk and draw
     $leadFilters = collect(ListViewConfig::filterFields('lead'))->pluck('id')->all();
 
     expect($leadColumns)->toBe(['title', 'contact', 'status', 'score'])
-        ->and($leadFilters)->toBe([])
+        ->and($leadFilters)->toBe(['status', 'created'])
         ->and($config)->toContain("'lead' => [")
         ->and($config)->toContain("['id' => 'title', 'label' => 'Title', 'defaultVisible' => true]");
 
-    expect($filter)->not->toContain('applyToLeads')
-        ->and($saved)->toContain("'in:contact,deal,company'");
+    expect($filter)->toContain('applyToLeads')
+        ->and($saved)->toContain("'in:contact,deal,company,ticket,quote,lead'");
 });
 
 it('does not migrate Quotes Pipeline or invent QuickRecordDrawer after the Deals shared-table migration', function () {
@@ -199,7 +198,7 @@ it('does not migrate Quotes Pipeline or invent QuickRecordDrawer after the Deals
         ->and($converter)->toContain('public function convert')
         ->and($path)->toContain("'converted'")
         ->and($path)->toContain('class LeadPath')
-        ->and($qualify)->toContain("function qualify")
+        ->and($qualify)->toContain('function qualify')
         ->and($qualify)->toContain("'mode' => ['nullable', 'in:create,link']");
 
     expect($leads)->not->toContain('QuickRecordDrawer')
@@ -255,25 +254,23 @@ it('keeps the Leads Inertia backend shape routes and permissions without inventi
             ->has('listView.columns')
             ->has('recordCount')
             ->has('paginator')
-            ->missing('activeFilters')
-            ->missing('savedFilters')
+            ->has('activeFilters')
+            ->has('savedFilters')
             ->missing('bulk')
             ->where('leads.0.id', $lead->id)
             ->where('leads.0.title', 'Clinic Atlas inbound')
-            ->where('listView.filterFields', [])
+            ->where('listView.filterFields', fn ($fields) => collect($fields)->pluck('id')->values()->all() === ['status', 'created'])
             ->where('listView.columnDefs', fn ($defs) => collect($defs)->pluck('id')->values()->all() === ['title', 'contact', 'status', 'score'])
         );
 
     $this->actingAs($user)
-        ->get('/crm/leads?q=ignored&status=working&page=2&view=my')
+        ->get('/crm/leads?q=ignored&status=working')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('crm/leads/index')
-            ->has('leads', 1)
-            ->where('leads.0.id', $lead->id)
-            ->missing('activeFilters')
-            ->where('paginator.page', 1)
-            ->where('paginator.last_page', 1)
+            ->has('leads', 0)
+            ->has('activeFilters')
+            ->where('activeFilters.status', 'working')
         );
 
     $this->actingAs($user)

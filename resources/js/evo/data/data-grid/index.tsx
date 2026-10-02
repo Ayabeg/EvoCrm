@@ -24,7 +24,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import * as React from 'react';
 
 import { ArrowsDownUp, CaretDown, CaretLeft, CaretRight, CaretUp, Columns, DotsThreeVertical } from '@/evo/icons';
-import { sr } from '@/evo/lib/a11y';
+import { announce, sr } from '@/evo/lib/a11y';
 import { cn } from '@/evo/lib/cn';
 import { EmptyState } from '@/evo/patterns/empty-state';
 import { ErrorState } from '@/evo/patterns/error-state';
@@ -52,6 +52,15 @@ export type EvoDataGridProps<TData> = {
     density?: 'compact' | 'standard';
     enableSelection?: boolean;
     enableVirtualization?: boolean;
+    /** Lab default is client. Production lists use `none` + WorkspacePaginator. */
+    pagination?: 'client' | 'none';
+    hideColumnPicker?: boolean;
+    /** Production CRM lists: no lab toolbar, no client pager chrome. */
+    embedded?: boolean;
+    tableClassName?: string;
+    enableSorting?: boolean;
+    rowClassName?: string;
+    getRowProps?: (row: TData) => React.HTMLAttributes<HTMLTableRowElement>;
     pageSize?: number;
     state?: 'ready' | 'loading' | 'empty' | 'error';
     errorMessage?: string;
@@ -63,6 +72,9 @@ export type EvoDataGridProps<TData> = {
     bulkActions?: React.ReactNode;
     rowActions?: (row: TData) => React.ReactNode;
     onRowClick?: (row: TData) => void;
+    onRowActivate?: (row: TData, event: React.MouseEvent | React.KeyboardEvent) => void;
+    sorting?: SortingState;
+    onSortingChange?: (sorting: SortingState) => void;
     className?: string;
 };
 
@@ -73,6 +85,13 @@ function EvoDataGridInner<TData>({
     density = 'standard',
     enableSelection = true,
     enableVirtualization = false,
+    pagination = 'client',
+    hideColumnPicker = false,
+    embedded = false,
+    tableClassName,
+    enableSorting = true,
+    rowClassName,
+    getRowProps,
     pageSize = 25,
     state = 'ready',
     errorMessage,
@@ -84,9 +103,12 @@ function EvoDataGridInner<TData>({
     bulkActions,
     rowActions,
     onRowClick,
+    onRowActivate,
+    sorting: sortingProp,
+    onSortingChange,
     className,
 }: EvoDataGridProps<TData>) {
-    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [sorting, setSorting] = React.useState<SortingState>(sortingProp ?? []);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>({});
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
@@ -158,9 +180,14 @@ function EvoDataGridInner<TData>({
         },
         getRowId,
         enableRowSelection: enableSelection,
-        enableColumnResizing: true,
+        enableSorting: enableSorting && !embedded,
+        enableColumnResizing: !embedded,
         columnResizeMode: 'onChange',
-        onSortingChange: setSorting,
+        onSortingChange: (updater) => {
+            const next = typeof updater === 'function' ? updater(sorting) : updater;
+            setSorting(next);
+            onSortingChange?.(next);
+        },
         onColumnVisibilityChange: setColumnVisibility,
         onColumnPinningChange: setColumnPinning,
         onRowSelectionChange: (updater) => {
@@ -170,7 +197,8 @@ function EvoDataGridInner<TData>({
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: enableVirtualization ? undefined : getPaginationRowModel(),
+        getPaginationRowModel:
+            enableVirtualization || pagination === 'none' ? undefined : getPaginationRowModel(),
         initialState: {
             pagination: { pageSize },
         },
@@ -198,6 +226,20 @@ function EvoDataGridInner<TData>({
 
     const selectedCount = Object.keys(rowSelection).filter((id) => rowSelection[id]).length;
 
+    React.useEffect(() => {
+        if (!enableSelection) {
+            return;
+        }
+
+        announce(dataGridFr.rowsSelected.replace(':count', String(selectedCount)));
+    }, [enableSelection, selectedCount]);
+
+    React.useEffect(() => {
+        if (sortingProp) {
+            setSorting(sortingProp);
+        }
+    }, [sortingProp]);
+
     if (state === 'loading') {
         return (
             <div className="space-y-1" aria-busy="true" aria-label={dataGridFr.loading}>
@@ -220,11 +262,13 @@ function EvoDataGridInner<TData>({
     const visibleRows = enableVirtualization ? virtualizer.getVirtualItems() : rows.map((row, index) => ({ index, start: index * rowHeight, size: rowHeight }));
 
     return (
-        <div className={cn('flex flex-col gap-2', className)} data-slot="data-grid">
+        <div className={cn(embedded ? 'min-h-0 min-w-0 flex-1' : 'flex flex-col gap-2', className)} data-slot="data-grid">
+            {embedded ? null : (
             <div className="flex items-center justify-between gap-2">
                 <p className="text-[12px] text-[var(--evo-ink-muted)]" aria-live="polite">
                     {dataGridFr.rowsSelected.replace(':count', String(selectedCount))}
                 </p>
+                {hideColumnPicker ? null : (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm">
@@ -246,13 +290,15 @@ function EvoDataGridInner<TData>({
                             ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
+                )}
             </div>
+            )}
 
-            {selectedCount > 0 && bulkActions ? (
+            {!embedded && selectedCount > 0 && bulkActions ? (
                 <div
                     role="region"
                     aria-label={dataGridFr.bulk}
-                    className="flex items-center gap-2 rounded-[var(--evo-radius-compact)] border border-[var(--evo-hairline)] bg-[var(--evo-surface-subtle)] px-3 py-2"
+                    className="flex items-center gap-2 rounded-[var(--evo-radius-compact)] border border-hairline bg-[var(--evo-surface-subtle)] px-3 py-2"
                 >
                     {bulkActions}
                     <Button
@@ -270,23 +316,51 @@ function EvoDataGridInner<TData>({
 
             <div
                 ref={parentRef}
-                className="relative overflow-auto rounded-[var(--evo-radius-standard)] border border-[var(--evo-hairline)]"
+                className={cn(
+                    'relative overflow-auto',
+                    embedded
+                        ? 'border-y border-hairline'
+                        : 'rounded-[var(--evo-radius-standard)] border border-hairline',
+                )}
                 style={enableVirtualization ? { maxHeight: 480 } : undefined}
             >
-                <table className="w-full caption-bottom text-[13px]">
+                <table className={cn('w-full caption-bottom text-[13px]', tableClassName)}>
                     <thead className="sticky top-0 z-10 bg-[var(--evo-surface)]">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <tr key={headerGroup.id} className="h-9 border-b border-[var(--evo-hairline)]">
+                            <tr key={headerGroup.id} className={cn('h-9 border-b border-hairline', embedded && 'bg-canvas-soft')}>
                                 {headerGroup.headers.map((header) => {
                                     const sorted = header.column.getIsSorted();
+                                    const widthClass = (
+                                        header.column.columnDef.meta as { widthClass?: string } | undefined
+                                    )?.widthClass;
+                                    const sized = header.column.columnDef.size != null;
 
                                     return (
                                         <th
                                             key={header.id}
-                                            className="relative px-3 text-left text-[11px] font-medium text-[var(--evo-ink-muted)]"
-                                            style={{ width: header.getSize(), minWidth: header.column.columnDef.minSize }}
+                                            className={cn(
+                                                'relative px-3 text-left text-[11px] font-medium text-[var(--evo-ink-muted)]',
+                                                widthClass,
+                                            )}
+                                            style={
+                                                embedded && !sized
+                                                    ? undefined
+                                                    : {
+                                                          width: header.getSize(),
+                                                          minWidth: header.column.columnDef.minSize,
+                                                      }
+                                            }
+                                            aria-sort={
+                                                sorted === 'asc'
+                                                    ? 'ascending'
+                                                    : sorted === 'desc'
+                                                      ? 'descending'
+                                                      : header.column.getCanSort()
+                                                        ? 'none'
+                                                        : undefined
+                                            }
                                         >
-                                            {header.isPlaceholder ? null : (
+                                            {header.isPlaceholder ? null : header.column.getCanSort() ? (
                                                 <button
                                                     type="button"
                                                     className="inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]"
@@ -300,16 +374,16 @@ function EvoDataGridInner<TData>({
                                                     }
                                                 >
                                                     {flexRender(header.column.columnDef.header, header.getContext())}
-                                                    {header.column.getCanSort() ? (
-                                                        sorted === 'asc' ? (
-                                                            <CaretUp className="size-3" aria-hidden />
-                                                        ) : sorted === 'desc' ? (
-                                                            <CaretDown className="size-3" aria-hidden />
-                                                        ) : (
-                                                            <ArrowsDownUp className="size-3 opacity-40" aria-hidden />
-                                                        )
-                                                    ) : null}
+                                                    {sorted === 'asc' ? (
+                                                        <CaretUp className="size-3" aria-hidden />
+                                                    ) : sorted === 'desc' ? (
+                                                        <CaretDown className="size-3" aria-hidden />
+                                                    ) : (
+                                                        <ArrowsDownUp className="size-3 opacity-40" aria-hidden />
+                                                    )}
                                                 </button>
+                                            ) : (
+                                                flexRender(header.column.columnDef.header, header.getContext())
                                             )}
                                             {header.column.getCanResize() ? (
                                                 <div
@@ -340,15 +414,34 @@ function EvoDataGridInner<TData>({
                                 return null;
                             }
 
+                            const extraRowProps = getRowProps?.(row.original) ?? {};
+
                             return (
                                 <tr
                                     key={row.id}
                                     data-state={row.getIsSelected() ? 'selected' : undefined}
                                     tabIndex={0}
-                                    onClick={() => onRowClick?.(row.original)}
+                                    {...extraRowProps}
+                                    onClick={(event) => {
+                                        extraRowProps.onClick?.(event);
+
+                                        if (event.defaultPrevented) {
+                                            return;
+                                        }
+
+                                        onRowActivate?.(row.original, event);
+                                        onRowClick?.(row.original);
+                                    }}
                                     onKeyDown={(event) => {
+                                        extraRowProps.onKeyDown?.(event);
+
+                                        if (event.defaultPrevented) {
+                                            return;
+                                        }
+
                                         if (event.key === 'Enter' || event.key === ' ') {
                                             event.preventDefault();
+                                            onRowActivate?.(row.original, event);
                                             onRowClick?.(row.original);
                                         }
 
@@ -361,8 +454,10 @@ function EvoDataGridInner<TData>({
                                         }
                                     }}
                                     className={cn(
-                                        'border-b border-[var(--evo-hairline)] outline-none focus-visible:bg-[var(--evo-teal-soft)] data-[state=selected]:bg-[var(--evo-teal-soft)]',
-                                        onRowClick && 'cursor-pointer',
+                                        'border-b border-hairline outline-none focus-visible:bg-[var(--evo-teal-soft)] focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)] data-[state=selected]:bg-[var(--evo-teal-soft)]',
+                                        (onRowClick || onRowActivate) && 'cursor-pointer',
+                                        rowClassName,
+                                        extraRowProps.className,
                                     )}
                                     style={{
                                         height: rowHeight,
@@ -374,13 +469,29 @@ function EvoDataGridInner<TData>({
                                                   width: '100%',
                                               }
                                             : {}),
+                                        ...extraRowProps.style,
                                     }}
                                 >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <td key={cell.id} className="px-3 align-middle" style={{ width: cell.column.getSize() }}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </td>
-                                    ))}
+                                    {row.getVisibleCells().map((cell) => {
+                                        const widthClass = (
+                                            cell.column.columnDef.meta as { widthClass?: string } | undefined
+                                        )?.widthClass;
+                                        const sized = cell.column.columnDef.size != null;
+
+                                        return (
+                                            <td
+                                                key={cell.id}
+                                                className={cn('px-3 align-middle', widthClass)}
+                                                style={
+                                                    embedded && !sized
+                                                        ? undefined
+                                                        : { width: cell.column.getSize() }
+                                                }
+                                            >
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        );
+                                    })}
                                 </tr>
                             );
                         })}
@@ -388,7 +499,7 @@ function EvoDataGridInner<TData>({
                 </table>
             </div>
 
-            {enableVirtualization ? null : (
+            {enableVirtualization || pagination === 'none' ? null : (
                 <nav className="flex items-center justify-between gap-2" aria-label={sr.pagination}>
                     <p className="text-[12px] text-[var(--evo-ink-muted)]">
                         {dataGridFr.page} {table.getState().pagination.pageIndex + 1} {dataGridFr.of}{' '}

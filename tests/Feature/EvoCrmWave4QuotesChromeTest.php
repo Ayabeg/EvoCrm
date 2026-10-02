@@ -48,7 +48,7 @@ function wave4Quote(User $user, array $overrides = []): Quote
 
 it('rebuilds the quotes list as HubSpot-dense Wave 1 chrome on the locked triad', function () {
     $index = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $config = file_get_contents(app_path('Support/ListViewConfig.php'));
     $types = file_get_contents(resource_path('js/lib/list-view-config.ts'));
 

@@ -12,7 +12,7 @@ it('locks the shared overflow contract and required viewports', function () {
     expect($responsive)->toContain('export const P25_VIEWPORTS = [1440, 1280, 1024, 768]')
         ->and($responsive)->toContain("export const PAGE_OVERFLOW_CLASS = 'min-w-0 overflow-x-hidden'")
         ->and($responsive)->toContain("export const LOCAL_SCROLL_X_CLASS = 'min-w-0 overflow-x-auto'")
-        ->and($responsive)->toContain("export const MONEY_NEVER_CLIP_CLASS =")
+        ->and($responsive)->toContain('export const MONEY_NEVER_CLIP_CLASS =')
         ->and($responsive)->toContain('break-words')
         ->and($responsive)->not->toContain('text-[10px]')
         ->and($css)->toContain('.overflow-page')
@@ -22,7 +22,7 @@ it('locks the shared overflow contract and required viewports', function () {
 it('contains DataWorkspace, FilterBar, and list money so wide tables cannot H-overflow the page', function () {
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
     $filterBar = file_get_contents(resource_path('js/ds/workspace/FilterBar.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/quote-columns.tsx'));
 
     expect($workspace)->toContain('PAGE_OVERFLOW_CLASS')
@@ -90,7 +90,7 @@ it('does not leak integration secrets through Settings DOM strings', function ()
         ->and($secret)->toContain('break-all')
         ->and($secret)->not->toContain('access_token')
         ->and($secret)->not->toContain('defaultValue={callback')
-        ->and($sms)->toContain("type=\"password\"")
+        ->and($sms)->toContain('type="password"')
         ->and($sms)->not->toContain('defaultValue={api_key')
         ->and($meta)->toContain('SecretCallbackField')
         ->and($meta)->not->toContain('access_token')

@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
 import { contactInitials, formatContactName } from '@/lib/contact-name';
+import { t } from '@/lib/i18n';
 import type { ListColumnDef } from '@/lib/list-view-config';
 
 /**
@@ -48,15 +49,15 @@ export function contactRowHref(row: { id: number | string }): string {
 export function contactEmptyState(filtered: boolean): DataWorkspaceEmpty {
     if (filtered) {
         return {
-            title: 'No contacts match these filters',
-            body: 'Clear filters or open another saved view to see records.',
+            title: t('No contacts match these filters'),
+            body: t('Clear filters or open another saved view to see records.'),
         };
     }
 
     return {
-        title: 'No contacts yet',
-        body: 'Add the first person you sell to, or import a list. Name, phone, and company are enough to start.',
-        actionLabel: 'Create contact',
+        title: t('No contacts yet'),
+        body: t('Add the first person you sell to, or import a list. Name, phone, and company are enough to start.'),
+        actionLabel: t('Create contact'),
     };
 }
 

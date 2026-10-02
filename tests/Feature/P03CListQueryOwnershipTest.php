@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Route;
  * P03C — URL / query state ownership.
  * Canonical query contract. URL is source of truth. No competing React mirror.
  */
-
 it('defines an explicit canonical list query contract with domain adapters', function () {
     $types = file_get_contents(resource_path('js/lib/list-query/types.ts'));
     $adapters = file_get_contents(resource_path('js/lib/list-query/adapters.ts'));
@@ -33,7 +32,8 @@ it('defines an explicit canonical list query contract with domain adapters', fun
         ->and($adapters)->toContain("object: 'deal'")
         ->and($adapters)->toContain("object: 'quote'")
         ->and($adapters)->toContain("object: 'lead'")
-        ->and($adapters)->toContain("supportsQuery: false");
+        ->and($adapters)->toContain('supportsQuery: true')
+        ->and($adapters)->toContain("object: 'lead'");
 
     expect($patch)->toContain('Meaningful changes reset page')
         ->and($patch)->toContain('Page-only patches keep search');
@@ -51,7 +51,7 @@ it('defines an explicit canonical list query contract with domain adapters', fun
         ->and($contract)->toContain('companies request shape')
         ->and($contract)->toContain('deals request shape')
         ->and($contract)->toContain('quotes request shape')
-        ->and($contract)->toContain('leads emit no list query')
+        ->and($contract)->toContain('leads request shape')
         ->and($contract)->toContain('stage preserves search/filters/sort/view/pipeline and resets page')
         ->and($contract)->toContain('pipeline preserves search/filters/sort/view and drops stage')
         ->and($contract)->toContain('filter sibling preservation keeps q/sort/direction/view')
@@ -202,7 +202,8 @@ it('keeps existing backend request params for Contacts Companies Leads Deals and
         ->assertInertia(fn ($page) => $page
             ->component('crm/leads/index')
             ->has('leads')
-            ->missing('activeFilters')
+            ->has('activeFilters')
+            ->has('savedFilters')
         );
 });
 

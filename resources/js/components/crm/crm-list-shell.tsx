@@ -13,6 +13,7 @@ import type {
     DataWorkspaceEmpty,
     DataWorkspacePaginator,
 } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
 import {
     applyStageFilter,
     fromActiveFilters,
@@ -30,8 +31,8 @@ import { applyCompanyColumnContract } from '@/pages/crm/companies/company-column
 import { applyContactColumnContract } from '@/pages/crm/contacts/contact-columns';
 import { applyDealColumnContract } from '@/pages/crm/deals/deal-columns';
 import { applyLeadColumnContract } from '@/pages/crm/leads/lead-columns';
-import { t } from '@/lib/i18n';
 import { applyQuoteColumnContract } from '@/pages/crm/quotes/quote-columns';
+import { applyTicketColumnContract } from '@/pages/crm/tickets/ticket-columns';
 
 type Member = { id: number; name: string };
 type Company = { id: number; name: string };
@@ -74,11 +75,11 @@ function toWorkspacePaginator(
 }
 
 /**
- * Thin Inertia mapper. Domain result mode remains the default for
- * Tickets (CrmEmptyState + CrmListFooter in children until later).
- * Contacts, Companies, Leads, Deals, and Quotes use resultMode="shared-table".
- * Optional `board` is the P11 slot — Deals list does not pass it.
- * The deals board page passes `mode="board"` and the kanban node.
+ * Thin Inertia mapper. Contacts, Companies, Leads, Deals, Quotes, and
+ * Tickets use resultMode="shared-table" (ONE DataGrid). Domain result
+ * mode remains available for board/custom surfaces (CrmEmptyState +
+ * CrmListFooter). Optional `board` is the P11 slot — Deals list does
+ * not pass it. The deals board page passes `mode="board"` and the kanban node.
  */
 export function CrmListShell<Row extends { id: RowId }>({
     title,
@@ -203,7 +204,9 @@ export function CrmListShell<Row extends { id: RowId }>({
                   ? applyDealColumnContract(listView?.columnDefs ?? [])
                   : entity === 'quote'
                     ? applyQuoteColumnContract(listView?.columnDefs ?? [])
-                    : (listView?.columnDefs ?? []);
+                    : entity === 'ticket'
+                      ? applyTicketColumnContract(listView?.columnDefs ?? [])
+                      : (listView?.columnDefs ?? []);
     const sharedPaginator = toWorkspacePaginator(paginator);
 
     useEffect(() => {
@@ -303,13 +306,19 @@ export function CrmListShell<Row extends { id: RowId }>({
             </>
         ),
         toolbarExtra:
-            resultMode === 'shared-table' && entity === 'deal' && stagePills.length > 0 ? (
+            resultMode === 'shared-table' &&
+            (entity === 'deal' || entity === 'ticket') &&
+            stagePills.length > 0 ? (
                 <StagePills
                     stages={stagePills}
                     activeSlug={
-                        typeof activeFilters.stage === 'string'
-                            ? activeFilters.stage
-                            : null
+                        entity === 'ticket'
+                            ? typeof activeFilters.status === 'string'
+                                ? activeFilters.status
+                                : null
+                            : typeof activeFilters.stage === 'string'
+                              ? activeFilters.stage
+                              : null
                     }
                     hrefFor={(slug) =>
                         listQueryHref(
@@ -317,7 +326,7 @@ export function CrmListShell<Row extends { id: RowId }>({
                             applyStageFilter(
                                 fromActiveFilters(activeFilters, query),
                                 slug,
-                                'stage',
+                                entity === 'ticket' ? 'status' : 'stage',
                             ),
                             entity as ListQueryObject,
                         )

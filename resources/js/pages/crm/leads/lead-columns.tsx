@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
 import { formatContactName } from '@/lib/contact-name';
+import { t } from '@/lib/i18n';
 import type { ListColumnDef } from '@/lib/list-view-config';
 
 /**
@@ -38,15 +39,15 @@ export function leadRowHref(row: { id: number | string }): string {
 export function leadEmptyState(filtered: boolean): DataWorkspaceEmpty {
     if (filtered) {
         return {
-            title: 'No leads match these filters',
-            body: 'Clear filters to see inbound records again.',
+            title: t('No leads match these filters'),
+            body: t('Clear filters to see inbound records again.'),
         };
     }
 
     return {
-        title: 'No leads yet',
-        body: 'Create a lead from an existing contact to work inbound records here.',
-        actionLabel: 'Create lead',
+        title: t('No leads yet'),
+        body: t('Create a lead from an existing contact to work inbound records here.'),
+        actionLabel: t('Create lead'),
     };
 }
 

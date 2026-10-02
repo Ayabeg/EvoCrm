@@ -29,7 +29,7 @@ it('moves Deals list onto DataWorkspace shared-table without a domain children p
         ->and($deals)->toContain('entity="deal"')
         ->and($deals)->toContain('DealLayoutToggle')
         ->and($deals)->toContain('PipelineSwitcher')
-        ->and($deals)->toContain("extraQuery={{ pipeline: pipeline.id }}")
+        ->and($deals)->toContain('extraQuery={{ pipeline: pipeline.id }}')
         ->and($deals)->not->toContain('ListViewTable')
         ->and($deals)->not->toContain('CrmEmptyState')
         ->and($deals)->not->toContain('CrmListFooter')
@@ -52,7 +52,7 @@ it('moves Deals list onto DataWorkspace shared-table without a domain children p
         ->and($shell)->toContain('rowHref={rowHref}')
         ->and($shell)->toContain('applyDealColumnContract')
         ->and($shell)->toContain('toolbarExtra')
-        ->and($shell)->toContain("entity === 'deal' && stagePills.length > 0")
+        ->and($shell)->toContain("(entity === 'deal' || entity === 'ticket') &&")
         ->and($shell)->toContain("mode: mode ?? (entity === 'deal' ? 'list' as const : undefined)")
         ->and($shell)->not->toContain('rows={[]}')
         ->and($shell)->not->toContain("empty={{ title: '', body: '' }}");
@@ -69,7 +69,7 @@ it('moves Deals list onto DataWorkspace shared-table without a domain children p
 it('keeps Deals row identity amount stage owner next step and selection on the shared contracts', function () {
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $columns = file_get_contents(resource_path('js/pages/crm/deals/deal-columns.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $selection = file_get_contents(resource_path('js/ds/workspace/selection.ts'));
     $contract = file_get_contents(resource_path('js/pages/crm/deals/deal-columns-contract.ts'));
     $toggle = file_get_contents(resource_path('js/components/crm/deal-layout-toggle.tsx'));
@@ -78,7 +78,7 @@ it('keeps Deals row identity amount stage owner next step and selection on the s
         ->and($deals)->toContain('selectable: canBulk')
         ->and($deals)->toContain('pageIds: deals.map((deal) => deal.id)')
         ->and($deals)->toContain('BulkActionBar')
-        ->and($deals)->toContain("entity=\"deal\"")
+        ->and($deals)->toContain('entity="deal"')
         ->and($deals)->not->toContain('useState<number[]>([])')
         ->and($deals)->not->toContain('setSelectedIds');
 

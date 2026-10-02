@@ -7,7 +7,7 @@ use App\Models\User;
 
 it('rebuilds the deals list as a HubSpot-dense workspace on the Wave 0 shell', function () {
     $index = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $config = file_get_contents(app_path('Support/ListViewConfig.php'));
 
     expect($index)->toContain('data-crm="deals-workspace"')

@@ -46,7 +46,7 @@ it('moves Contacts onto DataWorkspace shared-table without a domain children pat
 it('keeps Contacts row identity href columns and selection on the shared contracts', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $columns = file_get_contents(resource_path('js/pages/crm/contacts/contact-columns.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $selection = file_get_contents(resource_path('js/ds/workspace/selection.ts'));
     $contract = file_get_contents(resource_path('js/pages/crm/contacts/contact-columns-contract.ts'));
 

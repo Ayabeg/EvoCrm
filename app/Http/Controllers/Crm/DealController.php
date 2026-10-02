@@ -51,7 +51,7 @@ class DealController extends Controller
             ->where('pipeline_id', $pipeline->id)
             ->with(['contact.company', 'company', 'stage', 'owner']);
 
-        $filter->applyToDeals($query, $filters);
+        $filter->apply('deal', $query, $filters);
         $filter->applySort('deal', $query, $filters);
 
         [$dealRows, $paginator] = $filter->paginate($query, $request);
@@ -98,7 +98,7 @@ class DealController extends Controller
             $countQuery = Deal::query()->forWorkspace($workspace);
             $countFilters = $filters;
             unset($countFilters['stage']);
-            $filter->applyToDeals($countQuery, $countFilters);
+            $filter->apply('deal', $countQuery, $countFilters);
 
             return [
                 'id' => $stage->id,
@@ -388,7 +388,7 @@ class DealController extends Controller
             ->where('pipeline_id', $pipeline->id)
             ->with(['contact', 'company', 'owner', 'stage']);
 
-        $filter->applyToDeals($query, $filters);
+        $filter->apply('deal', $query, $filters);
 
         return response()->streamDownload(function () use ($query): void {
             $out = fopen('php://output', 'w');
@@ -481,7 +481,7 @@ class DealController extends Controller
             $query->where('owner_id', $filters['owner'] ?? null);
         }
 
-        $filter->applyToDeals($query, $queueFilters);
+        $filter->apply('deal', $query, $queueFilters);
 
         return $attention->queue($query);
     }

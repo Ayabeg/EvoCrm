@@ -36,7 +36,7 @@ class ContactController extends Controller
             ->with(['company', 'owner', 'deals.stage'])
             ->withCount(['threads', 'deals', 'enrollments']);
 
-        $filter->applyToContacts($query, $filters);
+        $filter->apply('contact', $query, $filters);
         $filter->applySort('contact', $query, $filters);
 
         [$contactRows, $paginator] = $filter->paginate($query, $request);

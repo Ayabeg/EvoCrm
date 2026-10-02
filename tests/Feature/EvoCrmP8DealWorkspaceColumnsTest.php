@@ -7,7 +7,7 @@ use App\Models\User;
 
 it('exposes health and next step on the deals list contract', function () {
     $config = file_get_contents(app_path('Support/ListViewConfig.php'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
 
     expect($config)->toContain("'id' => 'health'")
         ->and($config)->toContain("'id' => 'next_step'")

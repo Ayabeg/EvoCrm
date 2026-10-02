@@ -24,7 +24,7 @@ it('gives CRM list pages one workspace shell without room tabs or a card stack',
     $workspace = file_get_contents(resource_path('js/ds/workspace/DataWorkspace.tsx'));
     $toolbar = file_get_contents(resource_path('js/components/crm/list-toolbar.tsx'));
     $header = file_get_contents(resource_path('js/components/crm/crm-object-header.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $empty = file_get_contents(resource_path('js/components/crm/list-chrome.tsx'));
     $crmShell = file_get_contents(resource_path('js/components/crm/crm-shell.tsx'));
 

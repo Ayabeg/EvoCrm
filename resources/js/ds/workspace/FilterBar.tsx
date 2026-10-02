@@ -97,7 +97,11 @@ export function FilterBar({
               ? t('Search deals…')
               : object === 'quote'
                 ? t('Search quotes…')
-                : t('Search');
+                : object === 'lead'
+                  ? t('Search leads…')
+                  : object === 'ticket'
+                    ? t('Search tickets…')
+                    : t('Search');
     const searchLabel =
         object === 'company'
             ? t('Search companies')
@@ -105,7 +109,11 @@ export function FilterBar({
               ? t('Search deals')
               : object === 'quote'
                 ? t('Search quotes')
-                : t('Search list');
+                : object === 'lead'
+                  ? t('Search leads')
+                  : object === 'ticket'
+                    ? t('Search tickets')
+                    : t('Search list');
     const applyFilter = (key: ListQueryFilterKey, value: string | null) => {
         navigateListQuery(basePath, current, { filters: { [key]: value } }, object);
     };

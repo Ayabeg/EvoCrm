@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
+import { t } from '@/lib/i18n';
 import type { ListColumnDef } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -48,15 +49,15 @@ export function quoteRowHref(row: { id: number | string }): string {
 export function quoteEmptyState(filtered: boolean): DataWorkspaceEmpty {
     if (filtered) {
         return {
-            title: 'No quotes match these filters',
-            body: 'Clear filters or pick another owner to see records.',
+            title: t('No quotes match these filters'),
+            body: t('Clear filters or pick another owner to see records.'),
         };
     }
 
     return {
-        title: 'No quotes yet',
-        body: 'Create a quote on a deal. Amount, status, and owner stay on this list.',
-        actionLabel: 'Create quote',
+        title: t('No quotes yet'),
+        body: t('Create a quote on a deal. Amount, status, and owner stay on this list.'),
+        actionLabel: t('Create quote'),
     };
 }
 
@@ -118,7 +119,7 @@ export function QuoteIdentityCell({
     const body = (
         <>
             <span
-                className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[#eceae6] text-[10px] leading-none font-medium text-ink"
+                className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-canvas-soft text-[10px] leading-none font-medium text-ink"
                 aria-hidden
             >
                 {initials || '?'}
@@ -236,7 +237,7 @@ export function QuoteStatusCell({
                     aria-hidden
                     className={cn(
                         'size-1.5 shrink-0 rounded-full',
-                        tone === 'accepted' ? 'bg-[#17a85b]' : 'bg-[#5c5a55]',
+                        tone === 'accepted' ? 'bg-success' : 'bg-mute',
                     )}
                 />
             ) : null}

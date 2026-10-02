@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\File;
 it('locks P26 keyboard, names, and overlay a11y without a new widget kit', function () {
     $a11y = File::get(resource_path('js/lib/a11y.ts'));
     $kanban = File::get(resource_path('js/components/crm/pipeline-kanban.tsx'));
-    $list = File::get(resource_path('js/components/crm/list-view-table.tsx'));
+    $list = File::get(resource_path('js/evo/data/crm-list/table.tsx')).File::get(resource_path('js/evo/data/crm-list/cells.tsx'));
     $table = File::get(resource_path('js/ds/workspace/DataTable.tsx'));
     $bulk = File::get(resource_path('js/ds/workspace/BulkActionBar.tsx'));
     $inbox = File::get(resource_path('js/components/crm/inbox-chrome.tsx'));
@@ -98,7 +98,7 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($palette)->toContain('aria-label="Palette de commandes"')
         ->and($palette)->toContain('aria-label="Rechercher des commandes"');
 
-    expect($motion)->toContain("@media (prefers-reduced-motion: reduce)")
+    expect($motion)->toContain('@media (prefers-reduced-motion: reduce)')
         ->and($motion)->toContain("[data-command='os']")
         ->and($motion)->toContain("[data-command='backdrop']");
 

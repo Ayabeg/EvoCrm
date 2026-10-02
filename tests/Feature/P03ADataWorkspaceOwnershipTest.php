@@ -101,12 +101,14 @@ it('keeps Contacts Companies Deals Quotes and Leads list behavior on the same ow
         ->and($leads)->not->toContain('DataWorkspace');
 
     expect($tickets)->toContain('CrmListShell')
-        ->and($tickets)->toContain('ListViewTable')
+        ->and($tickets)->toContain('resultMode="shared-table"')
+        ->and($tickets)->toContain('rows={tickets}')
+        ->and($tickets)->toContain('rowHref={ticketRowHref}')
         ->and($tickets)->toContain('TicketLayoutToggle')
-        ->and($tickets)->not->toContain('resultMode=');
+        ->and($tickets)->not->toContain('ListViewTable');
 });
 
-it('keeps Tickets on domain result mode after the Quotes shared-table migration', function () {
+it('keeps Tickets on shared-table after the Quotes shared-table migration', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
@@ -118,7 +120,7 @@ it('keeps Tickets on domain result mode after the Quotes shared-table migration'
         ->and($contacts)->toContain('resultMode="shared-table"')
         ->and($deals)->toContain('resultMode="shared-table"')
         ->and($quotes)->toContain('resultMode="shared-table"')
-        ->and($tickets)->not->toContain('resultMode=')
+        ->and($tickets)->toContain('resultMode="shared-table"')
         ->and($shell)->toContain('resultMode="domain"')
         ->and($workspace)->toContain('useWorkspaceSelection');
 });
@@ -232,6 +234,7 @@ it('keeps Contacts Companies Deals Quotes and Leads Inertia contracts', function
             ->has('listView.columnDefs')
             ->has('recordCount')
             ->has('paginator')
-            ->missing('activeFilters')
+            ->has('activeFilters')
+            ->has('savedFilters')
         );
 });

@@ -53,7 +53,7 @@ it('exposes empty paginator and board helpers that do not require domain childre
 
 it('lets CrmListShell pass the P11 board slot without changing domain pages', function () {
     $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
-    $listTable = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $listTable = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
 
     expect($shell)->toContain('resultMode="domain"')
         ->and($shell)->toContain('resultMode="shared-table"')

@@ -146,7 +146,11 @@ const QUOTE_SHAPE = toDomainParams(
 );
 
 const LEAD_SHAPE = toDomainParams(
-    query({ search: 'should-not-emit', page: 2 }),
+    query({
+        search: 'clinic',
+        page: 2,
+        filters: { ...emptyCanonicalListQuery().filters, status: 'new', created: '7d' },
+    }),
     listQueryAdapter('lead'),
 );
 
@@ -304,7 +308,14 @@ export function runP03CQueryProofs(): void {
             !P03C_QUOTE_KEYS.includes('pipeline'),
         'quotes request shape',
     );
-    assert(P03C_LEAD_KEYS.length === 0, 'leads emit no list query');
+    assert(
+        P03C_LEAD_KEYS.includes('q') &&
+            P03C_LEAD_KEYS.includes('status') &&
+            P03C_LEAD_KEYS.includes('created') &&
+            !P03C_LEAD_KEYS.includes('owner') &&
+            !P03C_LEAD_KEYS.includes('pipeline'),
+        'leads request shape',
+    );
     assert(
         P03C_CONTACT_HREF === '/crm/contacts?q=amel&view=all&page=2&owner=9',
         'contact href uses existing q/view/page/owner params',

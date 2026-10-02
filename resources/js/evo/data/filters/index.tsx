@@ -258,8 +258,8 @@ function FilterBuilder({ value, fields, onChange, onApply, resource, allowGroups
                     ) : null}
                 </div>
                 <p className="text-[11px] text-[var(--evo-ink-muted)]">
-                    Les groupes de filtres ne sont pas proposés ici — le backend ne les exécute pas encore
-                    sur cet index (PR4).
+                    Les groupes de filtres ne sont pas proposés ici — le backend ne les exécute pas
+                    sur cet index.
                 </p>
             </div>
         );

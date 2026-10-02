@@ -9,6 +9,7 @@ use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Models\User;
 use App\Services\Ai\RecordInsight;
+use App\Services\Crm\CrmFilter;
 use App\Services\Crm\LeadConverter;
 use App\Services\Crm\LeadScorer;
 use App\Services\Crm\PipelineManager;
@@ -22,28 +23,28 @@ use Inertia\Response;
 
 class LeadController extends Controller
 {
-    public function index(Request $request, CrmHub $hub): Response
+    public function index(Request $request, CrmHub $hub, CrmFilter $filter): Response
     {
         $workspace = $request->user()->workspace;
-        $leads = Lead::query()
+        $filters = $filter->resolve($request, $workspace, 'lead');
+
+        $query = Lead::query()
             ->forWorkspace($workspace)
-            ->with(['contact', 'latestScore'])
-            ->latest()
-            ->limit(100)
-            ->get();
-        $total = $leads->count();
+            ->with(['contact', 'latestScore']);
+
+        $filter->apply('lead', $query, $filters);
+        $query->latest();
+
+        [$leads, $paginator] = $filter->paginate($query, $request);
 
         return Inertia::render('crm/leads/index', [
             'leads' => $leads,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
-            'listView' => $hub->listViewMeta('lead'),
-            'recordCount' => $total,
-            'paginator' => [
-                'page' => 1,
-                'per_page' => 100,
-                'total' => $total,
-                'last_page' => 1,
-            ],
+            'savedFilters' => $hub->filters($workspace, 'lead', $request->user()),
+            'activeFilters' => $filters,
+            'listView' => $hub->listViewMeta('lead', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
+            'recordCount' => $paginator['total'],
+            'paginator' => $paginator,
         ]);
     }
 

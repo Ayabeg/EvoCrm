@@ -1,14 +1,17 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { CrmObjectHeader } from '@/components/crm/crm-object-header';
-import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmShell } from '@/components/crm/crm-shell';
 import { CrmEmptyState, CrmListFooter } from '@/components/crm/list-chrome';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import SegmentFilterForm from '@/components/crm/segment-filter-form';
 import type { SegmentFilters } from '@/components/crm/segment-filter-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DataGrid } from '@/evo/data/data-grid';
+import type { EvoDataGridColumn } from '@/evo/data/data-grid';
+import { t } from '@/lib/i18n';
 import type { ListFieldDef } from '@/lib/list-view-config';
 import { cn } from '@/lib/utils';
 
@@ -61,6 +64,117 @@ export default function SegmentsIndex({
         entity === 'deal' ? dealFilterFields : contactFilterFields;
     const href = (entity: string, id: number) =>
         entity === 'deal' ? `/crm/deals?filter_id=${id}` : `/crm/contacts?filter_id=${id}`;
+    const columns: EvoDataGridColumn<Segment>[] = [
+        {
+            id: 'name',
+            header: t('Name'),
+            cell: ({ row }) => (
+                <Link href={href(row.original.entity, row.original.id)} className="font-medium text-ink hover:underline">
+                    {row.original.name}
+                </Link>
+            ),
+        },
+        {
+            id: 'entity',
+            header: t('Entity'),
+            cell: ({ row }) => <span className="capitalize text-mute">{row.original.entity}</span>,
+        },
+        {
+            id: 'count',
+            header: t('Count'),
+            cell: ({ row }) => <span className="tabular-nums">{row.original.count}</span>,
+        },
+        {
+            id: 'campaigns',
+            header: t('Campaigns'),
+            cell: ({ row }) => (
+                <>
+                    {row.original.campaigns.map((campaign) => (
+                        <Link key={campaign.id} href={`/outbound/campaigns/${campaign.id}`} className="me-2 text-[12px] text-ink hover:underline">
+                            {campaign.name}
+                        </Link>
+                    ))}
+                </>
+            ),
+        },
+        {
+            id: 'actions',
+            header: t('Actions'),
+            enableSorting: false,
+            cell: ({ row }) => {
+                const segment = row.original;
+
+                return (
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Link href={`/crm/segments/${segment.id}`} className="text-[12px] text-mute hover:text-ink">
+                            {t('History')}
+                        </Link>
+                        <MorphingForm
+                            label="Edit"
+                            title="Edit segment"
+                            plainTrigger
+                            open={editSegment?.id === segment.id}
+                            onOpenChange={(open) => {
+                                if (open) {
+                                    setEditSegment(segment);
+                                    setDraftFilters(segment.filters ?? {});
+
+                                    return;
+                                }
+
+                                if (editSegment?.id === segment.id) {
+                                    setEditSegment(null);
+                                }
+                            }}
+                        >
+                            <Form
+                                action={`/crm/segments/${segment.id}`}
+                                method="put"
+                                className="space-y-3"
+                                onSuccess={() => setEditSegment(null)}
+                            >
+                                {({ processing }) => (
+                                    <>
+                                        <Input name="name" defaultValue={segment.name} required />
+                                        <input type="hidden" name="entity" value={segment.entity} />
+                                        <input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)} />
+                                        <SegmentFilterForm
+                                            entity={segment.entity as 'contact' | 'deal'}
+                                            filters={draftFilters}
+                                            onChange={setDraftFilters}
+                                            members={members}
+                                            cities={cities}
+                                            wilayas={wilayas}
+                                            stages={stages}
+                                            filterFields={fields(segment.entity as 'contact' | 'deal')}
+                                        />
+                                        <div className="flex justify-end">
+                                            <Button disabled={processing}>Update</Button>
+                                        </div>
+                                    </>
+                                )}
+                            </Form>
+                        </MorphingForm>
+                        {segment.entity === 'contact' && canSyncMeta ? (
+                            <Form action={`/crm/segments/${segment.id}/sync-meta`} method="post" className="inline-flex items-center gap-1">
+                                <Input name="audience_id" placeholder="Audience ID" className="h-7 w-28" />
+                                <Button type="submit" size="sm" variant="outline" className="h-7">
+                                    Meta
+                                </Button>
+                            </Form>
+                        ) : null}
+                        <button
+                            type="button"
+                            className="text-[12px] text-mute hover:text-ink"
+                            onClick={() => confirm('Delete?') && router.delete(`/crm/segments/${segment.id}`)}
+                        >
+                            {t('Delete')}
+                        </button>
+                    </div>
+                );
+            },
+        },
+    ];
 
     return (
         <CrmShell title="Segments" chrome="workspace">
@@ -80,6 +194,7 @@ export default function SegmentsIndex({
                                 if (open) {
                                     setDraftFilters({});
                                 }
+
                                 setCreateOpen(open);
                             }}
                         >
@@ -158,103 +273,25 @@ export default function SegmentsIndex({
                             onAction={() => setCreateOpen(true)}
                         />
                     ) : (
-                        <div className="min-h-0 flex-1 overflow-auto">
-                            <table className="w-full min-w-[640px] border-collapse text-[13px]">
-                                <thead>
-                                    <tr className="border-b border-hairline bg-canvas-soft text-left">
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:px-6">Name</th>
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">Entity</th>
-                                        <th className="px-4 py-1.5 text-right text-[11px] font-medium text-mute">Count</th>
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute">Campaigns</th>
-                                        <th className="px-4 py-1.5 text-[11px] font-medium text-mute sm:pr-6">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filtered.map((segment) => (
-                                        <tr
-                                            key={segment.id}
-                                            className="cursor-pointer border-b border-hairline hover:bg-canvas-soft"
-                                            onClick={(event) => {
-                                                if ((event.target as HTMLElement).closest('a,button,input,form')) {
-                                                    return;
-                                                }
-                                                router.visit(href(segment.entity, segment.id));
-                                            }}
-                                        >
-                                            <td className="px-4 py-1.5 sm:px-6">
-                                                <Link href={href(segment.entity, segment.id)} className="font-medium text-ink hover:underline">
-                                                    {segment.name}
-                                                </Link>
-                                            </td>
-                                            <td className="px-4 py-1.5 capitalize text-mute">{segment.entity}</td>
-                                            <td className="px-4 py-1.5 text-right text-ink">{segment.count}</td>
-                                            <td className="px-4 py-1.5 text-mute">
-                                                {segment.campaigns.map((campaign) => (
-                                                    <Link key={campaign.id} href={`/outbound/campaigns/${campaign.id}`} className="me-2 text-[12px] text-ink hover:underline">
-                                                        {campaign.name}
-                                                    </Link>
-                                                ))}
-                                            </td>
-                                            <td className="px-4 py-1.5 sm:pr-6">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <Link href={`/crm/segments/${segment.id}`} className="text-[12px] text-mute hover:text-ink">History</Link>
-                                                    <MorphingForm
-                                                        label="Edit"
-                                                        title="Edit segment"
-                                                        plainTrigger
-                                                        open={editSegment?.id === segment.id}
-                                                        onOpenChange={(open) => {
-                                                            if (open) {
-                                                                setEditSegment(segment);
-                                                                setDraftFilters(segment.filters ?? {});
-                                                                return;
-                                                            }
-                                                            if (editSegment?.id === segment.id) {
-                                                                setEditSegment(null);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Form
-                                                            action={`/crm/segments/${segment.id}`}
-                                                            method="put"
-                                                            className="space-y-3"
-                                                            onSuccess={() => setEditSegment(null)}
-                                                        >
-                                                            {({ processing }) => (
-                                                                <>
-                                                                    <Input name="name" defaultValue={segment.name} required />
-                                                                    <input type="hidden" name="entity" value={segment.entity} />
-                                                                    <input type="hidden" name="filters_json" value={JSON.stringify(draftFilters)} />
-                                                                    <SegmentFilterForm
-                                                                        entity={segment.entity as 'contact' | 'deal'}
-                                                                        filters={draftFilters}
-                                                                        onChange={setDraftFilters}
-                                                                        members={members}
-                                                                        cities={cities}
-                                                                        wilayas={wilayas}
-                                                                        stages={stages}
-                                                                        filterFields={fields(segment.entity as 'contact' | 'deal')}
-                                                                    />
-                                                                    <div className="flex justify-end">
-                                                                        <Button disabled={processing}>Update</Button>
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                        </Form>
-                                                    </MorphingForm>
-                                                    {segment.entity === 'contact' && canSyncMeta ? (
-                                                        <Form action={`/crm/segments/${segment.id}/sync-meta`} method="post" className="inline-flex items-center gap-1">
-                                                            <Input name="audience_id" placeholder="Audience ID" className="h-7 w-28" />
-                                                            <Button type="submit" size="sm" variant="outline" className="h-7">Meta</Button>
-                                                        </Form>
-                                                    ) : null}
-                                                    <button type="button" className="text-[12px] text-mute hover:text-ink" onClick={() => confirm('Delete?') && router.delete(`/crm/segments/${segment.id}`)}>Delete</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-2 md:px-6">
+                            <DataGrid
+                                columns={columns}
+                                data={filtered}
+                                getRowId={(segment) => String(segment.id)}
+                                density="standard"
+                                enableSelection={false}
+                                pagination="none"
+                                hideColumnPicker
+                                embedded
+                                enableSorting={false}
+                                onRowActivate={(segment, event) => {
+                                    if ((event.target as HTMLElement).closest('a,button,input,form,label')) {
+                                        return;
+                                    }
+
+                                    router.visit(href(segment.entity, segment.id));
+                                }}
+                            />
                         </div>
                     )}
                     <CrmListFooter count={filtered.length} noun="segments" />

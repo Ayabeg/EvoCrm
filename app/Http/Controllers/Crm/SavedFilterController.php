@@ -94,7 +94,7 @@ class SavedFilterController extends Controller
     {
         $rules = [
             'name' => [$updating ? 'sometimes' : 'required', 'string', 'max:120'],
-            'entity' => [$updating ? 'sometimes' : 'required', 'in:contact,deal,company'],
+            'entity' => [$updating ? 'sometimes' : 'required', 'in:contact,deal,company,ticket,quote,lead'],
             'filters' => ['nullable', 'array'],
             'filter_groups' => ['nullable'],
             'columns' => ['nullable'],

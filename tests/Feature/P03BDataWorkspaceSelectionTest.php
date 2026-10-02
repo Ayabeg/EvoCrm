@@ -9,7 +9,6 @@ use App\Models\User;
  * P03B — Selection ownership + bulk state.
  * Shared contract. Domain tables consume it. No URL / backend / bar redesign.
  */
-
 it('defines a typed shared selection contract with explicit controlled and uncontrolled modes', function () {
     $types = file_get_contents(resource_path('js/ds/workspace/types.ts'));
     $selection = file_get_contents(resource_path('js/ds/workspace/selection.ts'));
@@ -119,7 +118,7 @@ it('wires Leads to the contract without inventing selectable bulk UI', function 
 
 it('preserves select-all as the current rendered page and marks indeterminate', function () {
     $selection = file_get_contents(resource_path('js/ds/workspace/selection.ts'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $dataTable = file_get_contents(resource_path('js/ds/workspace/DataTable.tsx'));
     $proofs = file_get_contents(resource_path('js/ds/workspace/selection-contract.ts'));
 
@@ -130,7 +129,7 @@ it('preserves select-all as the current rendered page and marks indeterminate', 
         ->and($selection)->toContain('Header flags are computed against CURRENT PAGE ids only')
         ->and($selection)->toContain('bulkActive: selectedIds.length > 0')
         ->and($table)->toContain('element.indeterminate = somePageSelected')
-        ->and($table)->toContain("aria-checked={")
+        ->and($table)->toContain('aria-checked={')
         ->and($table)->toContain("'mixed'")
         ->and($table)->toContain('aria-label="Select page"')
         ->and($table)->toContain('aria-label={`Select ${row.id}`}')
@@ -152,7 +151,7 @@ it('does not redesign the bulk bar or change the bulk POST shape', function () {
     $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
     $deals = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
 
-    expect($dsBar)->toContain("actionPathFor")
+    expect($dsBar)->toContain('actionPathFor')
         ->and($dsBar)->toContain("'/crm/contacts/bulk'")
         ->and($dsBar)->toContain("'/crm/deals/bulk'")
         ->and($dsBar)->toContain('ids: selectedIds')

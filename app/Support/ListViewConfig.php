@@ -126,6 +126,10 @@ class ListViewConfig
                 ['id' => 'owner', 'label' => 'Owner', 'type' => 'select'],
                 ['id' => 'created', 'label' => 'Create date', 'type' => 'select', 'options' => ['today', '7d', '30d', '90d']],
             ],
+            'lead' => [
+                ['id' => 'status', 'label' => 'Lead status', 'type' => 'select', 'options' => ['new', 'working', 'qualified', 'disqualified']],
+                ['id' => 'created', 'label' => 'Create date', 'type' => 'select', 'options' => ['today', '7d', '30d', '90d']],
+            ],
             default => [],
         };
     }

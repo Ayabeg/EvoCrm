@@ -6,14 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
-use App\Models\Ticket;
 use App\Models\Thread;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\CrmFilter;
 use App\Support\CrmHub;
 use App\Support\TicketPath;
 use App\Support\TicketSla;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,20 +25,13 @@ class TicketController extends Controller
     public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
     {
         $workspace = $request->user()->workspace;
+        $filters = $filter->resolve($request, $workspace, 'ticket');
+
         $query = Ticket::query()
             ->forWorkspace($workspace)
             ->with(['contact', 'company', 'owner']);
 
-        $this->constrain($query, $request);
-
-        if ($request->filled('q')) {
-            $q = $request->string('q')->toString();
-            $query->where(function ($inner) use ($q): void {
-                $inner->where('subject', 'like', '%'.$q.'%')
-                    ->orWhere('number', 'like', '%'.$q.'%');
-            });
-        }
-
+        $filter->apply('ticket', $query, $filters);
         $query->latest('id');
         [$rows, $paginator] = $filter->paginate($query, $request);
 
@@ -54,17 +48,8 @@ class TicketController extends Controller
             'tickets' => $rows->map->present()->values()->all(),
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
             'members' => $hub->members($workspace),
-            'savedFilters' => [],
-            'activeFilters' => [
-                'view' => $request->input('view', 'all'),
-                'status' => $request->input('status'),
-                'owner' => $request->input('owner'),
-                'priority' => $request->input('priority'),
-                'channel' => $request->input('channel'),
-                'unassigned' => $request->boolean('unassigned') ?: null,
-                'unanswered' => $request->boolean('unanswered') ?: null,
-                'q' => $request->input('q'),
-            ],
+            'savedFilters' => $hub->filters($workspace, 'ticket', $request->user()),
+            'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('ticket', null, null, $workspace),
             'recordCount' => $paginator['total'],
             'paginator' => $paginator,
@@ -326,7 +311,7 @@ class TicketController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Ticket>  $query
+     * @param  Builder<Ticket>  $query
      */
     protected function constrain($query, Request $request): void
     {

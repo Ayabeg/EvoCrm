@@ -202,7 +202,7 @@ it('keeps Tickets next to Leads and does not add a second Help Desk app', functi
     $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $list = file_get_contents(resource_path('js/pages/crm/tickets/index.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/tickets/board.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $palette = file_get_contents(resource_path('js/lib/command-os.ts'));
     $routes = file_get_contents(base_path('routes/web.php'));
 

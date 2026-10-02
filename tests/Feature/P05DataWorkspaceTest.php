@@ -23,7 +23,7 @@ it('lands DataWorkspace with the sketched props and a thin CrmListShell adapter'
         expect(resource_path($path))->toBeFile();
     }
 
-    expect($types)->toContain("object: DataWorkspaceEntity")
+    expect($types)->toContain('object: DataWorkspaceEntity')
         ->and($types)->toContain('title: string')
         ->and($types)->toContain('views: SavedView[]')
         ->and($types)->toContain('filterFields: ListFieldDef[]')
@@ -56,7 +56,8 @@ it('opens advanced filters in a right Drawer and keeps list-query plus /crm/filt
     expect($drawer)->toContain("from '@/components/ui/drawer'")
         ->and($drawer)->toContain('side="right"')
         ->and($drawer)->toContain('Advanced filters')
-        ->and($drawer)->toContain('filter-builder')
+        ->and($drawer)->toContain("from '@/evo/data/filters'")
+        ->and($drawer)->toContain('FilterBuilder')
         ->and($drawer)->not->toContain('border-t border-hairline pt-2');
 
     expect($views)->toContain("from '@/components/crm/list-query'")
@@ -90,7 +91,7 @@ it('locks row 48, page pad-x 32, and 36px controls without object-specific CSS',
     }
 
     $table = file_get_contents(resource_path('js/ds/workspace/DataTable.tsx'));
-    $listTable = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $listTable = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $header = file_get_contents(resource_path('js/ds/chrome/PageHeader.tsx'));
     $bar = file_get_contents(resource_path('js/ds/workspace/FilterBar.tsx'));
     $bulk = file_get_contents(resource_path('js/ds/workspace/BulkActionBar.tsx'));

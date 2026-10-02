@@ -1,8 +1,8 @@
 import { router } from '@inertiajs/react';
-import ListViewTable from '@/components/crm/list-view-table';
 import { derivePageSelection, hasRowId } from '@/ds/workspace/selection';
 import type { RowId } from '@/ds/workspace/selection';
 import type { DataTableProps } from '@/ds/workspace/types';
+import { CrmListTable } from '@/evo/data/crm-list/table';
 import { t } from '@/lib/i18n';
 import type { ListColumnDef, ListObjectType, ListViewColumn } from '@/lib/list-view-config';
 import { MOTION_HOVER_CLASS } from '@/lib/motion';
@@ -177,7 +177,7 @@ export function ListDataTable<Row extends { id: RowId }>({
             )}
             data-ds="data-table"
         >
-            <ListViewTable
+            <CrmListTable
                 entity={object}
                 rows={rows as never}
                 columnDefs={columnDefs}

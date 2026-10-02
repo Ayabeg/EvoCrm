@@ -25,7 +25,10 @@ const QUOTE_FILTER_KEYS = [
     'status',
 ] as const satisfies readonly ListQueryFilterKey[];
 
-const EMPTY_FILTER_KEYS = [] as const satisfies readonly ListQueryFilterKey[];
+const LEAD_FILTER_KEYS = [
+    'created',
+    'status',
+] as const satisfies readonly ListQueryFilterKey[];
 
 const CONTACT_ADAPTER: DomainListQueryAdapter = {
     object: 'contact',
@@ -70,9 +73,9 @@ const TICKET_ADAPTER: DomainListQueryAdapter = {
 const LEAD_ADAPTER: DomainListQueryAdapter = {
     object: 'lead',
     searchParam: 'q',
-    filterKeys: EMPTY_FILTER_KEYS,
+    filterKeys: LEAD_FILTER_KEYS,
     extras: [],
-    supportsQuery: false,
+    supportsQuery: true,
 };
 
 const ADAPTERS: Record<ListQueryObject, DomainListQueryAdapter> = {

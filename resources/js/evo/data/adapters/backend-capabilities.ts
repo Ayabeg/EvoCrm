@@ -9,21 +9,18 @@
  * - Operators: eq, neq, contains, gt, gte, lt, lte, before, after,
  *   is_set, is_not_set, is_true, is_false, in
  * - Custom attributes via `custom:{key}`
- * - Company index uses `CrmFilter::apply()` so groups run
- * - Segments preview / report builder / contact export also call `apply()`
+ * - Company / contact / deal / ticket / quote / lead indexes call
+ *   `CrmFilter::apply()` so two-level `filter_groups` execute (PR4).
+ * - Segments preview / report builder / contact + deal export also call `apply()`
  *
  * CANNOT / gaps:
  * - Nested groups deeper than 2 levels — silently dropped by parseFilterGroups
- * - Contact and Deal list controllers call `applyToContacts` / `applyToDeals`
- *   directly, so `filter_groups` do NOT affect those list pages today
- * - Tickets and quotes use controller `constrain()` — no CrmFilter groups
  * - Unknown operators are no-ops
+ * - Deal board still uses `applyToDeals` (PR5)
  *
  * UI rule: FilterBuilder exposes only two levels. Nested ReUI trees are flattened
  * by `flattenToWorkspaceFilters` before URL / Inertia serialization.
- * Filter groups are offered only where LIST_PAGES_EXECUTE_FILTER_GROUPS is true
- * (company today). Contact / deal / ticket / quote / lead stay flat until PR4
- * wires CrmFilter::apply() on those indexes. Do not change the backend in PR3.
+ * Filter groups are offered where LIST_PAGES_EXECUTE_FILTER_GROUPS is true.
  */
 
 export type ListPageResource = keyof typeof LIST_PAGES_EXECUTE_FILTER_GROUPS;
@@ -53,9 +50,9 @@ export const BACKEND_FILTER_DEPTH = 2;
 
 export const LIST_PAGES_EXECUTE_FILTER_GROUPS = {
     company: true,
-    contact: false,
-    deal: false,
-    ticket: false,
-    quote: false,
-    lead: false,
+    contact: true,
+    deal: true,
+    ticket: true,
+    quote: true,
+    lead: true,
 } as const;

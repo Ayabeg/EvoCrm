@@ -1,6 +1,5 @@
 import { Form } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import FilterBuilder from '@/components/crm/filter-builder';
 import { filterFields } from '@/components/crm/list-query';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +11,8 @@ import {
     DrawerTitle,
 } from '@/components/ui/drawer';
 import type { DataWorkspaceEntity, DataWorkspaceFilterContext } from '@/ds/workspace/types';
+import { FilterBuilder } from '@/evo/data/filters';
+import { t } from '@/lib/i18n';
 import { fromActiveFilters } from '@/lib/list-query';
 import type { ListFieldDef, ListViewFilters } from '@/lib/list-view-config';
 import { filterGroupsFromActive } from '@/lib/list-view-config';
@@ -59,9 +60,9 @@ export function AdvancedFilterDrawer({
                 data-ds="advanced-filter-drawer"
             >
                 <DrawerHeader>
-                    <DrawerTitle>Advanced filters</DrawerTitle>
+                    <DrawerTitle>{t('Advanced filters')}</DrawerTitle>
                     <DrawerDescription className="sr-only">
-                        Narrow this list with field conditions. Apply writes the current URL.
+                        {t('Narrow this list with field conditions. Apply writes the current URL.')}
                     </DrawerDescription>
                 </DrawerHeader>
                 <Form
@@ -104,26 +105,24 @@ export function AdvancedFilterDrawer({
                         ) : null}
                         {fieldDefs.length > 0 ? (
                             <FilterBuilder
-                                entity={object}
+                                resource={object}
                                 fields={fieldDefs}
                                 value={groups}
                                 onChange={setGroups}
-                                members={filterContext?.members ?? []}
-                                cities={cities}
-                                wilayas={wilayas}
-                                stages={filterContext?.stages ?? []}
+                                allowGroups
                             />
                         ) : null}
+                        <input type="hidden" name="filter_groups" value={JSON.stringify(groups)} />
                         {cities.length > 0 ? (
                             <label className="grid gap-1 text-[13px] text-ink">
-                                City
+                                {t('City')}
                                 <select
                                     key={`city:${String(fields.city ?? '')}`}
                                     name="city"
                                     defaultValue={String(fields.city ?? '')}
                                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                                 >
-                                    <option value="">Any</option>
+                                    <option value="">{t('Any')}</option>
                                     {cities.map((city) => (
                                         <option key={city} value={city}>
                                             {city}
@@ -134,14 +133,14 @@ export function AdvancedFilterDrawer({
                         ) : null}
                         {wilayas.length > 0 ? (
                             <label className="grid gap-1 text-[13px] text-ink">
-                                Wilaya
+                                {t('Wilaya')}
                                 <select
                                     key={`wilaya:${String(fields.wilaya ?? '')}`}
                                     name="wilaya"
                                     defaultValue={String(fields.wilaya ?? '')}
                                     className="h-9 rounded-md border border-hairline bg-canvas px-2 text-[13px]"
                                 >
-                                    <option value="">Any</option>
+                                    <option value="">{t('Any')}</option>
                                     {wilayas.map((wilaya) => (
                                         <option key={wilaya} value={wilaya}>
                                             {wilaya}
@@ -158,7 +157,7 @@ export function AdvancedFilterDrawer({
                                 value="1"
                                 defaultChecked={!!fields.unanswered}
                             />
-                            Unanswered
+                            {t('Unanswered')}
                         </label>
                         <label className="flex h-9 items-center gap-2 text-[13px] text-ink">
                             <input
@@ -168,7 +167,7 @@ export function AdvancedFilterDrawer({
                                 value="1"
                                 defaultChecked={!!fields.unassigned}
                             />
-                            Unassigned
+                            {t('Unassigned')}
                         </label>
                     </div>
                     <DrawerFooter className="flex flex-row justify-end gap-2 border-t border-hairline px-5 py-3">
@@ -178,10 +177,10 @@ export function AdvancedFilterDrawer({
                             className="h-9"
                             onClick={() => onOpenChange(false)}
                         >
-                            Cancel
+                            {t('Cancel')}
                         </Button>
                         <Button type="submit" className="h-9">
-                            Apply
+                            {t('Apply')}
                         </Button>
                     </DrawerFooter>
                 </Form>

@@ -40,7 +40,7 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
 
     $hub = file_get_contents(resource_path('js/components/crm/record-hub.tsx'));
     $chrome = file_get_contents(resource_path('js/components/crm/record-chrome.tsx'));
-    $listTable = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $listTable = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $dealsShow = file_get_contents(resource_path('js/pages/crm/deals/show.tsx'));
 
     expect($hub)->toContain('@/components/ui/avatar')
@@ -54,6 +54,7 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
         ->and($chrome)->toContain("label: 'Note'")
         ->and($chrome)->not->toContain('shape="pill"')
         ->and($chrome)->not->toContain('min-h-11')
-        ->and($listTable)->toContain('export default function ListViewTable')
+        ->and($listTable)->toContain('export function CrmListTable')
+        ->and($listTable)->toContain('DataGrid')
         ->and($dealsShow)->toContain('DealLineItems');
 });

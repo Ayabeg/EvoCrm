@@ -3,6 +3,7 @@ import type { DataWorkspaceEmpty } from '@/ds/workspace/types';
 import { formatContactName } from '@/lib/contact-name';
 import type { DealAttention } from '@/lib/deal-attention';
 import { attentionToneClass } from '@/lib/deal-attention';
+import { t } from '@/lib/i18n';
 import type { ListColumnDef } from '@/lib/list-view-config';
 import { formatDzd } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -62,15 +63,15 @@ export function dealRowHref(row: { id: number | string }): string {
 export function dealEmptyState(filtered: boolean): DataWorkspaceEmpty {
     if (filtered) {
         return {
-            title: 'No deals match these filters',
-            body: 'Clear filters or pick another stage to see records.',
+            title: t('No deals match these filters'),
+            body: t('Clear filters or pick another stage to see records.'),
         };
     }
 
     return {
-        title: 'No deals yet',
-        body: 'Create a deal to start the sales pipeline. A contact plus this deal is the first useful loop.',
-        actionLabel: 'Create deal',
+        title: t('No deals yet'),
+        body: t('Create a deal to start the sales pipeline. A contact plus this deal is the first useful loop.'),
+        actionLabel: t('Create deal'),
     };
 }
 

@@ -72,7 +72,7 @@ it('moves Quotes list onto DataWorkspace shared-table without a domain children 
 it('keeps Quotes row identity customer status money validity deal and selection on the shared contracts', function () {
     $quotes = file_get_contents(resource_path('js/pages/crm/quotes/index.tsx'));
     $columns = file_get_contents(resource_path('js/pages/crm/quotes/quote-columns.tsx'));
-    $table = file_get_contents(resource_path('js/components/crm/list-view-table.tsx'));
+    $table = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $selection = file_get_contents(resource_path('js/ds/workspace/selection.ts'));
     $contract = file_get_contents(resource_path('js/pages/crm/quotes/quote-columns-contract.ts'));
     $controller = file_get_contents(app_path('Http/Controllers/Crm/QuoteController.php'));
@@ -163,8 +163,8 @@ it('preserves Quote query adapter search saved-view consume-only filters create 
 
     expect($controller)->toContain("Inertia::render('crm/quotes/index'")
         ->and($controller)->toContain("Inertia::render('crm/quotes/show'")
-        ->and($controller)->toContain("'savedFilters' => []")
-        ->and($controller)->toContain("'q' => \$request->input('q')")
+        ->and($controller)->toContain("'savedFilters' => \$hub->filters(\$workspace, 'quote', \$user)")
+        ->and($controller)->toContain("apply('quote'")
         ->and($controller)->toContain("in_array(\$status, ['draft', 'sent', 'accepted'], true)")
         ->and($controller)->toContain('latest(\'id\')')
         ->and($controller)->toContain('$filter->paginate');
@@ -172,7 +172,7 @@ it('preserves Quote query adapter search saved-view consume-only filters create 
     expect($adapters)->toContain("object: 'quote'")
         ->and($adapters)->toContain('supportsQuery: true')
         ->and($adapters)->toContain("searchParam: 'q'")
-        ->and($adapters)->toContain("filterKeys: QUOTE_FILTER_KEYS")
+        ->and($adapters)->toContain('filterKeys: QUOTE_FILTER_KEYS')
         ->and($adapters)->toContain("'owner',")
         ->and($adapters)->toContain("'created',")
         ->and($adapters)->toContain("'status',");
@@ -231,9 +231,10 @@ it('does not migrate Tickets Deals board or invent QuickRecordDrawer builder or 
     $acceptor = file_get_contents(app_path('Services/Crm/QuoteAcceptor.php'));
     $totals = file_get_contents(app_path('Services/Crm/QuoteTotals.php'));
 
-    expect($tickets)->toContain('ListViewTable')
-        ->and($tickets)->toContain('CrmListFooter')
-        ->and($tickets)->not->toContain('resultMode=');
+    expect($tickets)->toContain('resultMode="shared-table"')
+        ->and($tickets)->toContain('rowHref={ticketRowHref}')
+        ->and($tickets)->not->toContain('ListViewTable')
+        ->and($tickets)->not->toContain('CrmListFooter');
 
     expect($board)->toContain('DealPipelineBoard')
         ->and($board)->toContain('DealLayoutToggle')
