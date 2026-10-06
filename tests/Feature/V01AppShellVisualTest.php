@@ -61,8 +61,8 @@ it('restyles Command OS presentation without a second palette', function () {
     $compat = file_get_contents(resource_path('js/components/crm/command-palette.tsx'));
 
     expect(file_exists(resource_path('js/components/aurora/command-palette.tsx')))->toBeFalse();
-    expect($product)->toContain('560px')
-        ->and($product)->toContain('min(560px,calc(100vw-2rem))')
+    expect($product)->toContain('640px')
+        ->and($product)->toContain('min(640px,calc(100vw-2rem))')
         ->and($product)->toContain('h-11')
         ->and($product)->toContain('rounded-[12px]')
         ->and($product)->toContain('data-[selected=true]:bg-[var(--evo-teal-soft)]')

@@ -1,22 +1,31 @@
 <?php
 
-it('keeps one 212px cabinet with modes as tablist and cmdk as the only command surface', function () {
+it('keeps one 224/56 cabinet with cmdk as the only command surface', function () {
     $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
     $shell = file_get_contents(resource_path('js/components/shell/evo-shell.tsx'));
+    $nav = file_get_contents(resource_path('js/components/shell/product-nav.ts'));
     $switch = file_get_contents(resource_path('js/evo/shell/mode-switch.tsx'));
     $palette = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
     $css = file_get_contents(resource_path('css/evo-shell.css'));
+    $tokens = file_get_contents(resource_path('js/evo/tokens/evo.css'));
     $agents = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
 
-    expect($css)->toContain('width: 212px')
+    expect($tokens)->toContain('--evo-rail: 224px')
+        ->and($tokens)->toContain('--evo-rail-collapsed: 56px')
+        ->and($css)->toContain('width: var(--evo-rail)')
+        ->and($css)->toContain('width: var(--evo-rail-collapsed)')
+        ->and($css)->not->toContain('width: 212px')
         ->and($css)->toContain('transform: translateX(16px)')
         ->and($css)->toContain('transform: translateX(-12px)')
         ->and($css)->toContain('var(--evo-duration-micro)')
         ->and($css)->not->toContain('150ms ease')
+        ->and($switch)->toContain('Retired from the live rail')
         ->and($switch)->toContain('role="tablist"')
         ->and($switch)->toContain("t(item.label)")
         ->and($switch)->toContain("label: 'Search'")
-        ->and($rail)->toContain('ShellModeSwitch')
+        ->and($rail)->not->toContain('ShellModeSwitch')
+        ->and($nav)->toContain("id: 'agents'")
+        ->and($nav)->toContain("href: '/agents'")
         ->and($rail)->not->toContain('@astryxdesign')
         ->and($rail)->not->toContain('lucide-react')
         ->and($shell)->toContain('CommandPalette')

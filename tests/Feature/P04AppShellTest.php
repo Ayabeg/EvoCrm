@@ -1,67 +1,68 @@
 <?php
 
-it('locks the app-aware rail IA, paper tokens, and simple-mode hook', function () {
-    $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+it('locks the live rail IA, paper tokens, and simple-mode hook', function () {
+    $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $nav = file_get_contents(resource_path('js/components/shell/product-nav.ts'));
 
-    expect($rail)->toContain("type AppId = 'vendre' | 'desk' | 'outbound' | 'ads' | 'reports'")
-        ->and($rail)->toContain("label: 'Home'")
-        ->and($rail)->toContain("href: '/dashboard'")
-        ->and($rail)->toContain("label: 'Vendre'")
-        ->and($rail)->toContain("href: '/crm/contacts'")
-        ->and($rail)->toContain("href: '/crm/companies'")
-        ->and($rail)->toContain("href: '/crm/deals'")
-        ->and($rail)->toContain("activePaths: ['/crm/deals/board']")
-        ->and($rail)->toContain("href: '/inbox'")
-        ->and($rail)->toContain("href: '/crm/activities'")
-        ->and($rail)->toContain("href: '/crm/quotes'")
-        ->and($rail)->toContain("label: 'Lead captures'")
-        ->and($rail)->toContain("href: '/crm/workflows'")
-        ->and($rail)->toContain("href: '/crm/leads'")
-        ->and($rail)->toContain("href: '/crm/tickets'")
-        ->and($rail)->toContain("href: '/crm/segments'")
-        ->and($rail)->toContain("href: '/ads'")
-        ->and($rail)->toContain("href: '/reports'")
-        ->and($rail)->toContain("href: '/outbound'")
-        ->and($rail)->toContain("href: '/settings'")
-        ->and($rail)->toContain("localStorage.getItem('evo:nav-app')")
-        ->and($rail)->toContain("localStorage.setItem('evo:nav-app'")
-        ->and($rail)->toContain('data-nav="crm-objects"')
+    expect($nav)->toContain("id: 'home'")
+        ->and($nav)->toContain("href: '/dashboard'")
+        ->and($nav)->toContain("href: '/crm/contacts'")
+        ->and($nav)->toContain("href: '/crm/companies'")
+        ->and($nav)->toContain("href: '/crm/deals'")
+        ->and($nav)->toContain("href: '/crm/deals/board'")
+        ->and($nav)->toContain("href: '/inbox'")
+        ->and($nav)->toContain("href: '/crm/activities'")
+        ->and($nav)->toContain("href: '/crm/quotes'")
+        ->and($nav)->toContain("href: '/crm/leads'")
+        ->and($nav)->toContain("href: '/crm/tickets'")
+        ->and($nav)->toContain("href: '/crm/segments'")
+        ->and($nav)->toContain("href: '/ads'")
+        ->and($nav)->toContain("href: '/reports'")
+        ->and($nav)->toContain("href: '/outbound'")
+        ->and($nav)->toContain("href: '/settings'")
+        ->and($nav)->toContain("id: 'agents'")
+        ->and($nav)->toContain("href: '/agents'")
         ->and($rail)->toContain('useSimpleMode')
-        ->and($rail)->toContain('bg-sidebar-accent')
-        ->and($rail)->toContain("from '@phosphor-icons/react'")
+        ->and($rail)->toContain('visibleSections')
         ->and($rail)->not->toContain('lucide-react')
-        ->and($rail)->not->toContain("label: 'Pipeline'")
-        ->and($rail)->not->toContain("id: 'pipeline'")
         ->and($rail)->not->toContain('#0176D3')
-        ->and($rail)->not->toContain('#00A4BD')
-        ->and($rail)->not->toContain('#000000');
+        ->and($rail)->not->toContain('#00A4BD');
 });
 
-it('locks P04 desktop 64/240 widths and the 240px labeled mobile Sheet', function () {
+it('locks P0.1 desktop 224/56 widths and a 224px mobile overlay Sheet', function () {
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
-    $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+    $tokens = file_get_contents(resource_path('js/evo/tokens/evo.css'));
+    $css = file_get_contents(resource_path('css/evo-shell.css'));
+    $persist = file_get_contents(resource_path('js/components/shell/rail-state.ts'));
 
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "240px"')
-        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "64px"')
-        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "240px"')
+    expect($tokens)->toContain('--evo-rail: 224px')
+        ->and($tokens)->toContain('--evo-rail-collapsed: 56px')
+        ->and($css)->toContain('width: var(--evo-rail)')
+        ->and($css)->toContain('width: var(--evo-rail-collapsed)')
+        ->and($css)->not->toContain('width: 212px')
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH = "224px"')
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "56px"')
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "224px"')
         ->and($sidebar)->toContain('sidebar_state')
         ->and($sidebar)->toContain('<SheetContent')
-        ->and($rail)->toContain("const labeled = isMobile || state === 'expanded'")
-        ->and($rail)->toContain('text-[13px]');
+        ->and($persist)->toContain('sidebar_state')
+        ->and($persist)->toContain('writeSidebarCookie');
 });
 
-it('locks the P04 topbar search, command shortcut, and Ask Evo · Create · Tasks · Profile', function () {
-    $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+it('locks rail search, command shortcut, and Create · Tasks · Profile — no top bar', function () {
+    $layout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
     $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $shell = file_get_contents(resource_path('js/components/shell/evo-shell.tsx'));
 
-    expect($rail)->toContain('Search EvoCRM')
-        ->and($rail)->toContain('/crm/command/search')
-        ->and(file_get_contents(resource_path('js/components/shell/evo-shell.tsx')))->toContain('useCommandPaletteShortcut')
+    expect($layout)->not->toContain('AppSidebarHeader')
+        ->and($layout)->not->toContain('app-topbar')
+        ->and($rail)->toContain('Search EvoCRM')
+        ->and($rail)->toContain('data-chrome="search"')
+        ->and($shell)->toContain('useCommandPaletteShortcut')
         ->and($rail)->toContain('account menu')
-        ->and($header)->toContain("t('Ask Evo')")
-        ->and($header)->toContain("t('Create')")
-        ->and($header)->toContain("t('Tasks')")
-        ->and($header)->toContain('/crm/quotes?create=1')
-        ->and($header)->not->toContain('Find a record or page')
-        ->and($header)->not->toContain('aria-label="Help"');
+        ->and($rail)->toContain("t('Create')")
+        ->and($rail)->toContain("t('Tasks')")
+        ->and($rail)->toContain('/crm/quotes?create=1')
+        ->and($rail)->not->toContain('Find a record or page')
+        ->and($rail)->not->toContain('aria-label="Help"');
 });

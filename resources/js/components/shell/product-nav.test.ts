@@ -93,5 +93,49 @@ describe('hierarchical product navigation', () => {
         expect(ids).not.toContain('outbound');
         expect(ids).not.toContain('ads');
         expect(ids).toContain('crm');
+        expect(ids).toContain('agents');
+    });
+
+    it('keeps SIMPLE_NAV hrefs and hides Agents from Simple Mode', () => {
+        const allowed = new Set([
+            'home',
+            'inbox',
+            'leads',
+            'contacts',
+            'companies',
+            'deals',
+            'quotes',
+            'activities',
+        ]);
+        const simple = visibleSections(true, allowed, features, null);
+        const full = visibleSections(false, null, features, null);
+        const simpleIds = simple.flatMap((section) =>
+            section.items.flatMap((item) => [
+                item.id,
+                ...(item.children ?? []).map((child) => child.id),
+            ]),
+        );
+        const fullIds = full.flatMap((section) =>
+            section.items.map((item) => item.id),
+        );
+
+        expect(simpleIds).toEqual(
+            expect.arrayContaining([
+                'home',
+                'inbox',
+                'contacts',
+                'companies',
+                'leads',
+                'activities',
+                'deals',
+                'quotes',
+            ]),
+        );
+        expect(simpleIds).not.toContain('agents');
+        expect(simpleIds).not.toContain('outbound');
+        expect(fullIds).toContain('agents');
+        expect(NAV_SECTIONS.some((section) => section.id === 'pilot')).toBe(
+            true,
+        );
     });
 });

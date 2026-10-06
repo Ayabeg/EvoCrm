@@ -160,15 +160,16 @@ it('locks the P02 semantic tokens and retires Slate and antique orange', functio
     expect($bridge)->not->toContain('#2e3a45');
 });
 
-it('keeps the P04 rail at 240px expanded, 64px collapsed, and a 240px mobile Sheet', function () {
+it('keeps the P0.1 rail at 224px expanded, 56px collapsed, and a 224px mobile Sheet', function () {
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
 
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "240px"');
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "240px"');
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "64px"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "224px"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "224px"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "56px"');
     expect($sidebar)->toContain('sidebar_state');
     expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "3.5rem"');
     expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "220px"');
+    expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "240px"');
     expect($sidebar)->toContain('<SheetContent');
     expect($sidebar)->toContain('background: "var(--sidebar)"');
     expect($sidebar)->toContain('width: SIDEBAR_WIDTH_MOBILE');
@@ -251,46 +252,48 @@ it('keeps the page shell as a flat Brand canvas with no mesh radials', function 
     expect($shell)->toContain('bg-[var(--aurora-shell-bg)]');
 });
 
-it('paints the topbar as a solid hairline instead of an Aurora panel gradient', function () {
+it('neutralizes leftover topbar CSS so a remount cannot resurrect Aurora glass', function () {
     $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+    $layout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
+    expect($layout)->not->toContain('AppSidebarHeader');
+    expect($header)->toContain('UNMOUNTED');
     expect($header)->toContain('app-topbar');
     expect($header)->not->toContain('linear-gradient(180deg, var(--aurora-panel-strong-top)');
     expect($css)->toContain('.app-topbar');
+    expect($css)->toContain('display: none');
     expect($css)->toContain('background: var(--color-surface)');
     expect($css)->toContain('backdrop-filter: none');
     expect($css)->not->toContain('rgb(247 247 245 / 0.86)');
     expect($css)->not->toMatch('/\.app-topbar[^{]*\{[^}]*color-mix\([^)]*transparent/');
 });
 
-it('names topbar icon-only actions for assistive tech', function () {
-    $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+it('names rail icon-only actions for assistive tech', function () {
+    $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
 
-    expect($header)->toContain("t('Create')");
-    expect($header)->toContain("t('Tasks')");
-    expect(file_get_contents(resource_path('js/components/shell/evo-rail.tsx')))
-        ->toContain("t(':name account menu'");
+    expect($rail)->toContain("t('Create')");
+    expect($rail)->toContain("t('Tasks')");
+    expect($rail)->toContain("t(':name account menu'");
 });
 
-it('keeps the top bar as one honest instrument without a second bell', function () {
-    $header = file_get_contents(resource_path('js/components/app-sidebar-header.tsx'));
+it('keeps the live rail as one honest instrument without a second bell', function () {
+    $liveRail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $layout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
     $palette = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
-    $rail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
+    $deadRail = file_get_contents(resource_path('js/components/app-sidebar.tsx'));
     $css = file_get_contents(resource_path('css/app.css'));
 
-    expect(file_get_contents(resource_path('js/components/shell/evo-rail.tsx')))->toContain('Search EvoCRM');
-    expect($header)->not->toContain('Find or Ask');
-    expect($header)->not->toContain('Find a record or page');
-    expect($header)->not->toContain('unread');
+    expect($layout)->not->toContain('AppSidebarHeader');
+    expect($liveRail)->toContain('Search EvoCRM');
+    expect($liveRail)->toContain('data-chrome="notify"');
+    expect($liveRail)->toContain('data-chrome="create"');
+    expect($liveRail)->not->toContain('Find or Ask');
+    expect($liveRail)->not->toContain('Find a record or page');
+    expect($liveRail)->not->toContain('unread');
     expect($palette)->toContain("t('Search, navigate, create or act')");
     expect($palette)->not->toContain('Search contacts, deals');
-    expect($rail)->not->toContain('Bell');
-    expect($header)->toContain('data-chrome="notify"');
-    expect($header)->toContain('data-chrome="menu"');
-    expect($header)->toContain('data-chrome="ai"');
-    expect($header)->toContain('hidden min-[390px]:block');
-    expect($header)->toContain('data-chrome="menu"');
+    expect($deadRail)->not->toContain('Bell');
     expect($css)->toContain('--app-chrome-height: 48px');
     expect($css)->toContain(".app-topbar [data-chrome='notify']");
     expect($css)->toContain('@media (max-width: 389px)');
