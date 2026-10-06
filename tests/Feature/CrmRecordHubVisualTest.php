@@ -40,6 +40,7 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
 
     $hub = file_get_contents(resource_path('js/components/crm/record-hub.tsx'));
     $chrome = file_get_contents(resource_path('js/components/crm/record-chrome.tsx'));
+    $shell = file_get_contents(resource_path('js/evo/crm/record/RecordWorkspace.tsx'));
     $listTable = file_get_contents(resource_path('js/evo/data/crm-list/table.tsx')).file_get_contents(resource_path('js/evo/data/crm-list/cells.tsx'));
     $dealsShow = file_get_contents(resource_path('js/pages/crm/deals/show.tsx'));
 
@@ -47,7 +48,8 @@ it('keeps CRM record hubs on Aurora adapters without HubSpot chrome or a ListVie
         ->and($hub)->toContain('@/evo/ui/card')
         ->and($hub)->toContain('RECORD_HUB_RADIUS = 12')
         ->and($hub)->toContain('variant="outline"')
-        ->and($chrome)->toContain('AdaptiveWorkspaceShell')
+        ->and($shell)->toContain('export function RecordShell')
+        ->and($chrome)->toContain("from '@/evo/crm/record'")
         ->and($chrome)->toContain('@/evo/ui/tabs')
         ->and($chrome)->toContain('@/evo/ui/card')
         ->and($chrome)->toContain('record-action-group')

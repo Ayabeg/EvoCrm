@@ -24,7 +24,7 @@ export default function DeskThreadCard({
         : inboxHref;
 
     return (
-        <AssociationCard title="Desk + WhatsApp" addHref={href} addLabel={t('Open')}>
+        <AssociationCard title={t('Desk + WhatsApp')} addHref={href} addLabel={t('Open')}>
             {thread?.last_message || thread?.subject ? (
                 <div>
                     <p className="text-[13px] text-ink">
