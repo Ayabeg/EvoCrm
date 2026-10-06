@@ -110,4 +110,4 @@ File: `resources/js/layouts/app/app-sidebar-layout.tsx`
 - Contacts first row y=207 still above blueprint header budget (Agent 06 / list workspace).
 - Settings is still a modal (pre-existing).
 - FR/EN mix on nav labels “Leads” / “Contacts” (i18n copy, not shell).
-- `tsc` still the same 3 pre-existing errors. `scripts/product-rebuild/qa-baseline.sh` on `016e1d70`: Pest 1206/1205 + 1 skip + 1 risky; Vitest 26/90; vite build 15.71s OK; ESLint full-repo **437** (434 errors, 3 warnings) on this VM vs Wave 0 written **389**. Owned P0.1 files are clean; the five import-order / set-state issues this branch introduced were fixed (442 → 437 on the same VM). Do not treat the remaining 389→437 gap as new shell debt without a same-env Wave 0 rerun.
+- `tsc` still the same 3 pre-existing errors. Review-fix head: Pest **1207/1206 + 1 skip + 1 risky** (one new P01 overlay/G-chord lock); Vitest 26/90; vite build OK. First-paint rail now seeds from Inertia `sidebarOpen` (R05-01). P16 Ask Evo lock is on `evo-shell.tsx` (R05-03).
