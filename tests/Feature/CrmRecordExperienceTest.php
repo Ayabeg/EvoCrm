@@ -26,6 +26,7 @@ it('keeps Contact, Company, and Deal records on a shared operable shell', functi
 it('demotes Ask Evo and keeps a single primary record action', function () {
     $ask = file_get_contents(resource_path('js/components/crm/ask-evo-panel.tsx'));
     $chrome = file_get_contents(resource_path('js/components/crm/record-chrome.tsx'));
+    $shell = file_get_contents(resource_path('js/evo/crm/record/RecordWorkspace.tsx'));
     $activity = file_get_contents(resource_path('js/components/crm/record-activity.ts'));
 
     expect($ask)->not->toContain('fixed end-4 bottom-20')
@@ -43,8 +44,8 @@ it('demotes Ask Evo and keeps a single primary record action', function () {
         ->and($chrome)->toContain("label: 'Meet'")
         ->and($chrome)->toContain('WhatsApp')
         ->and($chrome)->toContain('More')
-        ->and($chrome)->toContain('rightLabel = \'Ask Evo\'')
-        ->and($chrome)->toContain('defaultPanel="center"')
+        ->and($shell)->toContain('rightLabel = \'Related\'')
+        ->and($shell)->toContain('defaultPane = \'center\'')
         ->and($activity)->toContain("key: 'overview'")
         ->and($activity)->toContain("key: 'activities'")
         ->and($activity)->toContain("key: 'intelligence'")
