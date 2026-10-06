@@ -10,7 +10,7 @@ export default function AppSidebarLayout({ children }: AppLayoutProps) {
                 {/*
                   AGENT 06 MOUNT POINT — WorkspaceFrame
                   Frame owns scroll on the 10 acceptance routes and keeps
-                  data-shell-scroll="document" for unmigrated routes.
+                  the document scroller for unmigrated routes.
                 */}
                 <WorkspaceFrame>{children}</WorkspaceFrame>
             </EvoShell>

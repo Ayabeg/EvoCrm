@@ -6,6 +6,7 @@ import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 import { LtrValue } from '@/components/ltr-value';
 import { formatDate } from '@/evo/lib/format';
 import { EVO_CHART_STAGE, EVO_CHART_TRACK } from '@/evo/tokens/literal-hex';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import type { ActivationState } from '@/lib/activation';
 import type {
     DashboardMetrics,
@@ -13,7 +14,6 @@ import type {
     DashboardRecentDeal,
     DashboardContext,
 } from '@/lib/dashboard-operating-home';
-import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { t } from '@/lib/i18n';
 import { formatCompactDzd } from '@/lib/money';
 import type { Auth } from '@/types';

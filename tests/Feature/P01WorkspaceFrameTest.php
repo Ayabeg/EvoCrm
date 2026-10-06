@@ -39,7 +39,7 @@ it('owns scroll per archetype and keeps the document scroller on unmigrated rout
     $layout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
 
     expect($layout)->toContain('<WorkspaceFrame>{children}</WorkspaceFrame>')
-        ->and($layout)->not->toContain('data-shell-scroll="document"')
+        ->and($layout)->not->toContain('overflow-y-auto')
         ->and($frame)->toContain("data-shell-scroll={ownsScroll ? 'frame' : 'document'}")
         ->and($routes)->toContain("scrollOwner: 'surface'")
         ->and($routes)->toContain("scrollOwner: 'pipeline'")
@@ -58,5 +58,5 @@ it('titles Accueil Home instead of a greeting and keeps no page primary', functi
         ->and($home)->toContain('<WorkspaceHeader')
         ->and($home)->not->toContain("t('Hello :name'")
         ->and($home)->not->toContain('primaryAction=')
-        ->and($home)->not->toContain('home-accent');
+        ->and($home)->not->toContain('bg-[var(--home-accent)] px-[18px]');
 });

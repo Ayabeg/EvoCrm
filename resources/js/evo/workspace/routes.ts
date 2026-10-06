@@ -2,7 +2,6 @@ import type {
     WorkspaceArchetype,
     WorkspaceRouteResolution,
     WorkspaceScrollOwner,
-    WorkspaceShellScroll,
 } from '@/evo/workspace/types';
 
 const GREETING_RE =
@@ -83,16 +82,19 @@ function resolveAcceptance(path: string): Omit<
         'duplicates',
         'merge',
     ]);
+
     if (contact) {
         return recordColumns();
     }
 
     const company = matchRecord(path, '/crm/companies/', []);
+
     if (company) {
         return recordColumns();
     }
 
     const lead = matchRecord(path, '/crm/leads/', ['captures']);
+
     if (lead) {
         return recordColumns();
     }
