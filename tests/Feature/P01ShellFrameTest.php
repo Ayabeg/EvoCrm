@@ -45,7 +45,7 @@ it('persists collapse through the existing sidebar_state cookie', function () {
         ->and($shell)->toContain('writeSidebarCookie')
         ->and($shell)->toContain('defaultRailExpanded')
         ->and($sidebar)->toContain('sidebar_state')
-        ->and($sidebar)->toContain('Mobile overlay must not overwrite');
+        ->and($sidebar)->toContain('must not overwrite that cookie');
 });
 
 it('keeps SIMPLE_NAV membership exactly as the business contract', function () {
