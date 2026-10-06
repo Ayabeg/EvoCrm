@@ -3,6 +3,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import { RecordSection } from '@/components/crm/record-hub';
 import { Badge } from '@/evo/ui/badge';
 import { Button } from '@/evo/ui/button';
+import { t } from '@/lib/i18n';
 
 export type EnrichmentRunRow = {
     id: number;
@@ -57,7 +58,7 @@ export default function EnrichmentPanel({
 }) {
     return (
         <RecordSection
-            title="Enrichment"
+            title={t('Enrichment')}
             action={
                 <Form
                     action={action}
@@ -73,7 +74,7 @@ export default function EnrichmentPanel({
                             className="h-7 gap-1.5"
                         >
                             <MagnifyingGlass className="size-3.5" aria-hidden />
-                            Enrich
+                            {t('Enrich')}
                         </Button>
                     )}
                 </Form>
@@ -81,9 +82,9 @@ export default function EnrichmentPanel({
         >
             {runs.length === 0 ? (
                 <p className="text-mute">
-                    No enrichment runs yet. Enrich pulls the public website and
-                    Google Places. It never invents an email or WhatsApp
-                    number.
+                    {t(
+                        'No enrichment runs yet. Enrich pulls the public website and Google Places. It never invents an email or WhatsApp number.',
+                    )}
                 </p>
             ) : (
                 <ul className="space-y-3">

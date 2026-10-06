@@ -503,7 +503,7 @@ body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[ari
 
 .dark [data-cabinet='rail'] .app-rail-item[data-active='true'] svg,
 .dark [data-cabinet='rail'] .app-rail-item[aria-current='page'] svg {
-    color: #5EB0C0;
+    color: var(--evo-primary);
 }
 
 .dark [data-crm='contacts-workspace'],
@@ -549,7 +549,7 @@ body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[ari
 .dark [data-crm='contacts-workspace'] [data-ds='saved-views'] a[aria-current='page'],
 .dark [data-crm='deals-workspace'] [data-ds='saved-views'] a[aria-current='page'],
 .dark [data-crm='deals-board'] [data-ds='saved-views'] a[aria-current='page'] {
-    border-bottom-color: #5EB0C0;
+    border-bottom-color: var(--evo-primary);
     background: #0F4C5C;
     color: #e8e8e8;
 }
@@ -572,7 +572,7 @@ body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[ari
 .dark [data-crm='deals-workspace'] [data-crm='stage-pills'] a[aria-current='page'],
 .dark [data-crm='deals-board'] [data-crm='stage-pills'] a[aria-current='page'] {
     color: #e8e8e8;
-    box-shadow: inset 0 -2px 0 #5EB0C0;
+    box-shadow: inset 0 -2px 0 var(--evo-primary);
 }
 
 .dark .contact-record h1,
@@ -588,7 +588,7 @@ body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[ari
 
 .dark .contact-record [role='tab'][data-state='active'] {
     color: #e8e8e8;
-    box-shadow: inset 0 -2px 0 #5EB0C0;
+    box-shadow: inset 0 -2px 0 var(--evo-primary);
 }
 
 @media (min-width: 768px) {
@@ -605,7 +605,7 @@ body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[ari
 }
 
 .dark [data-crm='quotes-workspace'] [data-ds='saved-views'] a[aria-current='page'] {
-    border-bottom-color: #5EB0C0;
+    border-bottom-color: var(--evo-primary);
     color: #e8e8e8;
 }
 
@@ -630,4 +630,62 @@ body:has([data-crm='quotes-workspace']) [data-cabinet='rail'] .app-rail-item[ari
 
 .dark [data-crm='quotes-workspace'] [data-ds='data-table'] tbody tr:hover {
     background: #1c1c1c;
+}
+
+/* Contacts/Tablecn mobile contract: keep the canonical table, but make the
+ * identity, useful context and row selection fit without a clipped desktop
+ * column. The full saved-view column model remains unchanged above 640px. */
+@media (max-width: 639px) {
+    [data-tablecn='data-table'][data-contact-tablecn='contacts'] {
+        overflow-x: hidden;
+    }
+
+    [data-tablecn='data-table'][data-contact-tablecn='contacts'] > div {
+        overflow-x: hidden;
+    }
+
+    [data-tablecn='data-table'][data-contact-tablecn='contacts'] table {
+        width: 100% !important;
+        min-width: 0 !important;
+        table-layout: fixed;
+    }
+
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='email'] {
+        width: 38% !important;
+    }
+
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='name'] {
+        width: 62% !important;
+    }
+
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='_select'] {
+        width: 44px !important;
+    }
+
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='phone'],
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='lead_status'],
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='company'],
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='owner'],
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='city'],
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='wilaya'],
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='last_activity_at'],
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-column='created_at'] {
+        display: none;
+    }
+
+    [data-tablecn='data-table'][data-contact-tablecn='contacts']
+        [data-contact-table-row] {
+        height: 48px;
+    }
 }

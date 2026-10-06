@@ -101,7 +101,14 @@ export function ContactIdentityCell({
                 <span className="block truncate text-[13px] leading-[18px] font-medium text-ink" dir="auto" title={name}>
                     {name}
                 </span>
-                {secondary ? <span className="sr-only">{secondary}</span> : null}
+                {secondary ? (
+                    <span
+                        className="hidden truncate text-[11px] leading-4 text-[var(--evo-ink-secondary)] max-[639px]:block"
+                        title={secondary}
+                    >
+                        {secondary}
+                    </span>
+                ) : null}
             </span>
         </>
     );

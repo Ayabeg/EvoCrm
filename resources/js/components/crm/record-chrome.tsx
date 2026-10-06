@@ -14,7 +14,7 @@ import {
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { LogCallForm } from '@/components/crm/activity-composer';
-import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
+export { RecordBack, RecordShell } from '@/evo/crm/record';
 import { Button } from '@/evo/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/evo/ui/card';
 import {
@@ -26,18 +26,6 @@ import {
 import { Input } from '@/evo/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/evo/ui/tabs';
 import { t } from '@/lib/i18n';
-import { cn } from '@/lib/utils';
-
-export function RecordBack({ href, label }: { href: string; label: string }) {
-    return (
-        <Link
-            href={href}
-            className="inline-flex items-center text-[11px] font-medium text-mute hover:text-ink"
-        >
-            ← {t(label)}
-        </Link>
-    );
-}
 
 type ActionType = 'note' | 'email' | 'call' | 'task' | 'meeting';
 
@@ -99,12 +87,12 @@ export function RecordActions({
                         type="button"
                         size="sm"
                         variant="ghost"
-                        title="WhatsApp"
+                                title={t('WhatsApp')}
                         className="h-8 px-2 text-[12px] font-medium"
                     >
                         <Link href={whatsappHref}>
                             <ChatCircle className="size-3.5" aria-hidden />
-                            WhatsApp
+                            {t('WhatsApp')}
                         </Link>
                     </Button>
                     <DropdownMenu>
@@ -282,43 +270,6 @@ export function RecordActions({
                 </Form>
             ) : null}
         </div>
-    );
-}
-
-export function RecordShell({
-    left,
-    center,
-    right,
-    leftLabel = 'About',
-    centerLabel = 'Workspace',
-    rightLabel = 'Ask Evo',
-    leftClassName,
-    centerClassName,
-    rightClassName,
-}: {
-    left: ReactNode;
-    center: ReactNode;
-    right: ReactNode;
-    leftLabel?: string;
-    centerLabel?: string;
-    rightLabel?: string;
-    leftClassName?: string;
-    centerClassName?: string;
-    rightClassName?: string;
-}) {
-    return (
-        <AdaptiveWorkspaceShell
-            left={left}
-            center={center}
-            right={right}
-            leftLabel={leftLabel}
-            centerLabel={centerLabel}
-            rightLabel={rightLabel}
-            defaultPanel="center"
-            leftClassName={cn('md:px-4 md:py-4', leftClassName)}
-            centerClassName={cn('sm:px-5 sm:py-4', centerClassName)}
-            rightClassName={cn('md:px-4 md:py-4', rightClassName)}
-        />
     );
 }
 
