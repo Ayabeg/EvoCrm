@@ -1,11 +1,11 @@
 {
-  "capturedAt": "2026-10-06T18:25:03.897Z",
-  "commit": "fd70e0708de3f872709728ae6a0d17acb5ccce9e",
+  "capturedAt": "2026-10-06T18:53:42.661Z",
+  "commit": "0046706e5e034fd2e2fc5b9cb9aa928644c09b50",
   "baseUrl": "http://127.0.0.1:8000",
   "email": "owner@evosales.local",
   "seeded": {
     "workspace": "Evotechly",
-    "simple_mode": true,
+    "simple_mode": false,
     "inbox_url": "https://desk.evotechly.com",
     "contact": 1,
     "company": 1,
@@ -378,31 +378,35 @@
         "inset": null,
         "firstUseful": {
           "x": 241,
-          "y": 368,
+          "y": 717,
           "width": 1240,
           "height": 37,
           "selectorHint": "TR",
           "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
         },
-        "contentStartY": 368,
+        "contentStartY": 717,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 4,
+        "toolbarRowCount": 5,
         "toolbarBands": [
           {
             "y": 0,
             "height": 64
           },
           {
-            "y": 101,
+            "y": 77,
+            "height": 34
+          },
+          {
+            "y": 450,
             "height": 39
           },
           {
-            "y": 196,
+            "y": 545,
             "height": 36
           },
           {
-            "y": 244,
+            "y": 593,
             "height": 74
           }
         ],
@@ -411,7 +415,7 @@
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 35
+          "overflowingChildCount": 21
         },
         "language": {
           "frenchMarkers": [
@@ -465,44 +469,79 @@
         "inset": null,
         "firstUseful": {
           "x": 234,
-          "y": 393,
+          "y": 793,
           "width": 259,
           "height": 150,
           "selectorHint": "DIV",
           "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
         },
-        "contentStartY": 393,
+        "contentStartY": 793,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 5,
+        "toolbarRowCount": 6,
         "toolbarBands": [
           {
             "y": 0,
             "height": 64
           },
           {
-            "y": 92,
+            "y": 64,
             "height": 51
           },
           {
-            "y": 156,
+            "y": 128,
             "height": 34
           },
           {
-            "y": 196,
+            "y": 501,
+            "height": 39
+          },
+          {
+            "y": 596,
             "height": 36
           },
           {
-            "y": 244,
+            "y": 644,
             "height": 74
           }
         ],
-        "nestedScrollCount": 0,
-        "nestedScrollers": [],
+        "nestedScrollCount": 5,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "scrollHeight": 459,
+            "clientHeight": 254
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "scrollHeight": 461,
+            "clientHeight": 254
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "scrollHeight": 461,
+            "clientHeight": 254
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "scrollHeight": 461,
+            "clientHeight": 254
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "scrollHeight": 305,
+            "clientHeight": 254
+          }
+        ],
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 54
+          "overflowingChildCount": 45
         },
         "language": {
           "frenchMarkers": [
@@ -840,16 +879,16 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 127,
+          "y": 79,
           "width": 1216,
-          "height": 873,
+          "height": 921,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 127,
+        "contentStartY": 79,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -857,10 +896,6 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
@@ -920,16 +955,16 @@
         "inset": null,
         "firstUseful": {
           "x": 803,
-          "y": 236,
+          "y": 188,
           "width": 341,
-          "height": 500,
+          "height": 548,
           "selectorHint": "DIV",
           "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
         },
-        "contentStartY": 236,
+        "contentStartY": 188,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -937,10 +972,6 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
@@ -950,7 +981,7 @@
             "tag": "ASIDE",
             "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white",
             "scrollHeight": 1313,
-            "clientHeight": 873
+            "clientHeight": 921
           }
         ],
         "overflow": {
@@ -1588,31 +1619,35 @@
         "inset": null,
         "firstUseful": {
           "x": 241,
-          "y": 412,
+          "y": 761,
           "width": 1240,
           "height": 37,
           "selectorHint": "TR",
           "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
         },
-        "contentStartY": 412,
+        "contentStartY": 761,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 4,
+        "toolbarRowCount": 5,
         "toolbarBands": [
           {
             "y": 0,
             "height": 64
           },
           {
-            "y": 101,
+            "y": 77,
+            "height": 34
+          },
+          {
+            "y": 450,
             "height": 39
           },
           {
-            "y": 196,
+            "y": 545,
             "height": 80
           },
           {
-            "y": 288,
+            "y": 637,
             "height": 74
           }
         ],
@@ -1621,7 +1656,7 @@
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 48
+          "overflowingChildCount": 18
         },
         "language": {
           "frenchMarkers": [
@@ -1675,69 +1710,79 @@
         "inset": null,
         "firstUseful": {
           "x": 234,
-          "y": 437,
+          "y": 837,
           "width": 259,
           "height": 150,
           "selectorHint": "DIV",
           "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
         },
-        "contentStartY": 437,
+        "contentStartY": 837,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 5,
+        "toolbarRowCount": 6,
         "toolbarBands": [
           {
             "y": 0,
             "height": 64
           },
           {
-            "y": 92,
+            "y": 64,
             "height": 51
           },
           {
-            "y": 156,
+            "y": 128,
             "height": 34
           },
           {
-            "y": 196,
+            "y": 501,
+            "height": 39
+          },
+          {
+            "y": 596,
             "height": 80
           },
           {
-            "y": 288,
+            "y": 688,
             "height": 74
           }
         ],
-        "nestedScrollCount": 4,
+        "nestedScrollCount": 5,
         "nestedScrollers": [
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 459,
-            "clientHeight": 428
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 428
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 428
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 428
+            "clientHeight": 254
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "scrollHeight": 305,
+            "clientHeight": 254
           }
         ],
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 88
+          "overflowingChildCount": 44
         },
         "language": {
           "frenchMarkers": [
@@ -2096,16 +2141,16 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 127,
+          "y": 79,
           "width": 1056,
-          "height": 773,
+          "height": 821,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 127,
+        "contentStartY": 79,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -2113,10 +2158,6 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
@@ -2176,16 +2217,16 @@
         "inset": null,
         "firstUseful": {
           "x": 803,
-          "y": 236,
+          "y": 188,
           "width": 181,
-          "height": 400,
+          "height": 448,
           "selectorHint": "DIV",
           "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
         },
-        "contentStartY": 236,
+        "contentStartY": 188,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -2193,10 +2234,6 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
@@ -2206,7 +2243,7 @@
             "tag": "ASIDE",
             "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white",
             "scrollHeight": 1313,
-            "clientHeight": 773
+            "clientHeight": 821
           }
         ],
         "overflow": {
@@ -2818,32 +2855,40 @@
         "inset": null,
         "firstUseful": {
           "x": 73,
-          "y": 412,
+          "y": 761,
           "width": 1240,
           "height": 37,
           "selectorHint": "TR",
           "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
         },
-        "contentStartY": 412,
+        "contentStartY": 761,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 4,
+        "toolbarRowCount": 6,
         "toolbarBands": [
           {
             "y": 0,
             "height": 64
           },
           {
-            "y": 101,
+            "y": 77,
+            "height": 34
+          },
+          {
+            "y": 450,
             "height": 39
           },
           {
-            "y": 196,
+            "y": 545,
             "height": 80
           },
           {
-            "y": 288,
+            "y": 637,
             "height": 74
+          },
+          {
+            "y": 723,
+            "height": 45
           }
         ],
         "nestedScrollCount": 1,
@@ -2858,7 +2903,7 @@
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 36
+          "overflowingChildCount": 9
         },
         "language": {
           "frenchMarkers": [
@@ -2902,37 +2947,25 @@
         },
         "inset": null,
         "firstUseful": {
-          "x": 66,
-          "y": 437,
-          "width": 259,
-          "height": 150,
-          "selectorHint": "DIV",
-          "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
+          "x": 942,
+          "y": 135,
+          "width": 49,
+          "height": 18,
+          "selectorHint": "A",
+          "text": "Voir tous"
         },
-        "contentStartY": 437,
+        "contentStartY": 135,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 5,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
             "height": 64
           },
           {
-            "y": 92,
-            "height": 51
-          },
-          {
-            "y": 156,
-            "height": 34
-          },
-          {
-            "y": 196,
-            "height": 80
-          },
-          {
-            "y": 288,
-            "height": 74
+            "y": 64,
+            "height": 50
           }
         ],
         "nestedScrollCount": 6,
@@ -2947,37 +2980,37 @@
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 459,
-            "clientHeight": 296
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 296
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 296
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 296
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 305,
-            "clientHeight": 296
+            "clientHeight": 254
           }
         ],
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 85
+          "overflowingChildCount": 0
         },
         "language": {
           "frenchMarkers": [
@@ -3298,16 +3331,16 @@
         "inset": null,
         "firstUseful": {
           "x": 56,
-          "y": 127,
+          "y": 79,
           "width": 968,
-          "height": 641,
+          "height": 689,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 127,
+        "contentStartY": 79,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -3315,26 +3348,16 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
-        "nestedScrollCount": 2,
+        "nestedScrollCount": 1,
         "nestedScrollers": [
           {
             "tag": "DIV",
             "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-aut",
             "scrollHeight": 460,
             "clientHeight": 444
-          },
-          {
-            "tag": "DIV",
-            "className": "min-h-0 flex-1 overflow-y-auto",
-            "scrollHeight": 568,
-            "clientHeight": 540
           }
         ],
         "overflow": {
@@ -3380,16 +3403,16 @@
         "inset": null,
         "firstUseful": {
           "x": 635,
-          "y": 236,
+          "y": 188,
           "width": 373,
-          "height": 268,
+          "height": 316,
           "selectorHint": "DIV",
           "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
         },
-        "contentStartY": 236,
+        "contentStartY": 188,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -3397,26 +3420,16 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
-        "nestedScrollCount": 2,
+        "nestedScrollCount": 1,
         "nestedScrollers": [
           {
             "tag": "DIV",
             "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-aut",
             "scrollHeight": 460,
             "clientHeight": 444
-          },
-          {
-            "tag": "DIV",
-            "className": "min-h-0 flex-1 overflow-y-auto",
-            "scrollHeight": 568,
-            "clientHeight": 540
           }
         ],
         "overflow": {
@@ -3976,27 +3989,31 @@
         "inset": null,
         "firstUseful": {
           "x": 17,
-          "y": 532,
+          "y": 881,
           "width": 1240,
           "height": 37,
           "selectorHint": "TR",
           "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
         },
-        "contentStartY": 532,
+        "contentStartY": 881,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 4,
         "toolbarBands": [
           {
             "y": 48,
             "height": 64
           },
           {
-            "y": 149,
+            "y": 125,
+            "height": 34
+          },
+          {
+            "y": 498,
             "height": 39
           },
           {
-            "y": 244,
+            "y": 593,
             "height": 80
           }
         ],
@@ -4005,7 +4022,7 @@
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 78
+          "overflowingChildCount": 28
         },
         "language": {
           "frenchMarkers": [
@@ -4050,65 +4067,75 @@
         "inset": null,
         "firstUseful": {
           "x": 10,
-          "y": 557,
+          "y": 957,
           "width": 259,
           "height": 150,
           "selectorHint": "DIV",
           "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
         },
-        "contentStartY": 557,
+        "contentStartY": 957,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 4,
+        "toolbarRowCount": 5,
         "toolbarBands": [
           {
             "y": 48,
             "height": 64
           },
           {
-            "y": 140,
+            "y": 112,
             "height": 51
           },
           {
-            "y": 204,
+            "y": 176,
             "height": 34
           },
           {
-            "y": 244,
+            "y": 549,
+            "height": 39
+          },
+          {
+            "y": 644,
             "height": 80
           }
         ],
-        "nestedScrollCount": 4,
+        "nestedScrollCount": 5,
         "nestedScrollers": [
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 459,
-            "clientHeight": 432
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 432
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 432
+            "clientHeight": 254
           },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
             "scrollHeight": 461,
-            "clientHeight": 432
+            "clientHeight": 254
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "scrollHeight": 305,
+            "clientHeight": 254
           }
         ],
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 128
+          "overflowingChildCount": 63
         },
         "language": {
           "frenchMarkers": [
@@ -4378,16 +4405,16 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 195,
+          "y": 147,
           "width": 768,
-          "height": 829,
+          "height": 877,
           "selectorHint": "DIV",
           "text": "Dossiers\nBoîte de réception\nConversation\n\nBoîte de réception\n\n8\n\nFiltrer les con"
         },
-        "contentStartY": 195,
+        "contentStartY": 147,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 48,
@@ -4395,10 +4422,6 @@
           },
           {
             "y": 90,
-            "height": 48
-          },
-          {
-            "y": 138,
             "height": 57
           }
         ],
@@ -4447,16 +4470,16 @@
         "inset": null,
         "firstUseful": {
           "x": 338,
-          "y": 341,
+          "y": 293,
           "width": 414,
-          "height": 419,
+          "height": 467,
           "selectorHint": "DIV",
           "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
         },
-        "contentStartY": 341,
+        "contentStartY": 293,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 4,
+        "toolbarRowCount": 3,
         "toolbarBands": [
           {
             "y": 48,
@@ -4464,14 +4487,10 @@
           },
           {
             "y": 90,
-            "height": 48
-          },
-          {
-            "y": 138,
             "height": 57
           },
           {
-            "y": 195,
+            "y": 147,
             "height": 37
           }
         ],
@@ -4981,19 +5000,36 @@
         "contentStartY": null,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 3,
         "toolbarBands": [
           {
             "y": 48,
             "height": 64
           },
           {
-            "y": 149,
+            "y": 125,
+            "height": 34
+          },
+          {
+            "y": 445,
             "height": 85
           }
         ],
-        "nestedScrollCount": 0,
-        "nestedScrollers": [],
+        "nestedScrollCount": 2,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "flex h-full min-h-0 flex-col text-ink min-w-0 overflow-x-hidden bg-white",
+            "scrollHeight": 929,
+            "clientHeight": 884
+          },
+          {
+            "tag": "DIV",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "scrollHeight": 311,
+            "clientHeight": 265
+          }
+        ],
         "overflow": {
           "documentX": false,
           "documentY": false,
@@ -5041,37 +5077,35 @@
         },
         "inset": null,
         "firstUseful": {
-          "x": 10,
-          "y": 766,
-          "width": 259,
-          "height": 150,
-          "selectorHint": "DIV",
-          "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
+          "x": 348,
+          "y": 177,
+          "width": 49,
+          "height": 18,
+          "selectorHint": "A",
+          "text": "Voir tous"
         },
-        "contentStartY": 766,
+        "contentStartY": 177,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 4,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 48,
             "height": 64
           },
           {
-            "y": 140,
-            "height": 51
-          },
-          {
-            "y": 204,
-            "height": 34
-          },
-          {
-            "y": 711,
-            "height": 47
+            "y": 112,
+            "height": 44
           }
         ],
-        "nestedScrollCount": 5,
+        "nestedScrollCount": 6,
         "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "scrollHeight": 311,
+            "clientHeight": 248
+          },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
@@ -5106,7 +5140,7 @@
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 116
+          "overflowingChildCount": 6
         },
         "language": {
           "frenchMarkers": [
@@ -5376,16 +5410,16 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 215,
+          "y": 167,
           "width": 430,
-          "height": 717,
+          "height": 765,
           "selectorHint": "DIV",
           "text": "Dossiers\nBoîte de réception\nConversation\n\nBoîte de réception\n\n8\n\nFiltrer les con"
         },
-        "contentStartY": 215,
+        "contentStartY": 167,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 48,
@@ -5393,10 +5427,6 @@
           },
           {
             "y": 90,
-            "height": 48
-          },
-          {
-            "y": 138,
             "height": 77
           }
         ],
@@ -5447,7 +5477,7 @@
         "contentStartY": null,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 14,
+        "toolbarRowCount": 13,
         "toolbarBands": [
           {
             "y": 48,
@@ -5455,54 +5485,50 @@
           },
           {
             "y": 90,
-            "height": 48
-          },
-          {
-            "y": 138,
             "height": 77
           },
           {
-            "y": 215,
+            "y": 167,
             "height": 37
           },
           {
-            "y": 252,
+            "y": 204,
             "height": 69
           },
           {
-            "y": 282,
+            "y": 234,
             "height": 32
           },
           {
-            "y": 321,
+            "y": 273,
             "height": 71
           },
           {
-            "y": 392,
+            "y": 344,
             "height": 71
           },
           {
-            "y": 463,
+            "y": 415,
             "height": 71
           },
           {
-            "y": 534,
+            "y": 486,
             "height": 71
           },
           {
-            "y": 605,
+            "y": 557,
             "height": 71
           },
           {
-            "y": 676,
+            "y": 628,
             "height": 71
           },
           {
-            "y": 747,
+            "y": 699,
             "height": 71
           },
           {
-            "y": 818,
+            "y": 770,
             "height": 71
           }
         ],
@@ -5994,19 +6020,36 @@
         "contentStartY": null,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 3,
         "toolbarBands": [
           {
             "y": 48,
             "height": 64
           },
           {
-            "y": 149,
+            "y": 125,
+            "height": 34
+          },
+          {
+            "y": 406,
             "height": 85
           }
         ],
-        "nestedScrollCount": 0,
-        "nestedScrollers": [],
+        "nestedScrollCount": 2,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "flex h-full min-h-0 flex-col text-ink min-w-0 overflow-x-hidden bg-white",
+            "scrollHeight": 841,
+            "clientHeight": 796
+          },
+          {
+            "tag": "DIV",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "scrollHeight": 311,
+            "clientHeight": 231
+          }
+        ],
         "overflow": {
           "documentX": false,
           "documentY": false,
@@ -6054,37 +6097,35 @@
         },
         "inset": null,
         "firstUseful": {
-          "x": 10,
-          "y": 766,
-          "width": 259,
-          "height": 150,
-          "selectorHint": "DIV",
-          "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
+          "x": 308,
+          "y": 173,
+          "width": 49,
+          "height": 18,
+          "selectorHint": "A",
+          "text": "Voir tous"
         },
-        "contentStartY": 766,
+        "contentStartY": 173,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 4,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 48,
             "height": 64
           },
           {
-            "y": 140,
-            "height": 51
-          },
-          {
-            "y": 204,
-            "height": 34
-          },
-          {
-            "y": 711,
-            "height": 47
+            "y": 112,
+            "height": 40
           }
         ],
-        "nestedScrollCount": 5,
+        "nestedScrollCount": 6,
         "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "scrollHeight": 311,
+            "clientHeight": 216
+          },
           {
             "tag": "DIV",
             "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
@@ -6119,7 +6160,7 @@
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 86
+          "overflowingChildCount": 6
         },
         "language": {
           "frenchMarkers": [
@@ -6403,16 +6444,16 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 215,
+          "y": 167,
           "width": 390,
-          "height": 629,
+          "height": 677,
           "selectorHint": "DIV",
           "text": "Dossiers\nBoîte de réception\nConversation\n\nBoîte de réception\n\n8\n\nFiltrer les con"
         },
-        "contentStartY": 215,
+        "contentStartY": 167,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 48,
@@ -6420,22 +6461,11 @@
           },
           {
             "y": 90,
-            "height": 48
-          },
-          {
-            "y": 138,
             "height": 77
           }
         ],
-        "nestedScrollCount": 1,
-        "nestedScrollers": [
-          {
-            "tag": "DIV",
-            "className": "min-h-0 flex-1 overflow-y-auto",
-            "scrollHeight": 568,
-            "clientHeight": 523
-          }
-        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
         "overflow": {
           "documentX": false,
           "documentY": false,
@@ -6489,62 +6519,55 @@
           },
           {
             "y": 90,
-            "height": 48
-          },
-          {
-            "y": 138,
             "height": 77
           },
           {
-            "y": 215,
+            "y": 167,
             "height": 37
           },
           {
-            "y": 252,
+            "y": 204,
             "height": 69
           },
           {
-            "y": 282,
+            "y": 234,
             "height": 32
           },
           {
-            "y": 321,
+            "y": 273,
             "height": 71
           },
           {
-            "y": 392,
+            "y": 344,
             "height": 71
           },
           {
-            "y": 463,
+            "y": 415,
             "height": 71
           },
           {
-            "y": 534,
+            "y": 486,
             "height": 71
           },
           {
-            "y": 605,
+            "y": 557,
             "height": 71
           },
           {
-            "y": 676,
+            "y": 628,
             "height": 71
           },
           {
-            "y": 747,
+            "y": 699,
+            "height": 71
+          },
+          {
+            "y": 770,
             "height": 71
           }
         ],
-        "nestedScrollCount": 1,
-        "nestedScrollers": [
-          {
-            "tag": "DIV",
-            "className": "min-h-0 flex-1 overflow-y-auto",
-            "scrollHeight": 568,
-            "clientHeight": 523
-          }
-        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
         "overflow": {
           "documentX": false,
           "documentY": false,
@@ -6992,16 +7015,16 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 127,
+          "y": 79,
           "width": 1216,
-          "height": 873,
+          "height": 921,
           "selectorHint": "DIV",
           "text": "INBOX\n\nAll\n8\nUnassigned\n1\nAssigned to me\n7\nAll open\n4\nWhatsApp\n0\nWhatsApp Busine"
         },
-        "contentStartY": 127,
+        "contentStartY": 79,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -7009,10 +7032,6 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
@@ -7260,16 +7279,16 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 127,
+          "y": 79,
           "width": 1216,
-          "height": 873,
+          "height": 921,
           "selectorHint": "DIV",
           "text": "صندوق الوارد\n\nالكل\n8\nغير معيّن\n1\nالمعيّن لي\n7\nالكل المفتوح\n4\nWhatsApp\n0\nWhatsApp"
         },
-        "contentStartY": 127,
+        "contentStartY": 79,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -7277,10 +7296,6 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],
@@ -7558,16 +7573,16 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 127,
+          "y": 79,
           "width": 1216,
-          "height": 873,
+          "height": 921,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 127,
+        "contentStartY": 79,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 0,
@@ -7575,10 +7590,6 @@
           },
           {
             "y": 42,
-            "height": 48
-          },
-          {
-            "y": 90,
             "height": 37
           }
         ],

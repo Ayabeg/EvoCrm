@@ -1,7 +1,7 @@
 # P0.1 FRAME-NOTES (Agent 06)
 
 **Branch:** `rebuild/p01-workspace-frame`  
-**Base:** `rebuild/p01-shell` `22b14d1`  
+**Base:** `rebuild/p01-shell` `f27fbfca` (merged; Agent 05 advanced past `22b14d1`)  
 **PR:** draft #291 — *P0.1 workspace frame (Gate A, do not merge)*  
 **Host:** `http://127.0.0.1:8000` only. DatabaseSeeder + VisualQaSeeder. No deploy, DNS, production, extra records.
 
@@ -52,7 +52,7 @@ The layout file is now AppShell → EvoShell → WorkspaceFrame. Do not put head
 | `/settings*` | document | document | frame |
 | Unmigrated | inferred | document | **document** (left in place) |
 
-Capture at 1440: list/board/record acceptance routes report **0 nested overflow-y-auto** except the intended Inbox thread pane and Settings nav column. Deal **record** (not an acceptance route) still has a pane scroller.
+Capture at 1440: list/record acceptance routes report **0 nested overflow-y-auto** except the intended Inbox thread pane and Settings nav column. Deal **record** (not an acceptance route) still has a pane scroller. Restoring the Deals forecast/attention slab shrinks the board columns, so the five pipeline column scrollers overflow again — Wave 2 / C-18 owns those.
 
 ## First-content y @1440 FR light (before = shell / after = this PR)
 
@@ -60,24 +60,24 @@ Measured by `scripts/product-rebuild/capture.mjs` (`contentStartY`).
 
 | Route | Before | After | Notes |
 |---|---:|---:|---|
-| Accueil `/dashboard` | 18 | 29 | First useful is now the Accueil h1 (48px title row), not the 27px greeting. |
+| Accueil `/dashboard` | 18 | 29 | First useful is the Accueil h1 (48px title row), not the 27px greeting. |
 | Contacts | **207** | **209** | Budget ≤150 **not met**. SavedViews + FilterBar + thead still sit in DataWorkspace (not owned). |
 | Companies list | 255 | 238 | Not an acceptance route; header adapter only. |
 | Leads list | 211 | 194 | Not an acceptance route. |
-| Deals list | 715 | 368 | Attention collapsed. Remaining stack is DataWorkspace chrome. |
-| Deals board | **791** | **393** | Budget ≤200 **not met**. Disclosure removed the KPI/attention slab (−398). Remaining: title 48 + views + search/filters + stage pills + column headers (DataWorkspace / board internals). |
+| Deals list | 715 | **717** | Attention queue restored (R06-01). First row is back at the shell-era stack. +2 vs shell is the WorkspaceHeader title row. |
+| Deals board | **791** | **793** | ForecastBar + AttentionQueue restored (R06-01). First card back at the shell-era stack. Budget ≤200 **not met** — Wave 2 / C-18. +2 vs shell is the header adapter. |
 | Contact record | 59 | 22 | |
 | Company record | 35 | 14 | |
 | Lead record | 35 | 14 | |
 | Deal record | 58 | 58 | Not an acceptance route. |
-| Inbox | 79 | 127 | WorkspaceHeader + existing RoomShell tabs. |
-| Inbox thread | 188 | 236 | Same extra title row. |
+| Inbox | 79 | **79** | Conversation header is quiet. Matches the shell baseline. RoomShell tabs remain. |
+| Inbox thread | 188 | **188** | Same quiet header; no extra title row. |
 | Quotes list | 179 | 195 | |
 | Quote document | 31 | 21 | |
 | Settings | 185 | 169 | Modal, document scroll. |
 | Accueil Simple Mode | 18 | 29 | Same header as Full. |
 
-**Blocking the vertical budget (not Wave 1 page composition):** DataWorkspace still renders SavedViews + FilterBar **below** the title row. I must not edit those internals. Board column headers and stage pills are Pipeline internals. If Agent 07/Wave 2 folds views/filters into header slots J–Q, Contacts can approach ≤150 and the board can approach ≤200.
+**Blocking the vertical budget (not Wave 1 page composition):** DataWorkspace still renders SavedViews + FilterBar **below** the title row. I must not edit those internals. Board column headers, stage pills, ForecastBar, and AttentionQueue are Pipeline / Deals internals. If Wave 2 folds views/filters into header slots J–Q and owns Deals composition, Contacts can approach ≤150 and the board can approach ≤200.
 
 ## Visual proof
 
@@ -95,8 +95,8 @@ Not touched: `evo.css`, `evo-shell*`, `evo-rail`, `rail-state`, `app-shell`, `ap
 
 ## Tests added or retargeted
 
-- New Pest `P01WorkspaceFrameTest`: one primary, slot contract, archetype scroll owner, Accueil is not a greeting.
-- New Vitest `workspace.test.ts` (5 cases). Suite **27/95** (was 26/90).
+- Pest `P01WorkspaceFrameTest`: one primary, slot contract, archetype scroll owner, Accueil is not a greeting, Contacts orange fill, Accueil zero page-level orange primaries, Deals banners not in a disclosure, conversation header quiet.
+- Vitest `workspace.test.ts` (6 cases). Suite **27/96** (was 26/90).
 - **Updated, not deleted:**
   - `V02DashboardVisualTest`: `t('Hello :name')` → `title={t('Home')}` + `WorkspaceHeader`.
   - `AgentsShellTest`: `agents-route-page-shell` now asserted on `WorkspaceFrame`.
@@ -121,8 +121,8 @@ None. `--evo-header-title` / `--evo-header-view` / `--evo-header-chip` and `--ev
 ## Remaining P0 / P1 / P2 / P3
 
 **P0 (unfixed, out of ownership)**
-- Contacts first row still above ≤150 (SavedViews + FilterBar live in DataWorkspace).
-- Deals board first card returns to the shell-era stack (forecast + attention + views/filters/stage pills). Wave 2 / C-18 owns that composition. Reported honestly after recapture.
+- Contacts first row y=209 (need SavedViews + FilterBar density inside DataWorkspace).
+- Deals board first card **y=793** and list first row **y=717**. Wave 2 / C-18 owns ForecastBar + AttentionQueue + the rest of the Deals stack. Reported honestly.
 
 **P1**
 - DataWorkspace still owns views + filters as separate bands (HDR-01 not fully composed into slots J–N).
@@ -151,10 +151,10 @@ Zero console errors / pageerrors / requestfailed across 103 shots.
 
 ## qa-baseline.sh (this branch)
 
-| Check | Shell `016e1d70` | This PR |
+| Check | Shell `016e1d70` | This PR (`0046706e` + recapture) |
 |---|---|---|
-| Pest | 1206 tests / 1205 pass + 1 skip + 1 risky | **1210 / 1209 pass + 1 skip + 1 risky** (+4 locks) |
-| Vitest | 26 files / 90 tests | **27 / 95** (+1 file, +5) |
+| Pest | 1206 tests / 1205 pass + 1 skip + 1 risky | **1214 / 1213 pass + 1 skip + 1 risky** |
+| Vitest | 26 files / 90 tests | **27 / 96** |
 | `tsc` | 3 pre-existing errors | **same 3** |
-| Vite build | OK | **OK** (20.96s) |
-| ESLint full-repo | 437 (434 err / 3 warn) on that VM | **436** (433 / 3). Owned files clean. |
+| Vite build | OK | **OK** (16.72s) |
+| ESLint full-repo | 437 (434 err / 3 warn) on that VM | not re-run this pass; owned files unchanged in lint surface |
