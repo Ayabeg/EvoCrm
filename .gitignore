@@ -2,6 +2,7 @@
 **/__pycache__/
 /bootstrap/ssr
 /node_modules
+/scripts/product-rebuild/node_modules
 /public/build
 /resources/design-lab/dist
 /public/fonts-manifest.dev.json
@@ -34,6 +35,9 @@ yarn-error.log
 
 # Local verification artifacts
 screenshots/
+!/artifacts/product-rebuild/
+!/artifacts/product-rebuild/**/screenshots/
+!/artifacts/product-rebuild/**/screenshots/**
 /.next
 
 # Expo / mobile workspace (also ignored inside mobile/)

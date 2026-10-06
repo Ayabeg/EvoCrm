@@ -1,0 +1,9 @@
+{
+    "name": "evocrm-product-rebuild-capture",
+    "private": true,
+    "type": "module",
+    "description": "Reusable Playwright capture matrix for EvoCRM product-rebuild before/after sheets.",
+    "dependencies": {
+        "playwright": "^1.56.1"
+    }
+}
