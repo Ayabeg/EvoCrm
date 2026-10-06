@@ -27,13 +27,14 @@ export function writeSidebarCookie(expanded: boolean): void {
 export function defaultRailExpanded(
     cookie: boolean | null,
     sidebarOpen: boolean,
-    viewportWidth: number,
+    viewportWidth?: number,
 ): boolean {
     if (cookie !== null) {
         return cookie;
     }
 
-    if (typeof window === 'undefined') {
+    // Inertia sidebarOpen is the server-read cookie. Never invent 1440.
+    if (viewportWidth === undefined || typeof window === 'undefined') {
         return sidebarOpen;
     }
 
