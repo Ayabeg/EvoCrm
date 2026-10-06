@@ -20,7 +20,7 @@ import type { AppLocale } from '@/lib/i18n';
 import { isAppLocale, t } from '@/lib/i18n';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
-import type { User } from '@/types';
+import type { User } from '@/types/auth';
 
 type Props = {
     user: User;

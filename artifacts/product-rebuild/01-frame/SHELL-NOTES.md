@@ -21,7 +21,7 @@ The live tree is unchanged: `AppLayout` → `AppSidebarLayout` → `AppShell` �
 | Ask Evo ⌘J | top-bar sparkle | Full Mode only (`features.ask_evo && !simpleMode`). Off in Simple Mode (C-07). |
 | Agents | Menu / Agents / Search pill | Pill retired. One Full-mode `product-nav` row under `pilot` (`/agents`). SIMPLE_NAV membership **unchanged** (C-02 OPEN). |
 | Palette | 560px | **640px**, opened from rail Search / ⌘K |
-| Collapse persist | `sidebar_state` cookie written by unused `SidebarProvider` (mobile could clobber) | `rail-state.ts` owns the cookie. Provider no longer writes it. |
+| Collapse persist | `sidebar_state` cookie written by unused `SidebarProvider` (mobile could clobber) | `rail-state.ts` owns the cookie. Provider no longer writes it. First paint seeds `data-collapsed` from Inertia `sidebarOpen` (server-read cookie) — no 1440 SSR snap. |
 
 Tokens in `resources/js/evo/tokens/evo.css` (Wave 1 token owner):
 
@@ -29,6 +29,7 @@ Tokens in `resources/js/evo/tokens/evo.css` (Wave 1 token owner):
 - New sidebar surface `#F0F2EE` (dark `#111111` so the rail is not the same black as canvas `#0A0A0A` / workspace `#121212`).
 - Rail `--evo-rail: 224px` / `--evo-rail-collapsed: 56px`.
 - Density: nav 32, header title/view/chip/toolbar 48/40/36/40, rows 32/36/40 + touch 44, radius panel 8 / chip 6.
+- **Agent 06 consumes `--evo-header-title` / `--evo-header-view` / `--evo-header-chip` (48/40/36)** from this file — Shell is the single token writer; Frame must not redefine them.
 - `--evo-radius-standard` stays **10px** and `--evo-chrome-height` stays **48px** — page consumers still read them. Do not treat those as “shell chrome height.”
 - Deleted leftover rail widths 212 / 240 / 248 from `evo-shell.css`, `approved-v02.css`, and `ui/sidebar.tsx`. Design-lab still shows 212 (out of P0.1 ownership).
 

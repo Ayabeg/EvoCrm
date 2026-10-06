@@ -28,9 +28,9 @@ it('locks one width system: 224 expanded / 56 icon rail', function () {
         ->and($css)->not->toContain('width: 212px')
         ->and($css)->not->toContain('width: 240px')
         ->and($css)->not->toContain('width: 248px')
-        ->and($sidebar)->toContain('const SIDEBAR_WIDTH = "224px"')
-        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "56px"')
-        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "224px"');
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH = "var(--evo-rail)"')
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "var(--evo-rail-collapsed)"')
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "var(--evo-rail)"');
 });
 
 it('persists collapse through the existing sidebar_state cookie', function () {
@@ -43,7 +43,8 @@ it('persists collapse through the existing sidebar_state cookie', function () {
         ->and($persist)->toContain('readSidebarCookie')
         ->and($persist)->toContain('RAIL_EXPAND_MIN = 1280')
         ->and($shell)->toContain('writeSidebarCookie')
-        ->and($shell)->toContain('defaultRailExpanded')
+        ->and($shell)->toContain('!sidebarOpen')
+        ->and($shell)->not->toContain('return 1440')
         ->and($sidebar)->toContain('sidebar_state')
         ->and($sidebar)->toContain('must not overwrite that cookie');
 });
@@ -68,6 +69,22 @@ it('gates Ask Evo Cmd+J on Full Mode via features.ask_evo and simpleMode', funct
         ->and($shell)->toContain('!features.ask_evo || simpleMode')
         ->and($shell)->toContain('openAskEvo()')
         ->and($shell)->toContain('features.ask_evo && !simpleMode');
+});
+
+it('centers overlays logically and lists the G-chord shortcuts on the live sheet', function () {
+    $shell = file_get_contents(resource_path('js/components/shell/evo-shell.tsx'));
+    $palette = file_get_contents(resource_path('js/evo/patterns/command-palette/index.tsx'));
+    $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+
+    expect($shell)->not->toContain('-translate-x-1/2')
+        ->and($palette)->not->toContain('-translate-x-1/2')
+        ->and($shell)->toContain('inset-inline-0')
+        ->and($palette)->toContain('inset-inline-0')
+        ->and($shell)->toContain('G then A')
+        ->and($shell)->toContain('G then V')
+        ->and($shell)->toContain('G then P')
+        ->and($shell)->toContain('G then G')
+        ->and($rail)->toContain("rowClass,\n                                'pe-2 ps-8'");
 });
 
 it('filters hierarchical nav by capability and publishes Agents only in Full Mode', function () {

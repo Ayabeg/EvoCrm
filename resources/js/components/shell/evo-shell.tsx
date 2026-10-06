@@ -5,7 +5,6 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import { EvoRail } from '@/components/shell/evo-rail';
 import {
     RAIL_EXPAND_MIN,
-    defaultRailExpanded,
     readSidebarCookie,
     writeSidebarCookie,
 } from '@/components/shell/rail-state';
@@ -27,10 +26,6 @@ function subscribeViewportWidth(onStoreChange: () => void) {
 
 function getViewportWidth(): number {
     return window.innerWidth;
-}
-
-function getServerViewportWidth(): number {
-    return 1440;
 }
 
 let shellHydrated = false;
@@ -85,24 +80,37 @@ export function EvoShell({ children }: { children: ReactNode }) {
     const isMobile = useIsMobile();
     const { setOpenMobile, openMobile } = useSidebar();
     const { features, simpleMode } = useSimpleMode();
-    const showMobileSheet = useShellHydrated() && isMobile;
+    const hydrated = useShellHydrated();
+    const showMobileSheet = hydrated && isMobile;
     const sidebarOpen = Boolean(page.props.sidebarOpen);
-    const cookie = readSidebarCookie();
+    // document.cookie is missing during SSR. Inertia sidebarOpen is the
+    // server-read sidebar_state — seed first paint from that so a stored
+    // collapse does not snap 224→56 after hydrate.
+    const cookie = hydrated ? readSidebarCookie() : null;
     const viewportWidth = useSyncExternalStore(
         subscribeViewportWidth,
         getViewportWidth,
-        getServerViewportWidth,
+        () => 0,
     );
-    const [pinnedCollapsed, setPinnedCollapsed] = useState(
-        () => !defaultRailExpanded(cookie, sidebarOpen, 1440),
-    );
+    const [pinnedCollapsed, setPinnedCollapsed] = useState(() => !sidebarOpen);
     const [railMode, setRailMode] = useState<'auto' | 'pinned'>(() =>
-        cookie !== null ? 'pinned' : 'auto',
+        sidebarOpen ? 'auto' : 'pinned',
     );
-    const collapsed =
-        railMode === 'pinned' || cookie !== null
+    const collapsed = !hydrated
+        ? !sidebarOpen
+        : cookie !== null
+          ? !cookie
+          : railMode === 'pinned'
             ? pinnedCollapsed
             : viewportWidth < RAIL_EXPAND_MIN;
+    const resolvedRailMode =
+        !hydrated
+            ? sidebarOpen
+                ? 'auto'
+                : 'pinned'
+            : cookie !== null || railMode === 'pinned'
+              ? 'pinned'
+              : 'auto';
     const [paletteOpen, setPaletteOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
@@ -272,7 +280,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
         <div
             className="evo-shell flex h-dvh w-full min-w-0 overflow-hidden"
             data-collapsed={collapsed ? 'true' : 'false'}
-            data-rail={railMode}
+            data-rail={resolvedRailMode}
             data-inbox-rail={inboxActive ? 'hook' : undefined}
         >
             <aside
@@ -339,7 +347,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
                         role="dialog"
                         aria-modal="true"
                         aria-label={t('Shortcuts')}
-                        className="absolute start-1/2 top-[18vh] w-[min(400px,calc(100vw-2rem))] -translate-x-1/2 rounded-[var(--evo-radius-floating)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] p-4 text-[13px] text-[var(--evo-ink)] shadow-[var(--evo-shadow-modal)]"
+                        className="absolute inset-inline-0 top-[18vh] mx-auto w-[min(400px,calc(100vw-2rem))] rounded-[var(--evo-radius-floating)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] p-4 text-[13px] text-[var(--evo-ink)] shadow-[var(--evo-shadow-modal)]"
                     >
                         <h2 className="mb-3 text-[14px] font-medium">
                             {t('Shortcuts')}
@@ -348,10 +356,16 @@ export function EvoShell({ children }: { children: ReactNode }) {
                             <li>⌘K — {t('Search EvoCRM…')}</li>
                             <li>C — {t('Create')}</li>
                             <li>⌘\ — {t('Collapse sidebar')}</li>
+                            <li>G then A — {t('nav.home')}</li>
                             <li>G then C — {t('nav.crm.contacts')}</li>
                             <li>G then D — {t('nav.deals.title')}</li>
                             <li>G then I — {t('nav.inbox')}</li>
+                            <li>G then V — {t('nav.quotes.title')}</li>
+                            <li>G then P — {t('Profile')}</li>
                             <li>G then N — {t('Tasks')}</li>
+                            {!simpleMode ? (
+                                <li>G then G — {t('nav.agents')}</li>
+                            ) : null}
                             {features.ask_evo && !simpleMode ? (
                                 <li>⌘J — {t('Ask Evo')}</li>
                             ) : null}

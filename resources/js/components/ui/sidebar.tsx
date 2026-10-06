@@ -24,10 +24,10 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
 // sidebar_state cookie is owned by EvoShell / rail-state.ts.
-// Mobile overlay only. Desktop rail is EvoShell 224/56.
-const SIDEBAR_WIDTH = "224px"
-const SIDEBAR_WIDTH_MOBILE = "224px"
-const SIDEBAR_WIDTH_ICON = "56px"
+// Mobile overlay only. Desktop rail is EvoShell --evo-rail / --evo-rail-collapsed.
+const SIDEBAR_WIDTH = "var(--evo-rail)"
+const SIDEBAR_WIDTH_MOBILE = "var(--evo-rail)"
+const SIDEBAR_WIDTH_ICON = "var(--evo-rail-collapsed)"
 
 type SidebarContext = {
   state: "expanded" | "collapsed"
