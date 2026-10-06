@@ -569,7 +569,8 @@ function NavGroup({
                                 activeId === child.id ? 'page' : undefined
                             }
                             className={cn(
-                                'evo-nav-link relative flex h-8 items-center rounded-[6px] pe-2 ps-8 text-start text-[13px] text-[var(--evo-ink-secondary)] hover:bg-[var(--evo-sidebar-hover)]',
+                                rowClass,
+                                'pe-2 ps-8',
                                 isNavigationChildActive(path, child) &&
                                     'font-medium text-[var(--evo-teal-ink)]',
                             )}
