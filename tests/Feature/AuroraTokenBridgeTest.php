@@ -163,9 +163,9 @@ it('locks the P02 semantic tokens and retires Slate and antique orange', functio
 it('keeps the P0.1 rail at 224px expanded, 56px collapsed, and a 224px mobile Sheet', function () {
     $sidebar = file_get_contents(resource_path('js/components/ui/sidebar.tsx'));
 
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "224px"');
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "224px"');
-    expect($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "56px"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH = "var(--evo-rail)"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH_MOBILE = "var(--evo-rail)"');
+    expect($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "var(--evo-rail-collapsed)"');
     expect($sidebar)->toContain('sidebar_state');
     expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "3.5rem"');
     expect($sidebar)->not->toContain('const SIDEBAR_WIDTH = "220px"');

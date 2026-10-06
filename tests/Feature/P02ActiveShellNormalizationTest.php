@@ -47,8 +47,8 @@ it('keeps AppLayout on the live 224/56 shell and does not remount the leftover h
         ->and($legacyHeader)->toContain('@deprecated')
         ->and($tokens)->toContain('--evo-rail: 224px')
         ->and($tokens)->toContain('--evo-rail-collapsed: 56px')
-        ->and($sidebar)->toContain('const SIDEBAR_WIDTH = "224px"')
-        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "56px"')
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH = "var(--evo-rail)"')
+        ->and($sidebar)->toContain('const SIDEBAR_WIDTH_ICON = "var(--evo-rail-collapsed)"')
         ->and($sidebar)->toContain('<SheetContent');
 });
 
