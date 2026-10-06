@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { EvoRail } from '@/components/shell/evo-rail';
 import {
+    RAIL_EXPAND_MIN,
     defaultRailExpanded,
     readSidebarCookie,
     writeSidebarCookie,
@@ -17,6 +18,20 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { openAskEvo } from '@/lib/ask-evo';
 import { t } from '@/lib/i18n';
+
+function subscribeViewportWidth(onStoreChange: () => void) {
+    window.addEventListener('resize', onStoreChange);
+
+    return () => window.removeEventListener('resize', onStoreChange);
+}
+
+function getViewportWidth(): number {
+    return window.innerWidth;
+}
+
+function getServerViewportWidth(): number {
+    return 1440;
+}
 
 let shellHydrated = false;
 
@@ -73,12 +88,21 @@ export function EvoShell({ children }: { children: ReactNode }) {
     const showMobileSheet = useShellHydrated() && isMobile;
     const sidebarOpen = Boolean(page.props.sidebarOpen);
     const cookie = readSidebarCookie();
-    const [collapsed, setCollapsed] = useState(
+    const viewportWidth = useSyncExternalStore(
+        subscribeViewportWidth,
+        getViewportWidth,
+        getServerViewportWidth,
+    );
+    const [pinnedCollapsed, setPinnedCollapsed] = useState(
         () => !defaultRailExpanded(cookie, sidebarOpen, 1440),
     );
     const [railMode, setRailMode] = useState<'auto' | 'pinned'>(() =>
         cookie !== null ? 'pinned' : 'auto',
     );
+    const collapsed =
+        railMode === 'pinned' || cookie !== null
+            ? pinnedCollapsed
+            : viewportWidth < RAIL_EXPAND_MIN;
     const [paletteOpen, setPaletteOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
@@ -86,17 +110,9 @@ export function EvoShell({ children }: { children: ReactNode }) {
     const workspace = page.props.workspace as { name?: string } | null;
     const workspaceName = workspace?.name?.trim() || 'EvoCRM';
 
-    useEffect(() => {
-        if (railMode !== 'auto' || cookie !== null) {
-            return;
-        }
-
-        setCollapsed(window.innerWidth < 1280);
-    }, [cookie, railMode]);
-
     const setRailCollapsed = useCallback((next: boolean) => {
         setRailMode('pinned');
-        setCollapsed(next);
+        setPinnedCollapsed(next);
         writeSidebarCookie(!next);
     }, []);
 

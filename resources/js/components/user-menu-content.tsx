@@ -1,5 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { GearSix, SignOut } from '@phosphor-icons/react';
+import { LANGUAGE_OPTIONS } from '@/components/language-selector';
+import { UserInfo } from '@/components/user-info';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -11,8 +13,6 @@ import {
     DropdownMenuSubContent,
     DropdownMenuSubTrigger,
 } from '@/evo/ui/dropdown-menu';
-import { UserInfo } from '@/components/user-info';
-import { LANGUAGE_OPTIONS } from '@/components/language-selector';
 import { useAppearance } from '@/hooks/use-appearance';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';

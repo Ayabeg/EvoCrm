@@ -1,4 +1,5 @@
 ﻿import { Link, usePage } from '@inertiajs/react';
+import { Bell } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { TasksOverlay } from '@/components/crm/tasks-overlay';
@@ -11,7 +12,6 @@ import {
 } from '@/components/shell/product-nav';
 import type { NavItem } from '@/components/shell/product-nav';
 import { UserMenuContent } from '@/components/user-menu-content';
-import { Bell } from '@phosphor-icons/react';
 import { CaretDown, CaretLeft, CaretRight, GearSix, MagnifyingGlass, Plus } from '@/evo/icons';
 import {
     DropdownMenu,
