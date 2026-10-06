@@ -16,8 +16,22 @@ One `WorkspaceFrame` + `WorkspaceHeader` (48 / 40 / 36) at the Agent 06 mount po
 | Record headers | `RecordIdentity` + `RecordBack` inline | Same components, passed as slots. RecordWorkspace left/center/right untouched (C-19). |
 | Quotes document | Own h1 + orange Save lines + orange Envoyer | `WorkspaceHeader` + **Save lines outline**. Envoyer stays the one orange. |
 | Settings | Own page header | `SettingsPageHeader` → `WorkspaceHeader` (document, sticky). Still a modal (Wave 1). |
-| Deals forecast / attention | Full-height blocks (board first card **y=791**) | Closed `<details>` disclosure. Props/query/DnD unchanged (C-18). |
-| Inbox | Inline embed header | `WorkspaceHeader` + existing Desk/Room. `min-h-0` on the panes. |
+| Deals forecast / attention | Full-height blocks (board first card **y=791**) | **Restored.** ForecastBar + AttentionQueue render in the default banner again (C-18 / Wave 2). The closed `<details>` disclosure was reverted — P0.1 does not own Deals page-internal visibility. |
+| Inbox | Inline embed header | Conversation `WorkspaceHeader` is **quiet**: accessible `h1` is `sr-only`, no 48px title row under RoomShell tabs. Embed keeps a slim count/secondary row. Desk/Composer untouched. |
+
+## `app-sidebar-layout.tsx` handshake
+
+Shell left a one-line mount: replace the document-scroller wrapper with `<WorkspaceFrame>{children}</WorkspaceFrame>`. This branch owns that swap. Everything else in the file stays shell-owned.
+
+**Removed from the layout (moved into `WorkspaceFrame`, not deleted from the product):**
+
+| What left the layout | Why |
+|---|---|
+| `usePage()` + path parse | Route → archetype / scroll owner lives in `resolveWorkspaceRoute`. The layout must not keep a second copy of that decision. |
+| `agents-route-page-shell` class | Agents source-locks still need the class. `WorkspaceFrame` applies it when the resolved path is `/agents` or `/agents/…`. |
+| `overflow-y-auto` + `data-shell-scroll="document"` on the wrapper | A layout-level document scroller would nest under frame-owned acceptance routes. Frame sets `data-shell-scroll="frame"` on the 10 routes and `"document"` on unmigrated ones; CSS then chooses `overflow-y: hidden` vs `auto`. |
+
+The layout file is now AppShell → EvoShell → WorkspaceFrame. Do not put header slots or scroll classes back on the layout.
 
 ## Scroll owner per route
 
@@ -92,7 +106,7 @@ Not touched: `evo.css`, `evo-shell*`, `evo-rail`, `rail-state`, `app-shell`, `ap
 
 | ID | Status |
 |---|---|
-| C-18 Deals forecast/attention | **Honored as presentation.** Components still receive the same props. Hidden behind a closed disclosure. |
+| C-18 Deals forecast/attention | **Honored as default visibility.** Same props/query/DnD. Not collapsed by the frame. |
 | C-19 RecordWorkspace slots | **Honored.** left/center/right untouched. |
 | AMB-01 Accueil primary | **Honored.** No slot H. New deal is secondary/neutral. |
 | C-02 Simple nav | **OPEN — not changed.** |
@@ -107,14 +121,20 @@ None. `--evo-header-title` / `--evo-header-view` / `--evo-header-chip` and `--ev
 ## Remaining P0 / P1 / P2 / P3
 
 **P0 (unfixed, out of ownership)**
-- Contacts first row y=209 (need SavedViews + FilterBar density inside DataWorkspace).
-- Deals board first card y=393 (need views/filters/stage-pill stack folded or shortened). Cannot redesign cards/columns.
+- Contacts first row still above ≤150 (SavedViews + FilterBar live in DataWorkspace).
+- Deals board first card returns to the shell-era stack (forecast + attention + views/filters/stage pills). Wave 2 / C-18 owns that composition. Reported honestly after recapture.
 
 **P1**
 - DataWorkspace still owns views + filters as separate bands (HDR-01 not fully composed into slots J–N).
-- Inbox RoomShell tabs + WorkspaceHeader stack (Desk internals).
 - Settings remains a dialog (LAW-09).
 - Quote Resend can still be the orange send (LAW-10 “Renvoyer is never orange” is Documents wave; we only demoted Save lines).
+
+**Review fixes on this pass**
+- R06-01: disclosure reverted on deals list + board.
+- R06-03: conversation header is quiet (no visible title under RoomShell).
+- R06-02: Pest locks Contacts orange primary fill and Accueil zero page-level orange primaries.
+- R06-04: this handshake section.
+- R06-06 / R06-07: no-op ternary and empty primary ruleset removed.
 
 **P2**
 - Companies / Leads lists are not acceptance-migrated (document scroller).

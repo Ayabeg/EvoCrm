@@ -37,25 +37,6 @@
     min-height: 0;
 }
 
-.workspace-disclosure {
-    border-block-end: 1px solid var(--evo-hairline);
-    background: var(--evo-canvas);
-}
-
-.workspace-disclosure > summary {
-    cursor: pointer;
-    list-style-position: outside;
-    padding-block: 0.375rem;
-    padding-inline: var(--gutter, 1rem);
-    font-size: 0.75rem;
-    line-height: 1rem;
-    color: var(--evo-ink-secondary, var(--evo-mute, #6b7780));
-}
-
-.workspace-disclosure > summary::-webkit-details-marker {
-    color: var(--evo-teal, #0f4c5c);
-}
-
 .workspace-header {
     --workspace-header-title: var(--evo-header-title, 48px);
     --workspace-header-view: var(--evo-header-view, 40px);
@@ -120,6 +101,25 @@
     min-height: var(--workspace-header-title);
 }
 
+.workspace-header[data-archetype='conversation'][data-chrome='quiet'] .workspace-header-title {
+    height: auto;
+    min-height: 0;
+}
+
+.workspace-header[data-archetype='conversation'][data-chrome='quiet']:not([data-has-aux='true']) .workspace-header-title {
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+}
+
+.workspace-header[data-archetype='conversation'][data-chrome='quiet'][data-has-aux='true'] .workspace-header-title {
+    min-height: 0;
+    height: auto;
+    padding-block: 0.5rem;
+}
+
 .workspace-header[data-archetype='record'] .workspace-header-title-text {
     font-size: 1.25rem;
     line-height: 1.75rem;
@@ -143,10 +143,6 @@
     justify-content: flex-end;
     gap: 0.5rem;
     margin-inline-start: auto;
-}
-
-.workspace-header-primary :is(button, a, [data-slot='button']) {
-    /* Keep the single orange fill the adapters already pass. */
 }
 
 .workspace-header :focus-visible {

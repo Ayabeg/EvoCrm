@@ -54,12 +54,26 @@ export function WorkspaceHeader({
     const overflowForced = overflowActions.length > 0;
     const showOverflow = overflowForced || Boolean(secondaryActions);
     const primaryCount = primaryAction ? 1 : 0;
+    const conversationQuiet = archetype === 'conversation';
+    const hasTitleAux = Boolean(
+        leading ||
+            context ||
+            count ||
+            status ||
+            meta ||
+            secondaryActions ||
+            primaryAction ||
+            panels ||
+            overflowForced,
+    );
 
     return (
         <header
             className={cn('workspace-header', className)}
             data-workspace="header"
             data-archetype={archetype}
+            data-chrome={conversationQuiet ? 'quiet' : undefined}
+            data-has-aux={hasTitleAux ? 'true' : 'false'}
             data-sticky={sticky ? 'true' : 'false'}
             data-density={density}
             data-has-primary={primaryAction ? 'true' : 'false'}
@@ -93,6 +107,7 @@ export function WorkspaceHeader({
                         className={cn(
                             'workspace-header-title-text text-page-title',
                             LONG_TEXT_CLASS,
+                            conversationQuiet && 'sr-only',
                         )}
                         data-workspace-slot="c"
                         title={raw || undefined}

@@ -58,5 +58,45 @@ it('titles Accueil Home instead of a greeting and keeps no page primary', functi
         ->and($home)->toContain('<WorkspaceHeader')
         ->and($home)->not->toContain("t('Hello :name'")
         ->and($home)->not->toContain('primaryAction=')
-        ->and($home)->not->toContain('bg-[var(--home-accent)] px-[18px]');
+        ->and($home)->not->toContain('bg-[var(--home-accent)] px-[18px]')
+        ->and($home)->not->toContain('bg-[var(--evo-primary)]')
+        ->and($home)->toContain('border-[var(--evo-hairline)] px-3 text-[12px] font-medium text-[var(--evo-ink)]');
+});
+
+it('locks the Contacts primary slot to the orange primary fill', function () {
+    $contacts = file_get_contents(resource_path('js/pages/crm/contacts/index.tsx'));
+    $object = file_get_contents(resource_path('js/components/crm/crm-object-header.tsx'));
+    $header = file_get_contents(resource_path('js/evo/workspace/WorkspaceHeader.tsx'));
+    $button = file_get_contents(resource_path('js/evo/ui/button.tsx'));
+    $morph = file_get_contents(resource_path('js/components/crm/morphing-form.tsx'));
+
+    expect($contacts)->toContain('primaryLabel="Create contact"')
+        ->and($contacts)->toContain('primarySlot=')
+        ->and($object)->toContain('primaryAction={primary}')
+        ->and($header)->toContain('data-workspace-slot="h"')
+        ->and($header)->toContain('data-workspace-primary="true"')
+        ->and($morph)->toContain("buttonVariants({ size: 'sm' })")
+        ->and($button)->toContain('bg-[var(--evo-primary)]')
+        ->and($button)->toContain('text-[var(--evo-on-primary)]');
+});
+
+it('does not hide Deals forecast or attention behind a disclosure', function () {
+    $list = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
+    $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
+
+    expect($list)->not->toContain('<details')
+        ->and($board)->not->toContain('<details')
+        ->and($list)->toContain('<DealAttentionQueue')
+        ->and($board)->toContain('<DealForecastBar')
+        ->and($board)->toContain('<DealAttentionQueue');
+});
+
+it('renders the conversation header without a visible title row', function () {
+    $header = file_get_contents(resource_path('js/evo/workspace/WorkspaceHeader.tsx'));
+    $inbox = file_get_contents(resource_path('js/pages/desk/inbox.tsx'));
+
+    expect($header)->toContain("archetype === 'conversation'")
+        ->and($header)->toContain("data-chrome={conversationQuiet ? 'quiet' : undefined}")
+        ->and($header)->toContain('conversationQuiet && \'sr-only\'')
+        ->and($inbox)->toContain('archetype="conversation"');
 });

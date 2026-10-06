@@ -149,18 +149,12 @@ export default function DealsIndex({
                     }
                     extraQuery={{ pipeline: pipeline.id }}
                     banner={
-                        <details
-                            className="workspace-disclosure"
-                            data-workspace="disclosure"
-                        >
-                            <summary>{t('Attention')}</summary>
-                            <DealAttentionQueue
-                                items={attentionQueue}
-                                basePath="/crm/deals"
-                                activeFilters={activeFilters}
-                                extraQuery={{ pipeline: pipeline.id }}
-                            />
-                        </details>
+                        <DealAttentionQueue
+                            items={attentionQueue}
+                            basePath="/crm/deals"
+                            activeFilters={activeFilters}
+                            extraQuery={{ pipeline: pipeline.id }}
+                        />
                     }
                     selection={{
                         mode: 'uncontrolled',

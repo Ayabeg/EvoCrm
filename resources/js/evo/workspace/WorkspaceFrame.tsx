@@ -9,13 +9,12 @@ export function WorkspaceFrame({ children }: { children: ReactNode }) {
     const agentsActive =
         resolution.path === '/agents' || resolution.path.startsWith('/agents/');
     const ownsScroll = resolution.shellScroll === 'frame';
-    const documentLike = resolution.scrollOwner === 'document';
 
     return (
         <div
             className={`workspace-frame aurora-page-shell min-h-0 min-w-0 overflow-x-clip flex-1 !bg-[var(--aurora-shell-bg)] font-sans${
                 agentsActive ? ' agents-route-page-shell' : ''
-            }${ownsScroll && !documentLike ? '' : ''}`}
+            }`}
             data-workspace-frame=""
             data-archetype={resolution.archetype}
             data-scroll-owner={resolution.scrollOwner}

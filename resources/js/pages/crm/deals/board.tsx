@@ -246,23 +246,17 @@ export default function DealBoard({
                     extraQuery={{ pipeline: pipeline.id }}
                     banner={
                         <>
-                            <details
-                                className="workspace-disclosure"
-                                data-workspace="disclosure"
-                            >
-                                <summary>{t('Attention')}</summary>
-                                <DealForecastBar
-                                    forecast={forecast}
-                                    forecastBand={forecastBand}
-                                    forecastBacktest={forecastBacktest}
-                                />
-                                <DealAttentionQueue
-                                    items={attentionQueue}
-                                    basePath="/crm/deals/board"
-                                    activeFilters={activeFilters}
-                                    extraQuery={{ pipeline: pipeline.id }}
-                                />
-                            </details>
+                            <DealForecastBar
+                                forecast={forecast}
+                                forecastBand={forecastBand}
+                                forecastBacktest={forecastBacktest}
+                            />
+                            <DealAttentionQueue
+                                items={attentionQueue}
+                                basePath="/crm/deals/board"
+                                activeFilters={activeFilters}
+                                extraQuery={{ pipeline: pipeline.id }}
+                            />
                             {deals.length === 0 ? (
                                 <div
                                     className="border-b border-hairline bg-white"

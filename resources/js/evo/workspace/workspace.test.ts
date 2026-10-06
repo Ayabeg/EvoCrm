@@ -61,6 +61,15 @@ describe('workspace header contract', () => {
         expect(homeSource).not.toContain("t('Hello :name'");
         expect(homeSource).toContain('<WorkspaceHeader');
         expect(homeSource).not.toContain('primaryAction=');
+        expect(homeSource).not.toContain('bg-[var(--evo-primary)]');
+    });
+
+    it('hides the conversation title so Inbox does not stack a second chrome row', () => {
+        expect(headerSource).toContain("archetype === 'conversation'");
+        expect(headerSource).toContain(
+            "data-chrome={conversationQuiet ? 'quiet' : undefined}",
+        );
+        expect(headerSource).toContain('conversationQuiet && \'sr-only\'');
     });
 });
 
