@@ -51,8 +51,8 @@ Every failure is **PRE-EXISTING**. Every passing suite is **CURRENTLY GREEN**.
 | `npm test` (`vitest run`) | PASS (exit 0) | **26 files / 89 tests** | CURRENTLY GREEN |
 | `npm run lint:check` | FAIL (exit 1) | **389 problems (386 errors, 3 warnings)** across 114 files | PRE-EXISTING |
 | `npm run build` (`vite build`) | PASS (exit 0) | built in 31.98s; 2 build warnings (chunk size, ineffective dynamic import) | CURRENTLY GREEN (warnings noted) |
-| `composer ci:check` (`php artisan test`) | *pending this revision — filling after the Pest run* | — | — |
-| Headless Playwright authenticated routes | *pending this revision — filling after the browser pass* | — | — |
+| `composer ci:check` (`php artisan test`) | PASS (exit 0) | **1200 tests / 1199 passed / 1 skipped / 1 risky** / 33706 assertions / 58.6s | CURRENTLY GREEN (skip + risky are PRE-EXISTING) |
+| Headless Playwright authenticated routes | PASS | **12/12 routes HTTP 200**; 0 console errors; 0 console warnings; 0 failed network requests | CURRENTLY GREEN |
 
 CI implication: a green GitHub `ci` job can ship the 3 TypeScript errors and the 386 ESLint errors. Wave 1 must not treat “CI green” as “types/lint green.”
 
@@ -103,7 +103,7 @@ These two errors came in with PR #284 as an unused Tablecn contacts adapter. Wav
 | `@typescript-eslint/no-unused-vars` | 2 |
 | `@typescript-eslint/no-require-imports` | 2 |
 | `@stylistic/brace-style` | 2 |
-| (plus 1 truncated `renders` line in the parser — still inside the 386) | 1 |
+| `react-hooks/set-state-in-effect` | 1 (`inline-record-field.tsx:25` — “Calling setState synchronously within an effect can trigger cascading renders”) |
 
 Root `eslint.config.js` lints the whole repo, including `mobile/` CommonJS mocks (`module` / `require` → `no-undef`).
 
@@ -143,41 +143,73 @@ Largest chunks after minify: `a11y-*.js` 674.61 kB, `main-*.js` 573.23 kB, `app-
 
 ---
 
-## 7. Pest / CI
+## 7. Pest / CI — CURRENTLY GREEN
 
-*This section is completed in the follow-up commit after `composer ci:check` finishes.* Known context: GitHub Actions runs this command only. Local Pest uses `RefreshDatabase` on Feature tests (`tests/Pest.php`) and in-memory SQLite (`phpunit.xml`).
+Exact `composer ci:check` reporter JSON (measured **before** installing Playwright at `/tmp/pw`, which is the CI-equivalent state):
 
-Expected classification: if Pest is green, mark **CURRENTLY GREEN** with the exact `Tests: N passed` line. Any failure is **PRE-EXISTING**.
+```
+{"tool":"pest","result":"passed","tests":1200,"passed":1199,"assertions":33706,"duration_ms":58601,"skipped":1,"risky":1}
+```
+
+Exit 0.
+
+### 7.1 Skipped (PRE-EXISTING)
+
+`tests/Feature/GoldenCopyGuardTest.php` — `it loads every golden route in light 1440 and fails on denylisted copy`:
+
+```
+Playwright is not installed at /tmp/pw.
+```
+
+CI never installs Playwright, so this skip is the GitHub `ci` job’s normal path. The test is in group `golden`.
+
+If `/tmp/pw` **is** present, the same test **fails** (not a baseline CI failure): `phpunit.xml` sets `APP_URL=http://localhost` (no port), and the guard script then does `page.goto('http://localhost/login')` → `net::ERR_CONNECTION_REFUSED`. Do not treat that local fail as a Wave 0 product regression.
+
+### 7.2 Risky (PRE-EXISTING)
+
+Pest reports `risky:1` even with `--exclude-group=golden` (1199 passed, still `risky:1`). JUnit has no `assertions="0"` case. Every run also prints:
+
+```
+PHP Warning: The use statement with non-compound name 'InvalidArgumentException' has no effect in /workspace/tests/Feature/EvoTicketsP1ModelTest.php on line 10
+PHP Warning: The use statement with non-compound name 'InvalidArgumentException' has no effect in /workspace/tests/Feature/EvoTicketsP4DeskOpenTest.php on line 12
+```
+
+Not a failure. Do not “fix” those imports in this Wave 0 PR.
+
+### 7.3 What CI does not run
+
+`.github/workflows/tests.yml` → `composer setup` + `composer ci:check`. **Not** `tsc`, Vitest, ESLint, or `vite build`. A green PR check can ship the three TypeScript errors in §4.
 
 ---
 
-## 8. Authenticated Playwright routes
+## 8. Authenticated Playwright routes — CURRENTLY GREEN
 
-*This section is completed after the local seed + headless Chromium pass.*
+Local app: `.env.example` → key, SQLite, `php artisan migrate --force`, `php artisan db:seed --force`, `npm run build`, `php artisan serve --host=0.0.0.0 --port=8000`.
 
-Seeded login (from `database/seeders/DatabaseSeeder.php`):
+Login: `owner@evosales.local` / `password` (seeded **Evotechly** owner). Both seeded workspaces have `simple_mode = true`. Login landed on `/dashboard` with no console or network failures.
 
-- `owner@evosales.local` / `password` (workspace **Evotechly**, `simple_mode = true`)
-- Record IDs used: contact `1`, deal `1`, quote `1`
+Headless Chromium (`playwright-core` + system Chrome, 1440×900, light). Per-route wait: `domcontentloaded` + 2.5s. **Not** a repo script and **not** added to `package.json`.
 
-Routes to load (and later tabulated):
+| Route | Path | Final URL | Title | HTTP | Console errors | Console warnings | Failed network |
+|---|---|---|---|---|---|---|---|
+| Dashboard | `/dashboard` | `/dashboard` | Accueil · EvoCrm | 200 | none | none | none |
+| Contacts | `/crm/contacts` | `/crm/contacts` | Contacts · EvoCrm | 200 | none | none | none |
+| Contact record | `/crm/contacts/1` | `/crm/contacts/1` | Amine Benali · EvoCrm | 200 | none | none | none |
+| Companies | `/crm/companies` | `/crm/companies` | Companies · EvoCrm | 200 | none | none | none |
+| Leads | `/crm/leads` | `/crm/leads` | Leads · EvoCrm | 200 | none | none | none |
+| Deals list | `/crm/deals` | `/crm/deals` | Affaires · EvoCrm | 200 | none | none | none |
+| Deals board | `/crm/deals/board` | `/crm/deals/board` | Affaires · EvoCrm | 200 | none | none | none |
+| Deal record | `/crm/deals/1` | `/crm/deals/1` | Clinic website intake · EvoCrm | 200 | none | none | none |
+| Inbox | `/inbox` | `/inbox` | Boîte de réception · EvoCrm | 200 | none | none | none |
+| Quotes | `/crm/quotes` | `/crm/quotes` | Devis · EvoCrm | 200 | none | none | none |
+| Quote detail | `/crm/quotes/1` | `/crm/quotes/1` | Clinic website intake · EvoCrm | 200 | none | none | none |
+| Settings | `/settings` | `/settings/profile` | Paramètres du profil · EvoCrm | 200 | none | none | none |
 
-| Route | Path |
-|---|---|
-| Dashboard | `/dashboard` |
-| Contacts | `/crm/contacts` |
-| Contact record | `/crm/contacts/1` |
-| Companies | `/crm/companies` |
-| Leads | `/crm/leads` |
-| Deals list | `/crm/deals` |
-| Deals board | `/crm/deals/board` |
-| Deal record | `/crm/deals/1` |
-| Inbox | `/inbox` |
-| Quotes | `/crm/quotes` |
-| Quote detail | `/crm/quotes/1` |
-| Settings | `/settings` → `/settings/profile` |
+**Console errors/warnings per route:** none recorded.
 
-Both seeded workspaces have `simple_mode = true` (provisioner default). That is the live default Wave 1 will inherit.
+**Failed network requests per route:** none recorded (status ≥ 400 or `requestfailed`).
+
+Observational (not a Playwright failure): document titles for **Companies** and **Leads** stayed English while Home / Deals / Inbox / Quotes / Settings used French (`APP_LOCALE=fr`). Wave 1 i18n work should treat those two list titles as a parity hole — see §10.8.
 
 ---
 
@@ -228,5 +260,5 @@ These are the holes. Prefer one focused Vitest or one Pest Inertia assertion eac
 
 | Rev | Contents |
 |---|---|
-| 1 | Git identity, discovered commands, tsc / vitest / eslint / vite results, contract inventory, gaps. Pest + Playwright pending. |
-| 2 | *(next)* Pest counts + Playwright per-route console / network. |
+| 1 | Git identity, discovered commands, tsc / vitest / eslint / vite results, contract inventory, gaps. |
+| 2 | Pest JSON counts (CI-equivalent skip of GoldenCopy), Playwright 12/12 green with empty console/network tables. |

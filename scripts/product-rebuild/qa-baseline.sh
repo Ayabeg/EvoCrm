@@ -43,9 +43,14 @@ run pest composer ci:check
 
 if [[ "$with_playwright" -eq 1 ]]; then
     echo
-    echo "== playwright (optional; not a repo script) =="
-    echo "Use the committed BASELINE-QA.md route list and a local Chromium runner."
-    echo "This helper does not add Playwright to package.json."
+    echo "== playwright (optional; not a package.json script) =="
+    echo "This helper does not add Playwright to the product tree."
+    echo "Seeded login: owner@evosales.local / password"
+    echo "Routes: /dashboard /crm/contacts /crm/contacts/1 /crm/companies"
+    echo "        /crm/leads /crm/deals /crm/deals/board /crm/deals/1"
+    echo "        /inbox /crm/quotes /crm/quotes/1 /settings"
+    echo "Do not install Playwright at /tmp/pw if you want CI-equivalent Pest:"
+    echo "GoldenCopyGuardTest skips without it and fails against APP_URL=http://localhost when it is present."
 fi
 
 echo
