@@ -304,8 +304,9 @@ async function measure(page, routeId, useful) {
 
             const topbar = document.querySelector('.app-topbar');
             const sidebar =
-                document.querySelector('[data-slot="sidebar"]') ||
-                document.querySelector('[data-sidebar]');
+                document.querySelector('[data-slot="sidebar"] > .fixed') ||
+                document.querySelector('[data-sidebar="sidebar"]') ||
+                document.querySelector('[data-slot="sidebar"]');
             const inset = document.querySelector('[data-slot="sidebar-inset"]');
 
             const usefulSelectors = {
@@ -322,7 +323,10 @@ async function measure(page, routeId, useful) {
                 ],
                 record: [
                     '[data-crm$="-record"] h1',
+                    '[data-crm="quotes-record"] h1',
+                    '[data-crm="object-header"] h1',
                     '[data-crm="object-header"]',
+                    'h1',
                     '[data-crm$="-record"]',
                 ],
                 inbox: [
