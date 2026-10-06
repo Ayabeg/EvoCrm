@@ -41,88 +41,98 @@
     color: inherit;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .evo-rail-slot {
-        width: 212px;
-        transition: width var(--evo-duration-normal) var(--evo-ease);
+        width: var(--evo-rail);
+        transition: width var(--evo-duration-rail) var(--evo-ease);
     }
 
     .evo-rail-panel {
-        width: 212px;
-        transform: translateX(0);
-        transition: transform var(--evo-duration-normal) var(--evo-ease);
+        width: var(--evo-rail);
+        transform: none;
+        transition: width var(--evo-duration-rail) var(--evo-ease);
     }
 
     .evo-workspace {
-        width: calc(100% - 212px);
-        transition: width var(--evo-duration-normal) var(--evo-ease);
+        width: calc(100% - var(--evo-rail));
+        transition: width var(--evo-duration-rail) var(--evo-ease);
     }
 
-    .evo-shell[data-collapsed='true'] .evo-rail-slot {
-        width: 0;
-        border-inline-end-width: 0;
-    }
-
+    .evo-shell[data-collapsed='true'] .evo-rail-slot,
     .evo-shell[data-collapsed='true'] .evo-rail-panel {
-        transform: translateX(-100%);
-    }
-
-    [dir='rtl'] .evo-shell[data-collapsed='true'] .evo-rail-panel {
-        transform: translateX(100%);
+        width: var(--evo-rail-collapsed);
     }
 
     .evo-shell[data-collapsed='true'] .evo-workspace {
+        width: calc(100% - var(--evo-rail-collapsed));
+    }
+
+    /* No cookie: tablet defaults to the 56px rail until the user pins expand. */
+    @media (max-width: 1279px) {
+        .evo-shell[data-rail='auto'] .evo-rail-slot,
+        .evo-shell[data-rail='auto'] .evo-rail-panel {
+            width: var(--evo-rail-collapsed);
+        }
+
+        .evo-shell[data-rail='auto'] .evo-workspace {
+            width: calc(100% - var(--evo-rail-collapsed));
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .evo-rail-slot {
+        display: none;
+    }
+
+    .evo-workspace {
         width: 100%;
     }
 }
 
-.evo-rail-reopen {
-    opacity: 0;
-    pointer-events: none;
-    transition:
-        opacity var(--evo-duration-normal) var(--evo-ease),
-        background-color var(--evo-duration-micro) var(--evo-ease);
+.evo-mobile-drawer [data-slot='sidebar-inner'],
+.evo-mobile-drawer {
+    box-shadow: var(--evo-shadow-modal);
 }
 
-.evo-shell[data-collapsed='true'] .evo-rail-reopen {
-    opacity: 1;
-    pointer-events: auto;
+/* Retired global top bar. Neutralize leftover rules so they cannot
+   resurrect a 52px strip above the workspace. */
+.evo-shell .app-topbar,
+.app-topbar {
+    display: none;
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
 }
 
-/* The legacy top bar is position:fixed across the viewport and was
-   painting over the mode switch. Keep it inside the workspace column,
-   and let it follow the active appearance instead of a paper literal. */
-.evo-shell .app-topbar {
-    position: sticky;
-    top: 0;
-    right: auto;
-    left: auto;
-    z-index: 20;
-    width: auto;
-    background: var(--color-surface);
-    border-bottom-color: var(--color-border);
-    color: var(--color-text);
+/* Light cabinet recedes from the workspace. Dark rail is #111111 so
+   it stays distinguishable from canvas #0a0a0a and workspace #121212. */
+.evo-rail-slot,
+.evo-rail-panel,
+.evo-mobile-drawer {
+    background: var(--evo-sidebar);
+    color: var(--evo-ink);
+    border-inline-end: 1px solid var(--evo-hairline);
 }
 
-/* Dark cabinet only. Theme tokens are concrete, so override the
-   shell colors themselves. Workspace pages stay outside this box. */
+.dark .evo-workspace {
+    background: var(--evo-surface);
+}
+
+.evo-nav-section-label {
+    color: var(--evo-ink-muted);
+}
+
+/* Leftover dark-cabinet helper. Live rail does not attach .evo-cabinet
+   in light mode. Agents page still pins its own light island below. */
 .evo-cabinet {
     color-scheme: dark;
-    --color-shell-canvas: var(--evo-canvas);
-    --color-shell-paper: var(--evo-surface);
-    --color-shell-ink: var(--evo-ink);
-    --color-shell-ink-2: var(--evo-ink-secondary);
-    --color-shell-muted: var(--evo-ink-muted);
-    --color-shell-faint: var(--evo-ink-faint);
-    --color-shell-hairline: var(--evo-hairline);
-    --color-shell-track: var(--evo-track);
-    --color-shell-pill: var(--evo-surface-raised);
-    --color-shell-teal-soft: var(--evo-teal-soft);
     background: var(--evo-canvas);
     color: var(--evo-ink);
 }
 
-/* The rail is always a dark cabinet, so section labels must keep muted ink. */
 .evo-cabinet :is(h1, h2, h3),
 .evo-cabinet .evo-nav-section-label {
     color: var(--color-shell-muted);
@@ -207,10 +217,20 @@
 }
 
 .evo-nav-link[aria-current='page'] {
-    border-left: 3px solid var(--evo-teal-ink);
-    border-radius: 0 8px 8px 0;
-    background: var(--evo-hover);
-    color: var(--evo-ink);
+    position: relative;
+    background: var(--evo-teal-soft);
+    color: var(--evo-teal-ink);
+    border-radius: var(--evo-radius-chip);
+}
+
+.evo-nav-link[aria-current='page']::before {
+    content: '';
+    position: absolute;
+    inset-block: 4px;
+    inset-inline-start: 0;
+    width: 2px;
+    border-radius: 999px;
+    background: var(--evo-teal);
 }
 
 .evo-nav-label {

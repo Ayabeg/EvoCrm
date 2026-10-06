@@ -8,6 +8,7 @@ import {
     House,
     Megaphone,
     PaperPlaneTilt,
+    StarFour,
     Ticket,
     Users,
 } from '@phosphor-icons/react';
@@ -159,6 +160,19 @@ export const NAV_SECTIONS: NavSection[] = [
                 { id: 'automation-segments', labelKey: 'nav.automation.segments', href: '/crm/segments' },
             ],
         }],
+    },
+    {
+        id: 'pilot',
+        labelKey: 'nav.sections.pilot',
+        items: [
+            {
+                id: 'agents',
+                labelKey: 'nav.agents',
+                href: '/agents',
+                icon: StarFour,
+                also: ['/agents'],
+            },
+        ],
     },
 ];
 

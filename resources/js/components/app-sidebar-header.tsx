@@ -1,6 +1,6 @@
 /**
- * Workspace utilities. Navigation and search live in the 212px shell.
- * Create stays this dropdown. One Tasks overlay. Ask Evo stays its own drawer.
+ * UNMOUNTED in P0.1. Create / search / tasks / theme live in evo-rail.
+ * Kept as a leftover file — do not remount `.app-topbar`.
  */
 import { Link, usePage } from '@inertiajs/react';
 import { Bell, Plus, Sparkle, Sun } from '@phosphor-icons/react';

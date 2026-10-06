@@ -1946,5 +1946,10 @@
     "Open CRM context": "Open CRM context",
     "Continue in a workspace linked to this agent.": "Continue in a workspace linked to this agent.",
     "Message templates": "Message templates",
-    "Use": "Use"
+    "Use": "Use",
+    "nav.sections.pilot": "Pilot",
+    "nav.agents": "Agents",
+    "Collapse sidebar": "Collapse sidebar",
+    "Expand sidebar": "Expand sidebar",
+    "Shortcuts": "Shortcuts"
 }

@@ -4,6 +4,7 @@ import { List, MagnifyingGlass, StarFour } from '@/evo/icons';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
+/** Retired from the live rail in P0.1. Agents is a Full-mode nav row. */
 export type ShellMode = 'menu' | 'agents' | 'search';
 
 export const SHELL_MODES: { id: ShellMode; label: string; icon: Icon }[] = [

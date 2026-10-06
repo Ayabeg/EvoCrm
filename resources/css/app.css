@@ -34,7 +34,7 @@
  *
  * Light: canvas #F7F8F5, surface #FFFFFF, ink #0D1B24, accent #EC6025.
  * Orange is primary / intentional actions only. Teal is focus, selection
- * and active. Authenticated rail is 212px.
+ * and active. Authenticated rail is 224px expanded / 56px collapsed.
  */
 :root {
     /* Compact enterprise topbar — 48px phones, 48px from sm. Not a tall header. */
@@ -520,7 +520,8 @@
      * to accent-soft wash + ink so Create remains the one orange CTA.
      */
     .app-topbar {
-        height: var(--app-chrome-height);
+        display: none;
+        height: 0;
         isolation: isolate;
         background: var(--color-surface);
         border-bottom: 1px solid var(--color-border);

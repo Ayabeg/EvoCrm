@@ -9,7 +9,7 @@ type Props = {
 };
 
 export function AppShell({ children, variant = 'sidebar' }: Props) {
-    const isOpen = usePage().props.sidebarOpen; // sidebar_state cookie → P04 64/240 persist
+    const isOpen = usePage().props.sidebarOpen; // sidebar_state cookie → desktop rail 224/56
 
     if (variant === 'header') {
         return (
@@ -23,7 +23,7 @@ export function AppShell({ children, variant = 'sidebar' }: Props) {
         <SidebarProvider
             defaultOpen={isOpen}
             className="min-h-[100dvh] bg-[var(--aurora-shell-bg)] font-sans"
-            style={{ ['--sidebar-width' as string]: '248px' }}
+            style={{ ['--sidebar-width' as string]: 'var(--evo-rail)' }}
         >
             {children}
         </SidebarProvider>

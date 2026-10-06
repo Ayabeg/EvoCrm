@@ -1,33 +1,30 @@
 /*
  * Approved operating shell (dashboard, contacts, deals).
- * Paper canvas, 52px top bar, 172px rail, orange only on the mark,
- * the active icon, and the page primary action.
+ * Leftover operating-page paint. P0.1 shell owns 224/56 rail widths
+ * and unmounts the 52px top bar. Do not resurrect 172/212/240/248.
  */
 
 .group\/sidebar-wrapper {
-    --app-chrome-height: 52px;
+    --app-chrome-height: 0px;
 }
 
 .app-topbar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 40;
-    height: 52px;
-    padding-right: 18px;
-    background: #fbfbfa;
-    border-bottom: 1px solid #e6e6e3;
+    display: none;
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
 }
 
 [data-slot='sidebar-inset'] {
-    padding-top: 52px;
+    padding-top: 0;
     background: #f7f7f5;
 }
 
 [data-slot='sidebar'] > .fixed {
-    top: 52px;
-    height: calc(100svh - 52px);
+    top: 0;
+    height: 100svh;
     background: #fbfbfa;
 }
 
@@ -37,7 +34,7 @@
 
 .evo-brand {
     display: flex;
-    width: 248px;
+    width: var(--evo-rail);
     flex: none;
     align-items: center;
     gap: 9px;
@@ -327,8 +324,9 @@
     }
 
     body:has([data-crm='quotes-workspace']) .app-topbar {
-        left: var(--sidebar-width, 248px);
-        height: 40px;
+        display: none;
+        inset-inline-start: var(--evo-rail);
+        height: 0;
         background: #f7f7f5;
     }
 }

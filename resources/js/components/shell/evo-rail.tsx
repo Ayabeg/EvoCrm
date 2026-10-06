@@ -1,7 +1,7 @@
-﻿import { Link, router, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
+﻿import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import { TasksOverlay } from '@/components/crm/tasks-overlay';
 import {
     activeParentId,
     activeNavId,
@@ -11,534 +11,441 @@ import {
 } from '@/components/shell/product-nav';
 import type { NavItem } from '@/components/shell/product-nav';
 import { UserMenuContent } from '@/components/user-menu-content';
-import { useQuickRecord } from '@/ds/workspace/quick-record';
-import { CaretDown, CaretLeft, CaretRight } from '@/evo/icons';
-import { ShellModeSwitch } from '@/evo/shell/mode-switch';
-import type { ShellMode } from '@/evo/shell/mode-switch';
+import { Bell } from '@phosphor-icons/react';
+import { CaretDown, CaretLeft, CaretRight, GearSix, MagnifyingGlass, Plus } from '@/evo/icons';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/evo/ui/dropdown-menu';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/evo/ui/tooltip';
 import { useInitials } from '@/hooks/use-initials';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
-import { openAskEvo } from '@/lib/ask-evo';
-import {
-    buildCommandCatalog,
-    COMMAND_SEARCH_DEBOUNCE_MS,
-    commandNeedle,
-    composeCommandResults,
-    filterValidRecents,
-    isStaleCommandSearch,
-    loadCommandRecents,
-    nextCommandSearchRequestId,
-    persistCommandRecents,
-    rememberCommandRecent,
-    visibleCommandRemoteHits,
-} from '@/lib/command-os';
-import type {
-    CommandRecent,
-    CommandResult,
-    CommandSearchHit,
-} from '@/lib/command-os';
-import { t, workspaceRoleLabel } from '@/lib/i18n';
+import { canCreateQuote } from '@/lib/command-os';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types/auth';
 
-export type RailMode = ShellMode;
-
 const rowClass =
-    'evo-nav-link flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-start text-[13px] text-shell-ink-2 transition-colors duration-[var(--evo-duration-micro)] hover:bg-[var(--evo-hover)] motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]';
+    'evo-nav-link relative flex h-8 w-full items-center gap-2 rounded-[6px] px-2 text-start text-[13px] font-medium text-[var(--evo-ink-secondary)] transition-colors duration-[var(--evo-duration-micro)] hover:bg-[var(--evo-sidebar-hover)] motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]';
+
+const iconTargetClass =
+    'grid size-10 shrink-0 place-items-center rounded-[6px] text-[var(--evo-ink-secondary)] hover:bg-[var(--evo-sidebar-hover)] hover:text-[var(--evo-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]';
 
 export function EvoRail({
-    activeHotkeys = true,
-    mode: modeProp,
-    onModeChange,
+    collapsed = false,
     onNavigate,
     onToggleCollapsed,
-    agentsContent,
+    onOpenPalette,
 }: {
-    activeHotkeys?: boolean;
-    mode?: RailMode;
-    onModeChange?: (mode: RailMode) => void;
+    collapsed?: boolean;
     onNavigate?: () => void;
     onToggleCollapsed?: () => void;
-    agentsContent?: ReactNode;
+    onOpenPalette?: () => void;
 }) {
     const page = usePage();
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
     const { simpleMode, nav, features } = useSimpleMode();
-    const { openRecord } = useQuickRecord();
     const initials = useInitials();
     const user = page.props.auth?.user as User | undefined;
     const workspace = page.props.workspace as { name?: string } | null;
     const workspaceName = workspace?.name?.trim() || 'EvoCRM';
     const rawCapabilities = page.props.auth?.capabilities;
-    const capabilities = useMemo(
-        () =>
-            Array.isArray(rawCapabilities) ? (rawCapabilities as string[]) : null,
-        [rawCapabilities],
-    );
-    const [uncontrolledMode, setUncontrolledMode] = useState<RailMode>('menu');
-    const mode = modeProp ?? uncontrolledMode;
-
-    const setMode = useCallback(
-        (next: RailMode) => {
-            onModeChange?.(next);
-
-            if (modeProp === undefined) {
-                setUncontrolledMode(next);
-            }
-        },
-        [modeProp, onModeChange],
-    );
-    const [query, setQuery] = useState('');
-    const [remoteHits, setRemoteHits] = useState<CommandSearchHit[]>([]);
-    const [hitsForQuery, setHitsForQuery] = useState('');
-    const [searching, setSearching] = useState(false);
-    const [cursor, setCursor] = useState(0);
-    const [recents, setRecents] = useState<CommandRecent[]>(() =>
-        loadCommandRecents(),
-    );
-    const searchRef = useRef<HTMLInputElement>(null);
-    const railRef = useRef<HTMLDivElement>(null);
-    const requestIdRef = useRef(0);
-    const abortRef = useRef<AbortController | null>(null);
-    const searchId = useId();
-
+    const capabilities = Array.isArray(rawCapabilities)
+        ? (rawCapabilities as string[])
+        : [];
+    const capabilitySet = capabilities.length > 0 ? new Set(capabilities) : null;
+    const taskCount = Number(page.props.evoOpenTaskCount ?? 0);
+    const [createOpen, setCreateOpen] = useState(false);
+    const [tasksOpen, setTasksOpen] = useState(false);
     const allowed = simpleMode ? new Set(nav.map((item) => item.id)) : null;
     const sections = visibleSections(
         simpleMode,
         allowed,
         features,
-        capabilities ? new Set(capabilities) : null,
+        capabilitySet,
     );
     const activeId = activeNavId(path, sections);
     const activeGroupId = activeParentId(path, sections);
     const settingsActive =
         path === '/settings' || path.startsWith('/settings/');
-    const settingsItem = visibleSettings(
-        capabilities ? new Set(capabilities) : null,
-    );
+    const settingsItem = visibleSettings(capabilitySet);
     const [manualOpenGroupId, setManualOpenGroupId] = useState<string | null>(
         null,
     );
-    // A deep link always wins over the last manually opened group. This keeps
-    // the active context visible without an effect-driven render pass.
-    const openGroupId = activeGroupId ?? (settingsActive ? settingsItem.id : manualOpenGroupId);
-
-    const catalog = useMemo(
-        () => buildCommandCatalog({ capabilities: capabilities ?? [], features }),
-        [capabilities, features],
-    );
-    const availableIds = useMemo(
-        () =>
-            [
-                ...catalog.navigate,
-                ...catalog.create,
-                ...catalog.act,
-                ...catalog.ask,
-            ].map((item) => item.id),
-        [catalog],
-    );
-    const results = useMemo(
-        () =>
-            composeCommandResults({
-                query,
-                catalog,
-                recents: filterValidRecents(recents, availableIds),
-                remoteHits: visibleCommandRemoteHits({
-                    query,
-                    hitsForQuery,
-                    remoteHits,
-                }),
-            }),
-        [availableIds, catalog, hitsForQuery, query, recents, remoteHits],
-    );
+    const openGroupId =
+        activeGroupId ??
+        (settingsActive ? settingsItem.id : manualOpenGroupId);
 
     useEffect(() => {
-        if (mode === 'search' && activeHotkeys) {
-            searchRef.current?.focus();
-        }
-    }, [activeHotkeys, mode]);
-
-    useEffect(() => {
-        if (mode !== 'search') {
-            abortRef.current?.abort();
-
-            return;
-        }
-
-        const needle = query.trim();
-        abortRef.current?.abort();
-        const requestId = nextCommandSearchRequestId(requestIdRef.current);
-        requestIdRef.current = requestId;
-
-        if (needle === '') {
-            return;
-        }
-
-        const controller = new AbortController();
-        abortRef.current = controller;
-        const timer = window.setTimeout(() => {
-            setSearching(true);
-
-            void fetch(`/crm/command/search?q=${encodeURIComponent(needle)}`, {
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                signal: controller.signal,
-            })
-                .then(async (response) => {
-                    if (!response.ok) {
-                        throw new Error('search-failed');
-                    }
-
-                    return (await response.json()) as {
-                        hits?: CommandSearchHit[];
-                    };
-                })
-                .then((payload) => {
-                    if (isStaleCommandSearch(requestIdRef.current, requestId)) {
-                        return;
-                    }
-
-                    setRemoteHits(
-                        Array.isArray(payload.hits) ? payload.hits : [],
-                    );
-                    setHitsForQuery(commandNeedle(needle));
-                    setSearching(false);
-                })
-                .catch((error: unknown) => {
-                    if (
-                        error instanceof DOMException &&
-                        error.name === 'AbortError'
-                    ) {
-                        return;
-                    }
-
-                    if (isStaleCommandSearch(requestIdRef.current, requestId)) {
-                        return;
-                    }
-
-                    setRemoteHits([]);
-                    setHitsForQuery(commandNeedle(needle));
-                    setSearching(false);
-                });
-        }, COMMAND_SEARCH_DEBOUNCE_MS);
+        const openCreate = () => setCreateOpen(true);
+        const openTasks = () => setTasksOpen(true);
+        window.addEventListener('openEvoCreate', openCreate);
+        window.addEventListener('openEvoTasks', openTasks);
 
         return () => {
-            window.clearTimeout(timer);
-            controller.abort();
+            window.removeEventListener('openEvoCreate', openCreate);
+            window.removeEventListener('openEvoTasks', openTasks);
         };
-    }, [mode, query]);
+    }, []);
 
-    const cursorIndex =
-        results.length === 0 ? 0 : Math.min(cursor, results.length - 1);
-
-    function selectMode(next: RailMode) {
-        setMode(next);
-
-        if (next === 'agents') {
-            onNavigate?.();
-
-            if (path !== '/agents') {
-                router.visit('/agents');
-            }
-        }
-    }
-
-    function selectResult(result: CommandResult) {
-        if (result.kind !== 'search') {
-            const next = persistCommandRecents(
-                rememberCommandRecent(recents, {
-                    id: result.id,
-                    kind: result.kind,
-                }),
-            );
-            setRecents(next);
-        }
-
-        onNavigate?.();
-
-        if (result.kind === 'ask') {
-            openAskEvo();
-
-            return;
-        }
-
-        if (result.recordRef) {
-            openRecord(result.recordRef);
-
-            return;
-        }
-
-        if (result.href) {
-            router.visit(result.href);
-        }
-    }
-
-    return (
-        <div
-            ref={railRef}
-            className="relative flex h-full min-h-0 w-full min-w-0 flex-col bg-shell-paper"
+    const searchControl = (
+        <button
+            type="button"
+            data-chrome="search"
+            data-command-trigger="search"
+            aria-label={t('Search EvoCRM…')}
+            className={cn(
+                collapsed
+                    ? iconTargetClass
+                    : 'flex h-8 w-full items-center gap-2 rounded-[6px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-2 text-start text-[13px] text-[var(--evo-ink-muted)] hover:bg-[var(--evo-sidebar-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]',
+            )}
+            onClick={onOpenPalette}
         >
-            <div className="shrink-0 px-3 pt-3">
-                <ShellModeSwitch mode={mode} onModeChange={selectMode} />
-            </div>
+            <MagnifyingGlass className="size-4 shrink-0" weight="regular" />
+            {collapsed ? null : (
+                <span className="min-w-0 flex-1 truncate">{t('Search EvoCRM…')}</span>
+            )}
+            {collapsed ? null : (
+                <kbd className="text-[11px] text-[var(--evo-ink-faint)]">⌘K</kbd>
+            )}
+        </button>
+    );
 
-            <div className="relative min-h-0 flex-1">
-                <div
-                    inert={mode !== 'menu'}
-                    role="tabpanel"
-                    id="shell-panel-menu"
-                    aria-labelledby="shell-tab-menu"
-                    data-shell-mode="menu"
+    const createMenu = (
+        <DropdownMenu open={createOpen} onOpenChange={setCreateOpen}>
+            <DropdownMenuTrigger asChild>
+                <button
+                    type="button"
+                    data-chrome="create"
+                    title={t('Create')}
+                    aria-label={t('Create')}
                     className={cn(
-                        'evo-mode absolute inset-0 flex min-h-0 flex-col',
-                        mode === 'menu'
-                            ? 'evo-mode-on'
-                            : mode === 'agents'
-                              ? 'evo-mode-exit-left'
-                              : 'evo-mode-off',
+                        collapsed
+                            ? iconTargetClass
+                            : 'inline-flex h-8 shrink-0 items-center justify-center gap-1 rounded-[6px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-2 text-[13px] font-medium text-[var(--evo-ink)] hover:bg-[var(--evo-sidebar-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]',
                     )}
                 >
-                    <div className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pb-2">
-                        <div className="mt-3 flex h-10 items-center gap-2">
-                            <AppLogoIcon className="size-8 shrink-0" />
-                            <span className="min-w-0 flex-1 leading-tight">
-                                <span className="block truncate text-[14px] font-semibold text-shell-ink">
-                                    {workspaceName}
-                                </span>
-                                <span className="block truncate text-[12px] text-shell-muted">
-                                    EvoCRM
-                                </span>
-                            </span>
-                            {onToggleCollapsed ? (
-                                <button
-                                    type="button"
-                                    className="grid size-8 shrink-0 place-items-center rounded-lg text-shell-muted hover:bg-[var(--evo-hover)] hover:text-shell-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]"
-                                    aria-label={t('Close menu')}
-                                    onClick={onToggleCollapsed}
-                                >
-                                    <CaretLeft
-                                        className="size-4 rtl:rotate-180"
-                                        weight="regular"
-                                    />
-                                </button>
-                            ) : null}
-                        </div>
+                    <Plus className="size-4" weight="bold" aria-hidden />
+                    {collapsed ? null : <span>{t('Create')}</span>}
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-44">
+                <DropdownMenuItem asChild>
+                    <Link href="/crm/contacts?create=1" onClick={onNavigate}>
+                        {t('Contact')}
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/crm/companies?create=1" onClick={onNavigate}>
+                        {t('Company')}
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/crm/leads?create=1" onClick={onNavigate}>
+                        {t('Lead')}
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/crm/deals?create=1" onClick={onNavigate}>
+                        {t('Deal')}
+                    </Link>
+                </DropdownMenuItem>
+                {canCreateQuote(capabilities) ? (
+                    <DropdownMenuItem asChild>
+                        <Link href="/crm/quotes?create=1" onClick={onNavigate}>
+                            {t('Quote')}
+                        </Link>
+                    </DropdownMenuItem>
+                ) : null}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 
-                        <div className="mt-3 flex flex-col">
-                            {sections.map((section) => (
-                                <section
-                                    key={section.id}
-                                    className={
-                                        section.labelKey ? 'mt-3' : undefined
-                                    }
-                                >
-                                    {section.labelKey ? (
-                                        <h2 className="evo-nav-section-label mb-1 border-t border-shell-hairline px-2 pt-3 text-[10px] font-semibold tracking-[0.08em] text-shell-muted uppercase">
-                                            {t(section.labelKey)}
-                                        </h2>
-                                    ) : null}
-                                    <ul className="flex flex-col gap-0.5">
-                                        {section.items.map((item) => (
-                                            <li key={item.id}>
-                                                <NavGroup
-                                                    item={item}
-                                                    activeId={
-                                                        settingsActive
-                                                            ? undefined
-                                                            : activeId
-                                                    }
-                                                    path={path}
-                                                    open={openGroupId === item.id}
-                                                    onToggle={() =>
-                                                        setManualOpenGroupId((current) =>
-                                                            current === item.id
-                                                                ? null
-                                                                : item.id,
-                                                        )
-                                                    }
-                                                    onNavigate={onNavigate}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </section>
-                            ))}
-                        </div>
-                    </div>
-                    <footer className="shrink-0 border-t border-shell-hairline px-2 py-2">
-                        <div className="evo-scroll max-h-[min(28rem,50dvh)] overflow-y-auto">
-                            <NavGroup
-                                item={settingsItem}
-                                active={settingsActive}
-                                path={path}
-                                open={openGroupId === settingsItem.id}
-                                onToggle={() =>
-                                    setManualOpenGroupId((current) =>
-                                        current === settingsItem.id
-                                            ? null
-                                            : settingsItem.id,
+    const tasksButton = (
+        <button
+            type="button"
+            data-chrome="notify"
+            title={t('Tasks')}
+            aria-label={
+                taskCount > 0 ? `${t('Tasks')} (${taskCount})` : t('Tasks')
+            }
+            className={cn(iconTargetClass, 'relative')}
+            onClick={() => setTasksOpen(true)}
+        >
+            <Bell className="size-4" weight="regular" aria-hidden />
+            {taskCount > 0 ? (
+                <span className="absolute top-1 end-1 grid min-w-3.5 place-items-center rounded-full bg-[var(--evo-teal)] px-0.5 text-[10px] leading-none text-[var(--evo-surface)]">
+                    {taskCount > 99 ? '99+' : taskCount}
+                </span>
+            ) : null}
+        </button>
+    );
+
+    if (collapsed) {
+        return (
+            <nav
+                aria-label={t('Menu')}
+                className="flex h-full min-h-0 w-full flex-col items-center bg-[var(--evo-sidebar)] py-2"
+            >
+                <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                        <Link
+                            href="/dashboard"
+                            className="mb-2 grid size-10 place-items-center"
+                            aria-label={workspaceName}
+                        >
+                            <AppLogoIcon className="size-5" />
+                        </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{workspaceName}</TooltipContent>
+                </Tooltip>
+                {onToggleCollapsed ? (
+                    <Tooltip delayDuration={300}>
+                        <TooltipTrigger asChild>
+                            <button
+                                type="button"
+                                className={cn(iconTargetClass, 'mb-2')}
+                                aria-label={t('Expand sidebar')}
+                                aria-expanded={false}
+                                onClick={onToggleCollapsed}
+                            >
+                                <CaretRight
+                                    className="size-4 rtl:rotate-180"
+                                    weight="regular"
+                                />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                            {t('Expand sidebar')} · ⌘\
+                        </TooltipContent>
+                    </Tooltip>
+                ) : null}
+                <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>{searchControl}</TooltipTrigger>
+                    <TooltipContent side="right">
+                        {t('Search EvoCRM…')} · ⌘K
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>{createMenu}</TooltipTrigger>
+                    <TooltipContent side="right">{t('Create')} · C</TooltipContent>
+                </Tooltip>
+                <div className="evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto">
+                    {sections.flatMap((section) =>
+                        section.items.map((item) => (
+                            <CollapsedNavItem
+                                key={item.id}
+                                item={item}
+                                active={
+                                    activeId === item.id ||
+                                    Boolean(
+                                        item.children?.some((child) =>
+                                            isNavigationChildActive(path, child),
+                                        ),
                                     )
                                 }
                                 onNavigate={onNavigate}
                             />
-                        </div>
-                        {user ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button
-                                        type="button"
-                                        className="mt-1 flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-start hover:bg-[var(--evo-hover)]"
-                                        title={user.name}
-                                        aria-label={t(':name account menu', {
-                                            name: user.name,
-                                        })}
-                                    >
-                                        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-shell-teal text-[12px] font-semibold text-shell-pill">
-                                            {initials(user.name)}
-                                        </span>
-                                        <span className="min-w-0 leading-tight">
-                                            <span className="block truncate text-[13px] font-medium text-shell-ink">
-                                                {user.name}
-                                            </span>
-                                            <span className="block truncate text-[12px] text-shell-muted">
-                                                {workspaceRoleLabel(user.role)}
-                                            </span>
-                                        </span>
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    align="start"
-                                    className="w-64"
-                                >
-                                    <UserMenuContent user={user} />
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : null}
-                    </footer>
-                </div>
-
-                <div
-                    inert={mode !== 'agents'}
-                    role="tabpanel"
-                    id="shell-panel-agents"
-                    aria-labelledby="shell-tab-agents"
-                    data-shell-mode="agents"
-                    className={cn(
-                        'evo-mode absolute inset-0 flex min-h-0 flex-col',
-                        mode === 'agents' ? 'evo-mode-on' : 'evo-mode-off',
+                        )),
                     )}
-                >
-                    {agentsContent}
                 </div>
-
-                <div
-                    inert={mode !== 'search'}
-                    role="tabpanel"
-                    id="shell-panel-search"
-                    aria-labelledby="shell-tab-search"
-                    data-shell-mode="search"
-                    className={cn(
-                        'evo-mode absolute inset-0 flex min-h-0 flex-col',
-                        mode === 'search' ? 'evo-mode-on' : 'evo-mode-off',
-                    )}
-                >
-                    <div className="evo-search-in flex min-h-0 flex-1 flex-col px-3 py-3">
-                        <label className="sr-only" htmlFor={searchId}>
-                            {t('Search EvoCRM…')}
-                        </label>
-                        <input
-                            ref={searchRef}
-                            id={searchId}
-                            value={query}
-                            data-chrome="search"
-                            data-command-trigger="search"
-                            aria-label={t('Search EvoCRM…')}
-                            onChange={(event) => {
-                                setQuery(event.target.value);
-                                setCursor(0);
-                            }}
-                            onKeyDown={(event) => {
-                                if (event.key === 'ArrowDown') {
-                                    event.preventDefault();
-                                    setCursor((current) =>
-                                        Math.min(
-                                            current + 1,
-                                            Math.max(results.length - 1, 0),
-                                        ),
-                                    );
-                                }
-
-                                if (event.key === 'ArrowUp') {
-                                    event.preventDefault();
-                                    setCursor((current) =>
-                                        Math.max(current - 1, 0),
-                                    );
-                                }
-
-                                if (
-                                    event.key === 'Enter' &&
-                                    results[cursorIndex]
-                                ) {
-                                    event.preventDefault();
-                                    selectResult(results[cursorIndex]);
-                                }
-                            }}
-                            placeholder={t('Search EvoCRM…')}
-                            className="app-search-trigger h-10 w-full rounded-lg border border-shell-hairline bg-shell-pill px-2.5 text-[14px] text-shell-ink outline-none placeholder:text-shell-faint focus:border-[var(--evo-teal-line)]"
-                            type="search"
-                        />
-                        <span className="sr-only">⌘K</span>
-                        <ul className="evo-scroll mt-2 min-h-0 flex-1 overflow-y-auto">
-                            {searching && commandNeedle(query) !== '' ? (
-                                <li className="py-2 text-[14px] text-shell-muted">
-                                    {t('Searching…')}
-                                </li>
-                            ) : null}
-                            {results.length === 0 && !searching ? (
-                                <li className="py-2 text-[14px] text-shell-muted">
-                                    {t('Nothing.')}
-                                </li>
-                            ) : (
-                                results.map((result, index) => (
-                                    <li key={result.id}>
-                                        <button
-                                            type="button"
-                                            className={cn(
-                                                'w-full rounded-lg px-1 py-2 text-start',
-                                                index === cursorIndex &&
-                                                    'bg-[var(--evo-teal-soft)]',
-                                            )}
-                                            onMouseEnter={() =>
-                                                setCursor(index)
-                                            }
-                                            onClick={() => selectResult(result)}
-                                        >
-                                            <span className="block text-[11px] font-semibold tracking-[0.06em] text-shell-muted uppercase">
-                                                {t(result.kind)}
-                                            </span>
-                                            <span className="block truncate text-[14px] font-medium text-shell-ink">
-                                                {t(result.label)}
-                                            </span>
-                                            {result.description ? (
-                                                <span className="block truncate text-[12px] text-shell-muted">
-                                                    {t(result.description)}
-                                                </span>
-                                            ) : null}
-                                        </button>
-                                    </li>
-                                ))
+                <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                        <Link
+                            href="/settings"
+                            aria-current={settingsActive ? 'page' : undefined}
+                            aria-label={t(settingsItem.labelKey)}
+                            className={cn(
+                                iconTargetClass,
+                                settingsActive &&
+                                    'bg-[var(--evo-teal-soft)] text-[var(--evo-teal-ink)]',
                             )}
-                        </ul>
-                    </div>
-                </div>
+                            onClick={onNavigate}
+                        >
+                            <GearSix className="size-5" weight="regular" />
+                        </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                        {t(settingsItem.labelKey)} · G P
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>{tasksButton}</TooltipTrigger>
+                    <TooltipContent side="right">{t('Tasks')} · G N</TooltipContent>
+                </Tooltip>
+                {user ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                type="button"
+                                className="mt-1 grid size-10 place-items-center rounded-full"
+                                title={user.name}
+                                aria-label={t(':name account menu', {
+                                    name: user.name,
+                                })}
+                            >
+                                <span className="grid size-6 place-items-center rounded-full bg-[var(--evo-teal-soft)] text-[11px] font-medium text-[var(--evo-teal)]">
+                                    {initials(user.name)}
+                                </span>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-64">
+                            <UserMenuContent user={user} />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : null}
+                <TasksOverlay open={tasksOpen} onOpenChange={setTasksOpen} />
+            </nav>
+        );
+    }
+
+    return (
+        <div className="relative flex h-full min-h-0 w-full min-w-0 flex-col bg-[var(--evo-sidebar)]">
+            <div className="flex h-12 shrink-0 items-center gap-2 px-3">
+                <AppLogoIcon className="size-5 shrink-0" />
+                <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[var(--evo-ink)]">
+                    {workspaceName}
+                </span>
+                {onToggleCollapsed ? (
+                    <button
+                        type="button"
+                        className="grid size-8 shrink-0 place-items-center rounded-[6px] text-[var(--evo-ink-muted)] hover:bg-[var(--evo-sidebar-hover)] hover:text-[var(--evo-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]"
+                        aria-label={t('Collapse sidebar')}
+                        aria-expanded={true}
+                        onClick={onToggleCollapsed}
+                    >
+                        <CaretLeft
+                            className="size-4 rtl:rotate-180"
+                            weight="regular"
+                        />
+                    </button>
+                ) : null}
             </div>
+            <div className="flex shrink-0 items-center gap-1.5 px-2 pb-2">
+                <div className="min-w-0 flex-1">{searchControl}</div>
+                {createMenu}
+            </div>
+            <nav
+                aria-label={t('Menu')}
+                className="evo-scroll min-h-0 flex-1 overflow-y-auto px-2 pb-2"
+            >
+                {sections.map((section) => (
+                    <section
+                        key={section.id}
+                        className={section.labelKey ? 'mt-3' : undefined}
+                    >
+                        {section.labelKey ? (
+                            <h2 className="evo-nav-section-label mb-1 px-2 text-[11px] font-medium text-[var(--evo-ink-muted)]">
+                                {t(section.labelKey)}
+                            </h2>
+                        ) : null}
+                        <ul className="flex flex-col gap-0.5">
+                            {section.items.map((item) => (
+                                <li key={item.id}>
+                                    <NavGroup
+                                        item={item}
+                                        activeId={
+                                            settingsActive ? undefined : activeId
+                                        }
+                                        path={path}
+                                        open={openGroupId === item.id}
+                                        onToggle={() =>
+                                            setManualOpenGroupId((current) =>
+                                                current === item.id
+                                                    ? null
+                                                    : item.id,
+                                            )
+                                        }
+                                        onNavigate={onNavigate}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                ))}
+            </nav>
+            <footer className="shrink-0 border-t border-[var(--evo-hairline)] px-2 py-2">
+                <Link
+                    href="/settings"
+                    aria-current={settingsActive ? 'page' : undefined}
+                    className={cn(rowClass, settingsActive && 'font-medium')}
+                    onClick={onNavigate}
+                >
+                    <GearSix className="size-4 shrink-0" weight="regular" />
+                    <span className="evo-nav-label min-w-0 flex-1 truncate">
+                        {t(settingsItem.labelKey)}
+                    </span>
+                </Link>
+                {user ? (
+                    <div className="mt-1 flex h-11 items-center gap-1">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-[6px] px-2 text-start hover:bg-[var(--evo-sidebar-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--evo-focus)]"
+                                    title={user.name}
+                                    aria-label={t(':name account menu', {
+                                        name: user.name,
+                                    })}
+                                >
+                                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--evo-teal-soft)] text-[11px] font-medium text-[var(--evo-teal)]">
+                                        {initials(user.name)}
+                                    </span>
+                                    <span className="min-w-0 truncate text-[13px] font-medium text-[var(--evo-ink)]">
+                                        {user.name}
+                                    </span>
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-64">
+                                <UserMenuContent user={user} />
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        {tasksButton}
+                    </div>
+                ) : null}
+            </footer>
+            <TasksOverlay open={tasksOpen} onOpenChange={setTasksOpen} />
         </div>
+    );
+}
+
+function CollapsedNavItem({
+    item,
+    active,
+    onNavigate,
+}: {
+    item: NavItem;
+    active: boolean;
+    onNavigate?: () => void;
+}) {
+    const Icon = item.icon;
+
+    return (
+        <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+                <Link
+                    href={item.href}
+                    prefetch
+                    aria-current={active ? 'page' : undefined}
+                    aria-label={t(item.labelKey)}
+                    className={cn(
+                        iconTargetClass,
+                        active &&
+                            'bg-[var(--evo-teal-soft)] text-[var(--evo-teal-ink)]',
+                    )}
+                    onClick={onNavigate}
+                >
+                    <Icon className="size-5" weight="regular" />
+                </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">{t(item.labelKey)}</TooltipContent>
+        </Tooltip>
     );
 }
 
@@ -562,7 +469,7 @@ function NavRow({
             className={cn(rowClass, active && 'font-medium')}
             onClick={onNavigate}
         >
-            <Icon className="size-5 shrink-0" weight="regular" />
+            <Icon className="size-4 shrink-0" weight="regular" />
             <span
                 className="evo-nav-label min-w-0 flex-1 truncate"
                 data-active={active ? 'true' : 'false'}
@@ -590,9 +497,10 @@ function NavGroup({
     onToggle: () => void;
     onNavigate?: () => void;
 }) {
-    const childActive = item.children?.some((child) =>
-        isNavigationChildActive(path, child),
-    ) ?? false;
+    const childActive =
+        item.children?.some((child) =>
+            isNavigationChildActive(path, child),
+        ) ?? false;
     const parentActive = active || activeId === item.id || childActive;
 
     if (!item.children?.length) {
@@ -614,7 +522,8 @@ function NavGroup({
                 className={cn(
                     rowClass,
                     'group',
-                    parentActive && 'bg-[var(--evo-teal-soft)] font-medium',
+                    parentActive &&
+                        'bg-[var(--evo-teal-soft)] font-medium text-[var(--evo-teal-ink)]',
                 )}
                 aria-expanded={open}
                 aria-controls={childrenId}
@@ -622,12 +531,7 @@ function NavGroup({
             >
                 <item.icon
                     aria-hidden
-                    className={cn(
-                        'size-5 shrink-0',
-                        parentActive
-                            ? 'text-[var(--evo-teal-ink)]'
-                            : 'text-[var(--evo-ink-secondary)]',
-                    )}
+                    className="size-4 shrink-0"
                     weight="regular"
                 />
                 <span className="evo-nav-label min-w-0 flex-1 truncate">
@@ -635,7 +539,7 @@ function NavGroup({
                 </span>
                 <span
                     aria-hidden
-                    className="grid size-5 shrink-0 place-items-center text-shell-muted transition-transform duration-180 ease-[var(--evo-ease)] motion-reduce:transition-none"
+                    className="grid size-5 shrink-0 place-items-center text-[var(--evo-ink-muted)]"
                     data-open={open ? 'true' : 'false'}
                 >
                     {open ? (
@@ -648,34 +552,34 @@ function NavGroup({
             <ul
                 id={childrenId}
                 className={cn(
-                    'evo-nav-children mt-0.5 flex flex-col gap-0.5 overflow-hidden ps-3 transition-[max-height,opacity,transform] duration-180 ease-[var(--evo-ease)] motion-reduce:transition-none',
+                    'evo-nav-children mt-0.5 flex flex-col gap-0.5 overflow-hidden ps-3',
                     open
                         ? 'max-h-[28rem] opacity-100'
-                        : 'pointer-events-none max-h-0 -translate-y-1 opacity-0',
+                        : 'pointer-events-none max-h-0 opacity-0',
                 )}
                 aria-hidden={!open}
                 inert={!open}
             >
-                    {item.children.map((child) => (
-                        <li key={child.id}>
-                            <Link
-                                href={child.href}
-                                prefetch
-                                aria-current={
-                                    activeId === child.id ? 'page' : undefined
-                                }
-                                className={cn(
-                                    'evo-nav-link relative flex h-8 items-center rounded-lg pe-2 ps-9 text-start text-[12px] text-shell-ink-2 hover:bg-[var(--evo-hover)]',
-                                    isNavigationChildActive(path, child) &&
-                                        'bg-[var(--evo-teal-soft)] font-medium text-[var(--evo-teal-ink)] before:pointer-events-none before:absolute before:inset-y-1.5 before:start-0 before:w-0.5 before:rounded-full before:bg-[var(--evo-teal-ink)]',
-                                )}
-                                onClick={onNavigate}
-                            >
-                                <span className="truncate">{t(child.labelKey)}</span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                {item.children.map((child) => (
+                    <li key={child.id}>
+                        <Link
+                            href={child.href}
+                            prefetch
+                            aria-current={
+                                activeId === child.id ? 'page' : undefined
+                            }
+                            className={cn(
+                                'evo-nav-link relative flex h-8 items-center rounded-[6px] pe-2 ps-8 text-start text-[13px] text-[var(--evo-ink-secondary)] hover:bg-[var(--evo-sidebar-hover)]',
+                                isNavigationChildActive(path, child) &&
+                                    'font-medium text-[var(--evo-teal-ink)]',
+                            )}
+                            onClick={onNavigate}
+                        >
+                            <span className="truncate">{t(child.labelKey)}</span>
+                        </Link>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }

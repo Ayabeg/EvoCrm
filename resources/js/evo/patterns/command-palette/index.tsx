@@ -441,7 +441,7 @@ export function CommandPalette({
                 aria-label={t('Command palette')}
                 data-command="os"
                 data-a11y="focus-trap"
-                className="absolute top-[18vh] left-1/2 w-[min(560px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-[12px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] text-[var(--evo-ink)] shadow-[var(--evo-shadow-modal)]"
+                className="absolute top-[18vh] start-1/2 w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-[12px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] text-[var(--evo-ink)] shadow-[var(--evo-shadow-modal)]"
                 onKeyDown={onDialogKeyDown}
             >
                 <Command

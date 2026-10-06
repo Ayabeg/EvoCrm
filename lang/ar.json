@@ -1946,5 +1946,10 @@
     "Open CRM context": "فتح سياق CRM",
     "Continue in a workspace linked to this agent.": "تابع في مساحة مرتبطة بهذا الوكيل.",
     "Message templates": "نماذج الرسائل",
-    "Use": "استخدام"
+    "Use": "استخدام",
+    "nav.sections.pilot": "القيادة",
+    "nav.agents": "الوكلاء",
+    "Collapse sidebar": "طي الشريط الجانبي",
+    "Expand sidebar": "توسيع الشريط الجانبي",
+    "Shortcuts": "الاختصارات"
 }
