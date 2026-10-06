@@ -109,4 +109,4 @@ File: `resources/js/layouts/app/app-sidebar-layout.tsx`
 - Contacts first row y=207 still above blueprint header budget (Agent 06 / list workspace).
 - Settings is still a modal (pre-existing).
 - FR/EN mix on nav labels “Leads” / “Contacts” (i18n copy, not shell).
-- `tsc` 3 pre-existing errors unchanged. Full-repo ESLint in this environment reports more than the Wave 0 **389** count (see closeout); owned shell files were brought back to clean.
+- `tsc` still the same 3 pre-existing errors. `scripts/product-rebuild/qa-baseline.sh` on `016e1d70`: Pest 1206/1205 + 1 skip + 1 risky; Vitest 26/90; vite build 15.71s OK; ESLint full-repo **437** (434 errors, 3 warnings) on this VM vs Wave 0 written **389**. Owned P0.1 files are clean; the five import-order / set-state issues this branch introduced were fixed (442 → 437 on the same VM). Do not treat the remaining 389→437 gap as new shell debt without a same-env Wave 0 rerun.
