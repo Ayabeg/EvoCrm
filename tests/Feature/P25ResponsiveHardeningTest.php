@@ -51,7 +51,7 @@ it('caps overlays to the viewport without rewriting Dialog/Drawer semantics', fu
         ->and($popover)->toContain('max-w-[calc(100vw-1rem)]')
         ->and($qrd)->toContain('PAGE_OVERFLOW_CLASS')
         ->and($qrd)->toContain('sm:w-[min(92vw,520px)]')
-        ->and($command)->toContain('min(560px,calc(100vw-2rem))');
+        ->and($command)->toContain('min(640px,calc(100vw-2rem))');
 });
 
 it('keeps P17 KPI 2×2, inbox native/embed, and quote money unclipped', function () {

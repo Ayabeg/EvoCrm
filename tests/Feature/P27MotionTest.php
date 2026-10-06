@@ -91,7 +91,7 @@ it('normalizes overlay open/close to the P27 contract and keeps P26 reduce strin
         ->and($qrd)->toContain('--motion-duration-drawer');
 
     expect($palette)->toContain('trapTabKey')
-        ->and($palette)->toContain('min(560px,calc(100vw-2rem))')
+        ->and($palette)->toContain('min(640px,calc(100vw-2rem))')
         ->and($palette)->toContain('data-command="os"')
         ->and($palette)->not->toContain('cubic-bezier(0.16, 1, 0.3, 1)');
     expect($motionCss)->toContain("[data-command='os']")
