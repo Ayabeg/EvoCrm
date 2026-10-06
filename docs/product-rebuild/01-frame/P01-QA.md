@@ -1,156 +1,121 @@
-# P0.1 QA — Contract certification (Gate A)
+# P0.1 QA — Contract certification (Gate A, final stack)
 
 **Agent:** 04 · Contract QA  
-**Head:** `rebuild/p01-workspace-frame` `02fa629f` (draft PR #291)  
-**Shell base:** `rebuild/p01-shell` `22b14d1` (PR #290)  
+**Product head:** `rebuild/p01-workspace-frame` `39c7de4e` (draft PR #291, includes shell `1e5eb94`)  
+**Cert branch:** `rebuild/p01-certification` (draft PR #292)  
 **Main:** `1e146ffb`  
 **Date:** 6 October 2026  
-**Host:** localhost only (`http://127.0.0.1:8000` head, `http://127.0.0.1:8001` main worktree). No deploy, DNS, production, secrets, or extra seed records.  
-**Seed:** `DatabaseSeeder` + `VisualQaSeeder`. Login `owner@evosales.local` / `password`.
+**Host:** localhost only (`:8000` head, `:8001` main worktree). No deploy, DNS, production, secrets, or extra seed records.  
+**Seed:** `DatabaseSeeder` + `VisualQaSeeder`. Login `owner@evosales.local` / `password`.  
+**Inbox:** workspace `inbox_url` forced `null`; `.env` `EVOSALES_INBOX_URL=` / `EVODESK_URL=`.
 
-This document compares the same environment on **main `1e146ff`** and **head `02fa629`**. Product code was not modified. Certification artifacts live on `rebuild/p01-certification`.
-
-Rerun helper: `scripts/product-rebuild/qa-baseline.sh`. Same-env logs: `/tmp/qa-baseline-main` (and `/tmp/qa-baseline-main-pest2` after the vendor-symlink false fail) and `/tmp/qa-baseline-head`.
+Supersedes the `02fa629` pass. Product code was not modified on the cert branch.
 
 ---
 
-## 1. Git / worktree identity
+## 1. Identity
 
 | Fact | main | head |
 |---|---|---|
-| SHA | `1e146ffb` | `02fa629f` |
-| Subject | Merge pull request #289 (`rebuild/w0-master-migration-map`) | `test(workspace): capture P0.1 after proof and FRAME-NOTES` |
-| Worktree | `/tmp/p01-qa-main` (detached / worktree) | `/workspace` on `rebuild/p01-certification` |
+| SHA | `1e146ffb` | product `39c7de4e` (cert HEAD is docs-on-top of that) |
+| Worktree | `/tmp/p01-qa-main` | `/workspace` |
 | Serve | `:8001` | `:8000` |
-| Product edits this run | none | none |
 
-First Pest run on main **failed 20 tests (EXIT 2)** because the worktree `vendor/` was a symlink into HEAD, so `resource_path()` read P0.1 source-locks against main’s older files. That failure is an **environment artifact, not a product regression**. After copying a real `vendor/` into the worktree, Pest passed (see §3). Classify that first fail as **not PRE-EXISTING product debt** and **not NEW**.
+`scripts/product-rebuild/qa-baseline.sh` always `cd`s to the script’s repo root. Main suites were run **inside** `/tmp/p01-qa-main` so they actually measure `1e146ff`.
 
 ---
 
 ## 2. Suite results (same environment)
 
-Every failure that exists on both SHAs is **PRE-EXISTING**. Head must not be worse.
-
-| Command | main `1e146ff` | head `02fa629` | Classification |
+| Command | main `1e146ff` | head `39c7de4` | Classification |
 |---|---|---|---|
-| `npm run types:check` (`tsc --noEmit`) | **FAIL** exit 2 — **3 errors / 0 warnings** | **FAIL** exit 2 — **same 3 errors** | PRE-EXISTING (identical text) |
-| `npm test` (`vitest run`) | **PASS** exit 0 — **26 files / 89 tests** | **PASS** exit 0 — **27 files / 95 tests** | CURRENTLY GREEN. Head +1 file / +6 tests (`workspace.test.ts`). Not a regression. |
-| `npm run lint:check` (`eslint .`) | **FAIL** exit 1 — **439 problems (436 errors, 3 warnings)** | **FAIL** exit 1 — **436 problems (433 errors, 3 warnings)** | PRE-EXISTING. Head is **3 errors better**, not worse. Same-env main is 439, not Wave 0’s written 389 — do not treat 389→436 as NEW P0.1 debt. |
-| `npm run build` (`vite build`) | **PASS** exit 0 — 15.14s | **PASS** exit 0 — 15.52s | CURRENTLY GREEN |
-| `composer ci:check` (`php artisan test`) | **PASS** exit 0 — **1200 tests / 1199 passed / 1 skipped / 1 risky** / 33706 assertions / 49.3s (rerun after vendor copy) | **PASS** exit 0 — **1210 tests / 1209 passed / 1 skipped / 1 risky** / 33855 assertions / 47.5s | CURRENTLY GREEN. Head +10 Pest locks (`P01WorkspaceFrameTest` + retargets). Skip + risky PRE-EXISTING. |
-| Playwright authenticated route sweep | **PASS** — **12/12 HTTP 200**; 0 `console` errors; 0 `pageerror`; 0 `requestfailed` | **PASS** — **12/12 HTTP 200**; 0 / 0 / 0 | CURRENTLY GREEN on both |
+| `npm run types:check` | FAIL exit 2 · **3 errors** | FAIL exit 2 · **same 3 errors** | PRE-EXISTING |
+| `npm test` | PASS · **26 files / 89 tests** | PASS · **27 files / 96 tests** | GREEN. Head +1 file / +7 tests |
+| `npm run lint:check` | FAIL · **439 (436e / 3w)** | FAIL · **436 (433e / 3w)** | PRE-EXISTING. Head cleaner. Same-env main is 439, not Wave 0’s 389 |
+| `npm run build` | PASS · 15.26s | PASS · 20.04s | GREEN |
+| `composer ci:check` | PASS · **1200 / 1199 + 1 skip + 1 risky** / 33706 assertions | PASS · **1214 / 1213 + 1 skip + 1 risky** / 33885 assertions | GREEN. Head +14 Pest locks |
+| Playwright 12 routes | 12/12 HTTP 200 · 0 console / pageerror / requestfailed | same | GREEN |
 
-CI implication unchanged from Wave 0: GitHub `ci` runs **Pest only**. A green CI job can still ship the 3 TypeScript errors and the ~430 ESLint errors.
-
-### 2.1 TypeScript errors (verbatim, both SHAs)
+### TypeScript (verbatim, both SHAs)
 
 ```
-resources/js/components/dashboard/dashboard-recent.tsx(53,33): error TS2322: Type '{ children: string; record: RecordRef; mode: "drawer"; className: string; dir: string; }' is not assignable to type 'IntrinsicAttributes & { record: RecordRef; mode?: "full" | "drawer" | undefined; children: ReactNode; className?: string | undefined; }'.
-  Property 'dir' does not exist on type 'IntrinsicAttributes & { record: RecordRef; mode?: "full" | "drawer" | undefined; children: ReactNode; className?: string | undefined; }'.
-resources/js/evo/data/crm-list/tablecn.tsx(20,44): error TS2305: Module '"@/evo/icons"' has no exported member 'EyeSlash'.
-resources/js/evo/data/crm-list/tablecn.tsx(32,23): error TS2305: Module '"@/lib/list-view-config"' has no exported member 'sortableColumnIds'.
+resources/js/components/dashboard/dashboard-recent.tsx(53,33): error TS2322: … Property 'dir' does not exist …
+resources/js/evo/data/crm-list/tablecn.tsx(20,44): error TS2305: … no exported member 'EyeSlash'.
+resources/js/evo/data/crm-list/tablecn.tsx(32,23): error TS2305: … no exported member 'sortableColumnIds'.
 ```
-
-Same three lines as `docs/product-rebuild/00-baseline/BASELINE-QA.md` §4. **PRE-EXISTING. Not introduced by #290 / #291.**
-
-### 2.2 Pest skip + risky (both SHAs)
-
-- **Skipped:** `GoldenCopyGuardTest` — Playwright not installed at `/tmp/pw`. PRE-EXISTING. Do not install `/tmp/pw` if you want the CI-equivalent path.
-- **Risky:** 1 (same as Wave 0). Also prints the two `InvalidArgumentException` use-statement warnings in `EvoTicketsP1ModelTest` / `EvoTicketsP4DeskOpenTest`. PRE-EXISTING.
-
-### 2.3 ESLint same-env note
-
-Wave 0 wrote **389** problems on a different measurement (`89eb457`). This VM’s full-repo lint on **main `1e146ff` is 439**. Head is 436. Owned P0.1 files were cleaned on #290 / #291. The 389→439 gap is **PRE-EXISTING on this environment**, not a Wave 1 introduction.
 
 ---
 
-## 3. Playwright route sweep (console / pageerror / requestfailed)
+## 3. Playwright route sweep
 
-Authenticated Chromium, 1440×900, FR light, `domcontentloaded` + settle. Routes match Wave 0 §8.
+| Route | main | head | console / pageerror / requestfailed |
+|---|---|---|---|
+| `/dashboard` | 200 | 200 | none |
+| `/crm/contacts` | 200 | 200 | none |
+| `/crm/contacts/1` | 200 | 200 | none |
+| `/crm/companies` | 200 | 200 | none |
+| `/crm/leads` | 200 | 200 | none |
+| `/crm/deals` | 200 | 200 | none |
+| `/crm/deals/board` | 200 | 200 | none |
+| `/crm/deals/1` | 200 | 200 | none |
+| `/inbox` | 200 | 200 | none |
+| `/crm/quotes` | 200 | 200 | none |
+| `/crm/quotes/1` | 200 | 200 | none |
+| `/settings` → `/settings/profile` | 200 | 200 | none |
 
-| Route | Path | main HTTP | head HTTP | console / pageerror / requestfailed |
-|---|---|---|---|---|
-| Dashboard | `/dashboard` | 200 | 200 | none / none / none |
-| Contacts | `/crm/contacts` | 200 | 200 | none / none / none |
-| Contact record | `/crm/contacts/1` | 200 | 200 | none / none / none |
-| Companies | `/crm/companies` | 200 | 200 | none / none / none |
-| Leads | `/crm/leads` | 200 | 200 | none / none / none |
-| Deals list | `/crm/deals` | 200 | 200 | none / none / none |
-| Deals board | `/crm/deals/board` | 200 | 200 | none / none / none |
-| Deal record | `/crm/deals/1` | 200 | 200 | none / none / none |
-| Inbox | `/inbox` | 200 | 200 | none / none / none |
-| Quotes | `/crm/quotes` | 200 | 200 | none / none / none |
-| Quote detail | `/crm/quotes/1` | 200 | 200 | none / none / none |
-| Settings | `/settings` → `/settings/profile` | 200 | 200 | none / none / none |
-
-**Browser console result (head):** empty on all 12 sweep routes and on all 103 after-capture routes (`artifacts/product-rebuild/01-frame/after/console-errors.json`). Titles for Companies / Leads stay English in FR chrome — PRE-EXISTING i18n hole (Wave 0 §10.8).
+After recapture (`inbox_url` null): **103/103** `console-errors.json` entries empty.
 
 ---
 
-## 4. Manual contract checks (head `02fa629`)
+## 4. Manual contract checks (head `39c7de4`)
 
-Exercised on `http://127.0.0.1:8000` against the seeded Evotechly workspace. No extra records created. Deal #1 was moved then restored.
+18 original + 3 review-fix checks.
 
 | Check | Result | Evidence |
 |---|---|---|
-| Contacts saved view applies | **PASS** | Click « Mes contacts » → ` /crm/contacts?owner=1&view=my` |
-| Contacts filters / sort / page write URL | **PASS** | Canonical query `?direction=asc&owner=1&page=2&sort=name&view=my` |
-| URL state survives reload | **PASS** | Same query after `location.reload()` |
-| URL state survives Back | **PASS** | From dashboard, Back restores the full query |
-| URL state survives Forward | **PASS** | Contacts (query) → Dashboard → Back (query intact) → Forward (`/dashboard`) |
-| Saved view applies (reload of `?view=my`) | **PASS** | Covered by the saved-view + URL-write rows |
-| QuickRecord opens from Contacts | **PASS** | `tr[data-row-peek=true]` (aria « Inspect Sara Khelifi ») + **Enter** opens a 448×900 dialog: name, company, « Open full », « Vue d’ensemble ». Click on nested `a` / `tel` / `mailto` correctly does **not** peek (P10). |
-| Deals board DnD issues the same move request | **PASS** | Card `[data-testid=deal-card-1]` → `[data-testid=stage-column-qualified]`. Network: `POST /crm/deals/1/move` body `{"stage_id":2}`. Stage 1 → 2. |
-| Deal stage restored after DnD | **PASS** | `Deal::moveTo` original stage. Fresh `stage_id=1`. |
-| Inbox composer anchored | **PASS** | Visible `[data-inbox=composer]` y=636 h=248 bottom=884 (viewport 900). « Envoyer » visible. |
-| Inbox list + thread scroll independently | **PASS** | List column 300×778; thread 341×437 `overflow-y: auto`. `document.scrollingElement` does **not** page-scroll. |
-| Simple Mode nav membership unchanged | **PASS** | Hrefs: `/dashboard`, `/inbox`, `/crm/contacts`, `/crm/companies`, `/crm/leads`, `/crm/activities`, `/crm/deals`, `/crm/quotes`, `/settings`. `missingSimple=[]`, `leakedPower=[]`. C-02 still OPEN (not changed). |
-| Cmd+K opens search | **PASS** | Dialog width **640**. Mentions present. |
-| Cmd+J absent in Simple Mode | **PASS** | No Ask Evo drawer. C-07 honored. |
-| Cmd+J present in Full Mode | **PASS** | Drawer + copy present when `simple_mode=false`. |
-| Rail collapse persists across reload | **PASS** | Collapsed width **56**; cookie `sidebar_state=false`; still 56 after reload. |
-| Mobile overlay does not resize workspace | **PASS** | At 390: workspace `width=390` before and while overlay open. |
-| Escape closes mobile overlay | **PASS** | Overlay `open=false` after Escape. |
-| Keyboard tab order + teal focus on rail / header | **PASS** | First chrome targets (collapse, Rechercher ⌘K, Créer, CRM group) show `outline: rgb(15, 76, 92) solid 2px` (`--evo-teal`). Nested Contacts / Sociétés links fall through to the browser default — PRE-EXISTING child-link behavior, not a new Gate A fail. |
-| Reduced motion respected | **PASS** | `prefers-reduced-motion: reduce` matches. Rail `transitionDuration=1e-05s` (effectively 0 ms). |
+| Saved view applies | **PASS** | `?owner=1&view=my` |
+| Filters/sort/page write URL | **PASS** | `?direction=asc&owner=1&page=2&sort=name&view=my` |
+| URL survives reload | **PASS** | same query |
+| URL survives Back | **PASS** | query intact |
+| URL survives Forward | **PASS** | Forward → `/dashboard` |
+| QuickRecord from Contacts | **PASS** | Enter on peek row → 448px dialog |
+| Deals DnD move request | **PASS** | `POST /crm/deals/1/move` `{"stage_id":2}` |
+| Deal stage restored | **PASS** | `stage_id=1` |
+| Inbox composer anchored | **PASS** | y=636 h=248 bottom=884; Envoyer visible; **no CSP banner** |
+| Inbox list/thread independent scroll | **PASS** | list 300×826; thread 341×485 `overflow-y:auto`; page does not scroll |
+| Simple Mode nav unchanged | **PASS** | `missingSimple=[]` `leakedPower=[]` |
+| Cmd+K opens search | **PASS** | dialog width 640 |
+| Cmd+J absent Simple | **PASS** | no Ask Evo drawer |
+| Cmd+J present Full | **PASS** | drawer present |
+| Rail collapse persists | **PASS** | width 56; cookie `false` after reload |
+| Mobile overlay does not resize | **PASS** | 390 before and while open |
+| Escape closes overlay | **PASS** | overlay closed |
+| Tab order + teal on rail/header | **PASS** | collapse / search / create / Accueil / Inbox / CRM = `rgb(15, 76, 92)` |
+| Reduced motion | **PASS** | rail `1e-05s` |
+| **Nested-nav focus ring teal (R05-02)** | **FAIL** | Top-level Accueil/Inbox/CRM are teal. Contacts *child* via Tab: `outline: rgb(74, 90, 99) solid 2px` (ink-secondary). Source uses the same `rowClass` + `--evo-focus`; computed child ring is not teal. **NEW P3** |
+| **No 224→56 first-paint snap (R05-01)** | **PASS** | Cookie `sidebar_state=false` pre-set. First nonzero sample t=138ms w=56; maxW=56; never saw 224 |
+| **Deals forecast/attention visible default (R06-01)** | **PASS** | List « À traiter » visible; board forecast + attention visible; `details` empty (no closed disclosure) |
 
-**Manual score:** 18 / 18 PASS. No NEW contract break.
+**Score: 20 / 21 PASS.** The one fail is a focus-color residual on nested children, not a contract break.
 
----
-
-## 5. What Wave 1 must not treat as a Gate A fail
-
-These still fail the **blueprint** budget / page-internal laws. They are **out of Gate A ownership** (DataWorkspace views/filters, board chrome, Desk internals, Settings modal). Listed so they are not forgotten; **not counted as NEW P1s**.
-
-- Contacts first row y=209 (target ≤150). SavedViews + FilterBar + thead still live in DataWorkspace.
-- Deals board first card y=393 (target ≤200 / ≈148). Views + search/filters + stage pills remain.
-- Companies / Leads lists still use the document scroller (not acceptance-migrated).
-- Settings is still a dialog.
-- Lead record is still an English island with an orange status control.
-
-See `P01-VISUAL-CERTIFICATION.md`.
+G-chord shortcuts (`G A`, `G C`, …): **NOT TESTED**.
 
 ---
 
-## 6. Classification summary
+## 5. Gate A vs Wave 2
 
-| Failure | PRE-EXISTING | NEW (#290 / #291) |
+Do not treat as NEW P1s: Contacts y=209; board y=793; list y=717; DataWorkspace bands; Settings modal; lead English; Companies/Leads document scroller.
+
+---
+
+## 6. Classification
+
+| Failure | PRE-EXISTING | NEW |
 |---|---|---|
-| `tsc` 3 errors | yes | no |
-| ESLint ~436–439 | yes (same-env) | no (head is cleaner) |
+| tsc 3 | yes | no |
+| ESLint ~436–439 | yes | no |
 | Pest skip + risky | yes | no |
-| Playwright console / pageerror / requestfailed | none | none |
-| Manual contract | none failed | none failed |
-| Main Pest 20-fail (vendor symlink) | n/a — environment | n/a |
+| Nested child focus gray | no | **P3** |
+| Playwright console | none | none |
 
-**Gate A contract QA: GO** (no NEW suite or manual regression).
-
----
-
-## 7. Environment notes
-
-- PHP 8.3 + Composer 2.10.3 + Node 22 / npm 10 on this VM.
-- Head `.env` from `.env.example`; inbox / desk URLs and PostHog keys cleared for the live QA server so `/inbox` is the native desk.
-- After-capture `metrics.json` still records `inbox_url=https://desk.evotechly.com` from the Agent 06 capture session — that is why some after Inbox PNGs show the CSP banner. Live QA and the Wave 0 baseline cleared that URL. Not a product-code change in #291.
-- No production access. No migrations beyond local SQLite seed.
+**Gate A contract QA: GO** (no NEW P0/P1).
