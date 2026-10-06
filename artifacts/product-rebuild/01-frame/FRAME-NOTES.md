@@ -1,7 +1,7 @@
 # P0.1 FRAME-NOTES (Agent 06)
 
 **Branch:** `rebuild/p01-workspace-frame`  
-**Base:** `rebuild/p01-shell` `f27fbfca` (merged; Agent 05 advanced past `22b14d1`)  
+**Base:** `rebuild/p01-shell` `1e5eb94` (Agent 05 finished; merged)  
 **PR:** draft #291 — *P0.1 workspace frame (Gate A, do not merge)*  
 **Host:** `http://127.0.0.1:8000` only. DatabaseSeeder + VisualQaSeeder. No deploy, DNS, production, extra records.
 
@@ -151,7 +151,7 @@ Zero console errors / pageerrors / requestfailed across 103 shots.
 
 ## qa-baseline.sh (this branch)
 
-| Check | Shell `016e1d70` | This PR (`0046706e` + recapture) |
+| Check | Shell `016e1d70` | This PR (merged `1e5eb94`, recapture) |
 |---|---|---|
 | Pest | 1206 tests / 1205 pass + 1 skip + 1 risky | **1214 / 1213 pass + 1 skip + 1 risky** |
 | Vitest | 26 files / 90 tests | **27 / 96** |
