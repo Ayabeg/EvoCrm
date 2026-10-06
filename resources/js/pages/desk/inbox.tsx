@@ -24,6 +24,7 @@ import { ConversationList } from '@/evo/inbox';
 import { deskThreadToConversation } from '@/evo/inbox/adapters';
 import { EmptyState } from '@/evo/patterns/empty-state';
 import { Button } from '@/evo/ui/button';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
 import type { InboxCrmContextPayload } from '@/lib/inbox-crm-context';
@@ -178,32 +179,35 @@ function DeskEmbedWorkspace({
             data-crm="inbox-workspace"
             data-inbox="embed"
         >
-            <header className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline bg-white px-4 py-2">
-                <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-ink">{t('Inbox')}</p>
-                    <p className="text-[11px] text-mute">
+            <WorkspaceHeader
+                archetype="conversation"
+                title={t('Inbox')}
+                count={
+                    <>
                         {t('Desk framed on this host')} · {host}
-                    </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                    <Link
-                        href="/conversations"
-                        className="text-[12px] text-mute underline-offset-2 hover:text-ink hover:underline"
-                    >
-                        {t('Conversation history')}
-                    </Link>
-                    {officialConnectors.some(
-                        (connector) => connector.status !== 'connected',
-                    ) ? (
+                    </>
+                }
+                secondaryActions={
+                    <>
                         <Link
-                            href="/settings/channels"
+                            href="/conversations"
                             className="text-[12px] text-mute underline-offset-2 hover:text-ink hover:underline"
                         >
-                            {t('Channels')}
+                            {t('Conversation history')}
                         </Link>
-                    ) : null}
-                </div>
-            </header>
+                        {officialConnectors.some(
+                            (connector) => connector.status !== 'connected',
+                        ) ? (
+                            <Link
+                                href="/settings/channels"
+                                className="text-[12px] text-mute underline-offset-2 hover:text-ink hover:underline"
+                            >
+                                {t('Channels')}
+                            </Link>
+                        ) : null}
+                    </>
+                }
+            />
             <div className="relative min-h-0 flex-1 bg-white">
                 {frameState === 'loading' ? <InboxEmbedSkeleton /> : null}
                 {frameState === 'failed' ? (
@@ -287,6 +291,10 @@ export default function DeskInbox({
                 data-crm="inbox-workspace"
                 data-inbox="native"
             >
+                <WorkspaceHeader
+                    archetype="conversation"
+                    title={t('Inbox')}
+                />
                 {workspaceEmpty ? (
                     <InboxEmpty
                         embedState={embedState}

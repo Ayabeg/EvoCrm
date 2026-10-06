@@ -92,7 +92,8 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                                     <Button
                                         disabled={processing}
                                         size="sm"
-                                        className="h-8 bg-brand text-white hover:bg-brand-hover"
+                                        variant="outline"
+                                        className="h-8"
                                     >
                                         {t('Save lines')}
                                     </Button>

@@ -26,6 +26,7 @@ import type { AttributeBag } from '@/components/crm/record-properties';
 import TicketsRelatedCard from '@/components/crm/tickets-related-card';
 import type { TicketsRelated } from '@/components/crm/tickets-related-card';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { formatPhone } from '@/evo/lib/format';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
@@ -111,58 +112,71 @@ export default function ContactShow({
                 >
                     <RecordPageFrame
                         header={
-                            <div className="flex flex-col gap-4 py-1">
-                                <div className="flex items-center justify-end">
+                            <WorkspaceHeader
+                                archetype="record"
+                                leading={
                                     <RecordBack
                                         href="/crm/contacts"
                                         label={t('Back to Contacts')}
                                     />
+                                }
+                                title={
+                                    <RecordIdentity
+                                        title={name}
+                                        kind="Contact"
+                                        subtitle={
+                                            company?.name ?? t('No company')
+                                        }
+                                        badge={
+                                            contact.lead_status ? (
+                                                <RecordStatusBadge>
+                                                    {contact.lead_status}
+                                                </RecordStatusBadge>
+                                            ) : null
+                                        }
+                                        meta={
+                                            contactEngagement ? (
+                                                <p className="text-[12px] leading-snug text-[var(--evo-ink-secondary)]">
+                                                    <span className="font-medium text-[var(--evo-ink)]">
+                                                        {
+                                                            contactEngagement.label
+                                                        }
+                                                    </span>{' '}
+                                                    ({contactEngagement.score}
+                                                    /100)
+                                                    <span className="hidden sm:inline">
+                                                        {' '}
+                                                        ·{' '}
+                                                        {
+                                                            contactEngagement.reason
+                                                        }
+                                                    </span>
+                                                </p>
+                                            ) : null
+                                        }
+                                        actions={
+                                            <RecordActions
+                                                entityId={contact.id}
+                                                contactId={contact.id}
+                                                companyId={contact.company_id}
+                                                whatsappHref={
+                                                    thread
+                                                        ? `/conversations?thread=${thread.id}`
+                                                        : '/inbox'
+                                                }
+                                            />
+                                        }
+                                    />
+                                }
+                                panels={
                                     <div className="md:hidden">
                                         <AskEvoTrigger
                                             action={askAction}
                                             insight={askEvo}
                                         />
                                     </div>
-                                </div>
-                                <RecordIdentity
-                                    title={name}
-                                    kind="Contact"
-                                    subtitle={company?.name ?? t('No company')}
-                                    badge={
-                                        contact.lead_status ? (
-                                            <RecordStatusBadge>
-                                                {contact.lead_status}
-                                            </RecordStatusBadge>
-                                        ) : null
-                                    }
-                                    meta={
-                                        contactEngagement ? (
-                                            <p className="text-[12px] leading-snug text-[var(--evo-ink-secondary)]">
-                                                <span className="font-medium text-[var(--evo-ink)]">
-                                                    {contactEngagement.label}
-                                                </span>{' '}
-                                                ({contactEngagement.score}/100)
-                                                <span className="hidden sm:inline">
-                                                    {' '}
-                                                    · {contactEngagement.reason}
-                                                </span>
-                                            </p>
-                                        ) : null
-                                    }
-                                    actions={
-                                        <RecordActions
-                                            entityId={contact.id}
-                                            contactId={contact.id}
-                                            companyId={contact.company_id}
-                                            whatsappHref={
-                                                thread
-                                                    ? `/conversations?thread=${thread.id}`
-                                                    : '/inbox'
-                                            }
-                                        />
-                                    }
-                                />
-                            </div>
+                                }
+                            />
                         }
                     >
                         <RecordShell
