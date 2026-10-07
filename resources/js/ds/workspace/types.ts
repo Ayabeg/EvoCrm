@@ -105,6 +105,15 @@ export type DataWorkspaceChromeProps = {
     banner?: ReactNode;
     filterExtra?: ReactNode;
     toolbarExtra?: ReactNode;
+    /**
+     * Deals-only compact chrome. Contacts / Quotes / Tickets stay on
+     * the default stacked SavedViews + FilterBar bands.
+     */
+    chromeDensity?: 'default' | 'compact';
+    /** Slot B — e.g. PipelineSwitcher when more than one pipeline. */
+    headerContext?: ReactNode;
+    /** Slot L — compact forecast one-liner. */
+    headerSummary?: ReactNode;
     className?: string;
     contentClassName?: string;
 };

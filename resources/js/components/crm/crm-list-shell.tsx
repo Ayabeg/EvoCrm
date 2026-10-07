@@ -104,6 +104,7 @@ export function CrmListShell<Row extends { id: RowId }>({
     canCreate = true,
     banner,
     headerActions,
+    headerSummary,
     layoutToggle,
     pipelineSwitcher,
     extraQuery,
@@ -145,6 +146,7 @@ export function CrmListShell<Row extends { id: RowId }>({
     canCreate?: boolean;
     banner?: ReactNode;
     headerActions?: ReactNode;
+    headerSummary?: ReactNode;
     layoutToggle?: ReactNode;
     pipelineSwitcher?: ReactNode;
     extraQuery?: Record<string, string | number | null | undefined>;
@@ -299,15 +301,18 @@ export function CrmListShell<Row extends { id: RowId }>({
         filterContext: { members, cities, wilayas, stages },
         secondaryActions: headerActions,
         banner,
+        chromeDensity: entity === 'deal' ? 'compact' : 'default',
+        headerContext: pipelineSwitcher,
+        headerSummary,
         filterExtra: (
             <>
                 {layoutToggle}
-                {pipelineSwitcher}
+                {entity === 'deal' ? null : pipelineSwitcher}
             </>
         ),
         toolbarExtra:
             resultMode === 'shared-table' &&
-            (entity === 'deal' || entity === 'ticket') &&
+            entity === 'ticket' &&
             stagePills.length > 0 ? (
                 <StagePills
                     stages={stagePills}
@@ -367,7 +372,7 @@ export function CrmListShell<Row extends { id: RowId }>({
             resultMode="domain"
             renderResults={({ columns: nextColumns, selection: workspaceSelection }) => (
                 <>
-                    {entity === 'deal' || entity === 'ticket' ? (
+                    {entity === 'ticket' ? (
                         <StagePills
                             stages={stagePills}
                             activeSlug={

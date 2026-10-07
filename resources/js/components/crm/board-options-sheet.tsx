@@ -7,6 +7,7 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from '@/evo/ui/drawer';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export type BoardOptions = {
@@ -40,31 +41,31 @@ export function BoardOptionsSheet({
                 style={{ background: 'var(--evosales-canvas)', color: 'var(--evosales-ink)' }}
             >
                 <DrawerHeader className="border-b border-hairline px-5 py-4">
-                    <DrawerTitle className="text-[15px] text-ink">Edit board view</DrawerTitle>
+                    <DrawerTitle className="text-[15px] text-ink">{t('Edit board view')}</DrawerTitle>
                     <div className="mt-3 flex gap-4 text-[13px]">
                         <button
                             type="button"
                             className={cn(
                                 'border-b-2 pb-1',
                                 tab === 'cards'
-                                    ? 'border-brand font-medium text-ink'
+                                    ? 'border-[var(--evo-teal)] font-medium text-[var(--evo-teal)]'
                                     : 'border-transparent text-mute',
                             )}
                             onClick={() => setTab('cards')}
                         >
-                            Cards
+                            {t('Cards')}
                         </button>
                         <button
                             type="button"
                             className={cn(
                                 'border-b-2 pb-1',
                                 tab === 'board'
-                                    ? 'border-brand font-medium text-ink'
+                                    ? 'border-[var(--evo-teal)] font-medium text-[var(--evo-teal)]'
                                     : 'border-transparent text-mute',
                             )}
                             onClick={() => setTab('board')}
                         >
-                            Board
+                            {t('Board')}
                         </button>
                     </div>
                 </DrawerHeader>
@@ -81,7 +82,7 @@ export function BoardOptionsSheet({
                                 <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4 text-[13px]">
                                     <fieldset>
                                         <legend className="mb-2 font-medium text-ink">
-                                            Choose card style
+                                            {t('Choose card style')}
                                         </legend>
                                         <div className="flex gap-3">
                                             <label className="flex cursor-pointer items-center gap-2">
@@ -91,7 +92,7 @@ export function BoardOptionsSheet({
                                                     value="default"
                                                     defaultChecked={options.card_style === 'default'}
                                                 />
-                                                Default
+                                                {t('Default')}
                                             </label>
                                             <label className="flex cursor-pointer items-center gap-2">
                                                 <input
@@ -100,7 +101,7 @@ export function BoardOptionsSheet({
                                                     value="compact"
                                                     defaultChecked={options.card_style === 'compact'}
                                                 />
-                                                Compact
+                                                {t('Compact')}
                                             </label>
                                         </div>
                                     </fieldset>
@@ -112,7 +113,7 @@ export function BoardOptionsSheet({
                                             value="1"
                                             defaultChecked={options.show_priority}
                                         />
-                                        Display priority and associated records
+                                        {t('Display priority and associated records')}
                                     </label>
                                     <input type="hidden" name="show_associations" value="1" />
 
@@ -125,9 +126,9 @@ export function BoardOptionsSheet({
                                             className="mt-0.5"
                                         />
                                         <span>
-                                            <span className="font-medium">Deal activity information</span>
+                                            <span className="font-medium">{t('Deal activity information')}</span>
                                             <span className="mt-0.5 block text-[12px] text-mute">
-                                                Show next and last activity information for each deal
+                                                {t('Show next and last activity information for each deal')}
                                             </span>
                                         </span>
                                     </label>
@@ -141,15 +142,15 @@ export function BoardOptionsSheet({
                                             className="mt-0.5"
                                         />
                                         <span>
-                                            <span className="font-medium">Inactive cards</span>
+                                            <span className="font-medium">{t('Inactive cards')}</span>
                                             <span className="mt-0.5 block text-[12px] text-mute">
-                                                Mark cards that have gone a designated amount of time with no recorded activity
+                                                {t('Mark cards that have gone a designated amount of time with no recorded activity')}
                                             </span>
                                         </span>
                                     </label>
 
                                     <label className="grid max-w-[12rem] gap-1 text-[12px] text-mute">
-                                        Mark cards inactive after
+                                        {t('Mark cards inactive after')}
                                         <span className="flex items-center gap-2">
                                             <input
                                                 type="number"
@@ -159,21 +160,21 @@ export function BoardOptionsSheet({
                                                 defaultValue={options.inactive_after_days}
                                                 className="h-8 w-16 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
                                             />
-                                            days
+                                            {t('days')}
                                         </span>
                                     </label>
 
                                     <label className="grid max-w-[16rem] gap-1 text-[12px] text-mute">
-                                        Sort
+                                        {t('Sort')}
                                         <select
                                             name="sort"
                                             defaultValue={options.sort}
                                             className="h-8 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
                                         >
-                                            <option value="last_activity">Last activity</option>
-                                            <option value="amount">Amount</option>
-                                            <option value="close_date">Close date</option>
-                                            <option value="title">Deal name</option>
+                                            <option value="last_activity">{t('Last activity')}</option>
+                                            <option value="amount">{t('Amount')}</option>
+                                            <option value="close_date">{t('Close date')}</option>
+                                            <option value="title">{t('Deal name')}</option>
                                         </select>
                                     </label>
                                 </div>
@@ -184,10 +185,10 @@ export function BoardOptionsSheet({
                                         size="sm"
                                         onClick={() => onOpenChange(false)}
                                     >
-                                        Cancel
+                                        {t('Cancel')}
                                     </Button>
                                     <Button type="submit" size="sm" disabled={processing}>
-                                        Save
+                                        {t('Save')}
                                     </Button>
                                 </div>
                             </>
@@ -196,17 +197,17 @@ export function BoardOptionsSheet({
                 ) : (
                     <div className="space-y-3 px-5 py-4 text-[13px]">
                         <p className="text-mute">
-                            Columns, stage names, and win probabilities live in pipeline settings.
+                            {t('Columns, stage names, and win probabilities live in pipeline settings.')}
                         </p>
                         <Link
                             href="/settings/pipelines"
-                            className="inline-block font-medium text-brand hover:underline"
+                            className="inline-block font-medium text-[var(--evo-teal)] hover:underline"
                         >
-                            Edit stages
+                            {t('Edit stages')}
                         </Link>
                         <div>
-                            <a href={exportHref} className="font-medium text-brand hover:underline">
-                                Export view
+                            <a href={exportHref} className="font-medium text-[var(--evo-teal)] hover:underline">
+                                {t('Export view')}
                             </a>
                         </div>
                     </div>

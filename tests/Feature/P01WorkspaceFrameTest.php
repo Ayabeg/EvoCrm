@@ -80,15 +80,35 @@ it('locks the Contacts primary slot to the orange primary fill', function () {
         ->and($button)->toContain('text-[var(--evo-on-primary)]');
 });
 
-it('does not hide Deals forecast or attention behind a disclosure', function () {
+it('moves Deals forecast and attention off the default stack (C-18)', function () {
     $list = file_get_contents(resource_path('js/pages/crm/deals/index.tsx'));
     $board = file_get_contents(resource_path('js/pages/crm/deals/board.tsx'));
+    $views = file_get_contents(resource_path('js/ds/workspace/SavedViews.tsx'));
+    $summary = file_get_contents(resource_path('js/components/crm/deal-forecast-summary.tsx'));
+    $queue = file_get_contents(resource_path('js/components/crm/deal-attention-queue.tsx'));
+    $bar = file_get_contents(resource_path('js/components/crm/deal-forecast-bar.tsx'));
+    $shell = file_get_contents(resource_path('js/components/crm/crm-list-shell.tsx'));
 
     expect($list)->not->toContain('<details')
         ->and($board)->not->toContain('<details')
-        ->and($list)->toContain('<DealAttentionQueue')
-        ->and($board)->toContain('<DealForecastBar')
-        ->and($board)->toContain('<DealAttentionQueue');
+        ->and($list)->not->toContain('<DealAttentionQueue')
+        ->and($list)->not->toContain('<DealForecastBar')
+        ->and($board)->not->toContain('<DealForecastBar')
+        ->and($board)->not->toContain('<DealAttentionQueue')
+        ->and($board)->toContain('DealForecastSummary')
+        ->and($board)->toContain('headerSummary=')
+        ->and($board)->not->toContain('view=open')
+        ->and($board)->not->toContain('/crm/deals/forecast')
+        ->and($list)->not->toContain('/crm/deals/attention')
+        ->and($views)->toContain("id: 'needs_attention'")
+        ->and($views)->toContain("t('Follow-up view')")
+        ->and($views)->toContain("applyAttentionFilter(current, 'needs_attention')")
+        ->and($summary)->toContain('data-testid="forecast-summary"')
+        ->and($bar)->toContain('data-testid="forecast-totals"')
+        ->and($queue)->toContain('View all')
+        ->and($queue)->toContain("attention: 'needs_attention'")
+        ->and($queue)->not->toContain('/crm/deals/attention')
+        ->and($shell)->toContain("chromeDensity: entity === 'deal' ? 'compact' : 'default'");
 });
 
 it('renders the conversation header without a visible title row', function () {

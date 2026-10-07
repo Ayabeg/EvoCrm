@@ -64,6 +64,7 @@ export function FilterBar({
     onColumnsChange,
     onAdvanced,
     extra,
+    density = 'default',
 }: {
     object: ListQueryObject;
     basePath: string;
@@ -77,6 +78,7 @@ export function FilterBar({
     onColumnsChange?: (columns: ListViewColumn[]) => void;
     onAdvanced: () => void;
     extra?: ReactNode;
+    density?: 'default' | 'compact';
 }) {
     const current = fromActiveFilters(filters, extraQuery);
     const members = filterContext?.members ?? [];
@@ -119,6 +121,7 @@ export function FilterBar({
     };
 
     const desk = object === 'quote';
+    const compact = density === 'compact';
     const columnChooser =
         columnDefs && columns ? (
             <ColumnChooser
@@ -154,7 +157,7 @@ export function FilterBar({
                         key={field.id}
                         className={cn(
                             'inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-hairline bg-canvas text-[13px] text-ink',
-                            desk ? 'h-8 px-2' : 'h-9 px-3',
+                            compact || desk ? 'h-8 px-2' : 'h-9 px-3',
                         )}
                     >
                         <span className="text-mute">{t(field.label)}</span>
@@ -184,7 +187,7 @@ export function FilterBar({
             <Button
                 type="button"
                 variant="outline"
-                className={desk ? 'h-8 shrink-0 px-2 text-[13px]' : 'h-9 shrink-0'}
+                className={compact || desk ? 'h-8 shrink-0 px-2 text-[13px]' : 'h-9 shrink-0'}
                 aria-label={t('Advanced')}
                 onClick={onAdvanced}
             >
@@ -196,7 +199,11 @@ export function FilterBar({
 
     return (
         <div className={cn('border-b border-hairline bg-canvas', PAGE_OVERFLOW_CLASS)} data-crm="list-toolbar" data-ds="filter-bar">
-            <div className={cn('flex min-w-0 flex-wrap items-center gap-2', desk ? 'px-4 py-1.5 md:px-6' : 'px-4 py-3 md:px-8')}>
+            <div className={cn(
+                'flex min-w-0 items-center gap-2',
+                compact ? 'flex-nowrap overflow-x-auto px-4 py-1 md:px-8' : 'flex-wrap',
+                !compact && (desk ? 'px-4 py-1.5 md:px-6' : 'px-4 py-3 md:px-8'),
+            )}>
                 {extra}
                 {queryEnabled ? (
                     <form
@@ -220,7 +227,7 @@ export function FilterBar({
                             name="q"
                             defaultValue={searchKey}
                             placeholder={searchPlaceholder}
-                            className={desk ? 'h-8 ps-10 text-[13px]' : 'h-9 ps-10'}
+                            className={compact || desk ? 'h-8 ps-10 text-[13px]' : 'h-9 ps-10'}
                             aria-label={searchLabel}
                         />
                     </form>
@@ -232,7 +239,10 @@ export function FilterBar({
             </div>
             {queryEnabled && chips.length > 0 ? (
                 <div
-                    className="flex flex-wrap items-center gap-1.5 px-4 pb-3 md:px-8"
+                    className={cn(
+                        'flex flex-wrap items-center gap-1.5 px-4 md:px-8',
+                        compact ? 'pb-1' : 'pb-3',
+                    )}
                     data-crm="active-filters"
                 >
                     {chips.map((chip) => (
