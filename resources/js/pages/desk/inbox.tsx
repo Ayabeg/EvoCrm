@@ -1,6 +1,6 @@
 import { Form, Link, router, usePage } from '@inertiajs/react';
 import { CaretDown, CaretLeft, Tray } from '@/evo/icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { AdaptiveWorkspaceShell } from '@/components/crm/adaptive-workspace-shell';
 import { DeskShell, deskTabs } from '@/components/crm/desk-shell';
 import {
@@ -99,6 +99,26 @@ type Props = {
 };
 
 const QUEUE_FOLDER_KEYS = ['all', 'unassigned', 'mine', 'open', 'closed'] as const;
+
+function useMinWidth(query: string, serverFallback = true): boolean {
+    return useSyncExternalStore(
+        (onChange) => {
+            if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+                return () => {};
+            }
+
+            const media = window.matchMedia(query);
+            media.addEventListener('change', onChange);
+
+            return () => media.removeEventListener('change', onChange);
+        },
+        () =>
+            typeof window !== 'undefined' &&
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia(query).matches,
+        () => serverFallback,
+    );
+}
 
 function ConnectWhatsAppCta({
     connectors,
@@ -574,7 +594,9 @@ function FrontDesk({
     const assignment: InboxAssignment =
         folder === 'mine' || folder === 'unassigned' ? folder : 'all';
     const channelFilter = isInboxChannelFolder(folder) ? folder : null;
-    const overlayContext = showContextHost || contextOverlay;
+    const contextDocks = useMinWidth('(min-width: 1440px)');
+    const overlayContext = !contextDocks && contextOverlay;
+    const contextShown = contextDocks ? showContextHost : contextOverlay;
 
     const contextSidebar = (className?: string, onCollapse?: () => void) => (
         <InboxContactSidebar
@@ -725,7 +747,7 @@ function FrontDesk({
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        if (showContextHost) {
+                                                        if (contextShown) {
                                                             visitInbox({
                                                                 context: '0',
                                                             });
@@ -743,7 +765,7 @@ function FrontDesk({
                                                     }}
                                                     className="text-[12px] text-mute hover:text-ink"
                                                 >
-                                                    {showContextHost
+                                                    {contextShown
                                                         ? t('Hide context')
                                                         : t('Context')}
                                                 </button>

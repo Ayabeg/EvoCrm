@@ -138,9 +138,9 @@ it('locks one InboxCrmContext composition without a QRD fork or fake primary', f
         ->and($chrome)->not->toContain('QuickRecordDrawer');
 
     expect($context)->toContain('openRecord')
-        ->and($context)->toContain('Contact owner')
-        ->and($context)->toContain('Deal owner')
-        ->and($context)->toContain('No CRM contact linked')
+        ->and($context)->toContain('inbox.context.contact_owner')
+        ->and($context)->toContain('inbox.context.deal_owner')
+        ->and($context)->toContain('inbox.context.no_contact')
         ->and($context)->toContain('formatMoneyCents')
         ->and($context)->toContain('attention.primary')
         ->and($context)->not->toContain('overdue_activity')

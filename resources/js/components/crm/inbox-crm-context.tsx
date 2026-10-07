@@ -99,7 +99,7 @@ function ActionLink({
     return (
         <Link
             href={href}
-            className="text-[12px] font-medium text-brand underline-offset-2 hover:underline"
+            className="text-[12px] font-medium text-[var(--evo-teal)] underline-offset-2 hover:underline"
         >
             {children}
         </Link>
@@ -120,7 +120,7 @@ function PeekButton({
     return (
         <button
             type="button"
-            className="text-[12px] font-medium text-brand underline-offset-2 hover:underline"
+            className="text-[12px] font-medium text-[var(--evo-teal)] underline-offset-2 hover:underline"
             onClick={(event) => {
                 openRecord({ type, id }, { opener: event.currentTarget });
             }}
@@ -169,7 +169,7 @@ function DealRow({
             <button
                 type="button"
                 onClick={() => onInspect(deal.id)}
-                className="block w-full truncate text-start text-[13px] font-medium text-ink hover:text-brand"
+                className="block w-full truncate text-start text-[13px] font-medium text-ink hover:text-[var(--evo-teal)]"
             >
                 {deal.title}
             </button>
@@ -241,7 +241,7 @@ export function InboxCrmContextError({
                 <button
                     type="button"
                     onClick={onRetry}
-                    className="mt-2 text-[12px] font-medium text-brand underline-offset-2 hover:underline"
+                    className="mt-2 text-[12px] font-medium text-[var(--evo-teal)] underline-offset-2 hover:underline"
                 >
                     {t('Retry')}
                 </button>
@@ -312,7 +312,7 @@ export function InboxCrmContext({
                                         <span className="truncate">{contact.email}</span>
                                         <button
                                             type="button"
-                                            className="shrink-0 text-[12px] text-brand"
+                                            className="shrink-0 text-[12px] text-[var(--evo-teal)]"
                                             onClick={() => {
                                                 void copy(contact.email ?? '');
                                             }}
@@ -333,7 +333,7 @@ export function InboxCrmContext({
                                         <span className="truncate">{contact.phone}</span>
                                         <button
                                             type="button"
-                                            className="shrink-0 text-[12px] text-brand"
+                                            className="shrink-0 text-[12px] text-[var(--evo-teal)]"
                                             onClick={() => {
                                                 void copy(contact.phone ?? '');
                                             }}
