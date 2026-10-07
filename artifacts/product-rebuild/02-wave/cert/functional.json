@@ -1,0 +1,435 @@
+{
+  "facts": {
+    "workspace": "Evotechly",
+    "inbox_url": null,
+    "inboxUrl": "",
+    "deals": 15,
+    "threads": 8,
+    "thread": 1,
+    "deal": {
+      "id": 1,
+      "title": "Clinic website intake",
+      "stage_id": 1
+    },
+    "stages": [
+      {
+        "id": 1,
+        "name": "New",
+        "slug": "new"
+      },
+      {
+        "id": 2,
+        "name": "Qualified",
+        "slug": "qualified"
+      },
+      {
+        "id": 3,
+        "name": "Demo",
+        "slug": "demo"
+      },
+      {
+        "id": 4,
+        "name": "Proposal",
+        "slug": "proposal"
+      },
+      {
+        "id": 5,
+        "name": "Won",
+        "slug": "won"
+      },
+      {
+        "id": 6,
+        "name": "Lost",
+        "slug": "lost"
+      }
+    ],
+    "member": {
+      "email": "sara@evosales.local",
+      "role": "member"
+    },
+    "member_can_crm_edit": false,
+    "member_can_desk": false
+  },
+  "checks": [
+    {
+      "name": "deals.no_forecast_slab",
+      "pass": true,
+      "detail": "forecastBar=false"
+    },
+    {
+      "name": "deals.no_attention_slab",
+      "pass": true,
+      "detail": "attention=false"
+    },
+    {
+      "name": "deals.no_stage_pills",
+      "pass": true,
+      "detail": "stagePills=false"
+    },
+    {
+      "name": "deals.views_in_header",
+      "pass": true
+    },
+    {
+      "name": "deals.board_page_no_scroll",
+      "pass": true
+    },
+    {
+      "name": "deals.first_card_hierarchy",
+      "pass": true,
+      "detail": "cardY=211 colY=156"
+    },
+    {
+      "name": "deals.followup_tab_visible",
+      "pass": true
+    },
+    {
+      "name": "deals.followup_writes_attention",
+      "pass": true,
+      "detail": "http://127.0.0.1:8000/crm/deals/board?attention=needs_attention&pipeline=1&view=all"
+    },
+    {
+      "name": "deals.list_board_share_attention",
+      "pass": true,
+      "detail": "http://127.0.0.1:8000/crm/deals?attention=needs_attention"
+    },
+    {
+      "name": "deals.layout_toggle_keeps_attention",
+      "pass": true,
+      "detail": "http://127.0.0.1:8000/crm/deals?attention=needs_attention&pipeline=1&view=all"
+    },
+    {
+      "name": "deals.url_round_trip",
+      "pass": true,
+      "detail": "http://127.0.0.1:8000/crm/deals/board?attention=needs_attention&q=clinic"
+    },
+    {
+      "name": "deals.filter_attention",
+      "pass": true,
+      "detail": "http://127.0.0.1:8000/crm/deals?attention=needs_attention&pipeline=1&view=all"
+    },
+    {
+      "name": "deals.card_present",
+      "pass": true
+    },
+    {
+      "name": "deals.quickrecord_opens",
+      "pass": true
+    },
+    {
+      "name": "deals.dnd_move_local",
+      "pass": true,
+      "detail": "http=200 uiDrag=false 1->2"
+    },
+    {
+      "name": "inbox.native_no_embed_banner",
+      "pass": true,
+      "detail": "caughtUp=false"
+    },
+    {
+      "name": "inbox.pick_not_caught_up",
+      "pass": true
+    },
+    {
+      "name": "inbox.page_no_scroll_list",
+      "pass": true
+    },
+    {
+      "name": "inbox.folders_not_a_column",
+      "pass": true
+    },
+    {
+      "name": "inbox.rows_present",
+      "pass": true
+    },
+    {
+      "name": "inbox.selection_sets_thread",
+      "pass": true,
+      "detail": "http://127.0.0.1:8000/inbox?thread=1"
+    },
+    {
+      "name": "inbox.thread_width_context_open",
+      "pass": true,
+      "detail": "thread=482 context=360"
+    },
+    {
+      "name": "inbox.note_toggle",
+      "pass": true,
+      "detail": "aria-pressed=true"
+    },
+    {
+      "name": "inbox.note_placeholder",
+      "pass": true,
+      "detail": "Note privée"
+    },
+    {
+      "name": "inbox.reply_toggle",
+      "pass": true
+    },
+    {
+      "name": "inbox.thread_width_context_closed",
+      "pass": true,
+      "detail": "thread=842"
+    },
+    {
+      "name": "inbox.independent_scroll_owner",
+      "pass": true
+    },
+    {
+      "name": "inbox.mobile_back_visible",
+      "pass": true,
+      "detail": "back=true"
+    },
+    {
+      "name": "inbox.mobile_back_clears_thread",
+      "pass": true,
+      "detail": "http://127.0.0.1:8000/inbox"
+    },
+    {
+      "name": "simple_mode.five_destinations",
+      "pass": true,
+      "detail": "Accueil | Contacts | Affaires | Boîte de réception | Devis | Paramètres"
+    },
+    {
+      "name": "simple_mode.no_power_items",
+      "pass": true,
+      "detail": "/dashboard,/crm/contacts,/crm/deals,/inbox,/crm/quotes,/settings"
+    },
+    {
+      "name": "simple_mode.settings_reachable",
+      "pass": true
+    },
+    {
+      "name": "member.can_view_deals",
+      "pass": true
+    },
+    {
+      "name": "member.can_view_inbox",
+      "pass": true
+    },
+    {
+      "name": "member.cannot_move_deal",
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "name": "member.cannot_reply",
+      "pass": true,
+      "detail": "status=403 (no external send)"
+    },
+    {
+      "name": "console.no_pageerrors",
+      "pass": true,
+      "detail": "[]"
+    }
+  ],
+  "measures": {
+    "board1440": {
+      "firstCard": {
+        "x": 234,
+        "y": 211,
+        "width": 259,
+        "height": 149.5
+      },
+      "firstRow": null,
+      "columnHeader": {
+        "x": 234,
+        "y": 156,
+        "width": 259,
+        "height": 47
+      },
+      "thead": null,
+      "header": {
+        "x": 224,
+        "y": 0,
+        "width": 1216,
+        "height": 96
+      },
+      "toolbar": {
+        "x": 224,
+        "y": 104,
+        "width": 1216,
+        "height": 44
+      },
+      "forecastBarPresent": false,
+      "attentionPresent": false,
+      "stagePillsPresent": false,
+      "viewsInsideHeader": true,
+      "pageScroll": false,
+      "scrollOwner": "pipeline",
+      "navText": "Evotechly Rechercher EvoCRM… ⌘K Créer Accueil Boîte de réception Vendre CRM Contacts Sociétés Pistes Activités Segments Affaires Toutes les affaires Pipeline Devis Tous les devis Prospecter Outbound Vue d’ensemble Campagnes Séquences Boîtes mail Domaines Modèles Chauffe Boîte d’envoi Suppressions Pubs Vue d’ensemble Campagnes Ensembles Publicités Audiences Attribution Servir Tickets Tous les ticke"
+    },
+    "inboxList1440": {
+      "rail": {
+        "x": 0,
+        "y": 0,
+        "width": 224,
+        "height": 1000
+      },
+      "list": {
+        "x": 224,
+        "y": 40,
+        "width": 340,
+        "height": 960
+      },
+      "thread": null,
+      "conversation": null,
+      "composer": null,
+      "context": null,
+      "foldersColumn": null,
+      "back": null,
+      "caughtUpVisible": false,
+      "pickVisible": true,
+      "pageScroll": false,
+      "scrollOwner": "conversation",
+      "overflowY": "hidden"
+    },
+    "inboxSelected1440": {
+      "rail": {
+        "x": 0,
+        "y": 0,
+        "width": 224,
+        "height": 1000
+      },
+      "list": {
+        "x": 224,
+        "y": 40,
+        "width": 340,
+        "height": 960
+      },
+      "thread": {
+        "x": 582,
+        "y": 109,
+        "width": 482,
+        "height": 627
+      },
+      "conversation": {
+        "x": 582,
+        "y": 56,
+        "width": 482,
+        "height": 928
+      },
+      "composer": {
+        "x": 582,
+        "y": 736,
+        "width": 482,
+        "height": 248
+      },
+      "context": {
+        "x": 1080,
+        "y": 40,
+        "width": 360,
+        "height": 960
+      },
+      "foldersColumn": null,
+      "back": null,
+      "caughtUpVisible": false,
+      "pickVisible": false,
+      "pageScroll": false,
+      "scrollOwner": "conversation",
+      "overflowY": "hidden"
+    },
+    "inboxContextClosed1440": {
+      "rail": {
+        "x": 0,
+        "y": 0,
+        "width": 224,
+        "height": 1000
+      },
+      "list": {
+        "x": 224,
+        "y": 40,
+        "width": 340,
+        "height": 960
+      },
+      "thread": {
+        "x": 582,
+        "y": 109,
+        "width": 842,
+        "height": 707
+      },
+      "conversation": {
+        "x": 582,
+        "y": 56,
+        "width": 842,
+        "height": 928
+      },
+      "composer": {
+        "x": 582,
+        "y": 816,
+        "width": 842,
+        "height": 169
+      },
+      "context": null,
+      "foldersColumn": null,
+      "back": null,
+      "caughtUpVisible": false,
+      "pickVisible": false,
+      "pageScroll": false,
+      "scrollOwner": "conversation",
+      "overflowY": "hidden"
+    },
+    "inboxMobileThread": {
+      "rail": null,
+      "list": null,
+      "thread": {
+        "x": 0,
+        "y": 218,
+        "width": 390,
+        "height": 205
+      },
+      "conversation": {
+        "x": 0,
+        "y": 125,
+        "width": 390,
+        "height": 467
+      },
+      "composer": {
+        "x": 0,
+        "y": 423,
+        "width": 390,
+        "height": 169
+      },
+      "context": null,
+      "foldersColumn": null,
+      "back": {
+        "x": 12,
+        "y": 135,
+        "width": 56,
+        "height": 32
+      },
+      "caughtUpVisible": false,
+      "pickVisible": false,
+      "pageScroll": false,
+      "scrollOwner": "conversation",
+      "overflowY": "hidden"
+    },
+    "simpleNav": [
+      {
+        "href": "/dashboard",
+        "text": "Accueil"
+      },
+      {
+        "href": "/crm/contacts",
+        "text": "Contacts"
+      },
+      {
+        "href": "/crm/deals",
+        "text": "Affaires"
+      },
+      {
+        "href": "/inbox",
+        "text": "Boîte de réception"
+      },
+      {
+        "href": "/crm/quotes",
+        "text": "Devis"
+      },
+      {
+        "href": "/settings",
+        "text": "Paramètres"
+      }
+    ]
+  },
+  "consoleErrors": []
+}

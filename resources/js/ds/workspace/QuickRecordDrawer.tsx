@@ -333,7 +333,7 @@ export function QuickRecordDrawer() {
 
                     {status === 'error' && error ? (
                         <div className="space-y-3">
-                            <p className="text-[14px] text-[var(--evo-ink)]">{error.message}</p>
+                            <p className="text-[14px] text-[var(--evo-ink)]">{t(error.message)}</p>
                             <div className="flex flex-wrap gap-2">
                                 <button
                                     type="button"
@@ -388,10 +388,10 @@ export function QuickRecordDrawer() {
                                                         className={attentionToneClass(signal.severity)}
                                                     >
                                                         <p className="text-[13px] font-medium">
-                                                            {signal.label}
+                                                            {t(signal.label)}
                                                         </p>
                                                         <p className="text-[12px] text-[var(--evo-ink-muted)]">
-                                                            {signal.reason}
+                                                            {t(signal.reason ?? '', signal.reason_replace)}
                                                         </p>
                                                     </li>
                                                 ))}

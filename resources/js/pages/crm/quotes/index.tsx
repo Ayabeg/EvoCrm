@@ -128,7 +128,7 @@ export default function QuotesIndex({
                                                     </div>
                                                     <div>
                                                         <Label className="mb-1 block text-[12px]">
-                                                            {t('Amount (DZD)')}
+                                                            {t('Amount (DA)')}
                                                         </Label>
                                                         <Input
                                                             name="items[0][unit_dzd]"

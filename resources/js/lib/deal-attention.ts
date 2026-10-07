@@ -9,6 +9,7 @@ export type DealAttentionSignal = {
     severity: DealAttentionSeverity;
     label: string;
     reason?: string;
+    reason_replace?: Record<string, string | number>;
     at?: string | null;
     ref?: { type: 'activity'; id: number } | null;
 };
@@ -18,6 +19,7 @@ export type DealAttentionPrimary = {
     severity: DealAttentionSeverity;
     label: string;
     reason?: string;
+    reason_replace?: Record<string, string | number>;
 };
 
 export type DealAttention = {

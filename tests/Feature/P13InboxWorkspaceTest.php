@@ -77,7 +77,7 @@ it('locks P13 native four-pane inbox without a third implementation', function (
 
     expect($chrome)->toContain('data-inbox="context-host"')
         ->and($chrome)->toContain('data-inbox="composer"')
-        ->and($chrome)->toContain('Send as resolved')
+        ->and($chrome)->toContain("t('inbox.composer.send_resolved')")
         ->and($chrome)->toContain("t('Send')")
         ->and($chrome)->toContain('Filter by name or subject')
         ->and($chrome)->toContain('whitespace-pre-wrap')
