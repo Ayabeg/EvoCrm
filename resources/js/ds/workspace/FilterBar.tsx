@@ -209,7 +209,8 @@ export function FilterBar({
                     <form
                         className={cn(
                             FILTER_SEARCH_CLASS,
-                            (object === 'company' || object === 'deal') && 'max-w-md basis-[16rem]',
+                            (object === 'company' || object === 'deal') && !compact && 'max-w-md basis-[16rem]',
+                            compact && object === 'deal' && 'w-[12rem] shrink-0',
                         )}
                         onSubmit={(event) => {
                             event.preventDefault();
@@ -232,7 +233,12 @@ export function FilterBar({
                         />
                     </form>
                 ) : null}
-                <div className={cn('flex min-w-0 flex-wrap items-center gap-2', desk && 'contents')}>
+                <div className={cn(
+                    compact
+                        ? 'flex min-w-0 flex-nowrap items-center gap-2'
+                        : 'flex min-w-0 flex-wrap items-center gap-2',
+                    desk && 'contents',
+                )}>
                     {quickFilters}
                     {desk ? <div className="ms-auto flex shrink-0">{columnChooser}</div> : columnChooser}
                 </div>
