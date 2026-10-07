@@ -10,13 +10,10 @@ class SimpleMode
     /** @var list<array{id: string, label: string, href: string}> */
     public const SIMPLE_NAV = [
         ['id' => 'home', 'label' => 'Home', 'href' => '/dashboard'],
-        ['id' => 'inbox', 'label' => 'Inbox', 'href' => '/inbox'],
-        ['id' => 'leads', 'label' => 'Leads', 'href' => '/crm/leads'],
         ['id' => 'contacts', 'label' => 'Contacts', 'href' => '/crm/contacts'],
-        ['id' => 'companies', 'label' => 'Companies', 'href' => '/crm/companies'],
         ['id' => 'deals', 'label' => 'Deals', 'href' => '/crm/deals'],
+        ['id' => 'inbox', 'label' => 'Inbox', 'href' => '/inbox'],
         ['id' => 'quotes', 'label' => 'Quotes', 'href' => '/crm/quotes'],
-        ['id' => 'activities', 'label' => 'Activities', 'href' => '/crm/activities'],
     ];
 
     /**
