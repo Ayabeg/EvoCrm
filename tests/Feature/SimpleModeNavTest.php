@@ -43,7 +43,7 @@ it('shares the compact Salesforce-style nav on a new workspace', function () {
                 ->where('features.tickets', false)
                 ->where('features.sms', false)
                 ->where('features.ask_evo', false)
-                ->has('nav', 8);
+                ->has('nav', 5);
 
             $nav = inertiaNav($page);
             $hrefs = collect($nav)->pluck('href')->all();
@@ -51,30 +51,29 @@ it('shares the compact Salesforce-style nav on a new workspace', function () {
 
             expect($ids)->toBe([
                 'home',
-                'inbox',
-                'leads',
                 'contacts',
-                'companies',
                 'deals',
+                'inbox',
                 'quotes',
-                'activities',
             ])
                 ->and($hrefs)->toBe([
                     '/dashboard',
-                    '/inbox',
-                    '/crm/leads',
                     '/crm/contacts',
-                    '/crm/companies',
                     '/crm/deals',
+                    '/inbox',
                     '/crm/quotes',
-                    '/crm/activities',
                 ])
+                ->and($hrefs)->not->toContain('/crm/companies')
+                ->and($hrefs)->not->toContain('/crm/leads')
+                ->and($hrefs)->not->toContain('/crm/activities')
+                ->and($hrefs)->not->toContain('/reports')
                 ->and($hrefs)->not->toContain('/crm/tickets')
                 ->and($hrefs)->not->toContain('/settings/sms')
                 ->and($hrefs)->not->toContain('/ads')
                 ->and($hrefs)->not->toContain('/outbound/warmup')
                 ->and($hrefs)->not->toContain('/crm/report-builder')
-                ->and($hrefs)->not->toContain('/crm/deals/board');
+                ->and($hrefs)->not->toContain('/crm/deals/board')
+                ->and($hrefs)->not->toContain('/settings');
         });
 });
 
