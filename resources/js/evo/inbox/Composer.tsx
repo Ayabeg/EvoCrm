@@ -146,10 +146,14 @@ export function Composer({
                 defaultValue={action ? undefined : undefined}
                 onChange={(event) => setBody(event.target.value)}
                 aria-label={
-                    mode === 'note' ? t('Private note') : t('Type your message')
+                    mode === 'note'
+                        ? t('inbox.composer.private_note')
+                        : t('inbox.composer.type_message')
                 }
                 placeholder={
-                    mode === 'note' ? t('Private note') : t('Type your message')
+                    mode === 'note'
+                        ? t('inbox.composer.private_note')
+                        : t('inbox.composer.type_message')
                 }
                 className="max-h-32 min-h-16"
                 onKeyDown={onKeyDown}
@@ -177,7 +181,7 @@ export function Composer({
                     <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
                         <PopoverTrigger asChild>
                             <Button type="button" variant="outline" size="sm">
-                                {t('Insert template')}
+                                {t('inbox.composer.insert_template')}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent align="start" className="w-80 p-2">
@@ -252,7 +256,7 @@ export function Composer({
                     </Button>
                     <span className="hidden items-center gap-1 text-[11px] text-[var(--evo-ink-muted)] sm:inline-flex">
                         <Kbd>↵</Kbd>
-                        <span>{t('Press Enter to send. Shift+Enter for a new line.')}</span>
+                        <span>{t('inbox.composer.enter_hint')}</span>
                     </span>
                 </div>
                 <div className="flex shrink-0 flex-nowrap justify-end gap-2">
@@ -271,7 +275,7 @@ export function Composer({
                                             : (event) => handleLocalSubmit(event, true)
                                     }
                                 >
-                                    {t('Send as resolved')}
+                                    {t('inbox.composer.send_resolved')}
                                 </Button>
                             ) : null}
                             <Button

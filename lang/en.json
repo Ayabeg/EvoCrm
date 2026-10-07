@@ -1973,5 +1973,10 @@
     "inbox.channel.telegram": "Telegram",
     "inbox.activity.scheduled": "Scheduled",
     "inbox.template.devis_envoye": "Quote sent",
-    "inbox.template.relance_devis": "Quote follow-up"
+    "inbox.template.relance_devis": "Quote follow-up",
+    "inbox.composer.enter_hint": "Press Enter to send. Shift+Enter for a new line.",
+    "inbox.composer.send_resolved": "Send as resolved",
+    "inbox.composer.insert_template": "Insert template",
+    "inbox.composer.private_note": "Private note",
+    "inbox.composer.type_message": "Type your message"
 }

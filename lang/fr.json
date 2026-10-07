@@ -1973,5 +1973,10 @@
     "inbox.channel.telegram": "Telegram",
     "inbox.activity.scheduled": "Planifié",
     "inbox.template.devis_envoye": "Devis envoyé",
-    "inbox.template.relance_devis": "Relance devis"
+    "inbox.template.relance_devis": "Relance devis",
+    "inbox.composer.enter_hint": "Entrée pour envoyer. Maj+Entrée pour une nouvelle ligne.",
+    "inbox.composer.send_resolved": "Envoyer et résoudre",
+    "inbox.composer.insert_template": "Insérer un modèle",
+    "inbox.composer.private_note": "Note privée",
+    "inbox.composer.type_message": "Saisissez votre message"
 }

@@ -1973,5 +1973,10 @@
     "inbox.channel.telegram": "تيليغرام",
     "inbox.activity.scheduled": "مجدول",
     "inbox.template.devis_envoye": "تم إرسال العرض",
-    "inbox.template.relance_devis": "متابعة العرض"
+    "inbox.template.relance_devis": "متابعة العرض",
+    "inbox.composer.enter_hint": "اضغط Enter للإرسال. Shift+Enter لسطر جديد.",
+    "inbox.composer.send_resolved": "إرسال وإغلاق",
+    "inbox.composer.insert_template": "إدراج نموذج",
+    "inbox.composer.private_note": "ملاحظة خاصة",
+    "inbox.composer.type_message": "اكتب رسالتك"
 }
