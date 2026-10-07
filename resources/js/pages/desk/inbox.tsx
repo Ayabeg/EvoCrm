@@ -850,9 +850,9 @@ function FrontDesk({
                                 </div>
                             )
                         }
-                        leftClassName="bg-white p-0"
-                        centerClassName="bg-white p-0"
-                        rightClassName="bg-white p-0"
+                        leftClassName="bg-white p-0 sm:p-0"
+                        centerClassName="bg-white p-0 sm:p-0"
+                        rightClassName="bg-white p-0 sm:p-0"
                         scrollPanels={{
                             left: true,
                             center: false,
