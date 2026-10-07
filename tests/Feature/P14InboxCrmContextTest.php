@@ -429,7 +429,7 @@ it('keeps P13 P12 P11 P09 and P10 inbox source locks', function () {
         ->and($inbox)->toContain('conversation-pending')
         ->and($inbox)->not->toContain('dangerouslySetInnerHTML');
 
-    expect($chrome)->toContain('Send as resolved')
+    expect($chrome)->toContain("t('inbox.composer.send_resolved')")
         ->and($chrome)->toContain('data-inbox="context-host"');
 
     expect($composer)->toContain('evaluate(')

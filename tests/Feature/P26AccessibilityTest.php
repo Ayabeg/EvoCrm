@@ -63,8 +63,8 @@ it('locks P26 keyboard, names, and overlay a11y without a new widget kit', funct
         ->and($inbox)->toContain("aria-pressed={mode === 'reply'}")
         ->and($inbox)->toContain("aria-pressed={mode === 'note'}")
         ->and($inbox)->toContain('aria-label={')
-        ->and($inbox)->toContain("t('Type your message')")
-        ->and($inbox)->toContain("t('Private note')")
+        ->and($inbox)->toContain("t('inbox.composer.type_message')")
+        ->and($inbox)->toContain("t('inbox.composer.private_note')")
         ->and($inbox)->not->toContain('InboxV2');
 
     expect($askPanel)->toContain('role="group"')
