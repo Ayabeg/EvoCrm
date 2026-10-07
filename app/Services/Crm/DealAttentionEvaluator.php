@@ -89,8 +89,12 @@ class DealAttentionEvaluator
                 'severity' => self::SEVERITY_CRITICAL,
                 'label' => 'Overdue activity',
                 'reason' => $subject !== ''
-                    ? "{$subject} was due {$when}"
-                    : "An activity was due {$when}",
+                    ? ':subject was due :when'
+                    : 'An activity was due :when',
+                'reason_replace' => [
+                    'subject' => $subject,
+                    'when' => $when,
+                ],
                 'at' => $activity->due_at->timezone(self::TIMEZONE)->toIso8601String(),
                 'ref' => ['type' => 'activity', 'id' => (int) $activity->id],
             ];
@@ -251,6 +255,9 @@ class DealAttentionEvaluator
                         'severity' => (string) $primary['severity'],
                         'label' => (string) $primary['label'],
                         'reason' => (string) ($primary['reason'] ?? ''),
+                        'reason_replace' => is_array($primary['reason_replace'] ?? null)
+                            ? $primary['reason_replace']
+                            : [],
                     ],
                 ];
             })

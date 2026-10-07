@@ -295,6 +295,58 @@ export function visibleSettings(capabilities: Set<string> | null = null): NavIte
     };
 }
 
+function parentForChild(id: string): NavItem | undefined {
+    for (const section of NAV_SECTIONS) {
+        for (const item of section.items) {
+            if (item.children?.some((child) => child.id === id)) {
+                return item;
+            }
+        }
+    }
+
+    return undefined;
+}
+
+export function toSimpleNavItem(id: string): NavItem {
+    if (id === SETTINGS_NAV.id) {
+        return { ...SETTINGS_NAV, children: undefined };
+    }
+
+    const found = findNavItem(id);
+
+    if ('icon' in found) {
+        return { ...found, children: undefined };
+    }
+
+    const parent = parentForChild(id);
+
+    return {
+        id: found.id,
+        labelKey: found.labelKey,
+        href: found.href,
+        icon: parent?.icon ?? House,
+        activePaths: found.activePaths,
+        exact: found.exact,
+        feature: found.feature,
+        permission: found.permission ?? parent?.permission,
+    };
+}
+
+export function visibleSimpleItems(
+    nav: Array<{ id: string }>,
+    features: LaunchFeatures,
+    capabilities: Set<string> | null = null,
+): NavItem[] {
+    return nav
+        .filter((entry) => entry.id !== SETTINGS_NAV.id)
+        .map((entry) => toSimpleNavItem(entry.id))
+        .filter(
+            (item) =>
+                featureOn(item.feature, features) &&
+                permissionOn(item.permission, capabilities),
+        );
+}
+
 export function findNavItem(id: string): NavItem | NavChild {
     if (id === SETTINGS_NAV.id) {
         return SETTINGS_NAV;

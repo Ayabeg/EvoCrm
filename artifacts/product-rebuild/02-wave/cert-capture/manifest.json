@@ -1,0 +1,71 @@
+{
+  "viewports": [
+    {
+      "id": "1440x1000",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "id": "1280x900",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "id": "1024x768",
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "id": "768x1024",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "430x932",
+      "width": 430,
+      "height": 932
+    },
+    {
+      "id": "390x844",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "routes": [
+    "deals-list",
+    "deals-board",
+    "inbox",
+    "inbox-thread"
+  ],
+  "output": "/workspace/artifacts/product-rebuild/02-wave/cert-capture",
+  "files": [
+    "deals-list__1440x1000__fr__light.png",
+    "deals-board__1440x1000__fr__light.png",
+    "inbox__1440x1000__fr__light.png",
+    "inbox-thread__1440x1000__fr__light.png",
+    "deals-list__1280x900__fr__light.png",
+    "deals-board__1280x900__fr__light.png",
+    "inbox__1280x900__fr__light.png",
+    "inbox-thread__1280x900__fr__light.png",
+    "deals-list__1024x768__fr__light.png",
+    "deals-board__1024x768__fr__light.png",
+    "inbox__1024x768__fr__light.png",
+    "inbox-thread__1024x768__fr__light.png",
+    "deals-list__768x1024__fr__light.png",
+    "deals-board__768x1024__fr__light.png",
+    "inbox__768x1024__fr__light.png",
+    "inbox-thread__768x1024__fr__light.png",
+    "deals-list__430x932__fr__light.png",
+    "deals-board__430x932__fr__light.png",
+    "inbox__430x932__fr__light.png",
+    "inbox-thread__430x932__fr__light.png",
+    "deals-list__390x844__fr__light.png",
+    "deals-board__390x844__fr__light.png",
+    "inbox__390x844__fr__light.png",
+    "inbox-thread__390x844__fr__light.png",
+    "inbox__1440x1000__en__light.png",
+    "inbox__1440x1000__ar__light.png",
+    "inbox__1440x1000__fr__dark.png",
+    "dashboard-simple__1440x1000__fr__light.png"
+  ]
+}

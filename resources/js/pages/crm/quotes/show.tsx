@@ -5,6 +5,7 @@ import { RecordBack } from '@/components/crm/record-chrome';
 import { RecordStatusBadge } from '@/components/crm/record-hub';
 import { RecordPageFrame } from '@/evo/crm/record';
 import { Button } from '@/evo/ui/button';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 import { quoteListHref, quotePreviewHref } from '@/lib/quote-builder';
@@ -25,48 +26,53 @@ export default function QuoteShow({ quote }: { quote: QuoteRecord }) {
             ) : (
                 <RecordPageFrame
                     header={
-                        <div
-                            className="flex flex-wrap items-start justify-between gap-3"
-                            data-crm="quotes-record"
-                        >
-                            <div className="min-w-0 space-y-1">
+                        <div data-crm="quotes-record">
+                        <WorkspaceHeader
+                            archetype="document"
+                            dataCrm="quotes-record"
+                            leading={
                                 <RecordBack
                                     href={quoteListHref()}
                                     label="Back to Quotes"
                                 />
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <h1 className="min-w-0 truncate text-record-title leading-snug font-semibold tracking-tight">
-                                        {quote.title}
-                                    </h1>
-                                    <RecordStatusBadge>
-                                        {quote.status_label}
-                                    </RecordStatusBadge>
-                                    <span className="text-[11px] text-mute">
-                                        {t('Quote #:id', { id: quote.id })}
-                                    </span>
-                                </div>
-                                <p className="text-[13px] text-mute">
+                            }
+                            title={quote.title}
+                            status={
+                                <RecordStatusBadge>
+                                    {quote.status_label}
+                                </RecordStatusBadge>
+                            }
+                            meta={
+                                <span className="text-[11px] text-mute">
+                                    {t('Quote #:id', { id: quote.id })}
+                                </span>
+                            }
+                            count={
+                                <>
                                     {contactName ?? t('No contact')}
                                     {quote.owner?.name
                                         ? ` · ${quote.owner.name}`
                                         : ''}
-                                </p>
-                            </div>
-                            <Button
-                                asChild
-                                variant="outline"
-                                size="sm"
-                                className="h-8 shrink-0"
-                            >
-                                <a
-                                    href={quotePreviewHref(quote.id)}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                </>
+                            }
+                            secondaryActions={
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 shrink-0"
                                 >
-                                    <FilePdf className="size-3.5" />
-                                    {t('Preview PDF')}
-                                </a>
-                            </Button>
+                                    <a
+                                        href={quotePreviewHref(quote.id)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <FilePdf className="size-3.5" />
+                                        {t('Preview PDF')}
+                                    </a>
+                                </Button>
+                            }
+                        />
                         </div>
                     }
                 >

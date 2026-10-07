@@ -9,6 +9,7 @@ import {
     isNavigationChildActive,
     visibleSections,
     visibleSettings,
+    visibleSimpleItems,
 } from '@/components/shell/product-nav';
 import type { NavItem } from '@/components/shell/product-nav';
 import { UserMenuContent } from '@/components/user-menu-content';
@@ -64,12 +65,14 @@ export function EvoRail({
     const [createOpen, setCreateOpen] = useState(false);
     const [tasksOpen, setTasksOpen] = useState(false);
     const allowed = simpleMode ? new Set(nav.map((item) => item.id)) : null;
-    const sections = visibleSections(
-        simpleMode,
-        allowed,
-        features,
-        capabilitySet,
-    );
+    const sections = simpleMode
+        ? [
+              {
+                  id: 'simple',
+                  items: visibleSimpleItems(nav, features, capabilitySet),
+              },
+          ]
+        : visibleSections(false, allowed, features, capabilitySet);
     const activeId = activeNavId(path, sections);
     const activeGroupId = activeParentId(path, sections);
     const settingsActive =
@@ -141,16 +144,20 @@ export function EvoRail({
                         {t('Contact')}
                     </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href="/crm/companies?create=1" onClick={onNavigate}>
-                        {t('Company')}
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href="/crm/leads?create=1" onClick={onNavigate}>
-                        {t('Lead')}
-                    </Link>
-                </DropdownMenuItem>
+                {!simpleMode ? (
+                    <DropdownMenuItem asChild>
+                        <Link href="/crm/companies?create=1" onClick={onNavigate}>
+                            {t('Company')}
+                        </Link>
+                    </DropdownMenuItem>
+                ) : null}
+                {!simpleMode ? (
+                    <DropdownMenuItem asChild>
+                        <Link href="/crm/leads?create=1" onClick={onNavigate}>
+                            {t('Lead')}
+                        </Link>
+                    </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuItem asChild>
                     <Link href="/crm/deals?create=1" onClick={onNavigate}>
                         {t('Deal')}

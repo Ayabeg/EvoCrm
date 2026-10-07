@@ -24,7 +24,7 @@ export const CANNED_TEMPLATES: InboxTemplate[] = [
     },
     {
         id: 'wa-quote',
-        title: 'devis_envoye',
+        title: 'inbox.template.devis_envoye',
         body: 'Bonjour {{1}}, votre devis EvoCRM est disponible. Montant : {{2}} DA. Répondez OUI pour planifier un appel.',
         channel: 'whatsapp',
         kind: 'whatsapp',
@@ -32,7 +32,7 @@ export const CANNED_TEMPLATES: InboxTemplate[] = [
     },
     {
         id: 'wa-followup',
-        title: 'relance_devis',
+        title: 'inbox.template.relance_devis',
         body: 'Bonjour {{1}}, je me permets de relancer le devis envoyé le {{2}}. Souhaitez-vous un ajustement ?',
         channel: 'whatsapp',
         kind: 'whatsapp',

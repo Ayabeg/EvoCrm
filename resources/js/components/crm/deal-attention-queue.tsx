@@ -82,7 +82,7 @@ export default function DealAttentionQueue({
                                 <span
                                     className={`block truncate text-[12px] ${attentionToneClass(item.primary.severity)}`}
                                 >
-                                    {t(item.primary.reason || item.primary.label)}
+                                    {t(item.primary.reason || item.primary.label, item.primary.reason_replace)}
                                 </span>
                             </span>
                             <span

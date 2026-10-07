@@ -1,0 +1,25 @@
+{
+  "output": "/workspace/artifacts/product-rebuild/02-wave/before/deals",
+  "email": "owner@evosales.local",
+  "baseUrl": "http://127.0.0.1:8000",
+  "files": [
+    "deals-list__1440x1000__fr__light.png",
+    "deals-board__1440x1000__fr__light.png",
+    "deals-list__1280x900__fr__light.png",
+    "deals-board__1280x900__fr__light.png",
+    "deals-list__1024x768__fr__light.png",
+    "deals-board__1024x768__fr__light.png",
+    "deals-list__768x1024__fr__light.png",
+    "deals-board__768x1024__fr__light.png",
+    "deals-list__430x932__fr__light.png",
+    "deals-board__430x932__fr__light.png",
+    "deals-list__390x844__fr__light.png",
+    "deals-board__390x844__fr__light.png",
+    "deals-list__1440x1000__en__light.png",
+    "deals-board__1440x1000__en__light.png",
+    "deals-list__1440x1000__ar__light.png",
+    "deals-board__1440x1000__ar__light.png",
+    "deals-list__1440x1000__fr__dark.png",
+    "deals-board__1440x1000__fr__dark.png"
+  ]
+}

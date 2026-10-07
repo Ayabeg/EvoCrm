@@ -1,0 +1,667 @@
+{
+  "list-1440": {
+    "vw": 1440,
+    "vh": 1000,
+    "url": "/inbox",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": {
+      "x": 0,
+      "y": 0,
+      "w": 224,
+      "h": 1000
+    },
+    "workspace": {
+      "x": 224,
+      "y": 0,
+      "w": 1216,
+      "h": 1000
+    },
+    "roomNav": {
+      "x": 256,
+      "y": 0,
+      "w": 1152,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 224,
+      "y": 42,
+      "w": 1216,
+      "h": 958
+    },
+    "folders": {
+      "x": 240,
+      "y": 58,
+      "w": 187,
+      "h": 357
+    },
+    "list": {
+      "x": 465,
+      "y": 58,
+      "w": 300,
+      "h": 926
+    },
+    "conversation": null,
+    "thread": null,
+    "composer": null,
+    "context": null,
+    "threadRows": 8,
+    "caughtUp": "Vous êtes à jour.",
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [],
+    "notePressed": []
+  },
+  "open-1440": {
+    "vw": 1440,
+    "vh": 1000,
+    "url": "/inbox?thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": {
+      "x": 0,
+      "y": 0,
+      "w": 224,
+      "h": 1000
+    },
+    "workspace": {
+      "x": 224,
+      "y": 0,
+      "w": 1216,
+      "h": 1000
+    },
+    "roomNav": {
+      "x": 256,
+      "y": 0,
+      "w": 1152,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 224,
+      "y": 42,
+      "w": 1216,
+      "h": 958
+    },
+    "folders": {
+      "x": 240,
+      "y": 58,
+      "w": 187,
+      "h": 357
+    },
+    "list": {
+      "x": 465,
+      "y": 58,
+      "w": 300,
+      "h": 926
+    },
+    "conversation": {
+      "x": 803,
+      "y": 58,
+      "w": 341,
+      "h": 926
+    },
+    "thread": {
+      "x": 803,
+      "y": 151,
+      "w": 341,
+      "h": 585
+    },
+    "composer": {
+      "x": 803,
+      "y": 736,
+      "w": 341,
+      "h": 248
+    },
+    "context": {
+      "x": 1160,
+      "y": 42,
+      "w": 280,
+      "h": 958
+    },
+    "threadRows": 8,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [],
+    "notePressed": [
+      "Répondre",
+      "Répondre"
+    ]
+  },
+  "closed-1440": {
+    "vw": 1440,
+    "vh": 1000,
+    "url": "/inbox?context=0&thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": {
+      "x": 0,
+      "y": 0,
+      "w": 224,
+      "h": 1000
+    },
+    "workspace": {
+      "x": 224,
+      "y": 0,
+      "w": 1216,
+      "h": 1000
+    },
+    "roomNav": {
+      "x": 256,
+      "y": 0,
+      "w": 1152,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 224,
+      "y": 42,
+      "w": 1216,
+      "h": 958
+    },
+    "folders": {
+      "x": 240,
+      "y": 58,
+      "w": 187,
+      "h": 357
+    },
+    "list": {
+      "x": 465,
+      "y": 58,
+      "w": 300,
+      "h": 926
+    },
+    "conversation": {
+      "x": 803,
+      "y": 58,
+      "w": 621,
+      "h": 926
+    },
+    "thread": {
+      "x": 803,
+      "y": 111,
+      "w": 621,
+      "h": 691
+    },
+    "composer": {
+      "x": 803,
+      "y": 802,
+      "w": 621,
+      "h": 182
+    },
+    "context": null,
+    "threadRows": 8,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [],
+    "notePressed": [
+      "Répondre",
+      "Répondre"
+    ]
+  },
+  "open-1280": {
+    "vw": 1280,
+    "vh": 900,
+    "url": "/inbox?thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": {
+      "x": 0,
+      "y": 0,
+      "w": 224,
+      "h": 900
+    },
+    "workspace": {
+      "x": 224,
+      "y": 0,
+      "w": 1056,
+      "h": 900
+    },
+    "roomNav": {
+      "x": 256,
+      "y": 0,
+      "w": 992,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 224,
+      "y": 42,
+      "w": 1056,
+      "h": 858
+    },
+    "folders": {
+      "x": 240,
+      "y": 58,
+      "w": 187,
+      "h": 357
+    },
+    "list": {
+      "x": 465,
+      "y": 58,
+      "w": 300,
+      "h": 826
+    },
+    "conversation": {
+      "x": 803,
+      "y": 58,
+      "w": 181,
+      "h": 826
+    },
+    "thread": {
+      "x": 803,
+      "y": 151,
+      "w": 181,
+      "h": 485
+    },
+    "composer": {
+      "x": 803,
+      "y": 636,
+      "w": 181,
+      "h": 248
+    },
+    "context": {
+      "x": 1000,
+      "y": 42,
+      "w": 280,
+      "h": 858
+    },
+    "threadRows": 8,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [],
+    "notePressed": [
+      "Répondre",
+      "Répondre"
+    ]
+  },
+  "open-1024": {
+    "vw": 1024,
+    "vh": 768,
+    "url": "/inbox?thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": {
+      "x": 0,
+      "y": 0,
+      "w": 56,
+      "h": 768
+    },
+    "workspace": {
+      "x": 56,
+      "y": 0,
+      "w": 968,
+      "h": 768
+    },
+    "roomNav": {
+      "x": 88,
+      "y": 0,
+      "w": 904,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 56,
+      "y": 42,
+      "w": 968,
+      "h": 726
+    },
+    "folders": {
+      "x": 72,
+      "y": 58,
+      "w": 187,
+      "h": 357
+    },
+    "list": {
+      "x": 297,
+      "y": 58,
+      "w": 300,
+      "h": 694
+    },
+    "conversation": {
+      "x": 635,
+      "y": 58,
+      "w": 373,
+      "h": 694
+    },
+    "thread": {
+      "x": 635,
+      "y": 151,
+      "w": 373,
+      "h": 353
+    },
+    "composer": {
+      "x": 635,
+      "y": 504,
+      "w": 373,
+      "h": 248
+    },
+    "context": null,
+    "threadRows": 8,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [],
+    "notePressed": [
+      "Répondre",
+      "Répondre"
+    ]
+  },
+  "open-768": {
+    "vw": 768,
+    "vh": 1024,
+    "url": "/inbox?thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": null,
+    "workspace": {
+      "x": 0,
+      "y": 0,
+      "w": 768,
+      "h": 1024
+    },
+    "roomNav": {
+      "x": 32,
+      "y": 48,
+      "w": 704,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 0,
+      "y": 90,
+      "w": 768,
+      "h": 934
+    },
+    "folders": null,
+    "list": {
+      "x": 20,
+      "y": 143,
+      "w": 280,
+      "h": 865
+    },
+    "conversation": {
+      "x": 338,
+      "y": 143,
+      "w": 414,
+      "h": 865
+    },
+    "thread": {
+      "x": 338,
+      "y": 236,
+      "w": 414,
+      "h": 524
+    },
+    "composer": {
+      "x": 338,
+      "y": 760,
+      "w": 414,
+      "h": 248
+    },
+    "context": null,
+    "threadRows": 8,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [
+      "Dossiers",
+      "Boîte de réception",
+      "Conversation"
+    ],
+    "notePressed": [
+      "Répondre",
+      "Répondre",
+      "Répondre"
+    ]
+  },
+  "open-430": {
+    "vw": 430,
+    "vh": 932,
+    "url": "/inbox?thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": null,
+    "workspace": {
+      "x": 0,
+      "y": 0,
+      "w": 430,
+      "h": 932
+    },
+    "roomNav": {
+      "x": 16,
+      "y": 48,
+      "w": 398,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 0,
+      "y": 90,
+      "w": 430,
+      "h": 842
+    },
+    "folders": null,
+    "list": null,
+    "conversation": {
+      "x": 0,
+      "y": 127,
+      "w": 430,
+      "h": 467
+    },
+    "thread": {
+      "x": 0,
+      "y": 220,
+      "w": 430,
+      "h": 205
+    },
+    "composer": {
+      "x": 0,
+      "y": 425,
+      "w": 430,
+      "h": 169
+    },
+    "context": null,
+    "threadRows": 0,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [
+      "Dossiers",
+      "Boîte de réception",
+      "Conversation"
+    ],
+    "notePressed": [
+      "Répondre",
+      "Répondre",
+      "Répondre"
+    ]
+  },
+  "open-390": {
+    "vw": 390,
+    "vh": 844,
+    "url": "/inbox?thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": null,
+    "workspace": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    "roomNav": {
+      "x": 16,
+      "y": 48,
+      "w": 358,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 0,
+      "y": 90,
+      "w": 390,
+      "h": 754
+    },
+    "folders": null,
+    "list": null,
+    "conversation": {
+      "x": 0,
+      "y": 127,
+      "w": 390,
+      "h": 467
+    },
+    "thread": {
+      "x": 0,
+      "y": 220,
+      "w": 390,
+      "h": 205
+    },
+    "composer": {
+      "x": 0,
+      "y": 425,
+      "w": 390,
+      "h": 169
+    },
+    "context": null,
+    "threadRows": 0,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [
+      "Dossiers",
+      "Boîte de réception",
+      "Conversation"
+    ],
+    "notePressed": [
+      "Répondre",
+      "Répondre",
+      "Répondre"
+    ]
+  },
+  "note-1440": {
+    "vw": 1440,
+    "vh": 1000,
+    "url": "/inbox?thread=1",
+    "dir": "ltr",
+    "lang": "fr",
+    "rail": {
+      "x": 0,
+      "y": 0,
+      "w": 224,
+      "h": 1000
+    },
+    "workspace": {
+      "x": 224,
+      "y": 0,
+      "w": 1216,
+      "h": 1000
+    },
+    "roomNav": {
+      "x": 256,
+      "y": 0,
+      "w": 1152,
+      "h": 42
+    },
+    "header": null,
+    "panes": {
+      "x": 224,
+      "y": 42,
+      "w": 1216,
+      "h": 958
+    },
+    "folders": {
+      "x": 240,
+      "y": 58,
+      "w": 187,
+      "h": 357
+    },
+    "list": {
+      "x": 465,
+      "y": 58,
+      "w": 300,
+      "h": 926
+    },
+    "conversation": {
+      "x": 803,
+      "y": 58,
+      "w": 341,
+      "h": 926
+    },
+    "thread": {
+      "x": 803,
+      "y": 151,
+      "w": 341,
+      "h": 585
+    },
+    "composer": {
+      "x": 803,
+      "y": 736,
+      "w": 341,
+      "h": 248
+    },
+    "context": {
+      "x": 1160,
+      "y": 42,
+      "w": 280,
+      "h": 958
+    },
+    "threadRows": 8,
+    "caughtUp": null,
+    "pageScroll": false,
+    "frame": {
+      "overflowY": "hidden",
+      "owner": "conversation",
+      "shell": "frame",
+      "archetype": "conversation"
+    },
+    "tabs": [],
+    "notePressed": [
+      "Note",
+      "Note"
+    ]
+  }
+}

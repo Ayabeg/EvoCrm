@@ -52,13 +52,10 @@ it('persists collapse through the existing sidebar_state cookie', function () {
 it('keeps SIMPLE_NAV membership exactly as the business contract', function () {
     expect(SimpleMode::SIMPLE_NAV)->toBe([
         ['id' => 'home', 'label' => 'Home', 'href' => '/dashboard'],
-        ['id' => 'inbox', 'label' => 'Inbox', 'href' => '/inbox'],
-        ['id' => 'leads', 'label' => 'Leads', 'href' => '/crm/leads'],
         ['id' => 'contacts', 'label' => 'Contacts', 'href' => '/crm/contacts'],
-        ['id' => 'companies', 'label' => 'Companies', 'href' => '/crm/companies'],
         ['id' => 'deals', 'label' => 'Deals', 'href' => '/crm/deals'],
+        ['id' => 'inbox', 'label' => 'Inbox', 'href' => '/inbox'],
         ['id' => 'quotes', 'label' => 'Quotes', 'href' => '/crm/quotes'],
-        ['id' => 'activities', 'label' => 'Activities', 'href' => '/crm/activities'],
     ]);
 });
 

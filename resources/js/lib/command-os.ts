@@ -577,15 +577,66 @@ export function commandAskItems(features: CommandFeatures | null | undefined): C
     ];
 }
 
+const DEFAULT_SIMPLE_HREFS = [
+    '/dashboard',
+    '/crm/contacts',
+    '/crm/deals',
+    '/inbox',
+    '/crm/quotes',
+    '/settings',
+];
+
+function commandPath(href: string | undefined): string {
+    if (!href) {
+        return '';
+    }
+
+    return href.split(/[?#]/, 1)[0] || '/';
+}
+
+function isSimpleCommandHref(
+    href: string | undefined,
+    allowed: Set<string>,
+): boolean {
+    const path = commandPath(href);
+
+    if (!path) {
+        return false;
+    }
+
+    if (path === '/settings' || path.startsWith('/settings/')) {
+        return true;
+    }
+
+    return allowed.has(path);
+}
+
 export function buildCommandCatalog(input: {
     capabilities: readonly string[];
     features?: CommandFeatures | null;
+    simpleMode?: boolean;
+    allowedHrefs?: readonly string[];
 }): CommandCatalog {
+    const navigate = commandNavigateItems(input.features);
+    const create = commandCreateItems(input.capabilities);
+    const act = commandActItems();
+    const ask = commandAskItems(input.features);
+
+    if (!input.simpleMode) {
+        return { navigate, create, act, ask };
+    }
+
+    const allowed = new Set(
+        input.allowedHrefs?.length ? input.allowedHrefs : DEFAULT_SIMPLE_HREFS,
+    );
+
     return {
-        navigate: commandNavigateItems(input.features),
-        create: commandCreateItems(input.capabilities),
-        act: commandActItems(),
-        ask: commandAskItems(input.features),
+        navigate: navigate.filter((item) =>
+            isSimpleCommandHref(item.href, allowed),
+        ),
+        create: create.filter((item) => isSimpleCommandHref(item.href, allowed)),
+        act: act.filter((item) => isSimpleCommandHref(item.href, allowed)),
+        ask,
     };
 }
 

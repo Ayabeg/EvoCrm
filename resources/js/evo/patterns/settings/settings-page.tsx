@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/evo/lib/cn';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { t } from '@/lib/i18n';
 
 export function SettingsPageHeader({
@@ -12,22 +13,14 @@ export function SettingsPageHeader({
     children?: ReactNode;
 }) {
     return (
-        <header
-            data-settings="page-header"
-            className="mb-3 flex flex-wrap items-start justify-between gap-3"
-        >
-            <div className="min-w-0">
-                <h1 className="text-[24px] leading-[32px] font-semibold tracking-tight text-[var(--evo-ink)]">
-                    {t(title)}
-                </h1>
-                {description ? (
-                    <p className="mt-1 max-w-[65ch] text-[14px] leading-5 text-[var(--evo-ink-secondary)]">
-                        {t(description)}
-                    </p>
-                ) : null}
-            </div>
-            {children}
-        </header>
+        <WorkspaceHeader
+            title={t(title)}
+            count={description ? t(description) : undefined}
+            secondaryActions={children}
+            archetype="document"
+            sticky
+            dataSettings="page-header"
+        />
     );
 }
 

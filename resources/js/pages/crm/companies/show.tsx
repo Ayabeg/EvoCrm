@@ -21,9 +21,10 @@ import {
 } from '@/components/crm/record-hub';
 import RecordProperties from '@/components/crm/record-properties';
 import type { AttributeBag } from '@/components/crm/record-properties';
+import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
-import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 
@@ -87,56 +88,61 @@ export default function CompanyShow({
             ) : (
                 <RecordPageFrame
                     header={
-                        <>
-                            <RecordBack
-                                href="/crm/companies"
-                                label="Back to Companies"
-                            />
-                            <RecordIdentity
-                                title={company.name}
-                                kind="Company"
-                                subtitle={
-                                    [
-                                        company.domain,
-                                        location,
-                                        company.owner?.name,
-                                    ]
-                                        .filter(Boolean)
-                                        .join(' · ') || undefined
-                                }
-                                actions={
-                                    <RecordActions
-                                        entityId={company.id}
-                                        companyId={company.id}
-                                        secondary={
-                                            <>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    aria-expanded={editing}
-                                                    onClick={() =>
-                                                        setEditing(
-                                                            (open) => !open,
-                                                        )
-                                                    }
-                                                >
-                                                    {editing
-                                                        ? 'Close edit'
-                                                        : 'Edit'}
-                                                </Button>
-                                                <div className="md:hidden">
-                                                    <AskEvoTrigger
-                                                        action={askAction}
-                                                        insight={askEvo}
-                                                    />
-                                                </div>
-                                            </>
-                                        }
-                                    />
-                                }
-                            />
-                        </>
+                        <WorkspaceHeader
+                            archetype="record"
+                            leading={
+                                <RecordBack
+                                    href="/crm/companies"
+                                    label="Back to Companies"
+                                />
+                            }
+                            title={
+                                <RecordIdentity
+                                    title={company.name}
+                                    kind="Company"
+                                    subtitle={
+                                        [
+                                            company.domain,
+                                            location,
+                                            company.owner?.name,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(' · ') || undefined
+                                    }
+                                    actions={
+                                        <RecordActions
+                                            entityId={company.id}
+                                            companyId={company.id}
+                                            secondary={
+                                                <>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        aria-expanded={editing}
+                                                        onClick={() =>
+                                                            setEditing(
+                                                                (open) => !open,
+                                                            )
+                                                        }
+                                                    >
+                                                        {editing
+                                                            ? 'Close edit'
+                                                            : 'Edit'}
+                                                    </Button>
+                                                    <div className="md:hidden">
+                                                        <AskEvoTrigger
+                                                            action={askAction}
+                                                            insight={askEvo}
+                                                        />
+                                                    </div>
+                                                </>
+                                            }
+                                        />
+                                    }
+                                />
+                            }
+                        />
                     }
                 >
                     <RecordShell

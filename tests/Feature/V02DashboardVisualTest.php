@@ -7,7 +7,9 @@ it('composes Home as an attention-first operating workspace', function () {
     $css = file_get_contents(resource_path('css/app.css'));
 
     expect($home)->toContain('data-home="workspace"')
-        ->and($home)->toContain("t('Hello :name'")
+        ->and($home)->toContain("title={t('Home')}")
+        ->and($home)->toContain('<WorkspaceHeader')
+        ->and($home)->not->toContain("t('Hello :name'")
         ->and($home)->toContain('<HomeKpiStrip')
         ->and($home)->toContain("t('Deal evolution')")
         ->and($home)->toContain("t('Pipeline split')")

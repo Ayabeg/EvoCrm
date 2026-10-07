@@ -9,7 +9,7 @@ it('gives the deals board a workspace shell without KPI cards or a second dashbo
         ->and($src)->toContain('Board options')
         ->and($src)->toContain('DealPipelineBoard')
         ->and($src)->toContain('action="/crm/deals"')
-        ->and($src)->toContain('DealForecastBar')
+        ->and($src)->toContain('DealForecastSummary')
         ->and($src)->not->toContain('CrmShell')
         ->and($src)->not->toContain('chrome="workspace"')
         ->and($src)->toContain('DealLayoutToggle')

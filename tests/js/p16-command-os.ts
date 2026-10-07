@@ -116,6 +116,41 @@ expectTrue(
     'feature-gated navigate items stay hidden',
 );
 
+const simpleCatalog = buildCommandCatalog({
+    capabilities: ['crm.view', 'crm.edit'],
+    features: {
+        tickets: false,
+        ask_evo: false,
+        ads: false,
+        report_builder: false,
+    },
+    simpleMode: true,
+    allowedHrefs: ['/dashboard', '/crm/contacts', '/crm/deals', '/inbox', '/crm/quotes'],
+});
+expectEqual(
+    simpleCatalog.navigate.map((item) => item.href),
+    ['/dashboard', '/crm/contacts', '/crm/deals', '/inbox', '/crm/quotes', '/settings'],
+    'Simple Mode navigate matches C-02 destinations plus Settings',
+);
+expectEqual(
+    simpleCatalog.create.map((item) => item.href),
+    ['/crm/contacts?create=1', '/crm/deals?create=1', '/crm/quotes?create=1'],
+    'Simple Mode create hides Company and Activity',
+);
+expectEqual(simpleCatalog.act.length, 0, 'Simple Mode hides Activities act destinations');
+expectTrue(
+    catalog.navigate.some((item) => item.href === '/crm/companies'),
+    'Full Mode still lists Companies',
+);
+expectTrue(
+    catalog.navigate.some((item) => item.href === '/crm/leads'),
+    'Full Mode still lists Leads',
+);
+expectTrue(
+    catalog.navigate.some((item) => item.href === '/crm/activities'),
+    'Full Mode still lists Activities',
+);
+
 const empty = composeCommandResults({
     query: '',
     catalog,

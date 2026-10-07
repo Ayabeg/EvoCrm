@@ -62,7 +62,7 @@ it('locks P11 source contracts for one Deal workspace and two views', function (
         ->and($board)->toContain('DealPipelineBoard')
         ->and($board)->toContain('DealLayoutToggle')
         ->and($board)->toContain('PipelineSwitcher')
-        ->and($board)->toContain('DealForecastBar')
+        ->and($board)->toContain('DealForecastSummary')
         ->and($board)->toContain('Create deal')
         ->and($board)->toContain('EmptyState')
         ->and($board)->toContain('density="banner"')

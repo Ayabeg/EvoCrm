@@ -185,7 +185,7 @@ export function CommandPalette({
 }) {
     const page = usePage();
     const { openRecord } = useQuickRecord();
-    const { features } = useSimpleMode();
+    const { features, simpleMode, nav } = useSimpleMode();
     const rawCapabilities = page.props.auth?.capabilities;
     const openerRef = useRef<HTMLElement | null>(null);
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -207,8 +207,12 @@ export function CommandPalette({
                     ? rawCapabilities
                     : []) as string[],
                 features,
+                simpleMode,
+                allowedHrefs: simpleMode
+                    ? nav.map((item) => item.href)
+                    : undefined,
             }),
-        [features, rawCapabilities],
+        [features, rawCapabilities, simpleMode, nav],
     );
 
     const availableIds = useMemo(
