@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-10-07T06:50:57.390Z",
+  "capturedAt": "2026-10-07T07:12:53.673Z",
   "seed": {
     "workspace": "Evotechly",
-    "simple_mode": true,
+    "simple_mode": false,
     "inbox_url": null,
     "thread": 1,
     "threads": 8
@@ -8346,13 +8346,13 @@
           "x": 376,
           "y": 113,
           "width": 482,
-          "height": 664
+          "height": 682
         },
         "composer": {
           "x": 376,
-          "y": 776,
+          "y": 794,
           "width": 482,
-          "height": 208
+          "height": 190
         },
         "context": {
           "x": 0,
@@ -9247,9 +9247,9 @@
         },
         "composer": {
           "x": 16,
-          "y": 580,
+          "y": 581,
           "width": 594,
-          "height": 172
+          "height": 171
         },
         "context": null,
         "back": null,
@@ -9362,9 +9362,9 @@
         },
         "composer": {
           "x": 16,
-          "y": 580,
+          "y": 581,
           "width": 594,
-          "height": 172
+          "height": 171
         },
         "context": null,
         "back": null,
