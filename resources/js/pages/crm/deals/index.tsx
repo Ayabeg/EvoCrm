@@ -4,7 +4,6 @@ import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
-import DealAttentionQueue from '@/components/crm/deal-attention-queue';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { hasActiveListFilters } from '@/components/crm/list-query';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
@@ -14,7 +13,7 @@ import { Input } from '@/evo/ui/input';
 import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { DealAttentionQueueItem } from '@/lib/deal-attention';
-import { t } from '@/lib/i18n';
+import { currentLocale, t } from '@/lib/i18n';
 import { stageLabel } from '@/lib/stage-copy';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {
@@ -71,6 +70,7 @@ export default function DealsIndex({
     const { auth } = usePage<{ auth: Auth }>().props;
     const canImport = auth.capabilities.includes('crm.import');
     const canBulk = Boolean(bulk?.enabled);
+    void attentionQueue;
 
     return (
         <>
@@ -125,7 +125,7 @@ export default function DealsIndex({
                         <>
                             {canImport ? (
                                 <CrmObjectSecondaryLink href="/crm/deals/import">
-                                    Import
+                                    {t('Import')}
                                 </CrmObjectSecondaryLink>
                             ) : null}
                         </>
@@ -148,14 +148,6 @@ export default function DealsIndex({
                         />
                     }
                     extraQuery={{ pipeline: pipeline.id }}
-                    banner={
-                        <DealAttentionQueue
-                            items={attentionQueue}
-                            basePath="/crm/deals"
-                            activeFilters={activeFilters}
-                            extraQuery={{ pipeline: pipeline.id }}
-                        />
-                    }
                     selection={{
                         mode: 'uncontrolled',
                         selectable: canBulk,
@@ -213,12 +205,12 @@ function DealCreateFields({
                         <Input name="title" required />
                     </div>
                     <div>
-                        <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
+                        <Label className="mb-1 block text-[12px]">{t('Amount (DA)')}</Label>
                         <Input name="amount_dzd" type="number" min="0" step="0.01" />
                     </div>
                     <div>
                         <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
-                        <Input name="close_date" type="date" />
+                        <Input name="close_date" type="date" lang={currentLocale()} />
                     </div>
                     <div>
                         <Label className="mb-1 block text-[12px]">{t('Contact')}</Label>

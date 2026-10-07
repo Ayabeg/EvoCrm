@@ -52,7 +52,8 @@ it('moves Deals list onto DataWorkspace shared-table without a domain children p
         ->and($shell)->toContain('rowHref={rowHref}')
         ->and($shell)->toContain('applyDealColumnContract')
         ->and($shell)->toContain('toolbarExtra')
-        ->and($shell)->toContain("(entity === 'deal' || entity === 'ticket') &&")
+        ->and($shell)->toContain("entity === 'ticket' &&")
+        ->and($shell)->not->toContain("(entity === 'deal' || entity === 'ticket') &&")
         ->and($shell)->toContain("mode: mode ?? (entity === 'deal' ? 'list' as const : undefined)")
         ->and($shell)->not->toContain('rows={[]}')
         ->and($shell)->not->toContain("empty={{ title: '', body: '' }}");

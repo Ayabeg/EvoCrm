@@ -1,12 +1,12 @@
 {
-  "capturedAt": "2026-10-06T19:03:41.033Z",
-  "commit": "dde13cacaed952f871c58aff876e88ceb1356967",
+  "capturedAt": "2026-10-06T19:21:49.651Z",
+  "commit": "6d5338ba09784ad5bcda909921e2a08c28caf1a5",
   "baseUrl": "http://127.0.0.1:8000",
   "email": "owner@evosales.local",
   "seeded": {
     "workspace": "Evotechly",
     "simple_mode": false,
-    "inbox_url": "https://desk.evotechly.com",
+    "inbox_url": null,
     "contact": 1,
     "company": 1,
     "lead": 1,
@@ -471,9 +471,9 @@
           "x": 234,
           "y": 793,
           "width": 259,
-          "height": 150,
+          "height": 148,
           "selectorHint": "DIV",
-          "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
         },
         "contentStartY": 793,
         "primaryActionCount": 0,
@@ -807,8 +807,10 @@
           "text": "Clinic website intake"
         },
         "contentStartY": 58,
-        "primaryActionCount": 0,
-        "primaryActionLabels": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Apply"
+        ],
         "toolbarRowCount": 1,
         "toolbarBands": [
           {
@@ -821,7 +823,7 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-4 bg-white",
-            "scrollHeight": 1302,
+            "scrollHeight": 1544,
             "clientHeight": 963
           }
         ],
@@ -879,24 +881,20 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 79,
+          "y": 42,
           "width": 1216,
-          "height": 921,
+          "height": 958,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 79,
+        "contentStartY": 42,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 0,
@@ -955,24 +953,20 @@
         "inset": null,
         "firstUseful": {
           "x": 803,
-          "y": 188,
+          "y": 151,
           "width": 341,
-          "height": 548,
+          "height": 585,
           "selectorHint": "DIV",
-          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
+          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:35 · reçu\n\nBien"
         },
-        "contentStartY": 188,
+        "contentStartY": 151,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 1,
@@ -981,7 +975,7 @@
             "tag": "ASIDE",
             "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white",
             "scrollHeight": 1313,
-            "clientHeight": 921
+            "clientHeight": 958
           }
         ],
         "overflow": {
@@ -1712,9 +1706,9 @@
           "x": 234,
           "y": 837,
           "width": 259,
-          "height": 150,
+          "height": 148,
           "selectorHint": "DIV",
-          "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
         },
         "contentStartY": 837,
         "primaryActionCount": 0,
@@ -2069,8 +2063,10 @@
           "text": "Clinic website intake"
         },
         "contentStartY": 58,
-        "primaryActionCount": 0,
-        "primaryActionLabels": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Apply"
+        ],
         "toolbarRowCount": 1,
         "toolbarBands": [
           {
@@ -2083,7 +2079,7 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-4 bg-white",
-            "scrollHeight": 1302,
+            "scrollHeight": 1544,
             "clientHeight": 863
           }
         ],
@@ -2141,24 +2137,20 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 79,
+          "y": 42,
           "width": 1056,
-          "height": 821,
+          "height": 858,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 79,
+        "contentStartY": 42,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 0,
@@ -2217,24 +2209,20 @@
         "inset": null,
         "firstUseful": {
           "x": 803,
-          "y": 188,
+          "y": 151,
           "width": 181,
-          "height": 448,
+          "height": 485,
           "selectorHint": "DIV",
-          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
+          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:35 · reçu\n\nBien"
         },
-        "contentStartY": 188,
+        "contentStartY": 151,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 1,
@@ -2243,7 +2231,7 @@
             "tag": "ASIDE",
             "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white",
             "scrollHeight": 1313,
-            "clientHeight": 821
+            "clientHeight": 858
           }
         ],
         "overflow": {
@@ -3066,13 +3054,19 @@
         "primaryActionLabels": [],
         "toolbarRowCount": 0,
         "toolbarBands": [],
-        "nestedScrollCount": 2,
+        "nestedScrollCount": 3,
         "nestedScrollers": [
           {
             "tag": "DIV",
             "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-aut",
             "scrollHeight": 460,
             "clientHeight": 444
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 overflow-y-auto px-5 py-4 bg-white",
+            "scrollHeight": 789,
+            "clientHeight": 665
           },
           {
             "tag": "DIV",
@@ -3263,8 +3257,10 @@
           "text": "Clinic website intake"
         },
         "contentStartY": 58,
-        "primaryActionCount": 0,
-        "primaryActionLabels": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Apply"
+        ],
         "toolbarRowCount": 1,
         "toolbarBands": [
           {
@@ -3272,7 +3268,7 @@
             "height": 38
           }
         ],
-        "nestedScrollCount": 2,
+        "nestedScrollCount": 3,
         "nestedScrollers": [
           {
             "tag": "DIV",
@@ -3283,7 +3279,13 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-4 bg-white",
-            "scrollHeight": 1302,
+            "scrollHeight": 1544,
+            "clientHeight": 731
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 overflow-y-auto px-5 py-4 bg-white",
+            "scrollHeight": 840,
             "clientHeight": 731
           }
         ],
@@ -3331,24 +3333,20 @@
         "inset": null,
         "firstUseful": {
           "x": 56,
-          "y": 79,
+          "y": 42,
           "width": 968,
-          "height": 689,
+          "height": 726,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 79,
+        "contentStartY": 42,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 1,
@@ -3403,24 +3401,20 @@
         "inset": null,
         "firstUseful": {
           "x": 635,
-          "y": 188,
+          "y": 151,
           "width": 373,
-          "height": 316,
+          "height": 353,
           "selectorHint": "DIV",
-          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
+          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:35 · reçu\n\nBien"
         },
-        "contentStartY": 188,
+        "contentStartY": 151,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 1,
@@ -4069,9 +4063,9 @@
           "x": 10,
           "y": 957,
           "width": 259,
-          "height": 150,
+          "height": 148,
           "selectorHint": "DIV",
-          "text": "Tlemcen school inbox\n\nÉcole Tlemcen Langues\n\n80 000 DA\n\nNon assigné\n\nAucune proc"
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
         },
         "contentStartY": 957,
         "primaryActionCount": 0,
@@ -4135,7 +4129,7 @@
         "overflow": {
           "documentX": false,
           "documentY": false,
-          "overflowingChildCount": 63
+          "overflowingChildCount": 62
         },
         "language": {
           "frenchMarkers": [
@@ -4405,24 +4399,20 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 147,
+          "y": 90,
           "width": 768,
-          "height": 877,
+          "height": 934,
           "selectorHint": "DIV",
           "text": "Dossiers\nBoîte de réception\nConversation\n\nBoîte de réception\n\n8\n\nFiltrer les con"
         },
-        "contentStartY": 147,
+        "contentStartY": 90,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 48,
             "height": 42
-          },
-          {
-            "y": 90,
-            "height": 57
           }
         ],
         "nestedScrollCount": 0,
@@ -4470,16 +4460,16 @@
         "inset": null,
         "firstUseful": {
           "x": 338,
-          "y": 293,
+          "y": 236,
           "width": 414,
-          "height": 467,
+          "height": 524,
           "selectorHint": "DIV",
-          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:21 · reçu\n\nBien"
+          "text": "6 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n17:35 · reçu\n\nBien"
         },
-        "contentStartY": 293,
+        "contentStartY": 236,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 3,
+        "toolbarRowCount": 2,
         "toolbarBands": [
           {
             "y": 48,
@@ -4487,10 +4477,6 @@
           },
           {
             "y": 90,
-            "height": 57
-          },
-          {
-            "y": 147,
             "height": 37
           }
         ],
@@ -5196,8 +5182,15 @@
         "primaryActionLabels": [],
         "toolbarRowCount": 0,
         "toolbarBands": [],
-        "nestedScrollCount": 0,
-        "nestedScrollers": [],
+        "nestedScrollCount": 1,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "min-h-0 overflow-y-auto px-4 py-3 bg-white",
+            "scrollHeight": 848,
+            "clientHeight": 608
+          }
+        ],
         "overflow": {
           "documentX": false,
           "documentY": false,
@@ -5364,8 +5357,15 @@
         "primaryActionLabels": [],
         "toolbarRowCount": 0,
         "toolbarBands": [],
-        "nestedScrollCount": 0,
-        "nestedScrollers": [],
+        "nestedScrollCount": 1,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "min-h-0 overflow-y-auto px-4 py-3 bg-white",
+            "scrollHeight": 987,
+            "clientHeight": 802
+          }
+        ],
         "overflow": {
           "documentX": false,
           "documentY": false,
@@ -5410,24 +5410,20 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 167,
+          "y": 90,
           "width": 430,
-          "height": 765,
+          "height": 842,
           "selectorHint": "DIV",
           "text": "Dossiers\nBoîte de réception\nConversation\n\nBoîte de réception\n\n8\n\nFiltrer les con"
         },
-        "contentStartY": 167,
+        "contentStartY": 90,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 48,
             "height": 42
-          },
-          {
-            "y": 90,
-            "height": 77
           }
         ],
         "nestedScrollCount": 0,
@@ -5477,7 +5473,7 @@
         "contentStartY": null,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 13,
+        "toolbarRowCount": 12,
         "toolbarBands": [
           {
             "y": 48,
@@ -5485,50 +5481,46 @@
           },
           {
             "y": 90,
-            "height": 77
-          },
-          {
-            "y": 167,
             "height": 37
           },
           {
-            "y": 204,
+            "y": 127,
             "height": 69
           },
           {
-            "y": 234,
+            "y": 157,
             "height": 32
           },
           {
-            "y": 273,
+            "y": 196,
             "height": 71
           },
           {
-            "y": 344,
+            "y": 267,
             "height": 71
           },
           {
-            "y": 415,
+            "y": 338,
             "height": 71
           },
           {
-            "y": 486,
+            "y": 409,
             "height": 71
           },
           {
-            "y": 557,
+            "y": 480,
             "height": 71
           },
           {
-            "y": 628,
+            "y": 551,
             "height": 71
           },
           {
-            "y": 699,
+            "y": 622,
             "height": 71
           },
           {
-            "y": 770,
+            "y": 693,
             "height": 71
           }
         ],
@@ -6221,7 +6213,7 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-3 bg-white",
-            "scrollHeight": 606,
+            "scrollHeight": 848,
             "clientHeight": 487
           }
         ],
@@ -6277,8 +6269,15 @@
         "primaryActionLabels": [],
         "toolbarRowCount": 0,
         "toolbarBands": [],
-        "nestedScrollCount": 0,
-        "nestedScrollers": [],
+        "nestedScrollCount": 1,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "min-h-0 overflow-y-auto bg-[var(--evo-surface)] px-4 py-3",
+            "scrollHeight": 564,
+            "clientHeight": 524
+          }
+        ],
         "overflow": {
           "documentX": false,
           "documentY": false,
@@ -6396,7 +6395,7 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-3 bg-white",
-            "scrollHeight": 783,
+            "scrollHeight": 987,
             "clientHeight": 714
           }
         ],
@@ -6444,24 +6443,20 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 167,
+          "y": 90,
           "width": 390,
-          "height": 677,
+          "height": 754,
           "selectorHint": "DIV",
           "text": "Dossiers\nBoîte de réception\nConversation\n\nBoîte de réception\n\n8\n\nFiltrer les con"
         },
-        "contentStartY": 167,
+        "contentStartY": 90,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 48,
             "height": 42
-          },
-          {
-            "y": 90,
-            "height": 77
           }
         ],
         "nestedScrollCount": 0,
@@ -6511,7 +6506,7 @@
         "contentStartY": null,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 13,
+        "toolbarRowCount": 12,
         "toolbarBands": [
           {
             "y": 48,
@@ -6519,50 +6514,46 @@
           },
           {
             "y": 90,
-            "height": 77
-          },
-          {
-            "y": 167,
             "height": 37
           },
           {
-            "y": 204,
+            "y": 127,
             "height": 69
           },
           {
-            "y": 234,
+            "y": 157,
             "height": 32
           },
           {
-            "y": 273,
+            "y": 196,
             "height": 71
           },
           {
-            "y": 344,
+            "y": 267,
             "height": 71
           },
           {
-            "y": 415,
+            "y": 338,
             "height": 71
           },
           {
-            "y": 486,
+            "y": 409,
             "height": 71
           },
           {
-            "y": 557,
+            "y": 480,
             "height": 71
           },
           {
-            "y": 628,
+            "y": 551,
             "height": 71
           },
           {
-            "y": 699,
+            "y": 622,
             "height": 71
           },
           {
-            "y": 770,
+            "y": 693,
             "height": 71
           }
         ],
@@ -6946,8 +6937,10 @@
           "text": "Clinic website intake"
         },
         "contentStartY": 58,
-        "primaryActionCount": 0,
-        "primaryActionLabels": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Apply"
+        ],
         "toolbarRowCount": 1,
         "toolbarBands": [
           {
@@ -6960,7 +6953,7 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-4 bg-white",
-            "scrollHeight": 1301,
+            "scrollHeight": 1543,
             "clientHeight": 963
           }
         ],
@@ -7015,24 +7008,20 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 79,
+          "y": 42,
           "width": 1216,
-          "height": 921,
+          "height": 958,
           "selectorHint": "DIV",
           "text": "INBOX\n\nAll\n8\nUnassigned\n1\nAssigned to me\n7\nAll open\n4\nWhatsApp\n0\nWhatsApp Busine"
         },
-        "contentStartY": 79,
+        "contentStartY": 42,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 0,
@@ -7220,8 +7209,10 @@
           "text": "Clinic website intake"
         },
         "contentStartY": 59,
-        "primaryActionCount": 0,
-        "primaryActionLabels": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Apply"
+        ],
         "toolbarRowCount": 1,
         "toolbarBands": [
           {
@@ -7234,7 +7225,7 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-4 bg-white",
-            "scrollHeight": 1308,
+            "scrollHeight": 1553,
             "clientHeight": 961
           }
         ],
@@ -7279,24 +7270,20 @@
         "inset": null,
         "firstUseful": {
           "x": 0,
-          "y": 79,
+          "y": 42,
           "width": 1216,
-          "height": 921,
+          "height": 958,
           "selectorHint": "DIV",
           "text": "صندوق الوارد\n\nالكل\n8\nغير معيّن\n1\nالمعيّن لي\n7\nالكل المفتوح\n4\nWhatsApp\n0\nWhatsApp"
         },
-        "contentStartY": 79,
+        "contentStartY": 42,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 0,
@@ -7501,8 +7488,10 @@
           "text": "Clinic website intake"
         },
         "contentStartY": 58,
-        "primaryActionCount": 0,
-        "primaryActionLabels": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Apply"
+        ],
         "toolbarRowCount": 1,
         "toolbarBands": [
           {
@@ -7515,7 +7504,7 @@
           {
             "tag": "DIV",
             "className": "min-h-0 overflow-y-auto px-4 py-4 bg-white",
-            "scrollHeight": 1302,
+            "scrollHeight": 1544,
             "clientHeight": 963
           }
         ],
@@ -7573,24 +7562,20 @@
         "inset": null,
         "firstUseful": {
           "x": 224,
-          "y": 79,
+          "y": 42,
           "width": 1216,
-          "height": 921,
+          "height": 958,
           "selectorHint": "DIV",
           "text": "BOÎTE DE RÉCEPTION\n\nTous\n8\nNon assigné\n1\nAssignés à moi\n7\nTous ouverts\n4\nWhatsAp"
         },
-        "contentStartY": 79,
+        "contentStartY": 42,
         "primaryActionCount": 0,
         "primaryActionLabels": [],
-        "toolbarRowCount": 2,
+        "toolbarRowCount": 1,
         "toolbarBands": [
           {
             "y": 0,
             "height": 42
-          },
-          {
-            "y": 42,
-            "height": 37
           }
         ],
         "nestedScrollCount": 0,

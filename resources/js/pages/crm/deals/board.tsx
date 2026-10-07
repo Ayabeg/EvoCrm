@@ -4,8 +4,7 @@ import { BoardOptionsSheet } from '@/components/crm/board-options-sheet';
 import type { BoardOptions } from '@/components/crm/board-options-sheet';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
 import { MorphingForm } from '@/components/crm/morphing-form';
-import DealAttentionQueue from '@/components/crm/deal-attention-queue';
-import DealForecastBar from '@/components/crm/deal-forecast-bar';
+import DealForecastSummary from '@/components/crm/deal-forecast-summary';
 import DealLayoutToggle from '@/components/crm/deal-layout-toggle';
 import { hasActiveListFilters } from '@/components/crm/list-query';
 import PipelineSwitcher from '@/components/crm/pipeline-switcher';
@@ -22,7 +21,7 @@ import { Input } from '@/evo/ui/input';
 import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { DealAttentionQueueItem } from '@/lib/deal-attention';
-import { t } from '@/lib/i18n';
+import { currentLocale, t } from '@/lib/i18n';
 import { stageLabel } from '@/lib/stage-copy';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {
@@ -109,6 +108,9 @@ export default function DealBoard({
     const loading = useInertiaLoading();
     const exportHref = `/crm/deals/export?pipeline=${pipeline.id}`;
     const filtered = hasActiveListFilters(activeFilters);
+    void forecastBand;
+    void forecastBacktest;
+    void attentionQueue;
     const emptyCopy = deals.length === 0
         ? filtered
             ? t('No deals match these filters')
@@ -153,12 +155,12 @@ export default function DealBoard({
                                             <Input name="title" required />
                                         </div>
                                         <div>
-                                            <Label className="mb-1 block text-[12px]">{t('Amount (DZD)')}</Label>
+                                            <Label className="mb-1 block text-[12px]">{t('Amount (DA)')}</Label>
                                             <Input name="amount_dzd" type="number" min="0" step="0.01" />
                                         </div>
                                         <div>
                                             <Label className="mb-1 block text-[12px]">{t('Close date')}</Label>
-                                            <Input name="close_date" type="date" />
+                                            <Input name="close_date" type="date" lang={currentLocale()} />
                                         </div>
                                         <div>
                                             <Label className="mb-1 block text-[12px]">{t('Stage')}</Label>
@@ -244,60 +246,47 @@ export default function DealBoard({
                         />
                     }
                     extraQuery={{ pipeline: pipeline.id }}
-                    banner={
-                        <>
-                            <DealForecastBar
-                                forecast={forecast}
-                                forecastBand={forecastBand}
-                                forecastBacktest={forecastBacktest}
-                            />
-                            <DealAttentionQueue
-                                items={attentionQueue}
-                                basePath="/crm/deals/board"
-                                activeFilters={activeFilters}
-                                extraQuery={{ pipeline: pipeline.id }}
-                            />
-                            {deals.length === 0 ? (
-                                <div
-                                    className="border-b border-hairline bg-white"
-                                    data-crm="pipeline-empty"
-                                >
-                                    {filtered ? (
-                                        <p
-                                            className="px-4 py-2 text-[12px] text-mute md:px-8"
-                                            role="status"
-                                        >
-                                            {emptyCopy}
-                                        </p>
-                                    ) : (
-                                        <EmptyState
-                                            density="banner"
-                                            kind="pipeline"
-                                            title={t('No deals in this pipeline')}
-                                            description={t('Create your first deal to start tracking opportunities.')}
-                                            action={
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    className="h-8"
-                                                    onClick={() => setDrawer(true)}
-                                                >
-                                                    {t('Create deal')}
-                                                </Button>
-                                            }
-                                        />
-                                    )}
-                                </div>
-                            ) : null}
-                        </>
-                    }
+                    headerSummary={<DealForecastSummary forecast={forecast} />}
                     board={
-                        <DealPipelineBoard
-                            stages={stages}
-                            deals={deals}
-                            options={boardOptions}
-                            loading={loading}
-                        />
+                        deals.length === 0 ? (
+                            <div
+                                className="border-b border-hairline bg-white"
+                                data-crm="pipeline-empty"
+                            >
+                                {filtered ? (
+                                    <p
+                                        className="px-4 py-2 text-[12px] text-mute md:px-8"
+                                        role="status"
+                                    >
+                                        {emptyCopy}
+                                    </p>
+                                ) : (
+                                    <EmptyState
+                                        density="banner"
+                                        kind="pipeline"
+                                        title={t('No deals in this pipeline')}
+                                        description={t('Create your first deal to start tracking opportunities.')}
+                                        action={
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                className="h-8"
+                                                onClick={() => setDrawer(true)}
+                                            >
+                                                {t('Create deal')}
+                                            </Button>
+                                        }
+                                    />
+                                )}
+                            </div>
+                        ) : (
+                            <DealPipelineBoard
+                                stages={stages}
+                                deals={deals}
+                                options={boardOptions}
+                                loading={loading}
+                            />
+                        )
                     }
                 />
             </div>

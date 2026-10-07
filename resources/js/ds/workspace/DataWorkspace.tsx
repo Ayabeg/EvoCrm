@@ -110,10 +110,14 @@ export function DataWorkspace<Row extends { id: RowId }>(
         banner,
         filterExtra,
         toolbarExtra,
+        chromeDensity = 'default',
+        headerContext,
+        headerSummary,
         className,
         contentClassName,
         resultMode,
     } = props;
+    const compactChrome = chromeDensity === 'compact';
     const { auth } = usePage().props as { auth: { user: { role: string } } };
     const canManageSettings = ['owner', 'admin'].includes(auth.user.role);
     const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -159,6 +163,25 @@ export function DataWorkspace<Row extends { id: RowId }>(
                 title={title}
                 description={description}
                 compact
+                context={headerContext}
+                summary={headerSummary}
+                views={
+                    compactChrome && queryEnabled ? (
+                        <SavedViews
+                            object={object}
+                            basePath={basePath}
+                            views={views}
+                            activeViewId={activeViewId}
+                            onViewChange={onViewChange}
+                            onViewSave={onViewSave}
+                            filters={filterRecord}
+                            columns={columns}
+                            extraQuery={extraQuery}
+                            canManageSettings={canManageSettings}
+                            density="embedded"
+                        />
+                    ) : undefined
+                }
                 secondaryActions={secondaryActions}
                 primaryAction={
                     primarySlot ??
@@ -175,8 +198,8 @@ export function DataWorkspace<Row extends { id: RowId }>(
                     ) : undefined)
                 }
             />
-            {banner}
-            {queryEnabled ? (
+            {compactChrome ? null : banner}
+            {queryEnabled && !compactChrome ? (
                 <SavedViews
                     object={object}
                     basePath={basePath}
@@ -202,6 +225,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
                 columnDefs={columnDefs}
                 onColumnsChange={onColumnsChange}
                 onAdvanced={() => setAdvancedOpen(true)}
+                density={compactChrome ? 'compact' : 'default'}
                 extra={
                     <>
                         {onModeChange ? (
@@ -236,7 +260,7 @@ export function DataWorkspace<Row extends { id: RowId }>(
                     </>
                 }
             />
-            {toolbarExtra}
+            {compactChrome ? null : toolbarExtra}
             {queryEnabled ? (
                 <AdvancedFilterDrawer
                     open={advancedOpen}

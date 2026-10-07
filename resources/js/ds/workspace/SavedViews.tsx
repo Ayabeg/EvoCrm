@@ -13,6 +13,7 @@ import { Input } from '@/evo/ui/input';
 import type { DataWorkspaceEntity } from '@/ds/workspace/types';
 import { t } from '@/lib/i18n';
 import {
+    applyAttentionFilter,
     applyBuiltInView,
     applySavedFilter,
     fromActiveFilters,
@@ -37,11 +38,14 @@ const OBJECT_NOUNS: Record<DataWorkspaceEntity, string> = {
     lead: 'leads',
 };
 
-const pillClass = (active: boolean) =>
+const pillClass = (active: boolean, compact = false) =>
     cn(
-        'inline-flex h-9 shrink-0 items-center rounded-full border px-3 text-[13px] whitespace-nowrap',
+        'inline-flex shrink-0 items-center rounded-full border whitespace-nowrap',
+        compact ? 'h-7 px-2.5 text-[12px]' : 'h-9 px-3 text-[13px]',
         active
-            ? 'border-brand bg-sidebar-accent font-medium text-ink'
+            ? compact
+                ? 'border-[var(--evo-teal)] bg-[color-mix(in_srgb,var(--evo-teal)_12%,transparent)] font-medium text-[var(--evo-teal)]'
+                : 'border-brand bg-sidebar-accent font-medium text-ink'
             : 'border-hairline bg-canvas text-mute hover:text-ink',
     );
 
@@ -64,6 +68,7 @@ export function SavedViews({
     columns,
     extraQuery = {},
     canManageSettings = false,
+    density = 'default',
 }: {
     object: DataWorkspaceEntity;
     basePath: string;
@@ -79,6 +84,7 @@ export function SavedViews({
     columns: ListViewColumn[];
     extraQuery?: Record<string, string | number | null | undefined>;
     canManageSettings?: boolean;
+    density?: 'default' | 'embedded';
 }) {
     const { auth } = usePage().props;
     void onViewChange;
@@ -99,6 +105,7 @@ export function SavedViews({
     const savedHref = (id: number) =>
         listQueryHref(basePath, applySavedFilter(current, id), queryObject);
 
+    const attentionActive = object === 'deal' && String(fields.attention ?? '') === 'needs_attention';
     const builtIn: Array<{ id: string; label: string; href: string }> =
         object === 'ticket'
             ? [
@@ -129,37 +136,86 @@ export function SavedViews({
                   {
                       id: 'all',
                       label: t('All :noun', { noun: t(nouns) }),
-                      href: hrefFor('all'),
+                      href:
+                          object === 'deal'
+                              ? listQueryHref(
+                                    basePath,
+                                    applyAttentionFilter(applyBuiltInView(current, 'all'), null),
+                                    queryObject,
+                                )
+                              : hrefFor('all'),
                   },
                   {
                       id: 'my',
                       label: t('My :noun', { noun: t(nouns) }),
-                      href: hrefFor('my', userId),
+                      href:
+                          object === 'deal'
+                              ? listQueryHref(
+                                    basePath,
+                                    applyAttentionFilter(
+                                        applyBuiltInView(current, 'my', userId),
+                                        null,
+                                    ),
+                                    queryObject,
+                                )
+                              : hrefFor('my', userId),
                   },
+                  ...(object === 'deal'
+                      ? [
+                            {
+                                id: 'needs_attention',
+                                label: t('Follow-up view'),
+                                href: listQueryHref(
+                                    basePath,
+                                    applyAttentionFilter(current, 'needs_attention'),
+                                    queryObject,
+                                ),
+                            },
+                        ]
+                      : []),
               ];
+    const compact = density === 'embedded';
+    const viewPill = (active: boolean) =>
+        object === 'quote' ? quoteViewClass(active) : pillClass(active, compact);
 
     const pinned = views.slice(0, 3);
     const overflow = views.slice(3);
     const filterId = String(fields.filter_id ?? '');
 
-    const viewClass = object === 'quote' ? quoteViewClass : pillClass;
-
     return (
         <div
-            className={cn(object === 'quote' ? 'px-4 pt-1 md:px-6' : 'px-4 pt-3 md:px-8')}
+            className={cn(
+                compact
+                    ? 'min-w-0'
+                    : object === 'quote'
+                      ? 'px-4 pt-1 md:px-6'
+                      : 'px-4 pt-3 md:px-8',
+            )}
             data-crm="views"
             data-ds="saved-views"
         >
-            <div className={cn('flex min-w-0 flex-wrap items-center', object === 'quote' ? 'gap-4' : 'gap-2')}>
+            <div
+                className={cn(
+                    'flex min-w-0 items-center',
+                    compact
+                        ? 'flex-nowrap gap-1.5 overflow-x-auto'
+                        : object === 'quote'
+                          ? 'flex-wrap gap-4'
+                          : 'flex-wrap gap-2',
+                )}
+            >
                 {builtIn.map((view) => {
-                    const active = activeViewId === view.id && !filterId;
+                    const active =
+                        view.id === 'needs_attention'
+                            ? attentionActive && !filterId
+                            : activeViewId === view.id && !filterId && !attentionActive;
 
                     return (
                         <Link
                             key={view.id}
                             href={view.href}
                             aria-current={active ? 'page' : undefined}
-                            className={viewClass(active)}
+                            className={viewPill(active)}
                         >
                             {view.label}
                         </Link>
@@ -170,7 +226,7 @@ export function SavedViews({
                         key={view.id}
                         href={savedHref(view.id)}
                         aria-current={String(view.id) === activeViewId ? 'page' : undefined}
-                        className={viewClass(String(view.id) === activeViewId)}
+                        className={viewPill(String(view.id) === activeViewId)}
                         title={
                             view.visibility === 'workspace'
                                 ? t('Shared with workspace')
@@ -188,7 +244,7 @@ export function SavedViews({
                         <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
-                                className={viewClass(
+                                className={viewPill(
                                     overflow.some((view) => String(view.id) === activeViewId),
                                 )}
                             >
@@ -216,7 +272,10 @@ export function SavedViews({
                     <button
                         type="button"
                         onClick={() => setNaming(true)}
-                        className="inline-flex h-9 shrink-0 items-center gap-1 px-2 text-[13px] text-mute hover:text-ink"
+                        className={cn(
+                            'inline-flex shrink-0 items-center gap-1 px-2 text-mute hover:text-ink',
+                            compact ? 'h-7 text-[12px]' : 'h-9 text-[13px]',
+                        )}
                     >
                         <Plus className="size-3.5" weight="bold" />
                         {t('Add view')}

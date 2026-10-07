@@ -13,13 +13,16 @@ import {
     ownerFrom,
     titleCaseStatus,
 } from '@/ds/workspace/record-adapters/present';
+import { t } from '@/lib/i18n';
+import { stageLabel } from '@/lib/stage-copy';
 
 export function adaptDeal(payload: QuickRecordPeekPayload): RecordDescriptor {
     assertType(payload.type, 'deal');
 
     const record = payload.record;
-    const title = asString(record.title) || `Deal #${payload.id}`;
-    const stage = asString(record.stage_name);
+    const title = asString(record.title) || t('Deal #:id', { id: payload.id });
+    const stageSlug = asString(record.stage_slug);
+    const stage = stageLabel(stageSlug, asString(record.stage_name));
     const ref = { type: 'deal' as const, id: payload.id };
     const href = fullRecordHref(ref);
     const currency = asString(record.currency) ?? 'DZD';
@@ -33,14 +36,14 @@ export function adaptDeal(payload: QuickRecordPeekPayload): RecordDescriptor {
         owner: ownerFrom(record),
         fullRecordHref: href,
         keyProperties: [
-            { id: 'stage', label: 'Stage', value: displayOrEmpty(stage) },
-            { id: 'amount', label: 'Amount', value: displayOrEmpty(formatMoneyCents(record.amount_cents, currency)) },
-            { id: 'company', label: 'Company', value: displayOrEmpty(asString(record.company_name)) },
-            { id: 'contact', label: 'Contact', value: displayOrEmpty(asString(record.contact_name)) },
-            { id: 'owner', label: 'Owner', value: displayOrEmpty(asString(record.owner_name)) },
-            { id: 'close_date', label: 'Close date', value: displayOrEmpty(formatQuietDate(record.close_date)) },
-            { id: 'next_step', label: 'Next step', value: displayOrEmpty(asString(record.next_step)) },
-            { id: 'priority', label: 'Priority', value: displayOrEmpty(titleCaseStatus(asString(record.priority))) },
+            { id: 'stage', label: t('Stage'), value: displayOrEmpty(stage) },
+            { id: 'amount', label: t('Amount'), value: displayOrEmpty(formatMoneyCents(record.amount_cents, currency)) },
+            { id: 'company', label: t('Company'), value: displayOrEmpty(asString(record.company_name)) },
+            { id: 'contact', label: t('Contact'), value: displayOrEmpty(asString(record.contact_name)) },
+            { id: 'owner', label: t('Owner'), value: displayOrEmpty(asString(record.owner_name)) },
+            { id: 'close_date', label: t('Close date'), value: displayOrEmpty(formatQuietDate(record.close_date)) },
+            { id: 'next_step', label: t('Next step'), value: displayOrEmpty(asString(record.next_step)) },
+            { id: 'priority', label: t('Priority'), value: displayOrEmpty(titleCaseStatus(asString(record.priority))) },
         ],
         associations: mapAssociations(payload.associations),
         activity: mapActivity(payload.activity),
