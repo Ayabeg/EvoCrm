@@ -314,7 +314,7 @@ export function toSimpleNavItem(id: string): NavItem {
 
     const found = findNavItem(id);
 
-    if ('icon' in found && found.icon) {
+    if ('icon' in found) {
         return { ...found, children: undefined };
     }
 
