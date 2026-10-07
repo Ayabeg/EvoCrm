@@ -301,7 +301,7 @@ export function CrmListShell<Row extends { id: RowId }>({
         filterContext: { members, cities, wilayas, stages },
         secondaryActions: headerActions,
         banner,
-        chromeDensity: entity === 'deal' ? 'compact' : 'default',
+        chromeDensity: (entity === 'deal' ? 'compact' : 'default') as 'compact' | 'default',
         headerContext: pipelineSwitcher,
         headerSummary,
         filterExtra: (

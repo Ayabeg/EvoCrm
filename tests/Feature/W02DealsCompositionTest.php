@@ -19,7 +19,7 @@ it('compacts Deals chrome without inventing a second filter bag or forecast rout
     expect($workspace)->toContain("chromeDensity = 'default'")
         ->and($workspace)->toContain("compactChrome = chromeDensity === 'compact'")
         ->and($workspace)->toContain('headerSummary')
-        ->and($shell)->toContain("chromeDensity: entity === 'deal' ? 'compact' : 'default'")
+        ->and($shell)->toContain("entity === 'deal' ? 'compact' : 'default'")
         ->and($shell)->toContain('headerSummary')
         ->and($shell)->toContain('<StagePills')
         ->and($board)->toContain('DealForecastSummary')

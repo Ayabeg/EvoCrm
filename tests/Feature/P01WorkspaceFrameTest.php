@@ -108,7 +108,7 @@ it('moves Deals forecast and attention off the default stack (C-18)', function (
         ->and($queue)->toContain('View all')
         ->and($queue)->toContain("attention: 'needs_attention'")
         ->and($queue)->not->toContain('/crm/deals/attention')
-        ->and($shell)->toContain("chromeDensity: entity === 'deal' ? 'compact' : 'default'");
+        ->and($shell)->toContain("entity === 'deal' ? 'compact' : 'default'");
 });
 
 it('renders the conversation header without a visible title row', function () {
