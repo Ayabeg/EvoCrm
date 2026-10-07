@@ -1,23 +1,18 @@
-import { usePage } from '@inertiajs/react';
 import { AppShell } from '@/components/app-shell';
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { EvoShell } from '@/components/shell/evo-shell';
+import { WorkspaceFrame } from '@/evo/workspace/WorkspaceFrame';
 import type { AppLayoutProps } from '@/types';
 
 export default function AppSidebarLayout({ children }: AppLayoutProps) {
-    const page = usePage();
-    const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
-    const agentsActive = path === '/agents' || path.startsWith('/agents/');
-
     return (
         <AppShell variant="sidebar">
             <EvoShell>
-                <AppSidebarHeader />
-                <div
-                    className={`aurora-page-shell min-h-0 min-w-0 overflow-x-clip flex-1 overflow-y-auto !bg-[var(--aurora-shell-bg)] font-sans${agentsActive ? ' agents-route-page-shell' : ''}`}
-                >
-                    {children}
-                </div>
+                {/*
+                  AGENT 06 MOUNT POINT — WorkspaceFrame
+                  Frame owns scroll on the 10 acceptance routes and keeps
+                  the document scroller for unmigrated routes.
+                */}
+                <WorkspaceFrame>{children}</WorkspaceFrame>
             </EvoShell>
         </AppShell>
     );

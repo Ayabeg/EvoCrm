@@ -26,6 +26,7 @@ import {
 import { RecordPath } from '@/components/crm/record-path';
 import type { PathStep } from '@/components/crm/record-path';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 
@@ -179,75 +180,92 @@ export default function LeadShow({
                 <RecordPageFrame
                     header={
                         <>
-                            <RecordBack
-                                href="/crm/leads"
-                                label="Back to Leads"
-                            />
-                            <RecordIdentity
-                                title={lead.title}
-                                kind="Lead"
-                                actionsClassName="sm:max-w-none"
-                                subtitle={
-                                    <>
-                                        {contactName || 'No contact'}
-                                        {lead.source ? ` · ${lead.source}` : ''}
-                                        {ownerName ? ` · ${ownerName}` : ''}
-                                    </>
-                                }
-                                badge={
-                                    lead.status ? (
-                                        <RecordStatusBadge>
-                                            {lead.status}
-                                        </RecordStatusBadge>
-                                    ) : null
-                                }
-                                meta={
-                                    <LeadScorePill
-                                        compact
-                                        score={
-                                            leadScore ??
-                                            (typeof lead.score === 'number'
-                                                ? {
-                                                      score: lead.score,
-                                                      reason: lead.latest_score
-                                                          ?.reason,
-                                                  }
-                                                : null)
-                                        }
+                            <WorkspaceHeader
+                                archetype="record"
+                                leading={
+                                    <RecordBack
+                                        href="/crm/leads"
+                                        label="Back to Leads"
                                     />
                                 }
-                                actions={
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        {converted ? null : (
-                                            <LeadConversionDialog
-                                                leadId={lead.id}
-                                                pipelines={pipelines}
-                                                members={members}
-                                                contactDeals={contactDeals}
-                                                open={convertOpen}
-                                                onOpenChange={setConvertOpen}
+                                title={
+                                    <RecordIdentity
+                                        title={lead.title}
+                                        kind="Lead"
+                                        actionsClassName="sm:max-w-none"
+                                        subtitle={
+                                            <>
+                                                {contactName || 'No contact'}
+                                                {lead.source
+                                                    ? ` · ${lead.source}`
+                                                    : ''}
+                                                {ownerName
+                                                    ? ` · ${ownerName}`
+                                                    : ''}
+                                            </>
+                                        }
+                                        badge={
+                                            lead.status ? (
+                                                <RecordStatusBadge>
+                                                    {lead.status}
+                                                </RecordStatusBadge>
+                                            ) : null
+                                        }
+                                        meta={
+                                            <LeadScorePill
+                                                compact
+                                                score={
+                                                    leadScore ??
+                                                    (typeof lead.score ===
+                                                    'number'
+                                                        ? {
+                                                              score: lead.score,
+                                                              reason: lead
+                                                                  .latest_score
+                                                                  ?.reason,
+                                                          }
+                                                        : null)
+                                                }
                                             />
-                                        )}
-                                        <LeadOwnerDialog
-                                            leadId={lead.id}
-                                            members={members}
-                                            ownerId={
-                                                contact?.owner_id ??
-                                                contact?.owner?.id
-                                            }
-                                        />
-                                        <LeadEditDialog
-                                            leadId={lead.id}
-                                            title={lead.title}
-                                            source={lead.source}
-                                        />
-                                        <div className="md:hidden">
-                                            <AskEvoTrigger
-                                                action={askAction}
-                                                insight={askEvo}
-                                            />
-                                        </div>
-                                    </div>
+                                        }
+                                        actions={
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                {converted ? null : (
+                                                    <LeadConversionDialog
+                                                        leadId={lead.id}
+                                                        pipelines={pipelines}
+                                                        members={members}
+                                                        contactDeals={
+                                                            contactDeals
+                                                        }
+                                                        open={convertOpen}
+                                                        onOpenChange={
+                                                            setConvertOpen
+                                                        }
+                                                    />
+                                                )}
+                                                <LeadOwnerDialog
+                                                    leadId={lead.id}
+                                                    members={members}
+                                                    ownerId={
+                                                        contact?.owner_id ??
+                                                        contact?.owner?.id
+                                                    }
+                                                />
+                                                <LeadEditDialog
+                                                    leadId={lead.id}
+                                                    title={lead.title}
+                                                    source={lead.source}
+                                                />
+                                                <div className="md:hidden">
+                                                    <AskEvoTrigger
+                                                        action={askAction}
+                                                        insight={askEvo}
+                                                    />
+                                                </div>
+                                            </div>
+                                        }
+                                    />
                                 }
                             />
                             <RecordPath

@@ -6,6 +6,7 @@ import { HomeWidgetEmpty } from '@/components/dashboard/home-widget';
 import { LtrValue } from '@/components/ltr-value';
 import { formatDate } from '@/evo/lib/format';
 import { EVO_CHART_STAGE, EVO_CHART_TRACK } from '@/evo/tokens/literal-hex';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import type { ActivationState } from '@/lib/activation';
 import type {
     DashboardMetrics,
@@ -67,7 +68,6 @@ export default function Home({
 }: Props) {
     const page = usePage<{ auth: Auth; workspace: { name: string } | null }>();
     const canCreate = page.props.auth.capabilities.includes('crm.edit');
-    const greetingName = page.props.workspace?.name || context.name;
     const trend = metrics.trend ?? [];
     const peak = Math.max(
         1,
@@ -80,24 +80,21 @@ export default function Home({
             <Head title={t('Home')} />
             <div className="flex-1 overflow-x-hidden bg-[var(--home-canvas)]" data-home="workspace">
                 <div className="mx-auto w-full max-w-[1510px] px-4 pt-[18px] pb-8 md:px-[22px]">
-                    <header className="mb-[15px] flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0">
-                            <h1 className="m-0 text-[27px] leading-none font-semibold tracking-[-0.7px] text-[var(--home-ink)]">
-                                {t('Hello :name', { name: greetingName })}
-                            </h1>
-                            <p className="mt-1.5 text-[12px] text-[var(--home-muted)]">
-                                {context.date} · {context.timezone}
-                            </p>
-                        </div>
-                        {canCreate ? (
-                            <Link
-                                href="/crm/deals?create=1"
-                                className="inline-flex h-[39px] shrink-0 items-center rounded-lg bg-[var(--home-accent)] px-[18px] text-[12px] font-semibold text-white focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] focus-visible:outline-none"
-                            >
-                                {t('New deal')}
-                            </Link>
-                        ) : null}
-                    </header>
+                    <WorkspaceHeader
+                        archetype="document"
+                        title={t('Home')}
+                        count={`${context.date} · ${context.timezone}`}
+                        secondaryActions={
+                            canCreate ? (
+                                <Link
+                                    href="/crm/deals?create=1"
+                                    className="inline-flex h-8 shrink-0 items-center rounded-[6px] border border-[var(--evo-hairline)] px-3 text-[12px] font-medium text-[var(--evo-ink)]"
+                                >
+                                    {t('New deal')}
+                                </Link>
+                            ) : undefined
+                        }
+                    />
 
                     {activation ? <ActivationChecklist activation={activation} /> : null}
 

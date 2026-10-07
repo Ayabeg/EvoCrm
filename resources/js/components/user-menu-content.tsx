@@ -1,24 +1,49 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { GearSix, SignOut } from '@phosphor-icons/react';
+import { LANGUAGE_OPTIONS } from '@/components/language-selector';
+import { UserInfo } from '@/components/user-info';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
 } from '@/evo/ui/dropdown-menu';
-import { UserInfo } from '@/components/user-info';
+import { useAppearance } from '@/hooks/use-appearance';
+import type { Appearance } from '@/hooks/use-appearance';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { t } from '@/lib/i18n';
+import type { AppLocale } from '@/lib/i18n';
+import { isAppLocale, t } from '@/lib/i18n';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
-import type { User } from '@/types';
+import type { User } from '@/types/auth';
 
 type Props = {
     user: User;
 };
 
+function persistLocale(next: AppLocale): void {
+    router.post(
+        '/locale',
+        { locale: next },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                window.location.reload();
+            },
+        },
+    );
+}
+
 export function UserMenuContent({ user }: Props) {
     const cleanup = useMobileNavigation();
+    const { appearance, updateAppearance } = useAppearance();
+    const pageLocale = usePage().props.locale;
+    const locale = isAppLocale(pageLocale) ? pageLocale : 'en';
 
     const handleLogout = () => {
         cleanup();
@@ -42,8 +67,56 @@ export function UserMenuContent({ user }: Props) {
                         onClick={cleanup}
                     >
                         <GearSix className="me-2 size-4" weight="regular" aria-hidden />
-                        {t('Settings')}
+                        {t('Profile')}
                     </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        {t('Appearance')}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                        <DropdownMenuRadioGroup
+                            value={appearance}
+                            onValueChange={(value) =>
+                                updateAppearance(value as Appearance)
+                            }
+                        >
+                            <DropdownMenuRadioItem value="light">
+                                {t('Light')}
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="dark">
+                                {t('Dark')}
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="system">
+                                {t('System')}
+                            </DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        {t('Language')}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                        {LANGUAGE_OPTIONS.map((option) => (
+                            <DropdownMenuItem
+                                key={option.value}
+                                onClick={() => persistLocale(option.value)}
+                            >
+                                {option.label}
+                                {locale === option.value ? (
+                                    <span className="ms-auto text-[11px]">✓</span>
+                                ) : null}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem
+                    onClick={() => {
+                        window.dispatchEvent(new Event('openEvoShortcuts'));
+                    }}
+                >
+                    {t('Shortcuts')}
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

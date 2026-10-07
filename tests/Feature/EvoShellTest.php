@@ -23,7 +23,6 @@ it('promotes the approved shell without prototype records', function () {
         ->and($shell)->toContain('<Sidebar')
         ->and($rail)->toContain('useSimpleMode')
         ->and($rail)->toContain('visibleSections')
-        ->and($rail)->toContain('/crm/command/search')
         ->and($shell)->toContain('useCommandPaletteShortcut')
         ->and($rail)->toContain("t('Search EvoCRM…')")
         ->and($rail)->toContain('⌘K')
@@ -35,17 +34,20 @@ it('promotes the approved shell without prototype records', function () {
         ->and($rail)->not->toContain('lucide-react');
 });
 
-it('switches sidebar modes with the Evo tablist — Astryx SegmentedControl retired in PR2', function () {
+it('retires the Menu/Agents/Search pill from the live rail — Agents is a Full-mode nav row', function () {
     $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $nav = file_get_contents(resource_path('js/components/shell/product-nav.ts'));
     $switch = file_get_contents(resource_path('js/evo/shell/mode-switch.tsx'));
     $css = file_get_contents(resource_path('css/evo-shell.css'));
     $appCss = file_get_contents(resource_path('css/app.css'));
     $agentsState = file_get_contents(resource_path('js/lib/desk/agents-workspace-state.ts'));
 
     expect(file_exists(resource_path('js/components/ui/segmented-control.tsx')))->toBeFalse();
-    expect($rail)->toContain("from '@/evo/shell/mode-switch'")
-        ->and($rail)->toContain('ShellModeSwitch')
-        ->and($rail)->not->toContain('@astryxdesign')
+    expect($rail)->not->toContain('ShellModeSwitch')
+        ->and($rail)->not->toContain("from '@/evo/shell/mode-switch'")
+        ->and($nav)->toContain("id: 'agents'")
+        ->and($nav)->toContain("href: '/agents'")
+        ->and($switch)->toContain('Retired from the live rail')
         ->and($switch)->toContain('role="tablist"')
         ->and($switch)->toContain('role="tab"')
         ->and($switch)->toContain("{ id: 'agents', label: 'Agents', icon: StarFour }")
@@ -54,7 +56,7 @@ it('switches sidebar modes with the Evo tablist — Astryx SegmentedControl reti
         ->and($rail)->not->toContain("from '@/components/ui/segmented-control'")
         ->and($css)->not->toContain('.evo-mode-capsule')
         ->and($appCss)->not->toContain('@astryxdesign')
-        ->and($rail)->toContain('data-shell-mode="agents"')
-        ->and($rail)->toContain('{agentsContent}')
+        ->and($rail)->not->toContain('data-shell-mode="agents"')
+        ->and($rail)->not->toContain('{agentsContent}')
         ->and($agentsState)->toContain('selectedChatByAgent');
 });

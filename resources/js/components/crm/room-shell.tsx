@@ -47,19 +47,21 @@ export function RoomShell({
     subTabs,
     children,
     actions,
+    hideNav = false,
 }: {
     title: string;
     tabs: RoomTab[];
     subTabs?: RoomTab[];
     children: ReactNode;
     actions?: ReactNode;
+    hideNav?: boolean;
 }) {
     return (
         <div
             className={cn('flex h-app-workspace flex-col bg-canvas-soft text-[13px] text-ink', PAGE_OVERFLOW_CLASS)}
             data-chrome="contextual"
         >
-            <div className="px-4 md:px-8">
+            <div className={cn(hideNav ? 'sr-only' : 'px-4 md:px-8')}>
                 <h1 className={cn('sr-only', LONG_TEXT_CLASS)}>{t(title)}</h1>
                 {actions ? <div className="flex items-center justify-end gap-2 py-1">{actions}</div> : null}
                 <nav className="flex gap-3 overflow-x-auto py-2" aria-label={`${t(title)} sections`}>

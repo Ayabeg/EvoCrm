@@ -1,0 +1,3994 @@
+{
+  "facts": {
+    "workspace": "Evotechly",
+    "simple_mode": false,
+    "locale": "fr",
+    "deals": 15,
+    "pipelines": 1,
+    "stages": 6
+  },
+  "capturedAt": "2026-10-07T06:01:27.925Z",
+  "captures": [
+    {
+      "file": "deals-list__1440x1000__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Import Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 76,
+              "width": 1184,
+              "height": 362,
+              "bottom": 438
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 450,
+              "width": 1216,
+              "height": 39,
+              "bottom": 489
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 489,
+              "width": 1216,
+              "height": 104,
+              "bottom": 593
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 593,
+              "width": 1184,
+              "height": 74,
+              "bottom": 667
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 50
+          }
+        ],
+        "firstUseful": {
+          "x": 241,
+          "y": 717,
+          "width": 1240,
+          "height": 37,
+          "bottom": 754,
+          "tag": "TR",
+          "testId": null,
+          "text": "CW Clinic website intake Clinique El Djazair Nouveau 220 000 DA — — Clinique El Djazair Amine Benali —"
+        },
+        "contentStartY": 717,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 241,
+          "y": 681,
+          "width": 1240,
+          "height": 36,
+          "bottom": 717
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-board__1440x1000__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Options du tableau Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 64,
+              "width": 1216,
+              "height": 50.5,
+              "bottom": 114.5
+            },
+            "text": "Pipeline 2 995 000 DA Affaires ouvertes 15 Pondéré 1 638 750 DA Bande · Hausse probable 1 229 063 DA – 2 212 313 DA Rétrotest · 90 j Il faut 3+ affaires fermées",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 126.5,
+              "width": 1184,
+              "height": 362,
+              "bottom": 488.5
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 500.5,
+              "width": 1216,
+              "height": 39,
+              "bottom": 539.5
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 539.5,
+              "width": 1216,
+              "height": 104,
+              "bottom": 643.5
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 643.5,
+              "width": 1184,
+              "height": 74,
+              "bottom": 717.5
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 234,
+          "y": 792.5,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 942,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Non assigné Aucune prochaine action Aucune activité"
+        },
+        "contentStartY": 792.5,
+        "columnHeader": {
+          "x": 234,
+          "y": 737.5,
+          "width": 259,
+          "height": 47,
+          "bottom": 784.5,
+          "text": "NOUVEAU 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 224,
+          "y": 729.5,
+          "width": 1216,
+          "height": 352,
+          "bottom": 1081.5,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-list__1280x900__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900,
+          "bottom": 900
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1056,
+          "height": 900,
+          "bottom": 900,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1056,
+          "height": 900,
+          "bottom": 900,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1056,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1056,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Import Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 76,
+              "width": 1024,
+              "height": 362,
+              "bottom": 438
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 450,
+              "width": 1056,
+              "height": 39,
+              "bottom": 489
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 489,
+              "width": 1056,
+              "height": 148,
+              "bottom": 637
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 637,
+              "width": 1024,
+              "height": 74,
+              "bottom": 711
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 50
+          }
+        ],
+        "firstUseful": {
+          "x": 241,
+          "y": 761,
+          "width": 1240,
+          "height": 37,
+          "bottom": 798,
+          "tag": "TR",
+          "testId": null,
+          "text": "CW Clinic website intake Clinique El Djazair Nouveau 220 000 DA — — Clinique El Djazair Amine Benali —"
+        },
+        "contentStartY": 761,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 241,
+          "y": 725,
+          "width": 1240,
+          "height": 36,
+          "bottom": 761
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 900,
+          "clientHeight": 900,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-board__1280x900__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900,
+          "bottom": 900
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1056,
+          "height": 900,
+          "bottom": 900,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1056,
+          "height": 900,
+          "bottom": 900,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1056,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1056,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Options du tableau Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 64,
+              "width": 1056,
+              "height": 50.5,
+              "bottom": 114.5
+            },
+            "text": "Pipeline 2 995 000 DA Affaires ouvertes 15 Pondéré 1 638 750 DA Bande · Hausse probable 1 229 063 DA – 2 212 313 DA Rétrotest · 90 j Il faut 3+ affaires fermées",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 126.5,
+              "width": 1024,
+              "height": 362,
+              "bottom": 488.5
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 500.5,
+              "width": 1056,
+              "height": 39,
+              "bottom": 539.5
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 539.5,
+              "width": 1056,
+              "height": 148,
+              "bottom": 687.5
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 687.5,
+              "width": 1024,
+              "height": 74,
+              "bottom": 761.5
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 234,
+          "y": 836.5,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 986,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Non assigné Aucune prochaine action Aucune activité"
+        },
+        "contentStartY": 836.5,
+        "columnHeader": {
+          "x": 234,
+          "y": 781.5,
+          "width": 259,
+          "height": 47,
+          "bottom": 828.5,
+          "text": "NOUVEAU 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 224,
+          "y": 773.5,
+          "width": 1056,
+          "height": 352,
+          "bottom": 1125.5,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 900,
+          "clientHeight": 900,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-list__1024x768__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768,
+          "bottom": 768
+        },
+        "frame": {
+          "x": 56,
+          "y": 0,
+          "width": 968,
+          "height": 768,
+          "bottom": 768,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 56,
+          "y": 0,
+          "width": 968,
+          "height": 768,
+          "bottom": 768,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 56,
+          "y": 0,
+          "width": 968,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 56,
+              "y": 0,
+              "width": 968,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Import Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 72,
+              "y": 76,
+              "width": 936,
+              "height": 362,
+              "bottom": 438
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 56,
+              "y": 450,
+              "width": 968,
+              "height": 39,
+              "bottom": 489
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 56,
+              "y": 489,
+              "width": 968,
+              "height": 148,
+              "bottom": 637
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 72,
+              "y": 637,
+              "width": 936,
+              "height": 74,
+              "bottom": 711
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 50
+          }
+        ],
+        "firstUseful": {
+          "x": 73,
+          "y": 761,
+          "width": 1240,
+          "height": 37,
+          "bottom": 798,
+          "tag": "TR",
+          "testId": null,
+          "text": "CW Clinic website intake Clinique El Djazair Nouveau 220 000 DA — — Clinique El Djazair Amine Benali —"
+        },
+        "contentStartY": 761,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 73,
+          "y": 725,
+          "width": 1240,
+          "height": 36,
+          "bottom": 761
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 768,
+          "clientHeight": 768,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "clientHeight": 444,
+            "scrollHeight": 460
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-board__1024x768__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768,
+          "bottom": 768
+        },
+        "frame": {
+          "x": 56,
+          "y": 0,
+          "width": 968,
+          "height": 768,
+          "bottom": 768,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 56,
+          "y": 0,
+          "width": 968,
+          "height": 768,
+          "bottom": 768,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 56,
+          "y": 0,
+          "width": 968,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 56,
+              "y": 0,
+              "width": 968,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Options du tableau Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 56,
+              "y": 64,
+              "width": 968,
+              "height": 50.2,
+              "bottom": 114.2
+            },
+            "text": "Pipeline 2 995 000 DA Affaires ouvertes 15 Pondéré 1 638 750 DA Bande · Hausse probable 1 229 063 DA – 2 212 313 DA Rétrotest · 90 j Il faut 3+ affaires fermées",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 72,
+              "y": 126.2,
+              "width": 936,
+              "height": 358.8,
+              "bottom": 485
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 56,
+              "y": 497,
+              "width": 968,
+              "height": 39,
+              "bottom": 536
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 56,
+              "y": 536,
+              "width": 968,
+              "height": 146.7,
+              "bottom": 682.6
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 72,
+              "y": 682.6,
+              "width": 936,
+              "height": 73.4,
+              "bottom": 756
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 66,
+          "y": 831,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 980.5,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Non assigné Aucune prochaine action Aucune activité"
+        },
+        "contentStartY": 831,
+        "columnHeader": {
+          "x": 66,
+          "y": 776,
+          "width": 259,
+          "height": 47,
+          "bottom": 823,
+          "text": "NOUVEAU 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 56,
+          "y": 768,
+          "width": 968,
+          "height": 352,
+          "bottom": 1120,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 768,
+          "clientHeight": 768,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "clientHeight": 444,
+            "scrollHeight": 460
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-list__768x1024__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "frame": {
+          "x": 0,
+          "y": 48,
+          "width": 768,
+          "height": 976,
+          "bottom": 1024,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 48,
+          "width": 768,
+          "height": 976,
+          "bottom": 1024,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 0,
+          "y": 48,
+          "width": 768,
+          "height": 56,
+          "bottom": 104
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 48,
+              "width": 768,
+              "height": 56,
+              "bottom": 104
+            },
+            "text": "Affaires 15 affaires Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 124,
+              "width": 736,
+              "height": 362,
+              "bottom": 486
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 498,
+              "width": 768,
+              "height": 39,
+              "bottom": 537
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 537,
+              "width": 768,
+              "height": 148,
+              "bottom": 685
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 685,
+              "width": 736,
+              "height": 146,
+              "bottom": 831
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 50
+          }
+        ],
+        "firstUseful": {
+          "x": 17,
+          "y": 881,
+          "width": 1240,
+          "height": 37,
+          "bottom": 918,
+          "tag": "TR",
+          "testId": null,
+          "text": "CW Clinic website intake Clinique El Djazair Nouveau 220 000 DA — — Clinique El Djazair Amine Benali —"
+        },
+        "contentStartY": 881,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 17,
+          "y": 845,
+          "width": 1240,
+          "height": 36,
+          "bottom": 881
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 1024,
+          "clientHeight": 1024,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-board__768x1024__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "frame": {
+          "x": 0,
+          "y": 48,
+          "width": 768,
+          "height": 976,
+          "bottom": 1024,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 48,
+          "width": 768,
+          "height": 976,
+          "bottom": 1024,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 0,
+          "y": 48,
+          "width": 768,
+          "height": 56,
+          "bottom": 104
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 48,
+              "width": 768,
+              "height": 56,
+              "bottom": 104
+            },
+            "text": "Affaires 15 affaires Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 112,
+              "width": 768,
+              "height": 50.5,
+              "bottom": 162.5
+            },
+            "text": "Pipeline 2 995 000 DA Affaires ouvertes 15 Pondéré 1 638 750 DA Bande · Hausse probable 1 229 063 DA – 2 212 313 DA Rétrotest · 90 j Il faut 3+ affaires fermées",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 174.5,
+              "width": 736,
+              "height": 362,
+              "bottom": 536.5
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 548.5,
+              "width": 768,
+              "height": 39,
+              "bottom": 587.5
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 587.5,
+              "width": 768,
+              "height": 148,
+              "bottom": 735.5
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 735.5,
+              "width": 736,
+              "height": 146,
+              "bottom": 881.5
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 10,
+          "y": 956.5,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 1106,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Non assigné Aucune prochaine action Aucune activité"
+        },
+        "contentStartY": 956.5,
+        "columnHeader": {
+          "x": 10,
+          "y": 901.5,
+          "width": 259,
+          "height": 47,
+          "bottom": 948.5,
+          "text": "NOUVEAU 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 0,
+          "y": 893.5,
+          "width": 768,
+          "height": 352,
+          "bottom": 1245.5,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 1024,
+          "clientHeight": 1024,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-list__430x932__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "frame": {
+          "x": 0,
+          "y": 48,
+          "width": 430,
+          "height": 884,
+          "bottom": 932,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 48,
+          "width": 430,
+          "height": 884,
+          "bottom": 932,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 0,
+          "y": 48,
+          "width": 430,
+          "height": 56,
+          "bottom": 104
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 48,
+              "width": 430,
+              "height": 56,
+              "bottom": 104
+            },
+            "text": "Affaires 15 affaires Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 124,
+              "width": 398,
+              "height": 309.2,
+              "bottom": 433.2
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 445.2,
+              "width": 430,
+              "height": 85,
+              "bottom": 530.2
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 530.2,
+              "width": 430,
+              "height": 264.9,
+              "bottom": 795.1
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 795.1,
+              "width": 398,
+              "height": 124.9,
+              "bottom": 920
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          }
+        ],
+        "firstUseful": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "tag": "TR",
+          "testId": null,
+          "text": "CWClinic website intakeClinique El DjazairNouveau220 000 DA——Clinique El DjazairAmine Benali—"
+        },
+        "contentStartY": 0,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 932,
+          "clientHeight": 932,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": "list-workspace",
+            "className": "flex h-full min-h-0 flex-col text-ink min-w-0 overflow-x-hidden bg-white",
+            "clientHeight": 884,
+            "scrollHeight": 929
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": "list-toolbar",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "clientHeight": 265,
+            "scrollHeight": 311
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-board__430x932__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "frame": {
+          "x": 0,
+          "y": 48,
+          "width": 430,
+          "height": 884,
+          "bottom": 932,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 48,
+          "width": 430,
+          "height": 884,
+          "bottom": 932,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 0,
+          "y": 48,
+          "width": 430,
+          "height": 56,
+          "bottom": 104
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 48,
+              "width": 430,
+              "height": 56,
+              "bottom": 104
+            },
+            "text": "Affaires 15 affaires Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 112,
+              "width": 430,
+              "height": 43.8,
+              "bottom": 155.8
+            },
+            "text": "Pipeline 2 995 000 DA Affaires ouvertes 15 Pondéré 1 638 750 DA Bande · Hausse probable 1 229 063 DA – 2 212 313 DA Rétrotest · 90 j Il faut 3+ affaires fermées",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 167.8,
+              "width": 398,
+              "height": 289.8,
+              "bottom": 457.6
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 469.6,
+              "width": 430,
+              "height": 85,
+              "bottom": 554.6
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 554.6,
+              "width": 430,
+              "height": 248.3,
+              "bottom": 802.9
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 802.9,
+              "width": 398,
+              "height": 117.1,
+              "bottom": 920
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 10,
+          "y": 995,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 1144.5,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Non assigné Aucune prochaine action Aucune activité"
+        },
+        "contentStartY": 995,
+        "columnHeader": {
+          "x": 10,
+          "y": 940,
+          "width": 259,
+          "height": 47,
+          "bottom": 987,
+          "text": "NOUVEAU 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 0,
+          "y": 932,
+          "width": 430,
+          "height": 352,
+          "bottom": 1284,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 932,
+          "clientHeight": 932,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": "list-toolbar",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "clientHeight": 248,
+            "scrollHeight": 311
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-list__390x844__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "frame": {
+          "x": 0,
+          "y": 48,
+          "width": 390,
+          "height": 796,
+          "bottom": 844,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 48,
+          "width": 390,
+          "height": 796,
+          "bottom": 844,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 0,
+          "y": 48,
+          "width": 390,
+          "height": 56,
+          "bottom": 104
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 48,
+              "width": 390,
+              "height": 56,
+              "bottom": 104
+            },
+            "text": "Affaires 15 affaires Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 124,
+              "width": 358,
+              "height": 270.3,
+              "bottom": 394.3
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 406.3,
+              "width": 390,
+              "height": 85,
+              "bottom": 491.3
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 491.3,
+              "width": 390,
+              "height": 231.4,
+              "bottom": 722.7
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 722.7,
+              "width": 358,
+              "height": 109.3,
+              "bottom": 832
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          }
+        ],
+        "firstUseful": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0,
+          "tag": "TR",
+          "testId": null,
+          "text": "CWClinic website intakeClinique El DjazairNouveau220 000 DA——Clinique El DjazairAmine Benali—"
+        },
+        "contentStartY": 0,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": "list-workspace",
+            "className": "flex h-full min-h-0 flex-col text-ink min-w-0 overflow-x-hidden bg-white",
+            "clientHeight": 796,
+            "scrollHeight": 841
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": "list-toolbar",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "clientHeight": 231,
+            "scrollHeight": 311
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-board__390x844__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "bottom": 0
+        },
+        "frame": {
+          "x": 0,
+          "y": 48,
+          "width": 390,
+          "height": 796,
+          "bottom": 844,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 48,
+          "width": 390,
+          "height": 796,
+          "bottom": 844,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 0,
+          "y": 48,
+          "width": 390,
+          "height": 56,
+          "bottom": 104
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 48,
+              "width": 390,
+              "height": 56,
+              "bottom": 104
+            },
+            "text": "Affaires 15 affaires Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 112,
+              "width": 390,
+              "height": 40.3,
+              "bottom": 152.3
+            },
+            "text": "Pipeline 2 995 000 DA Affaires ouvertes 15 Pondéré 1 638 750 DA Bande · Hausse probable 1 229 063 DA – 2 212 313 DA Rétrotest · 90 j Il faut 3+ affaires fermées",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 164.3,
+              "width": 358,
+              "height": 252.5,
+              "bottom": 416.8
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 428.8,
+              "width": 390,
+              "height": 85,
+              "bottom": 513.8
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 513.8,
+              "width": 390,
+              "height": 216,
+              "bottom": 729.8
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 729.8,
+              "width": 358,
+              "height": 102.2,
+              "bottom": 832
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 10,
+          "y": 907,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 1056.5,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Non assigné Aucune prochaine action Aucune activité"
+        },
+        "contentStartY": 907,
+        "columnHeader": {
+          "x": 10,
+          "y": 852,
+          "width": 259,
+          "height": 47,
+          "bottom": 899,
+          "text": "NOUVEAU 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 0,
+          "y": 844,
+          "width": 390,
+          "height": 352,
+          "bottom": 1196,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": "list-toolbar",
+            "className": "border-b border-hairline bg-canvas min-w-0 overflow-x-hidden",
+            "clientHeight": 216,
+            "scrollHeight": 311
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-list__1440x1000__en__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Deals 15 deals Import Create deal",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 76,
+              "width": 1184,
+              "height": 362,
+              "bottom": 438
+            },
+            "text": "Needs attention View all Oran lab CRM demo This open deal has no scheduled next action. No next action Annaba hospital intake This open deal has no scheduled ne",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 450,
+              "width": 1216,
+              "height": 39,
+              "bottom": 489
+            },
+            "text": "All deals My deals Open pipeline Add view (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 489,
+              "width": 1216,
+              "height": 104,
+              "bottom": 593
+            },
+            "text": "List Board Owner Any Unassigned Evotechly Owner Sara Khelifi Create date Any Today Last 7 days Last 30 days Last 90 days Deal status Any Open Won Lost Attention",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 593,
+              "width": 1184,
+              "height": 74,
+              "bottom": 667
+            },
+            "text": "New 3 Qualification 3 Demo 3 Proposal 3 Won 2 Lost 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 50
+          }
+        ],
+        "firstUseful": {
+          "x": 241,
+          "y": 717,
+          "width": 1240,
+          "height": 37,
+          "bottom": 754,
+          "tag": "TR",
+          "testId": null,
+          "text": "CW Clinic website intake Clinique El Djazair New 220 000 DA — — Clinique El Djazair Amine Benali —"
+        },
+        "contentStartY": 717,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 241,
+          "y": 681,
+          "width": 1240,
+          "height": 36,
+          "bottom": 717
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Create deal"
+        ],
+        "titleText": "Deals",
+        "countText": "15 deals"
+      }
+    },
+    {
+      "file": "deals-board__1440x1000__en__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Deals 15 deals Board options Create deal",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 64,
+              "width": 1216,
+              "height": 50.5,
+              "bottom": 114.5
+            },
+            "text": "Pipeline 2 995 000 DA Open deals 15 Weighted 1 638 750 DA Band · Upside likely 1 229 063 DA – 2 212 313 DA Backtest · 90d Need 3+ closed deals",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 126.5,
+              "width": 1184,
+              "height": 362,
+              "bottom": 488.5
+            },
+            "text": "Needs attention View all Oran lab CRM demo This open deal has no scheduled next action. No next action Annaba hospital intake This open deal has no scheduled ne",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 500.5,
+              "width": 1216,
+              "height": 39,
+              "bottom": 539.5
+            },
+            "text": "All deals My deals Open pipeline Add view (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 539.5,
+              "width": 1216,
+              "height": 104,
+              "bottom": 643.5
+            },
+            "text": "List Board Owner Any Unassigned Evotechly Owner Sara Khelifi Create date Any Today Last 7 days Last 30 days Last 90 days Deal status Any Open Won Lost Attention",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 643.5,
+              "width": 1184,
+              "height": 74,
+              "bottom": 717.5
+            },
+            "text": "New 3 Qualification 3 Demo 3 Proposal 3 Won 2 Lost 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 234,
+          "y": 792.5,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 942,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Unassigned No next action No activity"
+        },
+        "contentStartY": 792.5,
+        "columnHeader": {
+          "x": 234,
+          "y": 737.5,
+          "width": 259,
+          "height": 47,
+          "bottom": 784.5,
+          "text": "NEW 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 224,
+          "y": 729.5,
+          "width": 1216,
+          "height": 352,
+          "bottom": 1081.5,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Create deal"
+        ],
+        "titleText": "Deals",
+        "countText": "15 deals"
+      }
+    },
+    {
+      "file": "deals-list__1440x1000__ar__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 0,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "الصفقات 15 صفقات Import إنشاء صفقة",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 76,
+              "width": 1184,
+              "height": 386.2,
+              "bottom": 462.2
+            },
+            "text": "يحتاج متابعة عرض الكل Oran lab CRM demo هذه الصفقة المفتوحة بلا إجراء تالٍ مجدول. لا إجراء تالي Annaba hospital intake هذه الصفقة المفتوحة بلا إجراء تالٍ مجدول.",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 474.2,
+              "width": 1216,
+              "height": 39,
+              "bottom": 513.2
+            },
+            "text": "كل صفقات صفقات الخاصة بي المسار المفتوح إضافة عرض (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 513.2,
+              "width": 1216,
+              "height": 104,
+              "bottom": 617.2
+            },
+            "text": "قائمة لوحة المسؤول أيّ غير معيّن Evotechly Owner Sara Khelifi تاريخ الإنشاء أيّ اليوم آخر 7 أيام آخر 30 يوماً آخر 90 يوماً الصفقة الحالة أيّ فتح فازت خسرت انتبا",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 617.2,
+              "width": 1184,
+              "height": 74,
+              "bottom": 691.2
+            },
+            "text": "جديد 3 التأهيل 3 عرض توضيحي 3 اقتراح 3 فازت 2 خسرت 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 50
+          }
+        ],
+        "firstUseful": {
+          "x": -41,
+          "y": 741.2,
+          "width": 1240,
+          "height": 37,
+          "bottom": 778.2,
+          "tag": "TR",
+          "testId": null,
+          "text": "CW Clinic website intake Clinique El Djazair جديد 220 000 DA — — Clinique El Djazair Amine Benali —"
+        },
+        "contentStartY": 741.2,
+        "columnHeader": null,
+        "tableHead": {
+          "x": -41,
+          "y": 705.2,
+          "width": 1240,
+          "height": 36,
+          "bottom": 741.2
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "إنشاء صفقة"
+        ],
+        "titleText": "الصفقات",
+        "countText": "15 صفقات"
+      }
+    },
+    {
+      "file": "deals-board__1440x1000__ar__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 0,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "الصفقات 15 صفقات خيارات اللوحة إنشاء صفقة",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 64,
+              "width": 1216,
+              "height": 52.4,
+              "bottom": 116.4
+            },
+            "text": "مسار المبيعات 2 995 000 DA الصفقات المفتوحة 15 مرجّح 1 638 750 DA النطاق · ارتفاع محتمل 1 229 063 DA – 2 212 313 DA اختبار رجعي · 90 يوماً يلزم 3+ صفقات مغلقة",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 128.4,
+              "width": 1184,
+              "height": 386.2,
+              "bottom": 514.6
+            },
+            "text": "يحتاج متابعة عرض الكل Oran lab CRM demo هذه الصفقة المفتوحة بلا إجراء تالٍ مجدول. لا إجراء تالي Annaba hospital intake هذه الصفقة المفتوحة بلا إجراء تالٍ مجدول.",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 526.6,
+              "width": 1216,
+              "height": 39,
+              "bottom": 565.6
+            },
+            "text": "كل صفقات صفقات الخاصة بي المسار المفتوح إضافة عرض (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 0,
+              "y": 565.6,
+              "width": 1216,
+              "height": 104,
+              "bottom": 669.6
+            },
+            "text": "قائمة لوحة المسؤول أيّ غير معيّن Evotechly Owner Sara Khelifi تاريخ الإنشاء أيّ اليوم آخر 7 أيام آخر 30 يوماً آخر 90 يوماً الصفقة الحالة أيّ فتح فازت خسرت انتبا",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 16,
+              "y": 669.6,
+              "width": 1184,
+              "height": 74,
+              "bottom": 743.6
+            },
+            "text": "جديد 3 التأهيل 3 عرض توضيحي 3 اقتراح 3 فازت 2 خسرت 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 78.6
+          }
+        ],
+        "firstUseful": {
+          "x": 947,
+          "y": 822.2,
+          "width": 259,
+          "height": 158,
+          "bottom": 980.2,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA غير معيّن لا إجراء تالي لا النشاط"
+        },
+        "contentStartY": 822.2,
+        "columnHeader": {
+          "x": 947,
+          "y": 763.6,
+          "width": 259,
+          "height": 50.6,
+          "bottom": 814.2,
+          "text": "جديد 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 0,
+          "y": 755.6,
+          "width": 1216,
+          "height": 352,
+          "bottom": 1107.6,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 248,
+            "scrollHeight": 484
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 248,
+            "scrollHeight": 486
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 248,
+            "scrollHeight": 486
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 248,
+            "scrollHeight": 486
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 248,
+            "scrollHeight": 322
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "إنشاء صفقة"
+        ],
+        "titleText": "الصفقات",
+        "countText": "15 صفقات"
+      }
+    },
+    {
+      "file": "deals-list__1440x1000__fr__dark.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "surface",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-workspace"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Import Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 76,
+              "width": 1184,
+              "height": 362,
+              "bottom": 438
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 450,
+              "width": 1216,
+              "height": 39,
+              "bottom": 489
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 489,
+              "width": 1216,
+              "height": 104,
+              "bottom": 593
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 593,
+              "width": 1184,
+              "height": 74,
+              "bottom": 667
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "attention-queue",
+            "height": 20
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 50
+          }
+        ],
+        "firstUseful": {
+          "x": 241,
+          "y": 717,
+          "width": 1240,
+          "height": 37,
+          "bottom": 754,
+          "tag": "TR",
+          "testId": null,
+          "text": "CW Clinic website intake Clinique El Djazair Nouveau 220 000 DA — — Clinique El Djazair Amine Benali —"
+        },
+        "contentStartY": 717,
+        "columnHeader": null,
+        "tableHead": {
+          "x": 241,
+          "y": 681,
+          "width": 1240,
+          "height": 36,
+          "bottom": 717
+        },
+        "pipeline": null,
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    },
+    {
+      "file": "deals-board__1440x1000__fr__dark.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000,
+          "bottom": 1000
+        },
+        "frame": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "archetype": "workspace",
+          "scrollOwner": "pipeline",
+          "shellScroll": "frame"
+        },
+        "workspace": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 1000,
+          "bottom": 1000,
+          "crm": "deals-board"
+        },
+        "header": {
+          "x": 224,
+          "y": 0,
+          "width": 1216,
+          "height": 56,
+          "bottom": 56
+        },
+        "bands": [
+          {
+            "id": "workspace-header",
+            "label": "WorkspaceHeader (PageHeader adapter)",
+            "selector": "[data-workspace=\"header\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 0,
+              "width": 1216,
+              "height": 56,
+              "bottom": 56
+            },
+            "text": "Affaires 15 affaires Options du tableau Créer une affaire",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "forecast-bar",
+            "label": "DealForecastBar",
+            "selector": "[data-testid=\"forecast-totals\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 64,
+              "width": 1216,
+              "height": 50.5,
+              "bottom": 114.5
+            },
+            "text": "Pipeline 2 995 000 DA Affaires ouvertes 15 Pondéré 1 638 750 DA Bande · Hausse probable 1 229 063 DA – 2 212 313 DA Rétrotest · 90 j Il faut 3+ affaires fermées",
+            "display": "flex",
+            "overflowY": "auto"
+          },
+          {
+            "id": "attention-queue",
+            "label": "DealAttentionQueue",
+            "selector": "[data-crm=\"deal-attention-queue\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 126.5,
+              "width": 1184,
+              "height": 362,
+              "bottom": 488.5
+            },
+            "text": "À traiter Voir tous Oran lab CRM demo Cette affaire ouverte n’a pas de prochaine action planifiée. Aucune prochaine action Annaba hospital intake Cette affaire ",
+            "display": "block",
+            "overflowY": "hidden"
+          },
+          {
+            "id": "saved-views",
+            "label": "SavedViews",
+            "selector": "[data-crm=\"views\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 500.5,
+              "width": 1216,
+              "height": 39,
+              "bottom": 539.5
+            },
+            "text": "Tous les affaires Mes affaires Pipeline ouvert Ajouter une vue (1/5)",
+            "display": "block",
+            "overflowY": "visible"
+          },
+          {
+            "id": "filter-bar",
+            "label": "FilterBar / operational toolbar",
+            "selector": "[data-crm=\"list-toolbar\"]",
+            "present": true,
+            "rect": {
+              "x": 224,
+              "y": 539.5,
+              "width": 1216,
+              "height": 104,
+              "bottom": 643.5
+            },
+            "text": "Liste Tableau Propriétaire Tous Non assigné Evotechly Owner Sara Khelifi Date de création Tous Aujourd'hui 7 derniers jours 30 derniers jours 90 derniers jours ",
+            "display": "block",
+            "overflowY": "auto"
+          },
+          {
+            "id": "stage-pills",
+            "label": "StagePills (full-width stage-count strip)",
+            "selector": "[data-crm=\"stage-pills\"]",
+            "present": true,
+            "rect": {
+              "x": 240,
+              "y": 643.5,
+              "width": 1184,
+              "height": 74,
+              "bottom": 717.5
+            },
+            "text": "Nouveau 3 Qualification 3 Négociation 3 Proposition 3 Gagné 2 Perdu 1",
+            "display": "grid",
+            "overflowY": "hidden"
+          }
+        ],
+        "gaps": [
+          {
+            "after": "workspace-header",
+            "before": "forecast-bar",
+            "height": 8
+          },
+          {
+            "after": "forecast-bar",
+            "before": "attention-queue",
+            "height": 12
+          },
+          {
+            "after": "attention-queue",
+            "before": "saved-views",
+            "height": 12
+          },
+          {
+            "after": "stage-pills",
+            "before": "first-useful",
+            "height": 75
+          }
+        ],
+        "firstUseful": {
+          "x": 234,
+          "y": 792.5,
+          "width": 259,
+          "height": 149.5,
+          "bottom": 942,
+          "tag": "DIV",
+          "testId": "deal-card-11",
+          "text": "Tlemcen school inbox École Tlemcen Langues 80 000 DA Non assigné Aucune prochaine action Aucune activité"
+        },
+        "contentStartY": 792.5,
+        "columnHeader": {
+          "x": 234,
+          "y": 737.5,
+          "width": 259,
+          "height": 47,
+          "bottom": 784.5,
+          "text": "NOUVEAU 3 450 000 DA"
+        },
+        "tableHead": null,
+        "pipeline": {
+          "x": 224,
+          "y": 729.5,
+          "width": 1216,
+          "height": 352,
+          "bottom": 1081.5,
+          "overflowX": "auto"
+        },
+        "documentScroll": {
+          "scrollHeight": 1000,
+          "clientHeight": 1000,
+          "windowScrolls": false
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 459
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 461
+          },
+          {
+            "tag": "DIV",
+            "testId": null,
+            "crm": null,
+            "className": "min-h-0 min-h-16 flex-1 overflow-y-auto",
+            "clientHeight": 254,
+            "scrollHeight": 305
+          }
+        ],
+        "primaryActionCount": 1,
+        "primaryActionLabels": [
+          "Créer une affaire"
+        ],
+        "titleText": "Affaires",
+        "countText": "15 affaires"
+      }
+    }
+  ]
+}

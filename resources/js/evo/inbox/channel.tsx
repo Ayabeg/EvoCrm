@@ -61,11 +61,16 @@ export function normalizeInboxChannel(raw?: string | null): InboxChannel | strin
 }
 
 export function inboxChannelLabel(raw?: string | null): string {
+    const value = (raw ?? '').toLowerCase();
+
+    if (value === 'whatsapp_cloud' || value === 'whatsapp-business') {
+        return t('WhatsApp Business');
+    }
+
     const channel = normalizeInboxChannel(raw);
 
     switch (channel) {
         case 'whatsapp':
-        case 'whatsapp_cloud':
             return t('WhatsApp');
         case 'email':
             return t('Email');
@@ -80,8 +85,9 @@ export function inboxChannelLabel(raw?: string | null): string {
         case 'meta':
             return t('Meta');
         case 'sms':
+            return t('SMS');
         case 'telegram':
-            return t('Phone');
+            return t('inbox.channel.telegram');
         case 'all':
             return t('All');
         default:

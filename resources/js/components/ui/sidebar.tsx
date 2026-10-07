@@ -23,14 +23,11 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state"
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// P04: 240px labeled rail, 64px collapsed icon rail. Persist via sidebar_state.
-// Mobile Sheet stays an opaque 240px labeled list.
-const SIDEBAR_WIDTH = "240px"
-const SIDEBAR_WIDTH_MOBILE = "240px"
-const SIDEBAR_WIDTH_ICON = "64px"
-const SIDEBAR_KEYBOARD_SHORTCUT = "b"
+// sidebar_state cookie is owned by EvoShell / rail-state.ts.
+// Mobile overlay only. Desktop rail is EvoShell --evo-rail / --evo-rail-collapsed.
+const SIDEBAR_WIDTH = "var(--evo-rail)"
+const SIDEBAR_WIDTH_MOBILE = "var(--evo-rail)"
+const SIDEBAR_WIDTH_ICON = "var(--evo-rail-collapsed)"
 
 type SidebarContext = {
   state: "expanded" | "collapsed"
@@ -82,8 +79,8 @@ function SidebarProvider({
         _setOpen(openState)
       }
 
-      // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      // Desktop rail persist lives in EvoShell (sidebar_state). Mobile
+      // overlay must not overwrite that cookie.
     },
     [setOpenProp, open]
   )
@@ -92,22 +89,6 @@ function SidebarProvider({
   const toggleSidebar = React.useCallback(() => {
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
   }, [isMobile, setOpen, setOpenMobile])
-
-  // Adds a keyboard shortcut to toggle the sidebar.
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-        (event.metaKey || event.ctrlKey)
-      ) {
-        event.preventDefault()
-        toggleSidebar()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [toggleSidebar])
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.
@@ -188,7 +169,7 @@ function Sidebar({
           data-mobile="true"
           hideClose
           className={cn(
-            // Aurora Sheet min(token, 92vw) contract, bound to the 240px rail.
+            // Aurora Sheet min(token, 92vw) contract, bound to the 224px rail.
             "text-sidebar-foreground w-[min(var(--sidebar-width),92vw)] max-w-[var(--sidebar-width)] border-sidebar-border p-0",
             className,
           )}

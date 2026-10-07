@@ -22,7 +22,7 @@ function statusLabel(status?: string): string {
         case 'failed':
             return t(status);
         default:
-            return status;
+            return t('inbox.message.unknown_status');
     }
 }
 
@@ -58,9 +58,9 @@ export function MessageBubble({ message }: { message: InboxMessage }) {
                     ))}
                 </div>
             ) : null}
-            {message.status === 'failed' && message.failureReason ? (
+            {message.status === 'failed' ? (
                 <p role="status" className="mt-1 text-[11px] text-[var(--evo-danger)]">
-                    {message.failureReason}
+                    {t('inbox.message.send_failed')}
                 </p>
             ) : null}
             <p className="mt-1 font-mono text-[10px] text-[var(--evo-ink-muted)] tabular-nums">

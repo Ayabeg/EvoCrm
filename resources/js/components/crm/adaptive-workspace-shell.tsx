@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/evo/ui/tabs';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,45 @@ type PanelDef = {
     key: WorkspacePanelKey;
     label: string;
 };
+
+type ViewportBand = 'mobile' | 'tablet' | 'desktop';
+
+function subscribeMaxWidth(query: string, onChange: () => void) {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+        return () => {};
+    }
+
+    const media = window.matchMedia(query);
+    media.addEventListener('change', onChange);
+
+    return () => media.removeEventListener('change', onChange);
+}
+
+function useMaxWidth(query: string, serverFallback = false): boolean {
+    return useSyncExternalStore(
+        (onChange) => subscribeMaxWidth(query, onChange),
+        () =>
+            typeof window !== 'undefined' &&
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia(query).matches,
+        () => serverFallback,
+    );
+}
+
+function useViewportBand(): ViewportBand {
+    const isMobile = useMaxWidth('(max-width: 767px)');
+    const isTablet = useMaxWidth('(min-width: 768px) and (max-width: 1023px)');
+
+    if (isMobile) {
+        return 'mobile';
+    }
+
+    if (isTablet) {
+        return 'tablet';
+    }
+
+    return 'desktop';
+}
 
 function ScrollPanel({
     children,
@@ -83,6 +122,9 @@ export function WorkspacePanelSwitcher({
  * - Mobile (<768): one panel at a time via tab switcher (default: center)
  * - Tablet (768–1023): center + right visible; left via switcher
  * - Desktop (≥1024): full left | center | right grid with fluid side rails
+ *
+ * Inbox opts into hideLeftOnDesktop + singlePaneBelowLg + mountVisibleOnly
+ * so folders are not a grid track and hidden breakpoint copies stay unmounted.
  */
 export function AdaptiveWorkspaceShell({
     left,
@@ -92,12 +134,17 @@ export function AdaptiveWorkspaceShell({
     centerLabel = 'Activity',
     rightLabel = 'Related',
     defaultPanel = 'center',
+    activePanel,
+    onActivePanelChange,
     leftClassName,
     centerClassName,
     rightClassName,
     scrollPanels = { left: true, center: true, right: true },
     tabletGridClassName,
     desktopGridClassName,
+    hideLeftOnDesktop = false,
+    singlePaneBelowLg = false,
+    mountVisibleOnly = false,
 }: {
     left: ReactNode;
     center: ReactNode;
@@ -106,21 +153,46 @@ export function AdaptiveWorkspaceShell({
     centerLabel?: string;
     rightLabel?: string;
     defaultPanel?: WorkspacePanelKey;
+    activePanel?: WorkspacePanelKey;
+    onActivePanelChange?: (key: WorkspacePanelKey) => void;
     leftClassName?: string;
     centerClassName?: string;
     rightClassName?: string;
     scrollPanels?: Partial<Record<WorkspacePanelKey, boolean>>;
     tabletGridClassName?: string;
     desktopGridClassName?: string;
+    hideLeftOnDesktop?: boolean;
+    singlePaneBelowLg?: boolean;
+    mountVisibleOnly?: boolean;
 }) {
-    const [activePanel, setActivePanel] =
+    const [uncontrolledPanel, setUncontrolledPanel] =
         useState<WorkspacePanelKey>(defaultPanel);
+    const band = useViewportBand();
+    const currentPanel = activePanel ?? uncontrolledPanel;
 
-    const panels: PanelDef[] = [
-        { key: 'left', label: leftLabel },
-        { key: 'center', label: centerLabel },
-        { key: 'right', label: rightLabel },
-    ];
+    const setPanel = (key: WorkspacePanelKey) => {
+        onActivePanelChange?.(key);
+        if (activePanel === undefined) {
+            setUncontrolledPanel(key);
+        }
+    };
+
+    useEffect(() => {
+        if (activePanel !== undefined) {
+            setUncontrolledPanel(activePanel);
+        }
+    }, [activePanel]);
+
+    const switcherPanels: PanelDef[] = singlePaneBelowLg || hideLeftOnDesktop
+        ? [
+              { key: 'center', label: centerLabel },
+              { key: 'right', label: rightLabel },
+          ]
+        : [
+              { key: 'left', label: leftLabel },
+              { key: 'center', label: centerLabel },
+              { key: 'right', label: rightLabel },
+          ];
 
     const leftScroll = scrollPanels.left ?? true;
     const centerScroll = scrollPanels.center ?? true;
@@ -139,91 +211,146 @@ export function AdaptiveWorkspaceShell({
         rightClassName,
     );
 
-    return (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <WorkspacePanelSwitcher
-                panels={panels}
-                active={activePanel}
-                onChange={setActivePanel}
-                className="lg:hidden"
-            />
+    const desktopClassName = cn(
+        'min-h-0 flex-1 gap-px overflow-hidden bg-hairline',
+        mountVisibleOnly ? 'grid' : 'hidden lg:grid',
+        hideLeftOnDesktop
+            ? (desktopGridClassName ??
+              'lg:grid-cols-[minmax(17.5rem,21.25rem)_minmax(0,1fr)]')
+            : (desktopGridClassName ??
+              'lg:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)_minmax(18rem,22rem)]'),
+    );
 
-            {/* Mobile: single scroll region */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:hidden">
-                {activePanel === 'left' ? (
-                    <ScrollPanel className={leftRegion} scrollable={leftScroll}>
-                        {left}
-                    </ScrollPanel>
-                ) : null}
-                {activePanel === 'center' ? (
+    const renderDesktop = () => (
+        <div className={desktopClassName}>
+            {hideLeftOnDesktop ? null : (
+                <ScrollPanel className={leftRegion} scrollable={leftScroll}>
+                    {left}
+                </ScrollPanel>
+            )}
+            <ScrollPanel className={centerRegion} scrollable={centerScroll}>
+                {center}
+            </ScrollPanel>
+            <ScrollPanel className={rightRegion} scrollable={rightScroll}>
+                {right}
+            </ScrollPanel>
+        </div>
+    );
+
+    const renderTabletSplit = () => (
+        <div
+            className={cn(
+                'min-h-0 flex-1 overflow-hidden',
+                mountVisibleOnly ? 'flex flex-col' : 'hidden md:flex md:flex-col lg:hidden',
+            )}
+        >
+            {currentPanel === 'left' && !hideLeftOnDesktop ? (
+                <ScrollPanel
+                    className={cn(leftRegion, 'flex-1')}
+                    scrollable={leftScroll}
+                >
+                    {left}
+                </ScrollPanel>
+            ) : (
+                <div
+                    className={cn(
+                        'grid min-h-0 flex-1 gap-px overflow-hidden bg-hairline',
+                        tabletGridClassName ??
+                            'grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]',
+                    )}
+                >
                     <ScrollPanel
                         className={centerRegion}
                         scrollable={centerScroll}
                     >
                         {center}
                     </ScrollPanel>
-                ) : null}
-                {activePanel === 'right' ? (
                     <ScrollPanel
                         className={rightRegion}
                         scrollable={rightScroll}
                     >
                         {right}
                     </ScrollPanel>
-                ) : null}
-            </div>
+                </div>
+            )}
+        </div>
+    );
 
-            {/* Tablet: details full-width OR activity + related side-by-side */}
-            <div className="hidden min-h-0 flex-1 overflow-hidden md:flex md:flex-col lg:hidden">
-                {activePanel === 'left' ? (
-                    <ScrollPanel
-                        className={cn(leftRegion, 'flex-1')}
-                        scrollable={leftScroll}
-                    >
-                        {left}
-                    </ScrollPanel>
-                ) : (
-                    <div
-                        className={cn(
-                            'grid min-h-0 flex-1 gap-px overflow-hidden bg-hairline',
-                            tabletGridClassName ??
-                                'grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]',
-                        )}
-                    >
-                        <ScrollPanel
-                            className={centerRegion}
-                            scrollable={centerScroll}
-                        >
-                            {center}
-                        </ScrollPanel>
-                        <ScrollPanel
-                            className={rightRegion}
-                            scrollable={rightScroll}
-                        >
-                            {right}
-                        </ScrollPanel>
-                    </div>
-                )}
-            </div>
-
-            {/* Desktop: intrinsic fluid rails + independent scroll regions */}
-            <div
-                className={cn(
-                    'hidden min-h-0 flex-1 gap-px overflow-hidden bg-hairline lg:grid',
-                    desktopGridClassName ??
-                        'lg:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)_minmax(18rem,22rem)]',
-                )}
-            >
+    const renderSinglePane = (className: string) => (
+        <div className={cn('flex min-h-0 flex-1 flex-col overflow-hidden', className)}>
+            {currentPanel === 'left' && !hideLeftOnDesktop && !singlePaneBelowLg ? (
                 <ScrollPanel className={leftRegion} scrollable={leftScroll}>
                     {left}
                 </ScrollPanel>
-                <ScrollPanel className={centerRegion} scrollable={centerScroll}>
+            ) : null}
+            {currentPanel === 'center' ||
+            (singlePaneBelowLg && currentPanel !== 'right') ? (
+                <ScrollPanel
+                    className={centerRegion}
+                    scrollable={centerScroll}
+                >
                     {center}
                 </ScrollPanel>
-                <ScrollPanel className={rightRegion} scrollable={rightScroll}>
+            ) : null}
+            {currentPanel === 'right' ? (
+                <ScrollPanel
+                    className={rightRegion}
+                    scrollable={rightScroll}
+                >
                     {right}
                 </ScrollPanel>
+            ) : null}
+        </div>
+    );
+
+    if (mountVisibleOnly) {
+        const compact = band === 'mobile' || (band === 'tablet' && singlePaneBelowLg);
+
+        return (
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                {compact ? (
+                    <WorkspacePanelSwitcher
+                        panels={switcherPanels}
+                        active={
+                            switcherPanels.some((panel) => panel.key === currentPanel)
+                                ? currentPanel
+                                : 'center'
+                        }
+                        onChange={setPanel}
+                        className="lg:hidden"
+                    />
+                ) : null}
+                {compact
+                    ? renderSinglePane('')
+                    : band === 'tablet'
+                      ? renderTabletSplit()
+                      : renderDesktop()}
             </div>
+        );
+    }
+
+    return (
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <WorkspacePanelSwitcher
+                panels={switcherPanels}
+                active={
+                    switcherPanels.some((panel) => panel.key === currentPanel)
+                        ? currentPanel
+                        : 'center'
+                }
+                onChange={setPanel}
+                className="lg:hidden"
+            />
+
+            {renderSinglePane('md:hidden')}
+            {singlePaneBelowLg ? (
+                <div className="hidden min-h-0 flex-1 overflow-hidden md:flex md:flex-col lg:hidden">
+                    {renderSinglePane('')}
+                </div>
+            ) : (
+                renderTabletSplit()
+            )}
+            {renderDesktop()}
         </div>
     );
 }

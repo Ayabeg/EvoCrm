@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { Button } from '@/evo/ui/button';
+import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { t } from '@/lib/i18n';
-import { LONG_TEXT_CLASS, LONG_TEXT_WRAP_CLASS } from '@/lib/responsive';
+import { LONG_TEXT_CLASS } from '@/lib/responsive';
 import { cn } from '@/lib/utils';
 
 export type PageHeaderProps = {
@@ -11,6 +12,14 @@ export type PageHeaderProps = {
     secondaryActions?: ReactNode;
     /** Operational lists: title and count share a short row. */
     compact?: boolean;
+    /** Slot B — pipeline selector when Deals has more than one pipeline. */
+    context?: ReactNode;
+    /** Slot J — saved views, embedded in the header views row. */
+    views?: ReactNode;
+    /** Slot L — one-line forecast / summary. Hidden below 1024. */
+    summary?: ReactNode;
+    /** Slot Q — list/board toggle when the page owns it. */
+    layoutToggle?: ReactNode;
 };
 
 export function PageHeader({
@@ -19,50 +28,33 @@ export function PageHeader({
     primaryAction,
     secondaryActions,
     compact = false,
+    context,
+    views,
+    summary,
+    layoutToggle,
 }: PageHeaderProps) {
     return (
-        <header
-            className={cn(
-                'border-b border-hairline bg-canvas',
-                compact
-                    ? 'flex items-center justify-between gap-3 px-4 py-2.5 md:px-6'
-                    : 'flex flex-col gap-3 px-4 pb-6 pt-5 md:flex-row md:items-center md:justify-between md:px-8',
-            )}
+        <div
             data-crm="object-header"
             data-ds="page-header"
             data-density={compact ? 'workspace' : 'page'}
         >
-            <div className="min-w-0">
-                <h1
-                    className={cn(
-                        compact
-                            ? 'text-[22px] leading-7 font-semibold tracking-[-0.02em] text-ink'
-                            : 'text-[28px] leading-[34px] font-[650] tracking-tight text-ink',
-                        LONG_TEXT_CLASS,
-                    )}
-                >
-                    {t(title)}
-                </h1>
-                {description ? (
-                    <p
-                        className={cn(
-                            compact
-                                ? 'text-[13px] leading-4 text-mute'
-                                : 'mt-1 text-[14px] leading-5 text-mute',
-                            LONG_TEXT_WRAP_CLASS,
-                        )}
-                    >
-                        {t(description)}
-                    </p>
-                ) : null}
-            </div>
-            {secondaryActions || primaryAction ? (
-                <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                    {secondaryActions}
-                    {primaryAction}
-                </div>
-            ) : null}
-        </header>
+            <WorkspaceHeader
+                className={cn('md:px-8', LONG_TEXT_CLASS)}
+                title={t(title)}
+                count={description ? t(description) : undefined}
+                primaryAction={primaryAction}
+                secondaryActions={secondaryActions}
+                context={context}
+                views={views}
+                summary={summary}
+                layoutToggle={layoutToggle}
+                density={compact ? 'workspace' : 'page'}
+                archetype="workspace"
+                dataCrm="object-header"
+                dataDs="page-header"
+            />
+        </div>
     );
 }
 

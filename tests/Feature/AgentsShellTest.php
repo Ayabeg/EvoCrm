@@ -27,21 +27,21 @@ it('keeps directory and selected-agent views inside the same agents sidebar', fu
     $sidebar = file_get_contents(resource_path('js/components/desk/agents-sidebar.tsx'));
     $state = file_get_contents(resource_path('js/lib/desk/agents-workspace-state.ts'));
     $layout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
+    $frame = file_get_contents(resource_path('js/evo/workspace/WorkspaceFrame.tsx'));
     $styles = file_get_contents(resource_path('css/evo-shell.css'));
 
     expect($shell)
-        ->toContain('agentsContent={renderAgentsContent()}')
         ->not->toContain('showLegacyAgentsRoom')
+        ->not->toContain('agentsContent={renderAgentsContent()}')
         ->and(file_get_contents(resource_path('js/evo/shell/mode-switch.tsx')))
         ->toContain("{ id: 'agents', label: 'Agents', icon: StarFour }")
         ->and($rail)
         ->toContain('evo-nav-section-label')
-        ->toContain('{agentsContent}')
+        ->not->toContain('{agentsContent}')
         ->not->toContain('The desk is open in the workspace.')
         ->and($navigation)
-        ->not->toContain("id: 'agents'")
-        ->and($rail)
-        ->toContain("path !== '/agents'")
+        ->toContain("id: 'agents'")
+        ->toContain("href: '/agents'")
         ->and($sidebar)
         ->toContain('data-agents-sidebar')
         ->toContain('AnimatePresence')
@@ -56,6 +56,8 @@ it('keeps directory and selected-agent views inside the same agents sidebar', fu
         ->toContain('selectedChatByAgent')
         ->toContain('back-to-directory')
         ->and($layout)
+        ->toContain('<WorkspaceFrame>')
+        ->and($frame)
         ->toContain('agents-route-page-shell')
         ->and($styles)
         ->toContain('.evo-workspace .agents-route-page-shell')

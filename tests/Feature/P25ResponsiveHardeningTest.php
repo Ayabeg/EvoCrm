@@ -51,7 +51,7 @@ it('caps overlays to the viewport without rewriting Dialog/Drawer semantics', fu
         ->and($popover)->toContain('max-w-[calc(100vw-1rem)]')
         ->and($qrd)->toContain('PAGE_OVERFLOW_CLASS')
         ->and($qrd)->toContain('sm:w-[min(92vw,520px)]')
-        ->and($command)->toContain('min(560px,calc(100vw-2rem))');
+        ->and($command)->toContain('min(640px,calc(100vw-2rem))');
 });
 
 it('keeps P17 KPI 2×2, inbox native/embed, and quote money unclipped', function () {
@@ -102,6 +102,7 @@ it('keeps activation, Ask Evo, and shell overflow without a visual redesign', fu
     $ask = file_get_contents(resource_path('js/components/crm/ask-evo-panel.tsx'));
     $drawer = file_get_contents(resource_path('js/components/crm/ask-evo-drawer.tsx'));
     $shell = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
+    $frame = file_get_contents(resource_path('js/evo/workspace/WorkspaceFrame.tsx'));
     $header = file_get_contents(resource_path('js/ds/chrome/PageHeader.tsx'));
     $room = file_get_contents(resource_path('js/components/crm/room-shell.tsx'));
     $queue = file_get_contents(resource_path('js/components/crm/activity-work-queue.tsx'));
@@ -111,7 +112,8 @@ it('keeps activation, Ask Evo, and shell overflow without a visual redesign', fu
         ->and($ask)->toContain('overflow-x-hidden')
         ->and($ask)->toContain('data-testid="ask-evo-context"')
         ->and($drawer)->toContain('overflow-x-hidden')
-        ->and($shell)->toContain('min-w-0 overflow-x-clip')
+        ->and($shell)->toContain('<WorkspaceFrame>')
+        ->and($frame)->toContain('min-w-0 overflow-x-clip')
         ->and($header)->toContain('LONG_TEXT_CLASS')
         ->and($room)->toContain('PAGE_OVERFLOW_CLASS')
         ->and($room)->toContain('LONG_TEXT_CLASS')

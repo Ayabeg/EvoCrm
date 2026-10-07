@@ -135,7 +135,7 @@ it('preserves Company create filters header and query ownership without inventin
         ->and($filterBar)->toContain("field.id === 'city'")
         ->and($filterBar)->toContain("field.id === 'wilaya'")
         ->and($filterBar)->toContain("t('Search companies…')")
-        ->and($filterBar)->toContain("(object === 'company' || object === 'deal') && 'max-w-md basis-[16rem]'")
+        ->and($filterBar)->toContain("(object === 'company' || object === 'deal') && !compact && 'max-w-md basis-[16rem]'")
         ->and($companyFilters->pluck('id')->all())->toContain('city')
         ->and($companyFilters->pluck('id')->all())->toContain('wilaya')
         ->and($companyFilters->pluck('id')->all())->not->toContain('status');

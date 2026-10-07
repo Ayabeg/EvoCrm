@@ -92,7 +92,8 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                                     <Button
                                         disabled={processing}
                                         size="sm"
-                                        className="h-8 bg-brand text-white hover:bg-brand-hover"
+                                        variant="outline"
+                                        className="h-8"
                                     >
                                         {t('Save lines')}
                                     </Button>
@@ -439,7 +440,7 @@ function LineTable({
                                     required
                                     defaultValue={quoteUnitDzd(item.unit_cents)}
                                     className="ms-auto h-8 w-28 text-end"
-                                    aria-label={t('Amount (DZD)')}
+                                    aria-label={t('Amount (DA)')}
                                 />
                             ) : (
                                 formatDzd(item.unit_cents)

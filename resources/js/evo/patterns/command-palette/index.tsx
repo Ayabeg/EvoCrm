@@ -185,7 +185,7 @@ export function CommandPalette({
 }) {
     const page = usePage();
     const { openRecord } = useQuickRecord();
-    const { features } = useSimpleMode();
+    const { features, simpleMode, nav } = useSimpleMode();
     const rawCapabilities = page.props.auth?.capabilities;
     const openerRef = useRef<HTMLElement | null>(null);
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -207,8 +207,12 @@ export function CommandPalette({
                     ? rawCapabilities
                     : []) as string[],
                 features,
+                simpleMode,
+                allowedHrefs: simpleMode
+                    ? nav.map((item) => item.href)
+                    : undefined,
             }),
-        [features, rawCapabilities],
+        [features, rawCapabilities, simpleMode, nav],
     );
 
     const availableIds = useMemo(
@@ -441,7 +445,7 @@ export function CommandPalette({
                 aria-label={t('Command palette')}
                 data-command="os"
                 data-a11y="focus-trap"
-                className="absolute top-[18vh] left-1/2 w-[min(560px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-[12px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] text-[var(--evo-ink)] shadow-[var(--evo-shadow-modal)]"
+                className="absolute inset-inline-0 top-[18vh] mx-auto w-[min(640px,calc(100vw-2rem))] overflow-hidden rounded-[12px] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] text-[var(--evo-ink)] shadow-[var(--evo-shadow-modal)]"
                 onKeyDown={onDialogKeyDown}
             >
                 <Command
