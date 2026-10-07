@@ -107,7 +107,16 @@ export default function DealForecastBar({
                         {t('Backtest · 90d')}
                     </p>
                     <p className="mt-0.5 text-[13px] font-semibold text-ink">
-                        {t(forecastBacktest.label)}
+                        {forecastBacktest.sample_count >= 3
+                            ? forecastBacktest.within_15
+                                ? t('Within 15% · :count deals', {
+                                      count: forecastBacktest.sample_count,
+                                  })
+                                : t(':pct% off · :count deals', {
+                                      pct: forecastBacktest.error_pct ?? 0,
+                                      count: forecastBacktest.sample_count,
+                                  })
+                            : t(forecastBacktest.label)}
                     </p>
                 </div>
             ) : null}

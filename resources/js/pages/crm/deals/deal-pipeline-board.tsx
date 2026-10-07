@@ -19,6 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/evo/ui/dropdown-menu';
 import type { DealAttention } from '@/lib/deal-attention';
+import { formatDate } from '@/evo/lib/format';
 import { t } from '@/lib/i18n';
 import { formatDzd } from '@/lib/money';
 import { dealStageColumnAccent } from '@/lib/stage-colors';
@@ -69,10 +70,7 @@ function formatCloseDate(value: string): string {
     const month = Number(match[2]);
     const day = Number(match[3]);
 
-    return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'short',
-    });
+    return formatDate(new Date(year, month - 1, day), { year: undefined });
 }
 
 function moveDeal(dealId: number, stageId: number, lostReason?: string): void {

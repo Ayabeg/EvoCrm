@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import {
     applyPipeline,
     fromActiveFilters,
@@ -33,7 +34,7 @@ export default function PipelineSwitcher({
 
     return (
         <select
-            aria-label="Pipeline"
+            aria-label={t('Pipeline')}
             value={pipelineId}
             onChange={(event) =>
                 visitListQuery(
@@ -49,7 +50,7 @@ export default function PipelineSwitcher({
             {pipelines.map((option) => (
                 <option key={option.id} value={option.id}>
                     {option.name}
-                    {option.is_default ? ' (default)' : ''}
+                    {option.is_default ? ` ${t('(default)')}` : ''}
                 </option>
             ))}
         </select>

@@ -440,7 +440,7 @@ function LineTable({
                                     required
                                     defaultValue={quoteUnitDzd(item.unit_cents)}
                                     className="ms-auto h-8 w-28 text-end"
-                                    aria-label={t('Amount (DZD)')}
+                                    aria-label={t('Amount (DA)')}
                                 />
                             ) : (
                                 formatDzd(item.unit_cents)

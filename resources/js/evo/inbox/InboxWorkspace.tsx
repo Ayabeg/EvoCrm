@@ -171,7 +171,7 @@ export function InboxWorkspace({
                             density="panel"
                             icon={<Tray className="size-6" />}
                             title={t('Select a conversation')}
-                            description={t("You're all caught up.")}
+                            description={t('inbox.empty.pick_conversation')}
                         />
                     </div>
                 )}

@@ -1,0 +1,2022 @@
+{
+  "capturedAt": "2026-10-07T07:18:07.628Z",
+  "commit": "b6e16c35c6d5e4c47a74dd0d5c13ae974b5693d4",
+  "baseUrl": "http://127.0.0.1:8000",
+  "email": "owner@evosales.local",
+  "seeded": {
+    "workspace": "Evotechly",
+    "simple_mode": false,
+    "inbox_url": null,
+    "contact": 1,
+    "company": 1,
+    "lead": 1,
+    "deal": 1,
+    "quote": 1,
+    "thread": 1,
+    "counts": {
+      "contacts": 22,
+      "companies": 10,
+      "leads": 16,
+      "deals": 15,
+      "quotes": 1,
+      "threads": 8
+    }
+  },
+  "captures": [
+    {
+      "file": "deals-list__1440x1000__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "route": "deals-list",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 241,
+          "y": 186,
+          "width": 1240,
+          "height": 37,
+          "selectorHint": "TR",
+          "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
+        },
+        "contentStartY": 186,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 48
+          },
+          {
+            "y": 44,
+            "height": 47
+          },
+          {
+            "y": 104,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 36
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Colonnes",
+            "Tableau",
+            "Liste",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "deals-board__1440x1000__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "route": "deals-board",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 234,
+          "y": 211,
+          "width": 259,
+          "height": 148,
+          "selectorHint": "DIV",
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
+        },
+        "contentStartY": 211,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 48
+          },
+          {
+            "y": 44,
+            "height": 47
+          },
+          {
+            "y": 104,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 55
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Colonnes",
+            "Tableau",
+            "Liste",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "inbox__1440x1000__fr__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 580,
+          "y": 4,
+          "width": 80,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "Tous\n8"
+        },
+        "contentStartY": 4,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Tableau",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "inbox-thread__1440x1000__fr__light.png",
+      "route": "inbox-thread",
+      "path": "/inbox?thread=1",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox?thread=1",
+      "console": [],
+      "metrics": {
+        "route": "inbox-thread",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 582,
+          "y": 109,
+          "width": 482,
+          "height": 627,
+          "selectorHint": "DIV",
+          "text": "7 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n06:02 · reçu\n\nBien"
+        },
+        "contentStartY": 109,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 1,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 40
+          }
+        ],
+        "nestedScrollCount": 1,
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "className": "h-full min-h-0 shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:bor",
+            "scrollHeight": 1293,
+            "clientHeight": 960
+          }
+        ],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Tableau",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "deals-list__1280x900__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "route": "deals-list",
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 241,
+          "y": 186,
+          "width": 1240,
+          "height": 37,
+          "selectorHint": "TR",
+          "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
+        },
+        "contentStartY": 186,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 48
+          },
+          {
+            "y": 44,
+            "height": 47
+          },
+          {
+            "y": 104,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 55
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Colonnes",
+            "Tableau",
+            "Liste",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "deals-board__1280x900__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "route": "deals-board",
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 234,
+          "y": 211,
+          "width": 259,
+          "height": 148,
+          "selectorHint": "DIV",
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
+        },
+        "contentStartY": 211,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 48
+          },
+          {
+            "y": 44,
+            "height": 47
+          },
+          {
+            "y": 104,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 92
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Colonnes",
+            "Tableau",
+            "Liste",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "inbox__1280x900__fr__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 578,
+          "y": 4,
+          "width": 80,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "Tous\n8"
+        },
+        "contentStartY": 4,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Tableau",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "inbox-thread__1280x900__fr__light.png",
+      "route": "inbox-thread",
+      "path": "/inbox?thread=1",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox?thread=1",
+      "console": [],
+      "metrics": {
+        "route": "inbox-thread",
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 582,
+          "y": 109,
+          "width": 682,
+          "height": 607,
+          "selectorHint": "DIV",
+          "text": "7 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n06:02 · reçu\n\nBien"
+        },
+        "contentStartY": 109,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 2,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 40
+          },
+          {
+            "y": 56,
+            "height": 53
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Tableau",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "deals-list__1024x768__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "route": "deals-list",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 73,
+          "y": 186,
+          "width": 1240,
+          "height": 37,
+          "selectorHint": "TR",
+          "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
+        },
+        "contentStartY": 186,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 48
+          },
+          {
+            "y": 44,
+            "height": 47
+          },
+          {
+            "y": 104,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 1,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-aut",
+            "scrollHeight": 460,
+            "clientHeight": 444
+          }
+        ],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 55
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "deals-board__1024x768__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "route": "deals-board",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 66,
+          "y": 211,
+          "width": 259,
+          "height": 148,
+          "selectorHint": "DIV",
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
+        },
+        "contentStartY": 211,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 48
+          },
+          {
+            "y": 44,
+            "height": 47
+          },
+          {
+            "y": 104,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 1,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-aut",
+            "scrollHeight": 460,
+            "clientHeight": 444
+          }
+        ],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 94
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox__1024x768__fr__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 407,
+          "y": 4,
+          "width": 80,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "Tous\n8"
+        },
+        "contentStartY": 4,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 2,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-aut",
+            "scrollHeight": 460,
+            "clientHeight": 444
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 flex-1 overflow-y-auto",
+            "scrollHeight": 568,
+            "clientHeight": 494
+          }
+        ],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox-thread__1024x768__fr__light.png",
+      "route": "inbox-thread",
+      "path": "/inbox?thread=1",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox?thread=1",
+      "console": [],
+      "metrics": {
+        "route": "inbox-thread",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 414,
+          "y": 109,
+          "width": 594,
+          "height": 461,
+          "selectorHint": "DIV",
+          "text": "7 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n06:02 · reçu\n\nBien"
+        },
+        "contentStartY": 109,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 2,
+        "toolbarBands": [
+          {
+            "y": 0,
+            "height": 40
+          },
+          {
+            "y": 56,
+            "height": 53
+          }
+        ],
+        "nestedScrollCount": 2,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-aut",
+            "scrollHeight": 460,
+            "clientHeight": 444
+          },
+          {
+            "tag": "DIV",
+            "className": "min-h-0 flex-1 overflow-y-auto",
+            "scrollHeight": 568,
+            "clientHeight": 494
+          }
+        ],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "deals-list__768x1024__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "route": "deals-list",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 17,
+          "y": 234,
+          "width": 1240,
+          "height": 37,
+          "selectorHint": "TR",
+          "text": "\t\nCW\nClinic website intake\nClinique El Djazair\n\t\nNouveau\n\t\n220 000 DA\n\t\n—\n\t\n—\n\t\n"
+        },
+        "contentStartY": 234,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 48
+          },
+          {
+            "y": 92,
+            "height": 47
+          },
+          {
+            "y": 152,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 90
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "deals-board__768x1024__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "route": "deals-board",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 10,
+          "y": 259,
+          "width": 259,
+          "height": 148,
+          "selectorHint": "DIV",
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
+        },
+        "contentStartY": 259,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 48
+          },
+          {
+            "y": 92,
+            "height": 47
+          },
+          {
+            "y": 152,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 134
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox__768x1024__fr__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 348,
+          "y": 52,
+          "width": 80,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "Tous\n8"
+        },
+        "contentStartY": 52,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox-thread__768x1024__fr__light.png",
+      "route": "inbox-thread",
+      "path": "/inbox?thread=1",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox?thread=1",
+      "console": [],
+      "metrics": {
+        "route": "inbox-thread",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 17,
+          "y": 194,
+          "width": 735,
+          "height": 185,
+          "selectorHint": "DIV",
+          "text": "7 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n06:02 · reçu\n\nBien"
+        },
+        "contentStartY": 194,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 40
+          },
+          {
+            "y": 88,
+            "height": 37
+          },
+          {
+            "y": 141,
+            "height": 53
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "deals-list__430x932__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "route": "deals-list",
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": null,
+        "contentStartY": null,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 48
+          },
+          {
+            "y": 92,
+            "height": 47
+          },
+          {
+            "y": 152,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 11
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "deals-board__430x932__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "route": "deals-board",
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 10,
+          "y": 259,
+          "width": 259,
+          "height": 148,
+          "selectorHint": "DIV",
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
+        },
+        "contentStartY": 259,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 4,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 48
+          },
+          {
+            "y": 92,
+            "height": 47
+          },
+          {
+            "y": 152,
+            "height": 44
+          },
+          {
+            "y": 204,
+            "height": 47
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 181
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox__430x932__fr__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 16,
+          "y": 52,
+          "width": 80,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "Tous\n8"
+        },
+        "contentStartY": 52,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox-thread__430x932__fr__light.png",
+      "route": "inbox-thread",
+      "path": "/inbox?thread=1",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox?thread=1",
+      "console": [],
+      "metrics": {
+        "route": "inbox-thread",
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 0,
+          "y": 218,
+          "width": 430,
+          "height": 205,
+          "selectorHint": "DIV",
+          "text": "7 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n06:02 · reçu\n\nBien"
+        },
+        "contentStartY": 218,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 40
+          },
+          {
+            "y": 88,
+            "height": 37
+          },
+          {
+            "y": 133,
+            "height": 36
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "deals-list__390x844__fr__light.png",
+      "route": "deals-list",
+      "path": "/crm/deals",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals",
+      "console": [],
+      "metrics": {
+        "route": "deals-list",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": null,
+        "contentStartY": null,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 5,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 48
+          },
+          {
+            "y": 92,
+            "height": 47
+          },
+          {
+            "y": 152,
+            "height": 44
+          },
+          {
+            "y": 382,
+            "height": 44
+          },
+          {
+            "y": 681,
+            "height": 44
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 13
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "deals-board__390x844__fr__light.png",
+      "route": "deals-board",
+      "path": "/crm/deals/board",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/crm/deals/board",
+      "console": [],
+      "metrics": {
+        "route": "deals-board",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 10,
+          "y": 259,
+          "width": 259,
+          "height": 148,
+          "selectorHint": "DIV",
+          "text": "Clinic website intake\n\nClinique El Djazair\n\n220 000 DA\n\nNon assigné\n\nRelancer Am"
+        },
+        "contentStartY": 259,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 4,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 48
+          },
+          {
+            "y": 92,
+            "height": 47
+          },
+          {
+            "y": 152,
+            "height": 44
+          },
+          {
+            "y": 204,
+            "height": 47
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 185
+        },
+        "language": {
+          "frenchMarkers": [
+            "Affaires",
+            "Créer",
+            "Colonnes",
+            "Tableau",
+            "Liste"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox__390x844__fr__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 12,
+          "y": 52,
+          "width": 80,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "Tous\n8"
+        },
+        "contentStartY": 52,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 1,
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "className": "min-h-0 flex-1 overflow-y-auto",
+            "scrollHeight": 568,
+            "clientHeight": 523
+          }
+        ],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox-thread__390x844__fr__light.png",
+      "route": "inbox-thread",
+      "path": "/inbox?thread=1",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox?thread=1",
+      "console": [],
+      "metrics": {
+        "route": "inbox-thread",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 0,
+          "y": 218,
+          "width": 390,
+          "height": 205,
+          "selectorHint": "DIV",
+          "text": "7 oct.\n\nSalam, je veux un devis pour un logiciel commercial.\n\n06:02 · reçu\n\nBien"
+        },
+        "contentStartY": 218,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 3,
+        "toolbarBands": [
+          {
+            "y": 48,
+            "height": 40
+          },
+          {
+            "y": 88,
+            "height": 37
+          },
+          {
+            "y": 133,
+            "height": 36
+          }
+        ],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Boîte de réception"
+          ],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox__1440x1000__en__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 512,
+          "y": 4,
+          "width": 68,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "All\n8"
+        },
+        "contentStartY": 4,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [],
+          "englishMarkers": [
+            "Deals",
+            "Companies",
+            "Quotes",
+            "Settings",
+            "Create",
+            "Search",
+            "Inbox",
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox__1440x1000__ar__light.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 872,
+          "y": 4,
+          "width": 75,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "الكل\n8"
+        },
+        "contentStartY": 4,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [],
+          "englishMarkers": [],
+          "mixed": false
+        }
+      }
+    },
+    {
+      "file": "inbox__1440x1000__fr__dark.png",
+      "route": "inbox",
+      "path": "/inbox",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/inbox",
+      "console": [],
+      "metrics": {
+        "route": "inbox",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 580,
+          "y": 4,
+          "width": 80,
+          "height": 32,
+          "selectorHint": "BUTTON",
+          "text": "Tous\n8"
+        },
+        "contentStartY": 4,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Sociétés",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Tableau",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Leads",
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    },
+    {
+      "file": "dashboard-simple__1440x1000__fr__light.png",
+      "route": "dashboard-simple",
+      "path": "/dashboard",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "url": "http://127.0.0.1:8000/dashboard",
+      "console": [],
+      "metrics": {
+        "route": "dashboard-simple",
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "topBar": null,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "inset": null,
+        "firstUseful": {
+          "x": 270,
+          "y": 29,
+          "width": 64,
+          "height": 26,
+          "selectorHint": "H1",
+          "text": "Accueil"
+        },
+        "contentStartY": 29,
+        "primaryActionCount": 0,
+        "primaryActionLabels": [],
+        "toolbarRowCount": 0,
+        "toolbarBands": [],
+        "nestedScrollCount": 0,
+        "nestedScrollers": [],
+        "overflow": {
+          "documentX": false,
+          "documentY": false,
+          "overflowingChildCount": 0
+        },
+        "language": {
+          "frenchMarkers": [
+            "Accueil",
+            "Affaires",
+            "Devis",
+            "Paramètres",
+            "Créer",
+            "Rechercher",
+            "Boîte de réception"
+          ],
+          "englishMarkers": [
+            "Contacts"
+          ],
+          "mixed": true
+        }
+      }
+    }
+  ]
+}

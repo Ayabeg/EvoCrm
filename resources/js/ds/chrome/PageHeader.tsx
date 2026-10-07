@@ -12,6 +12,14 @@ export type PageHeaderProps = {
     secondaryActions?: ReactNode;
     /** Operational lists: title and count share a short row. */
     compact?: boolean;
+    /** Slot B — pipeline selector when Deals has more than one pipeline. */
+    context?: ReactNode;
+    /** Slot J — saved views, embedded in the header views row. */
+    views?: ReactNode;
+    /** Slot L — one-line forecast / summary. Hidden below 1024. */
+    summary?: ReactNode;
+    /** Slot Q — list/board toggle when the page owns it. */
+    layoutToggle?: ReactNode;
 };
 
 export function PageHeader({
@@ -20,6 +28,10 @@ export function PageHeader({
     primaryAction,
     secondaryActions,
     compact = false,
+    context,
+    views,
+    summary,
+    layoutToggle,
 }: PageHeaderProps) {
     return (
         <div
@@ -33,6 +45,10 @@ export function PageHeader({
                 count={description ? t(description) : undefined}
                 primaryAction={primaryAction}
                 secondaryActions={secondaryActions}
+                context={context}
+                views={views}
+                summary={summary}
+                layoutToggle={layoutToggle}
                 density={compact ? 'workspace' : 'page'}
                 archetype="workspace"
                 dataCrm="object-header"

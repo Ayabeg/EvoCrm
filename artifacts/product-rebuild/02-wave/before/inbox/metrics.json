@@ -1,0 +1,5412 @@
+{
+  "capturedAt": "2026-10-07T06:06:40.083Z",
+  "seed": {
+    "workspace": "Evotechly",
+    "simple_mode": false,
+    "inbox_url": null,
+    "thread": 1,
+    "threads": 8
+  },
+  "columns1440": {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "dir": "ltr",
+    "lang": "fr",
+    "theme": "light",
+    "url": "/inbox?thread=1",
+    "inboxUrlCleared": true,
+    "native": true,
+    "banner": false,
+    "rail": {
+      "x": 0,
+      "y": 0,
+      "width": 224,
+      "height": 1000
+    },
+    "roomNav": {
+      "x": 256,
+      "y": 0,
+      "width": 1152,
+      "height": 42
+    },
+    "header": {
+      "x": 224,
+      "y": 42,
+      "width": 1216,
+      "height": 0
+    },
+    "folders": {
+      "x": 240,
+      "y": 58,
+      "width": 187,
+      "height": 357
+    },
+    "list": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "conversation": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "thread": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "composer": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "context": {
+      "x": 1160,
+      "y": 42,
+      "width": 280,
+      "height": 958
+    },
+    "contextVisible": true,
+    "threadCount": 8,
+    "caughtUpVisible": false,
+    "caughtUpText": null,
+    "pageScroll": false,
+    "frameScroll": {
+      "overflowY": "hidden",
+      "scrollOwner": "conversation",
+      "shellScroll": "frame",
+      "archetype": "conversation"
+    },
+    "panes": {
+      "x": 224,
+      "y": 42,
+      "width": 1216,
+      "height": 958
+    },
+    "nestedScrollers": [
+      {
+        "tag": "ASIDE",
+        "inbox": "context-host",
+        "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+        "width": 280,
+        "height": 958,
+        "scrollHeight": 1313
+      }
+    ],
+    "tabLabels": [
+      "Dossiers",
+      "Boîte de réception",
+      "Conversation"
+    ]
+  },
+  "captures": [
+    {
+      "file": "list__1440x1000__fr__light.png",
+      "state": "list",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "Vous êtes à jour.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__1440x1000__fr__light.png",
+      "state": "selected",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__1440x1000__fr__light.png",
+      "state": "composer",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__1440x1000__fr__light.png",
+      "state": "internal-note",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__1440x1000__fr__light.png",
+      "state": "context-open",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__1440x1000__fr__light.png",
+      "state": "context-closed",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "list__1280x900__fr__light.png",
+      "state": "list",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 992,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "Vous êtes à jour.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 858
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__1280x900__fr__light.png",
+      "state": "selected",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 992,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1000,
+          "y": 42,
+          "width": 280,
+          "height": 858
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 858
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 858,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__1280x900__fr__light.png",
+      "state": "composer",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 992,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1000,
+          "y": 42,
+          "width": 280,
+          "height": 858
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 858
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 858,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__1280x900__fr__light.png",
+      "state": "internal-note",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 992,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1000,
+          "y": 42,
+          "width": 280,
+          "height": 858
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 858
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 858,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__1280x900__fr__light.png",
+      "state": "context-open",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 992,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1000,
+          "y": 42,
+          "width": 280,
+          "height": 858
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 858
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 858,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__1280x900__fr__light.png",
+      "state": "context-closed",
+      "viewport": "1280x900",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1280,
+          "height": 900
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 900
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 992,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1056,
+          "height": 858
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "list__1024x768__fr__light.png",
+      "state": "list",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "roomNav": {
+          "x": 88,
+          "y": 0,
+          "width": 904,
+          "height": 42
+        },
+        "header": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 0
+        },
+        "folders": {
+          "x": 72,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "Vous êtes à jour.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 726
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "inbox": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "width": 40,
+            "height": 444,
+            "scrollHeight": 460
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__1024x768__fr__light.png",
+      "state": "selected",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "roomNav": {
+          "x": 88,
+          "y": 0,
+          "width": 904,
+          "height": 42
+        },
+        "header": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 0
+        },
+        "folders": {
+          "x": 72,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 726
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "inbox": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "width": 40,
+            "height": 444,
+            "scrollHeight": 460
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__1024x768__fr__light.png",
+      "state": "composer",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "roomNav": {
+          "x": 88,
+          "y": 0,
+          "width": 904,
+          "height": 42
+        },
+        "header": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 0
+        },
+        "folders": {
+          "x": 72,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 726
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "inbox": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "width": 40,
+            "height": 444,
+            "scrollHeight": 460
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__1024x768__fr__light.png",
+      "state": "internal-note",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "roomNav": {
+          "x": 88,
+          "y": 0,
+          "width": 904,
+          "height": 42
+        },
+        "header": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 0
+        },
+        "folders": {
+          "x": 72,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 726
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "inbox": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "width": 40,
+            "height": 444,
+            "scrollHeight": 460
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__1024x768__fr__light.png",
+      "state": "context-open",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "roomNav": {
+          "x": 88,
+          "y": 0,
+          "width": 904,
+          "height": 42
+        },
+        "header": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 0
+        },
+        "folders": {
+          "x": 72,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 726
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "inbox": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "width": 40,
+            "height": 444,
+            "scrollHeight": 460
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__1024x768__fr__light.png",
+      "state": "context-closed",
+      "viewport": "1024x768",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 768
+        },
+        "roomNav": {
+          "x": 88,
+          "y": 0,
+          "width": 904,
+          "height": 42
+        },
+        "header": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 0
+        },
+        "folders": {
+          "x": 72,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 56,
+          "y": 42,
+          "width": 968,
+          "height": 726
+        },
+        "nestedScrollers": [
+          {
+            "tag": "DIV",
+            "inbox": null,
+            "className": "evo-scroll mt-2 flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto",
+            "width": 40,
+            "height": 444,
+            "scrollHeight": 460
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "list__768x1024__fr__light.png",
+      "state": "list",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 48,
+          "width": 704,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "Vous êtes à jour.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 934
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__768x1024__fr__light.png",
+      "state": "selected",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 48,
+          "width": 704,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 20,
+          "y": 143,
+          "width": 280,
+          "height": 865
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 934
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__768x1024__fr__light.png",
+      "state": "composer",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 48,
+          "width": 704,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 20,
+          "y": 143,
+          "width": 280,
+          "height": 865
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 934
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__768x1024__fr__light.png",
+      "state": "internal-note",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 48,
+          "width": 704,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 20,
+          "y": 143,
+          "width": 280,
+          "height": 865
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 934
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__768x1024__fr__light.png",
+      "state": "context-open",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 48,
+          "width": 704,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 20,
+          "y": 143,
+          "width": 280,
+          "height": 865
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 934
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__768x1024__fr__light.png",
+      "state": "context-closed",
+      "viewport": "768x1024",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 48,
+          "width": 704,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 20,
+          "y": 143,
+          "width": 280,
+          "height": 865
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 768,
+          "height": 934
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "list__430x932__fr__light.png",
+      "state": "list",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 398,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 127,
+          "width": 430,
+          "height": 637
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "Vous êtes à jour.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 842
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__430x932__fr__light.png",
+      "state": "selected",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 398,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 430,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 430,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 430,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 842
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__430x932__fr__light.png",
+      "state": "composer",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 398,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 430,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 430,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 430,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 842
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__430x932__fr__light.png",
+      "state": "internal-note",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 398,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 430,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 430,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 430,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 842
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__430x932__fr__light.png",
+      "state": "context-open",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 398,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 430,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 430,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 430,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 842
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__430x932__fr__light.png",
+      "state": "context-closed",
+      "viewport": "430x932",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 430,
+          "height": 932
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 398,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 430,
+          "height": 427
+        },
+        "thread": {
+          "x": 0,
+          "y": 180,
+          "width": 430,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 385,
+          "width": 430,
+          "height": 169
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 430,
+          "height": 842
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "list__390x844__fr__light.png",
+      "state": "list",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 358,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 127,
+          "width": 390,
+          "height": 637
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "Vous êtes à jour.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 754
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__390x844__fr__light.png",
+      "state": "selected",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 358,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 390,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 390,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 754
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__390x844__fr__light.png",
+      "state": "composer",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 358,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 390,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 390,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 754
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__390x844__fr__light.png",
+      "state": "internal-note",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 358,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 390,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 390,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 754
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__390x844__fr__light.png",
+      "state": "context-open",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 358,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 390,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 390,
+          "height": 169
+        },
+        "context": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 754
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__390x844__fr__light.png",
+      "state": "context-closed",
+      "viewport": "390x844",
+      "lang": "fr",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "roomNav": {
+          "x": 16,
+          "y": 48,
+          "width": 358,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 0
+        },
+        "folders": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 127,
+          "width": 390,
+          "height": 467
+        },
+        "thread": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 205
+        },
+        "composer": {
+          "x": 0,
+          "y": 425,
+          "width": 390,
+          "height": 169
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 0,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 90,
+          "width": 390,
+          "height": 754
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "list__1440x1000__en__light.png",
+      "state": "list",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "You're all caught up.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Folders",
+          "Inbox",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__1440x1000__en__light.png",
+      "state": "selected",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Folders",
+          "Inbox",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__1440x1000__en__light.png",
+      "state": "composer",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Folders",
+          "Inbox",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__1440x1000__en__light.png",
+      "state": "internal-note",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Folders",
+          "Inbox",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__1440x1000__en__light.png",
+      "state": "context-open",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Folders",
+          "Inbox",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__1440x1000__en__light.png",
+      "state": "context-closed",
+      "viewport": "1440x1000",
+      "lang": "en",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "en",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Folders",
+          "Inbox",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "list__1440x1000__ar__light.png",
+      "state": "list",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 1013,
+          "y": 58,
+          "width": 187,
+          "height": 359
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "أنت محدّث.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "المجلدات",
+          "صندوق الوارد",
+          "محادثة"
+        ]
+      }
+    },
+    {
+      "file": "selected__1440x1000__ar__light.png",
+      "state": "selected",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 1013,
+          "y": 58,
+          "width": 187,
+          "height": 359
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1390
+          }
+        ],
+        "tabLabels": [
+          "المجلدات",
+          "صندوق الوارد",
+          "محادثة"
+        ]
+      }
+    },
+    {
+      "file": "composer__1440x1000__ar__light.png",
+      "state": "composer",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 1013,
+          "y": 58,
+          "width": 187,
+          "height": 359
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1390
+          }
+        ],
+        "tabLabels": [
+          "المجلدات",
+          "صندوق الوارد",
+          "محادثة"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__1440x1000__ar__light.png",
+      "state": "internal-note",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 1013,
+          "y": 58,
+          "width": 187,
+          "height": 359
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1390
+          }
+        ],
+        "tabLabels": [
+          "المجلدات",
+          "صندوق الوارد",
+          "محادثة"
+        ]
+      }
+    },
+    {
+      "file": "context-open__1440x1000__ar__light.png",
+      "state": "context-open",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 1013,
+          "y": 58,
+          "width": 187,
+          "height": 359
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 0,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1390
+          }
+        ],
+        "tabLabels": [
+          "المجلدات",
+          "صندوق الوارد",
+          "محادثة"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__1440x1000__ar__light.png",
+      "state": "context-closed",
+      "viewport": "1440x1000",
+      "lang": "ar",
+      "theme": "light",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "rtl",
+        "lang": "ar",
+        "theme": "light",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 1216,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 32,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 1013,
+          "y": 58,
+          "width": 187,
+          "height": 359
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 0,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "المجلدات",
+          "صندوق الوارد",
+          "محادثة"
+        ]
+      }
+    },
+    {
+      "file": "list__1440x1000__fr__dark.png",
+      "state": "list",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "url": "/inbox",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": null,
+        "thread": null,
+        "composer": null,
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": true,
+        "caughtUpText": "Vous êtes à jour.",
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "selected__1440x1000__fr__dark.png",
+      "state": "selected",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "composer__1440x1000__fr__dark.png",
+      "state": "composer",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "internal-note__1440x1000__fr__dark.png",
+      "state": "internal-note",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-open__1440x1000__fr__dark.png",
+      "state": "context-open",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "url": "/inbox?thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": {
+          "x": 1160,
+          "y": 42,
+          "width": 280,
+          "height": 958
+        },
+        "contextVisible": true,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [
+          {
+            "tag": "ASIDE",
+            "inbox": "context-host",
+            "className": "h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-hairline bg-white lg:w-[17.",
+            "width": 280,
+            "height": 958,
+            "scrollHeight": 1313
+          }
+        ],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    },
+    {
+      "file": "context-closed__1440x1000__fr__dark.png",
+      "state": "context-closed",
+      "viewport": "1440x1000",
+      "lang": "fr",
+      "theme": "dark",
+      "status": 200,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "dir": "ltr",
+        "lang": "fr",
+        "theme": "dark",
+        "url": "/inbox?context=0&thread=1",
+        "inboxUrlCleared": true,
+        "native": true,
+        "banner": false,
+        "rail": {
+          "x": 0,
+          "y": 0,
+          "width": 224,
+          "height": 1000
+        },
+        "roomNav": {
+          "x": 256,
+          "y": 0,
+          "width": 1152,
+          "height": 42
+        },
+        "header": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 0
+        },
+        "folders": {
+          "x": 240,
+          "y": 58,
+          "width": 187,
+          "height": 357
+        },
+        "list": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "conversation": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "thread": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "composer": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "context": null,
+        "contextVisible": false,
+        "threadCount": 8,
+        "caughtUpVisible": false,
+        "caughtUpText": null,
+        "pageScroll": false,
+        "frameScroll": {
+          "overflowY": "hidden",
+          "scrollOwner": "conversation",
+          "shellScroll": "frame",
+          "archetype": "conversation"
+        },
+        "panes": {
+          "x": 224,
+          "y": 42,
+          "width": 1216,
+          "height": 958
+        },
+        "nestedScrollers": [],
+        "tabLabels": [
+          "Dossiers",
+          "Boîte de réception",
+          "Conversation"
+        ]
+      }
+    }
+  ]
+}

@@ -142,7 +142,8 @@ it('evaluates overdue future no-next won and lost fixtures without inventing sta
 
     expect($overdueEval['primary']['type'])->toBe(DealAttentionEvaluator::TYPE_OVERDUE_ACTIVITY)
         ->and($overdueEval['primary']['severity'])->toBe('critical')
-        ->and($overdueEval['primary']['reason'])->toContain('Call clinic')
+        ->and($overdueEval['primary']['reason'])->toBe(':subject was due :when')
+        ->and($overdueEval['primary']['reason_replace']['subject'])->toBe('Call clinic')
         ->and(collect($overdueEval['signals'])->pluck('type'))->not->toContain('no_next_action');
 
     expect($futureEval['primary'])->toBeNull()
