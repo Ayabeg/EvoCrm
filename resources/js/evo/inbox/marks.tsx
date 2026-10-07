@@ -51,11 +51,8 @@ export function InboxStatusBanner({
         return null;
     }
 
-    const host = configuredUrl ? safeHost(configuredUrl) : 'Desk';
-    const title =
-        embedState === 'blocked'
-            ? t(':host is not framed here', { host })
-            : t(':host could not be reached', { host });
+    void configuredUrl;
+    void embedReason;
 
     return (
         <div
@@ -63,10 +60,7 @@ export function InboxStatusBanner({
             data-crm="inbox-embed-banner"
             className="border-b border-[var(--evo-hairline)] bg-[var(--evo-surface)] px-4 py-2 text-[12px] leading-5 text-[var(--evo-ink-muted)]"
         >
-            <p>
-                <span className="font-medium text-[var(--evo-ink)]">{title}.</span>{' '}
-                {embedReason ? t(embedReason) : t('Showing the CRM inbox. Desk stays on this host.')}
-            </p>
+            <p>{t('inbox.embed.unavailable')}</p>
         </div>
     );
 }
@@ -141,12 +135,4 @@ export function InboxListHeader({
             </label>
         </div>
     );
-}
-
-function safeHost(url: string): string {
-    try {
-        return new URL(url).host;
-    } catch {
-        return url;
-    }
 }

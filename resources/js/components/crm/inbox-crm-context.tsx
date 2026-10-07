@@ -19,6 +19,26 @@ import type {
 } from '@/lib/inbox-crm-context';
 import { cn } from '@/lib/utils';
 
+function activityTypeLabel(type?: string | null): string {
+    if (!type) {
+        return '';
+    }
+
+    if (type === 'call') {
+        return t('Call');
+    }
+
+    if (type === 'note') {
+        return t('Note');
+    }
+
+    if (type === 'scheduled') {
+        return t('inbox.activity.scheduled');
+    }
+
+    return t(type);
+}
+
 function formatContextWhen(iso?: string | null): string {
     if (!iso) {
         return '';
@@ -119,7 +139,7 @@ function ActivityLine({
         <p className="truncate text-[13px] text-ink">
             {item.subject}
             <span className="ms-1 text-[12px] text-mute">
-                {item.type}
+                {activityTypeLabel(item.type)}
                 {item.at ? ` · ${formatContextWhen(item.at)}` : ''}
             </span>
         </p>
@@ -165,7 +185,7 @@ function DealRow({
             </p>
             {deal.owner ? (
                 <p className="truncate text-[12px] text-mute">
-                    {t('Deal owner')}: {deal.owner.name}
+                    {t('inbox.context.deal_owner')}: {deal.owner.name}
                 </p>
             ) : null}
             {deal.attention?.primary ? (
@@ -180,12 +200,12 @@ function DealRow({
             ) : null}
             {deal.next_activity ? (
                 <p className="truncate text-[12px] text-mute">
-                    {t('Next')}: {deal.next_activity.subject}
+                    {t('inbox.context.next_activity')}: {deal.next_activity.subject}
                 </p>
             ) : null}
             <div className="mt-1 flex flex-wrap gap-2">
                 <ActionLink href={deal.href}>{t('Open deal')}</ActionLink>
-                <PeekButton type="deal" id={deal.id} label={t('Peek')} />
+                <PeekButton type="deal" id={deal.id} label={t('inbox.context.peek')} />
             </div>
         </div>
     );
@@ -195,7 +215,7 @@ export function InboxCrmContextSkeleton() {
     return (
         <div
             aria-busy="true"
-            aria-label={t('Loading context')}
+            aria-label={t('inbox.context.loading')}
             data-inbox="context-pending"
             className="px-3 py-3"
         >
@@ -216,7 +236,7 @@ export function InboxCrmContextError({
 }) {
     return (
         <div data-inbox="context-error" className="px-3 py-3">
-            <p className="text-[13px] text-ink">{t('CRM context failed')}</p>
+            <p className="text-[13px] text-ink">{t('inbox.context.failed')}</p>
             {onRetry ? (
                 <button
                     type="button"
@@ -260,10 +280,10 @@ export function InboxCrmContext({
         return (
             <div data-inbox="context-empty" className="px-3 py-3">
                 <p className="text-[14px] font-medium text-ink">
-                    {t('No CRM contact linked')}
+                    {t('inbox.context.no_contact')}
                 </p>
                 <p className="mt-1 text-[12px] text-mute">
-                    {t('This conversation has no CRM contact to show.')}
+                    {t('inbox.context.no_contact_body')}
                 </p>
             </div>
         );
@@ -327,13 +347,13 @@ export function InboxCrmContext({
                             }
                         />
                         <Fact
-                            label={t('Contact owner')}
+                            label={t('inbox.context.contact_owner')}
                             value={contact.owner?.name ?? t('No owner')}
                         />
                     </div>
                     <div className="mt-2 flex flex-wrap gap-2">
                         <ActionLink href={contact.href}>{t('Open contact')}</ActionLink>
-                        <PeekButton type="contact" id={contact.id} label={t('Peek')} />
+                        <PeekButton type="contact" id={contact.id} label={t('inbox.context.peek')} />
                     </div>
                 </div>
             ) : null}
@@ -350,7 +370,7 @@ export function InboxCrmContext({
                         <PeekButton
                             type="company"
                             id={context.company.id}
-                            label={t('Peek')}
+                            label={t('inbox.context.peek')}
                         />
                     </div>
                 </Section>
@@ -368,7 +388,7 @@ export function InboxCrmContext({
                 >
                     {context.primary_deal_id == null && deals.length > 1 ? (
                         <p className="mb-1 text-[12px] text-mute">
-                            {t('Select a deal to inspect. Nothing is marked primary.')}
+                            {t('inbox.context.select_deal')}
                         </p>
                     ) : null}
                     <div className="divide-y divide-hairline">
@@ -408,13 +428,13 @@ export function InboxCrmContext({
                         </p>
                     ) : null}
                     <div className="mt-2 flex flex-wrap gap-2">
-                        <ActionLink href="/crm/activities">{t('View activity')}</ActionLink>
+                        <ActionLink href="/crm/activities">{t('inbox.context.view_activity')}</ActionLink>
                         {focusedDeal ? (
                             <ActionLink href={focusedDeal.href}>{t('Open deal')}</ActionLink>
                         ) : null}
                         {context.capabilities.can_create_activity ? (
                             <ActionLink href="/crm/activities?create=1">
-                                {t('Create activity')}
+                                {t('inbox.context.create_activity')}
                             </ActionLink>
                         ) : null}
                     </div>
@@ -428,7 +448,7 @@ export function InboxCrmContext({
             ) : null}
 
             {nextActivity ? (
-                <Section title={t('Next activity')}>
+                <Section title={t('inbox.context.next_activity')}>
                     <ActivityLine item={nextActivity} />
                 </Section>
             ) : null}

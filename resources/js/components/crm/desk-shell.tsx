@@ -46,9 +46,11 @@ export function deskTabs(pathname: string, simpleMode = false): RoomTab[] {
 export function DeskShell({
     title,
     children,
+    hideSectionNav = false,
 }: {
     title: string;
     children: ReactNode;
+    hideSectionNav?: boolean;
 }) {
     const { url } = usePage();
     const { simpleMode } = useSimpleMode();
@@ -57,7 +59,11 @@ export function DeskShell({
     return (
         <>
             <Head title={t(title)} />
-            <RoomShell title={t('Inbox')} tabs={deskTabs(pathname, simpleMode)}>
+            <RoomShell
+                title={t('Inbox')}
+                tabs={deskTabs(pathname, simpleMode)}
+                hideNav={hideSectionNav}
+            >
                 <div className="h-full overflow-hidden">{children}</div>
             </RoomShell>
         </>

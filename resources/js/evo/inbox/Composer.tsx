@@ -132,7 +132,7 @@ export function Composer({
                             : 'text-[12px] text-[var(--evo-ink-muted)]'
                     }
                 >
-                    {t('Note')}
+                    {t('inbox.composer.internal_note')}
                 </button>
             </div>
             {mode === 'note' && action ? (
@@ -195,7 +195,7 @@ export function Composer({
                                                 className="w-full rounded-[var(--evo-radius-compact)] px-2 py-1.5 text-start text-[13px] hover:bg-[var(--evo-hover)]"
                                             >
                                                 <span className="block font-medium">
-                                                    {template.title}
+                                                    {t(template.title)}
                                                 </span>
                                                 <span className="block truncate text-[12px] text-[var(--evo-ink-muted)]">
                                                     {template.body}
@@ -218,7 +218,7 @@ export function Composer({
                                                 className="w-full rounded-[var(--evo-radius-compact)] px-2 py-1.5 text-start text-[13px] hover:bg-[var(--evo-hover)]"
                                             >
                                                 <span className="block font-medium">
-                                                    {template.title}
+                                                    {t(template.title)}
                                                 </span>
                                                 <span className="block truncate text-[12px] text-[var(--evo-ink-muted)]">
                                                     {template.body}

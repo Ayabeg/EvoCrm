@@ -21,6 +21,7 @@ export function ConversationList({
     onQueryChange,
     channel,
     onChannelChange,
+    channels,
     assignment,
     onAssignmentChange,
     showFilters = true,
@@ -35,6 +36,7 @@ export function ConversationList({
     onQueryChange?: (value: string) => void;
     channel?: string | null;
     onChannelChange?: (channel: string | null) => void;
+    channels?: readonly string[];
     assignment?: InboxAssignment;
     onAssignmentChange?: (value: InboxAssignment) => void;
     showFilters?: boolean;
@@ -91,7 +93,11 @@ export function ConversationList({
                         </SegmentedControl>
                     ) : null}
                     {onChannelChange ? (
-                        <ChannelFilter value={channel} onChange={onChannelChange} />
+                        <ChannelFilter
+                            value={channel}
+                            onChange={onChannelChange}
+                            channels={channels}
+                        />
                     ) : null}
                 </div>
             ) : null}
@@ -101,7 +107,7 @@ export function ConversationList({
                         density="panel"
                         icon={<Tray className="size-6" weight="regular" />}
                         title={emptyTitle ?? t('No open conversations here')}
-                        description={emptyDescription ?? t("You're all caught up.")}
+                        description={emptyDescription ?? t('inbox.empty.folder_description')}
                     />
                 </div>
             ) : (
