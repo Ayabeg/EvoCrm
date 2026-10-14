@@ -4,7 +4,8 @@
 **Workstream:** P0 SECURITY  
 **Branch:** `security/consolidated-remediation-20261014`  
 **Base:** `main` `6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd` (verified)  
-**Draft PR title:** `security: consolidated dependency remediation (supersedes #302/#306/#307 candidate)`
+**Draft PR title:** `security: consolidated dependency remediation (supersedes #302/#306/#307 candidate)`  
+**Head (after dev-only overrides):** `f83ffb2bd6076a562c4c21569a80969594a25108` (docs commit will follow)
 
 This branch is a **new** branch. PRs #302, #306, and #307 were **not** modified.
 
@@ -16,7 +17,7 @@ Audit JSON evidence: [`security/`](./security/)
 1. Root `package-lock.json` / `composer.lock` are the production installation boundary (not `mobile/` or `scripts/product-rebuild/`).
 2. “Minimal compatible” means the **first patched** versions that clear the current advisories, not the latest Laravel 13 / CommonMark patch.
 3. #307’s diagnostic workflow is complementary evidence tooling, not required to remediate the advisories.
-4. Dev-only npm findings stay visible (no suppressions) and get a follow-up plan only.
+4. Dev-only npm findings are remediations via **narrow overrides** (no suppressions, no `npm audit fix --force`, no eslint major).
 
 ---
 
@@ -142,10 +143,10 @@ Raw JSON: [`security/composer-audit-main.json`](./security/composer-audit-main.j
 
 | File | Source | Why |
 |---|---|---|
-| `package.json` | #302 | Drop unused `concurrently` |
-| `package-lock.json` | #302 (after live `npm uninstall` / `npm update` confirmed same versions) | Pin `source-map-js@1.2.2`, `dompurify@3.4.17`; remove `shell-quote` |
+| `package.json` | #302 + this follow-up | Drop unused `concurrently`; add narrow `overrides` for remaining dev-only advisories |
+| `package-lock.json` | #302 then `npm install` for overrides | Pin `source-map-js@1.2.2`, `dompurify@3.4.17`; remove `shell-quote`; pin `brace-expansion@1.1.21` / `5.0.12` and `js-yaml@4.3.2` |
 | `composer.lock` | #307 lockfile (after live pinned `composer update` confirmed same versions/SHAs) | First patched Laravel / CommonMark / phpseclib |
-| `docs/engineering-recovery/2026-10-14/**` | this workstream | Review, inventory, evidence, remaining plan |
+| `docs/engineering-recovery/2026-10-14/**` | this workstream | Review, inventory, evidence |
 
 **Not changed:** application code, `composer.json` constraints, CI workflows, audit policy, `mobile/*`, `scripts/product-rebuild/*`.  
 **Not copied:** #307 diagnostic workflow / summary script (complementary).  
@@ -161,36 +162,26 @@ Raw JSON: [`security/composer-audit-main.json`](./security/composer-audit-main.j
 |---|---|---|
 | `composer validate --strict --no-check-publish` | **PASS** (exit 0, `./composer.json is valid`) | — |
 | `composer audit --locked` (after) | **PASS** (exit 0, 0 advisories, 0 abandoned) | — |
-| `npm ci --ignore-scripts` (after #302 lock) | **PASS** (exit 0, 706 packages) | — |
-| `npm audit --omit=dev` (after) | **PASS** (exit 0, 0 vulnerabilities) | — |
-| `npm audit` (after) | **FAIL expected** — 2 high, both dev-only (`brace-expansion`, `js-yaml`) | 2 security vulnerability (dev-only; documented; not suppressed) |
+| `npm ci --ignore-scripts` (after #302 lock, then again after overrides) | **PASS** (exit 0, 706 packages) both times | — |
+| `npm audit --omit=dev` (after production remediations, and after overrides) | **PASS** (exit 0, 0 vulnerabilities) both times | — |
+| `npm audit` (after production remediations, before overrides) | **FAIL expected** — 2 high, both dev-only (`brace-expansion`, `js-yaml`) | 2 (cleared by overrides) |
+| `npm audit` (after overrides) | **PASS** (exit 0, **0 vulnerabilities**) | — |
 | Pest full (`php artisan test`) | **PASS** (exit 0): 1220 tests, **1219 passed**, 1 skipped, 1 risky, 34706 assertions, 124.5s. Matches #307’s clean-main assertion count (34706); passed count is +1 vs their 1218 (class: no product regression). Pre-existing PHP warnings in `EvoTicketsP1ModelTest` / `EvoTicketsP4DeskOpenTest` (`InvalidArgumentException` use has no effect) = **3**. | — |
-| Vitest (`npm test -- --run`) | **PASS** (exit 0): 27 files, **97 passed** | — |
-| `tsc --noEmit` (after `php artisan wayfinder:generate --with-form`) | **FAIL expected** (exit 2): **exactly 3 errors**, same files/messages as the stated main baseline: `dashboard-recent.tsx` (`dir` prop), `tablecn.tsx` (`EyeSlash`), `tablecn.tsx` (`sortableColumnIds`). | 3 pre-existing quality debt |
-| `vite build` | **PASS** (exit 0, 16.89s, 7730 modules). Wayfinder types generated during build. | — |
+| Vitest (`npm test -- --run`) after overrides | **PASS** (exit 0): 27 files, **97 passed** (same as pre-override) | — |
+| `tsc --noEmit` after overrides | **FAIL expected** (exit 2): **exactly 3 errors**, same files/messages as the main baseline: `dashboard-recent.tsx` (`dir` prop), `tablecn.tsx` (`EyeSlash`), `tablecn.tsx` (`sortableColumnIds`). | 3 pre-existing quality debt |
+| `vite build` after overrides | **PASS** (exit 0, 16.84s, 7730 modules) | — |
+| `npm run lint:check` after overrides | **FAIL expected** (exit 1): eslint **ran to completion** (no parse/crash from `js-yaml@4.3.2` / patched `brace-expansion`). **618 problems (615 errors, 3 warnings)**, almost all `@stylistic/padding-line-between-statements`. Pre-existing on main; not introduced by overrides. eslint remains **9.39.5**. | 3 pre-existing quality debt |
 
 Lockfile identity vs reviewed PRs:
 
-- `git diff c25fc559 -- package.json package-lock.json` → empty
+- `git diff c25fc559 -- package.json package-lock.json` → empty **before** the override follow-up; now differs only by the `overrides` block and the three patched transitive versions
 - `git diff 8d5bc10c -- composer.lock` → empty
 
 ---
 
-## 6. Remaining dev-only advisories — remediations plan
+## 6. Dev-only advisories — implemented overrides
 
-Do **not** suppress. Do **not** `npm audit fix --force`. Production audit is already clean.
-
-Patched releases **exist** (verified on npm 2026-10-14):
-
-- `brace-expansion@1.1.21` and `brace-expansion@5.0.12`
-- `js-yaml@4.3.2` (stay on 4.x; 5.x is a major)
-
-Direct parents are still on vulnerable ranges: `minimatch@3.1.5` (latest 3.x) and `minimatch@10.2.6` (latest 10.x); `eslint@9.39.5` is deprecated and latest eslint is **10.12.0** (major).
-
-**Recommended follow-up (separate PR):**
-
-1. Preview only: `npm update eslint typescript-eslint eslint-plugin-import --dry-run` and inspect whether transitives move. A default `npm update` is unlikely to pull `brace-expansion@1.1.21` / `5.0.12` because `minimatch` does not require them yet.
-2. If parents do not move, add **narrow overrides** (justified: two major lines of `brace-expansion` cannot share one version):
+Applied on this same branch (no `npm audit fix --force`, no eslint major, no suppressions):
 
 ```json
 "overrides": {
@@ -200,8 +191,17 @@ Direct parents are still on vulnerable ranges: `minimatch@3.1.5` (latest 3.x) an
 }
 ```
 
-3. `npm ci`, `npm audit --json`, `npm run lint:check`, Vitest. Do not jump `eslint` 9→10 in the same change.
-4. Review date: next dependency hygiene cycle after this PR merges. Classification until then: **2 security vulnerability** (dev-only, lint toolchain).
+Resolved tree after `npm ci`:
+
+| Package | Before | After | Via |
+|---|---|---|---|
+| brace-expansion | 1.1.18 | **1.1.21** | `minimatch@3.1.5` (`eslint-plugin-import`) |
+| brace-expansion | 5.0.9 | **5.0.12** | `minimatch@10.2.6` (`typescript-eslint`) |
+| js-yaml | 4.3.1 | **4.3.2** | `@eslint/eslintrc` (`eslint@9.39.5`) |
+
+Only those three package versions changed in the lockfile. `eslint` stays 9.39.5; `typescript-eslint` stays 8.67.0. Full `npm audit` is **0**.
+
+Parents still declare the old ranges (`minimatch` does not yet require the patched `brace-expansion`); the overrides are the justified pin. Evidence: [`security/npm-audit-full-after-overrides.json`](./security/npm-audit-full-after-overrides.json).
 
 ---
 
@@ -209,13 +209,13 @@ Direct parents are still on vulnerable ranges: `minimatch@3.1.5` (latest 3.x) an
 
 | PR | Disposition | Reason |
 |---|---|---|
-| **#302** | **Superseded** | This branch contains the same `package.json` + `package-lock.json` (identical). |
+| **#302** | **Superseded** | Production npm remediations are identical to #302; this branch then adds narrow overrides on top. |
 | **#306** | **Superseded** | CommonMark 2.10.2 is included via the #307 lockfile. #306’s Composer metadata rewrite is not needed and would conflict with #307. |
 | **#307** | **Superseded** for the lockfile remediations; **complementary** for the diagnostic workflow/script (not copied here). | Composer lock is identical to #307. The extra CI files are useful evidence tooling but are not required to clear the four advisories; this workstream stores audit JSON under `docs/`. |
 
 #306 and #307 remain **conflicting with each other** if both are merged independently. This PR is the single integration candidate.
 
-Post-test update: Pest, Vitest, and `vite build` passed on this branch. `tsc` matches the 3-error main baseline (class 3). Draft remains unmerged.
+Post-override update: full `npm audit` is 0. Vitest / vite build still pass. `tsc` still matches the 3-error baseline. eslint still reports the pre-existing 618 style problems and did not crash. Draft remains unmerged.
 
 ---
 
@@ -228,4 +228,4 @@ Post-test update: Pest, Vitest, and `vite build` passed on this branch. `tsc` ma
 5. infrastructure restriction  
 6. missing evidence  
 
-Used above: remaining npm full findings = **2**; #302/#306 CI not running audits = **6** (and **4** if a production audit gate is expected in `tests.yml`). Packagist was **not** class 5 in this environment.
+Used above: remaining npm full findings after overrides = **none**; eslint / tsc failures = **3**; #302/#306 CI not running audits = **6** (and **4** if a production audit gate is expected in `tests.yml`). Packagist was **not** class 5 in this environment.
