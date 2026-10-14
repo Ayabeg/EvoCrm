@@ -323,6 +323,10 @@ it('keeps Contacts list chrome off the broken tablecn module and on shared overf
         ->and($contacts)->not->toContain('crm-list/tablecn')
         ->and($contacts)->not->toContain('data-contact-tablecn');
 
+    expect(File::get(resource_path('css/approved-v02.css')))
+        ->not->toContain('data-contact-tablecn')
+        ->not->toContain("[data-tablecn='data-table']");
+
     expect($shell)->toContain('DataWorkspace')
         ->and($workspace)->toContain('PAGE_OVERFLOW_CLASS')
         ->and($keys)->toContain("'sort'")
