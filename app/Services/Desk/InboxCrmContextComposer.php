@@ -78,7 +78,7 @@ class InboxCrmContextComposer
 
         $now = DealAttentionEvaluator::now();
         $presentedDeals = $deals
-            ->map(function (Deal $deal) use ($scheduled, $now, $contact, $company): array {
+            ->map(function (Deal $deal) use ($scheduled, $now): array {
                 $dealScheduled = $scheduled
                     ->filter(fn (Activity $activity): bool => (int) $activity->deal_id === (int) $deal->id)
                     ->values();
