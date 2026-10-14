@@ -1,0 +1,250 @@
+{
+  "workstream": "P0-SECURITY",
+  "date": "2026-10-14",
+  "branch": "security/consolidated-remediation-20261014",
+  "base": {
+    "ref": "main",
+    "sha": "6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd",
+    "verified": true
+  },
+  "environment": {
+    "php": "8.3.6",
+    "composer": "2.10.3",
+    "node": "v22.14.0",
+    "npm": "10.9.9",
+    "packagist_blocked": false,
+    "github_archives_blocked": false,
+    "npm_registry_blocked": false
+  },
+  "pr_review": {
+    "302": {
+      "head": "c25fc5594aa3881336d6e8a0e13e6fc9c621fb8e",
+      "branch": "security/npm-dependency-remediation",
+      "state": "OPEN",
+      "draft": false,
+      "based_on_main": true,
+      "files": ["package.json", "package-lock.json"],
+      "disposition": "superseded",
+      "evidence_completeness": "partial",
+      "evidence_notes": [
+        "Author claimed npm audit --omit=dev clean",
+        "tests.yml CI SUCCESS does not run npm audit",
+        "No committed audit JSON"
+      ],
+      "reproducible": true,
+      "this_branch_identical_lockfiles": true
+    },
+    "306": {
+      "head": "a920963082993520a158e98f68fe631798c7e52a",
+      "branch": "security/composer-commonmark-remediation",
+      "state": "OPEN",
+      "draft": true,
+      "based_on_main": true,
+      "files": ["composer.lock"],
+      "disposition": "superseded",
+      "evidence_completeness": "incomplete",
+      "evidence_notes": [
+        "Author reported Packagist audit blocked (exit 100)",
+        "tests.yml CI SUCCESS does not run composer audit",
+        "Leaves laravel/framework and phpseclib unfixed",
+        "Adds unrelated lock metadata rewrite (plugin-api-version 2.6.0->2.9.0)"
+      ],
+      "reproducible": true,
+      "commonmark": {
+        "from": "2.10.0",
+        "to": "2.10.2",
+        "reference": "692e90b901877bdfd727e51270ce4394633c6e74",
+        "identical_to_307": true
+      }
+    },
+    "307": {
+      "head": "8d5bc10c1a9af6ab76686ff41f19920f7d376456",
+      "branch": "ci/composer-audit-diagnostics-20261014",
+      "state": "OPEN",
+      "draft": true,
+      "based_on_main": true,
+      "files": [
+        "composer.lock",
+        ".github/workflows/composer-audit-diagnostics.yml",
+        "scripts/ci/composer-audit-summary.py"
+      ],
+      "disposition": "superseded_for_lockfile_complementary_for_ci_diagnostics",
+      "evidence_completeness": "complete_for_composer",
+      "evidence_notes": [
+        "Dedicated composer-audit workflow passed on head (0 advisories, exit 0)",
+        "Existing tests CI SUCCESS",
+        "CI diagnostic files not copied onto this branch"
+      ],
+      "reproducible": true,
+      "this_branch_identical_composer_lock": true
+    },
+    "overlaps": {
+      "302_vs_306": "complementary",
+      "302_vs_307": "complementary",
+      "306_vs_307": "conflicting_on_composer_lock_metadata_compatible_on_commonmark"
+    }
+  },
+  "main_inventory": {
+    "composer": {
+      "command": "composer audit --locked --format=json --no-interaction",
+      "exit": 1,
+      "abandoned": 0,
+      "advisories": [
+        {
+          "package": "laravel/framework",
+          "version": "13.26.1",
+          "advisory": "PKSA-d5tc-s1qs-h781",
+          "cve": "CVE-2026-102279",
+          "ghsa": "GHSA-jh5r-qr3c-85q8",
+          "severity": "low",
+          "fixed": ">=13.30.0"
+        },
+        {
+          "package": "league/commonmark",
+          "version": "2.10.0",
+          "advisory": "PKSA-m2dq-1fhr-29b1",
+          "cve": null,
+          "ghsa": "GHSA-97jj-33gv-5xf9",
+          "severity": "medium",
+          "fixed": ">=2.10.2"
+        },
+        {
+          "package": "league/commonmark",
+          "version": "2.10.0",
+          "advisory": "PKSA-m4t9-vsgq-8khn",
+          "cve": null,
+          "ghsa": "GHSA-3q6v-r5mr-hxv8",
+          "severity": "high",
+          "fixed": ">=2.10.2"
+        },
+        {
+          "package": "phpseclib/phpseclib",
+          "version": "3.0.56",
+          "advisory": "PKSA-12sz-bcny-pk4m",
+          "cve": "CVE-2026-84308",
+          "ghsa": "GHSA-q97c-8qh3-fpc6",
+          "severity": "medium",
+          "fixed": ">=3.0.57"
+        }
+      ]
+    },
+    "npm_omit_dev": {
+      "command": "npm audit --omit=dev --json",
+      "exit": 1,
+      "totals": {"low": 1, "high": 1, "critical": 2, "total": 4},
+      "packages": ["concurrently", "shell-quote", "dompurify", "source-map-js"]
+    },
+    "npm_full": {
+      "command": "npm audit --json",
+      "exit": 1,
+      "totals": {"low": 1, "high": 3, "critical": 2, "total": 6},
+      "packages": ["brace-expansion", "concurrently", "dompurify", "js-yaml", "shell-quote", "source-map-js"]
+    }
+  },
+  "remediation": {
+    "strategy": "minimal_first_patched_versions_reusing_302_and_307_lockfiles_after_live_confirmation",
+    "unconstrained_composer_update_rejected": {
+      "laravel/framework": "13.36.0",
+      "league/commonmark": "2.10.3",
+      "laravel/prompts": "0.3.26",
+      "reason": "valid newer compatible set but not minimal"
+    },
+    "applied": {
+      "laravel/framework": {"from": "13.26.1", "to": "13.30.0", "reference": "9c008e7c9a64a8ea6d6e4f1683bd569acc10bf9e"},
+      "league/commonmark": {"from": "2.10.0", "to": "2.10.2", "reference": "692e90b901877bdfd727e51270ce4394633c6e74"},
+      "phpseclib/phpseclib": {"from": "3.0.56", "to": "3.0.57", "reference": "d17e0ddaeaf6f22f7e007cbb437d78792fe2a0e4"},
+      "concurrently": {"from": "10.0.5", "to": null},
+      "shell-quote": {"from": "1.9.0", "to": null},
+      "source-map-js": {"from": "1.2.1", "to": "1.2.2"},
+      "dompurify": {"from": "3.4.14", "to": "3.4.17"}
+    },
+    "downgrades": false,
+    "suppressions": false,
+    "overrides": false,
+    "unrelated_bumps": false,
+    "composer_json_changed": false,
+    "composer_content_hash": "7516b9f548565910050eb8c72a7f0f26",
+    "application_code_changed": false
+  },
+  "after_inventory": {
+    "composer": {
+      "command": "composer audit --locked --format=json --no-interaction",
+      "exit": 0,
+      "advisories": [],
+      "abandoned": []
+    },
+    "npm_omit_dev": {
+      "command": "npm audit --omit=dev --json",
+      "exit": 0,
+      "totals": {"low": 0, "high": 0, "critical": 0, "total": 0}
+    },
+    "npm_full": {
+      "command": "npm audit --json",
+      "exit": 1,
+      "totals": {"high": 2, "total": 2},
+      "remaining_dev_only": ["brace-expansion", "js-yaml"]
+    }
+  },
+  "remaining_dev_only_plan": {
+    "classification": 2,
+    "classification_label": "security vulnerability (dev-only lint toolchain)",
+    "do_not": ["suppress", "npm audit fix --force", "eslint 9->10 in same PR"],
+    "patched_releases_exist": {
+      "brace-expansion": ["1.1.21", "5.0.12"],
+      "js-yaml": "4.3.2"
+    },
+    "recommended_overrides": {
+      "minimatch@3": {"brace-expansion": "1.1.21"},
+      "minimatch@10": {"brace-expansion": "5.0.12"},
+      "js-yaml@4": "4.3.2"
+    },
+    "verify": ["npm ci", "npm audit --json", "npm run lint:check", "vitest"]
+  },
+  "validation": {
+    "composer_validate_strict": {"exit": 0, "status": "PASS"},
+    "lockfile_identity_vs_302": true,
+    "lockfile_identity_vs_307_composer": true,
+    "npm_ci": {"exit": 0, "status": "PASS"},
+    "composer_audit_after": {"exit": 0, "status": "PASS"},
+    "npm_audit_omit_dev_after": {"exit": 0, "status": "PASS"},
+    "npm_audit_full_after": {"exit": 1, "status": "EXPECTED_FAIL_DEV_ONLY", "classification": 2},
+    "pest": {"status": "PENDING_POST_PR"},
+    "vitest": {"status": "PENDING_POST_PR"},
+    "tsc": {"status": "PENDING_POST_PR", "expected_baseline_errors": 3, "expected_classification": 3},
+    "vite_build": {"status": "PENDING_POST_PR"}
+  },
+  "failure_classes": {
+    "1": "product regression",
+    "2": "security vulnerability",
+    "3": "pre-existing quality debt",
+    "4": "CI config defect",
+    "5": "infrastructure restriction",
+    "6": "missing evidence"
+  },
+  "commands": [
+    {"cmd": "git rev-parse HEAD on main", "result": "6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd", "exit": 0},
+    {"cmd": "composer audit --locked --format=json (main)", "exit": 1, "note": "4 advisories"},
+    {"cmd": "npm audit --omit=dev --json (main)", "exit": 1, "note": "4 production findings"},
+    {"cmd": "npm audit --json (main)", "exit": 1, "note": "6 findings"},
+    {"cmd": "npm uninstall concurrently --save && npm update source-map-js dompurify --save", "exit": 0},
+    {"cmd": "composer update laravel/framework:13.30.0 league/commonmark:2.10.2 phpseclib/phpseclib:3.0.57 --with-dependencies --minimal-changes --no-install --no-scripts", "exit": 0},
+    {"cmd": "composer validate --strict --no-check-publish", "exit": 0},
+    {"cmd": "composer audit --locked (after)", "exit": 0},
+    {"cmd": "npm ci --ignore-scripts (after)", "exit": 0},
+    {"cmd": "npm audit --omit=dev (after)", "exit": 0},
+    {"cmd": "npm audit (after)", "exit": 1, "note": "2 high dev-only"}
+  ],
+  "files_changed_expected": [
+    "package.json",
+    "package-lock.json",
+    "composer.lock",
+    "docs/engineering-recovery/2026-10-14/P0-SECURITY-CONSOLIDATED-REMEDIATION.md",
+    "docs/engineering-recovery/2026-10-14/P0-SECURITY-CONSOLIDATED-REMEDIATION.json",
+    "docs/engineering-recovery/2026-10-14/security/composer-audit-main.json",
+    "docs/engineering-recovery/2026-10-14/security/composer-audit-after.json",
+    "docs/engineering-recovery/2026-10-14/security/npm-audit-omit-dev-main.json",
+    "docs/engineering-recovery/2026-10-14/security/npm-audit-omit-dev-after.json",
+    "docs/engineering-recovery/2026-10-14/security/npm-audit-full-main.json",
+    "docs/engineering-recovery/2026-10-14/security/npm-audit-full-after.json"
+  ]
+}
