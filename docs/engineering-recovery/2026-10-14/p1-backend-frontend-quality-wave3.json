@@ -1,0 +1,184 @@
+{
+  "workstream": "P1 BACKEND/FRONTEND QUALITY + WAVE 3 RECOVERY",
+  "date": "2026-10-14",
+  "repo": "https://github.com/Evotechly/EvoCrm",
+  "baseline": {
+    "branch": "main",
+    "sha": "6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd"
+  },
+  "agent_branch": "test/wave3-gap-coverage-20261014",
+  "based_on_pr_303": false,
+  "historical_wave3_evidence": {
+    "valuable-branches-review.md": "UNVERIFIED",
+    "valuable-branches-matrix.json": "UNVERIFIED",
+    "integration-roadmap.md": "UNVERIFIED",
+    "historical-17-branch-inventory.json": "UNVERIFIED",
+    "windows_export": "UNAVAILABLE"
+  },
+  "open_prs_reverified": [
+    {"number": 300, "head": "71bf04bc", "branch": "codex/slice-a-certification", "base": "main", "draft": true, "ci": "SUCCESS"},
+    {"number": 301, "head": "41835567", "branch": "codex/development-os-v1", "base": "main", "draft": true, "ci": "Level 3 FAILURE; browser SKIPPED; Certification FAILURE"},
+    {"number": 302, "head": "c25fc559", "branch": "security/npm-dependency-remediation", "base": "main", "draft": false, "ci": "SUCCESS"},
+    {"number": 303, "head": "efb61fdb", "branch": "codex/wave3-selective-recovery", "base": "main", "draft": true, "ci": "SUCCESS"},
+    {"number": 304, "head": "21acf8aa", "branch": "cursor/pr301-ci-recovery-8574", "base": "codex/development-os-v1", "draft": true, "ci": "CONFLICTING; Level 3 FAILURE"},
+    {"number": 306, "head": "a9209630", "branch": "security/composer-commonmark-remediation", "base": "main", "draft": true, "ci": "SUCCESS"},
+    {"number": 307, "head": "8d5bc10c", "branch": "ci/composer-audit-diagnostics-20261014", "base": "main", "draft": true, "ci": "composer-audit + ci SUCCESS"}
+  ],
+  "baseline_checks": {
+    "composer_validate": {
+      "command": "composer validate --no-check-publish --strict",
+      "result": "PASS",
+      "detail": "./composer.json is valid"
+    },
+    "pest": {
+      "command": "php artisan test --log-junit=/tmp/baseline-pest.xml",
+      "result": "PASS",
+      "tests": 1220,
+      "passed": 1219,
+      "skipped": 1,
+      "risky": 1,
+      "failed": 0,
+      "assertions": 34706,
+      "unit": {"tests": 23, "assertions": 75},
+      "feature": {"tests": 1197, "assertions": 34631, "skipped": 1},
+      "skipped_tests": [
+        {
+          "name": "it loads every golden route in light 1440 and fails on denylisted copy",
+          "file": "tests/Feature/GoldenCopyGuardTest.php",
+          "reason": "Playwright is not installed at /tmp/pw.",
+          "classification": 5
+        }
+      ],
+      "risky_tests": [
+        {
+          "name": "it source-locks customer-facing chrome onto t() on critical screens",
+          "file": "tests/Feature/I18nFoundationTest.php",
+          "reason": "0 assertions — hardcoded-chrome regex never matches, so expect() never runs",
+          "classification": 3
+        }
+      ]
+    },
+    "pint": {
+      "command": "vendor/bin/pint --parallel --test",
+      "result": "FAIL",
+      "files": 25,
+      "classification": 3
+    },
+    "phpstan": {
+      "command": "vendor/bin/phpstan analyse --no-progress --memory-limit=1G",
+      "configured": true,
+      "config": "phpstan.neon level 7 + larastan/larastan",
+      "result": "FAIL",
+      "errors": 1670,
+      "classification": 3
+    },
+    "tsc": {
+      "command": "php artisan wayfinder:generate --with-form && npx tsc --noEmit",
+      "result": "FAIL",
+      "exit": 2,
+      "errors": 3,
+      "details": [
+        "resources/js/components/dashboard/dashboard-recent.tsx:53 — RecordLink has no 'dir' prop",
+        "resources/js/evo/data/crm-list/tablecn.tsx:20 — EyeSlash not exported from @/evo/icons",
+        "resources/js/evo/data/crm-list/tablecn.tsx:32 — sortableColumnIds not exported from @/lib/list-view-config"
+      ]
+    },
+    "vitest": {
+      "command": "npx vitest run",
+      "result": "PASS",
+      "files": 27,
+      "tests": 97
+    },
+    "eslint": {
+      "command": "npx eslint .",
+      "result": "FAIL",
+      "problems": 618,
+      "errors": 615,
+      "warnings": 3,
+      "fixable": 523,
+      "classification": 3
+    },
+    "prettier": {
+      "command": "npx prettier --check resources/",
+      "result": "FAIL",
+      "files": 505,
+      "classification": 3
+    },
+    "vite_build": {
+      "command": "npm run build",
+      "result": "PASS",
+      "duration_s": 26.0
+    },
+    "mobile": {
+      "typecheck": {"command": "npm run typecheck", "cwd": "mobile", "result": "PASS"},
+      "lint": {"command": "npm run lint", "cwd": "mobile", "result": "PASS"},
+      "unit": {"command": "npm test", "cwd": "mobile", "result": "PASS", "suites": 25, "tests": 90},
+      "config": {"command": "npm run config:check", "cwd": "mobile", "result": "PASS"},
+      "doctor": "NOT RUN — user asked tsc/lint/unit/config only",
+      "export_android": "NOT RUN — user asked tsc/lint/unit/config only"
+    }
+  },
+  "pr_303": {
+    "head": "efb61fdb",
+    "production_diff": false,
+    "tests": [
+      "it('keeps Inbox selection and reply authorization inside the current workspace')",
+      "it('stores an internal note and resolves the Inbox thread through the desk contract')",
+      "it('rejects invalid typed company attributes without persisting them')",
+      "it('does not expose or update a company from another workspace')"
+    ],
+    "duplicated_here": false
+  },
+  "coverage_map": {
+    "desk_inbox": {
+      "inertia_import": {"main": "partial", "pr_303": false, "this_pr": true, "missing": "build import-graph assertion"},
+      "workspace_isolation": {"main": "partial", "pr_303": "empty-inbox foreign thread", "this_pr": "mixed inbox", "missing": null},
+      "authorization": {"main": "workspace id only", "pr_303": "foreign reply 404", "this_pr": "desk.manage 403", "missing": null},
+      "compose_reply": {"main": "outbound + SMS", "pr_303": "note+resolve", "this_pr": false, "missing": "embed compose E2E"}
+    },
+    "contacts": {
+      "selection": {"main": "P03B/P04/P10", "pr_303": false, "this_pr": false, "missing": "HTTP bulk E2E"},
+      "saved_views": {"main": "view=my + save POST", "pr_303": false, "this_pr": "filter_id apply", "missing": "Playwright #300"},
+      "filtering": {"main": "CrmFilterTest", "pr_303": false, "this_pr": "saved filter apply", "missing": "FilterBar E2E #300"},
+      "url_state": {"main": "q/owner/created/page/view", "pr_303": false, "this_pr": "sort keys lock", "missing": "URL sort ignored — product regression"},
+      "quick_record": {"main": "P09/P10", "pr_303": false, "this_pr": false, "missing": "list peek E2E #300"},
+      "responsive": {"main": "P25 shared", "pr_303": false, "this_pr": "no tablecn + PAGE_OVERFLOW", "missing": "viewport E2E #300"}
+    },
+    "company_attributes": {
+      "authorized_updates": {"main": "happy path", "pr_303": "foreign 403/404", "this_pr": "crm.edit 403", "missing": null},
+      "type_validation": {"main": "required only", "pr_303": "invalid number", "this_pr": "invalid date+list", "missing": null},
+      "persistence": {"main": "dedicated PUT", "pr_303": "negative number", "this_pr": "main company PUT", "missing": null},
+      "workspace_isolation": {"main": false, "pr_303": true, "this_pr": false, "missing": "list attribute leak"},
+      "display": {"main": false, "pr_303": false, "this_pr": "company show attributes", "missing": null}
+    }
+  },
+  "tests_added_passing": [
+    "it('locks Desk Inbox Inertia imports to @inertiajs/react and excludes test harnesses')",
+    "it('does not select a foreign thread while listing the current workspace inbox')",
+    "it('refuses Desk reply when the member lacks desk.manage')",
+    "it('returns saved company attributes on the company show page')",
+    "it('rejects invalid date and list company attributes without persisting them')",
+    "it('forbids company attribute updates for members without crm.edit')",
+    "it('persists company attributes through the main company update route')",
+    "it('applies a saved Contacts filter through filter_id URL state')",
+    "it('keeps Contacts list chrome off the broken tablecn module and on shared overflow')"
+  ],
+  "tests_added_failing_product_regression": [
+    {
+      "name": "it('applies URL-owned Contacts sort and direction to the list')",
+      "file": "tests/Feature/Wave3ContactsUrlSortRegressionTest.php",
+      "classification": 1,
+      "reason": "CrmFilter::resolve() ignores request sort/direction; frontend writes ?sort=&direction="
+    }
+  ],
+  "quality_defects": [
+    {"id": "Q1", "classification": 1, "summary": "Contacts URL sort/direction ignored by CrmFilter::resolve()"},
+    {"id": "Q2", "classification": 1, "summary": "RecordLink drops dir=auto on dashboard recent titles"},
+    {"id": "Q3", "classification": 3, "summary": "Orphan tablecn.tsx missing EyeSlash and sortableColumnIds"},
+    {"id": "Q4", "classification": 3, "summary": "I18nFoundationTest chrome lock is risky with 0 assertions"},
+    {"id": "Q5", "classification": 3, "summary": "PHPStan 1670 errors at level 7"},
+    {"id": "Q6", "classification": 3, "summary": "Pint unused import in InboxCrmContextComposer"},
+    {"id": "Q7", "classification": 3, "summary": "ESLint 618 / Prettier 505 — cosmetic, do not mass-format"}
+  ],
+  "production_behavior_changed": false
+}
