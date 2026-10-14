@@ -4,6 +4,7 @@
 **Agent branch:** `test/wave3-gap-coverage-20261014`  
 **Baseline SHA:** `6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd` (`main`)  
 **Head SHA (pre-docs):** `3d6f12a63e2333c82136f735891d6c32b7c762f4`  
+**Review-fix SHA (pre-docs):** `2b6b541f820480c6904221f30830fa1d4e23bb1e`  
 **Repo:** https://github.com/Evotechly/EvoCrm  
 **Draft PR:** https://github.com/Evotechly/EvoCrm/pull/311  
 
@@ -149,7 +150,7 @@ Based on `main`, not #303.
 
 - `it('applies URL-owned Contacts sort and direction to the list')` — **PASS** (22 assertions)
 - Frontend contract (`resources/js/lib/list-query/serialize.ts`, P03C) writes `?sort=name&direction=asc`.
-- `CrmFilter::resolve()` now overlays request `sort`/`direction` via `resolveSort()` + `sortableFields()` whitelist.
+- `CrmFilter::resolve()` inlines the #300 overlay and emits `url_sort` / `url_direction`. Quote/lead no longer whitelist `subject`.
 
 **RecordLink dir lock — `tests/Feature/RecordLinkDirTest.php`**
 
@@ -161,9 +162,9 @@ Do **not** run Pint/Prettier/ESLint `--fix` across the tree. No PHPStan ignores.
 
 | ID | Defect | Class | Status | Commit |
 |----|--------|-------|--------|--------|
-| Q1 | Contacts URL `sort`/`direction` ignored | 1 product regression | **FIXED** — `CrmFilter::resolveSort()` overlays request `sort`/`direction` when the field is in `sortableFields($entity)`. Unknown fields fall back to saved/default. `?sort=name&direction=asc` now returns Amel then Zineb and `activeFilters.sort.field=name`. | `dcf5971e` |
+| Q1 | Contacts URL `sort`/`direction` ignored | 1 product regression | **FIXED** — #300-shaped inline overlay + `url_sort`/`url_direction`. Pagination/search/chips reconstruct via `fromActiveFilters`. | `dcf5971e` then `22ec1382` + `6c422829` |
 | Q2 | `RecordLink` dropped `dir="auto"` | 1 product regression (RTL/bidi) + 3 types | **FIXED** — optional `dir?: 'auto' \| 'ltr' \| 'rtl'` forwarded to drawer `<button>` and `<Link>`. Dashboard recent titles already pass `dir="auto"` (both rows). | `bd4c438c` |
-| Q3 | Orphan `tablecn.tsx` missing `EyeSlash` / `sortableColumnIds` | 3 quality debt | **DELETED** — no JS/TS importer (`rg` on `resources/js` is empty). Contacts stays on `CrmListShell` / `table.tsx`. CSS `[data-contact-tablecn]` leftovers in `approved-v02.css` are unused selectors, not typechecked. Deleting the file removed the 2 tsc errors. | `0273631c` |
+| Q3 | Orphan `tablecn.tsx` missing `EyeSlash` / `sortableColumnIds` | 3 quality debt | **DELETED** file (`0273631c`) then dead `[data-contact-tablecn]` CSS (`2b6b541f`). | `0273631c` + `2b6b541f` |
 | Q4 | `I18nFoundationTest` chrome lock risky (0 assertions) | 3 quality debt | **FIXED** — regex now matches `{t('…')}` children **or** leftover capitalized text. `expect($src)->toContain('t(')` per file + `expect($translated)->toBeGreaterThan(0)`. Probe found 75 `t()` children, **0 new hardcoded-chrome violations** (only allowed brand tokens). Allowed list was **not** weakened. Test now 88 assertions, not risky. | `588b3e3a` |
 | Q5 | PHPStan 1,670 errors at level 7 | 3 quality debt | **UNCHANGED** — left as debt. No ignores added. | — |
 | Q6 | Unused closure `use` in `InboxCrmContextComposer` (`lambda_not_used_import`) | 3 quality debt | **FIXED** — deal map now `use ($scheduled, $now)` only. `Gate` import stays (used). Pint `--test` on changed PHP files **PASS**. Other 24 Pint files not touched. | `3d6f12a6` |
@@ -232,7 +233,59 @@ Re-run after `3d6f12a6`. No mass-format. No PHPStan ignores. No gate changes.
 | `588b3e3a` | `test: make the i18n chrome lock assert real t() matches` |
 | `3d6f12a6` | `fix: drop unused closure imports in InboxCrmContextComposer` |
 
-CI on `3d6f12a6` (`tests` / job `ci`): **SUCCESS** (completed 2026-10-14T14:52:55Z). Docs-only follow-up commit will re-queue CI.
+CI on `3d6f12a6` (`tests` / job `ci`): **SUCCESS** (completed 2026-10-14T14:52:55Z). Docs-only follow-up `c9d7f10c` also **SUCCESS**.
+
+## Independent review response (#311 @ `c9d7f10c`)
+
+Focused commits on the same branch. No force. No gate changes.
+
+| Item | Commit | What landed |
+|------|--------|-------------|
+| 1 Pagination/search/chips drop URL sort | `22ec1382` + `6c422829` | `CrmFilter::resolve()` now matches #300's inline `$urlSort` / `$allowedSorts` / `$urlSortIsValid` and emits `url_sort`/`url_direction`. `fromActiveFilters` reads `url_sort ?? sort` / `url_direction ?? direction`. `listPageHref` / FilterBar / AdvancedFilterDrawer already go through that path; drawer already writes hidden `sort`/`direction`. |
+| 2 Real columns only | `22ec1382` | Quote: `created_at`, `status`. Lead: `created_at`, `status`, `title`. Ticket keeps `subject` (real column). Contact `name`/`company` and deal `amount` stay as established sort keys (join / `amount_cents`). |
+| 3 Pest edge cases | `69992bf9` | `Wave3UrlSortContractTest` — invalid field/direction, `sort[]`, injection-shaped values, `filter_id` + URL override, page=2 keeps `url_sort`, quote/lead `?sort=subject` → 200, source-lock. |
+| 4 Dead CSS | `2b6b541f` | Removed `[data-contact-tablecn]` block from `approved-v02.css`. |
+
+### Whitelist vs real columns
+
+| Entity | URL whitelist | Exists as |
+|--------|---------------|-----------|
+| contact | name, company, email, city, wilaya, created_at, last_activity_at | `name` → `first_name`/`last_name`; `company` → `companies.name` join; others are contact columns |
+| deal | title, amount, close_date, created_at, last_activity_at | `amount` → `amount_cents`; others are deal columns |
+| company | name, city, wilaya, created_at | company columns |
+| ticket | created_at, status, subject | ticket columns |
+| quote | created_at, status | quote columns — **no `subject`** |
+| lead | created_at, status, title | lead columns — **no `subject`** |
+
+### Review-fix verification (`2b6b541f`)
+
+| Command | Result |
+|---------|--------|
+| Pest `--log-junit=/tmp/review-pest.xml` | **PASS** — 1239 tests, 1238 passed, 1 skipped, 0 risky, 35,077 assertions (Unit 23/75, Feature 1216/35,002) |
+| Vitest | **PASS** — 27/97, 9.73s |
+| `wayfinder && tsc --noEmit` | **PASS** — exit 0 |
+| ESLint on `serialize.ts` + `list-query-contract.ts` | **PASS** |
+| `npm run build` | **PASS** — 25.53s |
+| Pint `--test` on changed PHP | **PASS** |
+
+### merge-tree
+
+| Against | Result |
+|---------|--------|
+| #309 `fc5c23c1` | **CLEAN** — `git merge-tree --write-tree HEAD fc5c23c1` exit 0, tree `afd4a4a4` |
+| #300 `71bf04bc` (`codex/slice-a-certification`) | **ONE conflict** — `app/Services/Crm/CrmFilter.php` only |
+
+Remaining #300 conflict (same `resolve()` region both sides edited):
+
+```
+ours:  $urlSort = is_string($urlSortRaw) ? trim($urlSortRaw) : '';
+       + company / ticket / quote / lead match arms (real columns)
+
+theirs: $urlSort = trim((string) $request->input('sort', ''));
+        contact + deal only, `default => []`
+```
+
+`url_sort` / `url_direction` keys and the rest of the inline overlay already match. `applySort` quote/lead split auto-merges (ours-only). `fromActiveFilters` matches #300 exactly (no conflict). Resolution when merging: keep the `is_string` guard (so `sort[]` does not become `"Array"`) and keep the extra real-column arms.
 
 ## Blockers
 

@@ -297,5 +297,56 @@
       "command": "vendor/bin/pint --test app/Services/Crm/CrmFilter.php app/Services/Desk/InboxCrmContextComposer.php tests/Feature/I18nFoundationTest.php tests/Feature/RecordLinkDirTest.php tests/Feature/Wave3ContactsUrlSortRegressionTest.php",
       "result": "PASS"
     }
+  },
+  "review_fix": {
+    "reviewed_head": "c9d7f10c045e1ba05343afc1b6cea3669f724a10",
+    "code_head": "2b6b541f820480c6904221f30830fa1d4e23bb1e",
+    "commits": [
+      {"sha": "22ec1382", "message": "fix: emit url_sort in CrmFilter using #300's resolve shape"},
+      {"sha": "6c422829", "message": "fix: reconstruct URL sort from url_sort in fromActiveFilters"},
+      {"sha": "69992bf9", "message": "test: cover URL sort ignore, override, pagination, and subject"},
+      {"sha": "2b6b541f", "message": "chore: drop dead data-contact-tablecn CSS after tablecn deletion"}
+    ],
+    "whitelist": {
+      "contact": ["name", "company", "email", "city", "wilaya", "created_at", "last_activity_at"],
+      "deal": ["title", "amount", "close_date", "created_at", "last_activity_at"],
+      "company": ["name", "city", "wilaya", "created_at"],
+      "ticket": ["created_at", "status", "subject"],
+      "quote": ["created_at", "status"],
+      "lead": ["created_at", "status", "title"]
+    },
+    "verification": {
+      "pest": {
+        "result": "PASS",
+        "tests": 1239,
+        "passed": 1238,
+        "skipped": 1,
+        "risky": 0,
+        "failed": 0,
+        "assertions": 35077,
+        "unit": {"tests": 23, "assertions": 75},
+        "feature": {"tests": 1216, "assertions": 35002}
+      },
+      "vitest": {"result": "PASS", "files": 27, "tests": 97, "duration_s": 9.73},
+      "tsc": {"result": "PASS", "exit": 0},
+      "eslint_changed": {
+        "command": "npx eslint resources/js/lib/list-query/serialize.ts resources/js/lib/list-query/list-query-contract.ts",
+        "result": "PASS"
+      },
+      "vite_build": {"result": "PASS", "duration_s": 25.53}
+    },
+    "merge_tree": {
+      "pr_309": {
+        "sha": "fc5c23c197f681f5384c4a4eb1d2994373447732",
+        "result": "CLEAN",
+        "tree": "afd4a4a47863cb047197ff00aa1f3f7839734a2a"
+      },
+      "pr_300": {
+        "sha": "71bf04bc51adc2e1515191a37677709e12dcbb89",
+        "result": "CONFLICT",
+        "files": ["app/Services/Crm/CrmFilter.php"],
+        "remaining": "is_string guard vs (string) cast; extra company/ticket/quote/lead whitelist arms vs contact+deal only"
+      }
+    }
   }
 }
