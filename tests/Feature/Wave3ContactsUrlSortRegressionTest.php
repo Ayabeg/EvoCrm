@@ -4,10 +4,8 @@ use App\Models\Contact;
 use App\Models\User;
 
 /**
- * Product regression: the list-query contract writes ?sort=&direction=
- * (see resources/js/lib/list-query/serialize.ts and P03C), but
- * CrmFilter::resolve() never reads those request keys. Leave this
- * failing until the backend overlays URL sort on the saved/default sort.
+ * URL-owned sort: list-query writes ?sort=&direction= (serialize.ts / P03C).
+ * CrmFilter::resolve() overlays those keys onto the saved/default sort.
  */
 it('applies URL-owned Contacts sort and direction to the list', function () {
     $user = User::factory()->create();

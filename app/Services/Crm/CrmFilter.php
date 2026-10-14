@@ -111,8 +111,49 @@ class CrmFilter
             'filter_id' => $saved?->id,
             'filter_groups' => $filterGroups,
             'columns' => $saved?->resolvedColumns() ?? ListViewConfig::normalizeColumns($entity, null),
-            'sort' => $saved?->resolvedSort() ?? ListViewConfig::defaultSort($entity),
+            'sort' => $this->resolveSort($entity, $request, $saved),
         ];
+    }
+
+    /**
+     * URL-owned sort overlays a saved-view or default sort. Unknown fields
+     * are ignored so `?sort=` cannot inject an unsortable column.
+     *
+     * @return array{field: string, direction: string}
+     */
+    private function resolveSort(string $entity, Request $request, ?SavedFilter $saved): array
+    {
+        $fallback = $saved?->resolvedSort() ?? ListViewConfig::defaultSort($entity);
+        $field = $request->query('sort');
+
+        if (! is_string($field)) {
+            return $fallback;
+        }
+
+        $field = trim($field);
+
+        if ($field === '' || ! in_array($field, $this->sortableFields($entity), true)) {
+            return $fallback;
+        }
+
+        return [
+            'field' => $field,
+            'direction' => $request->query('direction') === 'asc' ? 'asc' : 'desc',
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function sortableFields(string $entity): array
+    {
+        return match ($entity) {
+            'contact' => ['name', 'company', 'email', 'city', 'wilaya', 'created_at', 'last_activity_at'],
+            'deal' => ['title', 'amount', 'close_date', 'created_at', 'last_activity_at'],
+            'company' => ['name', 'city', 'wilaya', 'created_at'],
+            'ticket', 'quote', 'lead' => ['created_at', 'status', 'subject'],
+            default => [],
+        };
     }
 
     /**
