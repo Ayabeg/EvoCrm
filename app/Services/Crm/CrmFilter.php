@@ -82,6 +82,27 @@ class CrmFilter
 
         $filterGroups = $this->parseFilterGroups($request->input('filter_groups'), $fromSaved['filter_groups'] ?? null);
 
+        $sort = $saved?->resolvedSort() ?? ListViewConfig::defaultSort($entity);
+        $urlSortRaw = $request->input('sort');
+        $urlSort = is_string($urlSortRaw) ? trim($urlSortRaw) : '';
+        $allowedSorts = match ($entity) {
+            'contact' => ['name', 'company', 'email', 'city', 'wilaya', 'created_at', 'last_activity_at'],
+            'deal' => ['title', 'amount', 'close_date', 'created_at', 'last_activity_at'],
+            'company' => ['name', 'city', 'wilaya', 'created_at'],
+            'ticket' => ['created_at', 'status', 'subject'],
+            'quote' => ['created_at', 'status'],
+            'lead' => ['created_at', 'status', 'title'],
+            default => [],
+        };
+        $urlSortIsValid = $urlSort !== '' && in_array($urlSort, $allowedSorts, true);
+
+        if ($urlSortIsValid) {
+            $sort = [
+                'field' => $urlSort,
+                'direction' => $request->input('direction') === 'asc' ? 'asc' : 'desc',
+            ];
+        }
+
         return [
             'stage' => $request->input('stage', $fromSaved['stage'] ?? null),
             'q' => $request->string('q')->toString() ?: ($fromSaved['q'] ?? null),
@@ -111,7 +132,9 @@ class CrmFilter
             'filter_id' => $saved?->id,
             'filter_groups' => $filterGroups,
             'columns' => $saved?->resolvedColumns() ?? ListViewConfig::normalizeColumns($entity, null),
-            'sort' => $saved?->resolvedSort() ?? ListViewConfig::defaultSort($entity),
+            'sort' => $sort,
+            'url_sort' => $urlSortIsValid ? $urlSort : null,
+            'url_direction' => $urlSortIsValid ? $sort['direction'] : null,
         ];
     }
 
@@ -157,7 +180,13 @@ class CrmFilter
             'contact' => $this->applyContactSort($query, $field, $direction),
             'deal' => $this->applyDealSort($query, $field, $direction),
             'company' => $this->applyCompanySort($query, $field, $direction),
-            'ticket', 'quote', 'lead' => in_array($field, ['created_at', 'status', 'subject'], true)
+            'ticket' => in_array($field, ['created_at', 'status', 'subject'], true)
+                ? $query->orderBy($field, $direction)
+                : $query,
+            'quote' => in_array($field, ['created_at', 'status'], true)
+                ? $query->orderBy($field, $direction)
+                : $query,
+            'lead' => in_array($field, ['created_at', 'status', 'title'], true)
                 ? $query->orderBy($field, $direction)
                 : $query,
             default => $query,

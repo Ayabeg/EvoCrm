@@ -13,11 +13,13 @@ export function RecordLink({
     mode = 'full',
     children,
     className,
+    dir,
 }: {
     record: RecordRef;
     mode?: 'drawer' | 'full';
     children: ReactNode;
     className?: string;
+    dir?: 'auto' | 'ltr' | 'rtl';
 }) {
     const { openRecord } = useQuickRecord();
     const href = fullRecordHref(record);
@@ -27,6 +29,7 @@ export function RecordLink({
             <button
                 type="button"
                 className={className}
+                dir={dir}
                 onClick={(event) => {
                     openRecord(record, { opener: event.currentTarget });
                 }}
@@ -37,7 +40,7 @@ export function RecordLink({
     }
 
     return (
-        <Link href={href} className={className}>
+        <Link href={href} className={className} dir={dir}>
             {children}
         </Link>
     );

@@ -40,6 +40,8 @@ export type ActiveFilterBag = {
     filter_groups?: unknown;
     sort?: unknown;
     direction?: unknown;
+    url_sort?: unknown;
+    url_direction?: unknown;
     pipeline?: unknown;
 };
 
@@ -92,7 +94,10 @@ export function fromActiveFilters(
             attention: emptyToNull(filters.attention),
         },
         filterGroups: parseFilterGroups(filters.filter_groups),
-        sort: parseUrlSort(filters.sort, filters.direction),
+        sort: parseUrlSort(
+            filters.url_sort ?? filters.sort,
+            filters.url_direction ?? filters.direction,
+        ),
         extras: extrasFromInput({
             pipeline: extra?.pipeline ?? toOptionalNumber(filters.pipeline),
         }),

@@ -335,11 +335,25 @@ it('source-locks customer-facing chrome onto t() on critical screens', function 
         'Google',
     ];
 
+    $translated = 0;
+
     foreach ($files as $file) {
         $src = (string) file_get_contents($file);
-        preg_match_all('/(?<![=])>\s*([A-Z][A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\'’ ,.—?-]{0,70})\s*</u', $src, $matches);
 
-        foreach ($matches[1] as $text) {
+        expect($src)->toContain('t(');
+
+        preg_match_all(
+            '/(?<![=])>\s*(?:\{t\(\s*[\'"]([^\'"]+)[\'"]\s*\)\}|([A-Z][A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\'’ ,.—?-]{0,70}))\s*</u',
+            $src,
+            $matches,
+        );
+
+        foreach (array_filter($matches[1]) as $key) {
+            $translated++;
+            expect($key)->not->toBe('');
+        }
+
+        foreach ($matches[2] as $text) {
             $text = trim($text);
 
             if ($text === '' || in_array($text, $allowed, true) || str_starts_with($text, '{')) {
@@ -352,6 +366,8 @@ it('source-locks customer-facing chrome onto t() on critical screens', function 
             );
         }
     }
+
+    expect($translated)->toBeGreaterThan(0);
 });
 
 it('rejects leftover physical directional Tailwind classes in evo chrome', function () {
