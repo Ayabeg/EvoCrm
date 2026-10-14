@@ -518,6 +518,6 @@
     "docs/engineering-recovery/2026-10-14/security/npm-audit-full-after-overrides.json",
     "docs/engineering-recovery/2026-10-14/security/npm-audit-omit-dev-after-overrides.json"
   ],
-  "head": "9503eb4c464eb6b94f1242d3a289064332084361",
+  "head": "aeb7d36724585f5409596838483cec8c51fd86d7",
   "overrides_commit": "f83ffb2bd6076a562c4c21569a80969594a25108"
 }

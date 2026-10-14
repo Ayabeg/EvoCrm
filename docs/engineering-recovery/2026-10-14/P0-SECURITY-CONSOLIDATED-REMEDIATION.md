@@ -5,7 +5,7 @@
 **Branch:** `security/consolidated-remediation-20261014`  
 **Base:** `main` `6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd` (verified)  
 **Draft PR title:** `security: consolidated dependency remediation (supersedes #302/#306/#307 candidate)`  
-**Head:** `9503eb4c464eb6b94f1242d3a289064332084361`
+**Head:** `aeb7d36724585f5409596838483cec8c51fd86d7` (tip after override remediations + evidence; overrides commit `f83ffb2b`)
 
 This branch is a **new** branch. PRs #302, #306, and #307 were **not** modified.
 
