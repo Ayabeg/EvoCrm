@@ -33,6 +33,8 @@ it('applies URL-owned Contacts sort and direction to the list', function () {
             ->where('contacts.1.id', $zeta->id)
             ->where('activeFilters.sort.field', 'name')
             ->where('activeFilters.sort.direction', 'asc')
+            ->where('activeFilters.url_sort', 'name')
+            ->where('activeFilters.url_direction', 'asc')
             ->where('listView.sort.field', 'name')
             ->where('listView.sort.direction', 'asc')
         );
