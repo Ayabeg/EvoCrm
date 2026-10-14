@@ -7,6 +7,8 @@
     "sha": "6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd"
   },
   "agent_branch": "test/wave3-gap-coverage-20261014",
+  "head_sha_pre_docs": "3d6f12a63e2333c82136f735891d6c32b7c762f4",
+  "draft_pr": "https://github.com/Evotechly/EvoCrm/pull/311",
   "based_on_pr_303": false,
   "historical_wave3_evidence": {
     "valuable-branches-review.md": "UNVERIFIED",
@@ -140,7 +142,7 @@
       "selection": {"main": "P03B/P04/P10", "pr_303": false, "this_pr": false, "missing": "HTTP bulk E2E"},
       "saved_views": {"main": "view=my + save POST", "pr_303": false, "this_pr": "filter_id apply", "missing": "Playwright #300"},
       "filtering": {"main": "CrmFilterTest", "pr_303": false, "this_pr": "saved filter apply", "missing": "FilterBar E2E #300"},
-      "url_state": {"main": "q/owner/created/page/view", "pr_303": false, "this_pr": "sort keys lock", "missing": "URL sort ignored — product regression"},
+      "url_state": {"main": "q/owner/created/page/view", "pr_303": false, "this_pr": "sort keys lock + URL sort overlay (Q1 fixed)", "missing": "Playwright sort/saved-view flow #300"},
       "quick_record": {"main": "P09/P10", "pr_303": false, "this_pr": false, "missing": "list peek E2E #300"},
       "responsive": {"main": "P25 shared", "pr_303": false, "this_pr": "no tablecn + PAGE_OVERFLOW", "missing": "viewport E2E #300"}
     },
@@ -163,24 +165,35 @@
     "it('applies a saved Contacts filter through filter_id URL state')",
     "it('keeps Contacts list chrome off the broken tablecn module and on shared overflow')"
   ],
-  "tests_added_failing_product_regression": [
+  "tests_added_now_passing_after_fix": [
     {
       "name": "it('applies URL-owned Contacts sort and direction to the list')",
       "file": "tests/Feature/Wave3ContactsUrlSortRegressionTest.php",
       "classification": 1,
-      "reason": "CrmFilter::resolve() ignores request sort/direction; frontend writes ?sort=&direction="
+      "status": "PASS",
+      "assertions": 22,
+      "fix_commit": "dcf5971e"
+    },
+    {
+      "name": "it('passes dir through RecordLink so dashboard recent titles isolate bidi')",
+      "file": "tests/Feature/RecordLinkDirTest.php",
+      "classification": 1,
+      "status": "PASS",
+      "assertions": 4,
+      "fix_commit": "bd4c438c"
     }
   ],
   "quality_defects": [
-    {"id": "Q1", "classification": 1, "summary": "Contacts URL sort/direction ignored by CrmFilter::resolve()"},
-    {"id": "Q2", "classification": 1, "summary": "RecordLink drops dir=auto on dashboard recent titles"},
-    {"id": "Q3", "classification": 3, "summary": "Orphan tablecn.tsx missing EyeSlash and sortableColumnIds"},
-    {"id": "Q4", "classification": 3, "summary": "I18nFoundationTest chrome lock is risky with 0 assertions"},
-    {"id": "Q5", "classification": 3, "summary": "PHPStan 1670 errors at level 7"},
-    {"id": "Q6", "classification": 3, "summary": "Pint unused import in InboxCrmContextComposer"},
-    {"id": "Q7", "classification": 3, "summary": "ESLint 618 / Prettier 505 — cosmetic, do not mass-format"}
+    {"id": "Q1", "classification": 1, "status": "FIXED", "commit": "dcf5971e", "summary": "Contacts URL sort/direction ignored by CrmFilter::resolve() — overlay + whitelist"},
+    {"id": "Q2", "classification": 1, "status": "FIXED", "commit": "bd4c438c", "summary": "RecordLink optional dir forwarded; dashboard recent uses dir=auto"},
+    {"id": "Q3", "classification": 3, "status": "FIXED", "commit": "0273631c", "summary": "Deleted unreferenced tablecn.tsx; cleared 2 tsc errors"},
+    {"id": "Q4", "classification": 3, "status": "FIXED", "commit": "588b3e3a", "summary": "I18n chrome lock regex now matches t() children; 88 assertions; 0 new violations; allowed list not weakened"},
+    {"id": "Q5", "classification": 3, "status": "UNCHANGED", "commit": null, "summary": "PHPStan 1670 errors at level 7 — left as debt, no ignores"},
+    {"id": "Q6", "classification": 3, "status": "FIXED", "commit": "3d6f12a6", "summary": "Dropped unused $contact/$company closure imports in InboxCrmContextComposer"},
+    {"id": "Q7", "classification": 3, "status": "UNCHANGED", "commit": null, "summary": "ESLint 618 / Prettier 505 — cosmetic, do not mass-format"}
   ],
-  "production_behavior_changed": false,
+  "production_behavior_changed": true,
+  "production_behavior_notes": "Q1 Contacts URL sort now honored; Q2 RecordLink forwards dir; Q3 deleted unused tablecn.tsx; Q6 unused closure imports only",
   "this_pr_verification": {
     "wave3_gap_coverage": {
       "command": "php artisan test --filter=Wave3GapCoverageTest",
@@ -198,6 +211,90 @@
     },
     "pint_new_tests": {
       "command": "vendor/bin/pint --test tests/Feature/Wave3GapCoverageTest.php tests/Feature/Wave3ContactsUrlSortRegressionTest.php",
+      "result": "PASS"
+    }
+  },
+  "focused_fix_commits": [
+    {"sha": "dcf5971e", "message": "fix: honor URL sort and direction in CrmFilter::resolve"},
+    {"sha": "bd4c438c", "message": "fix: pass optional dir through RecordLink for bidi titles"},
+    {"sha": "0273631c", "message": "chore: delete unreferenced tablecn Contacts table"},
+    {"sha": "588b3e3a", "message": "test: make the i18n chrome lock assert real t() matches"},
+    {"sha": "3d6f12a6", "message": "fix: drop unused closure imports in InboxCrmContextComposer"}
+  ],
+  "post_fix_verification": {
+    "head": "3d6f12a63e2333c82136f735891d6c32b7c762f4",
+    "ci_on_that_head": {
+      "workflow": "tests",
+      "check": "ci",
+      "conclusion": "SUCCESS",
+      "completed_at": "2026-10-14T14:52:55Z",
+      "details_url": "https://github.com/Evotechly/EvoCrm/actions/runs/38583904252/job/115920660443"
+    },
+    "pest": {
+      "command": "php artisan test --log-junit=/tmp/post-fix-pest.xml",
+      "result": "PASS",
+      "tests": 1231,
+      "passed": 1230,
+      "skipped": 1,
+      "risky": 0,
+      "failed": 0,
+      "assertions": 34934,
+      "unit": {"tests": 23, "assertions": 75},
+      "feature": {"tests": 1208, "assertions": 34859, "skipped": 1},
+      "duration_ms": 137826,
+      "skipped_tests": [
+        {
+          "name": "it loads every golden route in light 1440 and fails on denylisted copy",
+          "file": "tests/Feature/GoldenCopyGuardTest.php",
+          "reason": "Playwright is not installed at /tmp/pw.",
+          "classification": 5
+        }
+      ],
+      "risky_tests": []
+    },
+    "contacts_url_sort": {
+      "command": "php artisan test --filter=Wave3ContactsUrlSortRegressionTest",
+      "result": "PASS",
+      "assertions": 22
+    },
+    "record_link_dir": {
+      "command": "php artisan test --filter=RecordLinkDirTest",
+      "result": "PASS",
+      "assertions": 4
+    },
+    "i18n_chrome_lock": {
+      "result": "PASS",
+      "assertions": 88,
+      "translated_t_children": 75,
+      "new_hardcoded_violations": 0,
+      "allowed_list_weakened": false,
+      "no_longer_risky": true
+    },
+    "vitest": {
+      "command": "npx vitest run",
+      "result": "PASS",
+      "files": 27,
+      "tests": 97,
+      "duration_s": 8.46
+    },
+    "tsc": {
+      "command": "php artisan wayfinder:generate --with-form && npx tsc --noEmit",
+      "result": "PASS",
+      "exit": 0,
+      "errors": 0
+    },
+    "eslint_changed": {
+      "command": "npx eslint resources/js/ds/workspace/quick-record/RecordLink.tsx resources/js/components/dashboard/dashboard-recent.tsx",
+      "result": "PASS",
+      "exit": 0
+    },
+    "vite_build": {
+      "command": "npm run build",
+      "result": "PASS",
+      "duration_s": 25.23
+    },
+    "pint_changed_php": {
+      "command": "vendor/bin/pint --test app/Services/Crm/CrmFilter.php app/Services/Desk/InboxCrmContextComposer.php tests/Feature/I18nFoundationTest.php tests/Feature/RecordLinkDirTest.php tests/Feature/Wave3ContactsUrlSortRegressionTest.php",
       "result": "PASS"
     }
   }

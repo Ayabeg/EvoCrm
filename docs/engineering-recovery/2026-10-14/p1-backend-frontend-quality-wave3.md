@@ -3,7 +3,9 @@
 **Date:** 2026-10-14  
 **Agent branch:** `test/wave3-gap-coverage-20261014`  
 **Baseline SHA:** `6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd` (`main`)  
+**Head SHA (pre-docs):** `3d6f12a63e2333c82136f735891d6c32b7c762f4`  
 **Repo:** https://github.com/Evotechly/EvoCrm  
+**Draft PR:** https://github.com/Evotechly/EvoCrm/pull/311  
 
 This report is the live-repo evidence for workstream P1. Windows-only Wave 3 export under `C:\Users\Moham\.codex\branch-audits\EvoCrm\2026-10-13\wave5a-evidence-export` was not available. Historical conclusions from that tree are **UNVERIFIED**.
 
@@ -111,7 +113,7 @@ Legend: **main** = live tests on `6ba4f7c`. **#303** = only on that PR. **this P
 | Selection | P03B / P04 / P10 source + props | — | — | HTTP bulk selection E2E |
 | Saved views | `view=my` (CrmSavedViewTest); save POST | — | `filter_id` applies saved city filter | Playwright saved-view flow (lives on #300) |
 | Filtering | CrmFilterTest wilaya/unanswered/unassigned | — | saved-filter apply | browser FilterBar E2E (#300) |
-| URL state | P03C `q/owner/created/page/view` | — | keys lock for `sort`/`direction` | **URL sort is ignored by backend — failing test in a later commit** |
+| URL state | P03C `q/owner/created/page/view` | — | keys lock + `Wave3ContactsUrlSortRegressionTest` now **PASS** after Q1 overlay | Playwright sort/saved-view flow (#300) |
 | QuickRecord | P09 / P10 | — | — | list-row peek E2E (#300) |
 | Responsive | P25 shared overflow | — | contacts stay on CrmListShell / PAGE_OVERFLOW; not `tablecn` | viewport E2E 1440→390 (#300) |
 
@@ -143,30 +145,31 @@ Based on `main`, not #303.
 8. Contacts `filter_id` URL applies a saved view
 9. Contacts chrome stays off orphan `tablecn.tsx` and on shared overflow / sort keys
 
-**Failing product regression (separate commit) — `tests/Feature/Wave3ContactsUrlSortRegressionTest.php`**
+**Was failing (now green after Q1) — `tests/Feature/Wave3ContactsUrlSortRegressionTest.php`**
 
-- `it('applies URL-owned Contacts sort and direction to the list')`
+- `it('applies URL-owned Contacts sort and direction to the list')` — **PASS** (22 assertions)
 - Frontend contract (`resources/js/lib/list-query/serialize.ts`, P03C) writes `?sort=name&direction=asc`.
-- `CrmFilter::resolve()` sets `'sort' => $saved?->resolvedSort() ?? ListViewConfig::defaultSort($entity)` and **never reads** request `sort` / `direction`.
-- Classification: **1 product regression**.
+- `CrmFilter::resolve()` now overlays request `sort`/`direction` via `resolveSort()` + `sortableFields()` whitelist.
 
-No production files were changed to make tests pass.
+**RecordLink dir lock — `tests/Feature/RecordLinkDirTest.php`**
 
-## Genuine quality defects (not cosmetic) — proposed focused fixes
+- `it('passes dir through RecordLink so dashboard recent titles isolate bidi')` — **PASS** (4 assertions)
 
-Do **not** run Pint/Prettier/ESLint `--fix` across the tree.
+## Genuine quality defects — focused-fix status
 
-| ID | Defect | Class | Proposed focused fix |
-|----|--------|-------|----------------------|
-| Q1 | Contacts URL `sort`/`direction` ignored | 1 product regression | In `CrmFilter::resolve()`, overlay `parseUrlSort($request->input('sort'), $request->input('direction'))` on top of saved/default sort. Covered by the failing test. |
-| Q2 | `RecordLink` drops `dir="auto"` (`dashboard-recent.tsx:53`) | 1 product regression (RTL/bidi) + 3 types | Add optional `dir?: string` to `RecordLink` and pass it to the button/`Link`. |
-| Q3 | Orphan `tablecn.tsx` imports missing `EyeSlash` and `sortableColumnIds` | 3 quality debt | Either delete unused `tablecn.tsx` or re-export the symbols and wire it. Contacts production path is `table.tsx`. |
-| Q4 | `I18nFoundationTest` chrome lock is risky (0 assertions) | 3 quality debt | Tighten the regex or assert `expect($matches)->not->toBeEmpty()` per file so the lock is real. |
-| Q5 | PHPStan 1,670 errors at level 7 | 3 quality debt | Incremental: start with `argument.type` / `property.notFound` on Eloquent `Model` in `RunOutboundSequences` (typed relations). Do not add ignores. |
-| Q6 | Pint unused import in `InboxCrmContextComposer` (`lambda_not_used_import`) | 3 quality debt | Remove the unused import only. Do not Pint the other 24 style files in the same change. |
-| Q7 | ESLint 618 / Prettier 505 | 3 cosmetic | Out of scope. Do not mass-format. |
+Do **not** run Pint/Prettier/ESLint `--fix` across the tree. No PHPStan ignores. No CI gate changes.
 
-Pint 25 files and ESLint/Prettier counts are **not** treated as product regressions.
+| ID | Defect | Class | Status | Commit |
+|----|--------|-------|--------|--------|
+| Q1 | Contacts URL `sort`/`direction` ignored | 1 product regression | **FIXED** — `CrmFilter::resolveSort()` overlays request `sort`/`direction` when the field is in `sortableFields($entity)`. Unknown fields fall back to saved/default. `?sort=name&direction=asc` now returns Amel then Zineb and `activeFilters.sort.field=name`. | `dcf5971e` |
+| Q2 | `RecordLink` dropped `dir="auto"` | 1 product regression (RTL/bidi) + 3 types | **FIXED** — optional `dir?: 'auto' \| 'ltr' \| 'rtl'` forwarded to drawer `<button>` and `<Link>`. Dashboard recent titles already pass `dir="auto"` (both rows). | `bd4c438c` |
+| Q3 | Orphan `tablecn.tsx` missing `EyeSlash` / `sortableColumnIds` | 3 quality debt | **DELETED** — no JS/TS importer (`rg` on `resources/js` is empty). Contacts stays on `CrmListShell` / `table.tsx`. CSS `[data-contact-tablecn]` leftovers in `approved-v02.css` are unused selectors, not typechecked. Deleting the file removed the 2 tsc errors. | `0273631c` |
+| Q4 | `I18nFoundationTest` chrome lock risky (0 assertions) | 3 quality debt | **FIXED** — regex now matches `{t('…')}` children **or** leftover capitalized text. `expect($src)->toContain('t(')` per file + `expect($translated)->toBeGreaterThan(0)`. Probe found 75 `t()` children, **0 new hardcoded-chrome violations** (only allowed brand tokens). Allowed list was **not** weakened. Test now 88 assertions, not risky. | `588b3e3a` |
+| Q5 | PHPStan 1,670 errors at level 7 | 3 quality debt | **UNCHANGED** — left as debt. No ignores added. | — |
+| Q6 | Unused closure `use` in `InboxCrmContextComposer` (`lambda_not_used_import`) | 3 quality debt | **FIXED** — deal map now `use ($scheduled, $now)` only. `Gate` import stays (used). Pint `--test` on changed PHP files **PASS**. Other 24 Pint files not touched. | `3d6f12a6` |
+| Q7 | ESLint 618 / Prettier 505 | 3 cosmetic | **UNCHANGED** — out of scope. ESLint on changed TS (`RecordLink.tsx`, `dashboard-recent.tsx`) **PASS**. | — |
+
+Pint 25 files (baseline) and tree-wide ESLint/Prettier counts are **not** treated as product regressions.
 
 ## Commands run (baseline)
 
@@ -187,15 +190,49 @@ cd mobile && npm test                                  → PASS 25/90
 cd mobile && npm run config:check                      → PASS
 ```
 
-## Verification of this PR
+## Verification of this PR (pre-fix, historical)
 
 | Command | Result |
 |---------|--------|
 | `php artisan test --filter=Wave3GapCoverageTest` | **PASS** — 9 tests, 116 assertions |
-| `php artisan test --filter=Wave3ContactsUrlSortRegressionTest` | **FAIL** (expected) — `activeFilters.sort.field` is `created_at`, expected `name` |
+| `php artisan test --filter=Wave3ContactsUrlSortRegressionTest` | **FAIL** (was expected) — `activeFilters.sort.field` is `created_at`, expected `name` |
 | `vendor/bin/pint --test` on the two new test files | **PASS** |
 
-The URL-sort failure is the product regression (Q1). It is left red.
+## Post-fix verification (after Q1/Q2/Q3/Q4/Q6)
+
+Re-run after `3d6f12a6`. No mass-format. No PHPStan ignores. No gate changes.
+
+| Command | Result | Notes |
+|---------|--------|-------|
+| `php artisan test --log-junit=/tmp/post-fix-pest.xml` | **PASS** | 1231 tests, 1230 passed, 1 skipped, **0 risky**, 0 failed, 34,934 assertions. Unit 23/75. Feature 1208/34,859. Duration 137.8s. |
+| `Wave3ContactsUrlSortRegressionTest` | **PASS** | 22 assertions. `activeFilters.sort.field=name`, Amel then Zineb. |
+| `RecordLinkDirTest` | **PASS** | 4 assertions. |
+| `I18nFoundationTest` chrome lock | **PASS** | 88 assertions (was 0 / risky). Not in JUnit risky list. |
+| `Wave3GapCoverageTest` | **PASS** | 9 tests still green, including the `tablecn` absence lock. |
+| `npx vitest run` | **PASS** | 27 files / 97 tests, 8.46s. |
+| `php artisan wayfinder:generate --with-form && npx tsc --noEmit` | **PASS** | exit 0, empty output. Baseline's 3 errors are gone (Q2 + Q3). |
+| `npx eslint` on `RecordLink.tsx` + `dashboard-recent.tsx` | **PASS** | exit 0. Tree-wide ESLint not re-run (Q7 left as debt). |
+| `npm run build` | **PASS** | built in 25.23s. Chunk-size warnings only. |
+| `vendor/bin/pint --test` on changed PHP | **PASS** | `CrmFilter.php`, `InboxCrmContextComposer.php`, `I18nFoundationTest.php`, `RecordLinkDirTest.php`, `Wave3ContactsUrlSortRegressionTest.php`. |
+
+### Pest skipped / risky after fixes
+
+| Kind | Test | Why |
+|------|------|-----|
+| Skipped | `GoldenCopyGuardTest` / `it loads every golden route in light 1440 and fails on denylisted copy` | Playwright missing at `/tmp/pw`. Classification: **5 infrastructure restriction**. Unchanged. |
+| Risky | — | **None.** Chrome lock is no longer vacuous. |
+
+### Focused-fix commits (one each, normal push, no force)
+
+| SHA | Message |
+|-----|---------|
+| `dcf5971e` | `fix: honor URL sort and direction in CrmFilter::resolve` |
+| `bd4c438c` | `fix: pass optional dir through RecordLink for bidi titles` |
+| `0273631c` | `chore: delete unreferenced tablecn Contacts table` |
+| `588b3e3a` | `test: make the i18n chrome lock assert real t() matches` |
+| `3d6f12a6` | `fix: drop unused closure imports in InboxCrmContextComposer` |
+
+CI on `3d6f12a6` (`tests` / job `ci`): **SUCCESS** (completed 2026-10-14T14:52:55Z). Docs-only follow-up commit will re-queue CI.
 
 ## Blockers
 
@@ -203,3 +240,4 @@ The URL-sort failure is the product regression (Q1). It is left red.
 - PR #303 is the right place for the four recovered tests; do not merge it from this workstream.
 - PHP/Composer were missing on the agent image (installed for this run only).
 - Golden-copy Pest skip needs Playwright at `/tmp/pw`.
+- Q5 PHPStan 1,670 and Q7 tree-wide ESLint/Prettier remain quality debt. Not in this PR.
