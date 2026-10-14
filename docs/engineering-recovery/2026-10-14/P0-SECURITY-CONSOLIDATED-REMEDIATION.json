@@ -23,7 +23,10 @@
       "state": "OPEN",
       "draft": false,
       "based_on_main": true,
-      "files": ["package.json", "package-lock.json"],
+      "files": [
+        "package.json",
+        "package-lock.json"
+      ],
       "disposition": "superseded",
       "evidence_completeness": "partial",
       "evidence_notes": [
@@ -41,7 +44,9 @@
       "state": "OPEN",
       "draft": true,
       "based_on_main": true,
-      "files": ["composer.lock"],
+      "files": [
+        "composer.lock"
+      ],
       "disposition": "superseded",
       "evidence_completeness": "incomplete",
       "evidence_notes": [
@@ -132,14 +137,36 @@
     "npm_omit_dev": {
       "command": "npm audit --omit=dev --json",
       "exit": 1,
-      "totals": {"low": 1, "high": 1, "critical": 2, "total": 4},
-      "packages": ["concurrently", "shell-quote", "dompurify", "source-map-js"]
+      "totals": {
+        "low": 1,
+        "high": 1,
+        "critical": 2,
+        "total": 4
+      },
+      "packages": [
+        "concurrently",
+        "shell-quote",
+        "dompurify",
+        "source-map-js"
+      ]
     },
     "npm_full": {
       "command": "npm audit --json",
       "exit": 1,
-      "totals": {"low": 1, "high": 3, "critical": 2, "total": 6},
-      "packages": ["brace-expansion", "concurrently", "dompurify", "js-yaml", "shell-quote", "source-map-js"]
+      "totals": {
+        "low": 1,
+        "high": 3,
+        "critical": 2,
+        "total": 6
+      },
+      "packages": [
+        "brace-expansion",
+        "concurrently",
+        "dompurify",
+        "js-yaml",
+        "shell-quote",
+        "source-map-js"
+      ]
     }
   },
   "remediation": {
@@ -151,22 +178,62 @@
       "reason": "valid newer compatible set but not minimal"
     },
     "applied": {
-      "laravel/framework": {"from": "13.26.1", "to": "13.30.0", "reference": "9c008e7c9a64a8ea6d6e4f1683bd569acc10bf9e"},
-      "league/commonmark": {"from": "2.10.0", "to": "2.10.2", "reference": "692e90b901877bdfd727e51270ce4394633c6e74"},
-      "phpseclib/phpseclib": {"from": "3.0.56", "to": "3.0.57", "reference": "d17e0ddaeaf6f22f7e007cbb437d78792fe2a0e4"},
-      "concurrently": {"from": "10.0.5", "to": null},
-      "shell-quote": {"from": "1.9.0", "to": null},
-      "source-map-js": {"from": "1.2.1", "to": "1.2.2"},
-      "dompurify": {"from": "3.4.14", "to": "3.4.17"},
-      "brace-expansion@1": {"from": "1.1.18", "to": "1.1.21", "via": "minimatch@3"},
-      "brace-expansion@5": {"from": "5.0.9", "to": "5.0.12", "via": "minimatch@10"},
-      "js-yaml": {"from": "4.3.1", "to": "4.3.2", "via": "js-yaml@4 override"}
+      "laravel/framework": {
+        "from": "13.26.1",
+        "to": "13.30.0",
+        "reference": "9c008e7c9a64a8ea6d6e4f1683bd569acc10bf9e"
+      },
+      "league/commonmark": {
+        "from": "2.10.0",
+        "to": "2.10.2",
+        "reference": "692e90b901877bdfd727e51270ce4394633c6e74"
+      },
+      "phpseclib/phpseclib": {
+        "from": "3.0.56",
+        "to": "3.0.57",
+        "reference": "d17e0ddaeaf6f22f7e007cbb437d78792fe2a0e4"
+      },
+      "concurrently": {
+        "from": "10.0.5",
+        "to": null
+      },
+      "shell-quote": {
+        "from": "1.9.0",
+        "to": null
+      },
+      "source-map-js": {
+        "from": "1.2.1",
+        "to": "1.2.2"
+      },
+      "dompurify": {
+        "from": "3.4.14",
+        "to": "3.4.17"
+      },
+      "brace-expansion@1": {
+        "from": "1.1.18",
+        "to": "1.1.21",
+        "via": "minimatch@3"
+      },
+      "brace-expansion@5": {
+        "from": "5.0.9",
+        "to": "5.0.12",
+        "via": "minimatch@10"
+      },
+      "js-yaml": {
+        "from": "4.3.1",
+        "to": "4.3.2",
+        "via": "js-yaml@4 override"
+      }
     },
     "downgrades": false,
     "suppressions": false,
     "overrides": {
-      "minimatch@3": {"brace-expansion": "1.1.21"},
-      "minimatch@10": {"brace-expansion": "5.0.12"},
+      "minimatch@3": {
+        "brace-expansion": "1.1.21"
+      },
+      "minimatch@10": {
+        "brace-expansion": "5.0.12"
+      },
       "js-yaml@4": "4.3.2"
     },
     "audit_fix_force": false,
@@ -186,12 +253,24 @@
     "npm_omit_dev": {
       "command": "npm audit --omit=dev --json",
       "exit": 0,
-      "totals": {"low": 0, "high": 0, "critical": 0, "total": 0}
+      "totals": {
+        "low": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
     },
     "npm_full": {
       "command": "npm audit --json",
       "exit": 0,
-      "totals": {"info": 0, "low": 0, "moderate": 0, "high": 0, "critical": 0, "total": 0},
+      "totals": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
       "remaining_dev_only": []
     }
   },
@@ -201,25 +280,57 @@
     "audit_fix_force": false,
     "eslint_stayed_at": "9.39.5",
     "applied_overrides": {
-      "minimatch@3": {"brace-expansion": "1.1.21"},
-      "minimatch@10": {"brace-expansion": "5.0.12"},
+      "minimatch@3": {
+        "brace-expansion": "1.1.21"
+      },
+      "minimatch@10": {
+        "brace-expansion": "5.0.12"
+      },
       "js-yaml@4": "4.3.2"
     },
     "lockfile_version_changes_only": [
-      ["node_modules/brace-expansion", "1.1.18", "1.1.21"],
-      ["node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion", "5.0.9", "5.0.12"],
-      ["node_modules/js-yaml", "4.3.1", "4.3.2"]
+      [
+        "node_modules/brace-expansion",
+        "1.1.18",
+        "1.1.21"
+      ],
+      [
+        "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion",
+        "5.0.9",
+        "5.0.12"
+      ],
+      [
+        "node_modules/js-yaml",
+        "4.3.1",
+        "4.3.2"
+      ]
     ]
   },
   "validation": {
-    "composer_validate_strict": {"exit": 0, "status": "PASS"},
+    "composer_validate_strict": {
+      "exit": 0,
+      "status": "PASS"
+    },
     "lockfile_identity_vs_302": false,
     "lockfile_identity_vs_302_before_overrides": true,
     "lockfile_identity_vs_307_composer": true,
-    "npm_ci": {"exit": 0, "status": "PASS"},
-    "composer_audit_after": {"exit": 0, "status": "PASS"},
-    "npm_audit_omit_dev_after": {"exit": 0, "status": "PASS"},
-    "npm_audit_full_after": {"exit": 0, "status": "PASS", "note": "0 after overrides; was 2 high dev-only before overrides"},
+    "npm_ci": {
+      "exit": 0,
+      "status": "PASS"
+    },
+    "composer_audit_after": {
+      "exit": 0,
+      "status": "PASS"
+    },
+    "npm_audit_omit_dev_after": {
+      "exit": 0,
+      "status": "PASS"
+    },
+    "npm_audit_full_after": {
+      "exit": 0,
+      "status": "PASS",
+      "note": "0 after overrides; was 2 high dev-only before overrides"
+    },
     "eslint_lint_check": {
       "status": "EXPECTED_FAIL_BASELINE",
       "exit": 1,
@@ -241,7 +352,12 @@
       "main_baseline_assertions": 34706,
       "classification": null
     },
-    "vitest": {"status": "PASS", "exit": 0, "files": 27, "passed": 97},
+    "vitest": {
+      "status": "PASS",
+      "exit": 0,
+      "files": 27,
+      "passed": 97
+    },
     "tsc": {
       "status": "EXPECTED_FAIL_BASELINE",
       "exit": 2,
@@ -254,7 +370,12 @@
         "resources/js/evo/data/crm-list/tablecn.tsx(32,23): TS2305 sortableColumnIds"
       ]
     },
-    "vite_build": {"status": "PASS", "exit": 0, "duration_s": 16.84, "modules": 7730}
+    "vite_build": {
+      "status": "PASS",
+      "exit": 0,
+      "duration_s": 16.84,
+      "modules": 7730
+    }
   },
   "failure_classes": {
     "1": "product regression",
@@ -265,31 +386,122 @@
     "6": "missing evidence"
   },
   "commands": [
-    {"cmd": "git rev-parse HEAD on main", "result": "6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd", "exit": 0},
-    {"cmd": "composer audit --locked --format=json (main)", "exit": 1, "note": "4 advisories"},
-    {"cmd": "npm audit --omit=dev --json (main)", "exit": 1, "note": "4 production findings"},
-    {"cmd": "npm audit --json (main)", "exit": 1, "note": "6 findings"},
-    {"cmd": "npm uninstall concurrently --save && npm update source-map-js dompurify --save", "exit": 0},
-    {"cmd": "composer update laravel/framework:13.30.0 league/commonmark:2.10.2 phpseclib/phpseclib:3.0.57 --with-dependencies --minimal-changes --no-install --no-scripts", "exit": 0},
-    {"cmd": "composer validate --strict --no-check-publish", "exit": 0},
-    {"cmd": "composer audit --locked (after)", "exit": 0},
-    {"cmd": "npm ci --ignore-scripts (after)", "exit": 0},
-    {"cmd": "npm audit --omit=dev (after)", "exit": 0},
-    {"cmd": "npm audit (after)", "exit": 1, "note": "2 high dev-only"},
-    {"cmd": "composer install --no-interaction --prefer-dist --no-progress", "exit": 0, "note": "163 installs; laravel/framework v13.30.0, commonmark 2.10.2, phpseclib 3.0.57"},
-    {"cmd": "php artisan wayfinder:generate --with-form", "exit": 0},
-    {"cmd": "npx tsc --noEmit", "exit": 2, "note": "exactly 3 pre-existing errors"},
-    {"cmd": "npm test -- --run", "exit": 0, "note": "97 passed / 27 files"},
-    {"cmd": "npm run build", "exit": 0, "note": "vite 8.2.2, 7730 modules, 16.89s"},
-    {"cmd": "php artisan test", "exit": 0, "note": "1219 passed, 1 skipped, 1 risky, 34706 assertions"},
-    {"cmd": "npm install --ignore-scripts --no-audit --no-fund (apply overrides)", "exit": 0, "note": "changed 3 packages only"},
-    {"cmd": "npm ci --ignore-scripts (after overrides)", "exit": 0},
-    {"cmd": "npm audit --omit=dev (after overrides)", "exit": 0},
-    {"cmd": "npm audit (after overrides)", "exit": 0, "note": "0 vulnerabilities"},
-    {"cmd": "npm test -- --run (after overrides)", "exit": 0, "note": "97 passed / 27 files"},
-    {"cmd": "npx tsc --noEmit (after overrides)", "exit": 2, "note": "exactly 3 pre-existing errors"},
-    {"cmd": "npm run build (after overrides)", "exit": 0, "note": "7730 modules, 16.84s"},
-    {"cmd": "npm run lint:check (after overrides)", "exit": 1, "note": "618 pre-existing problems; eslint 9.39.5; no crash"}
+    {
+      "cmd": "git rev-parse HEAD on main",
+      "result": "6ba4f7c6c818c9a3d72cf56ec2069601d84c2edd",
+      "exit": 0
+    },
+    {
+      "cmd": "composer audit --locked --format=json (main)",
+      "exit": 1,
+      "note": "4 advisories"
+    },
+    {
+      "cmd": "npm audit --omit=dev --json (main)",
+      "exit": 1,
+      "note": "4 production findings"
+    },
+    {
+      "cmd": "npm audit --json (main)",
+      "exit": 1,
+      "note": "6 findings"
+    },
+    {
+      "cmd": "npm uninstall concurrently --save && npm update source-map-js dompurify --save",
+      "exit": 0
+    },
+    {
+      "cmd": "composer update laravel/framework:13.30.0 league/commonmark:2.10.2 phpseclib/phpseclib:3.0.57 --with-dependencies --minimal-changes --no-install --no-scripts",
+      "exit": 0
+    },
+    {
+      "cmd": "composer validate --strict --no-check-publish",
+      "exit": 0
+    },
+    {
+      "cmd": "composer audit --locked (after)",
+      "exit": 0
+    },
+    {
+      "cmd": "npm ci --ignore-scripts (after)",
+      "exit": 0
+    },
+    {
+      "cmd": "npm audit --omit=dev (after)",
+      "exit": 0
+    },
+    {
+      "cmd": "npm audit (after)",
+      "exit": 1,
+      "note": "2 high dev-only"
+    },
+    {
+      "cmd": "composer install --no-interaction --prefer-dist --no-progress",
+      "exit": 0,
+      "note": "163 installs; laravel/framework v13.30.0, commonmark 2.10.2, phpseclib 3.0.57"
+    },
+    {
+      "cmd": "php artisan wayfinder:generate --with-form",
+      "exit": 0
+    },
+    {
+      "cmd": "npx tsc --noEmit",
+      "exit": 2,
+      "note": "exactly 3 pre-existing errors"
+    },
+    {
+      "cmd": "npm test -- --run",
+      "exit": 0,
+      "note": "97 passed / 27 files"
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "note": "vite 8.2.2, 7730 modules, 16.89s"
+    },
+    {
+      "cmd": "php artisan test",
+      "exit": 0,
+      "note": "1219 passed, 1 skipped, 1 risky, 34706 assertions"
+    },
+    {
+      "cmd": "npm install --ignore-scripts --no-audit --no-fund (apply overrides)",
+      "exit": 0,
+      "note": "changed 3 packages only"
+    },
+    {
+      "cmd": "npm ci --ignore-scripts (after overrides)",
+      "exit": 0
+    },
+    {
+      "cmd": "npm audit --omit=dev (after overrides)",
+      "exit": 0
+    },
+    {
+      "cmd": "npm audit (after overrides)",
+      "exit": 0,
+      "note": "0 vulnerabilities"
+    },
+    {
+      "cmd": "npm test -- --run (after overrides)",
+      "exit": 0,
+      "note": "97 passed / 27 files"
+    },
+    {
+      "cmd": "npx tsc --noEmit (after overrides)",
+      "exit": 2,
+      "note": "exactly 3 pre-existing errors"
+    },
+    {
+      "cmd": "npm run build (after overrides)",
+      "exit": 0,
+      "note": "7730 modules, 16.84s"
+    },
+    {
+      "cmd": "npm run lint:check (after overrides)",
+      "exit": 1,
+      "note": "618 pre-existing problems; eslint 9.39.5; no crash"
+    }
   ],
   "files_changed_expected": [
     "package.json",
@@ -305,5 +517,7 @@
     "docs/engineering-recovery/2026-10-14/security/npm-audit-full-after.json",
     "docs/engineering-recovery/2026-10-14/security/npm-audit-full-after-overrides.json",
     "docs/engineering-recovery/2026-10-14/security/npm-audit-omit-dev-after-overrides.json"
-  ]
+  ],
+  "head": "9503eb4c464eb6b94f1242d3a289064332084361",
+  "overrides_commit": "f83ffb2bd6076a562c4c21569a80969594a25108"
 }
