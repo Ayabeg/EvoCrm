@@ -187,6 +187,16 @@ cd mobile && npm test                                  → PASS 25/90
 cd mobile && npm run config:check                      → PASS
 ```
 
+## Verification of this PR
+
+| Command | Result |
+|---------|--------|
+| `php artisan test --filter=Wave3GapCoverageTest` | **PASS** — 9 tests, 116 assertions |
+| `php artisan test --filter=Wave3ContactsUrlSortRegressionTest` | **FAIL** (expected) — `activeFilters.sort.field` is `created_at`, expected `name` |
+| `vendor/bin/pint --test` on the two new test files | **PASS** |
+
+The URL-sort failure is the product regression (Q1). It is left red.
+
 ## Blockers
 
 - Historical Wave 3 inventory artifacts: **UNVERIFIED / absent**.

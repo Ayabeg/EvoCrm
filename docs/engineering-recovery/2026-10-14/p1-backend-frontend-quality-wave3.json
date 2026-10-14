@@ -180,5 +180,25 @@
     {"id": "Q6", "classification": 3, "summary": "Pint unused import in InboxCrmContextComposer"},
     {"id": "Q7", "classification": 3, "summary": "ESLint 618 / Prettier 505 — cosmetic, do not mass-format"}
   ],
-  "production_behavior_changed": false
+  "production_behavior_changed": false,
+  "this_pr_verification": {
+    "wave3_gap_coverage": {
+      "command": "php artisan test --filter=Wave3GapCoverageTest",
+      "result": "PASS",
+      "tests": 9,
+      "assertions": 116
+    },
+    "contacts_url_sort_regression": {
+      "command": "php artisan test --filter=Wave3ContactsUrlSortRegressionTest",
+      "result": "FAIL",
+      "expected_fail": true,
+      "actual_sort_field": "created_at",
+      "expected_sort_field": "name",
+      "classification": 1
+    },
+    "pint_new_tests": {
+      "command": "vendor/bin/pint --test tests/Feature/Wave3GapCoverageTest.php tests/Feature/Wave3ContactsUrlSortRegressionTest.php",
+      "result": "PASS"
+    }
+  }
 }
