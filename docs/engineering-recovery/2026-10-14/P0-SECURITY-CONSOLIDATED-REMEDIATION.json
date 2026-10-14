@@ -208,10 +208,32 @@
     "composer_audit_after": {"exit": 0, "status": "PASS"},
     "npm_audit_omit_dev_after": {"exit": 0, "status": "PASS"},
     "npm_audit_full_after": {"exit": 1, "status": "EXPECTED_FAIL_DEV_ONLY", "classification": 2},
-    "pest": {"status": "PENDING_POST_PR"},
-    "vitest": {"status": "PENDING_POST_PR"},
-    "tsc": {"status": "PENDING_POST_PR", "expected_baseline_errors": 3, "expected_classification": 3},
-    "vite_build": {"status": "PENDING_POST_PR"}
+    "pest": {
+      "status": "PASS",
+      "exit": 0,
+      "tests": 1220,
+      "passed": 1219,
+      "skipped": 1,
+      "risky": 1,
+      "assertions": 34706,
+      "duration_ms": 124516,
+      "main_baseline_assertions": 34706,
+      "classification": null
+    },
+    "vitest": {"status": "PASS", "exit": 0, "files": 27, "passed": 97},
+    "tsc": {
+      "status": "EXPECTED_FAIL_BASELINE",
+      "exit": 2,
+      "error_count": 3,
+      "expected_baseline_errors": 3,
+      "classification": 3,
+      "errors": [
+        "resources/js/components/dashboard/dashboard-recent.tsx(53,33): TS2322 dir prop",
+        "resources/js/evo/data/crm-list/tablecn.tsx(20,44): TS2305 EyeSlash",
+        "resources/js/evo/data/crm-list/tablecn.tsx(32,23): TS2305 sortableColumnIds"
+      ]
+    },
+    "vite_build": {"status": "PASS", "exit": 0, "duration_s": 16.89, "modules": 7730}
   },
   "failure_classes": {
     "1": "product regression",
@@ -232,7 +254,13 @@
     {"cmd": "composer audit --locked (after)", "exit": 0},
     {"cmd": "npm ci --ignore-scripts (after)", "exit": 0},
     {"cmd": "npm audit --omit=dev (after)", "exit": 0},
-    {"cmd": "npm audit (after)", "exit": 1, "note": "2 high dev-only"}
+    {"cmd": "npm audit (after)", "exit": 1, "note": "2 high dev-only"},
+    {"cmd": "composer install --no-interaction --prefer-dist --no-progress", "exit": 0, "note": "163 installs; laravel/framework v13.30.0, commonmark 2.10.2, phpseclib 3.0.57"},
+    {"cmd": "php artisan wayfinder:generate --with-form", "exit": 0},
+    {"cmd": "npx tsc --noEmit", "exit": 2, "note": "exactly 3 pre-existing errors"},
+    {"cmd": "npm test -- --run", "exit": 0, "note": "97 passed / 27 files"},
+    {"cmd": "npm run build", "exit": 0, "note": "vite 8.2.2, 7730 modules, 16.89s"},
+    {"cmd": "php artisan test", "exit": 0, "note": "1219 passed, 1 skipped, 1 risky, 34706 assertions"}
   ],
   "files_changed_expected": [
     "package.json",

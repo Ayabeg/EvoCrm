@@ -164,10 +164,10 @@ Raw JSON: [`security/composer-audit-main.json`](./security/composer-audit-main.j
 | `npm ci --ignore-scripts` (after #302 lock) | **PASS** (exit 0, 706 packages) | — |
 | `npm audit --omit=dev` (after) | **PASS** (exit 0, 0 vulnerabilities) | — |
 | `npm audit` (after) | **FAIL expected** — 2 high, both dev-only (`brace-expansion`, `js-yaml`) | 2 security vulnerability (dev-only; documented; not suppressed) |
-| Pest full | see post-PR update | — |
-| Vitest | see post-PR update | — |
-| `tsc --noEmit` | see post-PR update; expected baseline = 3 pre-existing errors | 3 pre-existing quality debt if only those 3 |
-| `vite build` | see post-PR update | — |
+| Pest full (`php artisan test`) | **PASS** (exit 0): 1220 tests, **1219 passed**, 1 skipped, 1 risky, 34706 assertions, 124.5s. Matches #307’s clean-main assertion count (34706); passed count is +1 vs their 1218 (class: no product regression). Pre-existing PHP warnings in `EvoTicketsP1ModelTest` / `EvoTicketsP4DeskOpenTest` (`InvalidArgumentException` use has no effect) = **3**. | — |
+| Vitest (`npm test -- --run`) | **PASS** (exit 0): 27 files, **97 passed** | — |
+| `tsc --noEmit` (after `php artisan wayfinder:generate --with-form`) | **FAIL expected** (exit 2): **exactly 3 errors**, same files/messages as the stated main baseline: `dashboard-recent.tsx` (`dir` prop), `tablecn.tsx` (`EyeSlash`), `tablecn.tsx` (`sortableColumnIds`). | 3 pre-existing quality debt |
+| `vite build` | **PASS** (exit 0, 16.89s, 7730 modules). Wayfinder types generated during build. | — |
 
 Lockfile identity vs reviewed PRs:
 
@@ -215,7 +215,7 @@ Direct parents are still on vulnerable ranges: `minimatch@3.1.5` (latest 3.x) an
 
 #306 and #307 remain **conflicting with each other** if both are merged independently. This PR is the single integration candidate.
 
-Do not merge this draft until Pest / Vitest / tsc / vite evidence in the post-test update is reviewed.
+Post-test update: Pest, Vitest, and `vite build` passed on this branch. `tsc` matches the 3-error main baseline (class 3). Draft remains unmerged.
 
 ---
 
