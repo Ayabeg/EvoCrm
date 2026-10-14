@@ -431,8 +431,41 @@ export function runP03CQueryProofs(): void {
             direction: 'desc',
             page: 3,
         }).sort?.field === 'amount' &&
-            fromActiveFilters({ sort: { field: 'created_at', direction: 'desc' } }).sort === null,
+            fromActiveFilters({ sort: { field: 'created_at', direction: 'desc' } }).sort === null &&
+            fromActiveFilters({
+                url_sort: 'name',
+                url_direction: 'asc',
+                sort: { field: 'created_at', direction: 'desc' },
+                page: 2,
+            }).sort?.field === 'name' &&
+            fromActiveFilters({
+                url_sort: 'name',
+                url_direction: 'asc',
+                sort: { field: 'created_at', direction: 'desc' },
+                page: 2,
+            }).sort?.direction === 'asc',
         'URL sort/direction reconstructed; saved-view sort object is not URL-owned',
+    );
+    const urlSortPageHref = listQueryHref(
+        '/crm/contacts',
+        patchListQuery(
+            fromActiveFilters({
+                q: 'amel',
+                url_sort: 'name',
+                url_direction: 'asc',
+                sort: { field: 'created_at', direction: 'desc' },
+            }),
+            { page: 2 },
+        ),
+        'contact',
+    );
+    assert(
+        urlSortPageHref.includes('sort=name') &&
+            urlSortPageHref.includes('direction=asc') &&
+            urlSortPageHref.includes('page=2') &&
+            urlSortPageHref.includes('q=amel') &&
+            !urlSortPageHref.includes('created_at'),
+        'page nav from url_sort props keeps URL sort and drops saved-view sort object',
     );
 }
 
