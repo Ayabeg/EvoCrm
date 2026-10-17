@@ -1,5 +1,5 @@
 import { Form, Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import { SkeletonRecord } from '@/components/crm/empty-room';
@@ -120,6 +120,7 @@ export default function TicketShow({
     const loading = useInertiaLoading();
     const [mode, setMode] = useState<'reply' | 'note'>('reply');
     const [replyBody, setReplyBody] = useState('');
+    const [knowledgeQuery, setKnowledgeQuery] = useState('');
     const action = `/crm/tickets/${ticket.id}`;
     const askAction = `/crm/tickets/${ticket.id}/ask`;
     const contact = associations?.contact ?? ticket.contact ?? null;
@@ -130,6 +131,31 @@ export default function TicketShow({
         ? `${contact.first_name} ${contact.last_name ?? ''}`.trim()
         : 'No contact';
     const closed = path.complete;
+    const filteredKnowledgeArticles = useMemo(() => {
+        const query = knowledgeQuery.trim().toLowerCase();
+
+        if (!query) {
+            return knowledgeArticles;
+        }
+
+        return knowledgeArticles.filter((article) =>
+            [
+                article.title,
+                article.category,
+                article.excerpt,
+                ...(article.tags ?? []),
+            ]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase()
+                .includes(query),
+        );
+    }, [knowledgeArticles, knowledgeQuery]);
+    const replyLabel = thread?.channel?.toLowerCase().includes('email')
+        ? 'Send email'
+        : thread?.channel?.toLowerCase().includes('whatsapp')
+          ? 'Send on WhatsApp'
+          : 'Send message';
 
     function selectPath(step: string) {
         if (closed || step === path.current) {
@@ -482,9 +508,25 @@ export default function TicketShow({
                                                                 Inserts a draft
                                                             </span>
                                                         </div>
-                                                        <div className="mt-1.5 flex flex-wrap gap-1.5">
-                                                            {knowledgeArticles.map(
-                                                                (article) => (
+                                                        <input
+                                                            aria-label="Search knowledge"
+                                                            value={
+                                                                knowledgeQuery
+                                                            }
+                                                            onChange={(event) =>
+                                                                setKnowledgeQuery(
+                                                                    event.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Search help articles"
+                                                            className="mt-1.5 h-8 w-full rounded border border-hairline bg-canvas px-2 text-[12px] text-ink outline-none placeholder:text-mute focus:border-brand"
+                                                        />
+                                                        {filteredKnowledgeArticles.length >
+                                                        0 ? (
+                                                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                                                                {filteredKnowledgeArticles.map(
+                                                                    (article) => (
                                                                     <button
                                                                         key={
                                                                             article.id
@@ -506,9 +548,15 @@ export default function TicketShow({
                                                                     >
                                                                         {article.title}
                                                                     </button>
-                                                                ),
-                                                            )}
-                                                        </div>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="mt-1.5 text-[11px] text-mute">
+                                                                No matching help
+                                                                articles.
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 ) : null}
                                                 <Textarea
@@ -533,7 +581,7 @@ export default function TicketShow({
                                                     >
                                                         {mode === 'note'
                                                             ? 'Add note'
-                                                            : 'Send on WhatsApp'}
+                                                            : replyLabel}
                                                     </Button>
                                                 </div>
                                             </DeskGlass>
