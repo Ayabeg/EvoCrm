@@ -43,6 +43,17 @@ class ContactController extends Controller
 
         [$contactRows, $paginator] = $filter->paginate($query, $request);
 
+        $qualityContacts = Contact::query()->forWorkspace($workspace);
+        $dataQuality = [
+            'missing_contact' => (clone $qualityContacts)
+                ->whereNull('email')
+                ->whereNull('phone_e164')
+                ->count(),
+            'missing_company' => (clone $qualityContacts)->whereNull('company_id')->count(),
+            'unassigned' => (clone $qualityContacts)->whereNull('owner_id')->count(),
+            'missing_source' => (clone $qualityContacts)->whereNull('source')->count(),
+        ];
+
         return Inertia::render('crm/contacts/index', [
             'contacts' => $hub->withListAttributes($workspace, 'contact', $contactRows),
             'companies' => Company::query()->forWorkspace($workspace)->orderBy('name')->get(['id', 'name', 'city', 'wilaya']),
@@ -52,6 +63,7 @@ class ContactController extends Controller
             'listView' => $hub->listViewMeta('contact', $filters['columns'] ?? null, $filters['sort'] ?? null, $workspace),
             'recordCount' => $paginator['total'],
             'paginator' => $paginator,
+            'dataQuality' => $dataQuality,
             'cities' => config('evosales.cities'),
             'wilayas' => config('evosales.wilayas'),
             'hasMailbox' => Mailbox::query()->forWorkspace($workspace)->exists(),

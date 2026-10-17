@@ -2,9 +2,9 @@ import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { BulkActionBar } from '@/components/crm/bulk-action-bar';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
-import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
 import { hasActiveListFilters } from '@/components/crm/list-query';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
 import { Label } from '@/evo/ui/label';
@@ -32,6 +32,7 @@ export default function ContactsIndex({
     hasMailbox,
     createOpen,
     bulk,
+    dataQuality,
 }: {
     contacts: ContactListRow[];
     companies: { id: number; name: string }[];
@@ -40,12 +41,23 @@ export default function ContactsIndex({
     activeFilters: Record<string, unknown>;
     listView: ListViewMeta;
     recordCount: number;
-    paginator?: { page: number; per_page: number; total: number; last_page: number };
+    paginator?: {
+        page: number;
+        per_page: number;
+        total: number;
+        last_page: number;
+    };
     cities: string[];
     wilayas: string[];
     hasMailbox: boolean;
     createOpen?: boolean;
     bulk?: { enabled: boolean; sequences: { id: number; name: string }[] };
+    dataQuality: {
+        missing_contact: number;
+        missing_company: number;
+        unassigned: number;
+        missing_source: number;
+    };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
     const loading = useInertiaLoading();
@@ -58,9 +70,30 @@ export default function ContactsIndex({
         <>
             <Head title={t('Contacts')} />
             <div
-                className="v02-list flex h-app-workspace min-h-0 flex-col bg-[var(--evo-canvas)]"
+                className="v02-list h-app-workspace flex min-h-0 flex-col bg-[var(--evo-canvas)]"
                 data-crm="contacts-workspace"
             >
+                <section
+                    aria-label={t('Contact data quality')}
+                    className="grid shrink-0 grid-cols-2 gap-3 border-b border-hairline bg-white px-4 py-3 lg:grid-cols-4"
+                >
+                    <QualityMetric
+                        label={t('Missing email and phone')}
+                        value={dataQuality.missing_contact}
+                    />
+                    <QualityMetric
+                        label={t('Missing company')}
+                        value={dataQuality.missing_company}
+                    />
+                    <QualityMetric
+                        label={t('Unassigned owner')}
+                        value={dataQuality.unassigned}
+                    />
+                    <QualityMetric
+                        label={t('Missing lead source')}
+                        value={dataQuality.missing_source}
+                    />
+                </section>
                 <CrmListShell
                     resultMode="shared-table"
                     title="Contacts"
@@ -75,7 +108,10 @@ export default function ContactsIndex({
                             open={drawer}
                             onOpenChange={setDrawer}
                         >
-                            <ContactCreateForm onDone={() => setDrawer(false)} companies={companies} />
+                            <ContactCreateForm
+                                onDone={() => setDrawer(false)}
+                                companies={companies}
+                            />
                         </MorphingForm>
                     }
                     activeFilters={activeFilters}
@@ -91,7 +127,9 @@ export default function ContactsIndex({
                     contentClassName="bg-white"
                     rows={contacts}
                     rowHref={contactRowHref}
-                    empty={contactEmptyState(hasActiveListFilters(activeFilters))}
+                    empty={contactEmptyState(
+                        hasActiveListFilters(activeFilters),
+                    )}
                     paginator={paginator}
                     loading={loading}
                     headerActions={
@@ -129,7 +167,9 @@ export default function ContactsIndex({
                     banner={
                         !hasMailbox ? (
                             <div className="border-b border-hairline bg-white px-4 py-2 text-[12px] text-mute sm:px-6">
-                                {t('Connect email to log outbound from this list.')}{' '}
+                                {t(
+                                    'Connect email to log outbound from this list.',
+                                )}{' '}
                                 <Link
                                     href="/outbound/mailboxes"
                                     className="text-ink underline-offset-2 hover:underline"
@@ -141,8 +181,18 @@ export default function ContactsIndex({
                     }
                 />
             </div>
-
         </>
+    );
+}
+
+function QualityMetric({ label, value }: { label: string; value: number }) {
+    return (
+        <div className="rounded-lg border border-hairline bg-canvas-soft px-3 py-2.5">
+            <p className="text-[12px] font-medium text-mute">{label}</p>
+            <p className="mt-1 text-xl font-semibold text-ink">
+                {value.toLocaleString()}
+            </p>
+        </div>
     );
 }
 
@@ -165,24 +215,33 @@ function ContactCreateForm({
                 <>
                     <div>
                         <Label className="mb-1 block text-[12px]">
-                            {t('First name')} <span className="text-brand">*</span>
+                            {t('First name')}{' '}
+                            <span className="text-brand">*</span>
                         </Label>
                         <Input name="first_name" required />
                     </div>
                     <div>
-                        <Label className="mb-1 block text-[12px]">{t('Last name')}</Label>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Last name')}
+                        </Label>
                         <Input name="last_name" />
                     </div>
                     <div>
-                        <Label className="mb-1 block text-[12px]">{t('Email')}</Label>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Email')}
+                        </Label>
                         <Input name="email" type="email" />
                     </div>
                     <div>
-                        <Label className="mb-1 block text-[12px]">{t('Phone')}</Label>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Phone')}
+                        </Label>
                         <Input name="phone" placeholder="0550…" />
                     </div>
                     <div>
-                        <Label className="mb-1 block text-[12px]">{t('Company')}</Label>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Company')}
+                        </Label>
                         <select
                             name="company_id"
                             className="h-9 w-full rounded-md border bg-background px-2 text-sm"
@@ -196,7 +255,9 @@ function ContactCreateForm({
                         </select>
                     </div>
                     <div>
-                        <Label className="mb-1 block text-[12px]">{t('Lead status')}</Label>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Lead status')}
+                        </Label>
                         <select
                             name="lead_status"
                             className="h-9 w-full rounded-md border bg-background px-2 text-sm"
@@ -204,7 +265,9 @@ function ContactCreateForm({
                             <option value="">{t('None')}</option>
                             <option value="new">{t('New')}</option>
                             <option value="open">{t('Open')}</option>
-                            <option value="unqualified">{t('Unqualified')}</option>
+                            <option value="unqualified">
+                                {t('Unqualified')}
+                            </option>
                         </select>
                     </div>
                     <div className="flex justify-end gap-2 pt-2">
