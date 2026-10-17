@@ -47,6 +47,10 @@ class EnforceProductPermissions
             return 'crm.bulk';
         }
 
+        if (str_starts_with($name, 'crm.knowledge') && ! $request->isMethodSafe()) {
+            return 'desk.manage';
+        }
+
         if ($request->isMethodSafe()) {
             return null;
         }

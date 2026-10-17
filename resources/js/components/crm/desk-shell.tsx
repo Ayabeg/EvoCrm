@@ -24,6 +24,12 @@ const DESK_TABS: Array<RoomTab & { match?: (pathname: string) => boolean }> = [
             pathname === '/crm/tickets' || pathname.startsWith('/crm/tickets/'),
     },
     {
+        label: 'Knowledge base',
+        href: '/crm/knowledge',
+        match: (pathname) =>
+            pathname === '/crm/knowledge' || pathname.startsWith('/crm/knowledge/'),
+    },
+    {
         label: 'Channels',
         href: '/settings/channels',
         match: (pathname) =>

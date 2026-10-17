@@ -27,6 +27,7 @@ use App\Http\Controllers\Crm\FunnelController;
 use App\Http\Controllers\Crm\LeadCaptureController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\LeadOsController;
+use App\Http\Controllers\Crm\KnowledgeBaseController;
 use App\Http\Controllers\Crm\QuickRecordController;
 use App\Http\Controllers\Crm\QuickRecordHarnessController;
 use App\Http\Controllers\Crm\QuoteController;
@@ -189,6 +190,10 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::post('/desk/threads/{thread}/ticket', [InboxController::class, 'openTicket'])->name('desk.ticket.open');
     Route::post('/desk/connectors', [DeskConnectorController::class, 'store'])->name('desk.connectors.store');
     Route::get('/conversations', [ConversationHistoryController::class, 'index'])->name('crm.conversations');
+    Route::get('/crm/knowledge', [KnowledgeBaseController::class, 'index'])->name('crm.knowledge.index');
+    Route::post('/crm/knowledge', [KnowledgeBaseController::class, 'store'])->name('crm.knowledge.store');
+    Route::put('/crm/knowledge/{article}', [KnowledgeBaseController::class, 'update'])->name('crm.knowledge.update');
+    Route::delete('/crm/knowledge/{article}', [KnowledgeBaseController::class, 'destroy'])->name('crm.knowledge.destroy');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/reports/funnels', [FunnelController::class, 'index'])->name('reports.funnels');
