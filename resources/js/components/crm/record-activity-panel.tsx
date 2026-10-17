@@ -57,7 +57,13 @@ export default function RecordActivityPanel({
             return filtered;
         }
 
-        return filtered.filter((item) => item.type === chip);
+        return filtered.filter((item) =>
+            chip === 'email'
+                ? ['email', 'inbound_email', 'outbound_email'].includes(
+                      item.type,
+                  )
+                : item.type === chip,
+        );
     }, [tab, timeline, chip]);
     const next = deriveRecordNext({ catchUp, timeline, dealNext });
     const showCatchUp = hasCatchUpItems(catchUp);
@@ -207,6 +213,18 @@ export default function RecordActivityPanel({
                                             : t('Outbound')}
                                         {' · '}
                                         {item.meta.outcome}
+                                    </p>
+                                ) : null}
+                                {['inbound_email', 'outbound_email'].includes(
+                                    item.type,
+                                ) && item.meta?.status ? (
+                                    <p className="mt-0.5 text-[12px] text-mute">
+                                        {[item.meta.channel, item.meta.status]
+                                            .filter(Boolean)
+                                            .join(' · ')}
+                                        {item.meta.failure_reason
+                                            ? ` · ${item.meta.failure_reason}`
+                                            : ''}
                                     </p>
                                 ) : null}
                                 {item.type === 'task' && !item.done ? (

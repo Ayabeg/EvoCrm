@@ -137,7 +137,12 @@ export function RecordPageFrame({
     children: ReactNode;
 }) {
     return (
-        <div className={cn('h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink', PAGE_OVERFLOW_CLASS)}>
+        <div
+            className={cn(
+                'h-app-workspace flex flex-col bg-canvas-soft text-ui text-ink',
+                PAGE_OVERFLOW_CLASS,
+            )}
+        >
             <div className="relative shrink-0 border-b border-hairline bg-canvas px-4 py-2.5 sm:px-6">
                 {header}
             </div>
@@ -181,7 +186,9 @@ export function RecordIdentity({
                         </h1>
                         {badge}
                         {kind ? (
-                            <span className="text-[11px] text-mute">{kind}</span>
+                            <span className="text-[11px] text-mute">
+                                {kind}
+                            </span>
                         ) : null}
                     </div>
                     {subtitle ? (
@@ -238,7 +245,7 @@ export function RecordFact({
                     money
                         ? MONEY_NEVER_CLIP_CLASS
                         : wrap
-                          ? 'whitespace-normal break-words'
+                          ? 'break-words whitespace-normal'
                           : 'truncate',
                     money && 'font-medium',
                 )}
@@ -257,12 +264,7 @@ export function RecordFactList({
     className?: string;
 }) {
     return (
-        <div
-            className={cn(
-                'grid grid-cols-2 gap-x-4 gap-y-2',
-                className,
-            )}
-        >
+        <div className={cn('grid grid-cols-2 gap-x-4 gap-y-2', className)}>
             {children}
         </div>
     );
@@ -283,9 +285,7 @@ export function RecordSection({
         <section className={cn('space-y-2', className)}>
             {title ? (
                 <div className="flex items-center justify-between gap-2">
-                    <h3 className={RECORD_SECTION_HEADING}>
-                        {t(title)}
-                    </h3>
+                    <h3 className={RECORD_SECTION_HEADING}>{t(title)}</h3>
                     {action}
                 </div>
             ) : null}
@@ -310,12 +310,18 @@ export function RecordTimelineItem({
     children?: ReactNode;
 }) {
     const when = formatRecordWhen(at);
-    const typeLabel = t(type.charAt(0).toUpperCase() + type.slice(1));
+    const typeLabel = t(
+        (
+            {
+                inbound_email: 'Inbound email',
+                outbound_email: 'Outbound email',
+            } as Record<string, string>
+        )[type] ?? type.charAt(0).toUpperCase() + type.slice(1),
+    );
     const subject =
         typeof title === 'string' ? title.trim() : title ? String(title) : '';
     const line =
-        subject &&
-        !subject.toLowerCase().startsWith(typeLabel.toLowerCase())
+        subject && !subject.toLowerCase().startsWith(typeLabel.toLowerCase())
             ? `${typeLabel} · ${subject}`
             : subject || typeLabel;
 
@@ -346,10 +352,10 @@ export function RecordNextAction({
     return (
         <div className="flex items-start justify-between gap-3 border-b border-hairline pb-3">
             <div className="min-w-0">
-                <p className={RECORD_SECTION_HEADING}>
-                    {t('Next')}
+                <p className={RECORD_SECTION_HEADING}>{t('Next')}</p>
+                <p className="mt-0.5 text-[13px] font-medium text-ink">
+                    {title}
                 </p>
-                <p className="mt-0.5 text-[13px] font-medium text-ink">{title}</p>
                 {detail ? (
                     <p className="text-[11px] text-mute">{t(detail)}</p>
                 ) : null}

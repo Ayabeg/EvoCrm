@@ -6,6 +6,7 @@ use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Enrollment;
 use App\Models\Message;
+use App\Models\OutboundMessage;
 use App\Models\Sequence;
 use App\Models\Thread;
 use App\Models\User;
@@ -70,6 +71,39 @@ it('loads the contact show workspace with associations and catch-up', function (
             ->has('timeline')
             ->where('timeline.0.type', 'inbound_message')
             ->where('timeline.0.body', 'Need a callback this week')
+        );
+});
+
+it('includes outbound email delivery history in the unified contact timeline', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'amel@example.test',
+    ]);
+
+    OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Your proposal',
+        'body' => 'Please find the proposal attached.',
+        'status' => 'delivered',
+        'sent_at' => now(),
+        'opened_at' => now(),
+    ]);
+
+    $this->actingAs($user)
+        ->get("/crm/contacts/{$contact->id}")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('timeline', fn ($timeline) => collect($timeline)->contains(
+                fn (array $item): bool => $item['type'] === 'outbound_email'
+                    && $item['subject'] === 'Your proposal'
+                    && $item['meta']['status'] === 'delivered'
+                    && $item['meta']['opened_at'] !== null
+            ))
         );
 });
 

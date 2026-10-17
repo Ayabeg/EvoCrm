@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Message;
+use App\Models\OutboundMessage;
 use App\Models\Playbook;
 use App\Models\SavedFilter;
 use App\Models\Ticket;
@@ -303,8 +304,38 @@ class CrmHub
                 ])
             : collect();
 
+        $outboundMessages = $contact
+            ? OutboundMessage::query()
+                ->where('contact_id', $contact->id)
+                ->latest('created_at')
+                ->limit(80)
+                ->get()
+                ->map(fn (OutboundMessage $message): array => [
+                    'id' => 'outbound-message-'.$message->id,
+                    'type' => $message->direction === 'in' ? 'inbound_email' : 'outbound_email',
+                    'subject' => $message->subject,
+                    'body' => $message->body,
+                    'done' => in_array($message->status, ['sent', 'delivered', 'opened', 'clicked', 'replied'], true),
+                    'created_at' => $message->sent_at ?? $message->created_at,
+                    'owner' => null,
+                    'actor' => null,
+                    'meta' => [
+                        'channel' => $message->channel,
+                        'direction' => $message->direction,
+                        'status' => $message->status,
+                        'failure_reason' => $message->failure_reason,
+                        'to_address' => $message->to_address,
+                        'opened_at' => $message->opened_at,
+                        'replied_at' => $message->replied_at,
+                        'campaign_id' => $message->campaign_id,
+                        'sequence_id' => $message->sequence_id,
+                    ],
+                ])
+            : collect();
+
         return $activities
             ->concat($messages)
+            ->concat($outboundMessages)
             ->sortByDesc(function (Activity|array $item): int {
                 $createdAt = $item instanceof Activity ? $item->created_at : ($item['created_at'] ?? null);
 

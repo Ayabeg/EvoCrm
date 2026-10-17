@@ -13,6 +13,11 @@ export type RecordActivity = {
     meta?: {
         outcome?: string | null;
         direction?: string | null;
+        channel?: string | null;
+        status?: string | null;
+        failure_reason?: string | null;
+        opened_at?: string | null;
+        replied_at?: string | null;
         logged_at?: string | null;
         attendance?: string | null;
     } | null;
