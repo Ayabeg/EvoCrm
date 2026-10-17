@@ -184,6 +184,10 @@ class ContactController extends Controller
             'owner_id' => ['nullable', 'integer'],
             'city' => ['nullable', 'string', 'max:80'],
             'wilaya' => ['nullable', 'string', 'max:80'],
+            'source' => ['nullable', 'string', 'max:80'],
+            'source_detail' => ['nullable', 'string', 'max:180'],
+            'source_campaign' => ['nullable', 'string', 'max:180'],
+            'source_medium' => ['nullable', 'string', 'max:80'],
             'lead_status' => ['nullable', 'string', 'max:40'],
             'add_another' => ['sometimes', 'boolean'],
         ]);
@@ -208,6 +212,10 @@ class ContactController extends Controller
             'owner_id' => ['nullable', 'integer'],
             'city' => ['nullable', 'string', 'max:80'],
             'wilaya' => ['nullable', 'string', 'max:80'],
+            'source' => ['nullable', 'string', 'max:80'],
+            'source_detail' => ['nullable', 'string', 'max:180'],
+            'source_campaign' => ['nullable', 'string', 'max:180'],
+            'source_medium' => ['nullable', 'string', 'max:80'],
             'lead_status' => ['nullable', 'string', 'max:40'],
             'unanswered' => ['sometimes', 'boolean'],
             'attributes' => ['nullable', 'array'],
@@ -226,6 +234,10 @@ class ContactController extends Controller
             'owner_id' => $data['owner_id'] ?? null,
             'city' => $data['city'] ?? $contact->city,
             'wilaya' => $data['wilaya'] ?? $contact->wilaya,
+            'source' => array_key_exists('source', $data) ? $data['source'] : $contact->source,
+            'source_detail' => array_key_exists('source_detail', $data) ? $data['source_detail'] : $contact->source_detail,
+            'source_campaign' => array_key_exists('source_campaign', $data) ? $data['source_campaign'] : $contact->source_campaign,
+            'source_medium' => array_key_exists('source_medium', $data) ? $data['source_medium'] : $contact->source_medium,
             'lead_status' => array_key_exists('lead_status', $data) ? $data['lead_status'] : $contact->lead_status,
             'unanswered' => $request->has('unanswered') ? $request->boolean('unanswered') : $contact->unanswered,
         ])->save();
@@ -271,7 +283,7 @@ class ContactController extends Controller
 
         return response()->streamDownload(function () use ($query): void {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['id', 'first_name', 'last_name', 'email', 'phone', 'company', 'owner', 'city', 'wilaya', 'created_at', 'last_activity_at']);
+            fputcsv($out, ['id', 'first_name', 'last_name', 'email', 'phone', 'company', 'owner', 'city', 'wilaya', 'source', 'source_detail', 'source_campaign', 'source_medium', 'created_at', 'last_activity_at']);
 
             $query->orderBy('first_name')->each(function (Contact $contact) use ($out): void {
                 fputcsv($out, [
@@ -284,6 +296,10 @@ class ContactController extends Controller
                     $contact->owner?->name,
                     $contact->city,
                     $contact->wilaya,
+                    $contact->source,
+                    $contact->source_detail,
+                    $contact->source_campaign,
+                    $contact->source_medium,
                     $contact->created_at?->toDateTimeString(),
                     $contact->last_activity_at?->toDateTimeString(),
                 ]);

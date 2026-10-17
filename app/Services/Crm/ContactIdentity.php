@@ -36,6 +36,9 @@ class ContactIdentity
                 'phone' => $attributes['phone'] ?? $contact->phone,
                 'email' => $email ?? $contact->email,
                 'source' => $contact->source ?? ($attributes['source'] ?? null),
+                'source_detail' => $contact->source_detail ?? ($attributes['source_detail'] ?? null),
+                'source_campaign' => $contact->source_campaign ?? ($attributes['source_campaign'] ?? null),
+                'source_medium' => $contact->source_medium ?? ($attributes['source_medium'] ?? null),
             ], fn ($value) => $value !== null && $value !== ''));
             $contact->save();
 
@@ -54,6 +57,9 @@ class ContactIdentity
             'city' => $attributes['city'] ?? null,
             'wilaya' => $attributes['wilaya'] ?? null,
             'source' => $attributes['source'] ?? null,
+            'source_detail' => $attributes['source_detail'] ?? null,
+            'source_campaign' => $attributes['source_campaign'] ?? null,
+            'source_medium' => $attributes['source_medium'] ?? null,
             'lead_status' => $attributes['lead_status'] ?? null,
             'meta' => $attributes['meta'] ?? null,
         ]);

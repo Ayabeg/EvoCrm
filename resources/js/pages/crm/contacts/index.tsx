@@ -270,6 +270,40 @@ function ContactCreateForm({
                             </option>
                         </select>
                     </div>
+                    <div>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Lead source')}
+                        </Label>
+                        <select
+                            name="source"
+                            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                            defaultValue=""
+                        >
+                            <option value="">{t('Unknown')}</option>
+                            <option value="website">{t('Website')}</option>
+                            <option value="referral">{t('Referral')}</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="phone">{t('Phone')}</option>
+                            <option value="event">{t('Event')}</option>
+                            <option value="partner">{t('Partner')}</option>
+                            <option value="import">{t('Import')}</option>
+                            <option value="other">{t('Other')}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <Label className="mb-1 block text-[12px]">
+                            {t('Source detail')}
+                        </Label>
+                        <Input
+                            name="source_detail"
+                            placeholder={t(
+                                'Landing page, partner, or campaign detail',
+                            )}
+                            maxLength={180}
+                        />
+                    </div>
                     <div className="flex justify-end gap-2 pt-2">
                         <Button type="button" variant="ghost" onClick={onDone}>
                             {t('Cancel')}

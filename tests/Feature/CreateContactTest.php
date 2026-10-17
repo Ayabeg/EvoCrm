@@ -15,6 +15,10 @@ it('creates a unique Algeria-first contact on the workspace', function () {
             'phone' => '0550199001',
             'email' => 'amine.test@evotechly.dz',
             'company_id' => $company->id,
+            'source' => 'website',
+            'source_detail' => 'algiers-clinic-landing-page',
+            'source_campaign' => 'ramadan-2026',
+            'source_medium' => 'landing-page',
         ])
         ->assertRedirect();
 
@@ -22,5 +26,9 @@ it('creates a unique Algeria-first contact on the workspace', function () {
 
     expect($contact)->not->toBeNull()
         ->and($contact->phone_e164)->toStartWith('+213')
-        ->and($contact->company_id)->toBe($company->id);
+        ->and($contact->company_id)->toBe($company->id)
+        ->and($contact->source)->toBe('website')
+        ->and($contact->source_detail)->toBe('algiers-clinic-landing-page')
+        ->and($contact->source_campaign)->toBe('ramadan-2026')
+        ->and($contact->source_medium)->toBe('landing-page');
 });
