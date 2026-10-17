@@ -457,7 +457,7 @@ it('claims a synchronous mutation lock before every authoring write', function (
     expect($lib)->toContain('export function beginExclusiveAction')
         ->and($lib)->toContain('if (lock.current)')
         ->and($page)->toContain('if (!beginExclusiveAction(mutatingRef))')
-        ->and(substr_count($page, 'if (!beginExclusiveAction(mutatingRef))'))->toBe(4)
+        ->and(substr_count($page, 'if (!beginExclusiveAction(mutatingRef))'))->toBe(7)
         ->and($page)->toContain("router.post('/crm/workflows', payload, visit)")
         ->and($page)->toContain('router.put(`/crm/workflows/${editingId}`, payload, visit)')
         ->and($page)->toContain('`/crm/workflows/${workflow.id}/toggle`')

@@ -14,6 +14,7 @@ import type {
     WorkflowRow,
     WorkflowStage,
     WorkflowTemplate,
+    WorkflowVersionRow,
 } from '@/lib/workflow-authoring';
 
 export function WorkflowList({
@@ -27,6 +28,7 @@ export function WorkflowList({
     onToggle,
     onTest,
     onDelete,
+    onRestore,
     onUseTemplate,
 }: {
     workflows: WorkflowRow[];
@@ -39,8 +41,12 @@ export function WorkflowList({
     onToggle: (workflow: WorkflowRow) => void;
     onTest?: (workflow: WorkflowRow) => void;
     onDelete: (workflow: WorkflowRow) => void;
+    onRestore: (workflow: WorkflowRow, version: WorkflowVersionRow) => void;
     onUseTemplate: (key: string) => void;
 }) {
+    const versionsFor = (workflow: WorkflowRow): WorkflowVersionRow[] =>
+        workflow.versions ?? [];
+
     const columns: EvoDataGridColumn<WorkflowRow>[] = [
         {
             id: 'name',
@@ -93,6 +99,47 @@ export function WorkflowList({
             accessorFn: (row) => row.updated_at ?? '',
             cell: ({ row }) => formatWorkflowTimestamp(row.original.updated_at),
         },
+        {
+            id: 'versions',
+            header: t('Versions'),
+            accessorFn: (row) => versionsFor(row).length,
+            cell: ({ row }) => (
+                <details className="text-[12px]">
+                    <summary className="cursor-pointer text-[var(--evo-ink-muted)] hover:text-[var(--evo-ink)]">
+                        {versionsFor(row.original).length} {t('saved')}
+                    </summary>
+                    <div className="mt-2 min-w-48 space-y-1 rounded border border-[var(--evo-hairline)] bg-[var(--evo-surface)] p-2">
+                        {versionsFor(row.original).map((version) => (
+                            <div
+                                key={version.id}
+                                className="flex items-center justify-between gap-2"
+                            >
+                                <span className="text-[var(--evo-ink-muted)]">
+                                    v{version.version}
+                                    {version.created_by
+                                        ? ` · ${version.created_by}`
+                                        : ''}
+                                </span>
+                                {canManage ? (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-2 text-[11px]"
+                                        disabled={mutating}
+                                        onClick={() =>
+                                            onRestore(row.original, version)
+                                        }
+                                    >
+                                        {t('Restore')}
+                                    </Button>
+                                ) : null}
+                            </div>
+                        ))}
+                    </div>
+                </details>
+            ),
+        },
     ];
 
     return (
@@ -141,7 +188,7 @@ export function WorkflowList({
 
             <p className="px-1 text-[12px] text-[var(--evo-ink-muted)]">
                 {t(
-                    'History stays inspectable when a workflow is Draft. Turning a workflow off cancels pending delayed runs and does not rewrite completed or failed history.',
+                    'Workflow versions keep configuration changes recoverable. Turning a workflow off cancels pending delayed runs and does not rewrite execution history.',
                 )}
             </p>
 

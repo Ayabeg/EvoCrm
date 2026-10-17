@@ -220,6 +220,12 @@ class Workflow extends Model
         return $this->hasMany(WorkflowExecution::class);
     }
 
+    /** @return HasMany<WorkflowVersion, $this> */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(WorkflowVersion::class)->latest('version');
+    }
+
     /**
      * @return array<string, mixed>
      */

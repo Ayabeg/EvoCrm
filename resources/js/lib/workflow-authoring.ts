@@ -114,6 +114,15 @@ export type WorkflowRow = {
     delay_minutes: number;
     created_at: string | null;
     updated_at: string | null;
+    versions?: WorkflowVersionRow[];
+};
+
+export type WorkflowVersionRow = {
+    id: number;
+    version: number;
+    created_at: string | null;
+    created_by: string | null;
+    restored_from_version_id: number | null;
 };
 
 export type WorkflowTemplate = {

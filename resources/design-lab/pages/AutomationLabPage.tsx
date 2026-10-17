@@ -485,6 +485,7 @@ export function AutomationLabPage({ view = 'workflows' }: { view?: string }) {
                         onDelete={(workflow) => {
                             setWorkflows((current) => current.filter((row) => row.id !== workflow.id));
                         }}
+                        onRestore={() => {}}
                         onUseTemplate={(key) => {
                             const template = TEMPLATES.find((item) => item.key === key);
 

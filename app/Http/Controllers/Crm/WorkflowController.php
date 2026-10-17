@@ -14,10 +14,12 @@ use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workflow;
 use App\Models\WorkflowExecution;
+use App\Models\WorkflowVersion;
 use App\Models\Workspace;
 use App\Services\Crm\EvoWorkflowTemplates;
 use App\Services\Crm\WorkflowExecutionPresenter;
 use App\Services\Crm\WorkflowRunner;
+use App\Services\Crm\WorkflowVersioner;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,7 +37,7 @@ class WorkflowController extends Controller
 
         $workflows = Workflow::query()
             ->forWorkspace($workspace)
-            ->with('triggerStage')
+            ->with(['triggerStage', 'versions.createdBy'])
             ->latest('updated_at')
             ->get()
             ->map(fn (Workflow $workflow) => [
@@ -61,6 +63,17 @@ class WorkflowController extends Controller
                 'delay_minutes' => (int) ($workflow->delay_minutes ?? 0),
                 'created_at' => $workflow->created_at?->toIso8601String(),
                 'updated_at' => $workflow->updated_at?->toIso8601String(),
+                'versions' => $workflow->versions
+                    ->take(8)
+                    ->map(fn (WorkflowVersion $version): array => [
+                        'id' => $version->id,
+                        'version' => $version->version,
+                        'created_at' => $version->created_at?->toIso8601String(),
+                        'created_by' => $version->createdBy?->name,
+                        'restored_from_version_id' => $version->restored_from_version_id,
+                    ])
+                    ->values()
+                    ->all(),
             ]);
 
         $stages = Stage::query()
@@ -113,7 +126,7 @@ class WorkflowController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, WorkflowVersioner $versioner): RedirectResponse
     {
         $workspace = $request->user()->workspace;
         $data = $this->validated($request, $workspace);
@@ -131,7 +144,7 @@ class WorkflowController extends Controller
                 ->findOrFail($stageId);
         }
 
-        $workspace->workflows()->create([
+        $workflow = $workspace->workflows()->create([
             'name' => $data['name'],
             'trigger' => $data['trigger'],
             'trigger_stage_id' => $stageId,
@@ -149,11 +162,12 @@ class WorkflowController extends Controller
             'active' => $data['active'],
             'delay_minutes' => (int) ($data['delay_minutes'] ?? 0),
         ]);
+        $versioner->record($workflow, $request->user());
 
         return redirect()->route('crm.workflows.index');
     }
 
-    public function update(Request $request, Workflow $workflow): RedirectResponse
+    public function update(Request $request, Workflow $workflow, WorkflowVersioner $versioner): RedirectResponse
     {
         abort_unless((int) $workflow->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -190,17 +204,20 @@ class WorkflowController extends Controller
                 : null,
             'delay_minutes' => (int) ($data['delay_minutes'] ?? $workflow->delay_minutes ?? 0),
         ]);
+        $workflow->refresh();
+        $versioner->record($workflow, $request->user());
 
         return redirect()->route('crm.workflows.index');
     }
 
-    public function storeTemplate(Request $request, EvoWorkflowTemplates $templates): RedirectResponse
+    public function storeTemplate(Request $request, EvoWorkflowTemplates $templates, WorkflowVersioner $versioner): RedirectResponse
     {
         $data = $request->validate([
             'template_key' => ['required', 'string', 'max:80'],
         ]);
 
-        $templates->apply($request->user()->workspace, $data['template_key']);
+        $workflow = $templates->apply($request->user()->workspace, $data['template_key']);
+        $versioner->record($workflow, $request->user());
 
         return redirect()->route('crm.workflows.index');
     }
@@ -289,6 +306,23 @@ class WorkflowController extends Controller
         ]);
 
         return back();
+    }
+
+    public function restoreVersion(Request $request, WorkflowVersion $version, WorkflowVersioner $versioner): RedirectResponse
+    {
+        abort_unless((int) $version->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($request->user()->canPermission('automation.manage'), 403);
+
+        $versioner->restore($request->user()->workspace, $request->user(), $version);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Workflow restored from version :version. A new version was recorded.', [
+                'version' => $version->version,
+            ]),
+        ]);
+
+        return redirect()->route('crm.workflows.index');
     }
 
     public function destroy(Request $request, Workflow $workflow): RedirectResponse

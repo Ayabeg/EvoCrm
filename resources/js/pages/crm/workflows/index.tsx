@@ -28,6 +28,7 @@ import type {
     WorkflowStage,
     WorkflowTemplate,
     WorkflowTicketStatus,
+    WorkflowVersionRow,
 } from '@/lib/workflow-authoring';
 import { EMPTY_EXECUTION_PAGE } from '@/lib/workflow-execution';
 import type { WorkflowExecutionPage } from '@/lib/workflow-execution';
@@ -258,6 +259,35 @@ export default function WorkflowsIndex({
         );
     };
 
+    const restoreVersion = (
+        workflow: WorkflowRow,
+        version: WorkflowVersionRow,
+    ) => {
+        if (
+            !window.confirm(
+                t(
+                    'Restore this workflow version? The current configuration will be saved as a new version first.',
+                ) + `\n\n${workflow.name}`,
+            )
+        ) {
+            return;
+        }
+
+        if (!beginExclusiveAction(mutatingRef)) {
+            return;
+        }
+
+        setMutating(true);
+        router.post(
+            `/crm/workflows/versions/${version.id}/restore`,
+            {},
+            {
+                preserveScroll: true,
+                onFinish: releaseMutation,
+            },
+        );
+    };
+
     const deleteWorkflow = (workflow: WorkflowRow) => {
         const confirmed = window.confirm(
             t(
@@ -412,6 +442,7 @@ export default function WorkflowsIndex({
                             onToggle={toggleWorkflow}
                             onTest={testWorkflow}
                             onDelete={deleteWorkflow}
+                            onRestore={restoreVersion}
                             onUseTemplate={applyTemplate}
                         />
                     )}
