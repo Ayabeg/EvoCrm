@@ -48,6 +48,9 @@ type Lead = {
     title: string;
     status?: string | null;
     source?: string | null;
+    source_detail?: string | null;
+    source_campaign?: string | null;
+    source_medium?: string | null;
     qualified_at?: string | null;
     contact_id?: number | null;
     score?: number | null;
@@ -256,6 +259,15 @@ export default function LeadShow({
                                                     leadId={lead.id}
                                                     title={lead.title}
                                                     source={lead.source}
+                                                    sourceDetail={
+                                                        lead.source_detail
+                                                    }
+                                                    sourceCampaign={
+                                                        lead.source_campaign
+                                                    }
+                                                    sourceMedium={
+                                                        lead.source_medium
+                                                    }
                                                 />
                                                 <div className="md:hidden">
                                                     <AskEvoTrigger
@@ -367,6 +379,46 @@ export default function LeadShow({
                                         </p>
                                     </div>
                                 </RecordSection>
+                                <RecordSection title={t('Attribution')}>
+                                    <RecordFactList>
+                                        <RecordFact
+                                            label={t('Source detail')}
+                                            value={lead.source_detail}
+                                        />
+                                        <RecordFact
+                                            label={t('Campaign')}
+                                            value={lead.source_campaign}
+                                        />
+                                        <RecordFact
+                                            label={t('Source medium')}
+                                            value={lead.source_medium}
+                                        />
+                                    </RecordFactList>
+                                </RecordSection>
+                                {leadScore?.breakdown?.length ? (
+                                    <RecordSection title={t('Score factors')}>
+                                        <div className="space-y-2">
+                                            {leadScore.breakdown.map(
+                                                (factor) => (
+                                                    <div
+                                                        key={`${factor.pillar}-${factor.key}`}
+                                                        className="flex items-center justify-between gap-3 text-[13px]"
+                                                    >
+                                                        <span className="min-w-0 text-ink">
+                                                            {factor.label}
+                                                        </span>
+                                                        <span className="shrink-0 font-medium text-ink tabular-nums">
+                                                            {factor.points > 0
+                                                                ? '+'
+                                                                : ''}
+                                                            {factor.points}
+                                                        </span>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    </RecordSection>
+                                ) : null}
                                 <RecordSection title="Get in Touch">
                                     <div className="space-y-3">
                                         <InlineRecordField
@@ -505,7 +557,9 @@ export default function LeadShow({
                                             </RelatedRecordLink>
                                         ))
                                     ) : (
-                                        <p className="text-mute">{t('No deal')}</p>
+                                        <p className="text-mute">
+                                            {t('No deal')}
+                                        </p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard
@@ -524,7 +578,9 @@ export default function LeadShow({
                                             {contactName || 'Contact'}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">{t('No contact')}</p>
+                                        <p className="text-mute">
+                                            {t('No contact')}
+                                        </p>
                                     )}
                                 </AssociationCard>
                                 <AssociationCard title="Company">
@@ -535,7 +591,9 @@ export default function LeadShow({
                                             {company.name}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">{t('No company')}</p>
+                                        <p className="text-mute">
+                                            {t('No company')}
+                                        </p>
                                     )}
                                 </AssociationCard>
                                 {enrollments.length > 0 ? (

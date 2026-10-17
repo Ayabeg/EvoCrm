@@ -15,10 +15,16 @@ export default function LeadEditDialog({
     leadId,
     title,
     source,
+    sourceDetail,
+    sourceCampaign,
+    sourceMedium,
 }: {
     leadId: number;
     title: string;
     source?: string | null;
+    sourceDetail?: string | null;
+    sourceCampaign?: string | null;
+    sourceMedium?: string | null;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -33,8 +39,8 @@ export default function LeadEditDialog({
                 <DialogHeader>
                     <DialogTitle>Edit lead</DialogTitle>
                     <DialogDescription>
-                        Update the lead title and source. Contact fields save
-                        inline on the record.
+                        Update the lead title and attribution. Contact fields
+                        save inline on the record.
                     </DialogDescription>
                 </DialogHeader>
                 <Form
@@ -60,6 +66,30 @@ export default function LeadEditDialog({
                                 <Input
                                     name="source"
                                     defaultValue={source ?? ''}
+                                    className="mt-1 h-9"
+                                />
+                            </label>
+                            <label className="text-sm font-medium">
+                                Source detail
+                                <Input
+                                    name="source_detail"
+                                    defaultValue={sourceDetail ?? ''}
+                                    className="mt-1 h-9"
+                                />
+                            </label>
+                            <label className="text-sm font-medium">
+                                Campaign
+                                <Input
+                                    name="source_campaign"
+                                    defaultValue={sourceCampaign ?? ''}
+                                    className="mt-1 h-9"
+                                />
+                            </label>
+                            <label className="text-sm font-medium">
+                                Source medium
+                                <Input
+                                    name="source_medium"
+                                    defaultValue={sourceMedium ?? ''}
                                     className="mt-1 h-9"
                                 />
                             </label>

@@ -144,11 +144,19 @@ it('saves a single lead field without requiring the full form', function () {
     $lead = pathLead($user, ['title' => 'Clinic intake']);
 
     $this->actingAs($user)
-        ->put("/crm/leads/{$lead->id}", ['source' => 'whatsapp_cloud'])
+        ->put("/crm/leads/{$lead->id}", [
+            'source' => 'whatsapp_cloud',
+            'source_detail' => 'algiers-clinic',
+            'source_campaign' => 'ramadan-2026',
+            'source_medium' => 'whatsapp',
+        ])
         ->assertRedirect();
 
     expect($lead->fresh()->title)->toBe('Clinic intake')
-        ->and($lead->fresh()->source)->toBe('whatsapp_cloud');
+        ->and($lead->fresh()->source)->toBe('whatsapp_cloud')
+        ->and($lead->fresh()->source_detail)->toBe('algiers-clinic')
+        ->and($lead->fresh()->source_campaign)->toBe('ramadan-2026')
+        ->and($lead->fresh()->source_medium)->toBe('whatsapp');
 });
 
 it('does not render Slack chrome on the lead record', function () {

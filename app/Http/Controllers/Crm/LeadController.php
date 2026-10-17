@@ -56,6 +56,9 @@ class LeadController extends Controller
             'contact_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:180'],
             'source' => ['nullable', 'string', 'max:80'],
+            'source_detail' => ['nullable', 'string', 'max:180'],
+            'source_campaign' => ['nullable', 'string', 'max:180'],
+            'source_medium' => ['nullable', 'string', 'max:80'],
         ]);
 
         $contact = Contact::query()->forWorkspace($request->user()->workspace)->findOrFail($data['contact_id']);
@@ -66,6 +69,9 @@ class LeadController extends Controller
             'company_id' => $contact->company_id,
             'title' => $data['title'],
             'source' => $data['source'] ?? 'manual',
+            'source_detail' => $data['source_detail'] ?? null,
+            'source_campaign' => $data['source_campaign'] ?? null,
+            'source_medium' => $data['source_medium'] ?? null,
             'status' => 'new',
         ]);
 
@@ -148,6 +154,9 @@ class LeadController extends Controller
         $data = $request->validate([
             'title' => ['sometimes', 'required', 'string', 'max:180'],
             'source' => ['sometimes', 'nullable', 'string', 'max:80'],
+            'source_detail' => ['sometimes', 'nullable', 'string', 'max:180'],
+            'source_campaign' => ['sometimes', 'nullable', 'string', 'max:180'],
+            'source_medium' => ['sometimes', 'nullable', 'string', 'max:80'],
             'status' => ['sometimes', 'nullable', 'in:new,working,disqualified'],
             'path_step' => ['sometimes', 'nullable', 'in:new,contacted,nurturing,unqualified'],
             'owner_id' => ['sometimes', 'nullable', 'integer'],

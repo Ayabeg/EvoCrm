@@ -328,6 +328,7 @@ it('surfaces score and reason on lead show and the lead board card', function ()
             ->where('leadScore.fit', 40)
             ->where('leadScore.intent', 35)
             ->where('leadScore.timing', 25)
+            ->has('leadScore.breakdown')
             ->where('leadScore.reason', fn ($reason) => is_string($reason) && $reason !== '')
             ->has('askEvo.summary')
         );
