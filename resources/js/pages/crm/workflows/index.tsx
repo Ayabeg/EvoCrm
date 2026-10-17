@@ -40,7 +40,9 @@ const DEFAULT_CAPABILITIES: WorkflowCapabilities = {
     has_sequences: false,
 };
 
-function flattenErrors(errors: Record<string, string | string[]>): Record<string, string> {
+function flattenErrors(
+    errors: Record<string, string | string[]>,
+): Record<string, string> {
     return Object.fromEntries(
         Object.entries(errors).map(([key, value]) => [
             key,
@@ -78,7 +80,9 @@ export default function WorkflowsIndex({
     const [editingId, setEditingId] = useState<number | null>(null);
     const [draft, setDraft] = useState<WorkflowDraft>(emptyWorkflowDraft);
     const [baseline, setBaseline] = useState<WorkflowDraft>(emptyWorkflowDraft);
-    const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+    const [clientErrors, setClientErrors] = useState<Record<string, string>>(
+        {},
+    );
     const [mutating, setMutating] = useState(false);
     const ignoreDirtyClose = useRef(false);
     const mutatingRef = useRef(false);
@@ -147,7 +151,11 @@ export default function WorkflowsIndex({
         const issues = validateWorkflowDraft(draft);
 
         if (issues.length > 0) {
-            setClientErrors(Object.fromEntries(issues.map((issue) => [issue.field, issue.message])));
+            setClientErrors(
+                Object.fromEntries(
+                    issues.map((issue) => [issue.field, issue.message]),
+                ),
+            );
 
             return;
         }
@@ -218,6 +226,22 @@ export default function WorkflowsIndex({
         );
     };
 
+    const testWorkflow = (workflow: WorkflowRow) => {
+        if (!beginExclusiveAction(mutatingRef)) {
+            return;
+        }
+
+        setMutating(true);
+        router.post(
+            '/crm/workflows/' + workflow.id + '/test',
+            {},
+            {
+                preserveScroll: true,
+                onFinish: releaseMutation,
+            },
+        );
+    };
+
     const applyTemplate = (templateKey: string) => {
         if (!beginExclusiveAction(mutatingRef)) {
             return;
@@ -236,7 +260,9 @@ export default function WorkflowsIndex({
 
     const deleteWorkflow = (workflow: WorkflowRow) => {
         const confirmed = window.confirm(
-            t('Delete this workflow? Its execution history is removed with it.'),
+            t(
+                'Delete this workflow? Its execution history is removed with it.',
+            ),
         );
 
         if (!confirmed) {
@@ -286,7 +312,10 @@ export default function WorkflowsIndex({
                 ? ticket_statuses
                 : [
                       { value: 'new', label: 'New' },
-                      { value: 'waiting_on_contact', label: 'Waiting on contact' },
+                      {
+                          value: 'waiting_on_contact',
+                          label: 'Waiting on contact',
+                      },
                       { value: 'waiting_on_us', label: 'Waiting on us' },
                       { value: 'closed', label: 'Closed' },
                   ],
@@ -295,7 +324,10 @@ export default function WorkflowsIndex({
 
     return (
         <CrmShell title="Automation">
-            <div className="h-full overflow-y-auto overflow-x-hidden bg-[var(--evo-canvas)]" data-workflow="page">
+            <div
+                className="h-full overflow-x-hidden overflow-y-auto bg-[var(--evo-canvas)]"
+                data-workflow="page"
+            >
                 <div className="flex-1 space-y-5 p-4 md:p-6">
                     <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
@@ -303,7 +335,9 @@ export default function WorkflowsIndex({
                                 {t('Automation')}
                             </h1>
                             <p className="mt-1 text-[13px] text-[var(--evo-ink-secondary)]">
-                                {t('Structured workflows the runner can execute: when, if, then, else.')}
+                                {t(
+                                    'Structured workflows the runner can execute: when, if, then, else.',
+                                )}
                             </p>
                         </div>
                         {canManage && view !== 'history' ? (
@@ -345,7 +379,10 @@ export default function WorkflowsIndex({
                     </nav>
 
                     {view === 'history' ? (
-                        <WorkflowExecutionHistory executions={executions} workflows={workflows} />
+                        <WorkflowExecutionHistory
+                            executions={executions}
+                            workflows={workflows}
+                        />
                     ) : (
                         <WorkflowList
                             workflows={workflows}
@@ -356,6 +393,7 @@ export default function WorkflowsIndex({
                             mutating={mutating}
                             onEdit={openEdit}
                             onToggle={toggleWorkflow}
+                            onTest={testWorkflow}
                             onDelete={deleteWorkflow}
                             onUseTemplate={applyTemplate}
                         />
@@ -367,11 +405,17 @@ export default function WorkflowsIndex({
                 open={editorOpen}
                 onOpenChange={requestClose}
                 title={t(editorTitle)}
-                description={t('Save writes the structure. Enable is a separate action.')}
+                description={t(
+                    'Save writes the structure. Enable is a separate action.',
+                )}
                 showFormLink={false}
                 className="sm:max-w-2xl"
             >
-                <form onSubmit={submitEditor} className="space-y-4" data-workflow="editor-form">
+                <form
+                    onSubmit={submitEditor}
+                    className="space-y-4"
+                    data-workflow="editor-form"
+                >
                     <WorkflowBuilder
                         draft={draft}
                         onChange={patchDraft}
@@ -396,11 +440,16 @@ export default function WorkflowsIndex({
                             {summarizeWorkflow(draft, condition_fields, stages)}
                         </p>
                         <p className="mt-1 text-[12px] text-[var(--evo-ink-muted)]">
-                            This reviews the structure. It does not run the workflow.
+                            This reviews the structure. It does not run the
+                            workflow.
                         </p>
                     </div>
                     <div className="flex justify-end gap-2 pt-2">
-                        <Button type="button" variant="ghost" onClick={() => requestClose(false)}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => requestClose(false)}
+                        >
                             {t('Cancel')}
                         </Button>
                         <Button type="submit" disabled={!canManage || mutating}>

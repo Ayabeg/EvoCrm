@@ -25,6 +25,7 @@ export function WorkflowList({
     mutating,
     onEdit,
     onToggle,
+    onTest,
     onDelete,
     onUseTemplate,
 }: {
@@ -36,6 +37,7 @@ export function WorkflowList({
     mutating: boolean;
     onEdit: (workflow: WorkflowRow) => void;
     onToggle: (workflow: WorkflowRow) => void;
+    onTest?: (workflow: WorkflowRow) => void;
     onDelete: (workflow: WorkflowRow) => void;
     onUseTemplate: (key: string) => void;
 }) {
@@ -46,9 +48,15 @@ export function WorkflowList({
             accessorFn: (row) => row.name,
             cell: ({ row }) => (
                 <div className="min-w-0">
-                    <p className="truncate font-medium text-[var(--evo-ink)]">{row.original.name}</p>
+                    <p className="truncate font-medium text-[var(--evo-ink)]">
+                        {row.original.name}
+                    </p>
                     <p className="mt-0.5 text-[12px] leading-4 text-[var(--evo-ink-muted)]">
-                        {summarizeWorkflowRow(row.original, conditionFields, stages)}
+                        {summarizeWorkflowRow(
+                            row.original,
+                            conditionFields,
+                            stages,
+                        )}
                     </p>
                 </div>
             ),
@@ -60,8 +68,12 @@ export function WorkflowList({
             cell: ({ row }) => (
                 <div className="text-[13px] text-[var(--evo-ink)]">
                     {workflowTriggerLabel(row.original.trigger)}
-                    {row.original.trigger_stage ? ` → ${row.original.trigger_stage}` : ''}
-                    {row.original.trigger_status_label ? ` → ${row.original.trigger_status_label}` : ''}
+                    {row.original.trigger_stage
+                        ? ` → ${row.original.trigger_stage}`
+                        : ''}
+                    {row.original.trigger_status_label
+                        ? ` → ${row.original.trigger_status_label}`
+                        : ''}
                 </div>
             ),
         },
@@ -87,16 +99,25 @@ export function WorkflowList({
         <div className="space-y-5">
             <section className="rounded-[var(--evo-radius-standard)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)]">
                 <div className="border-b border-[var(--evo-hairline)] px-4 py-3">
-                    <h2 className="text-[13px] font-medium text-[var(--evo-ink)]">{t('Evo templates')}</h2>
+                    <h2 className="text-[13px] font-medium text-[var(--evo-ink)]">
+                        {t('Evo templates')}
+                    </h2>
                     <p className="mt-1 text-[12px] text-[var(--evo-ink-muted)]">
-                        {t('Starters that write a valid workflow into this workspace.')}
+                        {t(
+                            'Starters that write a valid workflow into this workspace.',
+                        )}
                     </p>
                 </div>
                 <ul className="divide-y divide-[var(--evo-hairline)]">
                     {templates.map((template) => (
-                        <li key={template.key} className="flex flex-wrap items-start justify-between gap-3 px-4 py-3">
+                        <li
+                            key={template.key}
+                            className="flex flex-wrap items-start justify-between gap-3 px-4 py-3"
+                        >
                             <div className="min-w-0">
-                                <p className="text-[13px] font-medium text-[var(--evo-ink)]">{template.name}</p>
+                                <p className="text-[13px] font-medium text-[var(--evo-ink)]">
+                                    {template.name}
+                                </p>
                                 <p className="mt-0.5 text-[12px] text-[var(--evo-ink-muted)]">
                                     {template.description}
                                 </p>
@@ -135,7 +156,9 @@ export function WorkflowList({
                     hideColumnPicker
                     embedded
                     enableSorting={false}
-                    emptyTitle={t('No workflows yet. Use an Evo template or create one.')}
+                    emptyTitle={t(
+                        'No workflows yet. Use an Evo template or create one.',
+                    )}
                     rowActions={
                         canManage
                             ? (workflow) => (
@@ -156,8 +179,21 @@ export function WorkflowList({
                                           disabled={mutating}
                                           onClick={() => onToggle(workflow)}
                                       >
-                                          {workflow.active ? t('Turn off') : t('Turn on')}
+                                          {workflow.active
+                                              ? t('Turn off')
+                                              : t('Turn on')}
                                       </Button>
+                                      {onTest ? (
+                                          <Button
+                                              type="button"
+                                              variant="outline"
+                                              size="sm"
+                                              disabled={mutating}
+                                              onClick={() => onTest(workflow)}
+                                          >
+                                              {t('Dry run')}
+                                          </Button>
+                                      ) : null}
                                       <Button
                                           type="button"
                                           variant="ghost"

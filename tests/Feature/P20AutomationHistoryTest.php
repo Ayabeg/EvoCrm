@@ -44,7 +44,7 @@ it('keeps P19 authoring frozen and does not invent a second engine', function ()
         ->and($src['history'])->toContain('Retry is not available')
         ->and($src['lib'])->not->toContain('success_rate')
         ->and($src['lib'])->not->toContain('run_count')
-        ->and(substr_count($src['page'], 'if (!beginExclusiveAction(mutatingRef))'))->toBe(4);
+        ->and(substr_count($src['page'], 'if (!beginExclusiveAction(mutatingRef))'))->toBe(5);
 });
 
 it('persists an immediate execution with then-branch facts', function () {

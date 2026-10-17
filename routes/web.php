@@ -246,6 +246,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::put('/crm/workflows/{workflow}', [WorkflowController::class, 'update'])->name('crm.workflows.update');
     Route::post('/crm/workflows/templates', [WorkflowController::class, 'storeTemplate'])->name('crm.workflows.templates.store');
     Route::post('/crm/workflows/{workflow}/toggle', [WorkflowController::class, 'toggle'])->name('crm.workflows.toggle');
+    Route::post('/crm/workflows/{workflow}/test', [WorkflowController::class, 'test'])->name('crm.workflows.test');
     Route::delete('/crm/workflows/{workflow}', [WorkflowController::class, 'destroy'])->name('crm.workflows.destroy');
     Route::get('/crm/quotes', [QuoteController::class, 'index'])->name('crm.quotes.index');
     Route::post('/crm/deals/{deal}/quotes', [QuoteController::class, 'store'])->name('crm.quotes.store');

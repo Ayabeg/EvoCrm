@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contact;
 use App\Models\CustomAttributeDefinition;
+use App\Models\Deal;
 use App\Models\Mailbox;
 use App\Models\SavedFilter;
 use App\Models\Sequence;
@@ -15,6 +17,7 @@ use App\Models\WorkflowExecution;
 use App\Models\Workspace;
 use App\Services\Crm\EvoWorkflowTemplates;
 use App\Services\Crm\WorkflowExecutionPresenter;
+use App\Services\Crm\WorkflowRunner;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -222,6 +225,51 @@ class WorkflowController extends Controller
         return redirect()->route('crm.workflows.index');
     }
 
+    public function test(Request $request, Workflow $workflow, WorkflowRunner $runner): RedirectResponse
+    {
+        abort_unless((int) $workflow->workspace_id === (int) $request->user()->workspace_id, 404);
+
+        $workspace = $request->user()->workspace;
+        $data = $request->validate([
+            'contact_id' => ['nullable', 'integer'],
+            'deal_id' => ['nullable', 'integer'],
+            'ticket_id' => ['nullable', 'integer'],
+        ]);
+
+        $contact = isset($data['contact_id'])
+            ? Contact::query()->forWorkspace($workspace)->findOrFail($data['contact_id'])
+            : null;
+        $deal = isset($data['deal_id'])
+            ? Deal::query()->forWorkspace($workspace)->with('contact')->findOrFail($data['deal_id'])
+            : null;
+        $ticket = isset($data['ticket_id'])
+            ? Ticket::query()->forWorkspace($workspace)->with(['contact', 'deal'])->findOrFail($data['ticket_id'])
+            : null;
+
+        if (! $contact && ! $deal && ! $ticket) {
+            [$contact, $deal, $ticket] = $this->defaultPreviewRecords($workspace, $workflow);
+        }
+
+        $contact ??= $deal?->contact ?? $ticket?->contact;
+        $deal ??= $ticket?->deal;
+        $preview = $runner->preview($workspace, $workflow, $contact, $deal, $ticket);
+        $action = $preview['action'] ?? 'no action';
+        $condition = $preview['condition_passed'] === null
+            ? 'no condition'
+            : ($preview['condition_passed'] ? 'condition passed' : 'condition did not pass');
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Dry run complete: :branch branch → :action; :condition. No changes were made.', [
+                'branch' => $preview['branch'],
+                'action' => $action,
+                'condition' => $condition,
+            ]),
+        ]);
+
+        return back();
+    }
+
     public function destroy(Request $request, Workflow $workflow): RedirectResponse
     {
         abort_unless((int) $workflow->workspace_id === (int) $request->user()->workspace_id, 404);
@@ -365,6 +413,38 @@ class WorkflowController extends Controller
                 'assign_entity' => $data['assign_entity'] ?? null,
                 'notify_user_id' => isset($data['notify_user_id']) ? (int) $data['notify_user_id'] : null,
             ],
+        ];
+    }
+
+    /**
+     * @return array{0: Contact|null, 1: Deal|null, 2: Ticket|null}
+     */
+    private function defaultPreviewRecords(Workspace $workspace, Workflow $workflow): array
+    {
+        if (str_starts_with($workflow->trigger, 'ticket.')) {
+            $ticket = Ticket::query()
+                ->forWorkspace($workspace)
+                ->with(['contact', 'deal'])
+                ->latest('id')
+                ->first();
+
+            return [$ticket?->contact, $ticket?->deal, $ticket];
+        }
+
+        if (str_starts_with($workflow->trigger, 'deal.')) {
+            $deal = Deal::query()
+                ->forWorkspace($workspace)
+                ->with('contact')
+                ->latest('id')
+                ->first();
+
+            return [$deal?->contact, $deal, null];
+        }
+
+        return [
+            Contact::query()->forWorkspace($workspace)->latest('id')->first(),
+            null,
+            null,
         ];
     }
 

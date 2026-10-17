@@ -262,6 +262,34 @@ class WorkflowRunner
         return $this->execute($workspace, $workflow, $contact, $deal, $ticket);
     }
 
+    /**
+     * Resolve a workflow branch without executing or persisting its action.
+     *
+     * @return array{branch: string, action: string|null, condition_passed: bool|null, action_parameters: array<string, mixed>}
+     */
+    public function preview(
+        Workspace $workspace,
+        Workflow $workflow,
+        ?Contact $contact = null,
+        ?Deal $deal = null,
+        ?Ticket $ticket = null,
+    ): array {
+        $hasCondition = $workflow->hasCondition();
+        $conditionPassed = $hasCondition
+            ? $this->conditionPasses($workspace, $workflow, $contact, $deal, $ticket)
+            : null;
+        $useThen = ! $hasCondition || $conditionPassed;
+        $action = $useThen ? $workflow->action : $workflow->else_action;
+        $config = $useThen ? $workflow->config() : $workflow->elseConfig();
+
+        return [
+            'branch' => $useThen ? 'then' : 'else',
+            'action' => filled($action) ? (string) $action : null,
+            'condition_passed' => $conditionPassed,
+            'action_parameters' => $this->redactor->redactParameters($config),
+        ];
+    }
+
     private function run(Workspace $workspace, string $trigger, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
     {
         $workflows = Workflow::query()
