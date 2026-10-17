@@ -76,7 +76,7 @@ function DialogContent({
                 {children}
                 {hideClose ? null : (
                     <DialogPrimitive.Close
-                        className="absolute end-3 top-3 inline-flex size-8 items-center justify-center rounded-[var(--evo-radius-compact)] text-[var(--evo-ink-muted)] hover:bg-[var(--evo-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]"
+                        className="absolute end-3 top-3 inline-flex size-9 items-center justify-center rounded-[var(--evo-radius-compact)] text-[var(--evo-ink-muted)] hover:bg-[var(--evo-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]"
                         aria-label={sr.close}
                     >
                         <X className="size-4" aria-hidden />

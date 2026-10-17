@@ -1,6 +1,9 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { GearSix, SignOut } from '@phosphor-icons/react';
-import { LANGUAGE_OPTIONS } from '@/components/language-selector';
+import {
+    LANGUAGE_OPTIONS,
+    persistLocale,
+} from '@/components/language-selector';
 import { UserInfo } from '@/components/user-info';
 import {
     DropdownMenuGroup,
@@ -16,7 +19,6 @@ import {
 import { useAppearance } from '@/hooks/use-appearance';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import type { AppLocale } from '@/lib/i18n';
 import { isAppLocale, t } from '@/lib/i18n';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
@@ -25,19 +27,6 @@ import type { User } from '@/types/auth';
 type Props = {
     user: User;
 };
-
-function persistLocale(next: AppLocale): void {
-    router.post(
-        '/locale',
-        { locale: next },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                window.location.reload();
-            },
-        },
-    );
-}
 
 export function UserMenuContent({ user }: Props) {
     const cleanup = useMobileNavigation();

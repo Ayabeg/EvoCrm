@@ -1,14 +1,14 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
-import AppLogoIcon from '@/components/app-logo-icon';
 import { EvoRail } from '@/components/shell/evo-rail';
+import { GlobalHeader } from '@/components/shell/global-header';
 import {
     RAIL_EXPAND_MIN,
     readSidebarCookie,
     writeSidebarCookie,
 } from '@/components/shell/rail-state';
-import { Sidebar, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import {
     CommandPalette,
     useCommandPaletteShortcut,
@@ -98,10 +98,10 @@ export function EvoShell({ children }: { children: ReactNode }) {
     );
     const collapsed = !hydrated
         ? !sidebarOpen
-        : cookie !== null
-          ? !cookie
-          : railMode === 'pinned'
-            ? pinnedCollapsed
+        : railMode === 'pinned'
+          ? pinnedCollapsed
+          : cookie !== null
+            ? !cookie
             : viewportWidth < RAIL_EXPAND_MIN;
     const resolvedRailMode =
         !hydrated
@@ -115,8 +115,6 @@ export function EvoShell({ children }: { children: ReactNode }) {
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const path = (page.url.split('?')[0] ?? '/').split('#')[0] ?? '/';
     const inboxActive = path === '/inbox' || path.startsWith('/inbox/');
-    const workspace = page.props.workspace as { name?: string } | null;
-    const workspaceName = workspace?.name?.trim() || 'EvoCRM';
 
     const setRailCollapsed = useCallback((next: boolean) => {
         setRailMode('pinned');
@@ -314,22 +312,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
                 </Sidebar>
             ) : null}
             <div className="evo-workspace relative flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-                <header className="evo-mobile-header flex h-12 shrink-0 items-center gap-2 border-b border-[var(--evo-hairline)] px-3 min-[769px]:hidden">
-                    <SidebarTrigger
-                        className="size-9 shrink-0 text-[var(--evo-ink)]"
-                        aria-label={t('Open menu')}
-                    />
-                    <Link
-                        href="/dashboard"
-                        className="flex min-w-0 items-center gap-2"
-                        title="EvoCRM"
-                    >
-                        <AppLogoIcon className="size-5" />
-                        <span className="truncate text-[13px] font-medium text-[var(--evo-ink)]">
-                            {workspaceName}
-                        </span>
-                    </Link>
-                </header>
+                <GlobalHeader />
                 <div className="flex min-h-0 min-w-0 flex-1 flex-col">
                     {children}
                 </div>
@@ -353,7 +336,7 @@ export function EvoShell({ children }: { children: ReactNode }) {
                             {t('Shortcuts')}
                         </h2>
                         <ul className="grid gap-1.5 text-[var(--evo-ink-secondary)]">
-                            <li>⌘K — {t('Search EvoCRM…')}</li>
+                            <li>⌘K — {t('Search')}</li>
                             <li>C — {t('Create')}</li>
                             <li>⌘\ — {t('Collapse sidebar')}</li>
                             <li>G then A — {t('nav.home')}</li>

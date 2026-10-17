@@ -37,16 +37,28 @@
                 document.documentElement.classList.toggle('dark', dark);
                 document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
                 document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+
+                let locale = @json($htmlLocale);
+                try {
+                    const storedLocale = localStorage.getItem('locale');
+                    if (storedLocale === 'fr' || storedLocale === 'en' || storedLocale === 'ar') {
+                        locale = storedLocale;
+                    }
+                } catch (e) {}
+
+                document.documentElement.lang = locale;
+                document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
+                document.documentElement.dataset.locale = locale;
             })();
         </script>
 
         <style>
             html {
-                background-color: #F7F8F5;
+                background-color: #FBFBF9;
             }
 
             html.dark {
-                background-color: #0A0A0A;
+                background-color: #050505;
             }
         </style>
 

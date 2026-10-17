@@ -101,7 +101,7 @@ function ContextMenuLabel({
 }: React.ComponentProps<typeof ContextMenuPrimitive.Label> & { inset?: boolean }) {
     return (
         <ContextMenuPrimitive.Label
-            className={cn('px-2 py-1.5 text-[11px] font-medium text-[var(--evo-ink-muted)]', inset && 'ps-8', className)}
+            className={cn('px-2 py-2 text-[12px] font-medium text-[var(--evo-ink-muted)]', inset && 'ps-8', className)}
             {...props}
         />
     );
@@ -112,7 +112,7 @@ function ContextMenuSeparator({ className, ...props }: React.ComponentProps<type
 }
 
 function ContextMenuShortcut({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
-    return <span className={cn('ms-auto text-[11px] text-[var(--evo-ink-muted)]', className)} {...props} />;
+    return <span className={cn('ms-auto text-[12px] text-[var(--evo-ink-muted)]', className)} {...props} />;
 }
 
 function ContextMenuSubTrigger({

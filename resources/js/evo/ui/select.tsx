@@ -80,7 +80,7 @@ function SelectTrigger({
                 'data-[placeholder]:text-[var(--evo-ink-faint)]',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--evo-canvas)]',
                 'disabled:cursor-not-allowed disabled:opacity-50',
-                size === 'sm' ? 'h-8' : 'h-9',
+                size === 'sm' ? 'h-9' : 'h-9',
                 className,
             )}
             {...props}
@@ -122,7 +122,7 @@ function SelectContent({
 function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
     return (
         <SelectPrimitive.Label
-            className={cn('px-2 py-1.5 text-[11px] font-medium text-[var(--evo-ink-muted)]', className)}
+            className={cn('px-2 py-2 text-[12px] font-medium text-[var(--evo-ink-muted)]', className)}
             {...props}
         />
     );

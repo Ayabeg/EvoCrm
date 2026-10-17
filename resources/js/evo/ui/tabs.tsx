@@ -31,7 +31,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     return (
         <TabsPrimitive.Trigger
             className={cn(
-                'inline-flex h-7 items-center justify-center rounded-[var(--evo-radius-compact)] px-2.5 font-medium text-[var(--evo-ink-secondary)]',
+                'inline-flex h-8 items-center justify-center rounded-[var(--evo-radius-compact)] px-2.5 font-medium text-[var(--evo-ink-secondary)]',
                 'data-[state=active]:bg-[var(--evo-surface)] data-[state=active]:text-[var(--evo-ink)] data-[state=active]:shadow-[var(--evo-shadow-pill)]',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]',
                 'disabled:pointer-events-none disabled:opacity-50',
@@ -61,7 +61,7 @@ function PillTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     return (
         <TabsPrimitive.Trigger
             className={cn(
-                'inline-flex h-8 items-center rounded-[var(--evo-radius-pill)] border border-[var(--evo-hairline)] px-3 text-[12px] text-[var(--evo-ink-secondary)]',
+                'inline-flex h-9 items-center rounded-[var(--evo-radius-pill)] border border-[var(--evo-hairline)] px-3 text-[13px] text-[var(--evo-ink-secondary)]',
                 'data-[state=active]:border-[var(--evo-teal)] data-[state=active]:bg-[var(--evo-teal-soft)] data-[state=active]:text-[var(--evo-ink)]',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]',
                 className,

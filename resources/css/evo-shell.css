@@ -3,8 +3,8 @@
  * resources/js/evo/tokens/evo.css. This file only maps shell utility
  * names and paints the rail / workspace structure.
  *
- * Accent #EC6025 is scarce interaction orange.
- * Logo orange #D9500F is the mark only. Do not use it as a control fill.
+ * Accent #F05A28 is scarce interaction orange.
+ * Logo orange #EA580C is the mark only. Do not use it as a control fill.
  */
 
 @theme {
@@ -39,6 +39,40 @@
     color-scheme: inherit;
     background: transparent;
     color: inherit;
+}
+
+.evo-global-header {
+    background: var(--evo-surface);
+    border-color: var(--evo-hairline);
+    color: var(--evo-ink);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--evo-hairline) 60%, transparent);
+}
+
+.evo-global-control {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--evo-hairline);
+    border-radius: var(--evo-radius-pill);
+    background: var(--evo-surface);
+    padding-inline: 0.7rem;
+    color: var(--evo-ink-secondary);
+    transition:
+        border-color var(--evo-duration-micro) var(--evo-ease),
+        background-color var(--evo-duration-micro) var(--evo-ease),
+        color var(--evo-duration-micro) var(--evo-ease);
+}
+
+.evo-global-control:hover {
+    border-color: var(--evo-hairline-strong);
+    background: var(--evo-surface-subtle);
+    color: var(--evo-ink);
+}
+
+.evo-global-control:focus-visible {
+    outline: 2px solid var(--evo-focus);
+    outline-offset: 2px;
 }
 
 @media (min-width: 769px) {
@@ -118,7 +152,7 @@
 }
 
 .dark .evo-workspace {
-    background: var(--evo-surface);
+    background: var(--evo-canvas);
 }
 
 .evo-nav-section-label {

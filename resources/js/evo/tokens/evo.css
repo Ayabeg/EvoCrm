@@ -3,36 +3,35 @@
  * This is the only file that may declare --evo-* values.
  * app.css, evo-shell.css, design-lab.css and ds layers alias into these.
  *
- * Light workspace: canvas #F7F8F5, surface #FFFFFF, ink #0D1B24,
- * hairline #E6E8E3, teal #0F4C5C, primary #EC6025.
- * Dark cabinet (one scale): #0A0A0A / #121212 / #1C1C1C.
- * Logo orange #D9500F is the mark only — never a control fill.
- * Primary labels on orange use #121212 (white on #EC6025 is 3.35:1).
+ * Light workspace: warm canvas #FBFBF9, white surfaces, slate ink,
+ * hairline #E5E7EB, teal selection, primary #F05A28.
+ * Dark cabinet: #050505 / #0A0A0A / #111111 with micro-borders.
+ * The signature orange is reserved for intentional actions and active state.
  */
 
 :root {
-    --evo-canvas: #f7f8f5;
+    --evo-canvas: #fbfbf9;
     --evo-surface: #ffffff;
-    --evo-surface-subtle: #f1f2ee;
+    --evo-surface-subtle: #f7f7f5;
     --evo-surface-raised: #ffffff;
-    --evo-ink: #0d1b24;
-    --evo-ink-secondary: #4a5a63;
-    --evo-ink-muted: #5b6b73;
-    --evo-ink-faint: #8a969c;
-    --evo-hairline: #e6e8e3;
-    --evo-hairline-strong: #d5d8d1;
+    --evo-ink: #111827;
+    --evo-ink-secondary: #4b5563;
+    --evo-ink-muted: #6b7280;
+    --evo-ink-faint: #9ca3af;
+    --evo-hairline: #e5e7eb;
+    --evo-hairline-strong: #d1d5db;
     --evo-teal: #0f4c5c;
     --evo-teal-ink: #0f4c5c;
     --evo-teal-soft: rgba(15, 76, 92, 0.08);
     --evo-teal-line: color-mix(in srgb, var(--evo-teal) 40%, transparent);
     --evo-focus: var(--evo-teal);
     --evo-hover: rgba(13, 27, 36, 0.04);
-    --evo-primary: #ec6025;
-    --evo-primary-hover: color-mix(in srgb, #ec6025 88%, #000);
-    --evo-primary-pressed: color-mix(in srgb, #ec6025 76%, #000);
-    --evo-primary-soft: color-mix(in srgb, #ec6025 12%, #ffffff);
-    --evo-on-primary: #121212;
-    --evo-logo: #d9500f;
+    --evo-primary: #f05a28;
+    --evo-primary-hover: color-mix(in srgb, #f05a28 88%, #000);
+    --evo-primary-pressed: color-mix(in srgb, #f05a28 76%, #000);
+    --evo-primary-soft: color-mix(in srgb, #f05a28 12%, #ffffff);
+    --evo-on-primary: #ffffff;
+    --evo-logo: #ea580c;
     --evo-success: #24845b;
     --evo-success-soft: color-mix(in srgb, #24845b 8%, var(--evo-surface));
     --evo-warning: #c77a11;
@@ -48,10 +47,10 @@
     --evo-chart-3: #5e8a94;
     --evo-chart-4: #9aa5ab;
     --evo-chart-5: #c9cfcb;
-    --evo-chart-highlight: #ec6025;
+    --evo-chart-highlight: #f05a28;
 
-    --evo-sidebar: #f0f2ee;
-    --evo-sidebar-hover: #e8ebe6;
+    --evo-sidebar: #ffffff;
+    --evo-sidebar-hover: #f7f7f5;
 
     --evo-surface-l0: var(--evo-canvas);
     --evo-surface-l1: var(--evo-surface);
@@ -71,7 +70,7 @@
     --evo-font-sans: var(--font-ui-latin);
     --evo-font-mono: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
 
-    --evo-text-11: 0.6875rem;
+    --evo-text-11: 0.75rem;
     --evo-text-12: 0.75rem;
     --evo-text-13: 0.8125rem;
     --evo-text-14: 0.875rem;
@@ -92,10 +91,10 @@
     --evo-type-metric: var(--evo-text-32);
 
     --evo-control-xs: 28px;
-    --evo-control-compact: 32px;
+    --evo-control-compact: 36px;
     --evo-control-standard: 36px;
     --evo-control-comfortable: 36px;
-    --evo-row-compact: 32px;
+    --evo-row-compact: 36px;
     --evo-row-standard: 36px;
     --evo-row-comfortable: 40px;
     --evo-row-touch: 44px;
@@ -104,7 +103,7 @@
     --evo-header-view: 40px;
     --evo-header-chip: 36px;
     --evo-header-toolbar: 40px;
-    --evo-nav-item: 32px;
+    --evo-nav-item: 36px;
     --evo-footer-settings: 32px;
     --evo-footer-user: 44px;
     --evo-rail: 224px;
@@ -126,9 +125,9 @@
     --evo-radius-pill: 999px;
 
     --evo-shadow-none: none;
-    --evo-shadow-pill: 0 1px 1px rgba(13, 27, 36, 0.08);
-    --evo-shadow-floating: 0 1px 1px rgba(13, 27, 36, 0.16);
-    --evo-shadow-modal: 0 8px 24px rgba(13, 27, 36, 0.12);
+    --evo-shadow-pill: 0 1px 2px rgba(17, 24, 39, 0.06);
+    --evo-shadow-floating: 0 1px 3px rgba(17, 24, 39, 0.08);
+    --evo-shadow-modal: 0 12px 32px rgba(17, 24, 39, 0.14);
 
     --evo-duration-micro: 120ms;
     --evo-duration-rail: 160ms;
@@ -150,52 +149,52 @@
 .evo-cabinet,
 [data-evo-theme='dark'] {
     color-scheme: dark;
-    --evo-canvas: #0a0a0a;
-    --evo-surface: #121212;
-    --evo-surface-subtle: #1c1c1c;
-    --evo-surface-raised: #1c1c1c;
-    --evo-sidebar: #111111;
-    --evo-sidebar-hover: #1c1c1c;
-    --evo-ink: #f5f5f5;
-    --evo-ink-secondary: #a3a3a3;
-    --evo-ink-muted: #8a8a8a;
-    --evo-ink-faint: #737373;
-    --evo-hairline: #262626;
-    --evo-hairline-strong: #3a3a3a;
+    --evo-canvas: #050505;
+    --evo-surface: #0a0a0a;
+    --evo-surface-subtle: #111111;
+    --evo-surface-raised: #111111;
+    --evo-sidebar: #0a0a0a;
+    --evo-sidebar-hover: #111111;
+    --evo-ink: #f9fafb;
+    --evo-ink-secondary: #d1d5db;
+    --evo-ink-muted: #9ca3af;
+    --evo-ink-faint: #6b7280;
+    --evo-hairline: #1f1f1f;
+    --evo-hairline-strong: #262626;
     --evo-teal: #0f4c5c;
     --evo-teal-ink: #5eb0c0;
-    --evo-teal-soft: color-mix(in srgb, #0f4c5c 28%, #121212);
+    --evo-teal-soft: color-mix(in srgb, #0f4c5c 28%, #0a0a0a);
     --evo-teal-line: color-mix(in srgb, #5eb0c0 40%, transparent);
     --evo-focus: #5eb0c0;
     --evo-hover: rgba(255, 255, 255, 0.06);
-    --evo-primary: #ec6025;
-    --evo-primary-hover: color-mix(in srgb, #ec6025 88%, #000);
-    --evo-primary-pressed: color-mix(in srgb, #ec6025 76%, #000);
-    --evo-primary-soft: color-mix(in srgb, #ec6025 18%, #121212);
-    --evo-on-primary: #121212;
-    --evo-success-soft: color-mix(in srgb, #24845b 18%, #121212);
-    --evo-warning-soft: color-mix(in srgb, #c77a11 18%, #121212);
-    --evo-danger-soft: color-mix(in srgb, #d92d20 18%, #121212);
+    --evo-primary: #f05a28;
+    --evo-primary-hover: color-mix(in srgb, #f05a28 88%, #000);
+    --evo-primary-pressed: color-mix(in srgb, #f05a28 76%, #000);
+    --evo-primary-soft: color-mix(in srgb, #f05a28 18%, #0a0a0a);
+    --evo-on-primary: #ffffff;
+    --evo-success-soft: color-mix(in srgb, #24845b 18%, #0a0a0a);
+    --evo-warning-soft: color-mix(in srgb, #c77a11 18%, #0a0a0a);
+    --evo-danger-soft: color-mix(in srgb, #d92d20 18%, #0a0a0a);
     --evo-info-soft: var(--evo-teal-soft);
-    --evo-track: #1c1c1c;
-    --evo-chart-1: #f5f5f5;
+    --evo-track: #111111;
+    --evo-chart-1: #f9fafb;
     --evo-chart-2: #5eb0c0;
     --evo-chart-3: #8a969c;
     --evo-chart-4: #5e8a94;
     --evo-chart-5: #3a3a3a;
-    --evo-surface-l0: #0a0a0a;
-    --evo-surface-l1: #121212;
-    --evo-surface-l2: #1c1c1c;
-    --evo-surface-l3: #1c1c1c;
-    --evo-surface-l4: #1c1c1c;
-    --evo-border: #262626;
-    --evo-border-subtle: #1c1c1c;
-    --evo-border-strong: #3a3a3a;
+    --evo-surface-l0: #050505;
+    --evo-surface-l1: #0a0a0a;
+    --evo-surface-l2: #111111;
+    --evo-surface-l3: #111111;
+    --evo-surface-l4: #111111;
+    --evo-border: #1f1f1f;
+    --evo-border-subtle: #111111;
+    --evo-border-strong: #262626;
     --evo-border-focus: #5eb0c0;
-    --evo-accent: #ec6025;
-    --evo-shadow-pill: none;
-    --evo-shadow-floating: none;
-    --evo-shadow-modal: none;
+    --evo-accent: #f05a28;
+    --evo-shadow-pill: 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --evo-shadow-floating: 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --evo-shadow-modal: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
 html[dir='rtl'] {

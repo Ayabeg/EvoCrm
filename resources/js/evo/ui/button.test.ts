@@ -11,7 +11,7 @@ describe('evo button', () => {
         expect(classes).toContain('text-[var(--evo-on-primary)]');
     });
 
-    it('keeps compact controls at 32px', () => {
-        expect(buttonVariants({ size: 'sm' })).toContain('h-8');
+    it('keeps compact controls at the comfortable 36px target', () => {
+        expect(buttonVariants({ size: 'sm' })).toContain('h-9');
     });
 });

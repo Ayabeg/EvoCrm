@@ -95,4 +95,6 @@ export function applyDocumentLocale(next: string | undefined = locale): void {
     document.documentElement.lang = resolved;
     document.documentElement.dir = documentDir(resolved);
     document.documentElement.dataset.locale = resolved;
+    document.body.dir = documentDir(resolved);
+    document.body.dataset.locale = resolved;
 }

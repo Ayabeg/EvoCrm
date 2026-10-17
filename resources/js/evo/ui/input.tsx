@@ -5,7 +5,7 @@
  * Upstream: https://github.com/shadcn-ui/ui @ d75a96ab781f3d659be1ad287347d5887ce9f2fc
  * License: MIT (LICENSE.md, verified 2026-10-01)
  * Copied: 2026-10-01
- * Modified: 32/36 heights; adornments/clearable from prior product API; Evo tokens; teal focus.
+ * Modified: 36px control heights; adornments/clearable from prior product API; Evo tokens; teal focus.
  */
 
 import * as React from 'react';
@@ -33,7 +33,7 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
 }
 
 const sizeClass: Record<InputSize, string> = {
-    sm: 'h-8 text-[12px] px-2.5',
+    sm: 'h-9 text-[13px] px-3',
     default: 'h-9 text-[13px] px-3',
     lg: 'h-9 text-[13px] px-3',
 };

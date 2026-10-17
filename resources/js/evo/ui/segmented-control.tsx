@@ -25,7 +25,7 @@ function SegmentedControl({ className, size = 'md', layout = 'hug', ...props }: 
             className={cn(
                 'inline-flex items-center rounded-[var(--evo-radius-standard)] bg-[var(--evo-surface-subtle)] p-0.5',
                 layout === 'fill' && 'w-full',
-                size === 'sm' && 'h-8',
+                size === 'sm' && 'h-9',
                 size === 'md' && 'h-9',
                 size === 'lg' && 'h-9',
                 className,
@@ -42,7 +42,7 @@ function SegmentedControlItem({
     return (
         <ToggleGroupPrimitive.Item
             className={cn(
-                'inline-flex flex-1 items-center justify-center rounded-[var(--evo-radius-compact)] px-2.5 text-[12px] font-medium text-[var(--evo-ink-secondary)]',
+                'inline-flex flex-1 items-center justify-center rounded-[var(--evo-radius-compact)] px-2.5 text-[13px] font-medium text-[var(--evo-ink-secondary)]',
                 'data-[state=on]:bg-[var(--evo-surface)] data-[state=on]:text-[var(--evo-ink)] data-[state=on]:shadow-[var(--evo-shadow-pill)]',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]',
                 'disabled:pointer-events-none disabled:opacity-50',
