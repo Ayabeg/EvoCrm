@@ -271,7 +271,7 @@ class ApiPayload
      */
     public static function quote(Quote $quote): array
     {
-        $quote->loadMissing(['items', 'deal.contact']);
+        $quote->loadMissing(['items', 'order', 'deal.contact']);
 
         return [
             'id' => $quote->id,
@@ -284,6 +284,12 @@ class ApiPayload
             'sent_at' => $quote->sent_at?->toIso8601String(),
             'accepted_at' => $quote->accepted_at?->toIso8601String(),
             'revoked_at' => $quote->revoked_at?->toIso8601String(),
+            'order' => $quote->order ? [
+                'id' => $quote->order->id,
+                'status' => $quote->order->status,
+                'total_cents' => (int) $quote->order->total_cents,
+                'paid_at' => $quote->order->paid_at?->toIso8601String(),
+            ] : null,
             'public_url' => $quote->public_token ? url('/q/'.$quote->public_token) : null,
             'items' => $quote->items->map(fn ($item) => [
                 'id' => $item->id,

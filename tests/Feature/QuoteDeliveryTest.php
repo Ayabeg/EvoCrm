@@ -4,6 +4,7 @@ use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Mailbox;
+use App\Models\Order;
 use App\Models\Quote;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -70,4 +71,18 @@ it('emails an immutable quote snapshot and records the send', function () {
 
     expect($quote->fresh()->notes)->toBe('Valid 14 days')
         ->and($quote->fresh()->snapshot['items'][0]['name'])->toBe('EvoSales workspace');
+
+    $quote->forceFill([
+        'public_token' => 'paid-order-token',
+        'token_expires_at' => now()->addDay(),
+    ])->save();
+
+    $this->post('/q/paid-order-token/accept')->assertRedirect();
+
+    $this->actingAs($user)
+        ->post("/crm/quotes/{$quote->id}/mark-paid")
+        ->assertRedirect();
+
+    expect(Order::query()->where('quote_id', $quote->id)->value('status'))->toBe(Order::STATUS_PAID)
+        ->and(Order::query()->where('quote_id', $quote->id)->value('paid_at'))->not->toBeNull();
 });

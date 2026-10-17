@@ -19,6 +19,13 @@ export type QuoteRecord = {
     sent_at?: string | null;
     accepted_at?: string | null;
     revoked_at?: string | null;
+    order?: {
+        id: number;
+        status: string;
+        status_label: string;
+        total_cents: number;
+        paid_at?: string | null;
+    } | null;
     public_url?: string | null;
     immutable: boolean;
     can: {

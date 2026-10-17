@@ -254,6 +254,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/crm/quotes/{quote}/preview', [QuoteController::class, 'preview'])->name('crm.quotes.preview');
     Route::post('/crm/quotes/{quote}/send', [QuoteController::class, 'send'])->name('crm.quotes.send');
     Route::post('/crm/quotes/{quote}/revoke', [QuoteController::class, 'revoke'])->name('crm.quotes.revoke');
+    Route::post('/crm/quotes/{quote}/mark-paid', [QuoteController::class, 'markPaid'])->name('crm.quotes.mark-paid');
 
     Route::get('/crm/companies', [CompanyController::class, 'index'])->name('crm.companies.index');
     Route::post('/crm/companies', [CompanyController::class, 'store'])->name('crm.companies.store');

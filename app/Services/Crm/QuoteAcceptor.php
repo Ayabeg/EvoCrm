@@ -3,6 +3,7 @@
 namespace App\Services\Crm;
 
 use App\Models\Activity;
+use App\Models\Order;
 use App\Models\Quote;
 use App\Services\Operations\AuditLogger;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,17 @@ class QuoteAcceptor
                 'accepted_at' => now(),
                 'accepted_ip' => $ip,
             ])->save();
+
+            Order::query()->firstOrCreate(
+                ['quote_id' => $locked->id],
+                [
+                    'workspace_id' => $locked->workspace_id,
+                    'deal_id' => $locked->deal_id,
+                    'status' => Order::STATUS_PLACED,
+                    'total_cents' => (int) $locked->total_cents,
+                    'currency' => $locked->currency ?: 'DZD',
+                ],
+            );
 
             $activity = $this->activities->record($locked->workspace, [
                 'type' => 'quote_accepted',

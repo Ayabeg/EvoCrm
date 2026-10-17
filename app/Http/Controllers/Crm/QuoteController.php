@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Deal;
+use App\Models\Order;
 use App\Models\Quote;
 use App\Models\User;
 use App\Services\Crm\CrmFilter;
@@ -60,7 +61,7 @@ class QuoteController extends Controller
         $this->authorize('view', $quote);
         abort_unless((int) $quote->workspace_id === (int) $request->user()->workspace_id, 404);
 
-        $quote->load(['items', 'deal.owner:id,name', 'deal.contact:id,first_name,last_name,email', 'deal.company:id,name']);
+        $quote->load(['items', 'order', 'deal.owner:id,name', 'deal.contact:id,first_name,last_name,email', 'deal.company:id,name']);
 
         /** @var User $user */
         $user = $request->user();
@@ -166,6 +167,33 @@ class QuoteController extends Controller
         return back();
     }
 
+    public function markPaid(Request $request, Quote $quote): RedirectResponse
+    {
+        $this->authorize('update', $quote);
+        abort_unless((int) $quote->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($quote->accepted_at, 422, 'Only accepted quotes can become paid orders.');
+
+        $order = $quote->order()->firstOrCreate(
+            ['quote_id' => $quote->id],
+            [
+                'workspace_id' => $quote->workspace_id,
+                'deal_id' => $quote->deal_id,
+                'status' => Order::STATUS_PLACED,
+                'total_cents' => (int) $quote->total_cents,
+                'currency' => $quote->currency ?: 'DZD',
+            ],
+        );
+
+        if ($order->status !== Order::STATUS_PAID) {
+            $order->forceFill([
+                'status' => Order::STATUS_PAID,
+                'paid_at' => now(),
+            ])->save();
+        }
+
+        return back();
+    }
+
     /**
      * @param  Builder<Quote>  $query
      */
@@ -248,6 +276,13 @@ class QuoteController extends Controller
             'sent_at' => $quote->sent_at?->toIso8601String(),
             'accepted_at' => $quote->accepted_at?->toIso8601String(),
             'revoked_at' => $quote->revoked_at?->toIso8601String(),
+            'order' => $quote->order ? [
+                'id' => $quote->order->id,
+                'status' => $quote->order->status,
+                'status_label' => $quote->order->statusLabel(),
+                'total_cents' => (int) $quote->order->total_cents,
+                'paid_at' => $quote->order->paid_at?->toIso8601String(),
+            ] : null,
             'public_url' => $quote->tokenIsUsable() ? url('/q/'.$quote->public_token) : null,
             'immutable' => $quote->isImmutable(),
             'can' => [

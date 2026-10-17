@@ -5,6 +5,7 @@ use App\Models\AuditEvent;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Integration;
+use App\Models\Order;
 use App\Models\Quote;
 use App\Models\User;
 use App\Services\Crm\QuoteDocument;
@@ -82,9 +83,12 @@ it('lets a customer accept a quote without signing in', function () {
     expect($quote->fresh()->status)->toBe('accepted')
         ->and($quote->fresh()->accepted_at)->not->toBeNull()
         ->and(Activity::query()->where('type', 'quote_accepted')->where('deal_id', $quote->deal_id)->exists())->toBeTrue();
+    expect(Order::query()->where('quote_id', $quote->id)->count())->toBe(1)
+        ->and(Order::query()->where('quote_id', $quote->id)->value('status'))->toBe(Order::STATUS_PLACED);
 
     $this->post('/q/accept-me/accept')->assertRedirect();
     expect(Quote::query()->where('id', $quote->id)->whereNotNull('accepted_at')->count())->toBe(1);
+    expect(Order::query()->where('quote_id', $quote->id)->count())->toBe(1);
 });
 
 it('rejects expired revoked and foreign quote tokens', function () {

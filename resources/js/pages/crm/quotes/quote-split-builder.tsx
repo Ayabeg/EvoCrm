@@ -1,5 +1,5 @@
 import { Form } from '@inertiajs/react';
-import { PaperPlaneTilt, Prohibit } from '@phosphor-icons/react';
+import { CheckCircle, PaperPlaneTilt, Prohibit } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { WorkspacePanelSwitcher } from '@/components/crm/adaptive-workspace-shell';
 import {
@@ -26,6 +26,7 @@ import {
     quoteCanEdit,
     quoteDateInputValue,
     quoteRevokeAction,
+    quoteMarkPaidAction,
     quoteSendAction,
     quoteUnitDzd,
     quoteUpdateAction,
@@ -47,7 +48,10 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
     const sent = Boolean(quote.sent_at);
     const accepted = Boolean(quote.accepted_at);
     const revoked = Boolean(quote.revoked_at);
-    const documentLines = editable && items.length === 0 ? [{ name: '', quantity: 1, unit_cents: 0 }] : items;
+    const documentLines =
+        editable && items.length === 0
+            ? [{ name: '', quantity: 1, unit_cents: 0 }]
+            : items;
 
     const document = (
         <section
@@ -59,7 +63,9 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                 <p className="text-[11px] font-semibold tracking-wide text-mute uppercase">
                     {t('Quote')}
                 </p>
-                <p className="mt-1 text-[12px] text-mute">{t('Quote #:id', { id: quote.id })}</p>
+                <p className="mt-1 text-[12px] text-mute">
+                    {t('Quote #:id', { id: quote.id })}
+                </p>
                 <h2 className="mt-1 text-[22px] leading-tight font-semibold tracking-tight text-ink">
                     {quote.title}
                 </h2>
@@ -84,10 +90,7 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                     >
                         {({ processing }) => (
                             <>
-                                <LineTable
-                                    items={documentLines}
-                                    editable
-                                />
+                                <LineTable items={documentLines} editable />
                                 <div className="flex justify-end">
                                     <Button
                                         disabled={processing}
@@ -110,10 +113,14 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                 {quote.notes ? (
                     <p className="mt-6 text-[13px] text-ink">{quote.notes}</p>
                 ) : (
-                    <p className="mt-6 text-[12px] text-mute">{t('No notes.')}</p>
+                    <p className="mt-6 text-[12px] text-mute">
+                        {t('No notes.')}
+                    </p>
                 )}
 
-                <p className={`${QUOTE_MONEY_CLASS} mt-6 text-end text-[20px] font-semibold tracking-tight text-ink`}>
+                <p
+                    className={`${QUOTE_MONEY_CLASS} mt-6 text-end text-[20px] font-semibold tracking-tight text-ink`}
+                >
                     {formatDzd(quote.total_cents)}
                 </p>
             </div>
@@ -223,7 +230,8 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                     <div data-quote="delivery" className="space-y-3">
                         {accepted ? (
                             <p className="text-[13px] text-ink">
-                                {t('Accepted')} {formatQuoteWhen(quote.accepted_at)}.
+                                {t('Accepted')}{' '}
+                                {formatQuoteWhen(quote.accepted_at)}.
                             </p>
                         ) : revoked ? (
                             <p className="text-[13px] text-ink">
@@ -251,7 +259,9 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                                                 defaultValue={
                                                     quote.contact?.email ?? ''
                                                 }
-                                                placeholder={t('Customer email')}
+                                                placeholder={t(
+                                                    'Customer email',
+                                                )}
                                                 className="h-8 w-full"
                                             />
                                         </div>
@@ -288,9 +298,57 @@ export function QuoteSplitBuilder({ quote }: { quote: QuoteRecord }) {
                             </Form>
                         ) : null}
                         {quote.public_url ? (
-                            <p className="break-all text-[11px] text-mute">
+                            <p className="text-[11px] break-all text-mute">
                                 {quote.public_url}
                             </p>
+                        ) : null}
+                    </div>
+                </RecordSection>
+
+                <RecordSection title="Commerce">
+                    <div className="space-y-3" data-quote="commerce">
+                        {quote.order ? (
+                            <RecordFactList>
+                                <RecordFact
+                                    label="Order"
+                                    value={`#${quote.order.id}`}
+                                />
+                                <RecordFact
+                                    label="Status"
+                                    value={quote.order.status_label}
+                                />
+                                <RecordFact
+                                    label="Paid"
+                                    value={formatQuoteWhen(quote.order.paid_at)}
+                                />
+                            </RecordFactList>
+                        ) : (
+                            <p className="text-[13px] text-mute">
+                                {t(
+                                    'An order is created when this quote is accepted.',
+                                )}
+                            </p>
+                        )}
+                        {quote.order &&
+                        quote.order.status !== 'paid' &&
+                        accepted &&
+                        canUpdate ? (
+                            <Form
+                                action={quoteMarkPaidAction(quote.id)}
+                                method="post"
+                            >
+                                {({ processing }) => (
+                                    <Button
+                                        disabled={processing}
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-8"
+                                    >
+                                        <CheckCircle className="size-3.5" />
+                                        {t('Mark paid')}
+                                    </Button>
+                                )}
+                            </Form>
                         ) : null}
                     </div>
                 </RecordSection>
@@ -391,70 +449,85 @@ function LineTable({
     return (
         <div className={LOCAL_SCROLL_X_CLASS}>
             <table className="w-full min-w-[28rem] border-collapse text-[13px]">
-            <thead>
-                <tr className="border-b border-hairline text-start text-[11px] text-mute">
-                    <th className="py-1.5 font-medium">{t('Item')}</th>
-                    <th className="py-1.5 font-medium">{t('Qty')}</th>
-                    <th className="py-1.5 text-end font-medium">{t('Unit')}</th>
-                    <th className="py-1.5 text-end font-medium">{t('Total')}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {items.map((item, index) => (
-                    <tr key={item.id ?? index} className="border-b border-hairline">
-                        <td className="py-1.5 text-ink">
-                            {editable ? (
-                                <Input
-                                    name={`items[${index}][name]`}
-                                    defaultValue={item.name}
-                                    required
-                                    maxLength={180}
-                                    className="h-8"
-                                    aria-label={t('Line name')}
-                                />
-                            ) : (
-                                item.name
-                            )}
-                        </td>
-                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-mute`}>
-                            {editable ? (
-                                <Input
-                                    name={`items[${index}][quantity]`}
-                                    type="number"
-                                    min={1}
-                                    defaultValue={item.quantity}
-                                    className="h-8 w-16"
-                                    aria-label={t('Quantity')}
-                                />
-                            ) : (
-                                item.quantity
-                            )}
-                        </td>
-                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-end text-mute`}>
-                            {editable ? (
-                                <Input
-                                    name={`items[${index}][unit_dzd]`}
-                                    type="number"
-                                    min={0}
-                                    step="0.01"
-                                    required
-                                    defaultValue={quoteUnitDzd(item.unit_cents)}
-                                    className="ms-auto h-8 w-28 text-end"
-                                    aria-label={t('Amount (DA)')}
-                                />
-                            ) : (
-                                formatDzd(item.unit_cents)
-                            )}
-                        </td>
-                        <td className={`${QUOTE_MONEY_CLASS} py-1.5 text-end text-ink`}>
-                            {formatDzd(
-                                item.total_cents ??
-                                    item.quantity * item.unit_cents,
-                            )}
-                        </td>
+                <thead>
+                    <tr className="border-b border-hairline text-start text-[11px] text-mute">
+                        <th className="py-1.5 font-medium">{t('Item')}</th>
+                        <th className="py-1.5 font-medium">{t('Qty')}</th>
+                        <th className="py-1.5 text-end font-medium">
+                            {t('Unit')}
+                        </th>
+                        <th className="py-1.5 text-end font-medium">
+                            {t('Total')}
+                        </th>
                     </tr>
-                ))}
-            </tbody>
+                </thead>
+                <tbody>
+                    {items.map((item, index) => (
+                        <tr
+                            key={item.id ?? index}
+                            className="border-b border-hairline"
+                        >
+                            <td className="py-1.5 text-ink">
+                                {editable ? (
+                                    <Input
+                                        name={`items[${index}][name]`}
+                                        defaultValue={item.name}
+                                        required
+                                        maxLength={180}
+                                        className="h-8"
+                                        aria-label={t('Line name')}
+                                    />
+                                ) : (
+                                    item.name
+                                )}
+                            </td>
+                            <td
+                                className={`${QUOTE_MONEY_CLASS} py-1.5 text-mute`}
+                            >
+                                {editable ? (
+                                    <Input
+                                        name={`items[${index}][quantity]`}
+                                        type="number"
+                                        min={1}
+                                        defaultValue={item.quantity}
+                                        className="h-8 w-16"
+                                        aria-label={t('Quantity')}
+                                    />
+                                ) : (
+                                    item.quantity
+                                )}
+                            </td>
+                            <td
+                                className={`${QUOTE_MONEY_CLASS} py-1.5 text-end text-mute`}
+                            >
+                                {editable ? (
+                                    <Input
+                                        name={`items[${index}][unit_dzd]`}
+                                        type="number"
+                                        min={0}
+                                        step="0.01"
+                                        required
+                                        defaultValue={quoteUnitDzd(
+                                            item.unit_cents,
+                                        )}
+                                        className="ms-auto h-8 w-28 text-end"
+                                        aria-label={t('Amount (DA)')}
+                                    />
+                                ) : (
+                                    formatDzd(item.unit_cents)
+                                )}
+                            </td>
+                            <td
+                                className={`${QUOTE_MONEY_CLASS} py-1.5 text-end text-ink`}
+                            >
+                                {formatDzd(
+                                    item.total_cents ??
+                                        item.quantity * item.unit_cents,
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
             </table>
         </div>
     );

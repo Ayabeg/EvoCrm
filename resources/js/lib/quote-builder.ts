@@ -79,6 +79,10 @@ export function quoteRevokeAction(id: number): string {
     return `/crm/quotes/${id}/revoke`;
 }
 
+export function quoteMarkPaidAction(id: number): string {
+    return `/crm/quotes/${id}/mark-paid`;
+}
+
 export function quoteUpdateAction(id: number): string {
     return `/crm/quotes/${id}`;
 }
