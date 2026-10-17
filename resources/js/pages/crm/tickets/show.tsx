@@ -65,6 +65,15 @@ type ThreadMessage = {
     created_at?: string | null;
 };
 
+type KnowledgeArticlePreview = {
+    id: number;
+    title: string;
+    category?: string | null;
+    excerpt?: string | null;
+    body: string;
+    tags?: string[];
+};
+
 type PathState = {
     steps: PathStep[];
     current: string;
@@ -78,6 +87,7 @@ export default function TicketShow({
     askEvo,
     thread,
     messages = [],
+    knowledgeArticles = [],
     attachableThreads = [],
     members = [],
     associations,
@@ -87,6 +97,7 @@ export default function TicketShow({
     askEvo?: AskEvoPayload | null;
     thread?: ThreadPreview | null;
     messages?: ThreadMessage[];
+    knowledgeArticles?: KnowledgeArticlePreview[];
     attachableThreads?: ThreadPreview[];
     members?: { id: number; name: string }[];
     associations?: {
@@ -108,6 +119,7 @@ export default function TicketShow({
 }) {
     const loading = useInertiaLoading();
     const [mode, setMode] = useState<'reply' | 'note'>('reply');
+    const [replyBody, setReplyBody] = useState('');
     const action = `/crm/tickets/${ticket.id}`;
     const askAction = `/crm/tickets/${ticket.id}/ask`;
     const contact = associations?.contact ?? ticket.contact ?? null;
@@ -417,6 +429,7 @@ export default function TicketShow({
                                         action={`/desk/threads/${thread.id}/reply`}
                                         method="post"
                                         resetOnSuccess={['body']}
+                                        onSuccess={() => setReplyBody('')}
                                     >
                                         {({ processing }) => (
                                             <DeskGlass
@@ -458,9 +471,55 @@ export default function TicketShow({
                                                         value="1"
                                                     />
                                                 ) : null}
+                                                {mode === 'reply' &&
+                                                knowledgeArticles.length > 0 ? (
+                                                    <div className="mb-2 rounded-md border border-hairline bg-canvas-soft p-2">
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <p className="text-[11px] font-medium text-ink">
+                                                                Use knowledge
+                                                            </p>
+                                                            <span className="text-[11px] text-mute">
+                                                                Inserts a draft
+                                                            </span>
+                                                        </div>
+                                                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                                                            {knowledgeArticles.map(
+                                                                (article) => (
+                                                                    <button
+                                                                        key={
+                                                                            article.id
+                                                                        }
+                                                                        type="button"
+                                                                        title={
+                                                                            article.excerpt ??
+                                                                            article.title
+                                                                        }
+                                                                        onClick={() =>
+                                                                            setReplyBody(
+                                                                                (current) =>
+                                                                                    current.trim()
+                                                                                        ? `${current.trim()}\n\n${article.body}`
+                                                                                        : article.body,
+                                                                            )
+                                                                        }
+                                                                        className="max-w-full truncate rounded border border-hairline bg-canvas px-2 py-1 text-start text-[11px] font-medium text-ink hover:border-brand hover:text-brand"
+                                                                    >
+                                                                        {article.title}
+                                                                    </button>
+                                                                ),
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ) : null}
                                                 <Textarea
                                                     name="body"
                                                     required
+                                                    value={replyBody}
+                                                    onChange={(event) =>
+                                                        setReplyBody(
+                                                            event.target.value,
+                                                        )
+                                                    }
                                                     placeholder={
                                                         mode === 'note'
                                                             ? 'Private note'

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\KnowledgeArticle;
 use App\Models\Thread;
 use App\Models\Ticket;
 use App\Models\User;
@@ -207,6 +208,23 @@ class TicketController extends Controller
             'total_cents' => $quote->total_cents,
         ])->values()->all() ?? [];
 
+        $knowledgeArticles = KnowledgeArticle::query()
+            ->forWorkspace($workspace)
+            ->where('status', KnowledgeArticle::STATUS_PUBLISHED)
+            ->latest('published_at')
+            ->latest('id')
+            ->limit(12)
+            ->get(['id', 'title', 'category', 'excerpt', 'body', 'tags'])
+            ->map(fn (KnowledgeArticle $article) => [
+                'id' => $article->id,
+                'title' => $article->title,
+                'category' => $article->category,
+                'excerpt' => $article->excerpt,
+                'body' => $article->body,
+                'tags' => $article->tags ?? [],
+            ])
+            ->all();
+
         return Inertia::render('crm/tickets/show', [
             'ticket' => $ticket->presentRecord(),
             'path' => TicketPath::present($ticket),
@@ -217,6 +235,7 @@ class TicketController extends Controller
                 'channel' => $ticket->thread->channel?->name,
             ] : null,
             'messages' => $messages,
+            'knowledgeArticles' => $knowledgeArticles,
             'attachableThreads' => $attachable,
             'members' => $hub->members($workspace),
             'associations' => [

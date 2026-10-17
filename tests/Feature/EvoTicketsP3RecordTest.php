@@ -5,6 +5,7 @@ use App\Models\Activity;
 use App\Models\AiInsight;
 use App\Models\Channel;
 use App\Models\Contact;
+use App\Models\KnowledgeArticle;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Models\Ticket;
@@ -62,6 +63,14 @@ it('renders the ticket record as Path plus a live Desk thread, not an empty conv
     $ticket = recordTicket($user);
     $thread = recordThread($user, $ticket->contact);
     $ticket->forceFill(['thread_id' => $thread->id, 'channel' => Ticket::CHANNEL_WHATSAPP_CLOUD])->save();
+    KnowledgeArticle::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'title' => 'Delivery delay reply',
+        'slug' => 'delivery-delay-reply',
+        'body' => 'We are checking the delivery status for you.',
+        'status' => KnowledgeArticle::STATUS_PUBLISHED,
+        'published_at' => now(),
+    ]);
 
     $this->actingAs($user)
         ->get("/crm/tickets/{$ticket->id}")
@@ -79,6 +88,7 @@ it('renders the ticket record as Path plus a live Desk thread, not an empty conv
             ->where('path.steps.3.label', 'Closed')
             ->where('thread.id', $thread->id)
             ->where('messages.0.body', 'Salaam, parts delayed')
+            ->where('knowledgeArticles.0.title', 'Delivery delay reply')
             ->has('askEvo.summary')
             ->where('associations.contact.first_name', 'Amel')
         );
