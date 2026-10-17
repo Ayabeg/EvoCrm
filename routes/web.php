@@ -276,6 +276,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/crm/contacts/duplicates', [ContactMergeController::class, 'index'])->name('crm.contacts.merge.index');
     Route::get('/crm/contacts/merge/{survivor}/{absorbed}', [ContactMergeController::class, 'show'])->name('crm.contacts.merge.show');
     Route::post('/crm/contacts/merge', [ContactMergeController::class, 'store'])->name('crm.contacts.merge.store');
+    Route::post('/crm/contacts/merges/{merge}/undo', [ContactMergeController::class, 'undo'])->name('crm.contacts.merge.undo');
     Route::post('/crm/contacts/bulk', [BulkActionController::class, 'contacts'])->name('crm.contacts.bulk');
     Route::post('/crm/contacts', [ContactController::class, 'store'])->name('crm.contacts.store');
     Route::get('/crm/contacts/{contact}', [ContactController::class, 'show'])->name('crm.contacts.show');

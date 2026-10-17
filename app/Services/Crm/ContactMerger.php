@@ -4,6 +4,8 @@ namespace App\Services\Crm;
 
 use App\Models\Activity;
 use App\Models\Contact;
+use App\Models\ContactConsent;
+use App\Models\ContactMerge;
 use App\Models\CustomAttributeValue;
 use App\Models\Deal;
 use App\Models\Enrollment;
@@ -11,6 +13,7 @@ use App\Models\Lead;
 use App\Models\Message;
 use App\Models\OutboundMessage;
 use App\Models\Thread;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Models\WorkflowExecution;
 use App\Models\Workspace;
@@ -132,6 +135,7 @@ class ContactMerger
         $absorbedName = $absorbed->displayName();
 
         DB::transaction(function () use ($workspace, $actor, $survivor, $absorbed, $values, $absorbedName): void {
+            $snapshot = $this->snapshot($survivor, $absorbed);
             $this->reassign($survivor, $absorbed);
 
             $absorbed->forceFill([
@@ -165,10 +169,75 @@ class ContactMerger
                 ['absorbed_name' => $absorbedName],
             );
 
+            ContactMerge::query()->create([
+                'workspace_id' => $workspace->id,
+                'survivor_contact_id' => $survivor->id,
+                'absorbed_contact_id' => $absorbed->id,
+                'merged_by' => $actor->id,
+                'snapshot' => $snapshot,
+                'merged_at' => now(),
+            ]);
+
             $absorbed->delete();
         });
 
         return $survivor->fresh() ?? $survivor;
+    }
+
+    public function undo(Workspace $workspace, User $actor, ContactMerge $merge): Contact
+    {
+        if ((int) $merge->workspace_id !== (int) $workspace->id) {
+            abort(404);
+        }
+
+        if ($merge->undone_at !== null) {
+            throw ValidationException::withMessages([
+                'merge' => 'This contact merge has already been undone.',
+            ]);
+        }
+
+        $snapshot = $merge->snapshot;
+        $survivorId = (int) $merge->survivor_contact_id;
+
+        DB::transaction(function () use ($workspace, $actor, $merge, $snapshot, $survivorId): void {
+            $this->clearSnapshotRows($snapshot, $merge->survivor_contact_id, $merge->absorbed_contact_id);
+
+            foreach ($snapshot['contacts'] ?? [] as $attributes) {
+                $contact = Contact::withTrashed()->forWorkspace($workspace)->findOrFail($attributes['id']);
+                $contact->forceFill($attributes)->saveQuietly();
+                if ($contact->trashed()) {
+                    $contact->restoreQuietly();
+                }
+            }
+
+            $this->restoreSnapshotRows($snapshot);
+
+            $merge->forceFill([
+                'undone_at' => now(),
+                'undone_by' => $actor->id,
+            ])->save();
+
+            $survivor = Contact::query()->forWorkspace($workspace)->findOrFail($survivorId);
+            $this->activities->record($workspace, [
+                'type' => 'merge_undone',
+                'subject' => 'Undid contact merge',
+                'body' => 'Restored both contacts and their pre-merge records.',
+                'contact_id' => $survivor->id,
+                'company_id' => $survivor->company_id,
+                'meta' => ['contact_merge_id' => $merge->id],
+            ], $actor);
+
+            $this->audit->record(
+                $workspace,
+                'contact.merge_undone',
+                'Undid a contact merge and restored its snapshot.',
+                $actor,
+                $survivor,
+                ['contact_merge_id' => $merge->id],
+            );
+        });
+
+        return Contact::query()->forWorkspace($workspace)->findOrFail($survivorId);
     }
 
     /**
@@ -220,6 +289,9 @@ class ContactMerger
         Activity::query()->where('contact_id', $absorbed->id)->update(['contact_id' => $survivor->id]);
         Message::query()->where('contact_id', $absorbed->id)->update(['contact_id' => $survivor->id]);
         OutboundMessage::query()->where('contact_id', $absorbed->id)->update(['contact_id' => $survivor->id]);
+        Ticket::query()->where('contact_id', $absorbed->id)->update(['contact_id' => $survivor->id]);
+
+        $this->reassignConsents($survivor, $absorbed);
 
         if (class_exists(WorkflowExecution::class)) {
             WorkflowExecution::query()->where('contact_id', $absorbed->id)->update(['contact_id' => $survivor->id]);
@@ -229,6 +301,72 @@ class ContactMerger
         $this->reassignThreads($survivor, $absorbed);
         $this->reassignAttributes($survivor, $absorbed);
         $this->reassignSegmentMemberships($survivor, $absorbed);
+        $this->reassignRelationships($survivor, $absorbed);
+    }
+
+    private function reassignConsents(Contact $survivor, Contact $absorbed): void
+    {
+        $keys = ContactConsent::query()
+            ->where('contact_id', $survivor->id)
+            ->get(['channel', 'purpose'])
+            ->map(fn (ContactConsent $consent): string => $consent->channel.'|'.$consent->purpose)
+            ->all();
+
+        foreach (ContactConsent::query()->where('contact_id', $absorbed->id)->get() as $consent) {
+            if (in_array($consent->channel.'|'.$consent->purpose, $keys, true)) {
+                $consent->delete();
+
+                continue;
+            }
+
+            $consent->forceFill(['contact_id' => $survivor->id])->save();
+        }
+    }
+
+    private function reassignRelationships(Contact $survivor, Contact $absorbed): void
+    {
+        if (! Schema::hasTable('record_relationships')) {
+            return;
+        }
+
+        $rows = DB::table('record_relationships')
+            ->where(function ($query) use ($absorbed): void {
+                $query->where(function ($nested) use ($absorbed): void {
+                    $nested->where('from_type', Contact::class)->where('from_id', $absorbed->id);
+                })->orWhere(function ($nested) use ($absorbed): void {
+                    $nested->where('to_type', Contact::class)->where('to_id', $absorbed->id);
+                });
+            })->get();
+
+        foreach ($rows as $row) {
+            $data = (array) $row;
+            $data['from_id'] = $data['from_type'] === Contact::class && (int) $data['from_id'] === (int) $absorbed->id
+                ? $survivor->id : $data['from_id'];
+            $data['to_id'] = $data['to_type'] === Contact::class && (int) $data['to_id'] === (int) $absorbed->id
+                ? $survivor->id : $data['to_id'];
+
+            $duplicate = DB::table('record_relationships')
+                ->where('workspace_id', $data['workspace_id'])
+                ->where('from_type', $data['from_type'])
+                ->where('from_id', $data['from_id'])
+                ->where('to_type', $data['to_type'])
+                ->where('to_id', $data['to_id'])
+                ->where('relationship_type', $data['relationship_type'])
+                ->where('id', '!=', $data['id'])
+                ->exists();
+
+            if ($duplicate) {
+                DB::table('record_relationships')->where('id', $data['id'])->delete();
+
+                continue;
+            }
+
+            DB::table('record_relationships')->where('id', $data['id'])->update([
+                'from_id' => $data['from_id'],
+                'to_id' => $data['to_id'],
+                'updated_at' => now(),
+            ]);
+        }
     }
 
     private function reassignEnrollments(Contact $survivor, Contact $absorbed): void
@@ -317,5 +455,160 @@ class ContactMerger
         DB::table('contact_segment_memberships')
             ->where('contact_id', $absorbed->id)
             ->update(['contact_id' => $survivor->id]);
+    }
+
+    /**
+     * Keep a raw database snapshot so undo can restore deleted duplicate rows,
+     * not only move the two contact records back.
+     *
+     * @return array<string, mixed>
+     */
+    private function snapshot(Contact $survivor, Contact $absorbed): array
+    {
+        $contactIds = [$survivor->id, $absorbed->id];
+        $tables = [
+            'deals',
+            'leads',
+            'activities',
+            'outbound_messages',
+            'workflow_executions',
+            'enrollments',
+            'tickets',
+            'contact_consents',
+            'threads',
+            'messages',
+        ];
+
+        $rows = [];
+        foreach ($tables as $table) {
+            if (! Schema::hasTable($table)) {
+                continue;
+            }
+
+            $query = DB::table($table)->whereIn('contact_id', $contactIds);
+            if ($table === 'messages') {
+                $threadIds = DB::table('threads')->whereIn('contact_id', $contactIds)->pluck('id')->all();
+                $query = DB::table($table)->where(function ($nested) use ($contactIds, $threadIds): void {
+                    $nested->whereIn('contact_id', $contactIds);
+                    if ($threadIds !== []) {
+                        $nested->orWhereIn('thread_id', $threadIds);
+                    }
+                });
+            }
+
+            $rows[$table] = $query->get()->map(fn ($row): array => (array) $row)->values()->all();
+        }
+
+        if (Schema::hasTable('custom_attribute_values')) {
+            $rows['custom_attribute_values'] = DB::table('custom_attribute_values')
+                ->where('entity_type', 'contact')
+                ->whereIn('entity_id', $contactIds)
+                ->get()
+                ->map(fn ($row): array => (array) $row)
+                ->values()
+                ->all();
+        }
+
+        if (Schema::hasTable('contact_segment_memberships')) {
+            $rows['contact_segment_memberships'] = DB::table('contact_segment_memberships')
+                ->whereIn('contact_id', $contactIds)
+                ->get()
+                ->map(fn ($row): array => (array) $row)
+                ->values()
+                ->all();
+        }
+
+        if (Schema::hasTable('record_relationships')) {
+            $rows['record_relationships'] = DB::table('record_relationships')
+                ->where(function ($query) use ($contactIds): void {
+                    $query->where(function ($nested) use ($contactIds): void {
+                        $nested->where('from_type', Contact::class)->whereIn('from_id', $contactIds);
+                    })->orWhere(function ($nested) use ($contactIds): void {
+                        $nested->where('to_type', Contact::class)->whereIn('to_id', $contactIds);
+                    });
+                })
+                ->get()
+                ->map(fn ($row): array => (array) $row)
+                ->values()
+                ->all();
+        }
+
+        return [
+            'contacts' => [$survivor->getRawOriginal(), $absorbed->getRawOriginal()],
+            'rows' => $rows,
+        ];
+    }
+
+    /** @param array<string, mixed> $snapshot */
+    private function clearSnapshotRows(array $snapshot, int $survivorId, int $absorbedId): void
+    {
+        $contactIds = [$survivorId, $absorbedId];
+        $rows = $snapshot['rows'] ?? [];
+
+        if (Schema::hasTable('messages')) {
+            $threadIds = collect($rows['messages'] ?? [])->pluck('thread_id')->filter()->values()->all();
+            DB::table('messages')->where(function ($query) use ($contactIds, $threadIds): void {
+                $query->whereIn('contact_id', $contactIds);
+                if ($threadIds !== []) {
+                    $query->orWhereIn('thread_id', $threadIds);
+                }
+            })->delete();
+        }
+
+        foreach (['threads', 'deals', 'leads', 'activities', 'outbound_messages', 'workflow_executions', 'enrollments', 'tickets', 'contact_consents'] as $table) {
+            if (Schema::hasTable($table)) {
+                DB::table($table)->whereIn('contact_id', $contactIds)->delete();
+            }
+        }
+
+        if (Schema::hasTable('custom_attribute_values')) {
+            DB::table('custom_attribute_values')
+                ->where('entity_type', 'contact')
+                ->whereIn('entity_id', $contactIds)
+                ->delete();
+        }
+
+        if (Schema::hasTable('contact_segment_memberships')) {
+            DB::table('contact_segment_memberships')->whereIn('contact_id', $contactIds)->delete();
+        }
+
+        if (Schema::hasTable('record_relationships')) {
+            DB::table('record_relationships')->where(function ($query) use ($contactIds): void {
+                $query->where(function ($nested) use ($contactIds): void {
+                    $nested->where('from_type', Contact::class)->whereIn('from_id', $contactIds);
+                })->orWhere(function ($nested) use ($contactIds): void {
+                    $nested->where('to_type', Contact::class)->whereIn('to_id', $contactIds);
+                });
+            })->delete();
+        }
+    }
+
+    /** @param array<string, mixed> $snapshot */
+    private function restoreSnapshotRows(array $snapshot): void
+    {
+        $rows = $snapshot['rows'] ?? [];
+        $orderedTables = [
+            'threads',
+            'messages',
+            'deals',
+            'leads',
+            'activities',
+            'outbound_messages',
+            'workflow_executions',
+            'enrollments',
+            'tickets',
+            'contact_consents',
+            'custom_attribute_values',
+            'contact_segment_memberships',
+            'record_relationships',
+        ];
+
+        foreach ($orderedTables as $table) {
+            if (! Schema::hasTable($table) || ($rows[$table] ?? []) === []) {
+                continue;
+            }
+
+            DB::table($table)->insert($rows[$table]);
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\ContactMerge;
 use App\Services\Crm\ContactMerger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,8 +15,25 @@ class ContactMergeController extends Controller
 {
     public function index(Request $request, ContactMerger $merger): Response
     {
+        $workspace = $request->user()->workspace;
+
         return Inertia::render('crm/contacts/duplicates', [
-            'groups' => $merger->groups($request->user()->workspace),
+            'groups' => $merger->groups($workspace),
+            'mergeHistory' => ContactMerge::query()
+                ->forWorkspace($workspace)
+                ->whereNull('undone_at')
+                ->with(['survivor', 'absorbed'])
+                ->latest('merged_at')
+                ->limit(20)
+                ->get()
+                ->map(fn (ContactMerge $merge): array => [
+                    'id' => $merge->id,
+                    'survivor' => $merge->survivor?->displayName(),
+                    'absorbed' => $merge->absorbed?->displayName(),
+                    'merged_at' => $merge->merged_at?->toISOString(),
+                ])
+                ->values()
+                ->all(),
         ]);
     }
 
@@ -61,6 +79,18 @@ class ContactMergeController extends Controller
         $merger->merge($workspace, $request->user(), $survivor, $absorbed, $data['values'] ?? []);
 
         return redirect()->route('crm.contacts.show', $survivor);
+    }
+
+    public function undo(Request $request, ContactMerge $merge, ContactMerger $merger): RedirectResponse
+    {
+        $workspace = $request->user()->workspace;
+        abort_unless((int) $merge->workspace_id === (int) $workspace->id, 404);
+
+        $survivor = $merger->undo($workspace, $request->user(), $merge);
+
+        return redirect()
+            ->route('crm.contacts.show', $survivor)
+            ->with('toast', 'Contact merge undone. Both records and their linked history were restored.');
     }
 
     /**

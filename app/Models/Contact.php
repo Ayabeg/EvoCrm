@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
     'workspace_id',
@@ -39,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Contact extends Model
 {
     /** @use HasFactory<ContactFactory> */
-    use BelongsToWorkspace, HasFactory, HasRecordRelationships;
+    use BelongsToWorkspace, HasFactory, HasRecordRelationships, SoftDeletes;
 
     protected function casts(): array
     {

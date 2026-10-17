@@ -5,6 +5,7 @@ use App\Enums\WorkspaceRole;
 use App\Models\Activity;
 use App\Models\Channel;
 use App\Models\Contact;
+use App\Models\ContactMerge;
 use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
 use App\Models\Deal;
@@ -202,4 +203,62 @@ it('rejects merging contacts from another workspace', function () {
         ->assertNotFound();
 
     expect(Contact::query()->find($absorbed->id))->not->toBeNull();
+});
+
+it('can undo a merge and restore the pre-merge records', function () {
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    seedMergeWorkspace($owner);
+    $workspace = $owner->workspace;
+
+    $survivor = Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'first_name' => 'Original',
+        'email' => 'original@example.test',
+        'phone' => '0550123456',
+        'city' => 'Algiers',
+    ]);
+    $absorbed = Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'first_name' => 'Duplicate',
+        'email' => 'duplicate@example.test',
+        'phone' => '0550000099',
+        'city' => 'Oran',
+    ]);
+    $activity = Activity::query()->create([
+        'workspace_id' => $workspace->id,
+        'type' => 'note',
+        'subject' => 'Before merge',
+        'contact_id' => $absorbed->id,
+    ]);
+
+    $this->actingAs($owner)
+        ->post('/crm/contacts/merge', [
+            'survivor_id' => $survivor->id,
+            'absorbed_id' => $absorbed->id,
+            'values' => [
+                'first_name' => 'Combined',
+                'phone' => $absorbed->phone,
+                'city' => $absorbed->city,
+            ],
+        ])
+        ->assertRedirect();
+
+    $merge = ContactMerge::query()->latest('id')->firstOrFail();
+
+    $this->actingAs($owner)
+        ->post("/crm/contacts/merges/{$merge->id}/undo")
+        ->assertRedirect();
+
+    expect($merge->fresh()->undone_at)->not->toBeNull()
+        ->and(Contact::query()->find($absorbed->id))->not->toBeNull()
+        ->and($survivor->fresh()->first_name)->toBe('Original')
+        ->and($survivor->fresh()->phone_e164)->toBe('+213550123456')
+        ->and($survivor->fresh()->city)->toBe('Algiers')
+        ->and($absorbed->fresh()->first_name)->toBe('Duplicate')
+        ->and($activity->fresh()->contact_id)->toBe($absorbed->id)
+        ->and(Activity::query()->where('contact_id', $survivor->id)->where('type', 'merge_undone')->exists())->toBeTrue();
+
+    $this->actingAs($owner)
+        ->post("/crm/contacts/merges/{$merge->id}/undo")
+        ->assertSessionHasErrors('merge');
 });

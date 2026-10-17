@@ -18,7 +18,14 @@ type DuplicateGroup = {
     contacts: DuplicateContact[];
 };
 
-export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[] }) {
+type MergeHistoryItem = {
+    id: number;
+    survivor?: string | null;
+    absorbed?: string | null;
+    merged_at?: string | null;
+};
+
+export default function ContactDuplicates({ groups, mergeHistory }: { groups: DuplicateGroup[]; mergeHistory: MergeHistoryItem[] }) {
     return (
         <CrmShell title="Duplicate contacts">
             <div className="h-full overflow-auto bg-canvas">
@@ -95,6 +102,39 @@ export default function ContactDuplicates({ groups }: { groups: DuplicateGroup[]
                             })}
                         </ul>
                     )}
+
+                    {mergeHistory.length > 0 ? (
+                        <section className="rounded-md border border-hairline">
+                            <div className="border-b border-hairline px-4 py-3">
+                                <h2 className="text-[14px] font-semibold text-ink">{t('Recent reversible merges')}</h2>
+                                <p className="mt-1 text-[12px] text-mute">
+                                    {t('Undo a merge to restore both contact records and their linked history.')}
+                                </p>
+                            </div>
+                            <ul className="divide-y divide-hairline">
+                                {mergeHistory.map((merge) => (
+                                    <li key={merge.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                                        <div>
+                                            <p className="text-[13px] font-medium text-ink">
+                                                {merge.survivor || t('Contact')} ← {merge.absorbed || t('Contact')}
+                                            </p>
+                                            <p className="text-[12px] text-mute">
+                                                {merge.merged_at ? new Date(merge.merged_at).toLocaleString() : t('Recently')}
+                                            </p>
+                                        </div>
+                                        <Link
+                                            href={`/crm/contacts/merges/${merge.id}/undo`}
+                                            method="post"
+                                            as="button"
+                                            className="rounded-md border border-hairline px-3 py-1.5 text-[12px] font-medium text-ink hover:bg-canvas-soft"
+                                        >
+                                            {t('Undo merge')}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    ) : null}
                 </div>
             </div>
         </CrmShell>
