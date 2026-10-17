@@ -279,6 +279,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::get('/crm/contacts/{contact}', [ContactController::class, 'show'])->name('crm.contacts.show');
     Route::put('/crm/contacts/{contact}', [ContactController::class, 'update'])->name('crm.contacts.update');
     Route::put('/crm/contacts/{contact}/attributes', [ContactController::class, 'updateAttributes'])->name('crm.contacts.attributes');
+    Route::post('/crm/contacts/{contact}/consent', [ContactController::class, 'consent'])->name('crm.contacts.consent');
     Route::post('/crm/contacts/{contact}/ask', [AskEvoController::class, 'contact'])->name('crm.contacts.ask');
     Route::post('/crm/contacts/{contact}/draft-email', [AskEvoController::class, 'draftContact'])->name('crm.contacts.draft-email');
     Route::post('/crm/contacts/{contact}/enrich', [EnrichmentController::class, 'contact'])->name('crm.contacts.enrich');

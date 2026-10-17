@@ -3,6 +3,7 @@
 namespace App\Services\Outbound;
 
 use App\Models\Contact;
+use App\Models\ContactConsent;
 use App\Models\Enrollment;
 use App\Models\Sequence;
 use App\Models\Workspace;
@@ -36,6 +37,23 @@ class SequenceEnrollment
         if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
             throw ValidationException::withMessages([
                 'contact_id' => 'Contact is on the suppression list.',
+            ]);
+        }
+
+        $consentChannel = match ($sequence->channel) {
+            'whatsapp_cloud' => ['whatsapp', 'whatsapp_cloud'],
+            'sms' => ['sms'],
+            default => ['email'],
+        };
+        $consent = $contact->consents()
+            ->where('purpose', 'marketing')
+            ->whereIn('channel', $consentChannel)
+            ->latest('id')
+            ->first();
+
+        if ($consent instanceof ContactConsent && ! $consent->isGranted()) {
+            throw ValidationException::withMessages([
+                'contact_id' => 'Contact has not granted marketing consent for this channel.',
             ]);
         }
 

@@ -64,6 +64,7 @@ type ContactConsent = {
     status: string;
     granted: boolean;
     source?: string | null;
+    expires_at?: string | null;
 };
 
 type ContactRelationship = {
@@ -553,6 +554,17 @@ export default function ContactShow({
                                                                     t(
                                                                         'Source not recorded',
                                                                     )}
+                                                                {consent.expires_at
+                                                                    ? ' · ' +
+                                                                      t(
+                                                                          'Expires',
+                                                                      ) +
+                                                                      ' ' +
+                                                                      consent.expires_at.slice(
+                                                                          0,
+                                                                          10,
+                                                                      )
+                                                                    : ''}
                                                             </p>
                                                         </div>
                                                         <RecordStatusBadge>
@@ -566,6 +578,66 @@ export default function ContactShow({
                                                 ))}
                                             </div>
                                         )}
+                                        <Form
+                                            action={
+                                                '/crm/contacts/' +
+                                                contact.id +
+                                                '/consent'
+                                            }
+                                            method="post"
+                                            className="space-y-2 border-t border-hairline pt-3"
+                                        >
+                                            <p className="text-[12px] font-medium text-ink">
+                                                {t('Record or update consent')}
+                                            </p>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <select
+                                                    name="channel"
+                                                    defaultValue="email"
+                                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[12px]"
+                                                >
+                                                    <option value="email">
+                                                        {t('Email')}
+                                                    </option>
+                                                    <option value="whatsapp">
+                                                        WhatsApp
+                                                    </option>
+                                                    <option value="sms">
+                                                        SMS
+                                                    </option>
+                                                </select>
+                                                <select
+                                                    name="status"
+                                                    defaultValue="granted"
+                                                    className="h-8 rounded-md border border-hairline bg-canvas px-2 text-[12px]"
+                                                >
+                                                    <option value="granted">
+                                                        {t('Granted')}
+                                                    </option>
+                                                    <option value="denied">
+                                                        {t('Denied')}
+                                                    </option>
+                                                    <option value="unknown">
+                                                        {t('Unknown')}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <Input
+                                                name="source"
+                                                placeholder={t(
+                                                    'Consent source',
+                                                )}
+                                                className="h-8"
+                                            />
+                                            <Input
+                                                name="expires_at"
+                                                type="date"
+                                                className="h-8"
+                                            />
+                                            <Button size="sm">
+                                                {t('Save consent')}
+                                            </Button>
+                                        </Form>
                                     </RecordSection>
                                     {enrichAction ? (
                                         <EnrichmentPanel

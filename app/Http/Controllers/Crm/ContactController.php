@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Crm;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use App\Models\Company;
 use App\Models\Contact;
+use App\Models\ContactConsent;
 use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Models\Mailbox;
@@ -18,6 +20,7 @@ use App\Services\Enrichment\EnrichmentService;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -122,6 +125,7 @@ class ContactController extends Controller
                 'status' => $consent->status,
                 'granted' => $consent->isGranted(),
                 'source' => $consent->source,
+                'expires_at' => $consent->expires_at?->timezone('Africa/Algiers')->toIso8601String(),
             ])->values()->all(),
             'relationships' => $relationships,
             'enrichmentRuns' => $enrichment->history($workspace, EnrichmentRun::TARGET_CONTACT, (int) $contact->id),
@@ -264,6 +268,55 @@ class ContactController extends Controller
             $data['attributes'],
             enforceRequired: true,
         );
+
+        return back();
+    }
+
+    public function consent(Request $request, Contact $contact): RedirectResponse
+    {
+        $this->authorize('update', $contact);
+
+        $data = $request->validate([
+            'channel' => ['required', 'in:email,whatsapp,sms'],
+            'purpose' => ['required', 'string', 'max:64'],
+            'status' => ['required', 'in:granted,denied,unknown'],
+            'source' => ['nullable', 'string', 'max:64'],
+            'expires_at' => ['nullable', 'date'],
+        ]);
+
+        DB::transaction(function () use ($contact, $data, $request): void {
+            $consent = ContactConsent::query()->updateOrCreate(
+                [
+                    'workspace_id' => $contact->workspace_id,
+                    'contact_id' => $contact->id,
+                    'channel' => $data['channel'],
+                    'purpose' => $data['purpose'],
+                ],
+                [
+                    'status' => $data['status'],
+                    'source' => $data['source'] ?? null,
+                    'captured_at' => now(),
+                    'expires_at' => $data['expires_at'] ?? null,
+                    'revoked_at' => $data['status'] === ContactConsent::STATUS_GRANTED ? null : now(),
+                ],
+            );
+
+            Activity::query()->create([
+                'workspace_id' => $contact->workspace_id,
+                'contact_id' => $contact->id,
+                'company_id' => $contact->company_id,
+                'type' => 'consent_updated',
+                'subject' => 'Updated '.$consent->channel.' '.$consent->purpose.' consent',
+                'owner_id' => $request->user()->id,
+                'actor_id' => $request->user()->id,
+                'meta' => [
+                    'consent_id' => $consent->id,
+                    'channel' => $consent->channel,
+                    'purpose' => $consent->purpose,
+                    'status' => $consent->status,
+                ],
+            ]);
+        });
 
         return back();
     }
