@@ -1,7 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import { PlugsConnected } from '@phosphor-icons/react';
-import { Badge } from '@/evo/ui/badge';
-import { Input } from '@/evo/ui/input';
 import {
     SettingsCard,
     SettingsEmptyState,
@@ -10,12 +8,15 @@ import {
     SettingsSaveBar,
     SettingsForm,
 } from '@/evo/patterns/settings';
+import { Badge } from '@/evo/ui/badge';
+import { Input } from '@/evo/ui/input';
 import { useSimpleMode } from '@/hooks/use-simple-mode';
 import { t } from '@/lib/i18n';
 
 export default function ChannelSettings({
     channels,
     evolution,
+    deliveryHealth,
     inboxUrl,
 }: {
     channels: { id: number; name: string; type: string; status: string }[];
@@ -23,6 +24,14 @@ export default function ChannelSettings({
         connected: boolean;
         last_webhook_at?: string | null;
         last_event?: string | null;
+    };
+    deliveryHealth: {
+        window_days: number;
+        inbound: number;
+        outbound: number;
+        failed: number;
+        last_inbound_at?: string | null;
+        last_outbound_at?: string | null;
     };
     inboxUrl: string;
 }) {
@@ -130,6 +139,44 @@ export default function ChannelSettings({
                         </ul>
                     </SettingsCard>
                 )}
+                <SettingsCard
+                    title="Delivery health"
+                    description={`Message activity over the last ${deliveryHealth.window_days} days.`}
+                >
+                    <div className="grid gap-3 sm:grid-cols-3">
+                        <DeliveryMetric
+                            label="Inbound"
+                            value={deliveryHealth.inbound}
+                        />
+                        <DeliveryMetric
+                            label="Outbound"
+                            value={deliveryHealth.outbound}
+                        />
+                        <DeliveryMetric
+                            label="Failed outbound"
+                            value={deliveryHealth.failed}
+                            danger={deliveryHealth.failed > 0}
+                        />
+                    </div>
+                    <div className="mt-4 grid gap-2 text-[12px] text-mute sm:grid-cols-2">
+                        <p>
+                            Last inbound:{' '}
+                            {deliveryHealth.last_inbound_at
+                                ? new Date(
+                                      deliveryHealth.last_inbound_at,
+                                  ).toLocaleString('en-GB')
+                                : 'None recorded'}
+                        </p>
+                        <p>
+                            Last outbound:{' '}
+                            {deliveryHealth.last_outbound_at
+                                ? new Date(
+                                      deliveryHealth.last_outbound_at,
+                                  ).toLocaleString('en-GB')
+                                : 'None recorded'}
+                        </p>
+                    </div>
+                </SettingsCard>
                 {evolution.last_webhook_at ? (
                     <p className="min-w-0 truncate text-[12px] text-mute">
                         Last Evolution event{' '}
@@ -141,6 +188,27 @@ export default function ChannelSettings({
                 ) : null}
             </div>
         </>
+    );
+}
+
+function DeliveryMetric({
+    label,
+    value,
+    danger = false,
+}: {
+    label: string;
+    value: number;
+    danger?: boolean;
+}) {
+    return (
+        <div className="rounded-lg border border-hairline bg-canvas-soft px-3 py-2.5">
+            <p className="text-[12px] font-medium text-mute">{label}</p>
+            <p
+                className={`mt-1 text-xl font-semibold ${danger ? 'text-destructive' : 'text-ink'}`}
+            >
+                {value.toLocaleString()}
+            </p>
+        </div>
     );
 }
 

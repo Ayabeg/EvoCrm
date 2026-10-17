@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Contact;
+use App\Models\Message;
+use App\Models\Thread;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 
@@ -41,6 +44,57 @@ it('serves My Inbox on the CRM host with the EvoDesk embed, never an eject', fun
         ->assertRedirect();
 
     expect($user->workspace->fresh()->inbox_url)->toBe('https://desk.example.test');
+});
+
+it('shows channel delivery health from the native message audit', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+    $contact = Contact::factory()->create(['workspace_id' => $workspace->id]);
+    $thread = Thread::query()->create([
+        'workspace_id' => $workspace->id,
+        'contact_id' => $contact->id,
+        'channel_id' => $workspace->channels()->firstOrFail()->id,
+        'subject' => 'Delivery health',
+        'last_message_at' => now(),
+    ]);
+
+    Message::query()->create([
+        'workspace_id' => $workspace->id,
+        'thread_id' => $thread->id,
+        'contact_id' => $contact->id,
+        'direction' => 'inbound',
+        'body' => 'Hello',
+        'status' => 'received',
+    ]);
+    Message::query()->create([
+        'workspace_id' => $workspace->id,
+        'thread_id' => $thread->id,
+        'contact_id' => $contact->id,
+        'direction' => 'outbound',
+        'body' => 'We are checking this.',
+        'status' => 'sent',
+    ]);
+    Message::query()->create([
+        'workspace_id' => $workspace->id,
+        'thread_id' => $thread->id,
+        'contact_id' => $contact->id,
+        'direction' => 'outbound',
+        'body' => 'Provider rejected this.',
+        'status' => 'failed',
+    ]);
+
+    $this->actingAs($user)
+        ->get('/settings/channels')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('settings/channels')
+            ->where('deliveryHealth.window_days', 7)
+            ->where('deliveryHealth.inbound', 1)
+            ->where('deliveryHealth.outbound', 2)
+            ->where('deliveryHealth.failed', 1)
+            ->has('deliveryHealth.last_inbound_at')
+            ->has('deliveryHealth.last_outbound_at')
+        );
 });
 
 it('serves the native CRM desk at /inbox when the desk refuses framing', function () {
