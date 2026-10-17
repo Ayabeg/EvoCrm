@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToWorkspace;
+use App\Models\Concerns\HasRecordRelationships;
 use App\Services\Crm\StagePropertyGate;
 use App\Services\LeadOs\DealHealthScorer;
 use Database\Factories\DealFactory;
@@ -39,7 +40,7 @@ use InvalidArgumentException;
 class Deal extends Model
 {
     /** @use HasFactory<DealFactory> */
-    use BelongsToWorkspace, HasFactory;
+    use BelongsToWorkspace, HasFactory, HasRecordRelationships;
 
     protected function casts(): array
     {
@@ -89,6 +90,11 @@ class Deal extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(Activity::class)->latest();
+    }
+
+    public function probabilitySnapshots(): HasMany
+    {
+        return $this->hasMany(DealProbabilitySnapshot::class)->latest('recorded_at');
     }
 
     public function quotes(): HasMany

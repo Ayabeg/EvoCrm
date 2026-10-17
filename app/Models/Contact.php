@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToWorkspace;
+use App\Models\Concerns\HasRecordRelationships;
 use App\Support\AlgerianPhone;
 use Database\Factories\ContactFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -24,22 +25,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'city',
     'wilaya',
     'source',
+    'source_detail',
+    'source_campaign',
+    'source_medium',
     'lead_status',
     'external_id',
     'meta',
     'last_activity_at',
+    'first_touch_at',
+    'last_touch_at',
     'unanswered',
 ])]
 class Contact extends Model
 {
     /** @use HasFactory<ContactFactory> */
-    use BelongsToWorkspace, HasFactory;
+    use BelongsToWorkspace, HasFactory, HasRecordRelationships;
 
     protected function casts(): array
     {
         return [
             'meta' => 'array',
             'last_activity_at' => 'datetime',
+            'first_touch_at' => 'datetime',
+            'last_touch_at' => 'datetime',
             'unanswered' => 'boolean',
         ];
     }
@@ -106,6 +114,11 @@ class Contact extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(Activity::class)->latest();
+    }
+
+    public function consents(): HasMany
+    {
+        return $this->hasMany(ContactConsent::class);
     }
 
     public function displayName(): string

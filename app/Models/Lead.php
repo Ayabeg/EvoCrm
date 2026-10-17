@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToWorkspace;
+use App\Models\Concerns\HasRecordRelationships;
 use Database\Factories\LeadFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,14 +22,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'title',
     'status',
     'source',
+    'source_detail',
+    'source_campaign',
+    'source_medium',
     'score',
     'payload',
     'qualified_at',
+    'first_touch_at',
+    'last_touch_at',
 ])]
 class Lead extends Model
 {
     /** @use HasFactory<LeadFactory> */
-    use BelongsToWorkspace, HasFactory;
+    use BelongsToWorkspace, HasFactory, HasRecordRelationships;
 
     protected function casts(): array
     {
@@ -36,6 +42,8 @@ class Lead extends Model
             'payload' => 'array',
             'score' => 'integer',
             'qualified_at' => 'datetime',
+            'first_touch_at' => 'datetime',
+            'last_touch_at' => 'datetime',
         ];
     }
 
