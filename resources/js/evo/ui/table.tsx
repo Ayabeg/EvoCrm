@@ -48,7 +48,7 @@ function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
     return (
         <th
             className={cn(
-                'h-9 px-3 text-start align-middle text-[11px] font-medium text-[var(--evo-ink-muted)]',
+                'h-9 px-3 text-start align-middle text-[12px] font-medium text-[var(--evo-ink-muted)]',
                 className,
             )}
             {...props}

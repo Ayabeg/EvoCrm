@@ -5,7 +5,7 @@
  * Upstream: https://github.com/shadcn-ui/ui @ d75a96ab781f3d659be1ad287347d5887ce9f2fc
  * License: MIT (LICENSE.md, verified 2026-10-01)
  * Copied: 2026-10-01
- * Modified: Evo raised surface; 11px type; no source glow.
+ * Modified: Evo raised surface; readable 12px type; no source glow.
  */
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
@@ -34,7 +34,7 @@ function TooltipContent({
                 data-slot="tooltip-content"
                 sideOffset={sideOffset}
                 className={cn(
-                    'z-[var(--evo-z-dropdown)] max-w-xs rounded-[var(--evo-radius-compact)] border border-[var(--evo-hairline)] bg-[var(--evo-surface-raised)] px-2 py-1 text-[11px] text-[var(--evo-ink)] shadow-[var(--evo-shadow-floating)]',
+                    'z-[var(--evo-z-dropdown)] max-w-xs rounded-[var(--evo-radius-compact)] border border-[var(--evo-hairline)] bg-[var(--evo-surface-raised)] px-2 py-1.5 text-[12px] text-[var(--evo-ink)] shadow-[var(--evo-shadow-floating)]',
                     className,
                 )}
                 {...props}

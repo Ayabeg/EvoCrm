@@ -54,8 +54,6 @@ export function EvoRail({
     const { simpleMode, nav, features } = useSimpleMode();
     const initials = useInitials();
     const user = page.props.auth?.user as User | undefined;
-    const workspace = page.props.workspace as { name?: string } | null;
-    const workspaceName = workspace?.name?.trim() || 'EvoCRM';
     const rawCapabilities = page.props.auth?.capabilities;
     const capabilities = Array.isArray(rawCapabilities)
         ? (rawCapabilities as string[])
@@ -102,7 +100,7 @@ export function EvoRail({
             type="button"
             data-chrome="search"
             data-command-trigger="search"
-            aria-label={t('Search EvoCRM…')}
+            aria-label={t('Search')}
             className={cn(
                 collapsed
                     ? iconTargetClass
@@ -112,7 +110,7 @@ export function EvoRail({
         >
             <MagnifyingGlass className="size-4 shrink-0" weight="regular" />
             {collapsed ? null : (
-                <span className="min-w-0 flex-1 truncate">{t('Search EvoCRM…')}</span>
+                <span className="min-w-0 flex-1 truncate">{t('Search')}</span>
             )}
             {collapsed ? null : (
                 <kbd className="text-[11px] text-[var(--evo-ink-faint)]">⌘K</kbd>
@@ -205,12 +203,12 @@ export function EvoRail({
                         <Link
                             href="/dashboard"
                             className="mb-2 grid size-10 place-items-center"
-                            aria-label={workspaceName}
+                            aria-label={t('Home')}
                         >
                             <AppLogoIcon className="size-5" />
                         </Link>
                     </TooltipTrigger>
-                    <TooltipContent side="right">{workspaceName}</TooltipContent>
+                    <TooltipContent side="right">{t('Home')}</TooltipContent>
                 </Tooltip>
                 {onToggleCollapsed ? (
                     <Tooltip delayDuration={300}>
@@ -236,7 +234,7 @@ export function EvoRail({
                 <Tooltip delayDuration={300}>
                     <TooltipTrigger asChild>{searchControl}</TooltipTrigger>
                     <TooltipContent side="right">
-                        {t('Search EvoCRM…')} · ⌘K
+                        {t('Search')} · ⌘K
                     </TooltipContent>
                 </Tooltip>
                 <Tooltip delayDuration={300}>
@@ -316,9 +314,6 @@ export function EvoRail({
         <div className="relative flex h-full min-h-0 w-full min-w-0 flex-col bg-[var(--evo-sidebar)]">
             <div className="flex h-12 shrink-0 items-center gap-2 px-3">
                 <AppLogoIcon className="size-5 shrink-0" />
-                <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[var(--evo-ink)]">
-                    {workspaceName}
-                </span>
                 {onToggleCollapsed ? (
                     <button
                         type="button"

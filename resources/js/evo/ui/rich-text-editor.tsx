@@ -41,7 +41,7 @@ function ToolbarButton({
             aria-pressed={pressed}
             onClick={onClick}
             className={cn(
-                'inline-flex size-8 items-center justify-center rounded-[var(--evo-radius-compact)] text-[var(--evo-ink)]',
+                'inline-flex size-9 items-center justify-center rounded-[var(--evo-radius-compact)] text-[var(--evo-ink)]',
                 'hover:bg-[var(--evo-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--evo-focus)]',
                 pressed && 'bg-[var(--evo-teal-soft)] text-[var(--evo-teal)]',
             )}

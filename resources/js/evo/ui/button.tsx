@@ -25,7 +25,7 @@ const focusRing =
 export const buttonVariants = cva(
     cn(
         'evo-btn inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap border font-medium',
-        'rounded-[var(--evo-radius-compact)] text-[13px] leading-none',
+        'rounded-[var(--evo-radius-compact)] text-[14px] leading-5',
         'transition-[background-color,border-color,color,box-shadow] duration-[var(--evo-duration-micro)] ease-[var(--evo-ease)]',
         'disabled:pointer-events-none disabled:opacity-50',
         '[&_svg]:pointer-events-none [&_svg]:shrink-0',
@@ -57,7 +57,7 @@ export const buttonVariants = cva(
             },
             size: {
                 default: 'h-9 px-3',
-                sm: 'h-8 px-2.5 text-[12px]',
+                sm: 'h-9 px-3 text-[14px]',
                 lg: 'h-9 px-3.5',
                 icon: 'size-9 p-0',
                 unstyled: 'h-auto w-auto border-0 bg-transparent p-0',
