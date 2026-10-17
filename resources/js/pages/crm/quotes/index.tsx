@@ -1,8 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
-import { MorphingForm } from '@/components/crm/morphing-form';
 import { hasActiveListFilters } from '@/components/crm/list-query';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
 import { Label } from '@/evo/ui/label';
@@ -28,6 +28,7 @@ export default function QuotesIndex({
     paginator,
     createOpen,
     can,
+    quoteMetrics,
 }: {
     quotes: QuoteListRow[];
     deals: DealOption[];
@@ -36,9 +37,21 @@ export default function QuotesIndex({
     activeFilters: Record<string, unknown>;
     listView: ListViewMeta;
     recordCount: number;
-    paginator?: { page: number; per_page: number; total: number; last_page: number };
+    paginator?: {
+        page: number;
+        per_page: number;
+        total: number;
+        last_page: number;
+    };
     createOpen?: boolean;
     can: { create: boolean };
+    quoteMetrics: {
+        total: number;
+        accepted: number;
+        accepted_value_cents: number;
+        paid_orders: number;
+        paid_value_cents: number;
+    };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen) && can.create);
     const [dealId, setDealId] = useState(deals[0] ? String(deals[0].id) : '');
@@ -48,9 +61,34 @@ export default function QuotesIndex({
         <>
             <Head title={t('Quotes')} />
             <div
-                className="flex h-app-workspace min-h-0 flex-col bg-canvas"
+                className="h-app-workspace flex min-h-0 flex-col bg-canvas"
                 data-crm="quotes-workspace"
             >
+                <section
+                    aria-label={t('Quote commerce summary')}
+                    className="grid shrink-0 grid-cols-2 gap-3 border-b border-hairline bg-canvas-soft px-4 py-3 lg:grid-cols-5"
+                >
+                    <QuoteMetric
+                        label={t('Quotes')}
+                        value={quoteMetrics.total.toLocaleString()}
+                    />
+                    <QuoteMetric
+                        label={t('Accepted')}
+                        value={quoteMetrics.accepted.toLocaleString()}
+                    />
+                    <QuoteMetric
+                        label={t('Accepted value')}
+                        value={formatDa(quoteMetrics.accepted_value_cents)}
+                    />
+                    <QuoteMetric
+                        label={t('Paid orders')}
+                        value={quoteMetrics.paid_orders.toLocaleString()}
+                    />
+                    <QuoteMetric
+                        label={t('Paid value')}
+                        value={formatDa(quoteMetrics.paid_value_cents)}
+                    />
+                </section>
                 <CrmListShell
                     resultMode="shared-table"
                     title="Quotes"
@@ -70,9 +108,13 @@ export default function QuotesIndex({
                             >
                                 {deals.length === 0 ? (
                                     <div className="space-y-3 text-[13px]">
-                                        <p className="text-ink">{t('A quote needs a deal first.')}</p>
+                                        <p className="text-ink">
+                                            {t('A quote needs a deal first.')}
+                                        </p>
                                         <p className="text-mute">
-                                            {t('Open Deals, create the opportunity, then come back to price it.')}
+                                            {t(
+                                                'Open Deals, create the opportunity, then come back to price it.',
+                                            )}
                                         </p>
                                         <Link
                                             href="/crm/deals?create=1"
@@ -93,16 +135,27 @@ export default function QuotesIndex({
                                             <>
                                                 <div>
                                                     <Label className="mb-1 block text-[12px]">
-                                                        {t('Deal')} <span className="text-brand">*</span>
+                                                        {t('Deal')}{' '}
+                                                        <span className="text-brand">
+                                                            *
+                                                        </span>
                                                     </Label>
                                                     <select
                                                         required
                                                         value={dealId}
-                                                        onChange={(event) => setDealId(event.target.value)}
+                                                        onChange={(event) =>
+                                                            setDealId(
+                                                                event.target
+                                                                    .value,
+                                                            )
+                                                        }
                                                         className="h-9 w-full rounded-md border border-hairline bg-canvas px-2 text-sm text-ink"
                                                     >
                                                         {deals.map((deal) => (
-                                                            <option key={deal.id} value={deal.id}>
+                                                            <option
+                                                                key={deal.id}
+                                                                value={deal.id}
+                                                            >
                                                                 {deal.title}
                                                             </option>
                                                         ))}
@@ -110,9 +163,16 @@ export default function QuotesIndex({
                                                 </div>
                                                 <div>
                                                     <Label className="mb-1 block text-[12px]">
-                                                        {t('Line name')} <span className="text-brand">*</span>
+                                                        {t('Line name')}{' '}
+                                                        <span className="text-brand">
+                                                            *
+                                                        </span>
                                                     </Label>
-                                                    <Input name="items[0][name]" required maxLength={180} />
+                                                    <Input
+                                                        name="items[0][name]"
+                                                        required
+                                                        maxLength={180}
+                                                    />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <div>
@@ -140,19 +200,26 @@ export default function QuotesIndex({
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <Label className="mb-1 block text-[12px]">{t('Notes')}</Label>
+                                                    <Label className="mb-1 block text-[12px]">
+                                                        {t('Notes')}
+                                                    </Label>
                                                     <Input name="notes" />
                                                 </div>
                                                 <div className="flex justify-end gap-2 pt-2">
                                                     <Button
                                                         type="button"
                                                         variant="ghost"
-                                                        onClick={() => setDrawer(false)}
+                                                        onClick={() =>
+                                                            setDrawer(false)
+                                                        }
                                                     >
                                                         {t('Cancel')}
                                                     </Button>
                                                     <Button
-                                                        disabled={processing || !dealId}
+                                                        disabled={
+                                                            processing ||
+                                                            !dealId
+                                                        }
                                                         className="bg-brand text-white hover:bg-brand-hover"
                                                     >
                                                         {t('Create quote')}
@@ -187,6 +254,10 @@ export default function QuotesIndex({
             </div>
         </>
     );
+}
+
+function formatDa(cents: number): string {
+    return `${Math.round(cents / 100).toLocaleString('fr-DZ')} DA`;
 }
 
 QuotesIndex.layout = {

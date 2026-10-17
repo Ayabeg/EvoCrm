@@ -37,6 +37,21 @@ class QuoteController extends Controller
         $query->latest('id');
         [$rows, $paginator] = $filter->paginate($query, $request);
 
+        $workspaceQuotes = Quote::query()->forWorkspace($workspace);
+        $quoteMetrics = [
+            'total' => (clone $workspaceQuotes)->count(),
+            'accepted' => (clone $workspaceQuotes)->whereNotNull('accepted_at')->count(),
+            'accepted_value_cents' => (int) (clone $workspaceQuotes)->whereNotNull('accepted_at')->sum('total_cents'),
+            'paid_orders' => Order::query()
+                ->forWorkspace($workspace)
+                ->where('status', Order::STATUS_PAID)
+                ->count(),
+            'paid_value_cents' => (int) Order::query()
+                ->forWorkspace($workspace)
+                ->where('status', Order::STATUS_PAID)
+                ->sum('total_cents'),
+        ];
+
         return Inertia::render('crm/quotes/index', [
             'quotes' => $rows->map(fn (Quote $quote): array => $this->presentList($quote))->values()->all(),
             'deals' => Deal::query()
@@ -49,6 +64,7 @@ class QuoteController extends Controller
             'listView' => $hub->listViewMeta('quote'),
             'recordCount' => $paginator['total'],
             'paginator' => $paginator,
+            'quoteMetrics' => $quoteMetrics,
             'createOpen' => $request->boolean('create'),
             'can' => [
                 'create' => $user->can('create', Quote::class),
