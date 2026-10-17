@@ -14,6 +14,7 @@ import {
     RecordFactList,
     RecordSection,
     RecordStatusBadge,
+    formatRecordWhen,
 } from '@/components/crm/record-hub';
 import { RecordPath } from '@/components/crm/record-path';
 import type { PathStep } from '@/components/crm/record-path';
@@ -74,6 +75,14 @@ type KnowledgeArticlePreview = {
     tags?: string[];
 };
 
+type TicketHistoryEvent = {
+    id: number;
+    type: string;
+    subject: string;
+    actor_name?: string | null;
+    created_at?: string | null;
+};
+
 type PathState = {
     steps: PathStep[];
     current: string;
@@ -88,6 +97,7 @@ export default function TicketShow({
     thread,
     messages = [],
     knowledgeArticles = [],
+    ticketHistory = [],
     attachableThreads = [],
     members = [],
     associations,
@@ -98,6 +108,7 @@ export default function TicketShow({
     thread?: ThreadPreview | null;
     messages?: ThreadMessage[];
     knowledgeArticles?: KnowledgeArticlePreview[];
+    ticketHistory?: TicketHistoryEvent[];
     attachableThreads?: ThreadPreview[];
     members?: { id: number; name: string }[];
     associations?: {
@@ -394,6 +405,35 @@ export default function TicketShow({
                                             {t(
                                                 'Feedback becomes available after the ticket is closed.',
                                             )}
+                                        </p>
+                                    )}
+                                </RecordSection>
+                                <RecordSection title={t('Case history')}>
+                                    {ticketHistory.length > 0 ? (
+                                        <ol className="space-y-3">
+                                            {ticketHistory.map((event) => (
+                                                <li
+                                                    key={event.id}
+                                                    className="border-s-2 border-hairline ps-3"
+                                                >
+                                                    <p className="text-[13px] text-ink">
+                                                        {event.subject}
+                                                    </p>
+                                                    <p className="mt-0.5 text-[12px] text-mute">
+                                                        {event.actor_name ??
+                                                            t('System')}
+                                                        {formatRecordWhen(
+                                                            event.created_at,
+                                                        )
+                                                            ? ` · ${formatRecordWhen(event.created_at)}`
+                                                            : ''}
+                                                    </p>
+                                                </li>
+                                            ))}
+                                        </ol>
+                                    ) : (
+                                        <p className="text-[13px] text-mute">
+                                            {t('No case history yet.')}
                                         </p>
                                     )}
                                 </RecordSection>

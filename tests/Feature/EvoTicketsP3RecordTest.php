@@ -63,6 +63,7 @@ it('renders the ticket record as Path plus a live Desk thread, not an empty conv
     $ticket = recordTicket($user);
     $thread = recordThread($user, $ticket->contact);
     $ticket->forceFill(['thread_id' => $thread->id, 'channel' => Ticket::CHANNEL_WHATSAPP_CLOUD])->save();
+    $ticket->recordActivity('ticket_status', 'EVO-000001 → Waiting on us', $user);
     KnowledgeArticle::query()->create([
         'workspace_id' => $user->workspace_id,
         'title' => 'Delivery delay reply',
@@ -89,6 +90,7 @@ it('renders the ticket record as Path plus a live Desk thread, not an empty conv
             ->where('thread.id', $thread->id)
             ->where('messages.0.body', 'Salaam, parts delayed')
             ->where('knowledgeArticles.0.title', 'Delivery delay reply')
+            ->where('ticketHistory.0.subject', 'EVO-000001 → Waiting on us')
             ->has('askEvo.summary')
             ->where('associations.contact.first_name', 'Amel')
         );

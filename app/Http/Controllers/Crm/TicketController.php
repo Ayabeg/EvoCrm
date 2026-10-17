@@ -225,6 +225,22 @@ class TicketController extends Controller
             ])
             ->all();
 
+        $ticketHistory = Activity::query()
+            ->forWorkspace($workspace)
+            ->where('meta->ticket_id', $ticket->id)
+            ->with('actor:id,name')
+            ->latest('id')
+            ->limit(20)
+            ->get(['id', 'type', 'subject', 'actor_id', 'created_at'])
+            ->map(fn (Activity $activity) => [
+                'id' => $activity->id,
+                'type' => $activity->type,
+                'subject' => $activity->subject,
+                'actor_name' => $activity->actor?->name,
+                'created_at' => $activity->created_at?->timezone('Africa/Algiers')->toIso8601String(),
+            ])
+            ->all();
+
         return Inertia::render('crm/tickets/show', [
             'ticket' => $ticket->presentRecord(),
             'path' => TicketPath::present($ticket),
@@ -236,6 +252,7 @@ class TicketController extends Controller
             ] : null,
             'messages' => $messages,
             'knowledgeArticles' => $knowledgeArticles,
+            'ticketHistory' => $ticketHistory,
             'attachableThreads' => $attachable,
             'members' => $hub->members($workspace),
             'associations' => [
