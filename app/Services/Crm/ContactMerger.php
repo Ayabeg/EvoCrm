@@ -117,6 +117,69 @@ class ContactMerger
     }
 
     /**
+     * Return lightweight duplicate-risk counts for the Contacts quality bar
+     * without loading the full duplicate review payload.
+     *
+     * @return array{groups: int, contacts: int}
+     */
+    public function duplicateSummary(Workspace $workspace): array
+    {
+        $contacts = Contact::query()
+            ->forWorkspace($workspace)
+            ->where(function ($query): void {
+                $query->whereNotNull('email')->where('email', '!=', '')
+                    ->orWhere(fn ($nested) => $nested->whereNotNull('phone_e164')->where('phone_e164', '!=', ''))
+                    ->orWhere(fn ($nested) => $nested->whereNotNull('external_id')->where('external_id', '!=', ''));
+            })
+            ->get(['id', 'email', 'phone_e164', 'external_id']);
+
+        $parent = [];
+        $find = function (int $id) use (&$parent, &$find): int {
+            $parent[$id] ??= $id;
+            if ($parent[$id] !== $id) {
+                $parent[$id] = $find($parent[$id]);
+            }
+
+            return $parent[$id];
+        };
+        $union = function (int $left, int $right) use (&$parent, $find): void {
+            $parent[$find($left)] = $find($right);
+        };
+
+        foreach (['email', 'phone_e164', 'external_id'] as $field) {
+            $buckets = [];
+            foreach ($contacts as $contact) {
+                $value = $contact->{$field};
+                if (filled($value)) {
+                    $buckets[(string) $value][] = $contact->id;
+                }
+            }
+
+            foreach ($buckets as $ids) {
+                if (count($ids) < 2) {
+                    continue;
+                }
+
+                foreach (array_slice($ids, 1) as $id) {
+                    $union($ids[0], $id);
+                }
+            }
+        }
+
+        $membersByRoot = [];
+        foreach ($contacts as $contact) {
+            if (isset($parent[$contact->id])) {
+                $membersByRoot[$find($contact->id)][] = $contact->id;
+            }
+        }
+
+        return [
+            'groups' => count($membersByRoot),
+            'contacts' => collect($membersByRoot)->flatten()->unique()->count(),
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $values
      */
     public function merge(Workspace $workspace, User $actor, Contact $survivor, Contact $absorbed, array $values): Contact

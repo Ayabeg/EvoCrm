@@ -57,6 +57,8 @@ export default function ContactsIndex({
         missing_company: number;
         unassigned: number;
         missing_source: number;
+        duplicate_groups: number;
+        duplicate_contacts: number;
     };
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
@@ -75,7 +77,7 @@ export default function ContactsIndex({
             >
                 <section
                     aria-label={t('Contact data quality')}
-                    className="grid shrink-0 grid-cols-2 gap-3 border-b border-hairline bg-white px-4 py-3 lg:grid-cols-4"
+                    className="grid shrink-0 grid-cols-2 gap-3 border-b border-hairline bg-white px-4 py-3 lg:grid-cols-3 xl:grid-cols-6"
                 >
                     <QualityMetric
                         label={t('Missing email and phone')}
@@ -93,6 +95,20 @@ export default function ContactsIndex({
                         label={t('Missing lead source')}
                         value={dataQuality.missing_source}
                     />
+                    {canMerge ? (
+                        <QualityMetric
+                            label={t('Duplicate groups')}
+                            value={dataQuality.duplicate_groups}
+                            href="/crm/contacts/duplicates"
+                        />
+                    ) : null}
+                    {canMerge ? (
+                        <QualityMetric
+                            label={t('Contacts in duplicate groups')}
+                            value={dataQuality.duplicate_contacts}
+                            href="/crm/contacts/duplicates"
+                        />
+                    ) : null}
                 </section>
                 <CrmListShell
                     resultMode="shared-table"
@@ -185,14 +201,30 @@ export default function ContactsIndex({
     );
 }
 
-function QualityMetric({ label, value }: { label: string; value: number }) {
-    return (
+function QualityMetric({
+    label,
+    value,
+    href,
+}: {
+    label: string;
+    value: number;
+    href?: string;
+}) {
+    const content = (
         <div className="rounded-lg border border-hairline bg-canvas-soft px-3 py-2.5">
             <p className="text-[12px] font-medium text-mute">{label}</p>
             <p className="mt-1 text-xl font-semibold text-ink">
                 {value.toLocaleString()}
             </p>
         </div>
+    );
+
+    return href ? (
+        <Link href={href} className="block rounded-lg hover:border-brand/40">
+            {content}
+        </Link>
+    ) : (
+        content
     );
 }
 

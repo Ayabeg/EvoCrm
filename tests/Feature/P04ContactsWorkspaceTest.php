@@ -233,3 +233,25 @@ it('keeps the Contacts Inertia backend shape routes and permissions', function (
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('crm/leads/index'));
 });
+
+it('surfaces duplicate risk in the contact data-quality metrics', function () {
+    $user = User::factory()->create();
+    Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'duplicate@example.test',
+        'phone' => '0550123456',
+    ]);
+    Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'duplicate@example.test',
+        'phone' => '0550000001',
+    ]);
+
+    $this->actingAs($user)
+        ->get('/crm/contacts')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('dataQuality.duplicate_groups', 1)
+            ->where('dataQuality.duplicate_contacts', 2)
+        );
+});

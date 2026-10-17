@@ -14,6 +14,7 @@ use App\Models\RecordRelationship;
 use App\Models\Sequence;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
+use App\Services\Crm\ContactMerger;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Enrichment\EnrichmentService;
@@ -27,7 +28,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContactController extends Controller
 {
-    public function index(Request $request, CrmFilter $filter, CrmHub $hub): Response
+    public function index(Request $request, CrmFilter $filter, CrmHub $hub, ContactMerger $merger): Response
     {
         $workspace = $request->user()->workspace;
         $filters = $filter->resolve($request, $workspace, 'contact');
@@ -56,6 +57,15 @@ class ContactController extends Controller
             'unassigned' => (clone $qualityContacts)->whereNull('owner_id')->count(),
             'missing_source' => (clone $qualityContacts)->whereNull('source')->count(),
         ];
+
+        if ($request->user()->canPermission('crm.merge')) {
+            $duplicateSummary = $merger->duplicateSummary($workspace);
+            $dataQuality['duplicate_groups'] = $duplicateSummary['groups'];
+            $dataQuality['duplicate_contacts'] = $duplicateSummary['contacts'];
+        } else {
+            $dataQuality['duplicate_groups'] = 0;
+            $dataQuality['duplicate_contacts'] = 0;
+        }
 
         return Inertia::render('crm/contacts/index', [
             'contacts' => $hub->withListAttributes($workspace, 'contact', $contactRows),
