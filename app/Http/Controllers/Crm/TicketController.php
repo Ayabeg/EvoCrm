@@ -326,6 +326,31 @@ class TicketController extends Controller
         return back();
     }
 
+    public function satisfaction(Request $request, Ticket $ticket): RedirectResponse
+    {
+        abort_unless((int) $ticket->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($ticket->status === Ticket::STATUS_CLOSED, 422, 'Satisfaction can be submitted after closure.');
+
+        $data = $request->validate([
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'feedback' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $ticket->forceFill([
+            'satisfaction_rating' => $data['rating'],
+            'satisfaction_feedback' => $data['feedback'] ?? null,
+            'satisfaction_submitted_at' => now(),
+        ])->save();
+
+        $ticket->recordActivity(
+            'ticket_csat',
+            $ticket->number.' satisfaction '.$data['rating'].'/5',
+            $request->user(),
+        );
+
+        return back();
+    }
+
     /**
      * @param  Builder<Ticket>  $query
      */

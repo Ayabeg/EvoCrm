@@ -18,9 +18,9 @@ import {
 import { RecordPath } from '@/components/crm/record-path';
 import type { PathStep } from '@/components/crm/record-path';
 import { DeskGlass } from '@/components/desk/desk-glass';
+import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { Button } from '@/evo/ui/button';
 import { Textarea } from '@/evo/ui/textarea';
-import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { t } from '@/lib/i18n';
 
@@ -37,6 +37,9 @@ type TicketRecord = {
     sla_due_at?: string | null;
     sla_label?: string | null;
     sla_breached?: boolean;
+    satisfaction_rating?: number | null;
+    satisfaction_feedback?: string | null;
+    satisfaction_submitted_at?: string | null;
     thread_id?: number | null;
     contact?: {
         id: number;
@@ -282,6 +285,80 @@ export default function TicketShow({
                                         </label>
                                     </div>
                                 </RecordSection>
+                                <RecordSection
+                                    title={t('Customer satisfaction')}
+                                >
+                                    {ticket.satisfaction_rating ? (
+                                        <div className="space-y-2 text-[13px]">
+                                            <RecordFact
+                                                label={t('Rating')}
+                                                value={`${ticket.satisfaction_rating}/5`}
+                                            />
+                                            {ticket.satisfaction_feedback ? (
+                                                <p className="rounded-md bg-canvas-soft p-2 text-ink">
+                                                    {
+                                                        ticket.satisfaction_feedback
+                                                    }
+                                                </p>
+                                            ) : null}
+                                        </div>
+                                    ) : closed ? (
+                                        <Form
+                                            action={`/crm/tickets/${ticket.id}/satisfaction`}
+                                            method="post"
+                                            className="space-y-2"
+                                        >
+                                            <label className="block text-[12px] font-medium text-ink">
+                                                {t(
+                                                    'How satisfied was the customer?',
+                                                )}
+                                                <select
+                                                    name="rating"
+                                                    required
+                                                    defaultValue=""
+                                                    className="mt-1 h-8 w-full rounded border border-hairline bg-canvas px-2 text-[13px] font-normal"
+                                                >
+                                                    <option value="" disabled>
+                                                        {t('Choose a rating')}
+                                                    </option>
+                                                    <option value="5">
+                                                        5 ·{' '}
+                                                        {t('Very satisfied')}
+                                                    </option>
+                                                    <option value="4">
+                                                        4 · {t('Satisfied')}
+                                                    </option>
+                                                    <option value="3">
+                                                        3 · {t('Neutral')}
+                                                    </option>
+                                                    <option value="2">
+                                                        2 · {t('Dissatisfied')}
+                                                    </option>
+                                                    <option value="1">
+                                                        1 ·{' '}
+                                                        {t('Very dissatisfied')}
+                                                    </option>
+                                                </select>
+                                            </label>
+                                            <Textarea
+                                                name="feedback"
+                                                placeholder={t(
+                                                    'Optional feedback',
+                                                )}
+                                                className="min-h-16"
+                                            />
+                                            <Button size="sm">
+                                                {t('Save feedback')}
+                                            </Button>
+                                        </Form>
+                                    ) : (
+                                        <p className="text-[13px] text-mute">
+                                            {t(
+                                                'Feedback becomes available after the ticket is closed.',
+                                            )}
+                                        </p>
+                                    )}
+                                </RecordSection>
                             </div>
                         }
                         center={
@@ -514,7 +591,9 @@ export default function TicketShow({
                                             {deal.title}
                                         </RelatedRecordLink>
                                     ) : (
-                                        <p className="text-mute">{t('No deal')}</p>
+                                        <p className="text-mute">
+                                            {t('No deal')}
+                                        </p>
                                     )}
                                 </AssociationCard>
                                 {quotes.length > 0 ? (

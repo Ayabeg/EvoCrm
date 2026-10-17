@@ -332,6 +332,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::post('/crm/tickets/{ticket}/thread', [TicketController::class, 'attachThread'])->name('crm.tickets.thread');
     Route::get('/crm/tickets/{ticket}', [TicketController::class, 'show'])->name('crm.tickets.show');
     Route::put('/crm/tickets/{ticket}', [TicketController::class, 'update'])->name('crm.tickets.update');
+    Route::post('/crm/tickets/{ticket}/satisfaction', [TicketController::class, 'satisfaction'])->name('crm.tickets.satisfaction');
 
     Route::get('/ads', [AdsCenterController::class, 'index'])->name('ads.index');
     Route::get('/ads/attribution', [AdsCenterController::class, 'attribution'])->name('ads.attribution');

@@ -4,8 +4,8 @@ namespace App\Models;
 
 use App\Enums\ChannelType;
 use App\Models\Concerns\BelongsToWorkspace;
-use App\Support\TicketSla;
 use App\Services\Crm\TicketSlaWhatsApp;
+use App\Support\TicketSla;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +27,9 @@ use InvalidArgumentException;
     'owner_id',
     'first_response_at',
     'resolved_at',
+    'satisfaction_rating',
+    'satisfaction_feedback',
+    'satisfaction_submitted_at',
     'sla_due_at',
     'sla_breached_at',
     'last_activity_at',
@@ -81,6 +84,8 @@ class Ticket extends Model
         return [
             'first_response_at' => 'datetime',
             'resolved_at' => 'datetime',
+            'satisfaction_rating' => 'integer',
+            'satisfaction_submitted_at' => 'datetime',
             'sla_due_at' => 'datetime',
             'sla_breached_at' => 'datetime',
             'last_activity_at' => 'datetime',
@@ -461,6 +466,9 @@ class Ticket extends Model
             'thread_id' => $this->thread_id,
             'deal' => $this->deal ? ['id' => $this->deal->id, 'title' => $this->deal->title] : null,
             'resolved_at' => $this->resolved_at?->timezone('Africa/Algiers')->toIso8601String(),
+            'satisfaction_rating' => $this->satisfaction_rating,
+            'satisfaction_feedback' => $this->satisfaction_feedback,
+            'satisfaction_submitted_at' => $this->satisfaction_submitted_at?->timezone('Africa/Algiers')->toIso8601String(),
         ]);
     }
 }
