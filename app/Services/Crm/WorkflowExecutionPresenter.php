@@ -25,6 +25,7 @@ class WorkflowExecutionPresenter
      *     data: list<array<string, mixed>>,
      *     paginator: array{page: int, last_page: int, per_page: int, total: int, prev_href: string|null, next_href: string|null},
      *     filters: array{workflow_id: int|null, status: string|null},
+     *     metrics: array{pending: int, running: int, completed: int, failed: int, cancelled: int},
      *     selected: array<string, mixed>|null,
      *     contract: array<string, mixed>
      * }
@@ -56,6 +57,12 @@ class WorkflowExecutionPresenter
         if ($status !== null) {
             $query->where('status', $status);
         }
+
+        $statusCounts = WorkflowExecution::query()
+            ->forWorkspace($workspace)
+            ->selectRaw('status, COUNT(*) as execution_count')
+            ->groupBy('status')
+            ->pluck('execution_count', 'status');
 
         /** @var LengthAwarePaginator<int, WorkflowExecution> $paginator */
         $paginator = $query->paginate(self::PER_PAGE, ['*'], 'history_page', $page);
@@ -111,6 +118,9 @@ class WorkflowExecutionPresenter
                 'workflow_id' => $workflowId ?: null,
                 'status' => $status,
             ],
+            'metrics' => collect(WorkflowExecution::STATUSES)
+                ->mapWithKeys(fn (string $state) => [$state => (int) ($statusCounts[$state] ?? 0)])
+                ->all(),
             'selected' => $selected,
             'contract' => $this->contract(),
         ];

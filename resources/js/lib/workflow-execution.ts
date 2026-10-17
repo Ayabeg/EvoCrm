@@ -10,7 +10,8 @@ export const WORKFLOW_EXECUTION_STATUSES = [
     'cancelled',
 ] as const;
 
-export type WorkflowExecutionStatus = (typeof WORKFLOW_EXECUTION_STATUSES)[number];
+export type WorkflowExecutionStatus =
+    (typeof WORKFLOW_EXECUTION_STATUSES)[number];
 
 export type WorkflowExecutionRecordRef = {
     visible: boolean;
@@ -65,6 +66,13 @@ export type WorkflowExecutionPage = {
         workflow_id: number | null;
         status: string | null;
     };
+    metrics: {
+        pending: number;
+        running: number;
+        completed: number;
+        failed: number;
+        cancelled: number;
+    };
     selected: WorkflowExecutionRow | null;
     contract: {
         retry_available: boolean;
@@ -91,6 +99,13 @@ export const EMPTY_EXECUTION_PAGE: WorkflowExecutionPage = {
     filters: {
         workflow_id: null,
         status: null,
+    },
+    metrics: {
+        pending: 0,
+        running: 0,
+        completed: 0,
+        failed: 0,
+        cancelled: 0,
     },
     selected: null,
     contract: {
