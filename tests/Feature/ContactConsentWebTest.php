@@ -63,3 +63,68 @@ it('blocks automated marketing enrollment after an explicit denial', function ()
     expect(fn () => app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact))
         ->toThrow(ValidationException::class);
 });
+
+it('supports consent-aware contact and segment filtering', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+    $granted = Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'email' => 'granted@example.test',
+    ]);
+    $denied = Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'email' => 'denied@example.test',
+    ]);
+    Contact::factory()->create([
+        'workspace_id' => $workspace->id,
+        'email' => 'unknown@example.test',
+    ]);
+
+    ContactConsent::query()->create([
+        'workspace_id' => $workspace->id,
+        'contact_id' => $granted->id,
+        'channel' => 'email',
+        'purpose' => 'marketing',
+        'status' => ContactConsent::STATUS_GRANTED,
+    ]);
+    ContactConsent::query()->create([
+        'workspace_id' => $workspace->id,
+        'contact_id' => $denied->id,
+        'channel' => 'email',
+        'purpose' => 'marketing',
+        'status' => ContactConsent::STATUS_DENIED,
+    ]);
+
+    $this->actingAs($user)
+        ->postJson('/crm/segments/preview', [
+            'entity' => 'contact',
+            'filters' => ['marketing_consent' => 'granted'],
+        ])
+        ->assertOk()
+        ->assertJson(['count' => 1])
+        ->assertJsonPath('members.0.detail', 'granted@example.test');
+
+    $filterGroups = urlencode(json_encode([
+        'logic' => 'and',
+        'groups' => [[
+            'logic' => 'and',
+            'rules' => [[
+                'field' => 'marketing_consent',
+                'operator' => 'eq',
+                'value' => 'unknown',
+            ]],
+        ]],
+    ]));
+
+    $this->actingAs($user)
+        ->get('/crm/contacts?filter_groups='.$filterGroups)
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('recordCount', 1)
+            ->where('contacts.0.email', 'unknown@example.test')
+            ->where('listView.filterFields', fn ($fields) => collect($fields)->contains(
+                fn ($field) => ($field['id'] ?? '') === 'marketing_consent'
+                    && ($field['options'] ?? []) === ['granted', 'denied', 'unknown']
+            ))
+        );
+});

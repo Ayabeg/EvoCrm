@@ -92,6 +92,7 @@ class ListViewConfig
                 ['id' => 'enrolled_in_sequence', 'label' => 'Enrolled in sequence', 'type' => 'select'],
                 ['id' => 'email_replied', 'label' => 'Replied to email', 'type' => 'boolean'],
                 ['id' => 'email_opened', 'label' => 'Opened email', 'type' => 'boolean'],
+                ['id' => 'marketing_consent', 'label' => 'Marketing consent', 'type' => 'select', 'options' => ['granted', 'denied', 'unknown']],
             ],
             'deal' => [
                 ['id' => 'stage', 'label' => 'Stage', 'type' => 'select'],

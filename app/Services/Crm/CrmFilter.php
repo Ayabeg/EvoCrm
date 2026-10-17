@@ -4,6 +4,7 @@ namespace App\Services\Crm;
 
 use App\Models\Company;
 use App\Models\Contact;
+use App\Models\ContactConsent;
 use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
 use App\Models\Deal;
@@ -38,6 +39,7 @@ class CrmFilter
             'attention' => DealAttentionEvaluator::normalizeFilter($fromSaved['attention'] ?? null),
             'unanswered' => ($fromSaved['unanswered'] ?? null) === true || ($fromSaved['unanswered'] ?? null) === '1',
             'unassigned' => ($fromSaved['unassigned'] ?? null) === true || ($fromSaved['unassigned'] ?? null) === '1',
+            'marketing_consent' => $fromSaved['marketing_consent'] ?? null,
             'deal_stage' => $fromSaved['deal_stage'] ?? null,
             'has_open_deal' => ($fromSaved['has_open_deal'] ?? null) === true || ($fromSaved['has_open_deal'] ?? null) === '1',
             'has_won_deal' => ($fromSaved['has_won_deal'] ?? null) === true || ($fromSaved['has_won_deal'] ?? null) === '1',
@@ -120,6 +122,7 @@ class CrmFilter
             'enrolled_in_sequence' => $request->input('enrolled_in_sequence', $fromSaved['enrolled_in_sequence'] ?? null),
             'email_replied' => $request->boolean('email_replied') || (($fromSaved['email_replied'] ?? null) === true || ($fromSaved['email_replied'] ?? null) === '1'),
             'email_opened' => $request->boolean('email_opened') || (($fromSaved['email_opened'] ?? null) === true || ($fromSaved['email_opened'] ?? null) === '1'),
+            'marketing_consent' => $request->input('marketing_consent', $fromSaved['marketing_consent'] ?? null),
             'deal_stage' => $request->input('deal_stage', $fromSaved['deal_stage'] ?? null),
             'has_open_deal' => $request->boolean('has_open_deal') || (($fromSaved['has_open_deal'] ?? null) === true || ($fromSaved['has_open_deal'] ?? null) === '1'),
             'has_won_deal' => $request->boolean('has_won_deal') || (($fromSaved['has_won_deal'] ?? null) === true || ($fromSaved['has_won_deal'] ?? null) === '1'),
@@ -656,6 +659,7 @@ class CrmFilter
         }
 
         $this->applyBehaviorFilters($query, $filters);
+        $this->applyMarketingConsentFilter($query, $filters['marketing_consent'] ?? null);
 
         $this->applyLastActivity($query, $filters['last_activity'] ?? null);
         $this->applyCreated($query, $filters['created'] ?? null);
@@ -1046,6 +1050,75 @@ class CrmFilter
 
         if (! empty($filters['email_opened'])) {
             $query->whereHas('outboundMessages', fn (Builder $message) => $message->whereNotNull('opened_at'));
+        }
+    }
+
+    /**
+     * Classify a contact by its effective marketing consent state.
+     *
+     * A contact is "granted" when at least one marketing channel has an
+     * unrevoked, unexpired grant. "Denied" is reserved for contacts with no
+     * usable grant but an explicit denial, revocation, or expired grant.
+     * Everything else remains "unknown", including contacts without a
+     * consent record.
+     *
+     * @param  Builder<Contact>  $query
+     */
+    protected function applyMarketingConsentFilter(Builder $query, mixed $state): void
+    {
+        if (! in_array($state, ['granted', 'denied', 'unknown'], true)) {
+            return;
+        }
+
+        $activeGrant = function (Builder $consent): void {
+            $consent
+                ->where('purpose', 'marketing')
+                ->where('status', ContactConsent::STATUS_GRANTED)
+                ->whereNull('revoked_at')
+                ->where(function (Builder $expires): void {
+                    $expires->whereNull('expires_at')
+                        ->orWhere('expires_at', '>', now());
+                });
+        };
+
+        if ($state === 'granted') {
+            $query->whereHas('consents', $activeGrant);
+
+            return;
+        }
+
+        $query->whereDoesntHave('consents', $activeGrant);
+
+        if ($state === 'denied') {
+            $query->whereHas('consents', function (Builder $consent): void {
+                $consent
+                    ->where('purpose', 'marketing')
+                    ->where(function (Builder $denied): void {
+                        $denied
+                            ->where('status', ContactConsent::STATUS_DENIED)
+                            ->orWhereNotNull('revoked_at')
+                            ->orWhere(function (Builder $expired): void {
+                                $expired->where('status', ContactConsent::STATUS_GRANTED)
+                                    ->whereNotNull('expires_at')
+                                    ->where('expires_at', '<=', now());
+                            });
+                    });
+            });
+        } else {
+            $query->whereDoesntHave('consents', function (Builder $consent): void {
+                $consent
+                    ->where('purpose', 'marketing')
+                    ->where(function (Builder $denied): void {
+                        $denied
+                            ->where('status', ContactConsent::STATUS_DENIED)
+                            ->orWhereNotNull('revoked_at')
+                            ->orWhere(function (Builder $expired): void {
+                                $expired->where('status', ContactConsent::STATUS_GRANTED)
+                                    ->whereNotNull('expires_at')
+                                    ->where('expires_at', '<=', now());
+                            });
+                    });
+            });
         }
     }
 
