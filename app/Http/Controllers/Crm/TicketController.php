@@ -44,6 +44,21 @@ class TicketController extends Controller
             ];
         })->all();
 
+        $openTickets = Ticket::query()
+            ->forWorkspace($workspace)
+            ->where('status', '!=', Ticket::STATUS_CLOSED);
+
+        $serviceMetrics = [
+            'open' => (clone $openTickets)->count(),
+            'needs_response' => (clone $openTickets)->whereNull('first_response_at')->count(),
+            'sla_breached' => (clone $openTickets)
+                ->whereNull('first_response_at')
+                ->whereNotNull('sla_due_at')
+                ->where('sla_due_at', '<', now())
+                ->count(),
+            'waiting_on_us' => (clone $openTickets)->where('status', Ticket::STATUS_WAITING_ON_US)->count(),
+        ];
+
         return Inertia::render('crm/tickets/index', [
             'tickets' => $rows->map->present()->values()->all(),
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
@@ -54,6 +69,7 @@ class TicketController extends Controller
             'recordCount' => $paginator['total'],
             'paginator' => $paginator,
             'stagePills' => $statusPills,
+            'serviceMetrics' => $serviceMetrics,
             'createOpen' => $request->boolean('create'),
             'createDefaults' => [
                 'contact_id' => $request->integer('contact_id') ?: null,
