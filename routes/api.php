@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AgentToolController;
 use App\Http\Controllers\Api\V1\ActivityController;
 use App\Http\Controllers\Api\V1\AuthTokenController;
+use App\Http\Controllers\Api\V1\ContactConsentController;
 use App\Http\Controllers\Api\V1\ContactController;
 use App\Http\Controllers\Api\V1\DealController;
 use App\Http\Controllers\Api\V1\DeviceController;
@@ -31,6 +32,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
         Route::get('/contacts/{contact}', [ContactController::class, 'show'])->name('contacts.show');
         Route::put('/contacts/{contact}', [ContactController::class, 'update'])->name('contacts.update');
+        Route::post('/contacts/{contact}/consents', [ContactConsentController::class, 'store'])->name('contacts.consents.store');
 
         Route::get('/leads/board', [LeadController::class, 'board'])->name('leads.board');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');

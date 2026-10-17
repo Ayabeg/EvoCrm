@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AuditEvent;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\ContactConsent;
@@ -98,4 +99,42 @@ it('returns contact attribution, consent, relationships, and a unified timeline'
 
 it('requires a Sanctum token to list contacts', function () {
     $this->getJson('/api/v1/contacts')->assertUnauthorized();
+});
+
+it('upserts contact consent and records the governance audit event', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    $this->withToken(apiToken($user))
+        ->postJson('/api/v1/contacts/'.$contact->id.'/consents', [
+            'channel' => 'email',
+            'purpose' => 'marketing',
+            'status' => 'granted',
+            'source' => 'web_form',
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.granted', true)
+        ->assertJsonPath('data.status', 'granted');
+
+    $this->withToken(apiToken($user))
+        ->postJson('/api/v1/contacts/'.$contact->id.'/consents', [
+            'channel' => 'email',
+            'purpose' => 'marketing',
+            'status' => 'denied',
+            'source' => 'unsubscribe',
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.granted', false)
+        ->assertJsonPath('data.status', 'denied');
+
+    expect(ContactConsent::query()
+        ->where('contact_id', $contact->id)
+        ->where('channel', 'email')
+        ->where('purpose', 'marketing')
+        ->count())->toBe(1);
+
+    expect(AuditEvent::query()
+        ->where('workspace_id', $user->workspace_id)
+        ->where('action', 'contact.consent_updated')
+        ->count())->toBe(2);
 });
