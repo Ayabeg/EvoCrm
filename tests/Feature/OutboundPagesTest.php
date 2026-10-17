@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Contact;
+use App\Models\Deal;
 use App\Models\Mailbox;
+use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
 use App\Models\User;
@@ -60,6 +62,46 @@ it('renders the outbound overview, outbox, replies, and reports pages', function
             ->where('outboundDetail.totals.opened', 1)
             ->has('outboundDetail.tracking.opened')
             ->has('outboundDetail.tracking.bounced')
+        );
+});
+
+it('attributes outbound campaign reporting to won contact revenue', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
+    $mailbox = Mailbox::factory()->create(['workspace_id' => $user->workspace_id, 'enabled' => false]);
+    $pipeline = $user->workspace->defaultPipeline();
+
+    OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'mailbox_id' => $mailbox->id,
+        'campaign_id' => $campaign->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Campaign',
+        'body' => 'Body',
+        'status' => 'sent',
+        'sent_at' => now(),
+        'replied_at' => now(),
+    ]);
+    Deal::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stageBySlug('won')->id,
+        'title' => 'Won from campaign',
+        'amount_cents' => 250_000,
+        'currency' => 'DZD',
+    ]);
+
+    $this->actingAs($user)
+        ->get('/reports/outbound')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('outboundDetail.perCampaign.0.won_deals', 1)
+            ->where('outboundDetail.perCampaign.0.won_revenue_cents', 250_000)
         );
 });
 

@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { DataGrid } from '@/evo/data/data-grid';
 import type { EvoDataGridColumn } from '@/evo/data/data-grid';
-import { formatNumber } from '@/evo/lib/format';
+import { formatMoneyFromCents, formatNumber } from '@/evo/lib/format';
 import { statusTone } from '@/evo/outbound/status';
 import { SkeletonRow } from '@/evo/ui/skeleton';
 import { Status } from '@/evo/ui/status';
@@ -27,6 +27,8 @@ export type OutboundReportsProps = {
         sent: number;
         opened: number;
         replied: number;
+        won_deals?: number;
+        won_revenue_cents?: number;
     }>;
     daily: Array<{ day: string; sent: number; opened?: number }>;
     onOpenCampaign?: (id: string | number) => void;
@@ -60,20 +62,41 @@ export function OutboundReports({
             id: 'status',
             header: t('Status'),
             cell: ({ row }) => (
-                <Status tone={statusTone(row.original.status)} label={t(row.original.status)} />
+                <Status
+                    tone={statusTone(row.original.status)}
+                    label={t(row.original.status)}
+                />
             ),
         },
         {
             id: 'sent',
             header: t('Sent'),
             accessorFn: (row) => row.sent,
-            cell: ({ row }) => <span className="tabular-nums">{formatNumber(row.original.sent)}</span>,
+            cell: ({ row }) => (
+                <span className="tabular-nums">
+                    {formatNumber(row.original.sent)}
+                </span>
+            ),
         },
         {
             id: 'replied',
             header: t('Replied'),
             accessorFn: (row) => row.replied,
-            cell: ({ row }) => <span className="tabular-nums">{formatNumber(row.original.replied)}</span>,
+            cell: ({ row }) => (
+                <span className="tabular-nums">
+                    {formatNumber(row.original.replied)}
+                </span>
+            ),
+        },
+        {
+            id: 'won_revenue',
+            header: t('Won revenue'),
+            accessorFn: (row) => row.won_revenue_cents ?? 0,
+            cell: ({ row }) => (
+                <span className="tabular-nums">
+                    {formatMoneyFromCents(row.original.won_revenue_cents ?? 0)}
+                </span>
+            ),
         },
     ];
 
@@ -97,20 +120,28 @@ export function OutboundReports({
             header: t('Enrolled'),
             accessorFn: (row) => row.enrollments,
             cell: ({ row }) => (
-                <span className="tabular-nums">{formatNumber(row.original.enrollments)}</span>
+                <span className="tabular-nums">
+                    {formatNumber(row.original.enrollments)}
+                </span>
             ),
         },
         {
             id: 'sent',
             header: t('Sent'),
             accessorFn: (row) => row.sent,
-            cell: ({ row }) => <span className="tabular-nums">{formatNumber(row.original.sent)}</span>,
+            cell: ({ row }) => (
+                <span className="tabular-nums">
+                    {formatNumber(row.original.sent)}
+                </span>
+            ),
         },
     ];
 
     return (
         <section className="space-y-4">
-            <h2 className="text-[13px] font-medium text-[var(--evo-ink)]">{t('Outbound operations')}</h2>
+            <h2 className="text-[13px] font-medium text-[var(--evo-ink)]">
+                {t('Outbound operations')}
+            </h2>
             <div className="grid gap-3 md:grid-cols-4">
                 {Object.entries(totals)
                     .slice(0, 4)
@@ -119,8 +150,10 @@ export function OutboundReports({
                             key={key}
                             className="rounded-[var(--evo-radius-standard)] border border-[var(--evo-hairline)] bg-[var(--evo-surface)] p-3"
                         >
-                            <p className="text-[11px] uppercase text-[var(--evo-ink-muted)]">{t(key)}</p>
-                            <p className="text-[18px] font-semibold tabular-nums text-[var(--evo-ink)]">
+                            <p className="text-[11px] text-[var(--evo-ink-muted)] uppercase">
+                                {t(key)}
+                            </p>
+                            <p className="text-[18px] font-semibold text-[var(--evo-ink)] tabular-nums">
                                 {formatNumber(value)}
                             </p>
                         </div>

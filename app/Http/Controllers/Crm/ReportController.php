@@ -711,7 +711,34 @@ class ReportController extends Controller
         $out = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out');
         $totals = ['queued' => (clone $out)->where('status', 'queued')->count(), 'sent' => (clone $out)->where('status', 'sent')->count(), 'failed' => (clone $out)->where('status', 'failed')->count(), 'opened' => (clone $out)->whereNotNull('opened_at')->count(), 'clicked' => (clone $out)->whereNotNull('clicked_at')->count(), 'replied' => (clone $out)->whereNotNull('replied_at')->count(), 'bounced' => (clone $out)->where(fn ($query) => $query->where('status', 'bounced')->orWhereNotNull('bounced_at'))->count()];
         $perSequence = Sequence::query()->forWorkspace($workspace)->withCount('enrollments')->get()->map(fn (Sequence $s) => ['id' => $s->id, 'name' => $s->name, 'enrollments' => $s->enrollments_count, 'sent' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->where('status', 'sent')->count(), 'opened' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('opened_at')->count(), 'replied' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('replied_at')->count()]);
-        $perCampaign = OutboundCampaign::query()->forWorkspace($workspace)->latest()->limit(20)->get()->map(fn (OutboundCampaign $c) => array_merge(['id' => $c->id, 'name' => $c->name, 'status' => $c->status, 'audience_count' => $c->audience_count], $c->messageCounts()));
+        $campaignMessages = (clone $out)
+            ->whereNotNull('campaign_id')
+            ->get(['campaign_id', 'contact_id', 'replied_at']);
+        $contactIds = $campaignMessages->pluck('contact_id')->filter()->unique()->values();
+        $wonDealsByContact = $contactIds->isEmpty()
+            ? collect()
+            : Deal::query()
+                ->forWorkspace($workspace)
+                ->whereIn('contact_id', $contactIds)
+                ->whereHas('stage', fn (Builder $stage) => $stage->where('is_won', true))
+                ->get(['id', 'contact_id', 'amount_cents'])
+                ->groupBy('contact_id');
+        $perCampaign = OutboundCampaign::query()->forWorkspace($workspace)->latest()->limit(20)->get()->map(function (OutboundCampaign $campaign) use ($campaignMessages, $wonDealsByContact): array {
+            $messages = $campaignMessages->where('campaign_id', $campaign->id);
+            $campaignContactIds = $messages->pluck('contact_id')->filter()->unique();
+            $wonDeals = $campaignContactIds
+                ->flatMap(fn ($contactId) => $wonDealsByContact->get($contactId, collect()))
+                ->unique('id');
+
+            return array_merge([
+                'id' => $campaign->id,
+                'name' => $campaign->name,
+                'status' => $campaign->status,
+                'audience_count' => $campaign->audience_count,
+                'won_deals' => $wonDeals->count(),
+                'won_revenue_cents' => (int) $wonDeals->sum('amount_cents'),
+            ], $campaign->messageCounts());
+        });
         $daily = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'sent')->where('sent_at', '>=', now()->subDays(30))->selectRaw('DATE(sent_at) as day, COUNT(*) as sent')->groupBy('day')->orderBy('day')->get();
 
         return ['totals' => $totals, 'perSequence' => $perSequence, 'perCampaign' => $perCampaign, 'daily' => $daily, 'tracking' => ['sent' => '', 'opened' => '', 'clicked' => '', 'replied' => '', 'bounced' => '']];
