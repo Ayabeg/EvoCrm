@@ -99,6 +99,10 @@ class EnforceProductPermissions
             return 'settings.pipelines';
         }
 
+        if (str_starts_with($name, 'settings.support')) {
+            return 'settings.support';
+        }
+
         if (str_starts_with($name, 'settings.attributes')) {
             return 'settings.attributes';
         }

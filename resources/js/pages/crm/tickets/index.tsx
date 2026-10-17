@@ -9,6 +9,7 @@ import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
 import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
+import { t } from '@/lib/i18n';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
 import {
     ticketEmptyState,
@@ -17,6 +18,7 @@ import {
 import type { TicketListRow } from '@/pages/crm/tickets/ticket-columns';
 
 type Contact = { id: number; first_name: string; last_name?: string | null };
+type SupportQueue = { id: number; name: string; round_robin?: boolean };
 
 export default function TicketsIndex({
     tickets,
@@ -31,6 +33,7 @@ export default function TicketsIndex({
     createOpen,
     createDefaults,
     serviceMetrics,
+    queues = [],
 }: {
     tickets: TicketListRow[];
     stagePills: StagePill[];
@@ -54,6 +57,7 @@ export default function TicketsIndex({
         sla_breached: number;
         waiting_on_us: number;
     };
+    queues?: SupportQueue[];
 }) {
     const [drawer, setDrawer] = useState(Boolean(createOpen));
     const loading = useInertiaLoading();
@@ -137,6 +141,33 @@ export default function TicketsIndex({
                                                 maxLength={180}
                                             />
                                         </div>
+                                        {queues.length > 0 ? (
+                                            <div>
+                                                <Label className="mb-1 block text-[12px]">
+                                                    {t('Support queue')}
+                                                </Label>
+                                                <select
+                                                    name="queue_id"
+                                                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                                                    defaultValue=""
+                                                >
+                                                    <option value="">
+                                                        {t('No queue')}
+                                                    </option>
+                                                    {queues.map((queue) => (
+                                                        <option
+                                                            key={queue.id}
+                                                            value={queue.id}
+                                                        >
+                                                            {queue.name}
+                                                            {queue.round_robin
+                                                                ? ` · ${t('round-robin')}`
+                                                                : ''}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : null}
                                         <div>
                                             <Label className="mb-1 block text-[12px]">
                                                 Contact{' '}

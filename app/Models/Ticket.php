@@ -25,6 +25,7 @@ use InvalidArgumentException;
     'deal_id',
     'thread_id',
     'owner_id',
+    'queue_id',
     'first_response_at',
     'resolved_at',
     'satisfaction_rating',
@@ -168,6 +169,11 @@ class Ticket extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function queue(): BelongsTo
+    {
+        return $this->belongsTo(SupportQueue::class, 'queue_id');
     }
 
     public function isOpen(): bool
@@ -382,6 +388,7 @@ class Ticket extends Model
             ] : null,
             'company' => $this->company ? ['id' => $this->company->id, 'name' => $this->company->name] : null,
             'owner' => $this->owner ? ['id' => $this->owner->id, 'name' => $this->owner->name] : null,
+            'queue' => $this->queue ? ['id' => $this->queue->id, 'name' => $this->queue->name] : null,
         ];
     }
 

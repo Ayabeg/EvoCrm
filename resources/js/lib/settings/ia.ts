@@ -135,6 +135,14 @@ export const SETTINGS_DESTINATIONS: SettingsDestination[] = [
         permission: 'settings.pipelines',
     },
     {
+        title: 'Support queues',
+        href: '/settings/support-queues',
+        group: 'CRM',
+        scope: 'CRM',
+        keywords: ['tickets', 'desk', 'support', 'routing', 'round robin'],
+        permission: 'settings.support',
+    },
+    {
         title: 'Qualification',
         href: '/settings/qualify',
         group: 'CRM',
@@ -272,6 +280,7 @@ export const WIDE_SETTINGS_COMPONENTS = new Set([
     'settings/people',
     'settings/attributes',
     'settings/pipelines',
+    'settings/support-queues',
     'settings/record-layouts',
     'settings/connectors',
     'settings/system-health',

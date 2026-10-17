@@ -49,6 +49,7 @@ type TicketRecord = {
     } | null;
     company?: { id: number; name: string } | null;
     owner?: { id: number; name: string } | null;
+    queue?: { id: number; name: string } | null;
     deal?: { id: number; title: string } | null;
 };
 
@@ -83,6 +84,8 @@ type TicketHistoryEvent = {
     created_at?: string | null;
 };
 
+type SupportQueue = { id: number; name: string; round_robin?: boolean };
+
 type PathState = {
     steps: PathStep[];
     current: string;
@@ -98,6 +101,7 @@ export default function TicketShow({
     messages = [],
     knowledgeArticles = [],
     ticketHistory = [],
+    queues = [],
     attachableThreads = [],
     members = [],
     associations,
@@ -109,6 +113,7 @@ export default function TicketShow({
     messages?: ThreadMessage[];
     knowledgeArticles?: KnowledgeArticlePreview[];
     ticketHistory?: TicketHistoryEvent[];
+    queues?: SupportQueue[];
     attachableThreads?: ThreadPreview[];
     members?: { id: number; name: string }[];
     associations?: {
@@ -298,6 +303,42 @@ export default function TicketShow({
                                                 </option>
                                             </select>
                                         </label>
+                                        {queues.length > 0 ? (
+                                            <label className="block">
+                                                <span className="block text-[12px] text-mute">
+                                                    {t('Support queue')}
+                                                </span>
+                                                <select
+                                                    className="mt-0.5 h-9 w-full rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
+                                                    value={ticket.queue?.id ?? ''}
+                                                    onChange={(event) =>
+                                                        router.put(
+                                                            action,
+                                                            {
+                                                                queue_id:
+                                                                    event.target
+                                                                        .value,
+                                                            },
+                                                            {
+                                                                preserveScroll: true,
+                                                            },
+                                                        )
+                                                    }
+                                                >
+                                                    <option value="">
+                                                        {t('No queue')}
+                                                    </option>
+                                                    {queues.map((queue) => (
+                                                        <option
+                                                            key={queue.id}
+                                                            value={queue.id}
+                                                        >
+                                                            {queue.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </label>
+                                        ) : null}
                                         <label className="block">
                                             <span className="block text-[11px] text-mute">
                                                 Owner

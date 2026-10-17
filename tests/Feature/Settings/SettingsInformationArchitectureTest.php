@@ -104,6 +104,7 @@ it('redirects /settings onto profile and keeps bookmarked settings URLs', functi
         '/settings/people' => 'settings/people',
         '/settings/attributes' => 'settings/attributes',
         '/settings/pipelines' => 'settings/pipelines',
+        '/settings/support-queues' => 'settings/support-queues',
         '/settings/qualify' => 'settings/qualify',
         '/settings/quotas' => 'settings/quotas',
         '/settings/record-layouts' => 'settings/record-layouts',
@@ -158,6 +159,7 @@ it('forbids members from manager settings URLs while keeping personal destinatio
         '/settings/qualify',
         '/settings/quotas',
         '/settings/record-layouts',
+        '/settings/support-queues',
         '/settings/playbooks',
         '/settings/sms',
         '/settings/agent',
@@ -179,7 +181,8 @@ it('hides manager destinations from member nav while owners still see them', fun
         ->and($ia)->toContain("href: '/settings/permissions'")
         ->and($ia)->toContain("permission: 'settings.integrations'")
         ->and($ia)->toContain("permission: 'settings.attributes'")
-        ->and($ia)->toContain("permission: 'settings.pipelines'");
+        ->and($ia)->toContain("permission: 'settings.pipelines'")
+        ->and($ia)->toContain("permission: 'settings.support'");
 
     $owner = settingsOwner();
     $member = User::factory()->create([

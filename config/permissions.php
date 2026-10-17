@@ -58,6 +58,10 @@ return [
             'label' => 'Manage pipelines',
             'defaults' => ['owner' => true, 'admin' => true, 'member' => false],
         ],
+        'settings.support' => [
+            'label' => 'Manage support queues',
+            'defaults' => ['owner' => true, 'admin' => true, 'member' => false],
+        ],
         'settings.attributes' => [
             'label' => 'Manage custom attributes and layouts',
             'defaults' => ['owner' => true, 'admin' => true, 'member' => false],

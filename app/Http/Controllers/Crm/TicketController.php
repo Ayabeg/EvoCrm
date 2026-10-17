@@ -7,11 +7,14 @@ use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\KnowledgeArticle;
+use App\Models\SupportQueue;
 use App\Models\Thread;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\Workspace;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\CrmFilter;
+use App\Services\Crm\TicketRouter;
 use App\Support\CrmHub;
 use App\Support\TicketPath;
 use App\Support\TicketSla;
@@ -30,7 +33,7 @@ class TicketController extends Controller
 
         $query = Ticket::query()
             ->forWorkspace($workspace)
-            ->with(['contact', 'company', 'owner']);
+            ->with(['contact', 'company', 'owner', 'queue']);
 
         $filter->apply('ticket', $query, $filters);
         $query->latest('id');
@@ -64,6 +67,7 @@ class TicketController extends Controller
             'tickets' => $rows->map->present()->values()->all(),
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
             'members' => $hub->members($workspace),
+            'queues' => $this->availableQueues($workspace),
             'savedFilters' => $hub->filters($workspace, 'ticket', $request->user()),
             'activeFilters' => $filters,
             'listView' => $hub->listViewMeta('ticket', null, null, $workspace),
@@ -112,7 +116,7 @@ class TicketController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, TicketRouter $router): RedirectResponse
     {
         $data = $request->validate([
             'subject' => ['required', 'string', 'max:180'],
@@ -120,6 +124,7 @@ class TicketController extends Controller
             'deal_id' => ['nullable', 'integer'],
             'priority' => ['nullable', 'in:low,medium,high'],
             'channel' => ['nullable', 'in:whatsapp_cloud,email,manual'],
+            'queue_id' => ['nullable', 'integer'],
         ]);
 
         $contact = Contact::query()->forWorkspace($request->user()->workspace)->findOrFail($data['contact_id']);
@@ -131,12 +136,25 @@ class TicketController extends Controller
             $dealId = $deal->id;
         }
 
+        $queue = null;
+        if (! empty($data['queue_id'])) {
+            $queue = SupportQueue::query()
+                ->forWorkspace($request->user()->workspace)
+                ->where('is_active', true)
+                ->findOrFail($data['queue_id']);
+        }
+
+        $ownerId = $queue?->round_robin
+            ? ($router->nextOwnerId($queue) ?? $request->user()->id)
+            : $request->user()->id;
+
         $ticket = Ticket::query()->create([
             'workspace_id' => $request->user()->workspace_id,
             'contact_id' => $contact->id,
             'company_id' => $contact->company_id,
             'deal_id' => $dealId,
-            'owner_id' => $request->user()->id,
+            'owner_id' => $ownerId,
+            'queue_id' => $queue?->id,
             'subject' => $data['subject'],
             'priority' => $data['priority'] ?? Ticket::PRIORITY_MEDIUM,
             'channel' => $data['channel'] ?? Ticket::CHANNEL_MANUAL,
@@ -169,7 +187,7 @@ class TicketController extends Controller
         abort_unless((int) $ticket->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
-        $ticket->load(['contact', 'company', 'deal.quotes', 'owner', 'thread.channel']);
+        $ticket->load(['contact', 'company', 'deal.quotes', 'owner', 'queue', 'thread.channel']);
 
         $messages = $ticket->thread
             ? $ticket->thread->messages()->orderBy('id')->limit(80)->get()->map(fn ($message) => [
@@ -255,6 +273,7 @@ class TicketController extends Controller
             'ticketHistory' => $ticketHistory,
             'attachableThreads' => $attachable,
             'members' => $hub->members($workspace),
+            'queues' => $this->availableQueues($workspace),
             'associations' => [
                 'contact' => $ticket->contact ? [
                     'id' => $ticket->contact->id,
@@ -270,7 +289,7 @@ class TicketController extends Controller
         ]);
     }
 
-    public function update(Request $request, Ticket $ticket): RedirectResponse
+    public function update(Request $request, Ticket $ticket, TicketRouter $router): RedirectResponse
     {
         abort_unless((int) $ticket->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -282,12 +301,17 @@ class TicketController extends Controller
             $request->merge(['deal_id' => null]);
         }
 
+        if ($request->exists('queue_id') && $request->input('queue_id') === '') {
+            $request->merge(['queue_id' => null]);
+        }
+
         $data = $request->validate([
             'subject' => ['sometimes', 'required', 'string', 'max:180'],
             'priority' => ['sometimes', 'nullable', 'in:low,medium,high'],
             'status' => ['sometimes', 'nullable', 'in:'.implode(',', Ticket::STATUSES)],
             'owner_id' => ['sometimes', 'nullable', 'integer'],
             'deal_id' => ['sometimes', 'nullable', 'integer'],
+            'queue_id' => ['sometimes', 'nullable', 'integer'],
         ]);
 
         if (isset($data['priority'])
@@ -323,11 +347,48 @@ class TicketController extends Controller
             }
         }
 
+        if (array_key_exists('queue_id', $data)) {
+            $queueId = $data['queue_id'];
+            unset($data['queue_id']);
+
+            if ($queueId) {
+                $queue = SupportQueue::query()
+                    ->forWorkspace($request->user()->workspace)
+                    ->where('is_active', true)
+                    ->findOrFail($queueId);
+                $data['queue_id'] = $queue->id;
+
+                if (! array_key_exists('owner_id', $data) && ! $ticket->owner_id) {
+                    $data['owner_id'] = $router->nextOwnerId($queue);
+                }
+            } else {
+                $data['queue_id'] = null;
+            }
+        }
+
         if ($data !== []) {
             $ticket->forceFill($data + ['last_activity_at' => now()])->save();
         }
 
         return back();
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, round_robin: bool}>
+     */
+    private function availableQueues(Workspace $workspace): array
+    {
+        return SupportQueue::query()
+            ->forWorkspace($workspace)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'round_robin'])
+            ->map(fn (SupportQueue $queue) => [
+                'id' => $queue->id,
+                'name' => $queue->name,
+                'round_robin' => $queue->round_robin,
+            ])
+            ->all();
     }
 
     public function attachThread(Request $request, Ticket $ticket): RedirectResponse

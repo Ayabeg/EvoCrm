@@ -74,6 +74,7 @@ use App\Http\Controllers\Settings\OAuthSetupController;
 use App\Http\Controllers\Settings\PermissionsController;
 use App\Http\Controllers\Settings\PipelineController;
 use App\Http\Controllers\Settings\RecordLayoutSettingsController;
+use App\Http\Controllers\Settings\SupportQueueController;
 use App\Http\Controllers\Settings\WhatsAppController;
 use App\Http\Controllers\Webhooks\EvolutionWebhookController;
 use App\Http\Controllers\Webhooks\MetaLeadWebhookController;
@@ -444,6 +445,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::put('/settings/attributes/{definition}', [CustomAttributeController::class, 'update'])->name('settings.attributes.update');
     Route::delete('/settings/attributes/{definition}', [CustomAttributeController::class, 'destroy'])->name('settings.attributes.destroy');
     Route::get('/settings/pipelines', [PipelineController::class, 'index'])->name('settings.pipelines');
+    Route::get('/settings/support-queues', [SupportQueueController::class, 'index'])->name('settings.support-queues');
     Route::get('/settings/permissions', [PermissionsController::class, 'index'])->name('settings.permissions');
     Route::put('/settings/permissions/{user}', [PermissionsController::class, 'update'])->name('settings.permissions.update');
     Route::middleware('can-manage-settings')->group(function () {
@@ -463,6 +465,9 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
         Route::patch('/settings/pipelines/{pipeline}/stages/{stage}', [PipelineController::class, 'updateStage'])->name('settings.pipelines.stages.update');
         Route::delete('/settings/pipelines/{pipeline}/stages/{stage}', [PipelineController::class, 'destroyStage'])->name('settings.pipelines.stages.destroy');
         Route::post('/settings/pipelines/{pipeline}/stages/reorder', [PipelineController::class, 'reorderStages'])->name('settings.pipelines.stages.reorder');
+        Route::post('/settings/support-queues', [SupportQueueController::class, 'store'])->name('settings.support-queues.store');
+        Route::patch('/settings/support-queues/{queue}', [SupportQueueController::class, 'update'])->name('settings.support-queues.update');
+        Route::delete('/settings/support-queues/{queue}', [SupportQueueController::class, 'destroy'])->name('settings.support-queues.destroy');
     });
 });
 

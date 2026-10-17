@@ -25,6 +25,7 @@ export type NavPermission =
     | 'settings.integrations'
     | 'settings.people'
     | 'settings.pipelines'
+    | 'settings.support'
     | 'settings.attributes'
     | 'settings.permissions';
 
@@ -183,6 +184,7 @@ export const SETTINGS_NAV: NavItem = {
         { id: 'settings-people', labelKey: 'nav.settings.people', href: '/settings/people', permission: 'settings.people' },
         { id: 'settings-permissions', labelKey: 'nav.settings.permissions', href: '/settings/permissions', permission: 'settings.permissions' },
         { id: 'settings-pipelines', labelKey: 'nav.settings.pipelines', href: '/settings/pipelines', permission: 'settings.pipelines' },
+        { id: 'settings-support-queues', labelKey: 'nav.settings.supportQueues', href: '/settings/support-queues', permission: 'settings.support' },
         { id: 'settings-attributes', labelKey: 'nav.settings.properties', href: '/settings/attributes', permission: 'settings.attributes' },
         { id: 'settings-apps', labelKey: 'nav.settings.apps', href: '/settings/apps', permission: 'settings.integrations' },
         { id: 'settings-channels', labelKey: 'nav.settings.channels', href: '/settings/channels', permission: 'settings.integrations' },
