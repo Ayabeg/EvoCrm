@@ -135,6 +135,19 @@ class Deal extends Model
         $this->last_activity_at = now();
         $this->save();
 
+        if ((int) ($fromStage?->id ?? 0) !== (int) $stage->id) {
+            DealProbabilitySnapshot::query()->create([
+                'workspace_id' => $this->workspace_id,
+                'deal_id' => $this->id,
+                'stage_id' => $stage->id,
+                'probability' => $stage->winProbability(),
+                'amount_cents' => (int) $this->amount_cents,
+                'reason' => 'stage_change',
+                'recorded_by' => $actor?->id,
+                'recorded_at' => now(),
+            ]);
+        }
+
         Activity::query()->create([
             'workspace_id' => $this->workspace_id,
             'type' => 'stage_change',

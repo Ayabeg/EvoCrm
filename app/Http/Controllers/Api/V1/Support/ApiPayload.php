@@ -194,6 +194,10 @@ class ApiPayload
                 'is_won' => (bool) $deal->stage->is_won,
                 'is_lost' => (bool) $deal->stage->is_lost,
             ] : null,
+            'probability' => $deal->stage?->winProbability(),
+            'weighted_amount_cents' => $deal->stage
+                ? (int) round(((int) $deal->amount_cents * $deal->stage->winProbability()) / 100)
+                : 0,
             'contact_id' => $deal->contact_id,
             'contact_name' => $deal->contact?->displayName(),
             'company_id' => $deal->company_id,

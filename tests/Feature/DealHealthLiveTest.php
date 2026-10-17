@@ -4,6 +4,7 @@ use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealHealthSnapshot;
+use App\Models\DealProbabilitySnapshot;
 use App\Models\DealSuggestion;
 use App\Models\User;
 use App\Services\Evolution\EvolutionWebhookProcessor;
@@ -69,6 +70,26 @@ it('writes a deal health snapshot when the stage changes', function () {
             ->where('deal_id', $deal->id)
             ->where('kind', DealSuggestion::KIND_LOST_REASON)
             ->count())->toBe(0);
+});
+
+it('records an auditable probability snapshot when a deal changes stage', function () {
+    $user = User::factory()->create();
+    $deal = liveHealthDeal($user);
+    $pipeline = $user->workspace->defaultPipeline();
+
+    $deal->moveTo($pipeline->stageBySlug('demo'), $user);
+
+    $snapshot = DealProbabilitySnapshot::query()
+        ->where('deal_id', $deal->id)
+        ->latest('id')
+        ->first();
+
+    expect($snapshot)->not->toBeNull()
+        ->and($snapshot->stage_id)->toBe($pipeline->stageBySlug('demo')->id)
+        ->and($snapshot->probability)->toBe(50)
+        ->and($snapshot->amount_cents)->toBe($deal->amount_cents)
+        ->and($snapshot->recorded_by)->toBe($user->id)
+        ->and($snapshot->reason)->toBe('stage_change');
 });
 
 it('drafts a loss reason when a deal is marked lost', function () {
