@@ -39,6 +39,10 @@ type Company = {
     country?: string | null;
     owner?: { id: number; name: string } | null;
     owner_id?: number | null;
+    account_type?: string | null;
+    parent_company_id?: number | null;
+    parent_company?: { id: number; name: string } | null;
+    subsidiaries?: { id: number; name: string; account_type?: string | null }[];
 };
 
 export default function CompanyShow({
@@ -49,6 +53,7 @@ export default function CompanyShow({
     members,
     cities,
     wilayas,
+    parentCompanies,
     askEvo,
     enrichmentRuns = [],
     enrichAction,
@@ -67,6 +72,7 @@ export default function CompanyShow({
     members: { id: number; name: string }[];
     cities: string[];
     wilayas: string[];
+    parentCompanies: { id: number; name: string }[];
     askEvo?: AskEvoPayload | null;
     enrichmentRuns?: EnrichmentRunRow[];
     enrichAction?: string;
@@ -161,6 +167,14 @@ export default function CompanyShow({
                                         <RecordFact
                                             label="Industry"
                                             value={company.industry}
+                                        />
+                                        <RecordFact
+                                            label="Account type"
+                                            value={company.account_type}
+                                        />
+                                        <RecordFact
+                                            label="Parent company"
+                                            value={company.parent_company?.name}
                                         />
                                         <RecordFact
                                             label="Owner"
@@ -260,10 +274,76 @@ export default function CompanyShow({
                                                     </option>
                                                 ))}
                                             </select>
+                                            <select
+                                                name="account_type"
+                                                defaultValue={
+                                                    company.account_type ??
+                                                    'prospect'
+                                                }
+                                                className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                                            >
+                                                <option value="prospect">
+                                                    Prospect
+                                                </option>
+                                                <option value="customer">
+                                                    Customer
+                                                </option>
+                                                <option value="partner">
+                                                    Partner
+                                                </option>
+                                                <option value="subsidiary">
+                                                    Subsidiary
+                                                </option>
+                                            </select>
+                                            <select
+                                                name="parent_company_id"
+                                                defaultValue={
+                                                    company.parent_company_id ??
+                                                    ''
+                                                }
+                                                className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                                            >
+                                                <option value="">
+                                                    No parent company
+                                                </option>
+                                                {parentCompanies.map(
+                                                    (parent) => (
+                                                        <option
+                                                            key={parent.id}
+                                                            value={parent.id}
+                                                        >
+                                                            {parent.name}
+                                                        </option>
+                                                    ),
+                                                )}
+                                            </select>
                                             <Button className="h-8">
                                                 Save company
                                             </Button>
                                         </Form>
+                                    </RecordSection>
+                                ) : null}
+                                {company.subsidiaries?.length ? (
+                                    <RecordSection title="Subsidiaries">
+                                        <div className="space-y-1.5">
+                                            {company.subsidiaries.map(
+                                                (subsidiary) => (
+                                                    <a
+                                                        key={subsidiary.id}
+                                                        href={`/crm/companies/${subsidiary.id}`}
+                                                        className="flex items-center justify-between rounded-md border border-hairline px-2.5 py-2 text-[13px] text-ink hover:bg-canvas-soft"
+                                                    >
+                                                        <span>
+                                                            {subsidiary.name}
+                                                        </span>
+                                                        <span className="text-[11px] text-mute">
+                                                            {subsidiary.account_type ??
+                                                                '—'}
+                                                        </span>
+                                                    </a>
+                                                ),
+                                            )}
+                                        </div>
                                     </RecordSection>
                                 ) : null}
                                 {attributes ? (
@@ -293,7 +373,9 @@ export default function CompanyShow({
                                     addHref="/crm/contacts?create=1"
                                 >
                                     {contacts.length === 0 ? (
-                                        <p className="text-mute">{t('No contacts')}</p>
+                                        <p className="text-mute">
+                                            {t('No contacts')}
+                                        </p>
                                     ) : (
                                         contacts.map((contact) => (
                                             <RelatedRecordLink
@@ -308,7 +390,9 @@ export default function CompanyShow({
                                 </AssociationCard>
                                 <AssociationCard title="Deals">
                                     {deals.length === 0 ? (
-                                        <p className="text-mute">{t('No deals')}</p>
+                                        <p className="text-mute">
+                                            {t('No deals')}
+                                        </p>
                                     ) : (
                                         deals.map((deal) => (
                                             <RelatedRecordLink

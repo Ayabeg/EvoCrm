@@ -38,6 +38,10 @@ class CompanyController extends Controller
 
         return Inertia::render('crm/companies/index', [
             'companies' => $hub->withListAttributes($workspace, 'company', $companyRows),
+            'parentCompanies' => Company::query()
+                ->forWorkspace($workspace)
+                ->orderBy('name')
+                ->get(['id', 'name']),
             'members' => $hub->members($workspace),
             'savedFilters' => $hub->filters($workspace, 'company', $request->user()),
             'activeFilters' => $filters,
@@ -55,11 +59,16 @@ class CompanyController extends Controller
         abort_unless((int) $company->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
-        $company->load(['owner', 'contacts', 'deals.stage']);
+        $company->load(['owner', 'parentCompany', 'subsidiaries', 'contacts', 'deals.stage']);
         $company->loadCount('contacts');
 
         return Inertia::render('crm/companies/show', [
             'company' => $company,
+            'parentCompanies' => Company::query()
+                ->forWorkspace($workspace)
+                ->whereKeyNot($company->id)
+                ->orderBy('name')
+                ->get(['id', 'name']),
             'selected' => $company,
             'associations' => $hub->companyAssociations($company),
             'timeline' => $hub->timeline(company: $company),
@@ -84,9 +93,15 @@ class CompanyController extends Controller
             'phone' => ['nullable', 'string', 'max:40'],
             'city' => ['nullable', 'string', 'max:120'],
             'wilaya' => ['nullable', 'string', 'max:80'],
+            'parent_company_id' => ['nullable', 'integer'],
+            'account_type' => ['nullable', 'in:prospect,customer,partner,subsidiary'],
             'owner_id' => ['nullable', 'integer'],
             'add_another' => ['sometimes', 'boolean'],
         ]);
+
+        if (! empty($data['parent_company_id'])) {
+            Company::query()->forWorkspace($request->user()->workspace)->findOrFail($data['parent_company_id']);
+        }
 
         Company::query()->create([
             ...collect($data)->except('add_another')->all(),
@@ -110,6 +125,8 @@ class CompanyController extends Controller
             'phone' => ['nullable', 'string', 'max:40'],
             'city' => ['nullable', 'string', 'max:120'],
             'wilaya' => ['nullable', 'string', 'max:80'],
+            'parent_company_id' => ['nullable', 'integer'],
+            'account_type' => ['nullable', 'in:prospect,customer,partner,subsidiary'],
             'notes' => ['nullable', 'string'],
             'owner_id' => ['nullable', 'integer'],
             'attributes' => ['nullable', 'array'],
@@ -117,6 +134,12 @@ class CompanyController extends Controller
 
         $values = $data['attributes'] ?? [];
         unset($data['attributes']);
+
+        if (! empty($data['parent_company_id'])) {
+            abort_if((int) $data['parent_company_id'] === (int) $company->id, 422, 'A company cannot be its own parent.');
+            Company::query()->forWorkspace($request->user()->workspace)->findOrFail($data['parent_company_id']);
+        }
+
         $company->update($data);
 
         if ($values !== []) {

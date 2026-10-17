@@ -219,6 +219,7 @@ it('keeps the Companies Inertia backend shape routes and permissions', function 
             ->has('members')
             ->has('cities')
             ->has('wilayas')
+            ->has('parentCompanies')
             ->missing('bulk')
             ->where('listView.columnDefs', fn ($defs) => collect($defs)->contains(
                 fn ($def) => ($def['id'] ?? '') === 'wilaya'
@@ -245,7 +246,10 @@ it('keeps the Companies Inertia backend shape routes and permissions', function 
     $this->actingAs($user)
         ->get("/crm/companies/{$company->id}")
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('crm/companies/show'));
+        ->assertInertia(fn ($page) => $page
+            ->component('crm/companies/show')
+            ->has('parentCompanies')
+        );
 
     $this->actingAs($user)
         ->get('/crm/contacts')
