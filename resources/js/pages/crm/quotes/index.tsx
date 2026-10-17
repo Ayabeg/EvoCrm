@@ -260,6 +260,15 @@ function formatDa(cents: number): string {
     return `${Math.round(cents / 100).toLocaleString('fr-DZ')} DA`;
 }
 
+function QuoteMetric({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="rounded-lg border border-hairline bg-canvas px-3 py-2.5">
+            <p className="text-[12px] font-medium text-mute">{label}</p>
+            <p className="mt-1 text-xl font-semibold text-ink">{value}</p>
+        </div>
+    );
+}
+
 QuotesIndex.layout = {
     breadcrumbs: [{ title: 'Quotes', href: '/crm/quotes' }],
 };
