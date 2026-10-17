@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import AskEvoPanel, { AskEvoTrigger } from '@/components/crm/ask-evo-panel';
 import type { AskEvoPayload } from '@/components/crm/ask-evo-panel';
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
@@ -27,6 +28,9 @@ import TicketsRelatedCard from '@/components/crm/tickets-related-card';
 import type { TicketsRelated } from '@/components/crm/tickets-related-card';
 import { RecordIdentity, RecordPageFrame, RecordShell } from '@/evo/crm/record';
 import { formatPhone } from '@/evo/lib/format';
+import { Button } from '@/evo/ui/button';
+import { Input } from '@/evo/ui/input';
+import { Label } from '@/evo/ui/label';
 import { WorkspaceHeader } from '@/evo/workspace/WorkspaceHeader';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import { formatContactName } from '@/lib/contact-name';
@@ -39,6 +43,7 @@ type Contact = {
     display_name?: string;
     email?: string | null;
     phone_e164?: string | null;
+    phone?: string | null;
     lead_status?: string | null;
     created_at?: string;
     company_id?: number | null;
@@ -82,6 +87,8 @@ export default function ContactShow({
     relationships = [],
     enrichmentRuns = [],
     enrichAction,
+    companies = [],
+    members = [],
 }: {
     contact: Contact;
     associations: {
@@ -116,8 +123,11 @@ export default function ContactShow({
     playbooks?: Array<{ id: number; name: string; body: string }>;
     enrichmentRuns?: EnrichmentRunRow[];
     enrichAction?: string;
+    companies?: { id: number; name: string }[];
+    members?: { id: number; name: string }[];
 }) {
     const loading = useInertiaLoading();
+    const [editing, setEditing] = useState(false);
     const name =
         contact.display_name ??
         formatContactName(contact.first_name, contact.last_name);
@@ -191,6 +201,23 @@ export default function ContactShow({
                                                         ? `/conversations?thread=${thread.id}`
                                                         : '/inbox'
                                                 }
+                                                secondary={
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        aria-expanded={editing}
+                                                        onClick={() =>
+                                                            setEditing(
+                                                                (open) => !open,
+                                                            )
+                                                        }
+                                                    >
+                                                        {editing
+                                                            ? t('Close edit')
+                                                            : t('Edit')}
+                                                    </Button>
+                                                }
                                             />
                                         }
                                     />
@@ -215,6 +242,210 @@ export default function ContactShow({
                             rightClassName="bg-white"
                             left={
                                 <div className="space-y-5">
+                                    {editing ? (
+                                        <RecordSection
+                                            title={t('Edit contact')}
+                                        >
+                                            <Form
+                                                action={`/crm/contacts/${contact.id}`}
+                                                method="put"
+                                                className="space-y-2"
+                                            >
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <Label className="mb-1 block text-[12px]">
+                                                            {t('First name')}
+                                                        </Label>
+                                                        <Input
+                                                            name="first_name"
+                                                            defaultValue={
+                                                                contact.first_name
+                                                            }
+                                                            required
+                                                            className="h-8"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="mb-1 block text-[12px]">
+                                                            {t('Last name')}
+                                                        </Label>
+                                                        <Input
+                                                            name="last_name"
+                                                            defaultValue={
+                                                                contact.last_name ??
+                                                                ''
+                                                            }
+                                                            className="h-8"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <Input
+                                                    name="email"
+                                                    type="email"
+                                                    defaultValue={
+                                                        contact.email ?? ''
+                                                    }
+                                                    placeholder={t('Email')}
+                                                    className="h-8"
+                                                />
+                                                <Input
+                                                    name="phone"
+                                                    defaultValue={
+                                                        contact.phone ??
+                                                        contact.phone_e164 ??
+                                                        ''
+                                                    }
+                                                    placeholder={t('Phone')}
+                                                    className="h-8"
+                                                />
+                                                <select
+                                                    name="company_id"
+                                                    defaultValue={
+                                                        contact.company_id ?? ''
+                                                    }
+                                                    className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                                                >
+                                                    <option value="">
+                                                        {t('No company')}
+                                                    </option>
+                                                    {companies.map(
+                                                        (companyOption) => (
+                                                            <option
+                                                                key={
+                                                                    companyOption.id
+                                                                }
+                                                                value={
+                                                                    companyOption.id
+                                                                }
+                                                            >
+                                                                {
+                                                                    companyOption.name
+                                                                }
+                                                            </option>
+                                                        ),
+                                                    )}
+                                                </select>
+                                                <select
+                                                    name="owner_id"
+                                                    defaultValue={
+                                                        contact.owner?.id ?? ''
+                                                    }
+                                                    className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                                                >
+                                                    <option value="">
+                                                        {t('Unassigned')}
+                                                    </option>
+                                                    {members.map((member) => (
+                                                        <option
+                                                            key={member.id}
+                                                            value={member.id}
+                                                        >
+                                                            {member.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <select
+                                                    name="lead_status"
+                                                    defaultValue={
+                                                        contact.lead_status ??
+                                                        ''
+                                                    }
+                                                    className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                                                >
+                                                    <option value="">
+                                                        {t('No lead status')}
+                                                    </option>
+                                                    <option value="new">
+                                                        {t('New')}
+                                                    </option>
+                                                    <option value="open">
+                                                        {t('Open')}
+                                                    </option>
+                                                    <option value="qualified">
+                                                        {t('Qualified')}
+                                                    </option>
+                                                    <option value="unqualified">
+                                                        {t('Unqualified')}
+                                                    </option>
+                                                </select>
+                                                <select
+                                                    name="source"
+                                                    defaultValue={
+                                                        contact.source ?? ''
+                                                    }
+                                                    className="h-8 w-full rounded-md border border-hairline bg-canvas px-2 text-[13px]"
+                                                >
+                                                    <option value="">
+                                                        {t('Unknown source')}
+                                                    </option>
+                                                    <option value="website">
+                                                        {t('Website')}
+                                                    </option>
+                                                    <option value="referral">
+                                                        {t('Referral')}
+                                                    </option>
+                                                    <option value="facebook">
+                                                        Facebook
+                                                    </option>
+                                                    <option value="instagram">
+                                                        Instagram
+                                                    </option>
+                                                    <option value="whatsapp">
+                                                        WhatsApp
+                                                    </option>
+                                                    <option value="phone">
+                                                        {t('Phone')}
+                                                    </option>
+                                                    <option value="event">
+                                                        {t('Event')}
+                                                    </option>
+                                                    <option value="partner">
+                                                        {t('Partner')}
+                                                    </option>
+                                                    <option value="import">
+                                                        {t('Import')}
+                                                    </option>
+                                                    <option value="other">
+                                                        {t('Other')}
+                                                    </option>
+                                                </select>
+                                                <Input
+                                                    name="source_detail"
+                                                    defaultValue={
+                                                        contact.source_detail ??
+                                                        ''
+                                                    }
+                                                    placeholder={t(
+                                                        'Source detail',
+                                                    )}
+                                                    className="h-8"
+                                                />
+                                                <Input
+                                                    name="source_campaign"
+                                                    defaultValue={
+                                                        contact.source_campaign ??
+                                                        ''
+                                                    }
+                                                    placeholder={t('Campaign')}
+                                                    className="h-8"
+                                                />
+                                                <Input
+                                                    name="source_medium"
+                                                    defaultValue={
+                                                        contact.source_medium ??
+                                                        ''
+                                                    }
+                                                    placeholder={t(
+                                                        'Source medium',
+                                                    )}
+                                                    className="h-8"
+                                                />
+                                                <Button className="h-8">
+                                                    {t('Save contact')}
+                                                </Button>
+                                            </Form>
+                                        </RecordSection>
+                                    ) : null}
                                     <RecordSection
                                         title={t('About this contact')}
                                     >
