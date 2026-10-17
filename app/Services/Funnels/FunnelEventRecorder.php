@@ -126,7 +126,7 @@ class FunnelEventRecorder
     {
         $lead->loadMissing('contact');
 
-        return $this->record($lead->workspace, 'lead_qualified', [
+        return $this->record($lead->workspace, FunnelEvent::TYPE_LEAD_QUALIFIED, [
             'subject_type' => Lead::class,
             'subject_id' => $lead->id,
             'contact_id' => $lead->contact_id,

@@ -2,7 +2,11 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { ReportsShell } from '@/components/crm/reports-shell';
 import { FunnelReport, ReportsFilters } from '@/evo/reports';
-import type { FunnelStageRow, SourceBreakdownRow } from '@/evo/reports';
+import type {
+    CampaignAttributionRow,
+    FunnelStageRow,
+    SourceBreakdownRow,
+} from '@/evo/reports';
 import { NativeSelect } from '@/evo/ui/native-select';
 import { t } from '@/lib/i18n';
 
@@ -30,6 +34,7 @@ type ReportPayload = {
         conversion_rate: number | null;
     };
     sources: SourceBreakdownRow[];
+    campaigns: CampaignAttributionRow[];
 };
 
 type Props = {
@@ -45,11 +50,19 @@ export default function ConversionFunnels({ funnels, report, custom }: Props) {
 
     const apply = (event: React.FormEvent) => {
         event.preventDefault();
-        router.get('/reports/funnels', { from, to, funnel: funnelId }, { preserveState: true });
+        router.get(
+            '/reports/funnels',
+            { from, to, funnel: funnelId },
+            { preserveState: true },
+        );
     };
 
     const reset = () => {
-        router.get('/reports/funnels', { funnel: funnelId }, { preserveState: true });
+        router.get(
+            '/reports/funnels',
+            { funnel: funnelId },
+            { preserveState: true },
+        );
     };
 
     return (
@@ -77,13 +90,17 @@ export default function ConversionFunnels({ funnels, report, custom }: Props) {
                             {t('Funnel')}
                             <NativeSelect
                                 value={funnelId}
-                                onChange={(event) => setFunnelId(event.target.value)}
+                                onChange={(event) =>
+                                    setFunnelId(event.target.value)
+                                }
                                 className="h-8"
                             >
                                 {funnels.map((funnel) => (
                                     <option key={funnel.id} value={funnel.id}>
                                         {funnel.name}
-                                        {funnel.is_default ? ` ${t('(default)')}` : ''}
+                                        {funnel.is_default
+                                            ? ` ${t('(default)')}`
+                                            : ''}
                                     </option>
                                 ))}
                             </NativeSelect>
@@ -93,7 +110,12 @@ export default function ConversionFunnels({ funnels, report, custom }: Props) {
             }
             footer={`${t('Funnel')}: ${report.funnel.name} · ${report.window.from} → ${report.window.to}`}
         >
-            <FunnelReport stages={report.stages} kpis={report.kpis} sources={report.sources} />
+            <FunnelReport
+                stages={report.stages}
+                kpis={report.kpis}
+                sources={report.sources}
+                campaigns={report.campaigns}
+            />
         </ReportsShell>
     );
 }

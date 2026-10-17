@@ -55,6 +55,30 @@ export type RecordNext = {
     href?: string | null;
 };
 
+function isNumericTask(
+    item: RecordActivity,
+): item is RecordActivity & { id: number } {
+    return item.type === 'task' && typeof item.id === 'number';
+}
+
+function isOverdueTask(
+    item: RecordActivity,
+    now: number,
+): item is RecordActivity & { id: number } {
+    return (
+        isNumericTask(item) &&
+        !item.done &&
+        Boolean(item.due_at) &&
+        Date.parse(item.due_at as string) < now
+    );
+}
+
+function isOpenTask(
+    item: RecordActivity,
+): item is RecordActivity & { id: number } {
+    return isNumericTask(item) && !item.done;
+}
+
 export function deriveRecordNext(input: {
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
     timeline?: RecordActivity[];
@@ -64,12 +88,8 @@ export function deriveRecordNext(input: {
     const now = Date.now();
 
     const overdue = timeline.find(
-        (item) =>
-            item.type === 'task' &&
-            typeof item.id === 'number' &&
-            !item.done &&
-            item.due_at &&
-            Date.parse(item.due_at) < now,
+        (item): item is RecordActivity & { id: number } =>
+            isOverdueTask(item, now),
     );
 
     if (overdue) {
@@ -80,10 +100,7 @@ export function deriveRecordNext(input: {
         };
     }
 
-    const openTask = timeline.find(
-        (item) =>
-            item.type === 'task' && typeof item.id === 'number' && !item.done,
-    );
+    const openTask = timeline.find(isOpenTask);
 
     if (openTask) {
         return {

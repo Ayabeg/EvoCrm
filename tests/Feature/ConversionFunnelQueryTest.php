@@ -6,6 +6,7 @@ use App\Models\AdCampaignStat;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\FunnelEvent;
+use App\Models\Lead;
 use App\Models\User;
 use App\Services\Funnels\ConversionFunnelQuery;
 
@@ -72,6 +73,114 @@ it('returns funnel metrics with stage counts and source breakdown', function () 
         ->and($report['sources'])->not->toBeEmpty();
 });
 
+it('attributes campaign spend, lead progression, and won revenue', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+    $pipeline = $workspace->defaultPipeline();
+    $funnel = $workspace->conversionFunnels()->where('is_default', true)->first();
+    $account = AdAccount::query()->create([
+        'workspace_id' => $workspace->id,
+        'name' => 'Ads',
+        'status' => 'demo',
+    ]);
+    $campaign = AdCampaign::query()->create([
+        'workspace_id' => $workspace->id,
+        'ad_account_id' => $account->id,
+        'name' => 'Ramadan offer',
+        'status' => 'active',
+    ]);
+    AdCampaignStat::query()->create([
+        'workspace_id' => $workspace->id,
+        'ad_campaign_id' => $campaign->id,
+        'date' => now()->toDateString(),
+        'spend_cents' => 50_000,
+    ]);
+
+    $lead = Lead::factory()->create([
+        'workspace_id' => $workspace->id,
+        'ad_campaign_id' => $campaign->id,
+        'source' => 'facebook',
+        'status' => 'qualified',
+        'qualified_at' => now(),
+    ]);
+    $deal = Deal::query()->create([
+        'workspace_id' => $workspace->id,
+        'contact_id' => $lead->contact_id,
+        'lead_id' => $lead->id,
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stageBySlug('won')->id,
+        'title' => 'Ramadan order',
+        'amount_cents' => 250_000,
+        'currency' => 'DZD',
+    ]);
+
+    foreach ([
+        [
+            'workspace_id' => $workspace->id,
+            'conversion_funnel_id' => $funnel->id,
+            'event_type' => FunnelEvent::TYPE_VISIT,
+            'subject_type' => Lead::class,
+            'subject_id' => $lead->id,
+            'lead_id' => $lead->id,
+            'ad_campaign_id' => $campaign->id,
+            'source' => 'facebook',
+            'occurred_at' => now(),
+        ],
+        [
+            'workspace_id' => $workspace->id,
+            'conversion_funnel_id' => $funnel->id,
+            'event_type' => FunnelEvent::TYPE_LEAD_QUALIFIED,
+            'subject_type' => Lead::class,
+            'subject_id' => $lead->id,
+            'lead_id' => $lead->id,
+            'ad_campaign_id' => $campaign->id,
+            'source' => 'facebook',
+            'occurred_at' => now(),
+        ],
+        [
+            'workspace_id' => $workspace->id,
+            'conversion_funnel_id' => $funnel->id,
+            'event_type' => FunnelEvent::TYPE_ORDER_PLACED,
+            'subject_type' => Deal::class,
+            'subject_id' => $deal->id,
+            'deal_id' => $deal->id,
+            'lead_id' => $lead->id,
+            'ad_campaign_id' => $campaign->id,
+            'source' => 'facebook',
+            'occurred_at' => now(),
+        ],
+        [
+            'workspace_id' => $workspace->id,
+            'conversion_funnel_id' => $funnel->id,
+            'event_type' => FunnelEvent::TYPE_DELIVERED,
+            'subject_type' => Deal::class,
+            'subject_id' => $deal->id,
+            'deal_id' => $deal->id,
+            'lead_id' => $lead->id,
+            'ad_campaign_id' => $campaign->id,
+            'source' => 'facebook',
+            'occurred_at' => now(),
+        ],
+    ] as $event) {
+        FunnelEvent::query()->create($event);
+    }
+
+    $report = app(ConversionFunnelQuery::class)->forFunnel($workspace, $funnel, now()->subDay(), now());
+    $row = collect($report['campaigns'])->firstWhere('campaign_id', $campaign->id);
+
+    expect($row)->not->toBeNull()
+        ->and($row['campaign_name'])->toBe('Ramadan offer')
+        ->and($row['spend_cents'])->toBe(50_000)
+        ->and($row['visits'])->toBe(1)
+        ->and($row['leads'])->toBe(1)
+        ->and($row['qualified_leads'])->toBe(1)
+        ->and($row['deals_created'])->toBe(1)
+        ->and($row['won_deals'])->toBe(1)
+        ->and($row['won_revenue_cents'])->toBe(250_000)
+        ->and($row['cpl_cents'])->toBe(50_000)
+        ->and($row['roas'])->toBe(5.0);
+});
+
 it('serves the funnel dashboard page', function () {
     $user = User::factory()->create();
 
@@ -98,6 +207,7 @@ it('serves funnel metrics as JSON', function () {
             'stages',
             'kpis' => ['spend_cents', 'visits', 'orders', 'cpl_cents', 'conversion_rate'],
             'sources',
+            'campaigns',
         ]);
 });
 

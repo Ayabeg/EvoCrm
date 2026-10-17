@@ -36,6 +36,8 @@ class FunnelEvent extends Model
 
     public const TYPE_DELIVERED = 'delivered';
 
+    public const TYPE_LEAD_QUALIFIED = 'lead_qualified';
+
     protected function casts(): array
     {
         return [

@@ -2,9 +2,12 @@
 
 namespace App\Services\Funnels;
 
+use App\Models\AdCampaign;
 use App\Models\AdCampaignStat;
 use App\Models\ConversionFunnel;
+use App\Models\Deal;
 use App\Models\FunnelEvent;
+use App\Models\Lead;
 use App\Models\Workspace;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
@@ -26,7 +29,8 @@ class ConversionFunnelQuery
      *     window: array{from: string, to: string, days: int, timezone: string},
      *     stages: array<int, array{key: string, label: string, count: int, rate_from_previous: float|null, rate_from_top: float|null}>,
      *     kpis: array{spend_cents: int, visits: int, orders: int, cpl_cents: int|null, conversion_rate: float|null},
-     *     sources: array<int, array{source: string, visits: int, orders_placed: int, confirmed: int, delivered: int, spend_cents: int, cpl_cents: int|null}>
+     *     sources: array<int, array{source: string, visits: int, orders_placed: int, confirmed: int, delivered: int, spend_cents: int, cpl_cents: int|null}>,
+     *     campaigns: array<int, array{campaign_id: int|null, campaign_name: string, spend_cents: int, visits: int, leads: int, qualified_leads: int, deals_created: int, won_deals: int, won_revenue_cents: int, cpl_cents: int|null, roas: float|null}>
      * }
      */
     public function forFunnel(
@@ -96,6 +100,7 @@ class ConversionFunnelQuery
                 'conversion_rate' => $visits > 0 ? round(($orders / $visits) * 100, 1) : null,
             ],
             'sources' => $this->sourceBreakdown($events, $spendCents, $workspace, $from, $to),
+            'campaigns' => $this->campaignAttribution($events, $workspace, $from, $to),
         ];
     }
 
@@ -173,6 +178,106 @@ class ConversionFunnelQuery
                 'cpl_cents' => $visits > 0 ? (int) round($spendCents / $visits) : null,
             ];
         })->sortByDesc('visits')->values()->all();
+    }
+
+    /**
+     * Attribute funnel activity and won revenue to the campaign carried by
+     * each event. A separate unattributed row keeps direct/legacy records
+     * visible instead of silently dropping them from revenue reporting.
+     *
+     * @return array<int, array{campaign_id: int|null, campaign_name: string, spend_cents: int, visits: int, leads: int, qualified_leads: int, deals_created: int, won_deals: int, won_revenue_cents: int, cpl_cents: int|null, roas: float|null}>
+     */
+    private function campaignAttribution(
+        Collection $events,
+        Workspace $workspace,
+        Carbon $from,
+        Carbon $to,
+    ): array {
+        $campaignIds = $events->pluck('ad_campaign_id')->filter()->map(fn ($id) => (int) $id)->unique();
+
+        $campaignSpend = AdCampaignStat::query()
+            ->forWorkspace($workspace)
+            ->whereBetween('date', [$from->toDateString(), $to->toDateString()])
+            ->whereIn('ad_campaign_id', $campaignIds->all())
+            ->selectRaw('ad_campaign_id, COALESCE(SUM(spend_cents), 0) as spend_cents')
+            ->groupBy('ad_campaign_id')
+            ->pluck('spend_cents', 'ad_campaign_id');
+
+        $campaignIds = $campaignIds->merge($campaignSpend->keys()->map(fn ($id) => (int) $id))->unique()->values();
+        $campaignNames = $campaignIds->isEmpty()
+            ? collect()
+            : AdCampaign::query()
+                ->forWorkspace($workspace)
+                ->whereIn('id', $campaignIds->all())
+                ->pluck('name', 'id');
+
+        $buckets = $events
+            ->groupBy(fn (FunnelEvent $event) => $event->ad_campaign_id ? (int) $event->ad_campaign_id : 'unattributed')
+            ->mapWithKeys(fn (Collection $rows, $key) => [(string) $key => $rows]);
+
+        foreach ($campaignIds as $campaignId) {
+            $buckets->put((string) $campaignId, $buckets->get((string) $campaignId, collect()));
+        }
+
+        $rows = $buckets->map(function (Collection $rows, string $key) use ($campaignNames, $campaignSpend, $workspace) {
+            $campaignId = $key === 'unattributed' ? null : (int) $key;
+            $dealsCreated = $this->uniqueEventSubjects($rows->where('event_type', FunnelEvent::TYPE_ORDER_PLACED));
+            $wonEvents = $rows->where('event_type', FunnelEvent::TYPE_DELIVERED);
+            $wonDealIds = $wonEvents->pluck('deal_id')->filter()->map(fn ($id) => (int) $id)->unique()->values();
+            $wonRevenueCents = $wonDealIds->isEmpty()
+                ? 0
+                : (int) Deal::query()
+                    ->forWorkspace($workspace)
+                    ->whereIn('id', $wonDealIds->all())
+                    ->sum('amount_cents');
+            $leads = $this->uniqueEventSubjects($rows->filter(fn (FunnelEvent $event) => filled($event->lead_id) || $event->subject_type === Lead::class));
+            $qualifiedLeads = $this->uniqueEventSubjects($rows->where('event_type', FunnelEvent::TYPE_LEAD_QUALIFIED));
+            $spendCents = $campaignId === null ? 0 : (int) ($campaignSpend[$campaignId] ?? 0);
+
+            return [
+                'campaign_id' => $campaignId,
+                'campaign_name' => $campaignId === null
+                    ? 'Unattributed'
+                    : (string) ($campaignNames[$campaignId] ?? "Campaign #{$campaignId}"),
+                'spend_cents' => $spendCents,
+                'visits' => $this->uniqueEventSubjects($rows->where('event_type', FunnelEvent::TYPE_VISIT)),
+                'leads' => $leads,
+                'qualified_leads' => $qualifiedLeads,
+                'deals_created' => $dealsCreated,
+                'won_deals' => $this->uniqueEventSubjects($wonEvents),
+                'won_revenue_cents' => $wonRevenueCents,
+                'cpl_cents' => $leads > 0 ? (int) round($spendCents / $leads) : null,
+                'roas' => $spendCents > 0 ? round($wonRevenueCents / $spendCents, 2) : null,
+            ];
+        })->values();
+
+        return $rows
+            ->sortByDesc(fn (array $row) => [$row['won_revenue_cents'], $row['leads'], $row['spend_cents']])
+            ->values()
+            ->all();
+    }
+
+    private function uniqueEventSubjects(Collection $events): int
+    {
+        return $events->unique(function (FunnelEvent $event) {
+            if (filled($event->lead_id)) {
+                return 'lead-'.$event->lead_id;
+            }
+
+            if (filled($event->deal_id)) {
+                return 'deal-'.$event->deal_id;
+            }
+
+            if (filled($event->subject_type) && filled($event->subject_id)) {
+                return $event->subject_type.'-'.$event->subject_id;
+            }
+
+            if (filled($event->contact_id)) {
+                return 'contact-'.$event->contact_id;
+            }
+
+            return 'event-'.$event->id;
+        })->count();
     }
 
     private function spendInWindow(Workspace $workspace, Carbon $from, Carbon $to): int
