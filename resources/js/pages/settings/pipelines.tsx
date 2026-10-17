@@ -18,6 +18,7 @@ type StageRow = {
     is_lost: boolean;
     deals_count: number;
     required_properties?: string[];
+    requires_approval?: boolean;
 };
 
 type DealProperty = {
@@ -104,6 +105,22 @@ function PipelineStages({
                                         name="required_properties_present"
                                         value="1"
                                     />
+                                    <input
+                                        type="hidden"
+                                        name="requires_approval_present"
+                                        value="1"
+                                    />
+                                    <label className="flex items-center gap-1 text-[11px] text-ink">
+                                        <input
+                                            type="checkbox"
+                                            name="requires_approval"
+                                            value="1"
+                                            defaultChecked={
+                                                stage.requires_approval
+                                            }
+                                        />
+                                        {t('Approval required')}
+                                    </label>
                                     <fieldset className="w-full">
                                         <legend className="text-[10px] text-mute">
                                             Required to enter
@@ -175,7 +192,9 @@ function PipelineStages({
                             className="flex flex-wrap items-end gap-2"
                         >
                             <div>
-                                <Label className="text-[10px]">{t('New stage')}</Label>
+                                <Label className="text-[10px]">
+                                    {t('New stage')}
+                                </Label>
                                 <Input
                                     name="name"
                                     required
@@ -184,7 +203,9 @@ function PipelineStages({
                                 />
                             </div>
                             <div>
-                                <Label className="text-[10px]">{t('Win %')}</Label>
+                                <Label className="text-[10px]">
+                                    {t('Win %')}
+                                </Label>
                                 <Input
                                     name="probability"
                                     type="number"
@@ -224,14 +245,18 @@ export default function PipelineSettings({
 
                 {canManage ? (
                     <Card className="space-y-3 p-4">
-                        <h2 className="text-sm font-semibold">{t('Add pipeline')}</h2>
+                        <h2 className="text-sm font-semibold">
+                            {t('Add pipeline')}
+                        </h2>
                         <SettingsForm
                             action="/settings/pipelines"
                             method="post"
                             className="grid gap-3 md:grid-cols-3"
                         >
                             <div>
-                                <Label htmlFor="pipeline-name">{t('Name')}</Label>
+                                <Label htmlFor="pipeline-name">
+                                    {t('Name')}
+                                </Label>
                                 <Input
                                     id="pipeline-name"
                                     name="name"
@@ -249,7 +274,9 @@ export default function PipelineSettings({
                                 {t('Set as default')}
                             </label>
                             <div className="flex items-end">
-                                <Button type="submit">{t('Create pipeline')}</Button>
+                                <Button type="submit">
+                                    {t('Create pipeline')}
+                                </Button>
                             </div>
                         </SettingsForm>
                     </Card>
@@ -269,9 +296,17 @@ export default function PipelineSettings({
                                         </Badge>
                                     ) : null}
                                 </div>
-                                <div>{t(':count stages', { count: pipeline.stages_count })}</div>
+                                <div>
+                                    {t(':count stages', {
+                                        count: pipeline.stages_count,
+                                    })}
+                                </div>
                                 <div className="flex items-center justify-between gap-2">
-                                    <span>{t(':count deals', { count: pipeline.deals_count })}</span>
+                                    <span>
+                                        {t(':count deals', {
+                                            count: pipeline.deals_count,
+                                        })}
+                                    </span>
                                     {canManage &&
                                     !pipeline.is_default &&
                                     pipeline.deals_count === 0 ? (

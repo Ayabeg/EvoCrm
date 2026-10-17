@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
 #[Fillable([
@@ -128,12 +129,47 @@ class Deal extends Model
         app(StagePropertyGate::class)->assertCanEnter($this, $stage);
 
         $fromStage = $this->stage;
+        $approval = null;
+
+        if ($stage->requires_approval && (int) ($fromStage?->id ?? 0) !== (int) $stage->id) {
+            $approval = DealStageApproval::query()
+                ->forWorkspace($this->workspace_id)
+                ->where('deal_id', $this->id)
+                ->where('stage_id', $stage->id)
+                ->where('status', DealStageApproval::STATUS_APPROVED)
+                ->whereNull('consumed_at')
+                ->latest('id')
+                ->first();
+
+            if (! $approval instanceof DealStageApproval) {
+                DealStageApproval::query()->updateOrCreate(
+                    [
+                        'workspace_id' => $this->workspace_id,
+                        'deal_id' => $this->id,
+                        'stage_id' => $stage->id,
+                        'status' => DealStageApproval::STATUS_PENDING,
+                    ],
+                    [
+                        'requested_by' => $actor?->id,
+                        'requested_at' => now(),
+                        'note' => null,
+                    ],
+                );
+
+                throw ValidationException::withMessages([
+                    'stage_id' => "Stage {$stage->name} requires approval before this deal can enter it.",
+                ]);
+            }
+        }
+
         $from = $fromStage?->name ?? $this->stage_id;
 
         $this->stage()->associate($stage);
         $this->closed_at = $stage->isTerminal() ? now() : null;
         $this->last_activity_at = now();
         $this->save();
+
+        $approval?->consume();
 
         if ((int) ($fromStage?->id ?? 0) !== (int) $stage->id) {
             DealProbabilitySnapshot::query()->create([

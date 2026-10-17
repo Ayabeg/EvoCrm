@@ -343,6 +343,7 @@ class PipelineManager
                 'is_lost' => (bool) $stage->is_lost,
                 'deals_count' => (int) $stage->deals_count,
                 'required_properties' => $stage->requiredPropertyKeys(),
+                'requires_approval' => (bool) $stage->requires_approval,
             ])
             ->values()
             ->all();
@@ -368,6 +369,7 @@ class PipelineManager
             'is_won' => false,
             'is_lost' => false,
             'probability' => $probability,
+            'requires_approval' => false,
         ]);
     }
 
@@ -397,6 +399,10 @@ class PipelineManager
 
         if (array_key_exists('required_properties', $data)) {
             $stage->required_properties = array_values(array_unique(array_map('strval', $data['required_properties'] ?? [])));
+        }
+
+        if (array_key_exists('requires_approval', $data)) {
+            $stage->requires_approval = (bool) $data['requires_approval'];
         }
 
         $stage->save();

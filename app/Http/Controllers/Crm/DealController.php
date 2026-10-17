@@ -8,6 +8,7 @@ use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\DealHealthSnapshot;
+use App\Models\DealStageApproval;
 use App\Models\DealSuggestion;
 use App\Models\Pipeline;
 use App\Models\Product;
@@ -23,6 +24,7 @@ use App\Services\Crm\PipelineManager;
 use App\Services\Crm\StagePropertyGate;
 use App\Services\LeadOs\DealHealthScorer;
 use App\Services\LeadOs\NextMoveAdvisor;
+use App\Services\Operations\AuditLogger;
 use App\Support\CrmHub;
 use App\Support\StageCopy;
 use Illuminate\Http\RedirectResponse;
@@ -245,6 +247,25 @@ class DealController extends Controller
         $nextMove = $moves->latestPending($deal);
         $afterTouch = $moves->latestPending($deal, DealSuggestion::KIND_AFTER_TOUCH);
         $lostReason = $moves->latestPending($deal, DealSuggestion::KIND_LOST_REASON);
+        $stageApprovals = DealStageApproval::query()
+            ->forWorkspace($workspace)
+            ->where('deal_id', $deal->id)
+            ->with(['stage', 'requestedBy:id,name', 'approvedBy:id,name'])
+            ->latest('id')
+            ->limit(20)
+            ->get()
+            ->map(fn (DealStageApproval $approval): array => [
+                'id' => $approval->id,
+                'stage' => $approval->stage?->name,
+                'status' => $approval->status,
+                'note' => $approval->note,
+                'requested_by' => $approval->requestedBy?->name,
+                'approved_by' => $approval->approvedBy?->name,
+                'requested_at' => $approval->requested_at?->toIso8601String(),
+                'decided_at' => $approval->decided_at?->toIso8601String(),
+            ])
+            ->values()
+            ->all();
 
         return Inertia::render('crm/deals/show', [
             'deal' => $deal,
@@ -265,6 +286,8 @@ class DealController extends Controller
             'nextMove' => $nextMove?->present(),
             'afterTouch' => $afterTouch?->present(),
             'lostReason' => $lostReason?->present(),
+            'stageApprovals' => $stageApprovals,
+            'canApproveStage' => $request->user()->role->canManageSettings(),
             'askEvo' => $insight->forDeal($deal),
         ]);
     }
@@ -452,6 +475,47 @@ class DealController extends Controller
         }
 
         $deal->moveTo($stage, $request->user());
+
+        return back();
+    }
+
+    public function approveStage(Request $request, Deal $deal, DealStageApproval $approval, AuditLogger $audit): RedirectResponse
+    {
+        abort_unless($request->user()->role->canManageSettings(), 403);
+        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless((int) $approval->workspace_id === (int) $deal->workspace_id && (int) $approval->deal_id === (int) $deal->id, 404);
+
+        $approval->approve($request->user());
+        $audit->record(
+            $request->user()->workspace,
+            'deal.stage_approval_approved',
+            'Approved deal stage transition',
+            $request->user(),
+            $deal,
+            ['approval_id' => $approval->id, 'stage_id' => $approval->stage_id],
+            $request->ip(),
+        );
+
+        return back();
+    }
+
+    public function rejectStage(Request $request, Deal $deal, DealStageApproval $approval, AuditLogger $audit): RedirectResponse
+    {
+        abort_unless($request->user()->role->canManageSettings(), 403);
+        abort_unless((int) $deal->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless((int) $approval->workspace_id === (int) $deal->workspace_id && (int) $approval->deal_id === (int) $deal->id, 404);
+
+        $data = $request->validate(['note' => ['nullable', 'string', 'max:500']]);
+        $approval->reject($request->user(), $data['note'] ?? null);
+        $audit->record(
+            $request->user()->workspace,
+            'deal.stage_approval_rejected',
+            'Rejected deal stage transition',
+            $request->user(),
+            $deal,
+            ['approval_id' => $approval->id, 'stage_id' => $approval->stage_id],
+            $request->ip(),
+        );
 
         return back();
     }

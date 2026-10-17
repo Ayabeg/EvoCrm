@@ -61,7 +61,10 @@ type Deal = {
         slug: string;
         probability?: number | null;
     } | null;
-    pipeline?: { name: string; stages?: { id: number; name: string; slug?: string }[] } | null;
+    pipeline?: {
+        name: string;
+        stages?: { id: number; name: string; slug?: string }[];
+    } | null;
 };
 
 type QuoteRow = {
@@ -82,6 +85,8 @@ export default function DealShow({
     nextMove,
     afterTouch,
     lostReason,
+    stageApprovals,
+    canApproveStage,
     products,
     members,
     splits,
@@ -139,6 +144,17 @@ export default function DealShow({
     nextMove?: DealSuggestionPayload | null;
     afterTouch?: DealSuggestionPayload | null;
     lostReason?: DealSuggestionPayload | null;
+    stageApprovals?: Array<{
+        id: number;
+        stage?: string | null;
+        status: string;
+        note?: string | null;
+        requested_by?: string | null;
+        approved_by?: string | null;
+        requested_at?: string | null;
+        decided_at?: string | null;
+    }>;
+    canApproveStage?: boolean;
     products?: CatalogProduct[];
     members?: { id: number; name: string }[];
     splits?: {
@@ -199,7 +215,11 @@ export default function DealShow({
                                     subtitle={
                                         <>
                                             <span className="money font-medium text-ink">
-                                                <LtrValue>{formatDzd(deal.amount_cents)}</LtrValue>
+                                                <LtrValue>
+                                                    {formatDzd(
+                                                        deal.amount_cents,
+                                                    )}
+                                                </LtrValue>
                                             </span>
                                             {deal.pipeline?.name
                                                 ? ` · ${deal.pipeline.name}`
@@ -309,17 +329,19 @@ export default function DealShow({
                                                     }
                                                     className="h-8 min-w-0 flex-1 rounded border border-hairline bg-canvas px-2 text-[13px] text-ink"
                                                 >
-                                                    {sortStages(stages).map((stage) => (
-                                                        <option
-                                                            key={stage.id}
-                                                            value={stage.id}
-                                                        >
-                                                            {stageLabel(
-                                                                stage.slug,
-                                                                stage.name,
-                                                            )}
-                                                        </option>
-                                                    ))}
+                                                    {sortStages(stages).map(
+                                                        (stage) => (
+                                                            <option
+                                                                key={stage.id}
+                                                                value={stage.id}
+                                                            >
+                                                                {stageLabel(
+                                                                    stage.slug,
+                                                                    stage.name,
+                                                                )}
+                                                            </option>
+                                                        ),
+                                                    )}
                                                 </select>
                                                 <Button
                                                     variant="outline"
@@ -336,6 +358,84 @@ export default function DealShow({
                                         )}
                                     </Form>
                                 </RecordSection>
+                                {stageApprovals?.length ? (
+                                    <RecordSection title={t('Stage approvals')}>
+                                        <div className="space-y-2">
+                                            {stageApprovals.map((approval) => (
+                                                <div
+                                                    key={approval.id}
+                                                    className="rounded border border-hairline p-2"
+                                                >
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <div>
+                                                            <p className="text-[13px] font-medium text-ink">
+                                                                {approval.stage ??
+                                                                    t('Stage')}
+                                                            </p>
+                                                            <p className="text-[11px] text-mute">
+                                                                {t(
+                                                                    approval.status,
+                                                                )}
+                                                                {approval.requested_by
+                                                                    ? ` · ${approval.requested_by}`
+                                                                    : ''}
+                                                            </p>
+                                                        </div>
+                                                        <RecordStatusBadge>
+                                                            {t(approval.status)}
+                                                        </RecordStatusBadge>
+                                                    </div>
+                                                    {approval.note ? (
+                                                        <p className="mt-1 text-[12px] text-mute">
+                                                            {approval.note}
+                                                        </p>
+                                                    ) : null}
+                                                    {canApproveStage &&
+                                                    approval.status ===
+                                                        'pending' ? (
+                                                        <div className="mt-2 flex gap-2">
+                                                            <Form
+                                                                action={`/crm/deals/${deal.id}/stage-approvals/${approval.id}/approve`}
+                                                                method="post"
+                                                                options={{
+                                                                    preserveScroll: true,
+                                                                }}
+                                                            >
+                                                                <Button
+                                                                    type="submit"
+                                                                    size="sm"
+                                                                    className="h-7 text-[11px]"
+                                                                >
+                                                                    {t(
+                                                                        'Approve',
+                                                                    )}
+                                                                </Button>
+                                                            </Form>
+                                                            <Form
+                                                                action={`/crm/deals/${deal.id}/stage-approvals/${approval.id}/reject`}
+                                                                method="post"
+                                                                options={{
+                                                                    preserveScroll: true,
+                                                                }}
+                                                            >
+                                                                <Button
+                                                                    type="submit"
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="h-7 text-[11px]"
+                                                                >
+                                                                    {t(
+                                                                        'Reject',
+                                                                    )}
+                                                                </Button>
+                                                            </Form>
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </RecordSection>
+                                ) : null}
                                 {nextMove ? (
                                     <DealSuggestionCard
                                         dealId={deal.id}
@@ -424,7 +524,10 @@ export default function DealShow({
                                             : undefined,
                                     },
                                     { label: t('Contact'), value: contactName },
-                                    { label: t('Company'), value: company?.name },
+                                    {
+                                        label: t('Company'),
+                                        value: company?.name,
+                                    },
                                 ]}
                             />
                         }
@@ -508,7 +611,11 @@ export default function DealShow({
                                                 meta={quote.status}
                                             >
                                                 {t('Quote')} #{quote.id} ·{' '}
-                                                <LtrValue>{formatDzd(quote.total_cents)}</LtrValue>
+                                                <LtrValue>
+                                                    {formatDzd(
+                                                        quote.total_cents,
+                                                    )}
+                                                </LtrValue>
                                             </RelatedRecordLink>
                                         ))
                                     )}

@@ -123,10 +123,15 @@ class PipelineController extends Controller
             'is_lost' => ['sometimes', 'boolean'],
             'required_properties' => ['sometimes', 'array'],
             'required_properties.*' => ['string', Rule::in($allowed)],
+            'requires_approval' => ['sometimes', 'boolean'],
         ]);
 
         if ($request->boolean('required_properties_present')) {
             $data['required_properties'] = array_values(array_filter((array) $request->input('required_properties', [])));
+        }
+
+        if ($request->boolean('requires_approval_present')) {
+            $data['requires_approval'] = $request->boolean('requires_approval');
         }
 
         $pipelines->updateStage($stage, $data);

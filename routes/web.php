@@ -313,6 +313,8 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::put('/crm/deals/{deal}', [DealController::class, 'update'])->name('crm.deals.update');
     Route::put('/crm/deals/{deal}/attributes', [DealController::class, 'updateAttributes'])->name('crm.deals.attributes');
     Route::post('/crm/deals/{deal}/move', [DealController::class, 'move'])->name('crm.deals.move');
+    Route::post('/crm/deals/{deal}/stage-approvals/{approval}/approve', [DealController::class, 'approveStage'])->name('crm.deals.stage-approvals.approve');
+    Route::post('/crm/deals/{deal}/stage-approvals/{approval}/reject', [DealController::class, 'rejectStage'])->name('crm.deals.stage-approvals.reject');
     Route::post('/crm/deals/{deal}/line-items', [DealLineItemController::class, 'store'])->name('crm.deals.line-items.store');
     Route::put('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'update'])->name('crm.deals.line-items.update');
     Route::delete('/crm/deals/{deal}/line-items/{lineItem}', [DealLineItemController::class, 'destroy'])->name('crm.deals.line-items.destroy');
