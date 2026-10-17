@@ -1,18 +1,15 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { CrmListShell } from '@/components/crm/crm-list-shell';
-import { MorphingForm } from '@/components/crm/morphing-form';
 import { CrmObjectSecondaryLink } from '@/components/crm/crm-object-header';
 import { hasActiveListFilters } from '@/components/crm/list-query';
+import { MorphingForm } from '@/components/crm/morphing-form';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
 import { Label } from '@/evo/ui/label';
 import { useInertiaLoading } from '@/hooks/use-inertia-loading';
 import type { ListViewMeta, SavedView } from '@/lib/list-view-config';
-import {
-    leadEmptyState,
-    leadRowHref,
-} from '@/pages/crm/leads/lead-columns';
+import { leadEmptyState, leadRowHref } from '@/pages/crm/leads/lead-columns';
 import type { LeadListRow } from '@/pages/crm/leads/lead-columns';
 
 type ContactOption = {
@@ -29,6 +26,7 @@ export default function LeadsIndex({
     listView,
     recordCount,
     paginator,
+    leadMetrics,
 }: {
     leads: LeadListRow[];
     contacts: ContactOption[];
@@ -36,7 +34,18 @@ export default function LeadsIndex({
     activeFilters?: Record<string, unknown>;
     listView: ListViewMeta;
     recordCount: number;
-    paginator?: { page: number; per_page: number; total: number; last_page: number };
+    paginator?: {
+        page: number;
+        per_page: number;
+        total: number;
+        last_page: number;
+    };
+    leadMetrics: {
+        total: number;
+        ready_to_qualify: number;
+        missing_source: number;
+        unscored: number;
+    };
 }) {
     const [drawer, setDrawer] = useState(false);
     const loading = useInertiaLoading();
@@ -45,9 +54,24 @@ export default function LeadsIndex({
         <>
             <Head title="Leads" />
             <div
-                className="flex h-app-workspace min-h-0 flex-col bg-canvas-soft"
+                className="h-app-workspace flex min-h-0 flex-col bg-canvas-soft"
                 data-crm="leads-workspace"
             >
+                <section
+                    aria-label="Lead quality"
+                    className="grid shrink-0 grid-cols-2 gap-3 border-b border-hairline bg-canvas px-4 py-3 lg:grid-cols-4"
+                >
+                    <LeadMetric label="Total leads" value={leadMetrics.total} />
+                    <LeadMetric
+                        label="Ready to qualify"
+                        value={leadMetrics.ready_to_qualify}
+                    />
+                    <LeadMetric
+                        label="Missing source"
+                        value={leadMetrics.missing_source}
+                    />
+                    <LeadMetric label="Unscored" value={leadMetrics.unscored} />
+                </section>
                 <CrmListShell
                     resultMode="shared-table"
                     title="Leads"
@@ -73,13 +97,19 @@ export default function LeadsIndex({
                                     <>
                                         <div>
                                             <Label className="mb-1 block text-[12px]">
-                                                Title <span className="text-brand">*</span>
+                                                Title{' '}
+                                                <span className="text-brand">
+                                                    *
+                                                </span>
                                             </Label>
                                             <Input name="title" required />
                                         </div>
                                         <div>
                                             <Label className="mb-1 block text-[12px]">
-                                                Contact <span className="text-brand">*</span>
+                                                Contact{' '}
+                                                <span className="text-brand">
+                                                    *
+                                                </span>
                                             </Label>
                                             <select
                                                 name="contact_id"
@@ -88,21 +118,36 @@ export default function LeadsIndex({
                                             >
                                                 <option value="">Select</option>
                                                 {contacts.map((contact) => (
-                                                    <option key={contact.id} value={contact.id}>
-                                                        {contact.first_name} {contact.last_name}
+                                                    <option
+                                                        key={contact.id}
+                                                        value={contact.id}
+                                                    >
+                                                        {contact.first_name}{' '}
+                                                        {contact.last_name}
                                                     </option>
                                                 ))}
                                             </select>
                                         </div>
                                         <div>
-                                            <Label className="mb-1 block text-[12px]">Source</Label>
-                                            <Input name="source" placeholder="manual" />
+                                            <Label className="mb-1 block text-[12px]">
+                                                Source
+                                            </Label>
+                                            <Input
+                                                name="source"
+                                                placeholder="manual"
+                                            />
                                         </div>
                                         <div className="flex justify-end gap-2 pt-2">
-                                            <Button type="button" variant="ghost" onClick={() => setDrawer(false)}>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                onClick={() => setDrawer(false)}
+                                            >
                                                 Cancel
                                             </Button>
-                                            <Button disabled={processing}>Create</Button>
+                                            <Button disabled={processing}>
+                                                Create
+                                            </Button>
                                         </div>
                                     </>
                                 )}
@@ -134,6 +179,17 @@ export default function LeadsIndex({
                 />
             </div>
         </>
+    );
+}
+
+function LeadMetric({ label, value }: { label: string; value: number }) {
+    return (
+        <div className="rounded-lg border border-hairline bg-canvas-soft px-3 py-2.5">
+            <p className="text-[12px] font-medium text-mute">{label}</p>
+            <p className="mt-1 text-xl font-semibold text-ink">
+                {value.toLocaleString()}
+            </p>
+        </div>
     );
 }
 

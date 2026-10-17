@@ -37,8 +37,25 @@ class LeadController extends Controller
 
         [$leads, $paginator] = $filter->paginate($query, $request);
 
+        $allLeads = Lead::query()->forWorkspace($workspace);
+        $thresholds = $workspace->leadScoreThresholds();
+        $leadMetrics = [
+            'total' => (clone $allLeads)->count(),
+            'ready_to_qualify' => (clone $allLeads)
+                ->where('score', '>=', $thresholds['qualify'])
+                ->whereNotIn('status', ['qualified', 'disqualified'])
+                ->count(),
+            'missing_source' => (clone $allLeads)
+                ->where(function ($sourceQuery): void {
+                    $sourceQuery->whereNull('source')->orWhere('source', '');
+                })
+                ->count(),
+            'unscored' => (clone $allLeads)->whereDoesntHave('scores')->count(),
+        ];
+
         return Inertia::render('crm/leads/index', [
             'leads' => $leads,
+            'leadMetrics' => $leadMetrics,
             'contacts' => Contact::query()->forWorkspace($workspace)->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
             'savedFilters' => $hub->filters($workspace, 'lead', $request->user()),
             'activeFilters' => $filters,

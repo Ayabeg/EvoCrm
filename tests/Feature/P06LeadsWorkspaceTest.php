@@ -254,6 +254,8 @@ it('keeps the Leads Inertia backend shape routes and permissions without inventi
             ->has('listView.columns')
             ->has('recordCount')
             ->has('paginator')
+            ->has('leadMetrics')
+            ->where('leadMetrics.total', 1)
             ->has('activeFilters')
             ->has('savedFilters')
             ->missing('bulk')
