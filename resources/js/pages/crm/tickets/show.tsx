@@ -501,10 +501,10 @@ export default function TicketShow({
                                                 knowledgeArticles.length > 0 ? (
                                                     <div className="mb-2 rounded-md border border-hairline bg-canvas-soft p-2">
                                                         <div className="flex items-center justify-between gap-2">
-                                                            <p className="text-[11px] font-medium text-ink">
+                                                            <p className="text-[12px] font-medium text-ink">
                                                                 Use knowledge
                                                             </p>
-                                                            <span className="text-[11px] text-mute">
+                                                            <span className="text-[12px] text-mute">
                                                                 Inserts a draft
                                                             </span>
                                                         </div>
@@ -520,7 +520,7 @@ export default function TicketShow({
                                                                 )
                                                             }
                                                             placeholder="Search help articles"
-                                                            className="mt-1.5 h-8 w-full rounded border border-hairline bg-canvas px-2 text-[12px] text-ink outline-none placeholder:text-mute focus:border-brand"
+                                                            className="mt-1.5 h-9 w-full rounded border border-hairline bg-canvas px-2 text-[13px] text-ink outline-none placeholder:text-mute focus:border-brand"
                                                         />
                                                         {filteredKnowledgeArticles.length >
                                                         0 ? (
@@ -544,7 +544,7 @@ export default function TicketShow({
                                                                                         : article.body,
                                                                             )
                                                                         }
-                                                                        className="max-w-full truncate rounded border border-hairline bg-canvas px-2 py-1 text-start text-[11px] font-medium text-ink hover:border-brand hover:text-brand"
+                                                                        className="max-w-full truncate rounded border border-hairline bg-canvas px-2 py-1 text-start text-[12px] font-medium text-ink hover:border-brand hover:text-brand"
                                                                     >
                                                                         {article.title}
                                                                     </button>
@@ -552,7 +552,7 @@ export default function TicketShow({
                                                                 )}
                                                             </div>
                                                         ) : (
-                                                            <p className="mt-1.5 text-[11px] text-mute">
+                                                            <p className="mt-1.5 text-[12px] text-mute">
                                                                 No matching help
                                                                 articles.
                                                             </p>
