@@ -141,9 +141,13 @@ export const automationMessages: Record<string, string> = {
     Result: 'Résultat',
     Recorded: 'Enregistré',
     Error: 'Erreur',
-    'Retry is not available': 'La relance n’est pas disponible',
-    'Retry is not available. Re-running would risk duplicate side effects.':
-        'La relance n’est pas disponible. Relancer risquerait des effets de bord en double.',
+    'Replay failed run': 'Rejouer l’exécution échouée',
+    'Replay runs the current workflow configuration and keeps this failed attempt unchanged.':
+        'Le rejeu utilise la configuration actuelle et conserve cette tentative échouée.',
+    'Only failed runs can be replayed by automation managers.':
+        'Seules les exécutions échouées peuvent être rejouées par les responsables de l’automatisation.',
+    'Failed workflow run replayed. The original execution was kept unchanged.':
+        'Exécution échouée rejouée. L’exécution originale est conservée.',
     Close: 'Fermer',
     'Segment rules': 'Règles de segment',
     Stage: 'Étape',
@@ -172,7 +176,8 @@ export const automationMessages: Record<string, string> = {
     'Advanced filter groups': 'Groupes de filtres avancés',
     'AND / OR groups reuse the CRM filter builder.':
         'Les groupes ET / OU réutilisent le constructeur de filtres CRM.',
-    'Discard unsaved changes?': 'Abandonner les modifications non enregistrées ?',
+    'Discard unsaved changes?':
+        'Abandonner les modifications non enregistrées ?',
     'You have unsaved changes. Leave anyway?':
         'Vous avez des modifications non enregistrées. Quitter quand même ?',
     'Record hidden': 'Fiche masquée',

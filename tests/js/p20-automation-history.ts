@@ -16,7 +16,9 @@ import type { WorkflowExecutionRow } from '../../resources/js/lib/workflow-execu
 
 function expectEqual<T>(actual: T, expected: T, label: string): void {
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-        throw new Error(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+        throw new Error(
+            `${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`,
+        );
     }
 }
 
@@ -32,12 +34,29 @@ expectEqual(
     'execution statuses match persisted WorkflowExecution::STATUSES',
 );
 
-expectEqual(EMPTY_EXECUTION_PAGE.contract.retry_available, false, 'retry is not available');
-expectEqual(EMPTY_EXECUTION_PAGE.contract.test_available, false, 'fake test run is not available');
-expectEqual(EMPTY_EXECUTION_PAGE.contract.review_is_not_a_run, true, 'review is not a run');
+expectEqual(
+    EMPTY_EXECUTION_PAGE.contract.retry_available,
+    true,
+    'replay is available for failed runs',
+);
+expectEqual(
+    EMPTY_EXECUTION_PAGE.contract.test_available,
+    false,
+    'fake test run is not available',
+);
+expectEqual(
+    EMPTY_EXECUTION_PAGE.contract.review_is_not_a_run,
+    true,
+    'review is not a run',
+);
 
 expectEqual(
-    executionHistoryHref({ page: 2, workflowId: 9, status: 'failed', execution: 4 }),
+    executionHistoryHref({
+        page: 2,
+        workflowId: 9,
+        status: 'failed',
+        execution: 4,
+    }),
     '/crm/workflows?view=history&history_page=2&history_workflow_id=9&history_status=failed&execution=4',
     'history href stays on the automation page',
 );
@@ -51,8 +70,16 @@ expectEqual(executionBadgeVariant('failed'), 'destructive', 'failed badge');
 expectEqual(executionBadgeVariant('pending'), 'secondary', 'pending badge');
 expectEqual(executionBadgeVariant('cancelled'), 'outline', 'cancelled badge');
 
-expectEqual(formatExecutionTimestamp(null), 'Unknown', 'missing timestamp is unknown');
-expectEqual(formatExecutionDuration(null), 'Unknown', 'missing duration is unknown');
+expectEqual(
+    formatExecutionTimestamp(null),
+    'Unknown',
+    'missing timestamp is unknown',
+);
+expectEqual(
+    formatExecutionDuration(null),
+    'Unknown',
+    'missing duration is unknown',
+);
 expectEqual(formatExecutionDuration(0), '<1s', 'sub-second duration');
 
 const hidden: WorkflowExecutionRow = {
@@ -100,7 +127,14 @@ const hidden: WorkflowExecutionRow = {
     },
 };
 
-expectEqual(executionRecordLabel(hidden), 'Record hidden', 'hidden records do not leak names');
-expectTrue(hidden.can_retry === false, 'rows never advertise retry');
+expectEqual(
+    executionRecordLabel(hidden),
+    'Record hidden',
+    'hidden records do not leak names',
+);
+expectTrue(
+    hidden.can_retry === false,
+    'successful rows never advertise replay',
+);
 
 console.log('p20-automation-history proofs passed');

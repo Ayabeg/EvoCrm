@@ -1,5 +1,5 @@
 /**
- * P20 execution history contract. Do not invent statuses, retry, or fake metrics.
+ * P20 execution history contract. Replay is explicit and only available for failed runs.
  */
 
 export const WORKFLOW_EXECUTION_STATUSES = [
@@ -109,7 +109,7 @@ export const EMPTY_EXECUTION_PAGE: WorkflowExecutionPage = {
     },
     selected: null,
     contract: {
-        retry_available: false,
+        retry_available: true,
         test_available: false,
         review_is_not_a_run: true,
         disable_cancels_pending: true,

@@ -290,6 +290,41 @@ class WorkflowRunner
         ];
     }
 
+    /**
+     * Replay a failed execution with the workflow's current configuration.
+     *
+     * The original row is never mutated. A new row records the result so
+     * operators can compare the failed attempt with its replay.
+     */
+    public function replay(Workspace $workspace, WorkflowExecution $execution): WorkflowExecution
+    {
+        $workflow = $execution->workflow;
+        if (! $workflow instanceof Workflow) {
+            throw new RuntimeException('The workflow for this execution no longer exists.');
+        }
+
+        $outcome = $this->execute(
+            $workspace,
+            $workflow,
+            $execution->contact,
+            $execution->deal,
+            $execution->ticket,
+        );
+
+        return WorkflowExecution::query()->create([
+            'workspace_id' => $workspace->id,
+            'workflow_id' => $workflow->id,
+            'workflow_name' => $workflow->name,
+            'contact_id' => $execution->contact_id,
+            'deal_id' => $execution->deal_id,
+            'ticket_id' => $execution->ticket_id,
+            'trigger' => $execution->trigger ?: $workflow->trigger,
+            'delay_minutes' => 0,
+            'run_at' => $outcome->startedAt,
+            ...$outcome->attributes($this->redactor),
+        ]);
+    }
+
     private function run(Workspace $workspace, string $trigger, ?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): void
     {
         $workflows = Workflow::query()

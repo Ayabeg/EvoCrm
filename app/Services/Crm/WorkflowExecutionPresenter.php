@@ -167,7 +167,8 @@ class WorkflowExecutionPresenter
             'status_label' => $this->statusLabel($execution),
             'is_delayed' => ((int) $execution->delay_minutes) > 0,
             'is_terminal' => $execution->isTerminal(),
-            'can_retry' => false,
+            'can_retry' => $execution->status === WorkflowExecution::STATUS_FAILED
+                && $user->canPermission('automation.manage'),
             'trigger' => $execution->trigger ?: $execution->workflow?->trigger,
             'branch' => $execution->branch,
             'action' => $execution->action,
@@ -210,7 +211,7 @@ class WorkflowExecutionPresenter
     public function contract(): array
     {
         return [
-            'retry_available' => false,
+            'retry_available' => true,
             'test_available' => false,
             'review_is_not_a_run' => true,
             'disable_cancels_pending' => true,

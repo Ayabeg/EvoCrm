@@ -270,6 +270,27 @@ class WorkflowController extends Controller
         return back();
     }
 
+    public function replay(Request $request, WorkflowExecution $execution, WorkflowRunner $runner): RedirectResponse
+    {
+        abort_unless((int) $execution->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($request->user()->canPermission('automation.manage'), 403);
+        abort_unless($execution->status === WorkflowExecution::STATUS_FAILED, 422);
+
+        $runner->replay($request->user()->workspace, $execution->load([
+            'workflow',
+            'contact',
+            'deal',
+            'ticket',
+        ]));
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Failed workflow run replayed. The original execution was kept unchanged.'),
+        ]);
+
+        return back();
+    }
+
     public function destroy(Request $request, Workflow $workflow): RedirectResponse
     {
         abort_unless((int) $workflow->workspace_id === (int) $request->user()->workspace_id, 404);

@@ -280,6 +280,22 @@ export default function WorkflowsIndex({
         });
     };
 
+    const replayExecution = (executionId: number) => {
+        if (!beginExclusiveAction(mutatingRef)) {
+            return;
+        }
+
+        setMutating(true);
+        router.post(
+            '/crm/workflows/executions/' + executionId + '/replay',
+            {},
+            {
+                preserveScroll: true,
+                onFinish: releaseMutation,
+            },
+        );
+    };
+
     useEffect(() => {
         if (!editorOpen || !dirty) {
             return;
@@ -382,6 +398,7 @@ export default function WorkflowsIndex({
                         <WorkflowExecutionHistory
                             executions={executions}
                             workflows={workflows}
+                            onReplay={replayExecution}
                         />
                     ) : (
                         <WorkflowList

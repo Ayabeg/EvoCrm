@@ -15,7 +15,7 @@ function p20HistorySource(): array
 {
     return [
         'page' => File::get(resource_path('js/pages/crm/workflows/index.tsx')),
-        'history' => File::get(resource_path('js/components/crm/workflow-execution-history.tsx')),
+        'history' => File::get(resource_path('js/evo/automation/ExecutionHistory.tsx')),
         'lib' => File::get(resource_path('js/lib/workflow-execution.ts')),
         'authoring' => File::get(resource_path('js/lib/workflow-authoring.ts')),
         'builder' => File::get(resource_path('js/components/crm/workflow-builder.tsx')),
@@ -37,14 +37,15 @@ it('keeps P19 authoring frozen and does not invent a second engine', function ()
         ->and($src['authoring'])->toContain('summarizeWorkflow')
         ->and($src['page'])->toContain('WorkflowBuilder')
         ->and($src['page'])->toContain('Review configuration')
-        ->and($src['page'])->toContain('This reviews the structure. It does not run the workflow.')
+        ->and($src['page'])->toContain('This reviews the structure.')
+        ->and($src['page'])->toContain('does not run the')
         ->and($src['page'])->not->toContain('Test succeeded')
         ->and($src['page'])->not->toContain('Ask Evo')
-        ->and($src['history'])->not->toContain('onRetry')
-        ->and($src['history'])->toContain('Retry is not available')
+        ->and($src['history'])->toContain('onReplay')
+        ->and($src['history'])->toContain('Replay failed run')
         ->and($src['lib'])->not->toContain('success_rate')
         ->and($src['lib'])->not->toContain('run_count')
-        ->and(substr_count($src['page'], 'if (!beginExclusiveAction(mutatingRef))'))->toBe(5);
+        ->and(substr_count($src['page'], 'if (!beginExclusiveAction(mutatingRef))'))->toBe(6);
 });
 
 it('persists an immediate execution with then-branch facts', function () {
@@ -260,7 +261,7 @@ it('exposes paginated sanitized history without fake metrics or retry', function
             ->where('executions.metrics.completed', 26)
             ->where('executions.metrics.failed', 0)
             ->where('executions.metrics.pending', 0)
-            ->where('executions.contract.retry_available', false)
+            ->where('executions.contract.retry_available', true)
             ->where('executions.contract.test_available', false)
             ->where('executions.data.0.can_retry', false)
             ->where('executions.data.0.workflow_name', 'History source')
@@ -359,7 +360,7 @@ it('lets a member without automation.manage inspect history but not mutate', fun
 it('locks the P20 proof file to truthful history language', function () {
     $js = p20HistorySource()['js'];
 
-    expect($js)->toContain('retry is not available')
+    expect($js)->toContain('replay is available for failed runs')
         ->and($js)->toContain('fake test run is not available')
         ->and($js)->toContain('hidden records do not leak names')
         ->and($js)->toContain("'pending'")

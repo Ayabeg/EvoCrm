@@ -52,9 +52,11 @@ function RecordLink({
 export function ExecutionHistory({
     executions,
     workflows,
+    onReplay,
 }: {
     executions: WorkflowExecutionPage;
     workflows: Array<{ id: number; name: string }>;
+    onReplay: (executionId: number) => void;
 }) {
     const selected = executions.selected;
     const filters = executions.filters;
@@ -456,12 +458,26 @@ export function ExecutionHistory({
                         ) : null}
 
                         <p className="text-[12px] text-[var(--evo-ink-muted)]">
-                            {t(
-                                'Retry is not available. Re-running would risk duplicate side effects.',
-                            )}
+                            {selected.can_retry
+                                ? t(
+                                      'Replay runs the current workflow configuration and keeps this failed attempt unchanged.',
+                                  )
+                                : t(
+                                      'Only failed runs can be replayed by automation managers.',
+                                  )}
                         </p>
 
-                        <div className="flex justify-end">
+                        <div className="flex justify-end gap-2">
+                            {selected.can_retry ? (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => onReplay(selected.id)}
+                                >
+                                    {t('Replay failed run')}
+                                </Button>
+                            ) : null}
                             <Button
                                 type="button"
                                 variant="outline"
