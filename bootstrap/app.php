@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureRegistrationIsOpen;
 use App\Http\Middleware\EnsureUserCanManageSettings;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PostHogRequestContext;
+use App\Http\Middleware\RequestId;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SecurityHeaders;
 use App\Services\Analytics\ProductAnalytics;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(RequestId::class);
         $middleware->trustProxies(at: TrustedProxies::at());
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state', 'locale']);
