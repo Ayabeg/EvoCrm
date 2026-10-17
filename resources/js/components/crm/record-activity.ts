@@ -1,7 +1,7 @@
 import type { CatchUpItem } from '@/components/crm/catch-up-block';
 
 export type RecordActivity = {
-    id: number;
+    id: number | string;
     type: string;
     subject?: string | null;
     body?: string | null;
@@ -44,7 +44,7 @@ export function hasCatchUpItems(
 ): boolean {
     return Boolean(
         (catchUp?.inbound?.length ?? 0) > 0 ||
-            (catchUp?.outbound?.length ?? 0) > 0,
+        (catchUp?.outbound?.length ?? 0) > 0,
     );
 }
 
@@ -66,6 +66,7 @@ export function deriveRecordNext(input: {
     const overdue = timeline.find(
         (item) =>
             item.type === 'task' &&
+            typeof item.id === 'number' &&
             !item.done &&
             item.due_at &&
             Date.parse(item.due_at) < now,
@@ -80,7 +81,8 @@ export function deriveRecordNext(input: {
     }
 
     const openTask = timeline.find(
-        (item) => item.type === 'task' && !item.done,
+        (item) =>
+            item.type === 'task' && typeof item.id === 'number' && !item.done,
     );
 
     if (openTask) {

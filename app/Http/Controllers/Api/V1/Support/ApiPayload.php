@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\V1\Support;
 
 use App\Models\Activity;
 use App\Models\Contact;
+use App\Models\ContactConsent;
 use App\Models\Deal;
 use App\Models\Device;
 use App\Models\Lead;
 use App\Models\Message;
 use App\Models\Quote;
+use App\Models\RecordRelationship;
 use App\Models\Thread;
 use App\Models\User;
 use App\Models\Workspace;
@@ -45,11 +47,11 @@ class ApiPayload
     /**
      * @return array<string, mixed>
      */
-    public static function contact(Contact $contact): array
+    public static function contact(Contact $contact, bool $details = false): array
     {
         $contact->loadMissing(['company:id,name', 'owner:id,name']);
 
-        return [
+        $payload = [
             'id' => $contact->id,
             'first_name' => $contact->first_name,
             'last_name' => $contact->last_name,
@@ -65,9 +67,109 @@ class ApiPayload
             'owner_id' => $contact->owner_id,
             'owner_name' => $contact->owner?->name,
             'source' => $contact->source,
+            'source_detail' => $contact->source_detail,
+            'source_campaign' => $contact->source_campaign,
+            'source_medium' => $contact->source_medium,
+            'first_touch_at' => $contact->first_touch_at?->toIso8601String(),
+            'last_touch_at' => $contact->last_touch_at?->toIso8601String(),
             'last_activity_at' => $contact->last_activity_at?->toIso8601String(),
             'created_at' => $contact->created_at?->toIso8601String(),
             'updated_at' => $contact->updated_at?->toIso8601String(),
+        ];
+
+        if (! $details) {
+            return $payload;
+        }
+
+        $contact->loadMissing([
+            'consents',
+            'incomingRelationships.fromRecord',
+            'outgoingRelationships.toRecord',
+        ]);
+
+        return array_merge($payload, [
+            'consents' => $contact->consents
+                ->map(fn (ContactConsent $consent): array => [
+                    'id' => $consent->id,
+                    'channel' => $consent->channel,
+                    'purpose' => $consent->purpose,
+                    'status' => $consent->status,
+                    'source' => $consent->source,
+                    'captured_at' => $consent->captured_at?->toIso8601String(),
+                    'expires_at' => $consent->expires_at?->toIso8601String(),
+                    'revoked_at' => $consent->revoked_at?->toIso8601String(),
+                    'granted' => $consent->isGranted(),
+                ])
+                ->values()
+                ->all(),
+            'relationships' => $contact->outgoingRelationships
+                ->map(fn (RecordRelationship $relationship): array => self::relationship($relationship, 'outgoing'))
+                ->concat($contact->incomingRelationships->map(
+                    fn (RecordRelationship $relationship): array => self::relationship($relationship, 'incoming')
+                ))
+                ->values()
+                ->all(),
+            'timeline' => self::contactTimeline($contact),
+        ]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public static function contactTimeline(Contact $contact): array
+    {
+        $activities = Activity::query()
+            ->forWorkspace($contact->workspace_id)
+            ->with(['contact', 'deal', 'owner', 'actor'])
+            ->where('contact_id', $contact->id)
+            ->latest()
+            ->limit(80)
+            ->get()
+            ->map(fn (Activity $activity): array => self::activity($activity));
+
+        $messages = Message::query()
+            ->forWorkspace($contact->workspace_id)
+            ->with(['user', 'thread.channel'])
+            ->where('contact_id', $contact->id)
+            ->latest()
+            ->limit(80)
+            ->get()
+            ->map(fn (Message $message): array => array_merge(self::message($message), [
+                'timeline_type' => $message->direction === 'inbound' ? 'inbound_message' : 'outbound_message',
+                'actor_name' => $message->user?->name,
+                'channel' => $message->thread?->channel?->type?->value,
+            ]));
+
+        return $activities
+            ->concat($messages)
+            ->sortByDesc('created_at')
+            ->take(80)
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function relationship(RecordRelationship $relationship, string $direction): array
+    {
+        $record = $direction === 'outgoing' ? $relationship->toRecord : $relationship->fromRecord;
+        $label = match (true) {
+            $record instanceof Contact => $record->displayName(),
+            $record instanceof Company => $record->name,
+            $record instanceof Deal => $record->title,
+            $record instanceof Lead => $record->title,
+            default => null,
+        };
+
+        return [
+            'id' => $relationship->id,
+            'direction' => $direction,
+            'relationship_type' => $relationship->relationship_type,
+            'record_type' => $record ? class_basename($record) : null,
+            'record_id' => $record?->getKey(),
+            'record_label' => $label,
+            'meta' => $relationship->meta,
         ];
     }
 
@@ -121,12 +223,17 @@ class ApiPayload
             'title' => $lead->title,
             'status' => $lead->status,
             'source' => $lead->source,
+            'source_detail' => $lead->source_detail,
+            'source_campaign' => $lead->source_campaign,
+            'source_medium' => $lead->source_medium,
             'score' => $lead->score,
             'contact_id' => $lead->contact_id,
             'contact_name' => $lead->contact?->displayName(),
             'company_id' => $lead->company_id,
             'deal_id' => $lead->deal?->id,
             'qualified_at' => $lead->qualified_at?->toIso8601String(),
+            'first_touch_at' => $lead->first_touch_at?->toIso8601String(),
+            'last_touch_at' => $lead->last_touch_at?->toIso8601String(),
             'created_at' => $lead->created_at?->toIso8601String(),
         ];
     }
@@ -214,6 +321,7 @@ class ApiPayload
             'type' => $message->type,
             'body' => $message->body,
             'status' => $message->status,
+            'provider' => $message->provider,
             'created_at' => $message->created_at?->toIso8601String(),
         ];
     }

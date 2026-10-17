@@ -54,7 +54,7 @@ class ContactController extends Controller
         $this->ensureInWorkspace($contact, $this->workspace($request));
 
         return response()->json([
-            'data' => ApiPayload::contact($contact),
+            'data' => ApiPayload::contact($contact, details: true),
         ]);
     }
 

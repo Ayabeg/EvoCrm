@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\EnrichmentRun;
+use App\Models\Lead;
 use App\Models\Mailbox;
+use App\Models\RecordRelationship;
 use App\Models\Sequence;
 use App\Services\Ai\RecordInsight;
 use App\Services\Crm\ContactIdentity;
@@ -69,8 +71,23 @@ class ContactController extends Controller
         abort_unless((int) $contact->workspace_id === (int) $request->user()->workspace_id, 404);
 
         $workspace = $request->user()->workspace;
-        $contact->load(['company', 'owner', 'deals.stage']);
+        $contact->load([
+            'company.parentCompany',
+            'owner',
+            'deals.stage',
+            'consents',
+            'incomingRelationships.fromRecord',
+            'outgoingRelationships.toRecord',
+        ]);
         $pipeline = $workspace->defaultPipeline()->load('stages');
+
+        $relationships = $contact->outgoingRelationships
+            ->map(fn ($relationship): array => $this->presentRelationship($relationship, 'outgoing'))
+            ->concat($contact->incomingRelationships->map(
+                fn ($relationship): array => $this->presentRelationship($relationship, 'incoming')
+            ))
+            ->values()
+            ->all();
 
         return Inertia::render('crm/contacts/show', [
             'contact' => array_merge($contact->toArray(), [
@@ -86,6 +103,15 @@ class ContactController extends Controller
             'askEvo' => $insight->forContact($contact),
             'contactEngagement' => $insight->contactEngagement($contact),
             'proactiveSummary' => $insight->proactiveSummary($contact),
+            'consents' => $contact->consents->map(fn ($consent): array => [
+                'id' => $consent->id,
+                'channel' => $consent->channel,
+                'purpose' => $consent->purpose,
+                'status' => $consent->status,
+                'granted' => $consent->isGranted(),
+                'source' => $consent->source,
+            ])->values()->all(),
+            'relationships' => $relationships,
             'enrichmentRuns' => $enrichment->history($workspace, EnrichmentRun::TARGET_CONTACT, (int) $contact->id),
             'enrichAction' => "/crm/contacts/{$contact->id}/enrich",
             'dealsKanban' => [
@@ -103,6 +129,34 @@ class ContactController extends Controller
                 ])->values(),
             ],
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function presentRelationship(RecordRelationship $relationship, string $direction): array
+    {
+        $record = $direction === 'outgoing' ? $relationship->toRecord : $relationship->fromRecord;
+        $label = match (true) {
+            $record instanceof Contact => $record->displayName(),
+            $record instanceof Company => $record->name,
+            $record instanceof Lead => $record->title,
+            default => null,
+        };
+        $href = match (true) {
+            $record instanceof Contact => '/crm/contacts/'.$record->id,
+            $record instanceof Company => '/crm/companies/'.$record->id,
+            $record instanceof Lead => '/crm/leads/'.$record->id,
+            default => null,
+        };
+
+        return [
+            'id' => $relationship->id,
+            'direction' => $direction,
+            'relationship_type' => $relationship->relationship_type,
+            'label' => $label,
+            'href' => $href,
+        ];
     }
 
     public function store(Request $request, ContactIdentity $identity): RedirectResponse

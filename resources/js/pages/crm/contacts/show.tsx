@@ -44,6 +44,29 @@ type Contact = {
     company_id?: number | null;
     company?: { id: number; name: string } | null;
     owner?: { id: number; name: string } | null;
+    source?: string | null;
+    source_detail?: string | null;
+    source_campaign?: string | null;
+    source_medium?: string | null;
+    first_touch_at?: string | null;
+    last_touch_at?: string | null;
+};
+
+type ContactConsent = {
+    id: number;
+    channel: string;
+    purpose: string;
+    status: string;
+    granted: boolean;
+    source?: string | null;
+};
+
+type ContactRelationship = {
+    id: number;
+    direction: string;
+    relationship_type: string;
+    label?: string | null;
+    href?: string | null;
 };
 
 export default function ContactShow({
@@ -55,6 +78,8 @@ export default function ContactShow({
     contactEngagement,
     catchUp,
     playbooks,
+    consents = [],
+    relationships = [],
     enrichmentRuns = [],
     enrichAction,
 }: {
@@ -76,6 +101,8 @@ export default function ContactShow({
     contactEngagement?: { score: number; label: string; reason: string } | null;
     proactiveSummary?: string | null;
     catchUp?: { inbound?: CatchUpItem[]; outbound?: CatchUpItem[] } | null;
+    consents?: ContactConsent[];
+    relationships?: ContactRelationship[];
     dealsKanban?: {
         pipeline: { id: number; name: string };
         stages: { id: number; name: string; slug: string }[];
@@ -188,7 +215,9 @@ export default function ContactShow({
                             rightClassName="bg-white"
                             left={
                                 <div className="space-y-5">
-                                    <RecordSection title={t('About this contact')}>
+                                    <RecordSection
+                                        title={t('About this contact')}
+                                    >
                                         <RecordFactList>
                                             <RecordFact
                                                 label="Email"
@@ -198,7 +227,9 @@ export default function ContactShow({
                                                 label="Phone"
                                                 value={
                                                     contact.phone_e164
-                                                        ? formatPhone(contact.phone_e164)
+                                                        ? formatPhone(
+                                                              contact.phone_e164,
+                                                          )
                                                         : null
                                                 }
                                             />
@@ -215,6 +246,14 @@ export default function ContactShow({
                                                 value={contact.lead_status}
                                             />
                                             <RecordFact
+                                                label="Source"
+                                                value={contact.source}
+                                            />
+                                            <RecordFact
+                                                label="Campaign"
+                                                value={contact.source_campaign}
+                                            />
+                                            <RecordFact
                                                 label="Created"
                                                 value={
                                                     contact.created_at
@@ -225,6 +264,77 @@ export default function ContactShow({
                                                 }
                                             />
                                         </RecordFactList>
+                                    </RecordSection>
+                                    <RecordSection
+                                        title={t('Attribution details')}
+                                    >
+                                        <RecordFactList>
+                                            <RecordFact
+                                                label="Source detail"
+                                                value={contact.source_detail}
+                                            />
+                                            <RecordFact
+                                                label="Source medium"
+                                                value={contact.source_medium}
+                                            />
+                                            <RecordFact
+                                                label="First touch"
+                                                value={contact.first_touch_at?.slice(
+                                                    0,
+                                                    10,
+                                                )}
+                                            />
+                                            <RecordFact
+                                                label="Last touch"
+                                                value={contact.last_touch_at?.slice(
+                                                    0,
+                                                    10,
+                                                )}
+                                            />
+                                        </RecordFactList>
+                                    </RecordSection>
+                                    <RecordSection
+                                        title={t('Communication consent')}
+                                    >
+                                        {consents.length === 0 ? (
+                                            <p className="text-[13px] text-mute">
+                                                {t('No consent record yet')}
+                                            </p>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                {consents.map((consent) => (
+                                                    <div
+                                                        key={consent.id}
+                                                        className="flex items-center justify-between gap-3"
+                                                    >
+                                                        <div className="min-w-0">
+                                                            <p className="text-[13px] text-ink">
+                                                                {
+                                                                    consent.channel
+                                                                }{' '}
+                                                                ·{' '}
+                                                                {
+                                                                    consent.purpose
+                                                                }
+                                                            </p>
+                                                            <p className="text-[11px] text-mute">
+                                                                {consent.source ??
+                                                                    t(
+                                                                        'Source not recorded',
+                                                                    )}
+                                                            </p>
+                                                        </div>
+                                                        <RecordStatusBadge>
+                                                            {consent.granted
+                                                                ? t('Granted')
+                                                                : t(
+                                                                      consent.status,
+                                                                  )}
+                                                        </RecordStatusBadge>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </RecordSection>
                                     {enrichAction ? (
                                         <EnrichmentPanel
@@ -275,7 +385,9 @@ export default function ContactShow({
                                                 ? `/crm/companies/${company.id}`
                                                 : '/crm/companies?create=1'
                                         }
-                                        addLabel={company ? t('View') : t('Add')}
+                                        addLabel={
+                                            company ? t('View') : t('Add')
+                                        }
                                     >
                                         {company ? (
                                             <RelatedRecordLink
@@ -307,6 +419,31 @@ export default function ContactShow({
                                                     {deal.title}
                                                 </RelatedRecordLink>
                                             ))
+                                        )}
+                                    </AssociationCard>
+                                    <AssociationCard title={t('Relationships')}>
+                                        {relationships.length === 0 ? (
+                                            <p className="text-mute">
+                                                {t('No relationships yet')}
+                                            </p>
+                                        ) : (
+                                            relationships.map(
+                                                (relationship) => (
+                                                    <RelatedRecordLink
+                                                        key={relationship.id}
+                                                        href={
+                                                            relationship.href ??
+                                                            '#'
+                                                        }
+                                                        meta={
+                                                            relationship.relationship_type
+                                                        }
+                                                    >
+                                                        {relationship.label ??
+                                                            t('Unknown record')}
+                                                    </RelatedRecordLink>
+                                                ),
+                                            )
                                         )}
                                     </AssociationCard>
                                     <TicketsRelatedCard

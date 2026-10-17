@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
+use Illuminate\Support\Collection;
 
 class CrmHub
 {
@@ -80,7 +81,7 @@ class CrmHub
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, Contact|Deal|Company>  $rows
+     * @param  Collection<int, Contact|Deal|Company>  $rows
      * @return list<array<string, mixed>>
      */
     public function withListAttributes(Workspace $workspace, string $entity, $rows): array
@@ -242,7 +243,13 @@ class CrmHub
     }
 
     /**
-     * @return array<int, Activity>
+     * Return one chronological stream for activities and channel messages.
+     *
+     * Messages are intentionally represented as lightweight timeline rows so
+     * the existing record activity UI can render them without exposing the
+     * full conversation payload.
+     *
+     * @return array<int, Activity|array<string, mixed>>
      */
     public function timeline(?Contact $contact = null, ?Deal $deal = null, ?Company $company = null): array
     {
@@ -265,7 +272,47 @@ class CrmHub
             return [];
         }
 
-        return $query->limit(80)->get()->all();
+        $activities = $query->limit(80)->get();
+
+        if (! $contact && $deal) {
+            $deal->loadMissing('contact');
+            $contact = $deal->contact;
+        }
+
+        $messages = $contact
+            ? Message::query()
+                ->with(['user', 'thread.channel'])
+                ->where('contact_id', $contact->id)
+                ->latest()
+                ->limit(80)
+                ->get()
+                ->map(fn (Message $message): array => [
+                    'id' => 'message-'.$message->id,
+                    'type' => $message->direction === 'inbound' ? 'inbound_message' : 'outbound_message',
+                    'subject' => $message->thread?->subject,
+                    'body' => $message->body,
+                    'done' => true,
+                    'created_at' => $message->created_at,
+                    'owner' => null,
+                    'actor' => $message->user ? ['name' => $message->user->name] : null,
+                    'meta' => [
+                        'direction' => $message->direction,
+                        'channel' => $message->thread?->channel?->type?->value,
+                        'status' => $message->status,
+                    ],
+                ])
+            : collect();
+
+        return $activities
+            ->concat($messages)
+            ->sortByDesc(function (Activity|array $item): int {
+                $createdAt = $item instanceof Activity ? $item->created_at : ($item['created_at'] ?? null);
+
+                return $createdAt?->getTimestamp() ?? 0;
+            })
+            ->take(80)
+            ->values()
+            ->all();
     }
 
     /**

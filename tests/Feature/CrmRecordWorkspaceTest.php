@@ -68,6 +68,8 @@ it('loads the contact show workspace with associations and catch-up', function (
             ->where('catchUp.inbound.0.label', 'Need a callback this week')
             ->has('catchUp.outbound')
             ->has('timeline')
+            ->where('timeline.0.type', 'inbound_message')
+            ->where('timeline.0.body', 'Need a callback this week')
         );
 });
 

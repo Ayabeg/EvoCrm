@@ -110,19 +110,27 @@ export default function RecordActivityPanel({
                 <div className="space-y-2">
                     <p className="text-[13px] text-ink">
                         {insight?.summary ??
-                            t('Ask Evo in the right rail. Context is this record, not a generic agent.')}
+                            t(
+                                'Ask Evo in the right rail. Context is this record, not a generic agent.',
+                            )}
                     </p>
                     {insight?.answer ? (
-                        <p className="text-[13px] text-mute">{insight.answer}</p>
+                        <p className="text-[13px] text-mute">
+                            {insight.answer}
+                        </p>
                     ) : (
                         <p className="text-[13px] text-mute">
-                            {t('No generated note yet. Use Ask Evo — source chip stays “This record”.')}
+                            {t(
+                                'No generated note yet. Use Ask Evo — source chip stays “This record”.',
+                            )}
                         </p>
                     )}
                 </div>
             ) : (
                 <div>
-                    {tab === 'overview' && highlights && highlights.length > 0 ? (
+                    {tab === 'overview' &&
+                    highlights &&
+                    highlights.length > 0 ? (
                         <dl className="mb-3 grid gap-2 sm:grid-cols-2">
                             {highlights
                                 .filter((item) => item.value)
@@ -151,20 +159,22 @@ export default function RecordActivityPanel({
                                 }
                             />
                             <div className="flex flex-wrap gap-1">
-                            {ACTIVITY_CHIPS.map((item) => (
-                                <Button
-                                    key={item.key}
-                                    type="button"
-                                    size="sm"
-                                    variant={
-                                        chip === item.key ? 'secondary' : 'ghost'
-                                    }
-                                    className="h-7 text-[11px]"
-                                    onClick={() => setChip(item.key)}
-                                >
-                                    {t(item.label)}
-                                </Button>
-                            ))}
+                                {ACTIVITY_CHIPS.map((item) => (
+                                    <Button
+                                        key={item.key}
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            chip === item.key
+                                                ? 'secondary'
+                                                : 'ghost'
+                                        }
+                                        className="h-7 text-[11px]"
+                                        onClick={() => setChip(item.key)}
+                                    >
+                                        {t(item.label)}
+                                    </Button>
+                                ))}
                             </div>
                         </div>
                     ) : null}
@@ -214,7 +224,8 @@ export default function RecordActivityPanel({
                                         </Button>
                                     </Form>
                                 ) : null}
-                                {item.type === 'meeting' ? (
+                                {item.type === 'meeting' &&
+                                typeof item.id === 'number' ? (
                                     <MeetingAttendanceButtons
                                         activityId={item.id}
                                         attendance={item.meta?.attendance}
