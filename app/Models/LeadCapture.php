@@ -36,11 +36,14 @@ class LeadCapture extends Model
 
     public const SOURCE_MAPS_SEARCH = 'maps_search';
 
+    public const SOURCE_LEAD_MAGNET = 'lead_magnet';
+
     public const SOURCES = [
         self::SOURCE_META_FORM,
         self::SOURCE_CSV,
         self::SOURCE_URL,
         self::SOURCE_MAPS_SEARCH,
+        self::SOURCE_LEAD_MAGNET,
     ];
 
     public const STATUS_NEW = 'new';

@@ -1,0 +1,56 @@
+# EvoCRM acquisition data model
+
+## Existing source-of-truth entities
+
+| Entity | Purpose | Reuse rule |
+|---|---|---|
+| `workspaces` | Tenant boundary, locale/timezone, scoring settings | Every acquisition record belongs to a workspace |
+| `companies` | Organization/business record | Enrichment updates this record only after normalization/conflict handling |
+| `contacts` | Individual/business contact methods and attribution | Do not create parallel person records |
+| `leads` / `deals` | Qualification and sales pipeline | Lead-magnet and outbound outcomes link here |
+| `activities` | CRM timeline | Record meaningful submissions, enrichment decisions, sends, replies, and outcomes |
+| `contact_consents` | Channel-specific consent | Delivery consent and optional marketing consent remain distinct |
+| `lead_captures` | Existing inbound capture staging | Reuse for raw inbound capture where compatible; add a first-class offer reference rather than duplicating captures |
+| `enrichment_runs` | Existing field-level enrichment candidates | Preserve source, field, value, confidence, status, raw evidence, and decision metadata |
+| `lead_scores` | Existing scored lead snapshots | Keep data quality separate from sales fit; extend carefully if the current schema cannot represent both |
+| `import_batches` | Existing import lifecycle | Add column mapping/row error detail through existing import conventions |
+| outbound tables | Mailboxes, templates, sequences, campaigns, enrollments, messages, suppressions, replies | All sends use existing suppression and idempotency paths |
+
+## Required new or clarified records
+
+The implementation should add only records that are not already represented by the current schema. Candidate records are:
+
+### Lead-magnet offers and submissions
+
+- `lead_magnet_offers`: stable offer slug, name, version, status, workspace/global scope, delivery configuration, and calculator definition version.
+- `lead_magnet_submissions`: offer/version, workspace, optional contact/company/lead links, idempotency key, result assumptions, calculated result, source attribution, delivery status, and timestamps.
+- `lead_magnet_events` (or an equivalent existing funnel/event record): visit/start/submit/use/delivery/demo-request outcome with dedupe key and attribution.
+
+Submissions may be anonymous until the user supplies delivery details. The calculator result itself must not require unnecessary PII.
+
+### Field provenance and verification
+
+The current `enrichment_runs` table is a candidate/evidence ledger, but the broader contract needs explicit status semantics for values used by outbound. Prefer extending it or adding a normalized field-evidence table only if existing consumers cannot safely carry:
+
+- target entity and field;
+- normalized value and optional redacted/raw value;
+- provider/method and evidence URL;
+- retrieved/verified timestamps;
+- verification status (`verified`, `evidence_supported`, `unknown`, `not_found`, `not_detected`, `conflicting`, `invalid`);
+- confidence/evidence strength;
+- decision (`accepted`, `rejected`, `needs_review`) and reason.
+
+### Eligibility and suppression
+
+Use the existing suppression tables and consent records as the enforcement source. If an audit record is needed, record the decision reason and policy version in the outbound enrollment/message or activity/event record; do not create a second suppression list.
+
+## Invariants and indexes
+
+- All new records have `workspace_id` and a foreign key with the existing cascade/null-delete conventions.
+- Offer submissions have a workspace/offer/idempotency uniqueness rule so retries do not create duplicate contacts or delivery events.
+- Provider events have a provider/event-id uniqueness rule where the provider supplies an ID; otherwise use a deterministic event hash.
+- Evidence lookup is indexed by workspace, target, field, status, and recency.
+- List screens filter and paginate by workspace; no unbounded public or operator query is allowed.
+- Domain/email/phone normalization is deterministic and stored separately from display values when needed.
+- Existing user data is never overwritten by a lower-confidence candidate without an explicit decision.
+

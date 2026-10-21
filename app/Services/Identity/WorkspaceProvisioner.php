@@ -5,6 +5,7 @@ namespace App\Services\Identity;
 use App\Enums\ChannelType;
 use App\Enums\WorkspaceRole;
 use App\Models\Channel;
+use App\Models\LeadMagnetOffer;
 use App\Models\MetaConversionConfig;
 use App\Models\Pipeline;
 use App\Models\Product;
@@ -92,6 +93,18 @@ class WorkspaceProvisioner
         app(ConversionFunnelProvisioner::class)->provision($workspace);
 
         MetaConversionConfig::seedFor($workspace);
+
+        LeadMagnetOffer::query()->firstOrCreate(
+            ['workspace_id' => $workspace->id, 'slug' => 'lead-leakage-calculator'],
+            [
+                'name' => 'Lead Leakage Calculator',
+                'kind' => 'calculator',
+                'version' => 'lead-leakage-v1',
+                'status' => LeadMagnetOffer::STATUS_ACTIVE,
+                'description' => 'Estimate the value of inquiries lost through missed responses and inconsistent follow-up.',
+                'settings' => ['currency' => 'DZD'],
+            ],
+        );
 
         QuietHours::query()->firstOrCreate(
             ['workspace_id' => $workspace->id],

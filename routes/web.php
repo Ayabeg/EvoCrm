@@ -59,6 +59,7 @@ use App\Http\Controllers\Outbound\TemplateController;
 use App\Http\Controllers\Outbound\WarmupController;
 use App\Http\Controllers\Public\FunnelTrackingController;
 use App\Http\Controllers\Public\LegalController;
+use App\Http\Controllers\Public\LeadLeakageController;
 use App\Http\Controllers\Public\MeetingBookController;
 use App\Http\Controllers\Public\QuoteAcceptanceController;
 use App\Http\Controllers\Public\TrackingController;
@@ -109,6 +110,11 @@ Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update
 
 Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
 Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/lead-magnet/{workspace:slug}/lead-leakage-calculator', [LeadLeakageController::class, 'show'])
+    ->name('lead-magnet.lead-leakage.show');
+Route::post('/lead-magnet/{workspace:slug}/lead-leakage-calculator', [LeadLeakageController::class, 'store'])
+    ->middleware('throttle:20,1')
+    ->name('lead-magnet.lead-leakage.store');
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 
