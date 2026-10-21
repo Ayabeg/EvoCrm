@@ -25,8 +25,22 @@ use Inertia\Response;
 
 class LeadLeakageController extends Controller
 {
-    public function show(Workspace $workspace): Response
-    {
+    public function show(
+        Request $request,
+        Workspace $workspace,
+        FunnelEventRecorder $funnelEvents,
+    ): Response {
+        $funnelEvents->recordVisit($workspace, [
+            'source' => LeadCapture::SOURCE_LEAD_MAGNET,
+            'utm_source' => $this->boundedQueryValue($request->query('utm_source')),
+            'utm_medium' => $this->boundedQueryValue($request->query('utm_medium')),
+            'utm_campaign' => $this->boundedQueryValue($request->query('utm_campaign')),
+            'meta' => [
+                'offer' => 'lead-leakage-calculator',
+                'path' => $request->path(),
+            ],
+        ]);
+
         return Inertia::render('public/lead-leakage-calculator', $this->pageProps($workspace));
     }
 
@@ -238,5 +252,12 @@ class LeadLeakageController extends Controller
             ->where('slug', 'lead-leakage-calculator')
             ->where('status', LeadMagnetOffer::STATUS_ACTIVE)
             ->firstOrFail();
+    }
+
+    private function boundedQueryValue(mixed $value): ?string
+    {
+        return is_string($value) && trim($value) !== ''
+            ? mb_substr(trim($value), 0, 100)
+            : null;
     }
 }

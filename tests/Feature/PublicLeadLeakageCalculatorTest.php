@@ -20,6 +20,12 @@ it('renders the workspace lead leakage calculator publicly', function () {
             ->component('public/lead-leakage-calculator')
             ->where('offer.slug', 'lead-leakage-calculator')
             ->where('result', null));
+
+    expect(FunnelEvent::query()
+        ->where('event_type', FunnelEvent::TYPE_VISIT)
+        ->where('source', 'lead_magnet')
+        ->whereJsonContains('meta->offer', 'lead-leakage-calculator')
+        ->count())->toBe(1);
 });
 
 it('offers the configured booking flow and records a deduplicated demo request', function () {
