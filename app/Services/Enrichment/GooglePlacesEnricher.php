@@ -82,7 +82,15 @@ class GooglePlacesEnricher
 
         $place = $places[0];
         $confidence = count($places) === 1 ? 0.9 : 0.6;
-        $raw = ['query' => $query, 'place' => $place, 'result_count' => count($places)];
+        $evidenceUrl = is_string($place['googleMapsUri'] ?? null) && filter_var($place['googleMapsUri'], FILTER_VALIDATE_URL)
+            ? $place['googleMapsUri']
+            : null;
+        $raw = [
+            'query' => $query,
+            'place' => $place,
+            'result_count' => count($places),
+            ...($evidenceUrl ? ['evidence_url' => $evidenceUrl] : []),
+        ];
 
         $placeId = is_string($place['id'] ?? null) ? $place['id'] : null;
         $address = is_string($place['formattedAddress'] ?? null) ? $place['formattedAddress'] : null;

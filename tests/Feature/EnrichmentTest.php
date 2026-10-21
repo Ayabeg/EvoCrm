@@ -42,6 +42,7 @@ function fakeEnrichmentHttp(bool $withEmail = true): void
                 'location' => ['latitude' => 36.75, 'longitude' => 3.06],
                 'internationalPhoneNumber' => '+213 21 00 00 00',
                 'websiteUri' => 'https://clinique-atlas.dz',
+                'googleMapsUri' => 'https://maps.google.com/?cid=123',
             ]],
         ], 200),
     ]);
@@ -78,6 +79,7 @@ it('persists website and places runs with confidence and auto-applies empty high
         ->and($runs->firstWhere('field', 'email')?->value)->toBe('hello@clinique-atlas.dz')
         ->and($runs->firstWhere('field', 'place_id')?->value)->toBe('ChIJ-atlas')
         ->and($runs->firstWhere('field', 'place_id')?->source)->toBe(EnrichmentRun::SOURCE_GOOGLE_PLACES)
+        ->and($runs->firstWhere('field', 'place_id')?->evidence_url)->toBe('https://maps.google.com/?cid=123')
         ->and($runs->firstWhere('field', 'address')?->value)->toContain('Alger')
         ->and($runs->firstWhere('field', 'currency_hint')?->value)->toBe('DZD')
         ->and($company->fresh()->phone)->toBe('+21321000000');
