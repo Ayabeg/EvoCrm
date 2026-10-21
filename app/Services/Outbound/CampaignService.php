@@ -25,6 +25,7 @@ class CampaignService
         private QuietHoursGuard $quietHours,
         private TemplateRenderer $templates,
         private MailerFactory $mailers,
+        private OutboundEligibility $eligibility,
         private CrmFilter $crmFilter,
         private ProductAnalytics $analytics,
     ) {}
@@ -73,20 +74,27 @@ class CampaignService
                 continue;
             }
 
-            OutboundMessage::query()->create([
-                'workspace_id' => $workspace->id,
-                'contact_id' => $contact->id,
-                'mailbox_id' => $campaign->mailbox_id,
-                'campaign_id' => $campaign->id,
-                'channel' => 'email',
-                'direction' => 'out',
-                'to_address' => $contact->email,
-                'subject' => $this->templates->render($campaign->subject, $contact, $workspace),
-                'body' => $this->templates->render($campaign->body, $contact, $workspace),
-                'body_html' => $this->templates->render($campaign->body_html, $contact, $workspace),
-                'status' => 'queued',
-                'idempotency_key' => "campaign:{$campaign->id}:contact:{$contact->id}",
-            ]);
+            $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
+
+            if ($eligibilityReason !== null) {
+                OutboundMessage::query()->firstOrCreate(
+                    [
+                        'workspace_id' => $workspace->id,
+                        'idempotency_key' => $this->idempotencyKey($campaign, $contact),
+                    ],
+                    $this->messageAttributes($campaign, $contact, 'failed', $eligibilityReason),
+                );
+
+                continue;
+            }
+
+            OutboundMessage::query()->firstOrCreate(
+                [
+                    'workspace_id' => $workspace->id,
+                    'idempotency_key' => $this->idempotencyKey($campaign, $contact),
+                ],
+                $this->messageAttributes($campaign, $contact),
+            );
             $queued++;
         }
 
@@ -156,10 +164,12 @@ class CampaignService
                 continue;
             }
 
-            if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
+            $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
+
+            if ($eligibilityReason !== null) {
                 $message->forceFill([
                     'status' => 'failed',
-                    'failure_reason' => 'Recipient is on the suppression list.',
+                    'failure_reason' => $eligibilityReason,
                     'deferred_until' => null,
                     'defer_reason' => null,
                 ])->save();
@@ -220,6 +230,39 @@ class CampaignService
         $this->completeFinishedCampaigns();
 
         return $totals;
+    }
+
+    private function idempotencyKey(OutboundCampaign $campaign, Contact $contact): string
+    {
+        return "campaign:{$campaign->id}:contact:{$contact->id}";
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function messageAttributes(
+        OutboundCampaign $campaign,
+        Contact $contact,
+        string $status = 'queued',
+        ?string $failureReason = null,
+    ): array {
+        $workspace = $campaign->workspace;
+
+        return [
+            'workspace_id' => $workspace->id,
+            'contact_id' => $contact->id,
+            'mailbox_id' => $campaign->mailbox_id,
+            'campaign_id' => $campaign->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $contact->email,
+            'subject' => $this->templates->render($campaign->subject, $contact, $workspace),
+            'body' => $this->templates->render($campaign->body, $contact, $workspace),
+            'body_html' => $this->templates->render($campaign->body_html, $contact, $workspace),
+            'status' => $status,
+            'failure_reason' => $failureReason,
+            'idempotency_key' => $this->idempotencyKey($campaign, $contact),
+        ];
     }
 
     /**

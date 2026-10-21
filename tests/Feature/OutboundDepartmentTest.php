@@ -169,6 +169,29 @@ it('fails a campaign message honestly when the contact is suppressed after expan
     expect($message->failure_reason)->toContain('suppression');
 });
 
+it('keeps an invalid campaign recipient visible as ineligible', function () {
+    $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
+
+    $user = User::factory()->create();
+    enabledMailbox($user);
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'not-an-email',
+    ]);
+
+    $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
+    app(CampaignService::class)->expand($campaign);
+
+    $message = OutboundMessage::query()->where('campaign_id', $campaign->id)->where('contact_id', $contact->id)->firstOrFail();
+
+    expect($message->status)->toBe('failed')
+        ->and($message->failure_reason)->toContain('invalid business email');
+
+    $this->artisan('outbound:run')->assertSuccessful();
+
+    expect($message->fresh()->status)->toBe('failed');
+});
+
 it('cancels a sending campaign and drops its queued messages', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 
