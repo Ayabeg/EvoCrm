@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'delivery_error',
     'accepted_at',
     'marketing_consent',
+    'enrichment_consent',
 ])]
 class LeadMagnetSubmission extends Model
 {
@@ -36,6 +37,7 @@ class LeadMagnetSubmission extends Model
             'attribution' => 'array',
             'accepted_at' => 'datetime',
             'marketing_consent' => 'boolean',
+            'enrichment_consent' => 'boolean',
         ];
     }
 

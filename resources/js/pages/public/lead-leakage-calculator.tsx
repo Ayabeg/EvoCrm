@@ -16,6 +16,7 @@ type Inputs = {
     email: string;
     company: string;
     marketing_consent: boolean;
+    enrichment_consent: boolean;
     utm_source: string;
     utm_medium: string;
     utm_campaign: string;
@@ -56,6 +57,7 @@ export default function LeadLeakageCalculator({
         id: number;
         contact_created: boolean;
         marketing_consent_recorded: boolean;
+        enrichment_queued: boolean;
         delivery_status: string;
         delivery_error: string | null;
     } | null;
@@ -72,6 +74,7 @@ export default function LeadLeakageCalculator({
         email: '',
         company: '',
         marketing_consent: false,
+        enrichment_consent: false,
         utm_source: '',
         utm_medium: '',
         utm_campaign: '',
@@ -151,6 +154,15 @@ export default function LeadLeakageCalculator({
                                 />
                                 <span>I want to receive relevant EvoCrm updates by email.</span>
                             </label>
+                            <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-mute">
+                                <input
+                                    type="checkbox"
+                                    checked={form.data.enrichment_consent}
+                                    onChange={(event) => form.setData('enrichment_consent', event.target.checked)}
+                                    className="mt-0.5 accent-[var(--evo-primary)]"
+                                />
+                                <span>I allow EvoCrm to enrich this business record with relevant public business information for a more useful follow-up.</span>
+                            </label>
                         </div>
 
                         <Button type="submit" disabled={form.processing} className="w-full">
@@ -181,6 +193,9 @@ export default function LeadLeakageCalculator({
                             <p className="mt-4 text-sm text-ink">
                                 Your result is linked to your EvoCrm record. {submission.marketing_consent_recorded ? 'Your separate marketing choice was recorded.' : 'No marketing subscription was added.'}
                             </p>
+                        ) : null}
+                        {submission?.enrichment_queued ? (
+                            <p className="mt-2 text-sm text-mute">Relevant public business information will be checked in the background.</p>
                         ) : null}
                         {submission?.delivery_status === 'queued' || submission?.delivery_status === 'sending' ? (
                             <p className="mt-2 text-sm text-mute">A copy is queued for the email address you provided.</p>

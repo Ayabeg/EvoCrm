@@ -30,6 +30,8 @@ The current demo-request event uses the existing funnel_events table with event_
 
 Submissions may be anonymous until the user supplies delivery details. The calculator result itself must not require unnecessary PII.
 
+Lead-magnet submissions store `marketing_consent` and `enrichment_consent` separately. The latter authorizes the optional background enrichment queue and does not imply permission for outbound marketing.
+
 ### Field provenance and verification
 
 The current `enrichment_runs` table is a candidate/evidence ledger, but the broader contract needs explicit status semantics for values used by outbound. Prefer extending it or adding a normalized field-evidence table only if existing consumers cannot safely carry:

@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\EnrichRecordJob;
 use App\Mail\LeadLeakageResultMail;
 use App\Models\Contact;
 use App\Models\ContactConsent;
@@ -9,6 +10,7 @@ use App\Models\LeadMagnetSubmission;
 use App\Models\MeetingSchedule;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 
 it('renders the workspace lead leakage calculator publicly', function () {
@@ -128,4 +130,30 @@ it('does not create a contact for an anonymous calculator use and is idempotent'
     expect(LeadMagnetSubmission::query()->where('idempotency_key', $key)->count())->toBe(1)
         ->and(Contact::query()->where('workspace_id', $workspace->id)->count())->toBe(0)
         ->and(FunnelEvent::query()->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED)->count())->toBe(1);
+});
+
+it('queues permitted public enrichment separately from marketing consent', function () {
+    Mail::fake();
+    Queue::fake();
+    $workspace = User::factory()->create()->workspace;
+
+    $this->post("/lead-magnet/{$workspace->slug}/lead-leakage-calculator", [
+        'submission_key' => (string) Str::uuid(),
+        'monthly_inquiries' => 20,
+        'average_customer_value' => 500,
+        'inquiry_to_customer_rate' => 10,
+        'missed_inquiry_rate' => 5,
+        'delayed_response_rate' => 5,
+        'follow_up_dropoff_rate' => 5,
+        'email' => 'owner@clinic-atlas.test',
+        'enrichment_consent' => true,
+        'marketing_consent' => false,
+    ])->assertOk();
+
+    $contact = Contact::query()->where('email', 'owner@clinic-atlas.test')->firstOrFail();
+
+    Queue::assertPushed(EnrichRecordJob::class, fn (EnrichRecordJob $job): bool => $job->workspaceId === $workspace->id
+        && $job->targetType === 'contact'
+        && $job->targetId === $contact->id
+    );
 });
