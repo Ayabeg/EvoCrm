@@ -12,6 +12,9 @@ export type EnrichmentRunRow = {
     value?: string | null;
     confidence: number;
     status: string;
+    verification_status?: string;
+    evidence_url?: string | null;
+    retrieved_at?: string | null;
     error?: string | null;
     created_at?: string | null;
 };
@@ -104,6 +107,11 @@ export default function EnrichmentPanel({
                                     {sourceLabel(run.source)} ·{' '}
                                     {confidenceLabel(run.confidence)}
                                 </span>
+                                {run.verification_status ? (
+                                    <span className="text-[11px] text-mute">
+                                        · {run.verification_status.replaceAll('_', ' ')}
+                                    </span>
+                                ) : null}
                             </div>
                             {run.value ? (
                                 <p className="mt-1 break-words text-[13px] text-ink">
@@ -114,6 +122,16 @@ export default function EnrichmentPanel({
                                 <p className="mt-1 text-[12px] text-mute">
                                     {run.error}
                                 </p>
+                            ) : null}
+                            {run.evidence_url ? (
+                                <a
+                                    href={run.evidence_url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="mt-1 inline-flex text-[12px] text-ink underline-offset-2 hover:underline"
+                                >
+                                    Evidence
+                                </a>
                             ) : null}
                             {run.status === 'proposed' ? (
                                 <div className="mt-2 flex flex-wrap gap-2">
