@@ -30,7 +30,7 @@
 
 ### In progress
 
-- Lead-magnet delivery/conversion completion (M3): inline result, queued result-email delivery, and the demo-request handoff are implemented; completed booking-to-pipeline analytics and optional permitted enrichment remain.
+- Lead-magnet delivery/conversion completion (M3): inline result, queued result-email delivery, demo handoff, booking-to-pipeline analytics, and explicit enrichment consent are implemented; release-level integration and security review remain.
 - Shared provenance/verification/eligibility contract (A3, E1, O1).
 - Campaign audience policy for uncertain email states and provider-level delivery/idempotency verification remain for O1/O2; current local idempotency protects stable message creation, while live provider event semantics remain environment-dependent.
 - Exact gap analysis of existing enrichment, outbound eligibility, and lead-capture flows before adding migrations.
@@ -46,5 +46,5 @@
 
 ### Next verified task
 
-Expose the persisted data-quality score to prospect selection and finish the remaining enrichment operator surface, while keeping live-provider work blocked until credentials are configured.
+Finish provider-limit/retry controls and the remaining outbound/data-maintenance integration gates, while keeping live-provider work blocked until credentials are configured.
 
