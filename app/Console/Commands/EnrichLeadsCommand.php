@@ -17,6 +17,7 @@ class EnrichLeadsCommand extends Command
         {--id= : Specific record id}
         {--workspace= : Limit to one workspace id}
         {--limit=50 : Max records to queue per type}
+        {--stale-hours=168 : Only queue records without a recent successful/proposed enrichment}
         {--sync : Run inline instead of dispatching EnrichRecordJob}';
 
     protected $description = 'Queue first-party website + Google Places enrichment (E1). Nightly graph can call this.';
@@ -27,6 +28,7 @@ class EnrichLeadsCommand extends Command
         $id = $this->option('id');
         $workspaceId = $this->option('workspace');
         $limit = max(1, (int) $this->option('limit'));
+        $staleHours = max(0, (int) $this->option('stale-hours'));
         $sync = (bool) $this->option('sync');
 
         $types = $type === 'all'
@@ -42,7 +44,7 @@ class EnrichLeadsCommand extends Command
                 return self::FAILURE;
             }
 
-            foreach ($this->records($targetType, $workspaceId, $id, $limit) as $record) {
+            foreach ($this->records($targetType, $workspaceId, $id, $limit, $staleHours) as $record) {
                 $workspace = Workspace::query()->find($record->workspace_id);
 
                 if (! $workspace instanceof Workspace) {
@@ -67,7 +69,7 @@ class EnrichLeadsCommand extends Command
     /**
      * @return list<Company|Contact|Lead>
      */
-    private function records(string $type, mixed $workspaceId, mixed $id, int $limit): array
+    private function records(string $type, mixed $workspaceId, mixed $id, int $limit, int $staleHours): array
     {
         $query = match ($type) {
             EnrichmentRun::TARGET_CONTACT => Contact::query(),
@@ -82,6 +84,22 @@ class EnrichLeadsCommand extends Command
         if (filled($id)) {
             $query->where('id', (int) $id);
         }
+
+        $cutoff = now()->subHours($staleHours);
+        $table = $query->getModel()->getTable();
+        $targetType = $type;
+        $query->whereNotExists(function ($recent) use ($targetType, $cutoff, $table): void {
+            $recent->selectRaw('1')
+                ->from('enrichment_runs as recent_enrichment')
+                ->whereColumn('recent_enrichment.target_id', "{$table}.id")
+                ->where('recent_enrichment.target_type', $targetType)
+                ->where('recent_enrichment.created_at', '>=', $cutoff)
+                ->whereIn('recent_enrichment.status', [
+                    EnrichmentRun::STATUS_QUEUED,
+                    EnrichmentRun::STATUS_PROPOSED,
+                    EnrichmentRun::STATUS_APPLIED,
+                ]);
+        });
 
         return array_values($query->latest('id')->limit($limit)->get()->all());
     }

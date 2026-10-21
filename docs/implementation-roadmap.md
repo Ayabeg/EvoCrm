@@ -28,7 +28,7 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 | M3 | Lead-magnet delivery, CRM integration, and conversion path | **in progress** | M2, O1 | Submission creates/updates shared records, records attribution and offer event, optionally queues a result copy with honest delivery state, presents demo CTA, records attributed booking analytics, and never auto-enrolls cold outreach without consent | M |
 | I1 | End-to-end outbound workflow | planned | E3, O3 | Import → enrich → verify → score → select → preview → activate → send → event/reply → pipeline is integration-tested | L |
 | I2 | End-to-end inbound workflow | **in progress** | M3, E3 | Visit → use → submit → consent → shared record → permitted enrichment → delivery → demo request → analytics is integration-tested | M |
-| I3 | Data maintenance workflow | planned | E3, O1, A3 | Stale records can be refreshed without replacing stronger evidence or reintroducing suppressed contacts | M |
+| I3 | Data maintenance workflow | **in progress** | E3, O1, A3 | Stale records can be refreshed without replacing stronger evidence or reintroducing suppressed contacts | M |
 | Q1 | Security, privacy, and abuse review | planned | E3, O2, M3 | Authorization, validation, rate limits, secrets, PII logging, webhooks, XSS/SQLi protections, and suppression behavior reviewed with tests | M |
 | Q2 | Release readiness and operating documentation | planned | I1, I2, I3, Q1 | Run/test/configure/operate docs, migrations, external dependency blockers, and final verification report are current | M |
 
@@ -48,5 +48,6 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 - **No fabricated evidence:** unavailable enrichment fields remain unknown; estimates in the calculator are explicitly user-provided assumptions.
 - **Provider semantics:** acceptance by a mail API is not delivery; catch-all and unknown email results remain conservative.
 - **Enrichment queueing:** bulk queueing is capped at 100 IDs per request, workspace-scoped, deduplicated by workspace/target type/record ID, rate-limited per workspace, protected against concurrent duplicate execution, and retryable from failed record history. Broader provider coverage remains open.
+- **Scheduled maintenance:** `leads:enrich` now defaults to a seven-day freshness window and excludes records with a recent queued, proposed, or applied run; the window is configurable with `--stale-hours` and remains workspace-scoped.
 - **Quality-based selection:** contact segments and campaign saved filters can now require a minimum persisted lead data-quality score; broader duplicate review and provider-backed verification remain open.
 

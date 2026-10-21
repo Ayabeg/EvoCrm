@@ -298,6 +298,32 @@ it('queues EnrichRecordJob from the record Enrich action and from leads:enrich',
     Queue::assertPushed(EnrichRecordJob::class, 3);
 });
 
+it('queues only stale records during scheduled enrichment maintenance', function () {
+    Queue::fake();
+    $user = User::factory()->create();
+    $fresh = Company::factory()->create(['workspace_id' => $user->workspace_id]);
+    $stale = Company::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    EnrichmentRun::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'target_type' => EnrichmentRun::TARGET_COMPANY,
+        'target_id' => $fresh->id,
+        'status' => EnrichmentRun::STATUS_APPLIED,
+        'created_at' => now()->subHours(2),
+    ]);
+
+    $this->artisan('leads:enrich', [
+        '--type' => 'company',
+        '--workspace' => $user->workspace_id,
+        '--stale-hours' => 24,
+        '--limit' => 10,
+    ])->assertSuccessful();
+
+    Queue::assertPushed(EnrichRecordJob::class, 1);
+    Queue::assertPushed(EnrichRecordJob::class, fn (EnrichRecordJob $job): bool => $job->targetType === EnrichmentRun::TARGET_COMPANY && $job->targetId === $stale->id
+    );
+});
+
 it('lets an operator retry a failed enrichment run in the same workspace', function () {
     Queue::fake();
 

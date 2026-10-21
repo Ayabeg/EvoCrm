@@ -29,6 +29,7 @@
 - Added non-sending campaign previews with eligible/ineligible counts, explicit reasons, and a five-contact personalized sample. Outbound page/regression coverage passes 22 tests / 221 assertions; changed PHP passes Pint and the frontend type/lint checks pass.
 - Hardened enrichment jobs with workspace-scoped rate limiting, duplicate overlap protection, bounded retry behavior, and the canonical Google Maps field mask; enrichment/bulk coverage passes 12 tests / 104 assertions.
 - Added a workspace-scoped Retry action for failed enrichment history rows; the focused enrichment/bulk suite passes 13 tests / 108 assertions and the changed panel passes ESLint.
+- Added stale-record selection to scheduled enrichment maintenance: `leads:enrich` defaults to seven days, excludes recent queued/proposed/applied runs, and supports an explicit `--stale-hours` window. The enrichment suite passes 12 tests / 106 assertions for this maintenance boundary.
 - Repository-wide `php artisan test --compact` was run after the acquisition changes and remains non-zero on pre-existing UI/source-contract failures, including `tests/Feature/P04AppShellTest.php:59`, which still expects the literal `Search EvoCRM` shell text while the current shell renders the translated `Search` label. These failures are outside the acquisition-system files. Acquisition-focused suites remain green, and the two existing InvalidArgumentException import warnings are unchanged.
 
 ### In progress
@@ -40,6 +41,7 @@
 - Enrichment orchestration (E3): the existing per-record actions now share a capped workspace-scoped bulk queue endpoint and Contacts exposes a Queue enrichment action for selected records. EnrichRecordJob is unique per workspace/target/type, retries transient failures up to three times with bounded backoff, and the focused suite passes 11 tests / 97 assertions.
 - Lead-magnet booking attribution (M3): the demo handoff now carries a same-workspace submission reference into the existing public booking form, and MeetingBooker records one meeting_booked funnel event with contact/lead/deal links and lead-magnet source attribution. Focused meeting/lead-magnet coverage passes 16 tests / 158 assertions.
 - End-to-end inbound workflow (I2) is now covered from calculator submission through shared Contact/Lead creation, queued result delivery, demo handoff, booking, and lead-magnet funnel analytics.
+- Data maintenance (I3) is in progress: the scheduled enrichment command now has a tested stale-record boundary; stronger evidence preservation and suppression-safe outbound behavior remain under integration review.
 - Latest combined acquisition regression pass: 51 tests / 387 assertions passed across inbound workflow, lead-magnet delivery/conversion, funnel analytics, enrichment, and outbound campaign/sequence execution.
 
 ### Blocked
