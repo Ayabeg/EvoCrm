@@ -22,6 +22,7 @@
 - Added shared outbound eligibility checks and workspace-scoped message idempotency keys for sequence steps and campaigns. The focused outbound regression set passes 38 tests / 195 assertions.
 - Connected enrichment email verification to outbound eligibility: verification provenance is projected onto contact metadata, unsafe invalid/temporary/unsupported results are not auto-applied, catch-all and unknown policies are explicit, and the focused enrichment/outbound set passes 21 tests / 131 assertions.
 - Added an explainable `DataQualityScorer` and persisted `lead_scores.data_quality` without changing the existing qualification formula. The combined lead-score/enrichment/outbound regression set passes 49 tests / 326 assertions; the score breakdown records quality factors for later prospect selection.
+- Exposed the persisted quality score in the lead score payload and shared lead-list pill, with the targeted ESLint and TypeScript checks passing.
 - Repository-wide `php artisan test --compact` was run after the acquisition changes and remains non-zero on pre-existing UI/source-contract failures, including `tests/Feature/P04AppShellTest.php:59`, which still expects the literal `Search EvoCRM` shell text while the current shell renders the translated `Search` label. These failures are outside the acquisition-system files. Acquisition-focused suites remain green, and the two existing InvalidArgumentException import warnings are unchanged.
 
 ### In progress

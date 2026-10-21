@@ -29,7 +29,11 @@ export type LeadListRow = {
     status?: string | null;
     score?: number | null;
     contact?: { first_name?: string; last_name?: string | null } | null;
-    latest_score?: { score: number; reason?: string | null } | null;
+    latest_score?: {
+        score: number;
+        data_quality?: number;
+        reason?: string | null;
+    } | null;
 };
 
 export function leadRowHref(row: { id: number | string }): string {
@@ -143,11 +147,13 @@ function finiteLeadScore(value: number | null | undefined): number | null {
  */
 export function leadScorePayload(row: LeadListRow): {
     score: number;
+    data_quality?: number;
     reason?: string | null;
 } | null {
     if (row.latest_score) {
         return {
             score: finiteLeadScore(row.score) ?? row.latest_score.score,
+            data_quality: row.latest_score.data_quality,
             reason: row.latest_score.reason,
         };
     }
