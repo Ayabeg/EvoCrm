@@ -4,7 +4,10 @@ use App\Mail\MeetingBookedMail;
 use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\FunnelEvent;
 use App\Models\Integration;
+use App\Models\LeadMagnetOffer;
+use App\Models\LeadMagnetSubmission;
 use App\Models\MeetingSchedule;
 use App\Models\User;
 use App\Models\Workflow;
@@ -12,6 +15,7 @@ use App\Services\Connectors\FakeGoogleApiClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 beforeEach(function () {
     app(FakeGoogleApiClient::class)->reset();
@@ -161,6 +165,36 @@ it('books a meeting onto the contact timeline, calendar, and confirmation mail',
     $this->get('/book/'.$schedule->slug)
         ->assertOk()
         ->assertInertia(fn ($page) => $page->where('days.0.slots.0.label', '09:30'));
+});
+
+it('records a lead-magnet meeting booking in the conversion funnel', function () {
+    $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
+    Mail::fake();
+
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+    $offer = LeadMagnetOffer::query()
+        ->where('workspace_id', $user->workspace_id)
+        ->where('slug', 'lead-leakage-calculator')
+        ->firstOrFail();
+    $submission = LeadMagnetSubmission::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'lead_magnet_offer_id' => $offer->id,
+        'idempotency_key' => (string) Str::uuid(),
+        'assumptions' => ['monthly_inquiries' => 10],
+        'result' => ['revenue_at_risk' => 1000],
+        'delivery_status' => 'inline',
+    ]);
+
+    $this->post('/book/'.$schedule->slug, bookPayload([
+        'lead_magnet_submission_id' => $submission->id,
+    ]))->assertRedirect();
+
+    expect(FunnelEvent::query()
+        ->where('event_type', FunnelEvent::TYPE_MEETING_BOOKED)
+        ->where('source', 'lead_magnet')
+        ->whereJsonContains('meta->lead_magnet_submission_id', $submission->id)
+        ->exists())->toBeTrue();
 });
 
 it('links an optional deal and refuses a taken slot or a missing phone', function () {

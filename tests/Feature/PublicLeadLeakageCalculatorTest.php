@@ -50,12 +50,18 @@ it('offers the configured booking flow and records a deduplicated demo request',
     $this->get(route('lead-magnet.demo', [
         'workspace' => $user->workspace->slug,
         'submission' => $submission->id,
-    ]))->assertRedirect(route('meetings.public.show', $schedule->slug));
+    ]))->assertRedirect(route('meetings.public.show', [
+        'slug' => $schedule->slug,
+        'lead_magnet_submission_id' => $submission->id,
+    ]));
 
     $this->get(route('lead-magnet.demo', [
         'workspace' => $user->workspace->slug,
         'submission' => $submission->id,
-    ]))->assertRedirect(route('meetings.public.show', $schedule->slug));
+    ]))->assertRedirect(route('meetings.public.show', [
+        'slug' => $schedule->slug,
+        'lead_magnet_submission_id' => $submission->id,
+    ]));
 
     expect(FunnelEvent::query()
         ->where('event_type', FunnelEvent::TYPE_DEMO_REQUESTED)
