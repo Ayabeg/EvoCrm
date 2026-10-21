@@ -72,6 +72,12 @@ class EnrichmentRun extends Model
 
     public const VERIFICATION_INVALID = 'invalid';
 
+    public const VERIFICATION_CATCH_ALL = 'catch_all';
+
+    public const VERIFICATION_TEMPORARY_FAILURE = 'temporary_failure';
+
+    public const VERIFICATION_UNSUPPORTED = 'unsupported';
+
     public const HIGH_CONFIDENCE = 0.85;
 
     /**

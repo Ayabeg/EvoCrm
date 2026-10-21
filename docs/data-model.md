@@ -42,6 +42,8 @@ The current `enrichment_runs` table is a candidate/evidence ledger, but the broa
 - confidence/evidence strength;
 - decision (`accepted`, `rejected`, `needs_review`) and reason.
 
+For email fields, the latest run also projects status, source, evidence URL, retrieval time, confidence, and run ID onto `contacts.meta.email_verification` so outbound eligibility consumes the same provenance without a competing verification table.
+
 ### Eligibility and suppression
 
 Use the existing suppression tables and consent records as the enforcement source. If an audit record is needed, record the decision reason and policy version in the outbound enrollment/message or activity/event record; do not create a second suppression list.

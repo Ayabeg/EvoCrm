@@ -86,6 +86,11 @@ return [
         'ends_at' => env('EVOSALES_QUIET_END', '08:00'),
     ],
 
+    'outbound' => [
+        'block_catch_all' => env('EVOSALES_BLOCK_CATCH_ALL_EMAIL', true),
+        'block_unknown_verification' => env('EVOSALES_BLOCK_UNKNOWN_EMAIL', false),
+    ],
+
     'roles' => ['owner', 'admin', 'member'],
 
     'cities' => [

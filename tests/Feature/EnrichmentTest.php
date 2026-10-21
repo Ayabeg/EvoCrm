@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Models\User;
+use App\Services\Enrichment\EnrichmentPersister;
 use App\Services\Enrichment\EnrichmentService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -154,6 +155,33 @@ it('does not overwrite a human-set field silently', function () {
         ->and($emailRun->status)->toBe(EnrichmentRun::STATUS_PROPOSED);
 });
 
+it('records email verification provenance on the shared contact and avoids auto-applying unsafe states', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => null,
+    ]);
+
+    $run = app(EnrichmentPersister::class)->persistProposal(
+        $user->workspace,
+        EnrichmentRun::TARGET_CONTACT,
+        $contact,
+        EnrichmentRun::SOURCE_WEBSITE,
+        'email',
+        'invalid@clinic-atlas.dz',
+        0.98,
+        ['url' => 'https://clinic-atlas.dz/contact'],
+        EnrichmentRun::VERIFICATION_INVALID,
+    );
+
+    expect($run->status)->toBe(EnrichmentRun::STATUS_PROPOSED)
+        ->and($contact->fresh()->email)->toBeNull()
+        ->and(data_get($contact->fresh()->meta, 'email_verification.status'))
+        ->toBe(EnrichmentRun::VERIFICATION_INVALID)
+        ->and(data_get($contact->fresh()->meta, 'email_verification.run_id'))
+        ->toBe($run->id);
+});
+
 it('applies and dismisses proposed enrichment runs', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create([
@@ -250,7 +278,8 @@ it('queues EnrichRecordJob from the record Enrich action and from leads:enrich',
         '--limit' => 10,
     ])->assertSuccessful();
 
-    Queue::assertPushed(EnrichRecordJob::class, 6);
+    // The unique job contract collapses duplicate requests for the same record.
+    Queue::assertPushed(EnrichRecordJob::class, 3);
 });
 
 it('exposes enrichment history on lead, contact, and company show pages', function () {

@@ -45,6 +45,8 @@ Use provider adapters and the existing `EnrichmentService`, `WebsiteEnricher`, `
 
 Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `SuppressionService`, `QuietHoursGuard`, `MailerFactory`, `ImapReplyPoller`, bounce processing, tracking, and scheduler. Add missing eligibility/last-mile checks at the service boundary used by both campaign and sequence paths.
 
+Email verification provenance is projected from an `EnrichmentRun` onto the related contact's `meta.email_verification` record. Invalid, temporary-failure, and unsupported results are never auto-applied to an empty email field; catch-all and unknown states are governed by explicit outbound configuration.
+
 ### Dead Magnet
 
 Keep calculator math as a pure domain service with no HTTP or Eloquent dependencies. Persist the offer/submission/assumption result separately from the shared contact/lead record, then record attribution and consent using the existing CRM conventions. Delivery is transactional and separately observable from optional marketing eligibility.

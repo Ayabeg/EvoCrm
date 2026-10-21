@@ -33,6 +33,7 @@ class EnrichmentPersister
         ?Carbon $retrievedAt = null,
     ): EnrichmentRun {
         $value = $this->normalizeValue($field, $value);
+        $verificationStatus = $this->normalizeVerificationStatus($verificationStatus);
 
         $duplicate = EnrichmentRun::query()
             ->forWorkspace($workspace)
@@ -56,15 +57,18 @@ class EnrichmentPersister
         $occupied = $this->currentValue($target, $field) !== null;
         $status = EnrichmentRun::STATUS_PROPOSED;
 
-        if (! $occupied && $confidence >= EnrichmentRun::HIGH_CONFIDENCE) {
+        $safeToAutoApply = $field !== 'email' || in_array($verificationStatus, [
+            EnrichmentRun::VERIFICATION_VERIFIED,
+            EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED,
+        ], true);
+
+        if (! $occupied && $safeToAutoApply && $confidence >= EnrichmentRun::HIGH_CONFIDENCE) {
             if ($this->writeField($target, $field, $value, force: false)) {
                 $status = EnrichmentRun::STATUS_APPLIED;
             }
         }
 
-        $verificationStatus = $this->normalizeVerificationStatus($verificationStatus);
-
-        return EnrichmentRun::query()->create([
+        $run = EnrichmentRun::query()->create([
             'workspace_id' => $workspace->id,
             'target_type' => $targetType,
             'target_id' => $target->id,
@@ -79,6 +83,12 @@ class EnrichmentPersister
             'retrieved_at' => $retrievedAt ?? now(),
             'verified_at' => $verificationStatus === EnrichmentRun::VERIFICATION_VERIFIED ? ($retrievedAt ?? now()) : null,
         ]);
+
+        if ($field === 'email') {
+            $this->recordEmailVerification($target, $run);
+        }
+
+        return $run;
     }
 
     /**
@@ -163,7 +173,30 @@ class EnrichmentPersister
             EnrichmentRun::VERIFICATION_NOT_DETECTED,
             EnrichmentRun::VERIFICATION_CONFLICTING,
             EnrichmentRun::VERIFICATION_INVALID,
+            EnrichmentRun::VERIFICATION_CATCH_ALL,
+            EnrichmentRun::VERIFICATION_TEMPORARY_FAILURE,
+            EnrichmentRun::VERIFICATION_UNSUPPORTED,
         ], true) ? $status : EnrichmentRun::VERIFICATION_UNKNOWN;
+    }
+
+    private function recordEmailVerification(Company|Contact|Lead $target, EnrichmentRun $run): void
+    {
+        $contact = $this->relatedContact($target);
+
+        if (! $contact instanceof Contact) {
+            return;
+        }
+
+        $meta = $this->bag($contact->getAttribute('meta'));
+        $meta['email_verification'] = [
+            'status' => $run->verification_status,
+            'source' => $run->source,
+            'evidence_url' => $run->evidence_url,
+            'retrieved_at' => $run->retrieved_at?->toIso8601String(),
+            'confidence' => (float) $run->confidence,
+            'run_id' => $run->id,
+        ];
+        $contact->forceFill(['meta' => $meta])->save();
     }
 
     public function currentValue(Company|Contact|Lead $target, string $field): ?string

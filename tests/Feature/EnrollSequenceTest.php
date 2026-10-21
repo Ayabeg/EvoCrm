@@ -56,6 +56,22 @@ it('refuses to enroll an email sequence without a usable business email', functi
         ->toThrow(ValidationException::class, 'invalid business email');
 });
 
+it('refuses to enroll a contact with a catch-all verification result by default', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'catch-all@clinic.dz',
+        'meta' => ['email_verification' => ['status' => 'catch_all']],
+    ]);
+    $sequence = Sequence::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'channel' => 'email',
+    ]);
+
+    expect(fn () => app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact))
+        ->toThrow(ValidationException::class, 'catch-all');
+});
+
 it('refuses a second active sequence on the same channel', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);

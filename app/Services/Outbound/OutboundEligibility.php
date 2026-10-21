@@ -43,8 +43,20 @@ final class OutboundEligibility
             }
 
             $verificationStatus = data_get($contact->meta, 'email_verification.status');
-            if ($verificationStatus === 'invalid') {
-                return 'Contact email verification marked this address invalid.';
+            if (in_array($verificationStatus, ['invalid', 'temporary_failure', 'unsupported'], true)) {
+                return match ($verificationStatus) {
+                    'temporary_failure' => 'Contact email verification is temporarily unavailable.',
+                    'unsupported' => 'Contact email verification is unsupported for this address.',
+                    default => 'Contact email verification marked this address invalid.',
+                };
+            }
+
+            if ($verificationStatus === 'catch_all' && config('evosales.outbound.block_catch_all', true)) {
+                return 'Contact email verification marked this address catch-all.';
+            }
+
+            if ($verificationStatus === 'unknown' && config('evosales.outbound.block_unknown_verification', false)) {
+                return 'Contact email verification is unknown.';
             }
         }
 
