@@ -11,6 +11,7 @@ use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\CrmFilter;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Broadcast campaigns — the newsletter path. A campaign targets a CRM
@@ -48,6 +49,49 @@ class CampaignService
         }
 
         return $query->orderBy('id')->get();
+    }
+
+    /**
+     * Preview a campaign without creating messages or sending anything.
+     *
+     * @return array{audience_count: int, eligible_count: int, ineligible_count: int, reasons: array<string, int>, sample: list<array<string, mixed>>}
+     */
+    public function preview(OutboundCampaign $campaign): array
+    {
+        $workspace = $campaign->workspace;
+        $audience = $this->audience($workspace, $campaign->savedFilter);
+        $reasons = [];
+        $eligible = 0;
+        $sample = [];
+
+        foreach ($audience as $contact) {
+            $reason = $this->eligibility->reason($workspace, $contact, 'email');
+
+            if ($reason === null) {
+                $eligible++;
+            } else {
+                $reasons[$reason] = ($reasons[$reason] ?? 0) + 1;
+            }
+
+            if (count($sample) < 5) {
+                $sample[] = [
+                    'contact_id' => $contact->id,
+                    'email' => $contact->email,
+                    'eligible' => $reason === null,
+                    'reason' => $reason,
+                    'subject' => $this->templates->render($campaign->subject, $contact, $workspace),
+                    'body_preview' => Str::limit(strip_tags((string) $this->templates->render($campaign->body, $contact, $workspace)), 180),
+                ];
+            }
+        }
+
+        return [
+            'audience_count' => $audience->count(),
+            'eligible_count' => $eligible,
+            'ineligible_count' => $audience->count() - $eligible,
+            'reasons' => $reasons,
+            'sample' => $sample,
+        ];
     }
 
     /**

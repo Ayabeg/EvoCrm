@@ -119,7 +119,7 @@ class CampaignController extends Controller
         return redirect()->route('outbound.campaigns.show', $campaign);
     }
 
-    public function show(Request $request, OutboundCampaign $campaign): Response
+    public function show(Request $request, OutboundCampaign $campaign, CampaignService $campaigns): Response
     {
         abort_unless((int) $campaign->workspace_id === (int) $request->user()->workspace_id, 404);
 
@@ -128,6 +128,7 @@ class CampaignController extends Controller
                 ...$campaign->load(['savedFilter:id,name', 'template:id,name', 'mailbox:id,name,from_address'])->toArray(),
                 'counts' => $campaign->messageCounts(),
             ],
+            'preview' => $campaign->editable() ? $campaigns->preview($campaign) : null,
             'messages' => OutboundMessage::query()
                 ->where('campaign_id', $campaign->id)
                 ->where('direction', 'out')

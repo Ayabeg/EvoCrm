@@ -45,6 +45,22 @@ export type CampaignRow = {
 export type CampaignDetail = CampaignRow & {
     body: string;
     started_at?: string | null;
+    preview?: CampaignPreview | null;
+};
+
+export type CampaignPreview = {
+    audience_count: number;
+    eligible_count: number;
+    ineligible_count: number;
+    reasons: Record<string, number>;
+    sample: {
+        contact_id: number | string;
+        email: string | null;
+        eligible: boolean;
+        reason: string | null;
+        subject: string | null;
+        body_preview: string;
+    }[];
 };
 
 export type OutboundMessageRow = {

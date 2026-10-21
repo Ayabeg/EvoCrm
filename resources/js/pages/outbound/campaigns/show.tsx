@@ -85,6 +85,31 @@ export default function CampaignShow({
                         ) : null
                     }
                 />
+                {campaign.preview ? (
+                    <OutboundSection title={t('Audience preview')}>
+                        <div className="grid gap-3 sm:grid-cols-3">
+                            <PreviewMetric label={t('Audience')} value={campaign.preview.audience_count} />
+                            <PreviewMetric label={t('Eligible')} value={campaign.preview.eligible_count} />
+                            <PreviewMetric label={t('Needs attention')} value={campaign.preview.ineligible_count} />
+                        </div>
+                        {campaign.preview.sample.length ? (
+                            <div className="mt-4 space-y-2">
+                                {campaign.preview.sample.map((row) => (
+                                    <div key={row.contact_id} className="rounded-lg border border-[var(--evo-hairline)] px-3 py-2 text-[12px]">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span className="truncate font-medium">{row.email ?? t('No email')}</span>
+                                            <span className={row.eligible ? 'text-emerald-700' : 'text-red-700'}>
+                                                {row.eligible ? t('Eligible') : t('Excluded')}
+                                            </span>
+                                        </div>
+                                        <p className="mt-1 truncate text-[var(--evo-ink-muted)]">{row.subject ?? '—'}</p>
+                                        {!row.eligible && row.reason ? <p className="mt-1 text-red-700">{row.reason}</p> : null}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : null}
+                    </OutboundSection>
+                ) : null}
             </OutboundPage>
         </OutboundShell>
     );
@@ -96,3 +121,12 @@ CampaignShow.layout = {
         { title: t('Campaign'), href: '#' },
     ],
 };
+
+function PreviewMetric({ label, value }: { label: string; value: number }) {
+    return (
+        <div className="rounded-lg border border-[var(--evo-hairline)] px-3 py-2">
+            <p className="text-[11px] text-[var(--evo-ink-muted)]">{label}</p>
+            <p className="mt-1 text-lg font-semibold">{value}</p>
+        </div>
+    );
+}

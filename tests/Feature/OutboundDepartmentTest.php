@@ -192,6 +192,26 @@ it('keeps an invalid campaign recipient visible as ineligible', function () {
     expect($message->fresh()->status)->toBe('failed');
 });
 
+it('previews campaign eligibility without materializing or sending messages', function () {
+    $user = User::factory()->create();
+    $eligible = Contact::factory()->create(['workspace_id' => $user->workspace_id, 'email' => 'ok@clinic.dz']);
+    $invalid = Contact::factory()->create(['workspace_id' => $user->workspace_id, 'email' => 'not-an-email']);
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'subject' => 'Hello {{first_name}}',
+        'body' => 'Body for {{first_name}}',
+    ]);
+
+    $preview = app(CampaignService::class)->preview($campaign);
+
+    expect($preview['audience_count'])->toBe(2)
+        ->and($preview['eligible_count'])->toBe(1)
+        ->and($preview['ineligible_count'])->toBe(1)
+        ->and($preview['sample'][0]['subject'])->toContain('Hello')
+        ->and(OutboundMessage::query()->where('campaign_id', $campaign->id)->count())->toBe(0)
+        ->and($eligible->id)->toBeInt();
+});
+
 it('cancels a sending campaign and drops its queued messages', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 
