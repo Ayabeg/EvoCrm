@@ -133,6 +133,27 @@ export default function EnrichmentPanel({
                                     Evidence
                                 </a>
                             ) : null}
+                            {run.status === 'failed' ? (
+                                <div className="mt-2">
+                                    <Form
+                                        action={`/crm/enrichment-runs/${run.id}/retry`}
+                                        method="post"
+                                        options={{ preserveScroll: true }}
+                                    >
+                                        {({ processing }) => (
+                                            <Button
+                                                type="submit"
+                                                size="sm"
+                                                variant="outline"
+                                                className="h-7"
+                                                disabled={processing}
+                                            >
+                                                Retry
+                                            </Button>
+                                        )}
+                                    </Form>
+                                </div>
+                            ) : null}
                             {run.status === 'proposed' ? (
                                 <div className="mt-2 flex flex-wrap gap-2">
                                     <Form

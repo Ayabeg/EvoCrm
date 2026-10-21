@@ -28,6 +28,7 @@
 - Added a separate lead-magnet enrichment-consent flag and queued contact enrichment only for explicit opt-in submissions. The public calculator suite passes 5 tests / 55 assertions; ESLint and TypeScript checks pass.
 - Added non-sending campaign previews with eligible/ineligible counts, explicit reasons, and a five-contact personalized sample. Outbound page/regression coverage passes 22 tests / 221 assertions; changed PHP passes Pint and the frontend type/lint checks pass.
 - Hardened enrichment jobs with workspace-scoped rate limiting, duplicate overlap protection, bounded retry behavior, and the canonical Google Maps field mask; enrichment/bulk coverage passes 12 tests / 104 assertions.
+- Added a workspace-scoped Retry action for failed enrichment history rows; the focused enrichment/bulk suite passes 13 tests / 108 assertions and the changed panel passes ESLint.
 - Repository-wide `php artisan test --compact` was run after the acquisition changes and remains non-zero on pre-existing UI/source-contract failures, including `tests/Feature/P04AppShellTest.php:59`, which still expects the literal `Search EvoCRM` shell text while the current shell renders the translated `Search` label. These failures are outside the acquisition-system files. Acquisition-focused suites remain green, and the two existing InvalidArgumentException import warnings are unchanged.
 
 ### In progress

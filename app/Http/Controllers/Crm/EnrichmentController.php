@@ -91,4 +91,23 @@ class EnrichmentController extends Controller
 
         return back();
     }
+
+    public function retry(Request $request, EnrichmentRun $run, EnrichmentService $enrichment): RedirectResponse
+    {
+        abort_unless((int) $run->workspace_id === (int) $request->user()->workspace_id, 404);
+        abort_unless($run->status === EnrichmentRun::STATUS_FAILED, 404);
+        abort_unless($enrichment->resolve(
+            $request->user()->workspace,
+            $run->target_type,
+            (int) $run->target_id,
+        ), 404);
+
+        $enrichment->queue(
+            $request->user()->workspace,
+            $run->target_type,
+            (int) $run->target_id,
+        );
+
+        return back()->with('status', 'Queued enrichment retry.');
+    }
 }

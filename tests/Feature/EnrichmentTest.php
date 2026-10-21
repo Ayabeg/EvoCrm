@@ -298,6 +298,34 @@ it('queues EnrichRecordJob from the record Enrich action and from leads:enrich',
     Queue::assertPushed(EnrichRecordJob::class, 3);
 });
 
+it('lets an operator retry a failed enrichment run in the same workspace', function () {
+    Queue::fake();
+
+    $user = User::factory()->create();
+    $company = Company::factory()->create(['workspace_id' => $user->workspace_id]);
+    $run = EnrichmentRun::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'target_type' => EnrichmentRun::TARGET_COMPANY,
+        'target_id' => $company->id,
+        'source' => EnrichmentRun::SOURCE_WEBSITE,
+        'field' => 'url',
+        'status' => EnrichmentRun::STATUS_FAILED,
+        'error' => 'Website returned HTTP 503.',
+    ]);
+
+    $this->actingAs($user)
+        ->from("/crm/companies/{$company->id}")
+        ->post("/crm/enrichment-runs/{$run->id}/retry")
+        ->assertRedirect("/crm/companies/{$company->id}")
+        ->assertSessionHas('status', 'Queued enrichment retry.');
+
+    Queue::assertPushed(EnrichRecordJob::class, function (EnrichRecordJob $job) use ($user, $company): bool {
+        return $job->workspaceId === $user->workspace_id
+            && $job->targetType === EnrichmentRun::TARGET_COMPANY
+            && $job->targetId === $company->id;
+    });
+});
+
 it('exposes enrichment history on lead, contact, and company show pages', function () {
     $user = User::factory()->create();
     $company = Company::factory()->create(['workspace_id' => $user->workspace_id, 'name' => 'Clinique Atlas']);

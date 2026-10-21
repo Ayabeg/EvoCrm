@@ -319,6 +319,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::post('/crm/enrichment/bulk', [EnrichmentController::class, 'bulk'])->name('crm.enrichment.bulk');
     Route::post('/crm/enrichment-runs/{run}/apply', [EnrichmentController::class, 'apply'])->name('crm.enrichment.apply');
     Route::post('/crm/enrichment-runs/{run}/dismiss', [EnrichmentController::class, 'dismiss'])->name('crm.enrichment.dismiss');
+    Route::post('/crm/enrichment-runs/{run}/retry', [EnrichmentController::class, 'retry'])->name('crm.enrichment.retry');
 
     Route::get('/crm/deals/export', [DealController::class, 'export'])->name('crm.deals.export');
     Route::get('/crm/deals/import', [DealImportController::class, 'create'])->name('crm.deals.import');
