@@ -12,11 +12,14 @@
 - Created the required roadmap, architecture, data-model, progress-log, and testing/acceptance documents.
 - Implemented and verified `LeadLeakageCalculator`, a pure sequential calculator using only user-provided assumptions; focused Pest suite passes 6 tests / 21 assertions and Pint passes.
 - Implemented and verified the public workspace-scoped lead-magnet route, offer/submission schema, duplicate-safe persistence, shared Contact/Lead creation through the existing capture deduper, optional marketing consent, and funnel attribution. Focused feature suite passes 3 tests / 35 assertions; targeted ESLint, TypeScript, Pint, and Vite build pass.
+- The working tree also contains a concurrent, uncommitted lead-magnet delivery slice (`DeliverLeadMagnetSubmission`, result mail, delivery state migration/status props). It was preserved, its malformed migration imports were corrected in place, and the combined lead-magnet feature test now verifies queued result email acceptance honestly.
+- Added shared outbound eligibility checks and workspace-scoped message idempotency keys for sequence steps and campaigns. The focused outbound regression set passes 38 tests / 195 assertions.
 
 ### In progress
 
-- Lead-magnet delivery/conversion completion (M3): inline result works; email delivery and a configured demo-request destination remain to be added.
+- Lead-magnet delivery/conversion completion (M3): inline result and an uncommitted queued result-email slice are present; a configured demo-request destination remains to be added and the delivery slice needs ownership/commit integration.
 - Shared provenance/verification/eligibility contract (A3, E1, O1).
+- Campaign audience policy and provider-level delivery/idempotency verification remain for O1/O2; current local idempotency protects stable message creation, while live provider event semantics remain environment-dependent.
 - Exact gap analysis of existing enrichment, outbound eligibility, and lead-capture flows before adding migrations.
 
 ### Blocked

@@ -72,6 +72,9 @@ it('persists website and places runs with confidence and auto-applies empty high
         ->and($runs->firstWhere('field', 'website_title')?->value)->toBe('Clinique Atlas')
         ->and($runs->firstWhere('field', 'website_title')?->confidence)->toBeGreaterThanOrEqual(0.85)
         ->and($runs->firstWhere('field', 'website_title')?->source)->toBe(EnrichmentRun::SOURCE_WEBSITE)
+        ->and($runs->firstWhere('field', 'website_title')?->verification_status)->toBe(EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED)
+        ->and($runs->firstWhere('field', 'website_title')?->evidence_url)->toBe('https://clinique-atlas.dz')
+        ->and($runs->firstWhere('field', 'website_title')?->retrieved_at)->not->toBeNull()
         ->and($runs->firstWhere('field', 'email')?->value)->toBe('hello@clinique-atlas.dz')
         ->and($runs->firstWhere('field', 'place_id')?->value)->toBe('ChIJ-atlas')
         ->and($runs->firstWhere('field', 'place_id')?->source)->toBe(EnrichmentRun::SOURCE_GOOGLE_PLACES)
@@ -216,6 +219,7 @@ it('no-ops Google Places when the API key is missing and records the skip', func
 
     expect($skip)->not->toBeNull()
         ->and($skip->error)->toBe('GOOGLE_PLACES_API_KEY missing')
+        ->and($skip->verification_status)->toBe(EnrichmentRun::VERIFICATION_UNKNOWN)
         ->and(EnrichmentRun::query()->where('source', EnrichmentRun::SOURCE_GOOGLE_PLACES)->where('field', 'place_id')->whereNotNull('value')->count())->toBe(0)
         ->and(AiInsight::query()->where('question', 'Research brief')->count())->toBe(0);
 

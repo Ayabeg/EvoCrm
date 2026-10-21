@@ -15,7 +15,7 @@ class OutboundDispatcher
 {
     public function __construct(
         private MailerFactory $mailers,
-        private SuppressionService $suppressions,
+        private OutboundEligibility $eligibility,
         private QuietHoursGuard $quietHours,
         private EvolutionCloudService $evolution,
         private TemplateRenderer $templates,
@@ -34,7 +34,10 @@ class OutboundDispatcher
             default => (string) ($attributes['to_address'] ?? $contact->email),
         };
 
-        $message = OutboundMessage::query()->create([
+        $idempotencyKey = filled($attributes['idempotency_key'] ?? null)
+            ? (string) $attributes['idempotency_key']
+            : null;
+        $messageAttributes = [
             'workspace_id' => $workspace->id,
             'contact_id' => $contact->id,
             'mailbox_id' => $attributes['mailbox_id'] ?? null,
@@ -47,12 +50,38 @@ class OutboundDispatcher
             'body' => $this->templates->render($attributes['body'] ?? null, $contact, $workspace),
             'body_html' => $this->templates->render($attributes['body_html'] ?? null, $contact, $workspace),
             'status' => 'queued',
-        ]);
+            'idempotency_key' => $idempotencyKey,
+        ];
 
-        if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
+        $message = $idempotencyKey
+            ? OutboundMessage::query()->firstOrCreate(
+                ['workspace_id' => $workspace->id, 'idempotency_key' => $idempotencyKey],
+                $messageAttributes,
+            )
+            : OutboundMessage::query()->create($messageAttributes);
+
+        if ($message->wasRecentlyCreated === false && $message->status === 'sent') {
+            return $message;
+        }
+
+        if ($message->wasRecentlyCreated === false && $message->status !== 'queued') {
+            $message->forceFill([
+                'status' => 'queued',
+                'failure_reason' => null,
+                'sent_at' => null,
+            ])->save();
+        }
+
+        $eligibilityReason = $this->eligibility->reason($workspace, $contact, $channel);
+
+        if ($eligibilityReason === null && $channel === 'email' && ! filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            $eligibilityReason = 'The outbound recipient address is invalid.';
+        }
+
+        if ($eligibilityReason !== null) {
             $message->forceFill([
                 'status' => 'failed',
-                'failure_reason' => 'Recipient is on the suppression list.',
+                'failure_reason' => $eligibilityReason,
             ])->save();
 
             return $message;

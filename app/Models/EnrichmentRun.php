@@ -19,6 +19,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'confidence',
     'raw',
     'status',
+    'verification_status',
+    'evidence_url',
+    'retrieved_at',
+    'verified_at',
     'error',
     'decided_by',
     'decided_at',
@@ -54,6 +58,20 @@ class EnrichmentRun extends Model
 
     public const STATUS_FAILED = 'failed';
 
+    public const VERIFICATION_VERIFIED = 'verified';
+
+    public const VERIFICATION_EVIDENCE_SUPPORTED = 'evidence_supported';
+
+    public const VERIFICATION_UNKNOWN = 'unknown';
+
+    public const VERIFICATION_NOT_FOUND = 'not_found';
+
+    public const VERIFICATION_NOT_DETECTED = 'not_detected';
+
+    public const VERIFICATION_CONFLICTING = 'conflicting';
+
+    public const VERIFICATION_INVALID = 'invalid';
+
     public const HIGH_CONFIDENCE = 0.85;
 
     /**
@@ -81,6 +99,8 @@ class EnrichmentRun extends Model
         return [
             'raw' => 'array',
             'confidence' => 'float',
+            'retrieved_at' => 'datetime',
+            'verified_at' => 'datetime',
             'decided_at' => 'datetime',
         ];
     }

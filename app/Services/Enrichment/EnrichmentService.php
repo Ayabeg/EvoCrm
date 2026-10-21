@@ -102,7 +102,7 @@ class EnrichmentService
     }
 
     /**
-     * @return list<array{id: int, source: string, field: string, value: string|null, confidence: float, status: string, error: string|null, created_at: string|null}>
+     * @return list<array{id: int, source: string, field: string, value: string|null, confidence: float, status: string, verification_status: string, evidence_url: string|null, retrieved_at: string|null, verified_at: string|null, error: string|null, created_at: string|null}>
      */
     public function history(Workspace $workspace, string $targetType, int $targetId): array
     {
@@ -120,6 +120,10 @@ class EnrichmentService
                 'value' => $run->value,
                 'confidence' => (float) $run->confidence,
                 'status' => $run->status,
+                'verification_status' => $run->verification_status,
+                'evidence_url' => $run->evidence_url,
+                'retrieved_at' => $run->retrieved_at?->toIso8601String(),
+                'verified_at' => $run->verified_at?->toIso8601String(),
                 'error' => $run->error,
                 'created_at' => $run->created_at?->toIso8601String(),
             ])

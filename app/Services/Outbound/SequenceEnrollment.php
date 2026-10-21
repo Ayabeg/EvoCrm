@@ -9,15 +9,14 @@ use App\Models\Sequence;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\ActivityRecorder;
-use App\Support\AlgerianPhone;
 use Illuminate\Validation\ValidationException;
 
 class SequenceEnrollment
 {
     public function __construct(
-        private SuppressionService $suppressions,
         private ActivityRecorder $activities,
         private ProductAnalytics $analytics,
+        private OutboundEligibility $eligibility,
     ) {}
 
     public function enroll(Workspace $workspace, Sequence $sequence, Contact $contact): Enrollment
@@ -34,9 +33,11 @@ class SequenceEnrollment
             ]);
         }
 
-        if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
+        $eligibilityReason = $this->eligibility->reason($workspace, $contact, $sequence->channel, $sequence);
+
+        if ($eligibilityReason !== null) {
             throw ValidationException::withMessages([
-                'contact_id' => 'Contact is on the suppression list.',
+                'contact_id' => $eligibilityReason,
             ]);
         }
 
@@ -54,12 +55,6 @@ class SequenceEnrollment
         if ($consent instanceof ContactConsent && ! $consent->isGranted()) {
             throw ValidationException::withMessages([
                 'contact_id' => 'Contact has not granted marketing consent for this channel.',
-            ]);
-        }
-
-        if ($sequence->channel === 'sms' && ! AlgerianPhone::isMobile($contact->phone_e164 ?? $contact->phone)) {
-            throw ValidationException::withMessages([
-                'contact_id' => 'SMS sequences only enroll Algerian mobiles (+213 05 / 06 / 07).',
             ]);
         }
 

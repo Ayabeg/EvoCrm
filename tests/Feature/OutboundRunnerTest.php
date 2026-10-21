@@ -7,6 +7,7 @@ use App\Models\OutboundMessage;
 use App\Models\QuietHours;
 use App\Models\Sequence;
 use App\Models\User;
+use App\Services\Outbound\OutboundDispatcher;
 use App\Services\Outbound\SequenceEnrollment;
 use App\Services\Outbound\SuppressionService;
 use Illuminate\Support\Carbon;
@@ -126,6 +127,41 @@ it('fails honestly in the outbox when no mailbox is enabled', function () {
     $message = OutboundMessage::query()->where('sequence_id', $sequence->id)->firstOrFail();
     expect($message->status)->toBe('failed');
     expect($message->failure_reason)->toContain('No mailbox configured');
+});
+
+it('fails a direct dispatch with an invalid recipient address', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'not-an-email',
+    ]);
+
+    $message = app(OutboundDispatcher::class)->dispatch($user->workspace, $contact, [
+        'channel' => 'email',
+        'subject' => 'Test',
+        'body' => 'Test',
+    ]);
+
+    expect($message->status)->toBe('failed')
+        ->and($message->failure_reason)->toContain('invalid');
+});
+
+it('reuses an outbound message when a dispatch is retried with the same idempotency key', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    $attributes = [
+        'channel' => 'email',
+        'subject' => 'Test',
+        'body' => 'Test',
+        'idempotency_key' => 'sequence:42:contact:'.$contact->id.':step:7',
+    ];
+
+    $first = app(OutboundDispatcher::class)->dispatch($user->workspace, $contact, $attributes);
+    $second = app(OutboundDispatcher::class)->dispatch($user->workspace, $contact, $attributes);
+
+    expect($second->id)->toBe($first->id)
+        ->and(OutboundMessage::query()->where('idempotency_key', $attributes['idempotency_key'])->count())->toBe(1);
 });
 
 it('pauses and resumes enrollments from the UI', function () {

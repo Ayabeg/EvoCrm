@@ -85,6 +85,7 @@ class CampaignService
                 'body' => $this->templates->render($campaign->body, $contact, $workspace),
                 'body_html' => $this->templates->render($campaign->body_html, $contact, $workspace),
                 'status' => 'queued',
+                'idempotency_key' => "campaign:{$campaign->id}:contact:{$contact->id}",
             ]);
             $queued++;
         }

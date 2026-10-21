@@ -28,6 +28,7 @@ use Illuminate\Support\Str;
     'bounce_type',
     'bounced_at',
     'provider_event_id',
+    'idempotency_key',
     'deferred_until',
     'defer_reason',
     'sent_at',

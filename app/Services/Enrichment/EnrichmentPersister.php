@@ -9,6 +9,7 @@ use App\Models\Lead;
 use App\Models\Workspace;
 use App\Support\AlgerianPhone;
 use App\Support\AlgerianWilaya;
+use Illuminate\Support\Carbon;
 
 class EnrichmentPersister
 {
@@ -27,6 +28,9 @@ class EnrichmentPersister
         string $value,
         float $confidence,
         array $raw = [],
+        string $verificationStatus = EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED,
+        ?string $evidenceUrl = null,
+        ?Carbon $retrievedAt = null,
     ): EnrichmentRun {
         $value = $this->normalizeValue($field, $value);
 
@@ -58,6 +62,8 @@ class EnrichmentPersister
             }
         }
 
+        $verificationStatus = $this->normalizeVerificationStatus($verificationStatus);
+
         return EnrichmentRun::query()->create([
             'workspace_id' => $workspace->id,
             'target_type' => $targetType,
@@ -68,6 +74,10 @@ class EnrichmentPersister
             'confidence' => $confidence,
             'raw' => $raw,
             'status' => $status,
+            'verification_status' => $verificationStatus,
+            'evidence_url' => $evidenceUrl ?: $this->evidenceUrl($raw),
+            'retrieved_at' => $retrievedAt ?? now(),
+            'verified_at' => $verificationStatus === EnrichmentRun::VERIFICATION_VERIFIED ? ($retrievedAt ?? now()) : null,
         ]);
     }
 
@@ -93,6 +103,8 @@ class EnrichmentPersister
             'confidence' => 0,
             'raw' => $raw,
             'status' => EnrichmentRun::STATUS_SKIPPED,
+            'verification_status' => EnrichmentRun::VERIFICATION_UNKNOWN,
+            'retrieved_at' => now(),
             'error' => $error,
         ]);
     }
@@ -119,8 +131,39 @@ class EnrichmentPersister
             'confidence' => 0,
             'raw' => $raw,
             'status' => EnrichmentRun::STATUS_FAILED,
+            'verification_status' => EnrichmentRun::VERIFICATION_UNKNOWN,
+            'retrieved_at' => now(),
             'error' => $error,
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $raw
+     */
+    private function evidenceUrl(array $raw): ?string
+    {
+        foreach (['evidence_url', 'url'] as $key) {
+            $value = $raw[$key] ?? null;
+
+            if (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
+                return mb_substr($value, 0, 2048);
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizeVerificationStatus(string $status): string
+    {
+        return in_array($status, [
+            EnrichmentRun::VERIFICATION_VERIFIED,
+            EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED,
+            EnrichmentRun::VERIFICATION_UNKNOWN,
+            EnrichmentRun::VERIFICATION_NOT_FOUND,
+            EnrichmentRun::VERIFICATION_NOT_DETECTED,
+            EnrichmentRun::VERIFICATION_CONFLICTING,
+            EnrichmentRun::VERIFICATION_INVALID,
+        ], true) ? $status : EnrichmentRun::VERIFICATION_UNKNOWN;
     }
 
     public function currentValue(Company|Contact|Lead $target, string $field): ?string

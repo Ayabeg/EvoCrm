@@ -153,6 +153,7 @@ class RunOutboundSequences extends Command
                 'body' => $this->mergeMeetingUrl($step->body, $step->meeting_url),
                 'wa_template_name' => $step->wa_template_name,
                 'wa_template_language' => $step->wa_template_language,
+                'idempotency_key' => "sequence:{$sequence->id}:contact:{$contact->id}:step:{$step->id}",
             ]);
 
             if ($message->status === 'sent' && $step->position === 1 && filled($step->subject_b)) {
