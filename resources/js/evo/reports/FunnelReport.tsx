@@ -49,6 +49,7 @@ export function FunnelReport({
         spend_cents: number;
         visits: number;
         orders: number;
+        meetings_booked: number;
         cpl_cents: number | null;
         conversion_rate: number | null;
     };
@@ -141,7 +142,7 @@ export function FunnelReport({
     return (
         <div className="space-y-6">
             <ReportKpiRow
-                columns={5}
+                columns={6}
                 kpis={[
                     {
                         label: t('Ad spend'),
@@ -158,6 +159,11 @@ export function FunnelReport({
                         label: t('Orders'),
                         value: kpis.orders,
                         hint: t('Bottom-of-funnel conversions'),
+                    },
+                    {
+                        label: t('Meetings booked'),
+                        value: kpis.meetings_booked,
+                        hint: t('Attributed booking events'),
                     },
                     {
                         label: t('Cost per lead'),

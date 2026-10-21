@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\DeliverLeadMagnetSubmission;
+use App\Jobs\EnrichRecordJob;
 use App\Models\Activity;
 use App\Models\ContactConsent;
+use App\Models\EnrichmentRun;
 use App\Models\FunnelEvent;
 use App\Models\LeadCapture;
 use App\Models\LeadMagnetOffer;
@@ -67,7 +69,10 @@ class LeadLeakageController extends Controller
             'meta' => ['offer' => 'lead-leakage-calculator'],
         ]);
 
-        return redirect()->route('meetings.public.show', $schedule->slug);
+        return redirect()->route('meetings.public.show', [
+            'slug' => $schedule->slug,
+            'lead_magnet_submission_id' => $submission?->id,
+        ]);
     }
 
     public function store(
@@ -89,6 +94,7 @@ class LeadLeakageController extends Controller
             'email' => ['nullable', 'email', 'max:180'],
             'company' => ['nullable', 'string', 'max:180'],
             'marketing_consent' => ['sometimes', 'boolean'],
+            'enrichment_consent' => ['sometimes', 'boolean'],
             'utm_source' => ['nullable', 'string', 'max:100'],
             'utm_medium' => ['nullable', 'string', 'max:100'],
             'utm_campaign' => ['nullable', 'string', 'max:100'],
@@ -154,6 +160,7 @@ class LeadLeakageController extends Controller
                 'attribution' => $attribution ?: null,
                 'delivery_status' => filled($data['email'] ?? null) ? 'queued' : 'inline',
                 'marketing_consent' => (bool) ($data['marketing_consent'] ?? false),
+                'enrichment_consent' => (bool) ($data['enrichment_consent'] ?? false),
             ]);
 
             if ($contact && ($data['marketing_consent'] ?? false)) {
@@ -195,6 +202,14 @@ class LeadLeakageController extends Controller
             DeliverLeadMagnetSubmission::dispatch($submission->id);
         }
 
+        if ($submission->contact_id && $submission->enrichment_consent) {
+            EnrichRecordJob::dispatch(
+                $workspace->id,
+                EnrichmentRun::TARGET_CONTACT,
+                $submission->contact_id,
+            );
+        }
+
         $funnelEvents->record($workspace, FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED, [
             'subject_type' => LeadMagnetSubmission::class,
             'subject_id' => $submission->id,
@@ -216,6 +231,7 @@ class LeadLeakageController extends Controller
                 'marketing_consent_recorded' => $submission->marketing_consent && $submission->contact_id !== null,
                 'delivery_status' => $submission->delivery_status,
                 'delivery_error' => $submission->delivery_error,
+                'enrichment_queued' => $submission->enrichment_consent && $submission->contact_id !== null,
             ],
         ]);
     }

@@ -28,7 +28,7 @@ class ConversionFunnelQuery
      *     funnel: array{id: int, name: string, slug: string},
      *     window: array{from: string, to: string, days: int, timezone: string},
      *     stages: array<int, array{key: string, label: string, count: int, rate_from_previous: float|null, rate_from_top: float|null}>,
-     *     kpis: array{spend_cents: int, visits: int, orders: int, cpl_cents: int|null, conversion_rate: float|null},
+     *     kpis: array{spend_cents: int, visits: int, orders: int, meetings_booked: int, cpl_cents: int|null, conversion_rate: float|null},
      *     sources: array<int, array{source: string, visits: int, orders_placed: int, confirmed: int, delivered: int, spend_cents: int, cpl_cents: int|null}>,
      *     campaigns: array<int, array{campaign_id: int|null, campaign_name: string, spend_cents: int, visits: int, leads: int, qualified_leads: int, deals_created: int, won_deals: int, won_revenue_cents: int, cpl_cents: int|null, roas: float|null}>
      * }
@@ -78,6 +78,7 @@ class ConversionFunnelQuery
         $spendCents = $this->spendInWindow($workspace, $from, $to);
         $visits = $stageCounts['visits'] ?? 0;
         $orders = $stageCounts['orders_placed'] ?? 0;
+        $meetingsBooked = $this->uniqueEventSubjects($events->where('event_type', FunnelEvent::TYPE_MEETING_BOOKED));
 
         return [
             'funnel' => [
@@ -96,6 +97,7 @@ class ConversionFunnelQuery
                 'spend_cents' => $spendCents,
                 'visits' => $visits,
                 'orders' => $orders,
+                'meetings_booked' => $meetingsBooked,
                 'cpl_cents' => $visits > 0 ? (int) round($spendCents / $visits) : null,
                 'conversion_rate' => $visits > 0 ? round(($orders / $visits) * 100, 1) : null,
             ],

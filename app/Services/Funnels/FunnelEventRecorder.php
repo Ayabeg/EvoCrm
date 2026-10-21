@@ -2,10 +2,12 @@
 
 namespace App\Services\Funnels;
 
+use App\Models\Activity;
 use App\Models\ConversionFunnel;
 use App\Models\Deal;
 use App\Models\FunnelEvent;
 use App\Models\Lead;
+use App\Models\LeadMagnetSubmission;
 use App\Models\Workspace;
 use Illuminate\Support\Arr;
 
@@ -135,6 +137,33 @@ class FunnelEventRecorder
             'source' => $lead->source ?? $lead->contact?->source,
             'occurred_at' => $lead->qualified_at ?? now(),
             'meta' => ['event' => 'lead.qualified'],
+        ]);
+    }
+
+    public function recordMeetingBooked(Activity $activity, ?int $leadMagnetSubmissionId = null): ?FunnelEvent
+    {
+        $activity->loadMissing(['contact', 'deal.lead']);
+        $submission = $leadMagnetSubmissionId
+            ? LeadMagnetSubmission::query()
+                ->where('workspace_id', $activity->workspace_id)
+                ->find($leadMagnetSubmissionId)
+            : null;
+
+        return $this->record($activity->workspace, FunnelEvent::TYPE_MEETING_BOOKED, [
+            'subject_type' => Activity::class,
+            'subject_id' => $activity->id,
+            'contact_id' => $activity->contact_id ?: $submission?->contact_id,
+            'lead_id' => $activity->deal?->lead_id ?: $submission?->lead_id,
+            'deal_id' => $activity->deal_id,
+            'source' => $submission
+                ? 'lead_magnet'
+                : ($activity->contact?->source ?: 'booking'),
+            'occurred_at' => $activity->created_at ?? now(),
+            'meta' => array_filter([
+                'event' => 'meeting.booked',
+                'schedule_id' => data_get($activity->meta, 'schedule_id'),
+                'lead_magnet_submission_id' => $submission?->id,
+            ], static fn (mixed $value): bool => $value !== null),
         ]);
     }
 

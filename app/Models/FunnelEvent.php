@@ -42,6 +42,8 @@ class FunnelEvent extends Model
 
     public const TYPE_DEMO_REQUESTED = 'demo_requested';
 
+    public const TYPE_MEETING_BOOKED = 'meeting_booked';
+
     protected function casts(): array
     {
         return [

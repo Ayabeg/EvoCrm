@@ -30,6 +30,7 @@ type ReportPayload = {
         spend_cents: number;
         visits: number;
         orders: number;
+        meetings_booked: number;
         cpl_cents: number | null;
         conversion_rate: number | null;
     };

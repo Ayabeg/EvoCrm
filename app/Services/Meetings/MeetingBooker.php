@@ -14,6 +14,7 @@ use App\Services\Connectors\GoogleApiClient;
 use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\WorkflowRunner;
+use App\Services\Funnels\FunnelEventRecorder;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -24,6 +25,7 @@ class MeetingBooker
         private MeetingSlotFinder $slots,
         private ContactIdentity $contacts,
         private ActivityRecorder $activities,
+        private FunnelEventRecorder $funnelEvents,
         private WorkflowRunner $workflows,
         private GoogleApiClient $google,
         private MeetingMailer $mail,
@@ -85,6 +87,11 @@ class MeetingBooker
                 'guest_name' => $guest['first_name'],
             ],
         ], $host);
+
+        $this->funnelEvents->recordMeetingBooked(
+            $activity,
+            isset($guest['lead_magnet_submission_id']) ? (int) $guest['lead_magnet_submission_id'] : null,
+        );
 
         $googleId = $this->pushCalendar($schedule, $activity, $start, $end, $guest['email'], $host);
 

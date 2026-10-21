@@ -22,6 +22,7 @@ export default function PublicBook({
     host,
     schedule,
     days,
+    lead_magnet_submission_id,
     deal_id,
 }: {
     host: { name: string | null };
@@ -34,6 +35,7 @@ export default function PublicBook({
         calendar_connected: boolean;
     };
     days: Day[];
+    lead_magnet_submission_id: number | null;
     deal_id: number | null;
 }) {
     const [picked, setPicked] = useState<Slot | null>(null);
@@ -114,6 +116,13 @@ export default function PublicBook({
                         {({ processing }) => (
                             <>
                                 <input type="hidden" name="starts_at" value={picked.starts_at} />
+                                {lead_magnet_submission_id ? (
+                                    <input
+                                        type="hidden"
+                                        name="lead_magnet_submission_id"
+                                        value={lead_magnet_submission_id}
+                                    />
+                                ) : null}
                                 {deal_id ? <input type="hidden" name="deal_id" value={deal_id} /> : null}
                                 <p className="text-[13px] text-ink">{t('Selected: :when', { when: when ?? '' })}</p>
                                 <div>

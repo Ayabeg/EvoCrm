@@ -57,6 +57,8 @@ The lead-magnet result-copy job is unique per submission, retryable, and records
 
 When a workspace has an enabled MeetingSchedule, the calculator result links to a throttled, workspace-scoped demo redirect. The redirect records a deduplicated demo-requested funnel event for the submission and then hands off to the existing public booking flow; no booking link is invented when no schedule is configured.
 
+Completed bookings record a deduplicated meeting_booked funnel event against the booking Activity. If the booking came from a same-workspace lead-magnet submission, the event keeps the submission's contact/lead attribution and marks its source as lead_magnet; ordinary bookings remain attributed to booking or the contact source.
+
 ## Reliability rules
 
 - Every workspace-scoped write checks ownership and authorization.

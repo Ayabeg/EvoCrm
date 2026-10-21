@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\LeadMagnetSubmission;
 use App\Models\MeetingSchedule;
 use App\Services\Meetings\MeetingBooker;
 use App\Services\Meetings\MeetingSlotFinder;
@@ -18,6 +19,9 @@ class MeetingBookController extends Controller
     public function show(Request $request, string $slug, MeetingSlotFinder $slots): Response
     {
         $schedule = $this->resolve($slug);
+        $submission = LeadMagnetSubmission::query()
+            ->where('workspace_id', $schedule->workspace_id)
+            ->find($request->integer('lead_magnet_submission_id'));
 
         $days = collect($slots->slots($schedule))
             ->groupBy('date')
@@ -42,6 +46,7 @@ class MeetingBookController extends Controller
                 'calendar_connected' => $slots->calendarConnected($schedule),
             ],
             'days' => $days,
+            'lead_magnet_submission_id' => $submission?->id,
             'deal_id' => $request->integer('deal') ?: null,
         ]);
     }
@@ -58,6 +63,7 @@ class MeetingBookController extends Controller
             'phone' => ['required', 'string', 'max:40'],
             'note' => ['nullable', 'string', 'max:500'],
             'deal_id' => ['nullable', 'integer'],
+            'lead_magnet_submission_id' => ['nullable', 'integer'],
         ]);
 
         $phone = AlgerianPhone::normalize($data['phone']);
@@ -66,6 +72,10 @@ class MeetingBookController extends Controller
             return back()->withErrors(['phone' => __('Enter an Algerian mobile (+213).')]);
         }
 
+        $submission = LeadMagnetSubmission::query()
+            ->where('workspace_id', $schedule->workspace_id)
+            ->find($data['lead_magnet_submission_id'] ?? null);
+
         $activity = $booker->book($schedule, $data['starts_at'], [
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'] ?? null,
@@ -73,6 +83,7 @@ class MeetingBookController extends Controller
             'phone' => $phone,
             'note' => $data['note'] ?? null,
             'deal_id' => $data['deal_id'] ?? $request->integer('deal') ?: null,
+            'lead_magnet_submission_id' => $submission?->id,
         ]);
 
         $when = $activity->meta['starts_at'] ?? $data['starts_at'];
