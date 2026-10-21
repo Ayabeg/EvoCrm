@@ -20,6 +20,7 @@ No feature in the requested three-system expansion is marked complete merely bec
 - CSV preview/import with complete, incomplete, malformed, duplicate, and re-imported rows.
 - Enrichment provider success, partial result, stale result, conflict, timeout, retry, and permanent failure.
 - Workspace authorization, pagination, filtering, and duplicate review.
+- Workspace-scoped bulk enrichment queueing, cross-workspace ID rejection, unique job keys, and retry configuration.
 - Campaign activation, preview/test send, last-mile suppression check, daily limit, quiet hours, and duplicate send prevention.
 - Provider event idempotency, bounce/complaint/unsubscribe handling, reply pause, and restart-safe follow-up scheduling.
 - Lead-magnet submission persistence, duplicate request handling, separate delivery/marketing consent, contact/lead matching, delivery error state, and demo-request conversion.

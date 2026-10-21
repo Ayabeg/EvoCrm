@@ -316,6 +316,7 @@ Route::middleware(['auth', 'verified', EnforceProductPermissions::class, Enforce
     Route::post('/crm/leads/{lead}/qualify', [LeadController::class, 'qualify'])->name('crm.leads.qualify');
     Route::post('/crm/leads/{lead}/ask', [AskEvoController::class, 'lead'])->name('crm.leads.ask');
     Route::post('/crm/leads/{lead}/enrich', [EnrichmentController::class, 'lead'])->name('crm.leads.enrich');
+    Route::post('/crm/enrichment/bulk', [EnrichmentController::class, 'bulk'])->name('crm.enrichment.bulk');
     Route::post('/crm/enrichment-runs/{run}/apply', [EnrichmentController::class, 'apply'])->name('crm.enrichment.apply');
     Route::post('/crm/enrichment-runs/{run}/dismiss', [EnrichmentController::class, 'dismiss'])->name('crm.enrichment.dismiss');
 

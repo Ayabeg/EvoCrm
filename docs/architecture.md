@@ -62,6 +62,7 @@ When a workspace has an enabled MeetingSchedule, the calculator result links to 
 - Unique keys and idempotency keys prevent duplicate imports, submissions, sends, and provider events.
 - Long-running enrichment and outbound actions run through durable jobs/commands, not in-memory timers.
 - Retries use bounded exponential backoff and preserve the original error and attempt history.
+- Enrichment jobs are unique for one hour per workspace/target type/record, retry up to three times with bounded backoff, and can be queued from a workspace-scoped bulk action.
 - Stronger existing evidence is not silently replaced by weaker or stale evidence.
 - Public endpoints validate input, rate-limit where appropriate, and avoid exposing internal identifiers or PII.
 

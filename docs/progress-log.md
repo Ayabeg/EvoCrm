@@ -29,6 +29,7 @@
 - Shared provenance/verification/eligibility contract (A3, E1, O1).
 - Campaign audience policy for uncertain email states and provider-level delivery/idempotency verification remain for O1/O2; current local idempotency protects stable message creation, while live provider event semantics remain environment-dependent.
 - Exact gap analysis of existing enrichment, outbound eligibility, and lead-capture flows before adding migrations.
+- Enrichment orchestration (E3): the existing per-record actions now share a capped workspace-scoped bulk queue endpoint and Contacts exposes a Queue enrichment action for selected records. EnrichRecordJob is unique per workspace/target/type, retries transient failures up to three times with bounded backoff, and the focused suite passes 11 tests / 97 assertions.
 
 ### Blocked
 

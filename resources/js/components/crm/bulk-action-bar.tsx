@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import { BulkActionBar as DataWorkspaceBulkActionBar } from '@/ds/workspace/BulkActionBar';
 import type { RowId } from '@/ds/workspace/selection';
 import type { BulkAction } from '@/ds/workspace/types';
@@ -26,6 +27,17 @@ export function BulkActionBar({
             ? ['assign_owner', 'move_stage', 'delete']
             : ['assign_owner', 'enroll_sequence', 'delete'];
 
+    function queueEnrichment() {
+        router.post(
+            '/crm/enrichment/bulk',
+            { target_type: entity, ids: selectedIds },
+            {
+                preserveScroll: true,
+                onSuccess: () => onClear(),
+            },
+        );
+    }
+
     return (
         <DataWorkspaceBulkActionBar
             object={entity}
@@ -34,6 +46,7 @@ export function BulkActionBar({
             members={members}
             sequences={sequences}
             stages={stages}
+            onQueueEnrichment={entity === 'contact' ? queueEnrichment : undefined}
             onClear={onClear}
         />
     );

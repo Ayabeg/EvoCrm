@@ -19,7 +19,7 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 | A3 | Shared data-model migration gaps | **in progress** | A2 | First-class provenance, verification, suppression/eligibility, and lead-magnet records have workspace-scoped constraints and indexes without competing with existing entities | L |
 | E1 | Enrichment provider contract audit | **in progress** | A2 | Existing Google Places/website providers documented; provider results preserve source, time, confidence, status, conflicts, and errors | M |
 | E2 | Enrichment normalization, deduplication, and scoring | planned | E1, A3 | Incomplete imports are retained; normalization is idempotent; ambiguous duplicates are reviewable; data-quality and sales-fit scores are explainable and configurable | L |
-| E3 | Enrichment orchestration and operator UI | planned | E2 | Individual/batch queueing, retries/backoff, provider limits, status/error visibility, pagination, evidence, and retry actions work through the existing CRM | L |
+| E3 | Enrichment orchestration and operator UI | **in progress** | E2 | Individual/batch queueing, retries/backoff, provider limits, status/error visibility, pagination, evidence, and retry actions work through the existing CRM | L |
 | O1 | Outbound eligibility and campaign safety audit | **in progress** | A2, E2 | Last-mile send checks target segment, usable/allowed verification status, consent policy, suppression, conflicts, authorization, and campaign limits | M |
 | O2 | Durable outbound execution and reply lifecycle | **in progress** | O1 | Retry-safe sends, provider events, replies, follow-up stop conditions, idempotency, and restart recovery are covered by integration tests | L |
 | O3 | Outbound analytics and operational UI | planned | O2 | Metrics use explicit denominators and provider events are separated from estimates; campaign preview/activation is safe by default | M |
@@ -47,4 +47,5 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 - **Schema evolution:** existing migrations already contain enrichment, capture, scoring, import, and outbound tables. New tables must extend those sources of truth instead of duplicating them.
 - **No fabricated evidence:** unavailable enrichment fields remain unknown; estimates in the calculator are explicitly user-provided assumptions.
 - **Provider semantics:** acceptance by a mail API is not delivery; catch-all and unknown email results remain conservative.
+- **Enrichment queueing:** bulk queueing is capped at 100 IDs per request, workspace-scoped, and deduplicated by workspace/target type/record ID. Provider-rate limiting and operator retry controls still require the E2/E3 follow-up slices.
 

@@ -199,5 +199,6 @@ export type BulkActionBarProps = {
     members?: Array<{ id: number; name: string }>;
     sequences?: Array<{ id: number; name: string }>;
     stages?: Array<{ id: number; name: string }>;
+    onQueueEnrichment?: () => void;
     onClear: () => void;
 };
