@@ -18,12 +18,16 @@ class LeadScoreFormula
 
     public const TIMING_MAX = 25;
 
+    public function __construct(private DataQualityScorer $quality) {}
+
     /**
      * @return array{
      *     score: int,
      *     fit: int,
      *     intent: int,
      *     timing: int,
+     *     data_quality: int,
+     *     quality_breakdown: list<array{key: string, label: string, points: int}>,
      *     reason: string,
      *     breakdown: list<array{pillar: string, key: string, label: string, points: int}>
      * }
@@ -35,6 +39,7 @@ class LeadScoreFormula
         $fit = $this->fit($lead);
         $intent = $this->intent($lead);
         $timing = $this->timing($lead);
+        $quality = $this->quality->compute($lead);
 
         $score = max(0, min(100, $fit['points'] + $intent['points'] + $timing['points']));
         $breakdown = [...$fit['rules'], ...$intent['rules'], ...$timing['rules']];
@@ -44,6 +49,8 @@ class LeadScoreFormula
             'fit' => $fit['points'],
             'intent' => $intent['points'],
             'timing' => $timing['points'],
+            'data_quality' => $quality['score'],
+            'quality_breakdown' => $quality['breakdown'],
             'reason' => $this->reason($breakdown, $score),
             'breakdown' => $breakdown,
         ];

@@ -22,6 +22,8 @@ class LeadScorer
      *     fit: int,
      *     intent: int,
      *     timing: int,
+     *     data_quality: int,
+     *     quality_breakdown: list<array{key: string, label: string, points: int}>,
      *     reason: string,
      *     breakdown: list<array{pillar: string, key: string, label: string, points: int}>,
      *     changed: bool,
@@ -47,8 +49,18 @@ class LeadScorer
                     'fit' => $computed['fit'],
                     'intent' => $computed['intent'],
                     'timing' => $computed['timing'],
+                    'data_quality' => $computed['data_quality'],
                     'reason' => $computed['reason'],
-                    'breakdown' => $computed['breakdown'],
+                    'breakdown' => [
+                        ...$computed['breakdown'],
+                        ...array_map(
+                            fn (array $factor): array => [
+                                'pillar' => 'quality',
+                                ...$factor,
+                            ],
+                            $computed['quality_breakdown'],
+                        ),
+                    ],
                 ]);
             }
 
@@ -89,6 +101,7 @@ class LeadScorer
             'fit' => 0,
             'intent' => 0,
             'timing' => 0,
+            'data_quality' => 0,
             'reason' => $reason,
             'breakdown' => [],
         ]);

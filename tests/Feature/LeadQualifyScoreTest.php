@@ -92,6 +92,8 @@ it('computes a 0–100 formula score split into fit, intent, and timing', functi
         ->and($result['fit'])->toBe(40)
         ->and($result['intent'])->toBe(35)
         ->and($result['timing'])->toBe(25)
+        ->and($result['data_quality'])->toBeIn([75, 90])
+        ->and($result['quality_breakdown'])->toHaveCount(7)
         ->and($result['score'])->toBe($result['fit'] + $result['intent'] + $result['timing'])
         ->and($result['reason'])->toContain('Score 100');
 });
@@ -122,7 +124,8 @@ it('scores a thin lead near zero when fit, intent, and timing are missing', func
     expect($result['score'])->toBe(0)
         ->and($result['fit'])->toBe(0)
         ->and($result['intent'])->toBe(0)
-        ->and($result['timing'])->toBe(0);
+        ->and($result['timing'])->toBe(0)
+        ->and($result['data_quality'])->toBe(5);
 });
 
 it('qualifies when the formula score crosses the qualify threshold and does not convert', function () {

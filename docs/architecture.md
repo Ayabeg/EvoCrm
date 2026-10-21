@@ -41,6 +41,8 @@ Import or existing CRM record
 
 Use provider adapters and the existing `EnrichmentService`, `WebsiteEnricher`, `GooglePlacesEnricher`, `EnrichmentPersister`, import batches, and enrichment runs where their current contracts fit. A provider may add a candidate value, evidence, verification status, confidence, and error; it may not erase stronger existing data. Enrichment jobs are idempotent and retry transient failures only.
 
+Lead scoring keeps commercial qualification separate from data quality: the existing fit/intent/timing score remains the qualification authority, while `DataQualityScorer` computes an explainable completeness score from the shared company/contact/source fields and persists it with each score snapshot.
+
 ### EvoCRM Outbound
 
 Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `SuppressionService`, `QuietHoursGuard`, `MailerFactory`, `ImapReplyPoller`, bounce processing, tracking, and scheduler. Add missing eligibility/last-mile checks at the service boundary used by both campaign and sequence paths.

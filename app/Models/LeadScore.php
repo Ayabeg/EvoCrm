@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'fit',
     'intent',
     'timing',
+    'data_quality',
     'reason',
     'breakdown',
 ])]
@@ -28,6 +29,7 @@ class LeadScore extends Model
             'fit' => 'integer',
             'intent' => 'integer',
             'timing' => 'integer',
+            'data_quality' => 'integer',
             'breakdown' => 'array',
         ];
     }
@@ -38,7 +40,7 @@ class LeadScore extends Model
     }
 
     /**
-     * @return array{score: int, fit: int, intent: int, timing: int, reason: string|null, breakdown: list<array{pillar: string, key: string, label: string, points: int}>}
+     * @return array{score: int, fit: int, intent: int, timing: int, data_quality: int, reason: string|null, breakdown: list<array{pillar: string, key: string, label: string, points: int}>}
      */
     public function present(): array
     {
@@ -49,6 +51,7 @@ class LeadScore extends Model
             'fit' => (int) $this->fit,
             'intent' => (int) $this->intent,
             'timing' => (int) $this->timing,
+            'data_quality' => (int) $this->data_quality,
             'reason' => $this->reason,
             'breakdown' => is_array($breakdown) ? $breakdown : [],
         ];

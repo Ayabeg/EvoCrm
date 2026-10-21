@@ -3,6 +3,7 @@ export type LeadScorePayload = {
     fit?: number;
     intent?: number;
     timing?: number;
+    data_quality?: number;
     reason?: string | null;
     breakdown?: { pillar: string; key: string; label: string; points: number }[];
 };
@@ -33,6 +34,9 @@ export default function LeadScorePill({
                 {score.fit !== undefined ? (
                     <span className="tabular-nums opacity-80">
                         {score.fit}/{score.intent}/{score.timing}
+                        {score.data_quality !== undefined
+                            ? ` · Q${score.data_quality}`
+                            : null}
                     </span>
                 ) : null}
             </span>
