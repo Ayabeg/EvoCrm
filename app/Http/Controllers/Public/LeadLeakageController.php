@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\DeliverLeadMagnetSubmission;
 use App\Models\Activity;
 use App\Models\ContactConsent;
 use App\Models\FunnelEvent;
@@ -109,7 +110,7 @@ class LeadLeakageController extends Controller
                 'assumptions' => $calculation['assumptions'],
                 'result' => $calculation,
                 'attribution' => $attribution ?: null,
-                'delivery_status' => 'inline',
+                'delivery_status' => filled($data['email'] ?? null) ? 'queued' : 'inline',
                 'marketing_consent' => (bool) ($data['marketing_consent'] ?? false),
             ]);
 
@@ -148,6 +149,10 @@ class LeadLeakageController extends Controller
             return $submission;
         });
 
+        if ($submission->delivery_status === 'queued') {
+            DeliverLeadMagnetSubmission::dispatch($submission->id);
+        }
+
         $funnelEvents->record($workspace, FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED, [
             'subject_type' => LeadMagnetSubmission::class,
             'subject_id' => $submission->id,
@@ -168,6 +173,7 @@ class LeadLeakageController extends Controller
                 'contact_created' => $submission->contact_id !== null,
                 'marketing_consent_recorded' => $submission->marketing_consent && $submission->contact_id !== null,
                 'delivery_status' => $submission->delivery_status,
+                'delivery_error' => $submission->delivery_error,
             ],
         ]);
     }

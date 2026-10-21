@@ -57,6 +57,7 @@ export default function LeadLeakageCalculator({
         contact_created: boolean;
         marketing_consent_recorded: boolean;
         delivery_status: string;
+        delivery_error: string | null;
     } | null;
 }) {
     const form = useForm<Inputs>({
@@ -177,7 +178,18 @@ export default function LeadLeakageCalculator({
                             This result applies your missed-inquiry, delayed-response, and follow-up assumptions in order. It is not a promise of savings or revenue; it is a transparent estimate to help you decide what to measure next.
                         </p>
                         {submission?.contact_created ? (
-                            <p className="mt-4 text-sm text-ink">Your result is linked to your EvoCrm record. {submission.marketing_consent_recorded ? 'Your separate marketing choice was recorded.' : 'No marketing subscription was added.'}</p>
+                            <p className="mt-4 text-sm text-ink">
+                                Your result is linked to your EvoCrm record. {submission.marketing_consent_recorded ? 'Your separate marketing choice was recorded.' : 'No marketing subscription was added.'}
+                            </p>
+                        ) : null}
+                        {submission?.delivery_status === 'queued' || submission?.delivery_status === 'sending' ? (
+                            <p className="mt-2 text-sm text-mute">A copy is queued for the email address you provided.</p>
+                        ) : null}
+                        {submission?.delivery_status === 'accepted' ? (
+                            <p className="mt-2 text-sm text-mute">The configured mailer accepted a copy for sending. Inbox delivery depends on your email provider.</p>
+                        ) : null}
+                        {submission?.delivery_status === 'failed' ? (
+                            <p className="mt-2 text-sm text-red-700">We could not queue the email copy. Your result is still available above; no marketing subscription was added because of this error.</p>
                         ) : null}
                     </section>
                 ) : null}

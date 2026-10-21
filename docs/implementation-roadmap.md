@@ -25,7 +25,7 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 | O3 | Outbound analytics and operational UI | planned | O2 | Metrics use explicit denominators and provider events are separated from estimates; campaign preview/activation is safe by default | M |
 | M1 | Lead Leakage Calculator domain logic | **verified** | A2 | Validated user assumptions produce transparent estimates; no fabricated benchmarks or guarantees; unit tests cover reset, boundaries, and invalid input | S |
 | M2 | Public lead-magnet landing page and submission flow | **verified** | M1, A3 | Accessible responsive page, useful result without unnecessary PII, distinct delivery/marketing consent, duplicate-safe persistence, and honest errors | M |
-| M3 | Lead-magnet delivery, CRM integration, and conversion path | **in progress** | M2, O1 | Submission creates/updates shared records, records attribution and offer event, delivers promised asset, presents demo CTA, and never auto-enrolls cold outreach without consent | M |
+| M3 | Lead-magnet delivery, CRM integration, and conversion path | **in progress** | M2, O1 | Submission creates/updates shared records, records attribution and offer event, optionally queues a result copy with honest delivery state, presents demo CTA, and never auto-enrolls cold outreach without consent | M |
 | I1 | End-to-end outbound workflow | planned | E3, O3 | Import → enrich → verify → score → select → preview → activate → send → event/reply → pipeline is integration-tested | L |
 | I2 | End-to-end inbound workflow | planned | M3, E3 | Visit → use → submit → consent → shared record → permitted enrichment → delivery → demo request → analytics is integration-tested | M |
 | I3 | Data maintenance workflow | planned | E3, O1, A3 | Stale records can be refreshed without replacing stronger evidence or reintroducing suppressed contacts | M |
@@ -34,7 +34,7 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 
 ## Execution order
 
-1. Complete A2 documentation (current task), then implement the smallest shared migration and calculator slices.
+1. Complete A2 documentation, then verify the shared provenance and lead-magnet delivery slices before moving into enrichment and outbound eligibility.
 2. Close E1–E3 using the existing enrichment and import code rather than creating parallel services.
 3. Close O1–O3 using the existing outbound abstractions and database scheduler.
 4. Close M1–M3 and connect lead-magnet submissions to existing `Contact`, `Lead`, `LeadCapture`, consent, activity, and funnel concepts.

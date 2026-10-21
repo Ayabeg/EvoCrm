@@ -49,6 +49,8 @@ Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `Sup
 
 Keep calculator math as a pure domain service with no HTTP or Eloquent dependencies. Persist the offer/submission/assumption result separately from the shared contact/lead record, then record attribution and consent using the existing CRM conventions. Delivery is transactional and separately observable from optional marketing eligibility.
 
+The lead-magnet result-copy job is unique per submission, retryable, and records queued, sending, accepted, or failed state plus the last error. Accepted means the configured mailer accepted the message; it is not proof of inbox delivery. Anonymous calculator use remains inline and does not create a contact.
+
 ## Reliability rules
 
 - Every workspace-scoped write checks ownership and authorization.

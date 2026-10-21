@@ -23,6 +23,7 @@ No feature in the requested three-system expansion is marked complete merely bec
 - Campaign activation, preview/test send, last-mile suppression check, daily limit, quiet hours, and duplicate send prevention.
 - Provider event idempotency, bounce/complaint/unsubscribe handling, reply pause, and restart-safe follow-up scheduling.
 - Lead-magnet submission persistence, duplicate request handling, separate delivery/marketing consent, contact/lead matching, delivery error state, and demo-request conversion.
+- Result-copy delivery through the configured mailer, including unique retry-safe job dispatch and the distinction between mailer acceptance and actual inbox delivery.
 
 ### End-to-end workflow tests
 

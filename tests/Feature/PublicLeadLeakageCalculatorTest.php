@@ -1,11 +1,13 @@
 <?php
 
+use App\Mail\LeadLeakageResultMail;
 use App\Models\Contact;
 use App\Models\ContactConsent;
 use App\Models\FunnelEvent;
 use App\Models\Lead;
 use App\Models\LeadMagnetSubmission;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 it('renders the workspace lead leakage calculator publicly', function () {
@@ -20,6 +22,7 @@ it('renders the workspace lead leakage calculator publicly', function () {
 });
 
 it('persists a calculator submission, creates the shared lead, and records separate consent', function () {
+    Mail::fake();
     $workspace = User::factory()->create()->workspace;
     $key = (string) Str::uuid();
 
@@ -49,9 +52,13 @@ it('persists a calculator submission, creates the shared lead, and records separ
 
     expect($submission->contact_id)->toBe($contact->id)
         ->and(Lead::query()->where('contact_id', $contact->id)->count())->toBe(1)
+        ->and($submission->delivery_status)->toBe('accepted')
+        ->and($submission->accepted_at)->not->toBeNull()
         ->and(ContactConsent::query()->where('contact_id', $contact->id)->where('purpose', 'marketing')->value('status'))
         ->toBe(ContactConsent::STATUS_GRANTED)
         ->and(FunnelEvent::query()->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED)->count())->toBe(1);
+
+    Mail::assertSent(LeadLeakageResultMail::class, fn (LeadLeakageResultMail $mail): bool => $mail->hasTo('owner@clinic-atlas.test'));
 });
 
 it('does not create a contact for an anonymous calculator use and is idempotent', function () {

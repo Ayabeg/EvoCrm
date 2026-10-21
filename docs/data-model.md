@@ -23,7 +23,7 @@ The implementation should add only records that are not already represented by t
 ### Lead-magnet offers and submissions
 
 - `lead_magnet_offers`: stable offer slug, name, version, status, workspace/global scope, delivery configuration, and calculator definition version.
-- `lead_magnet_submissions`: offer/version, workspace, optional contact/company/lead links, idempotency key, result assumptions, calculated result, source attribution, delivery status, and timestamps.
+- `lead_magnet_submissions`: offer/version, workspace, optional contact/company/lead links, idempotency key, result assumptions, calculated result, source attribution, delivery status/error, mailer acceptance timestamp, and timestamps.
 - `lead_magnet_events` (or an equivalent existing funnel/event record): visit/start/submit/use/delivery/demo-request outcome with dedupe key and attribution.
 
 Submissions may be anonymous until the user supplies delivery details. The calculator result itself must not require unnecessary PII.
