@@ -24,6 +24,7 @@
 - Added an explainable `DataQualityScorer` and persisted `lead_scores.data_quality` without changing the existing qualification formula. The combined lead-score/enrichment/outbound regression set passes 49 tests / 326 assertions; the score breakdown records quality factors for later prospect selection.
 - Exposed the persisted quality score in the lead score payload and shared lead-list pill, with the targeted ESLint and TypeScript checks passing.
 - Completed the lead-magnet booking handoff: the public booking flow carries the submission attribution, creates a deduplicated `meeting_booked` funnel event, and the public lead-magnet plus scheduler regression set passes 15 tests / 150 assertions.
+- Connected data quality to prospect selection: contact segments and outbound campaign saved filters can require a minimum persisted lead data-quality score; filter/outbound regression checks pass 31 tests / 258 assertions.
 - Repository-wide `php artisan test --compact` was run after the acquisition changes and remains non-zero on pre-existing UI/source-contract failures, including `tests/Feature/P04AppShellTest.php:59`, which still expects the literal `Search EvoCRM` shell text while the current shell renders the translated `Search` label. These failures are outside the acquisition-system files. Acquisition-focused suites remain green, and the two existing InvalidArgumentException import warnings are unchanged.
 
 ### In progress
@@ -33,6 +34,7 @@
 - Campaign audience policy for uncertain email states and provider-level delivery/idempotency verification remain for O1/O2; current local idempotency protects stable message creation, while live provider event semantics remain environment-dependent.
 - Exact gap analysis of existing enrichment, outbound eligibility, and lead-capture flows before adding migrations.
 - Enrichment orchestration (E3): the existing per-record actions now share a capped workspace-scoped bulk queue endpoint and Contacts exposes a Queue enrichment action for selected records. EnrichRecordJob is unique per workspace/target/type, retries transient failures up to three times with bounded backoff, and the focused suite passes 11 tests / 97 assertions.
+- Lead-magnet booking attribution (M3): the demo handoff now carries a same-workspace submission reference into the existing public booking form, and MeetingBooker records one meeting_booked funnel event with contact/lead/deal links and lead-magnet source attribution. Focused meeting/lead-magnet coverage passes 16 tests / 158 assertions.
 
 ### Blocked
 

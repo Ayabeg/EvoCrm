@@ -3,6 +3,8 @@
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Deal;
+use App\Models\Lead;
+use App\Models\LeadScore;
 use App\Models\SavedFilter;
 use App\Models\User;
 use App\Services\Crm\CrmFilter;
@@ -40,6 +42,38 @@ it('filters contacts by wilaya, unanswered, and unassigned', function () {
             ->has('listView.columnDefs')
             ->has('recordCount')
         );
+});
+
+it('lets contact segments select leads by the persisted data-quality score', function () {
+    $user = User::factory()->create();
+    $kept = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $excluded = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    foreach ([[$kept, 80], [$excluded, 40]] as [$contact, $quality]) {
+        $lead = Lead::factory()->create([
+            'workspace_id' => $user->workspace_id,
+            'contact_id' => $contact->id,
+            'company_id' => $contact->company_id,
+        ]);
+        LeadScore::query()->create([
+            'workspace_id' => $user->workspace_id,
+            'lead_id' => $lead->id,
+            'score' => 50,
+            'fit' => 20,
+            'intent' => 20,
+            'timing' => 10,
+            'data_quality' => $quality,
+            'breakdown' => [],
+        ]);
+    }
+
+    $this->actingAs($user)
+        ->get('/crm/contacts?data_quality_min=70')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('contacts', 1)
+            ->where('contacts.0.id', $kept->id)
+            ->where('activeFilters.data_quality_min', '70'));
 });
 
 it('saves a reusable list filter', function () {

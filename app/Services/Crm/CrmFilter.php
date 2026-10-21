@@ -46,6 +46,7 @@ class CrmFilter
             'has_company' => ($fromSaved['has_company'] ?? null) === true || ($fromSaved['has_company'] ?? null) === '1',
             'has_associated_company' => ($fromSaved['has_associated_company'] ?? null) === true || ($fromSaved['has_associated_company'] ?? null) === '1',
             'deal_min_amount' => $fromSaved['deal_min_amount'] ?? null,
+            'data_quality_min' => $fromSaved['data_quality_min'] ?? null,
             'view' => $fromSaved['view'] ?? 'all',
             'filter_id' => $saved->id,
             'filter_groups' => $this->parseFilterGroups(null, $fromSaved['filter_groups'] ?? null),
@@ -129,6 +130,7 @@ class CrmFilter
             'has_company' => $request->boolean('has_company') || (($fromSaved['has_company'] ?? null) === true || ($fromSaved['has_company'] ?? null) === '1'),
             'has_associated_company' => $request->boolean('has_associated_company') || (($fromSaved['has_associated_company'] ?? null) === true || ($fromSaved['has_associated_company'] ?? null) === '1'),
             'deal_min_amount' => $request->input('deal_min_amount', $fromSaved['deal_min_amount'] ?? null),
+            'data_quality_min' => $request->input('data_quality_min', $fromSaved['data_quality_min'] ?? null),
             'priority' => $request->input('priority', $fromSaved['priority'] ?? null),
             'channel' => $request->input('channel', $fromSaved['channel'] ?? null),
             'view' => $view,
@@ -648,6 +650,11 @@ class CrmFilter
         if (filled($filters['deal_min_amount'] ?? null) && is_numeric($filters['deal_min_amount'])) {
             $cents = (int) round(((float) $filters['deal_min_amount']) * 100);
             $query->whereHas('deals', fn (Builder $deal) => $deal->where('amount_cents', '>=', $cents));
+        }
+
+        if (is_numeric($filters['data_quality_min'] ?? null)) {
+            $minimum = max(0, min(100, (int) $filters['data_quality_min']));
+            $query->whereHas('leads.latestScore', fn (Builder $score) => $score->where('data_quality', '>=', $minimum));
         }
 
         if (! empty($filters['unanswered'])) {

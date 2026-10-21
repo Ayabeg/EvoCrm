@@ -159,6 +159,7 @@ class CrmHub
             $fields[] = ['id' => 'has_won_deal', 'label' => 'Has won deal', 'type' => 'boolean'];
             $fields[] = ['id' => 'has_company', 'label' => 'Has company', 'type' => 'boolean'];
             $fields[] = ['id' => 'deal_min_amount', 'label' => 'Min deal amount (DZD)', 'type' => 'number'];
+            $fields[] = ['id' => 'data_quality_min', 'label' => 'Minimum data quality', 'type' => 'number'];
         }
 
         return $fields;
