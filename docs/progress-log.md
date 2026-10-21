@@ -37,6 +37,7 @@
 - Enrichment orchestration (E3): the existing per-record actions now share a capped workspace-scoped bulk queue endpoint and Contacts exposes a Queue enrichment action for selected records. EnrichRecordJob is unique per workspace/target/type, retries transient failures up to three times with bounded backoff, and the focused suite passes 11 tests / 97 assertions.
 - Lead-magnet booking attribution (M3): the demo handoff now carries a same-workspace submission reference into the existing public booking form, and MeetingBooker records one meeting_booked funnel event with contact/lead/deal links and lead-magnet source attribution. Focused meeting/lead-magnet coverage passes 16 tests / 158 assertions.
 - End-to-end inbound workflow (I2) is now covered from calculator submission through shared Contact/Lead creation, queued result delivery, demo handoff, booking, and lead-magnet funnel analytics.
+- Latest combined acquisition regression pass: 51 tests / 387 assertions passed across inbound workflow, lead-magnet delivery/conversion, funnel analytics, enrichment, and outbound campaign/sequence execution.
 
 ### Blocked
 
