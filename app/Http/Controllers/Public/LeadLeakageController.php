@@ -10,11 +10,13 @@ use App\Models\FunnelEvent;
 use App\Models\LeadCapture;
 use App\Models\LeadMagnetOffer;
 use App\Models\LeadMagnetSubmission;
+use App\Models\MeetingSchedule;
 use App\Models\Workspace;
 use App\Services\Crm\LeadCaptureDeduper;
 use App\Services\Funnels\FunnelEventRecorder;
 use App\Services\LeadMagnet\LeadLeakageCalculator;
 use App\Support\LeadCaptureNormalizer;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -26,6 +28,32 @@ class LeadLeakageController extends Controller
     public function show(Workspace $workspace): Response
     {
         return Inertia::render('public/lead-leakage-calculator', $this->pageProps($workspace));
+    }
+
+    public function demo(
+        Request $request,
+        Workspace $workspace,
+        FunnelEventRecorder $funnelEvents,
+    ): RedirectResponse {
+        $schedule = MeetingSchedule::query()
+            ->where('workspace_id', $workspace->id)
+            ->where('enabled', true)
+            ->orderBy('id')
+            ->firstOrFail();
+        $submission = LeadMagnetSubmission::query()
+            ->where('workspace_id', $workspace->id)
+            ->find($request->integer('submission'));
+
+        $funnelEvents->record($workspace, FunnelEvent::TYPE_DEMO_REQUESTED, [
+            'subject_type' => $submission ? LeadMagnetSubmission::class : null,
+            'subject_id' => $submission?->id,
+            'contact_id' => $submission?->contact_id,
+            'lead_id' => $submission?->lead_id,
+            'source' => LeadCapture::SOURCE_LEAD_MAGNET,
+            'meta' => ['offer' => 'lead-leakage-calculator'],
+        ]);
+
+        return redirect()->route('meetings.public.show', $schedule->slug);
     }
 
     public function store(
@@ -192,6 +220,11 @@ class LeadLeakageController extends Controller
                 'name' => $offer->name,
                 'version' => $offer->version,
                 'description' => $offer->description,
+                'demo_url' => MeetingSchedule::query()
+                    ->where('workspace_id', $workspace->id)
+                    ->where('enabled', true)
+                    ->orderBy('id')
+                    ->first()?->publicUrl(),
             ],
             'result' => null,
             'submission' => null,

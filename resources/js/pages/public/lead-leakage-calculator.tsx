@@ -50,7 +50,7 @@ export default function LeadLeakageCalculator({
     submission,
 }: {
     workspace: { name: string; slug: string };
-    offer: { slug: string; name: string; version: string; description: string | null };
+    offer: { slug: string; name: string; version: string; description: string | null; demo_url: string | null };
     result: Calculation | null;
     submission: {
         id: number;
@@ -190,6 +190,14 @@ export default function LeadLeakageCalculator({
                         ) : null}
                         {submission?.delivery_status === 'failed' ? (
                             <p className="mt-2 text-sm text-red-700">We could not queue the email copy. Your result is still available above; no marketing subscription was added because of this error.</p>
+                        ) : null}
+                        {offer.demo_url ? (
+                            <a
+                                href={submission ? offer.demo_url + '?submission=' + submission.id : offer.demo_url}
+                                className="mt-6 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white"
+                            >
+                                Request a personalized EvoCrm demo
+                            </a>
                         ) : null}
                     </section>
                 ) : null}

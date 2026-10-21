@@ -40,6 +40,8 @@ class FunnelEvent extends Model
 
     public const TYPE_LEAD_MAGNET_SUBMITTED = 'lead_magnet_submitted';
 
+    public const TYPE_DEMO_REQUESTED = 'demo_requested';
+
     protected function casts(): array
     {
         return [

@@ -6,6 +6,7 @@ use App\Models\ContactConsent;
 use App\Models\FunnelEvent;
 use App\Models\Lead;
 use App\Models\LeadMagnetSubmission;
+use App\Models\MeetingSchedule;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -19,6 +20,41 @@ it('renders the workspace lead leakage calculator publicly', function () {
             ->component('public/lead-leakage-calculator')
             ->where('offer.slug', 'lead-leakage-calculator')
             ->where('result', null));
+});
+
+it('offers the configured booking flow and records a deduplicated demo request', function () {
+    $user = User::factory()->create();
+    $schedule = MeetingSchedule::forUser($user);
+    $key = (string) Str::uuid();
+
+    $response = $this->post("/lead-magnet/{$user->workspace->slug}/lead-leakage-calculator", [
+        'submission_key' => $key,
+        'monthly_inquiries' => 10,
+        'average_customer_value' => 1000,
+        'inquiry_to_customer_rate' => 20,
+        'missed_inquiry_rate' => 10,
+        'delayed_response_rate' => 10,
+        'follow_up_dropoff_rate' => 10,
+    ])->assertOk();
+
+    $submission = LeadMagnetSubmission::query()->where('idempotency_key', $key)->firstOrFail();
+
+    $response->assertInertia(fn ($page) => $page->where('offer.demo_url', $schedule->publicUrl()));
+
+    $this->get(route('lead-magnet.demo', [
+        'workspace' => $user->workspace->slug,
+        'submission' => $submission->id,
+    ]))->assertRedirect(route('meetings.public.show', $schedule->slug));
+
+    $this->get(route('lead-magnet.demo', [
+        'workspace' => $user->workspace->slug,
+        'submission' => $submission->id,
+    ]))->assertRedirect(route('meetings.public.show', $schedule->slug));
+
+    expect(FunnelEvent::query()
+        ->where('event_type', FunnelEvent::TYPE_DEMO_REQUESTED)
+        ->where('subject_id', $submission->id)
+        ->count())->toBe(1);
 });
 
 it('persists a calculator submission, creates the shared lead, and records separate consent', function () {

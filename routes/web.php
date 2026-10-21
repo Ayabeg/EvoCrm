@@ -115,6 +115,9 @@ Route::get('/lead-magnet/{workspace:slug}/lead-leakage-calculator', [LeadLeakage
 Route::post('/lead-magnet/{workspace:slug}/lead-leakage-calculator', [LeadLeakageController::class, 'store'])
     ->middleware('throttle:20,1')
     ->name('lead-magnet.lead-leakage.store');
+Route::get('/lead-magnet/{workspace:slug}/demo', [LeadLeakageController::class, 'demo'])
+    ->middleware('throttle:30,1')
+    ->name('lead-magnet.demo');
 
 Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
 
