@@ -51,6 +51,7 @@ final class GooglePlacesClient
                         'places.internationalPhoneNumber',
                         'places.nationalPhoneNumber',
                         'places.websiteUri',
+                        'places.googleMapsUri',
                     ]),
                 ])
                 ->post(self::ENDPOINT, [

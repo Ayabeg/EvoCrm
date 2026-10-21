@@ -91,6 +91,11 @@ return [
         'block_unknown_verification' => env('EVOSALES_BLOCK_UNKNOWN_EMAIL', false),
     ],
 
+    'enrichment' => [
+        // Queue middleware uses this workspace-scoped budget for all provider calls.
+        'records_per_minute' => (int) env('EVOSALES_ENRICHMENT_RECORDS_PER_MINUTE', 30),
+    ],
+
     'roles' => ['owner', 'admin', 'member'],
 
     'cities' => [

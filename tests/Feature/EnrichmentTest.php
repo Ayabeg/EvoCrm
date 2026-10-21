@@ -9,6 +9,8 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Services\Enrichment\EnrichmentPersister;
 use App\Services\Enrichment\EnrichmentService;
+use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 
@@ -106,7 +108,21 @@ it('persists website and places runs with confidence and auto-applies empty high
 
     Http::assertSent(fn ($request) => $request->url() === 'https://places.googleapis.com/v1/places:searchText'
         && $request->hasHeader('X-Goog-Api-Key', 'test-places-key')
+        && str_contains((string) $request->header('X-Goog-FieldMask')[0], 'places.googleMapsUri')
         && str_contains((string) $request->body(), 'Clinique Atlas'));
+});
+
+it('bounds queued enrichment and prevents duplicate record overlap', function () {
+    $job = new EnrichRecordJob(17, EnrichmentRun::TARGET_COMPANY, 42);
+    $middleware = $job->middleware();
+
+    expect($job->uniqueId())->toBe('17:company:42')
+        ->and($middleware[0])->toBeInstanceOf(RateLimited::class)
+        ->and($middleware[0]->releaseAfter)->toBe(60)
+        ->and($middleware[1])->toBeInstanceOf(WithoutOverlapping::class)
+        ->and($middleware[1]->key)->toBe('17:company:42')
+        ->and($middleware[1]->releaseAfter)->toBe(30)
+        ->and($middleware[1]->expiresAfter)->toBe(90);
 });
 
 it('does not invent an email when the public page has none', function () {

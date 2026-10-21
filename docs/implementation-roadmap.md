@@ -47,6 +47,6 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 - **Schema evolution:** existing migrations already contain enrichment, capture, scoring, import, and outbound tables. New tables must extend those sources of truth instead of duplicating them.
 - **No fabricated evidence:** unavailable enrichment fields remain unknown; estimates in the calculator are explicitly user-provided assumptions.
 - **Provider semantics:** acceptance by a mail API is not delivery; catch-all and unknown email results remain conservative.
-- **Enrichment queueing:** bulk queueing is capped at 100 IDs per request, workspace-scoped, and deduplicated by workspace/target type/record ID. Provider-rate limiting and operator retry controls still require the E2/E3 follow-up slices.
+- **Enrichment queueing:** bulk queueing is capped at 100 IDs per request, workspace-scoped, deduplicated by workspace/target type/record ID, rate-limited per workspace, and protected against concurrent duplicate execution. Operator retry controls and broader provider coverage remain open.
 - **Quality-based selection:** contact segments and campaign saved filters can now require a minimum persisted lead data-quality score; broader duplicate review and provider-backed verification remain open.
 

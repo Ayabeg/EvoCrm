@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Jobs\EnrichRecordJob;
 use App\Models\Activity;
 use App\Models\Company;
 use App\Models\Contact;
@@ -39,6 +40,7 @@ use App\Support\Locale;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskStarting;
@@ -46,6 +48,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -81,6 +84,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        RateLimiter::for('enrichment', function (EnrichRecordJob $job): Limit {
+            return Limit::perMinute((int) config('evosales.enrichment.records_per_minute', 30))
+                ->by('workspace:'.$job->workspaceId);
+        });
 
         Gate::policy(Contact::class, ContactPolicy::class);
         Gate::policy(Company::class, CompanyPolicy::class);

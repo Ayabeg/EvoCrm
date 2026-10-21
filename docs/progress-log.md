@@ -27,6 +27,7 @@
 - Connected data quality to prospect selection: contact segments and outbound campaign saved filters can require a minimum persisted lead data-quality score; filter/outbound regression checks pass 31 tests / 258 assertions.
 - Added a separate lead-magnet enrichment-consent flag and queued contact enrichment only for explicit opt-in submissions. The public calculator suite passes 5 tests / 55 assertions; ESLint and TypeScript checks pass.
 - Added non-sending campaign previews with eligible/ineligible counts, explicit reasons, and a five-contact personalized sample. Outbound page/regression coverage passes 22 tests / 221 assertions; changed PHP passes Pint and the frontend type/lint checks pass.
+- Hardened enrichment jobs with workspace-scoped rate limiting, duplicate overlap protection, bounded retry behavior, and the canonical Google Maps field mask; enrichment/bulk coverage passes 12 tests / 104 assertions.
 - Repository-wide `php artisan test --compact` was run after the acquisition changes and remains non-zero on pre-existing UI/source-contract failures, including `tests/Feature/P04AppShellTest.php:59`, which still expects the literal `Search EvoCRM` shell text while the current shell renders the translated `Search` label. These failures are outside the acquisition-system files. Acquisition-focused suites remain green, and the two existing InvalidArgumentException import warnings are unchanged.
 
 ### In progress
