@@ -21,8 +21,6 @@ class TrackingController extends Controller
             ->where('direction', 'out')
             ->first();
 
-        abort_unless($message, 404);
-
         if ($message) {
             $message->forceFill([
                 'opened_at' => $message->opened_at ?? now(),
