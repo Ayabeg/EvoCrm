@@ -4,6 +4,7 @@ use App\Models\Contact;
 use App\Models\Workspace;
 use App\Services\Outbound\OutboundDispatcher;
 use App\Services\Outbound\SuppressionService;
+use Illuminate\Support\Facades\URL;
 
 it('blocks outbound when the recipient is suppressed', function () {
     $workspace = Workspace::factory()->create();
@@ -28,9 +29,27 @@ it('blocks outbound when the recipient is suppressed', function () {
 
 it('writes suppression from the public unsubscribe URL', function () {
     $workspace = Workspace::factory()->create();
+    $url = URL::signedRoute('unsubscribe', [
+        'email' => 'stop@evotechly.dz',
+        'workspace' => $workspace->id,
+    ]);
 
-    $this->get('/unsubscribe?email=stop@evotechly.dz&workspace='.$workspace->id)
+    $this->get($url)
         ->assertOk();
 
     expect(app(SuppressionService::class)->isSuppressed($workspace, 'stop@evotechly.dz'))->toBeTrue();
+});
+
+it('rejects tampered unsubscribe workspace or address parameters', function () {
+    $workspace = Workspace::factory()->create();
+    $other = Workspace::factory()->create();
+    $url = URL::signedRoute('unsubscribe', [
+        'email' => 'stop@evotechly.dz',
+        'workspace' => $workspace->id,
+    ]);
+
+    $this->get($url.'&workspace='.$other->id)->assertForbidden();
+
+    expect(app(SuppressionService::class)->isSuppressed($workspace, 'stop@evotechly.dz'))->toBeFalse()
+        ->and(app(SuppressionService::class)->isSuppressed($other, 'stop@evotechly.dz'))->toBeFalse();
 });

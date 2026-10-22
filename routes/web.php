@@ -24,10 +24,10 @@ use App\Http\Controllers\Crm\DealLineItemController;
 use App\Http\Controllers\Crm\DealSplitController;
 use App\Http\Controllers\Crm\EnrichmentController;
 use App\Http\Controllers\Crm\FunnelController;
+use App\Http\Controllers\Crm\KnowledgeBaseController;
 use App\Http\Controllers\Crm\LeadCaptureController;
 use App\Http\Controllers\Crm\LeadController;
 use App\Http\Controllers\Crm\LeadOsController;
-use App\Http\Controllers\Crm\KnowledgeBaseController;
 use App\Http\Controllers\Crm\QuickRecordController;
 use App\Http\Controllers\Crm\QuickRecordHarnessController;
 use App\Http\Controllers\Crm\QuoteController;
@@ -58,8 +58,8 @@ use App\Http\Controllers\Outbound\SuppressionController;
 use App\Http\Controllers\Outbound\TemplateController;
 use App\Http\Controllers\Outbound\WarmupController;
 use App\Http\Controllers\Public\FunnelTrackingController;
-use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Public\LeadLeakageController;
+use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Public\MeetingBookController;
 use App\Http\Controllers\Public\QuoteAcceptanceController;
 use App\Http\Controllers\Public\TrackingController;
@@ -119,7 +119,9 @@ Route::get('/lead-magnet/{workspace:slug}/demo', [LeadLeakageController::class, 
     ->middleware('throttle:30,1')
     ->name('lead-magnet.demo');
 
-Route::get('/unsubscribe', UnsubscribeController::class)->name('unsubscribe');
+Route::get('/unsubscribe', UnsubscribeController::class)
+    ->middleware('signed')
+    ->name('unsubscribe');
 
 Route::get('/up/scheduler', SchedulerHeartbeatController::class)->name('up.scheduler');
 

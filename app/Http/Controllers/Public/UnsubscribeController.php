@@ -15,12 +15,10 @@ class UnsubscribeController extends Controller
         $data = $request->validate([
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string'],
-            'workspace' => ['nullable', 'integer'],
+            'workspace' => ['required', 'integer', 'exists:workspaces,id'],
         ]);
 
-        $workspace = isset($data['workspace'])
-            ? Workspace::query()->find($data['workspace'])
-            : Workspace::query()->first();
+        $workspace = Workspace::query()->findOrFail($data['workspace']);
 
         if ($workspace) {
             if (! empty($data['email'])) {

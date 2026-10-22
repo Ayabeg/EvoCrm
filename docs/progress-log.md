@@ -44,6 +44,7 @@
 - Added conservative reply classification and suppression handling. IMAP replies now persist `interested`, `not_interested`, `out_of_office`, `unsubscribe`, or `needs_review` with confidence and classification time; explicit unsubscribe language creates a workspace suppression and cannot branch follow-ups. Reply/acquisition/runner coverage passes 12 tests / 54 assertions; Pint, targeted ESLint, TypeScript, and the production Vite build pass.
 - Current full regression after the import and reply slices: 1,318 tests, 1,304 passed, 13 failures, 35,593 assertions, and 1 skipped. The failures remain the existing UI/source-contract failures outside these acquisition changes; the two existing InvalidArgumentException warnings are unchanged.
 - Added the interested-reply handoff: an `interested` inbound reply now creates one durable CRM task for human follow-up, keyed to the inbound message so repeated IMAP ingestion cannot duplicate the task. Reply/acquisition coverage passes 3 tests / 21 assertions for this handoff, and Pint passes.
+- Fixed a tenant-isolation issue in public unsubscribe links: raw workspace/address query parameters are now protected by Laravel signed URLs, the endpoint requires a real workspace, and tampered parameters are rejected. Suppression/outbound coverage passes 21 tests / 137 assertions; Pint passes.
 
 ### In progress
 

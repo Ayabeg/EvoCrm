@@ -4,6 +4,7 @@ namespace App\Services\Outbound;
 
 use App\Models\Contact;
 use App\Models\Workspace;
+use Illuminate\Support\Facades\URL;
 
 /**
  * Renders {{variable}} placeholders in email subjects and bodies against a
@@ -29,12 +30,11 @@ class TemplateRenderer
 
     /**
      * Absolute unsubscribe URL on the app host (crm.evotechly.com in
-     * production). Public by design; the email + workspace id are the
-     * capability.
+     * production). Public by design; the signed URL is the capability.
      */
     public function unsubscribeUrl(Workspace $workspace, Contact $contact): string
     {
-        return route('unsubscribe', array_filter([
+        return URL::signedRoute('unsubscribe', array_filter([
             'email' => $contact->email,
             'phone' => $contact->email ? null : $contact->phone_e164,
             'workspace' => $workspace->id,
