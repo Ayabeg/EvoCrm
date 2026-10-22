@@ -115,6 +115,8 @@ Contact CSV imports may contain incomplete business records. A row with a compan
 
 The IMAP reply poller stores a conservative classification for each inbound reply. Explicit unsubscribe language creates a workspace suppression and stops follow-ups; `needs_review` and other non-suppression classifications are visible in Outbound → Replies for human handling. The poller marks mail seen only after CRM persistence and deduplicates provider message IDs/UID fallbacks.
 
+An `interested` classification also creates one CRM task titled `Review interested reply`, assigned to the contact owner when available. The task is keyed to the inbound message ID, so polling or replaying the same provider event does not create duplicate follow-up work.
+
 ## Environment requirements
 
 Required platform values:

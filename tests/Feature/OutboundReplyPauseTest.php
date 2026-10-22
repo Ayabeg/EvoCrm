@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Enrollment;
 use App\Models\Mailbox;
@@ -71,6 +72,11 @@ it('pauses the sequence enrollment when IMAP records a reply', function () {
     expect($enrollment->refresh()->status)->toBe('paused')
         ->and($enrollment->next_run_at)->toBeNull()
         ->and($reply->reply_classification)->toBe(ReplyClassifier::INTERESTED)
+        ->and(Activity::query()
+            ->where('contact_id', $contact->id)
+            ->where('type', 'task')
+            ->where('meta->reply_outbound_message_id', (string) $reply->id)
+            ->count())->toBe(1)
         ->and($duplicate->id)->toBe($reply->id)
         ->and(OutboundMessage::query()
             ->where('contact_id', $contact->id)

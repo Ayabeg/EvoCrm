@@ -2,12 +2,14 @@
 
 namespace App\Services\Outbound;
 
+use App\Models\Activity;
 use App\Models\Contact;
 use App\Models\Enrollment;
 use App\Models\Mailbox;
 use App\Models\OutboundMessage;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
+use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\WorkflowRunner;
 use RuntimeException;
 
@@ -23,6 +25,7 @@ class ImapReplyPoller
     public function __construct(
         private WorkflowRunner $workflows,
         private ProductAnalytics $analytics,
+        private ActivityRecorder $activities,
         private ReplyClassifier $classifier,
         private SuppressionService $suppressions,
     ) {}
@@ -183,6 +186,10 @@ class ImapReplyPoller
             );
         }
 
+        if ($classification['label'] === ReplyClassifier::INTERESTED) {
+            $this->createInterestedReplyTask($contact, $inbound);
+        }
+
         if ($lastOutbound && ! $lastOutbound->replied_at) {
             $lastOutbound->forceFill(['replied_at' => now()])->save();
             $this->analytics->capture(ProductAnalytics::EMAIL_REPLIED, [
@@ -200,6 +207,33 @@ class ImapReplyPoller
         }
 
         return $inbound;
+    }
+
+    private function createInterestedReplyTask(Contact $contact, OutboundMessage $inbound): void
+    {
+        $alreadyCreated = Activity::query()
+            ->forWorkspace($inbound->workspace_id)
+            ->where('type', 'task')
+            ->where('contact_id', $contact->id)
+            ->where('meta->reply_outbound_message_id', (string) $inbound->id)
+            ->exists();
+
+        if ($alreadyCreated) {
+            return;
+        }
+
+        $this->activities->record($contact->workspace ?? $inbound->workspace, [
+            'type' => 'task',
+            'subject' => 'Review interested reply',
+            'body' => 'An outbound reply was classified as interested. Review the reply and follow up.',
+            'due_at' => now(),
+            'owner_id' => $contact->owner_id,
+            'contact_id' => $contact->id,
+            'meta' => [
+                'reply_outbound_message_id' => (string) $inbound->id,
+                'source' => 'reply_classifier',
+            ],
+        ]);
     }
 
     protected function pauseEnrollmentOnReply(Contact $contact, OutboundMessage $outbound): void
