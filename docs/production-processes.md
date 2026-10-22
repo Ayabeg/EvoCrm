@@ -105,7 +105,11 @@ Each command records start/success/failure freshness in `scheduled_command_runs`
 Inbound webhooks resolve a workspace from a stored provider key, not “first workspace”:
 
 - Evolution and Meta lead ingestion
-- Outbound bounce events at `POST /webhooks/outbound/bounces/{webhookKey}`
+- Outbound delivery, bounce, and complaint events at `POST /webhooks/outbound/bounces/{webhookKey}`. The route name is retained for compatibility; the endpoint requires an event ID and records the normalized event in `outbound_provider_events` before projecting message state.
+
+The outbound event payload may identify the message with `message_id` or recipient `email`/`to`. Normalize `type` as `delivered`, `soft`, `hard`, or a complaint value such as `spam_complaint`. Provider acceptance is recorded separately from confirmed delivery. Duplicate event IDs are workspace/provider scoped and safe to retry.
+
+For manual enrichment maintenance, run `php artisan leads:enrich --stale-hours=168` from the web container. It queues stale contacts, companies, and leads for the database worker; use `--sync` only for controlled local verification. The worker must be running for queued enrichment, lead-magnet result delivery, and other background jobs.
 
 ## Environment requirements
 

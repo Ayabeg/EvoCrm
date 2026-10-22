@@ -30,7 +30,7 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 | I2 | End-to-end inbound workflow | **in progress** | M3, E3 | Visit → use → submit → consent → shared record → permitted enrichment → delivery → demo request → analytics is integration-tested | M |
 | I3 | Data maintenance workflow | **in progress** | E3, O1, A3 | Stale records can be refreshed without replacing stronger evidence or reintroducing suppressed contacts | M |
 | Q1 | Security, privacy, and abuse review | **in progress** | E3, O2, M3 | Authorization, validation, rate limits, secrets, PII logging, webhooks, XSS/SQLi protections, and suppression behavior reviewed with tests | M |
-| Q2 | Release readiness and operating documentation | planned | I1, I2, I3, Q1 | Run/test/configure/operate docs, migrations, external dependency blockers, and final verification report are current | M |
+| Q2 | Release readiness and operating documentation | **in progress** | I1, I2, I3, Q1 | Run/test/configure/operate docs, migrations, external dependency blockers, and final verification report are current | M |
 
 ## Execution order
 
