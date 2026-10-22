@@ -51,6 +51,7 @@
 - Closed the DNS-rebinding gap in enrichment fetches: every resolvable A/AAAA answer is checked for public range and the first approved address is pinned with Guzzle’s `resolve` option while preserving hostname-based TLS/SNI. Existing redirect/SSRF regression tests pass and Pint passes.
 - Closed the direct-PII analytics default: PostHog identity now sends only role plus a stable pseudonymous user ID unless `POSTHOG_IDENTIFY_PII=true` is explicitly configured. Backend privacy regression coverage passes and the changed frontend passes typecheck/lint.
 - Removed populated PostHog project keys from `.env.example`, `.env.production.example`, and checked-in UI evidence; templates keep provider values empty and default `POSTHOG_IDENTIFY_PII=false`. The local ignored `.env` remains an external secret-rotation item.
+- Re-read the supplied build brief and reviewed `Awaisali36/50k-lead-generation-system` as an implementation reference. Its staged acquisition/enrichment/qualification workflow informed the existing provider boundaries, bounded batch processing, provenance, and explainable scoring without importing its n8n/Airtable/Apify/Gemini assumptions. The complete focused acquisition regression set passes 194 tests / 1,371 assertions.
 
 ### In progress
 

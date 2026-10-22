@@ -4,6 +4,12 @@
 
 Dead Enrichment, EvoCRM Outbound, and Dead Magnet are capabilities inside the existing EvoCRM Laravel application. They share the existing workspace-scoped CRM records and activity/event infrastructure; they are not separate applications or competing customer databases.
 
+## Reference implementation review
+
+The supplied `Awaisali36/50k-lead-generation-system` repository was reviewed as an operational reference. Its n8n/Airtable workflow makes the useful separation explicit: source acquisition, staged enrichment, aggregation, and qualification are separate steps, with a bounded lead batch and a reusable qualification prompt. EvoCRM carries those ideas through native provider adapters, durable jobs, workspace-scoped provenance, chunked audience processing, and explainable data-quality/sales-fit scores.
+
+The reference's Apollo/LinkedIn scraping, Airtable tables, and Gemini-dependent scoring are not copied into the product. EvoCRM does not claim provider results without credentials or authorization, and public collection remains subject to the existing safety, rate-limit, privacy, and terms-of-service boundaries.
+
 ## Current runtime
 
 - Laravel HTTP application with Inertia/React screens.
