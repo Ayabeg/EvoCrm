@@ -129,6 +129,8 @@ class ProductAnalytics
         if (config('services.posthog.identify_pii', false)) {
             $identity['email'] = $user->email;
             $identity['name'] = $user->name;
+        } else {
+            unset($properties['email'], $properties['name']);
         }
 
         $payload = [
