@@ -136,6 +136,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Added a non-destructive migration preflight: the funnel-event unique constraint now stops with an actionable error when historical subject-scoped duplicates exist, instead of failing later with an opaque database-index error. The focused funnel regression remains green; the repository-wide baseline still has the documented 13 unrelated UI/source-contract failures.
 - Rechecked the migration follow-up with Codex Security scan `e1610fcd-062f-4485-b9c4-b4d08ee6ba00` for `5d125577` to `3d578579`: complete coverage of the migration surface and zero reportable findings.
 - Added a direct migration regression that removes only the test database's new index, inserts duplicate subject events, and verifies the preflight fails before schema creation; the migration-focused set now passes 20 tests / 152 assertions.
+- Latest full PHP regression after the migration preflight test: 1,339 tests, 1,325 passed, 13 existing UI/source-contract failures, 35,682 assertions, and 1 skipped. No acquisition-system PHP test failed; the two existing InvalidArgumentException warnings remain unchanged.
 
 ### Remaining
 
