@@ -48,7 +48,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 
 - Live SMTP/IMAP, mail-stack, Google Places, email-verification, Evolution, and other provider behavior remains unverified without configured external accounts.
 - Full repository release verification remains non-green because of the 13 pre-existing UI/source-contract failures.
-- The new funnel-event uniqueness migration should be preceded by a production data check for historical duplicate subject-scoped rows; no destructive reconciliation policy was assumed locally.
+- The funnel-event uniqueness migration performs a non-destructive preflight and stops with an actionable error if historical duplicate subject-scoped rows exist; no destructive reconciliation policy is assumed locally.
 - The repository-wide review remains partial by design; the committed hardening diff review covers the quote/import follow-up and the full code change in `46661ae7`.
 
 ## Deployment requirements and blockers
