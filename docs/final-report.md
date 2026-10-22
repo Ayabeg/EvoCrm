@@ -14,6 +14,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Dead Magnet Lead Leakage Calculator, validation, duplicate-safe submission persistence, separate delivery/marketing/enrichment consent, shared CRM handoff, queued result delivery with honest failure states, demo handoff, booking attribution, and persisted form-start, calculator-use, submission, demo-request, and booking funnel analytics.
 - Public analytics consent gating and pseudonymous authenticated analytics identity.
 - Database-backed idempotency for subject-scoped funnel events, with atomic recorder behavior and append-only subjectless visit tracking.
+- External repository audit completed: the three Ayabeg repositories are public but empty (size `0`, no remote heads), so there was no implementation to import; the non-empty 50k lead-generation repository was used as a reference for workflow boundaries only.
 
 ## Verification evidence
 
@@ -33,6 +34,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
 - Current acquisition diff-scoped Codex Security review `df528cd2-71b4-4b34-a846-e54a368f0cad` for `286f2634` through `5d125577`: complete coverage of three changed security surfaces and zero reportable findings. The subsequent migration-only review is recorded below.
 - Migration follow-up security review `e1610fcd-062f-4485-b9c4-b4d08ee6ba00` for `5d125577` through `3d578579`: complete coverage of the migration preflight and zero reportable findings.
+- External repository audit verified the absence of reusable source in `Ayabeg/Lead-enrichment-system`, `Ayabeg/outbound-system`, and `Ayabeg/Dead-Magnet`; `Awaisali36/50k-lead-generation-system` remains reference-only and its n8n/Airtable/Apify/Gemini assumptions were not adopted.
 
 ## Key implementation commits
 

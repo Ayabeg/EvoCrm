@@ -155,3 +155,15 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Latest full PHP regression after the conservative unknown-verification default: 1,340 tests, 1,326 passed, 13 existing UI/source-contract failures, 35,684 assertions, and 1 skipped. No acquisition-system PHP test failed; the two existing InvalidArgumentException warnings remain unchanged.
 - Completed security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
 
+## 2026-10-23 — external repository audit
+
+### Completed / verified
+
+- Checked the user-provided `Ayabeg/Lead-enrichment-system`, `Ayabeg/outbound-system`, and `Ayabeg/Dead-Magnet` repositories through their GitHub remotes and API metadata. All three are public repositories with size `0`, no remote heads, and no source or history available to integrate.
+- Reconfirmed `Awaisali36/50k-lead-generation-system` as the available non-empty reference repository. Its staged acquisition workflow informed provider boundaries, bounded processing, provenance, and qualification decisions; its n8n, Airtable, Apify, and Gemini-specific assumptions were not imported into EvoCRM.
+- No external source was copied, and no repository-local user changes were touched. The existing EvoCRM implementation remains the source of truth for all three connected systems.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open. No external repository currently supplies code that removes those dependencies.
+
