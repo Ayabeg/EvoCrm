@@ -57,8 +57,9 @@
 - Fixed cross-workspace API owner assignment for contacts and activities with workspace-scoped `Rule::exists` validation and regression tests for create/update rejection. Targeted API coverage passes 7 tests / 30 assertions. Commit: `a15645ca`.
 - Hardened trust boundaries after the security review: authenticated analytics events now ignore forged client distinct IDs; the OpenManus adapter fails closed with 503 when its bearer token is missing and 401 when invalid; outbound HTML previews use a sandboxed iframe. Targeted analytics/API/outbound coverage passes 34 tests / 214 assertions, Python AST parsing passes, and frontend type checking passes. Commit: `a65d66ba`.
 - Closed workflow webhook DNS rebinding by reusing public DNS validation and Guzzle address pinning before POST, with redirects disabled. Workflow/fetcher coverage passes 25 tests / 117 assertions. Commit: `6a76c1ba`.
-- Final focused acquisition regression after current-tree hardening passes 193 tests / 1,360 assertions. The scan's remaining open follow-ups are outbound consent policy, outbound bulk caps/queueing, Evolution payloads without provider identity, analytics consent, and full outbound-email HTML sanitization.
+- Final focused acquisition regression before the Evolution replay fix passed 193 tests / 1,360 assertions. The scan's remaining open follow-ups are outbound consent policy, outbound bulk caps/queueing, analytics consent, and full outbound-email HTML sanitization.
 - Closed the Evolution missing-identity replay gap: identity-less payloads now receive a canonical workspace/instance/event/payload hash before event and message persistence, so provider retries return the original message instead of repeating side effects. Evolution webhook coverage passes 4 tests / 13 assertions. Commit: `52470e36`.
+- Final focused acquisition regression after the Evolution replay fix passes 194 tests / 1,363 assertions.
 
 ### In progress
 
