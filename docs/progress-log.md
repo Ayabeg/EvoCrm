@@ -106,6 +106,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 ### Completed / verified
 
 - The current-tree Codex Security review is sealed as scan 013e6eaf-f741-4d08-ad0f-5ab2bef6f61b with zero reportable findings across seven reviewed acquisition surfaces. Coverage is explicitly partial; the report records live-provider signature/delivery semantics, deployment secret rotation, legal review, and unrelated repository surfaces as limitations. The scan snapshot predates the quote/import follow-up and final documentation edits; those follow-ups have separate targeted regression evidence.
+- A committed diff-scoped Codex Security review is also sealed as scan 8387f1e4-4aca-49d9-98e7-7621a3a338c1 for 29aad813 to 46661ae7, with zero reportable findings and complete coverage of five changed security surfaces. Live provider behavior, deployment secret rotation, and legal compliance remain external limitations.
 - Committed the hardening slice as 46661ae7. The four unrelated user edits remain unstaged and untouched.
 
 ### Remaining

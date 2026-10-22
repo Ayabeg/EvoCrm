@@ -21,6 +21,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `npm run types:check` passed.
 - `git diff --check` passed.
 - Current-tree Codex Security standard review `013e6eaf-f741-4d08-ad0f-5ab2bef6f61b`: zero reportable findings across seven reviewed acquisition surfaces; coverage is explicitly partial and limitations are recorded by the scan.
+- Committed hardening diff review `8387f1e4-4aca-49d9-98e7-7621a3a338c1` for `29aad813` to `46661ae7`: zero reportable findings with complete coverage of five changed security surfaces. Live provider behavior, deployment secret rotation, and legal compliance remain external limitations.
 
 ## Key implementation commits
 
@@ -35,7 +36,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 
 - Live SMTP/IMAP, mail-stack, Google Places, email-verification, Evolution, and other provider behavior remains unverified without configured external accounts.
 - Full repository release verification remains non-green because of the 13 pre-existing UI/source-contract failures.
-- The sealed security review used the pre-follow-up hardening snapshot; the quote/import follow-up and final documentation edits were created afterward. Their targeted tests passed, but they are not represented by that scan snapshot.
+- The repository-wide review remains partial by design; the committed hardening diff review covers the quote/import follow-up and the full code change in `46661ae7`.
 
 ## Deployment requirements and blockers
 
