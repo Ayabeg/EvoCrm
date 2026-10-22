@@ -86,6 +86,28 @@ it('records a visit from the public tracking pixel', function () {
     )->toBeTrue();
 });
 
+it('bounds attribution and strips query strings from public visit metadata', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+
+    $this->withHeader('Referer', 'https://example.test/landing?email=person@example.test')
+        ->get('/track/'.$workspace->slug.'/visit.gif?'.http_build_query([
+            'utm_source' => str_repeat('s', 140),
+            'path' => '/lead?email=person@example.test',
+        ]))
+        ->assertOk();
+
+    $event = FunnelEvent::query()
+        ->forWorkspace($workspace)
+        ->where('event_type', FunnelEvent::TYPE_VISIT)
+        ->latest('id')
+        ->firstOrFail();
+
+    expect($event->utm_source)->toHaveLength(100)
+        ->and($event->meta['referrer'])->toBe('https://example.test/landing')
+        ->and($event->meta['path'])->toBe('/lead');
+});
+
 it('records a visit when an ad-attributed lead is created', function () {
     $user = User::factory()->create();
     $workspace = $user->workspace;
