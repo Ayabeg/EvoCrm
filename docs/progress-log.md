@@ -185,8 +185,9 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Restored the localized `Search EvoCRM…` label in the live EvoRail's accessible name, visible control, and collapsed-rail tooltip. This matches the existing translation catalog and shell contract rather than the generic `Search` fallback.
 - The affected shell, locale, and Aurora contract set passes 38 tests / 475 assertions. `npm run types:check`, targeted ESLint, and `git diff --check` pass.
+- Latest repository-wide regression after the shell repair: 1,341 tests, 1,332 passed, 8 existing branding/design-system/automation contract failures, 35,740 assertions, and 1 skipped. No acquisition-system test failed; the two existing InvalidArgumentException warnings remain unchanged.
 
 ### Remaining
 
-- A repository-wide regression is still required after this UI contract repair. Live verification-provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and any remaining unrelated UI/source-contract failures remain open.
+- The remaining eight branding/design-system/automation contract failures are outside the acquisition systems. Live verification-provider semantics, deployment APP_KEY rotation, and legal sign-off for consentless cold outreach remain open.
 

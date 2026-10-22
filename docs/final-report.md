@@ -21,7 +21,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Previous complete focused acquisition regression: **207 tests / 1,440 assertions passed**.
 - Latest post-hardening acquisition integration subset: **181 tests / 1,254 assertions passed**, including lead-magnet engagement tracking, reply safety, imports, enrichment, provider events, and outbound execution.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
-- Latest repository-wide regression after the fail-closed verification fallback: **1,341 tests; 1,327 passed; 13 existing UI/source-contract failures; 35,686 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- Latest repository-wide regression after the shell contract repair: **1,341 tests; 1,332 passed; 8 existing branding/design-system/automation contract failures; 35,740 assertions; 1 skipped**. The 8 failures are outside the acquisition-system implementation.
 - Frontend Vitest suite: **27 test files / 97 tests passed**.
 - `npm run types:check` passed.
 - Local browser smoke test passed for the public Lead Leakage Calculator at desktop and 390px mobile widths: the optional contact fields render as text/email controls, the page has no horizontal overflow, an isolated submission rendered the result and linked the shared CRM record, and Reset inputs restored defaults and hid the prior result.
@@ -57,7 +57,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 ## Implemented but not fully verified
 
 - Live SMTP/IMAP, mail-stack, Google Places, email-verification, Evolution, and other provider behavior remains unverified without configured external accounts.
-- Full repository release verification remains non-green because of the 13 pre-existing UI/source-contract failures.
+- Full repository release verification remains non-green because of the 8 remaining branding/design-system/automation contract failures.
 - The funnel-event uniqueness migration performs a non-destructive preflight and stops with an actionable error if historical duplicate subject-scoped rows exist; no destructive reconciliation policy is assumed locally.
 - The repository-wide review remains partial by design; the committed hardening diff review covers the quote/import follow-up and the full code change in `46661ae7`.
 
