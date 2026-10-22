@@ -70,6 +70,7 @@
 - Final focused acquisition regression after the explicit consent-policy change passes 207 tests / 1,440 assertions. The repository typecheck remains green from the analytics/privacy change.
 - The latest repository-wide regression runs 1,334 tests with 1,320 passing, 13 existing UI/source-contract failures, 35,658 assertions, and 1 skipped. The failures remain outside the acquisition-system implementation; the two existing `InvalidArgumentException` import warnings are unchanged.
 - Completed the current-tree standard security review (`c38da5d1-4641-46e6-9a7c-7255f7d75f01`) at revision `02cac89f`: no reportable findings across the reviewed acquisition surfaces. Coverage is explicitly partial; live provider webhook semantics, deployment secret rotation, consentless-outreach legal review, and unrelated repository surfaces remain documented limitations.
+- Added the release-readiness report with explicit implemented/verified, incomplete, external-blocker, test, commit, and deployment sections. Commit: `1e61cd7c`.
 
 ### In progress
 
