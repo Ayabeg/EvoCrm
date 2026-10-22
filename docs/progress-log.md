@@ -111,6 +111,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Corrected the architecture, data-model, and production-process documentation to match the current two-minute Meta processing lease and the failed/quarantined handling of stale outbound SMTP claims.
 - Closed the stale-claim idempotency loophole: reusing the original outbound idempotency key now preserves the failed/unknown-provider state instead of automatically re-sending. The outbound runner and department regression set passes 32 tests / 187 assertions, and Pint passes.
 - Tightened reply branching so only explicitly interested replies can take a configured positive branch; out-of-office and review-needed replies now pause the enrollment for human handling. The reply/runner/department regression set passes 35 tests / 199 assertions, and Pint passes.
+- Added bounded lead-magnet form-start analytics and an idempotent calculator-use event keyed to each submission. The public lead-magnet, inbound workflow, meeting attribution, and funnel-tracking subset passes 14 tests / 94 assertions; Pint, TypeScript, and the diff check pass.
 
 ### Remaining
 

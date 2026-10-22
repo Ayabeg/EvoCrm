@@ -30,6 +30,23 @@ it('renders the workspace lead leakage calculator publicly', function () {
         ->count())->toBe(1);
 });
 
+it('records a bounded lead-magnet form-start event', function () {
+    $workspace = User::factory()->create()->workspace;
+
+    $this->get("/lead-magnet/{$workspace->slug}/lead-leakage-calculator/track?event=form_started")
+        ->assertNoContent();
+
+    expect(FunnelEvent::query()
+        ->where('workspace_id', $workspace->id)
+        ->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_FORM_STARTED)
+        ->where('source', 'lead_magnet')
+        ->whereJsonContains('meta->offer', 'lead-leakage-calculator')
+        ->count())->toBe(1);
+
+    $this->get("/lead-magnet/{$workspace->slug}/lead-leakage-calculator/track?event=unknown")
+        ->assertNotFound();
+});
+
 it('offers the configured booking flow and records a deduplicated demo request', function () {
     $user = User::factory()->create();
     $schedule = MeetingSchedule::forUser($user);
@@ -106,7 +123,11 @@ it('persists a calculator submission, creates the shared lead, and records separ
         ->and($submission->accepted_at)->not->toBeNull()
         ->and(ContactConsent::query()->where('contact_id', $contact->id)->where('purpose', 'marketing')->value('status'))
         ->toBe(ContactConsent::STATUS_GRANTED)
-        ->and(FunnelEvent::query()->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED)->count())->toBe(1);
+        ->and(FunnelEvent::query()->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED)->count())->toBe(1)
+        ->and(FunnelEvent::query()
+            ->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_USED)
+            ->where('subject_id', $submission->id)
+            ->count())->toBe(1);
 
     Mail::assertSent(LeadLeakageResultMail::class, fn (LeadLeakageResultMail $mail): bool => $mail->hasTo('owner@clinic-atlas.test'));
 });
@@ -129,7 +150,8 @@ it('does not create a contact for an anonymous calculator use and is idempotent'
 
     expect(LeadMagnetSubmission::query()->where('idempotency_key', $key)->count())->toBe(1)
         ->and(Contact::query()->where('workspace_id', $workspace->id)->count())->toBe(0)
-        ->and(FunnelEvent::query()->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED)->count())->toBe(1);
+        ->and(FunnelEvent::query()->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_SUBMITTED)->count())->toBe(1)
+        ->and(FunnelEvent::query()->where('event_type', FunnelEvent::TYPE_LEAD_MAGNET_USED)->count())->toBe(1);
 });
 
 it('queues permitted public enrichment separately from marketing consent', function () {

@@ -20,6 +20,7 @@ use App\Services\LeadMagnet\LeadLeakageCalculator;
 use App\Support\LeadCaptureNormalizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -73,6 +74,27 @@ class LeadLeakageController extends Controller
             'slug' => $schedule->slug,
             'lead_magnet_submission_id' => $submission?->id,
         ]);
+    }
+
+    public function track(
+        Request $request,
+        Workspace $workspace,
+        string $offer,
+        FunnelEventRecorder $funnelEvents,
+    ): HttpResponse {
+        abort_unless($offer === 'lead-leakage-calculator', 404);
+
+        $eventType = match ((string) $request->query('event')) {
+            'form_started' => FunnelEvent::TYPE_LEAD_MAGNET_FORM_STARTED,
+            default => abort(404),
+        };
+
+        $funnelEvents->record($workspace, $eventType, [
+            'source' => LeadCapture::SOURCE_LEAD_MAGNET,
+            'meta' => ['offer' => $offer],
+        ]);
+
+        return response()->noContent();
     }
 
     public function store(
@@ -201,6 +223,18 @@ class LeadLeakageController extends Controller
         if ($submission->delivery_status === 'queued') {
             DeliverLeadMagnetSubmission::dispatch($submission->id);
         }
+
+        $funnelEvents->record($workspace, FunnelEvent::TYPE_LEAD_MAGNET_USED, [
+            'subject_type' => LeadMagnetSubmission::class,
+            'subject_id' => $submission->id,
+            'contact_id' => $submission->contact_id,
+            'lead_id' => $submission->lead_id,
+            'source' => LeadCapture::SOURCE_LEAD_MAGNET,
+            'utm_source' => $attribution['utm_source'] ?? null,
+            'utm_medium' => $attribution['utm_medium'] ?? null,
+            'utm_campaign' => $attribution['utm_campaign'] ?? null,
+            'meta' => ['offer' => $offer->slug],
+        ]);
 
         if ($submission->contact_id && $submission->enrichment_consent) {
             EnrichRecordJob::dispatch(

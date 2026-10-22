@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useRef } from 'react';
 import type { FormEvent } from 'react';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
@@ -80,6 +81,19 @@ export default function LeadLeakageCalculator({
         utm_campaign: '',
     });
 
+    const formStarted = useRef(false);
+    const trackFormStart = () => {
+        if (formStarted.current) {
+            return;
+        }
+
+        formStarted.current = true;
+        void fetch(`/lead-magnet/${workspace.slug}/${offer.slug}/track?event=form_started`, {
+            credentials: 'same-origin',
+            keepalive: true,
+        }).catch(() => undefined);
+    };
+
     const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         form.post(`/lead-magnet/${workspace.slug}/${offer.slug}`, {
@@ -122,7 +136,7 @@ export default function LeadLeakageCalculator({
                         </div>
                     </div>
 
-                    <form onSubmit={submit} className="space-y-5 rounded-2xl border border-hairline bg-surface p-5 shadow-sm sm:p-7">
+                    <form onFocus={trackFormStart} onSubmit={submit} className="space-y-5 rounded-2xl border border-hairline bg-surface p-5 shadow-sm sm:p-7">
                         <div>
                             <h2 className="text-lg font-semibold text-ink">Your assumptions</h2>
                             <p className="mt-1 text-xs leading-5 text-mute">Percentages are applied sequentially to avoid double-counting the same inquiry.</p>

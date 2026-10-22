@@ -111,6 +111,8 @@ Evolution message events carry a provider message identity into the event ledger
 
 The outbound event payload may identify the message with `message_id` or recipient `email`/`to`. Normalize `type` as `delivered`, `soft`, `hard`, or a complaint value such as `spam_complaint`. Provider acceptance is recorded separately from confirmed delivery. Duplicate event IDs are workspace/provider scoped and safe to retry.
 
+Lead-magnet analytics record a public form-start event through a throttled, offer-bound endpoint. Successful calculator submissions record an idempotent calculator-use event keyed to the submission, alongside the submission, demo-request, and meeting-booked events. These events do not contain personal data unless the associated submission already has a CRM relationship.
+
 Public meeting booking validates the submitted time against the schedule’s enabled weekdays, working hours, slot duration, and slot boundary. The schedule row is locked while the CRM meeting is created so concurrent requests cannot reserve the same local slot twice. Public outbound click redirects require a valid outbound-message tracking token; malformed or unknown tokens return `404` instead of becoming open redirects.
 
 For manual enrichment maintenance, run `php artisan leads:enrich --stale-hours=168` from the web container. It queues stale contacts, companies, and leads for the database worker; use `--sync` only for controlled local verification. The worker must be running for queued enrichment, lead-magnet result delivery, and other background jobs. A stale outbound SMTP claim is quarantined as `failed` with an unknown-provider-outcome reason rather than automatically resent, because the provider may already have accepted the message.
