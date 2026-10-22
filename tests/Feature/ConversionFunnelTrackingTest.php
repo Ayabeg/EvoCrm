@@ -157,13 +157,16 @@ it('dedupes funnel events for the same deal and event type', function () {
         'currency' => 'DZD',
     ]);
 
-    $recorder->recordDealCreated($deal);
+    $first = $recorder->recordDealStage($deal, FunnelEvent::TYPE_CONFIRMED);
+    $second = $recorder->recordDealStage($deal, FunnelEvent::TYPE_CONFIRMED);
 
-    expect(
-        FunnelEvent::query()
-            ->forWorkspace($workspace)
-            ->where('event_type', FunnelEvent::TYPE_ORDER_PLACED)
-            ->where('deal_id', $deal->id)
-            ->count()
-    )->toBe(1);
+    expect($first)->not->toBeNull()
+        ->and($second)->toBeNull()
+        ->and(
+            FunnelEvent::query()
+                ->forWorkspace($workspace)
+                ->where('event_type', FunnelEvent::TYPE_CONFIRMED)
+                ->where('deal_id', $deal->id)
+                ->count()
+        )->toBe(1);
 });

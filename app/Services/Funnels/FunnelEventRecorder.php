@@ -33,21 +33,7 @@ class FunnelEventRecorder
         $subjectType = Arr::get($attributes, 'subject_type');
         $subjectId = Arr::get($attributes, 'subject_id');
 
-        if ($subjectType !== null && $subjectId !== null) {
-            $exists = FunnelEvent::query()
-                ->forWorkspace($workspace)
-                ->where('conversion_funnel_id', $funnel->id)
-                ->where('event_type', $eventType)
-                ->where('subject_type', $subjectType)
-                ->where('subject_id', $subjectId)
-                ->exists();
-
-            if ($exists) {
-                return null;
-            }
-        }
-
-        return FunnelEvent::query()->create([
+        $eventAttributes = [
             'workspace_id' => $workspace->id,
             'conversion_funnel_id' => $funnel->id,
             'event_type' => $eventType,
@@ -63,7 +49,22 @@ class FunnelEventRecorder
             'utm_campaign' => Arr::get($attributes, 'utm_campaign'),
             'occurred_at' => Arr::get($attributes, 'occurred_at', now()),
             'meta' => Arr::get($attributes, 'meta'),
-        ]);
+        ];
+
+        if ($subjectType !== null && $subjectId !== null) {
+            $identity = Arr::only($eventAttributes, [
+                'workspace_id',
+                'conversion_funnel_id',
+                'event_type',
+                'subject_type',
+                'subject_id',
+            ]);
+            $event = FunnelEvent::query()->createOrFirst($identity, Arr::except($eventAttributes, array_keys($identity)));
+
+            return $event->wasRecentlyCreated ? $event : null;
+        }
+
+        return FunnelEvent::query()->create($eventAttributes);
     }
 
     public function recordVisit(Workspace $workspace, array $attributes = []): ?FunnelEvent
