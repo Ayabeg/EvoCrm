@@ -140,5 +140,5 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 ### Remaining
 
-- The unique migration assumes the existing ledger has no duplicate subject-scoped rows; production rollout should inspect and reconcile any historical duplicates before applying the constraint. Live-provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open.
+- The unique migration now checks for historical duplicate subject-scoped rows and stops before schema changes when they exist; production still needs an explicit reconciliation decision before rerunning after such a failure. Live-provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open.
 
