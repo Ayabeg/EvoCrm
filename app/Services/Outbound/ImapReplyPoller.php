@@ -199,8 +199,7 @@ class ImapReplyPoller
                 'mailbox_id' => $mailbox->id,
             ], null, $contact->workspace ?? $mailbox->workspace);
 
-            if ($classification['label'] === ReplyClassifier::UNSUBSCRIBE
-                || $classification['label'] === ReplyClassifier::NOT_INTERESTED
+            if ($classification['label'] !== ReplyClassifier::INTERESTED
                 || ! $this->branchEnrollmentOnReply($contact, $lastOutbound)) {
                 $this->pauseEnrollmentOnReply($contact, $lastOutbound);
             }

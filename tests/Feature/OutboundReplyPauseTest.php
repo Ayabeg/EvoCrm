@@ -113,3 +113,68 @@ it('suppresses a contact when a reply explicitly asks to stop contact', function
             ->where('value', 'stop@clinic.dz')
             ->value('reason'))->toBe('reply_unsubscribe');
 });
+
+it('routes out-of-office replies to human review instead of the positive branch', function () {
+    $user = User::factory()->create();
+    $mailbox = Mailbox::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'enabled' => true,
+    ]);
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'vacation@clinic.dz',
+    ]);
+    $sequence = Sequence::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'channel' => 'email',
+        'active' => true,
+    ]);
+    $sequence->steps()->create([
+        'position' => 1,
+        'delay_hours' => 0,
+        'channel' => 'email',
+        'subject' => 'Hello',
+        'body' => 'First touch',
+        'on_reply_step' => 2,
+    ]);
+    $sequence->steps()->create([
+        'position' => 2,
+        'delay_hours' => 24,
+        'channel' => 'email',
+        'subject' => 'Follow-up',
+        'body' => 'Follow-up',
+    ]);
+
+    $enrollment = Enrollment::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'sequence_id' => $sequence->id,
+        'contact_id' => $contact->id,
+        'status' => 'active',
+        'next_step' => 2,
+        'next_run_at' => now()->addDay(),
+    ]);
+
+    OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'mailbox_id' => $mailbox->id,
+        'sequence_id' => $sequence->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Hello',
+        'body' => 'First touch',
+        'status' => 'sent',
+        'sent_at' => now()->subHour(),
+    ]);
+
+    $reply = app(ImapReplyPoller::class)->recordContactReply($mailbox, $contact, [
+        'subject' => 'Automatic reply: out of office',
+        'body' => 'I am out of office until Monday.',
+        'message_id' => '<reply-ooo@clinic.dz>',
+    ]);
+
+    expect($reply->reply_classification)->toBe(ReplyClassifier::OUT_OF_OFFICE)
+        ->and($enrollment->refresh()->status)->toBe('paused')
+        ->and($enrollment->next_run_at)->toBeNull();
+});
