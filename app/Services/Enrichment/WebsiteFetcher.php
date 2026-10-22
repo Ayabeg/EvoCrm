@@ -23,7 +23,19 @@ final class WebsiteFetcher
         }
 
         for ($redirect = 0; $redirect <= 2; $redirect++) {
+            $resolve = $this->publicResolve($normalized);
+
+            if ($resolve === false) {
+                return ['ok' => false, 'error' => 'Website address resolved to a blocked or invalid network.'];
+            }
+
             try {
+                $options = ['allow_redirects' => false];
+
+                if ($resolve !== []) {
+                    $options['resolve'] = $resolve;
+                }
+
                 $response = Http::timeout(8)
                     ->withHeaders([
                         'User-Agent' => 'EvoSales-Enrich/1.0 (+https://evotechly.com)',
@@ -31,7 +43,7 @@ final class WebsiteFetcher
                     ])
                     // Validate every hop before following it. Letting Guzzle follow
                     // redirects itself would validate only the user-supplied URL.
-                    ->withOptions(['allow_redirects' => false])
+                    ->withOptions($options)
                     ->get($normalized);
             } catch (Throwable) {
                 return ['ok' => false, 'error' => 'Website fetch failed.', 'retryable' => true];
@@ -142,5 +154,46 @@ final class WebsiteFetcher
         }
 
         return false;
+    }
+
+    /**
+     * Pin the first public DNS answer for this request. The original hostname
+     * remains in the URL so TLS SNI and the Host header stay correct.
+     *
+     * @return array<string, string>|false
+     */
+    private function publicResolve(string $url): array|false
+    {
+        $parts = parse_url($url);
+        $host = is_array($parts) ? (string) ($parts['host'] ?? '') : '';
+
+        if ($host === '' || filter_var($host, FILTER_VALIDATE_IP)) {
+            return [];
+        }
+
+        $records = @dns_get_record($host, DNS_A | DNS_AAAA);
+        $addresses = [];
+
+        foreach (is_array($records) ? $records : [] as $record) {
+            $address = $record['ip'] ?? $record['ipv6'] ?? null;
+
+            if (! is_string($address) || $address === '') {
+                continue;
+            }
+
+            if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                return false;
+            }
+
+            $addresses[] = $address;
+        }
+
+        if ($addresses === []) {
+            return [];
+        }
+
+        $port = (int) ($parts['port'] ?? (strtolower((string) ($parts['scheme'] ?? 'https')) === 'http' ? 80 : 443));
+
+        return [$host.':'.$port => $addresses[0]];
     }
 }
