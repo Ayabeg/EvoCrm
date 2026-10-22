@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `a561bdb0` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `3d578579` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -44,6 +44,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `9335676b` — persisted lead-magnet form-start and calculator-use engagement events.
 - `286f2634` — recorded the latest full regression evidence.
 - `a561bdb0` — made subject-scoped funnel event recording race-safe with a database uniqueness constraint.
+- `3d578579` — added the non-destructive duplicate preflight before applying the funnel-event uniqueness constraint.
 
 ## Implemented but not fully verified
 
