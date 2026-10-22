@@ -54,9 +54,12 @@ export default function TemplateShow({
                                         <span className="text-[var(--evo-ink-muted)]">{t('Subject')}:</span>{' '}
                                         {preview.subject ?? '—'}
                                     </p>
-                                    <div
+                                    <iframe
+                                        title={t('Rendered email preview')}
                                         className="rounded-[var(--evo-radius-compact)] border border-[var(--evo-hairline)] bg-[var(--evo-canvas)] p-4 text-[13px] [&_a]:text-[var(--evo-teal)]"
-                                        dangerouslySetInnerHTML={{ __html: preview.html }}
+                                        sandbox=""
+                                        srcDoc={preview.html}
+                                        style={{ minHeight: 240, width: '100%' }}
                                     />
                                 </OutboundSection>
                             }

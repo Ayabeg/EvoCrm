@@ -1,4 +1,5 @@
 import json
+import hmac
 import os
 import urllib.error
 import urllib.request
@@ -61,8 +62,8 @@ SECRET_KEYS = {"token", "access_token", "secret", "password", "authorization", "
 def authorize(authorization: str | None) -> None:
     expected = os.getenv("OPENMANUS_API_TOKEN")
     if not expected:
-        return
-    if authorization != f"Bearer {expected}":
+        raise HTTPException(status_code=503, detail="OpenManus API token is not configured")
+    if not authorization or not hmac.compare_digest(authorization, f"Bearer {expected}"):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 

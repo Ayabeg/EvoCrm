@@ -302,12 +302,12 @@ class ProductAnalytics
 
     private function distinctId(?User $user, ?Workspace $workspace): string
     {
-        if (filled($this->requestDistinctId)) {
-            return (string) $this->requestDistinctId;
-        }
-
         if ($user instanceof User) {
             return (string) $user->id;
+        }
+
+        if (filled($this->requestDistinctId)) {
+            return (string) $this->requestDistinctId;
         }
 
         if ($workspace instanceof Workspace) {

@@ -86,4 +86,6 @@ Browser Use and custom MCP servers are connected in Settings → Agent. Laravel 
 
 Keep the service private. The compose file binds port 8001 to localhost. In production, put Laravel and the runtime on a private network, require the shared bearer token, and do not expose the agent endpoint on the public internet.
 
+The adapter fails closed: requests return `503` when `OPENMANUS_API_TOKEN` is missing and `401` when the bearer token is invalid.
+
 OpenManus is MIT licensed. Keep its upstream license and attribution when distributing its source.

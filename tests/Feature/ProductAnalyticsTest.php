@@ -38,6 +38,17 @@ it('records contact created against the authenticated user and workspace', funct
         ->and($event['properties']['contact_id'])->toBeInt();
 });
 
+it('ignores a forged client analytics identity for authenticated events', function () {
+    $user = User::factory()->create();
+    $analytics = app(ProductAnalytics::class);
+    $analytics->setRequestContext('forged-user-id', 'forged-session');
+    $analytics->flushRecorded();
+
+    $analytics->capture('authenticated event', [], $user, $user->workspace);
+
+    expect($analytics->last('authenticated event')['distinctId'])->toBe((string) $user->id);
+});
+
 it('records deal created, stage change, and won on the workspace group', function () {
     $user = User::factory()->create();
     app(WorkspaceProvisioner::class)->seedDefaults($user->workspace);
