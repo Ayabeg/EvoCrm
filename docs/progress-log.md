@@ -173,6 +173,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Hardened `OutboundEligibility` so an absent `evosales.outbound.block_unknown_verification` configuration key still blocks `unknown` email-verification results instead of failing open.
 - Added a regression that removes the nested policy key while preserving the other outbound settings and verifies enrollment remains rejected. The focused enrollment test passes 7 tests / 15 assertions; the broader outbound safety set passes 44 tests / 219 assertions. Pint and `git diff --check` pass.
+- Latest repository-wide regression: 1,341 tests, 1,327 passed, 13 existing UI/source-contract failures, 35,686 assertions, and 1 skipped. No acquisition-system test failed; the two existing InvalidArgumentException warnings remain unchanged.
 
 ### Remaining
 
