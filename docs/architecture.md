@@ -73,10 +73,13 @@ Completed bookings record a deduplicated meeting_booked funnel event against the
 - Every cross-entity create/update that must remain consistent is transactional.
 - Unique keys and idempotency keys prevent duplicate imports, submissions, sends, and provider events.
 - Long-running enrichment and outbound actions run through durable jobs/commands, not in-memory timers.
+- Campaign audiences over 1,000 contacts use `ExpandOutboundCampaign` cursor jobs in 250-contact pages; each page persists progress and reuses the workspace/idempotency boundary before the campaign becomes sendable.
 - Retries use bounded exponential backoff and preserve the original error and attempt history.
 - Enrichment jobs are unique for one hour per workspace/target type/record, retry up to three times with bounded backoff, and can be queued from a workspace-scoped bulk action.
 - Stronger existing evidence is not silently replaced by weaker or stale evidence.
 - Public endpoints validate input, rate-limit where appropriate, and avoid exposing internal identifiers or PII.
+- Public PostHog collection is disabled until a visitor explicitly grants analytics consent; authenticated product events use pseudonymous server-derived identities and do not include login email by default.
+- Outbound HTML is sanitized before preview, tracking-link rewriting, and provider delivery; the CRM preview is additionally sandboxed.
 
 ## External boundaries
 

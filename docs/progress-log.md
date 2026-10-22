@@ -62,6 +62,10 @@
 - Final focused acquisition regression after the Evolution replay fix passes 194 tests / 1,363 assertions.
 - Bounded bulk sequence enrollment to 250 contacts per request, including saved-filter expansion before loading IDs; oversized requests are rejected without creating enrollments. Outbound department coverage passes 20 tests / 135 assertions. Commit: `d3ba9116`.
 - Final focused acquisition regression after the bulk-enrollment bound passes 195 tests / 1,367 assertions.
+- Added durable large-campaign expansion: audiences over 1,000 enter a resumable 250-contact cursor job with idempotent message creation, retry/failure state, cancellation support, and no request-path materialization. Outbound department coverage passes 21 tests / 142 assertions. Commit: `0764a179`.
+- Gated public PostHog boot behind explicit visitor analytics consent and removed login email from the product analytics event. Analytics/privacy coverage passes 13 tests / 86 assertions; `npm run types:check` passes. Commit: `c75b6c48`.
+- Sanitized outbound HTML before delivery, link rewriting, and preview, removing executable tags, event handlers, unsafe URLs, and dangerous CSS. Outbound coverage passes 22 tests / 147 assertions. Commit: `24e91025`.
+- Final focused acquisition regression after the campaign, analytics, and HTML-safety changes passes 197 tests / 1,381 assertions.
 
 ### In progress
 
@@ -81,9 +85,9 @@
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
 - Full-suite release verification is not green until the 13 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
-- The standard Codex Security scan is complete for the captured revision with 7 medium findings and partial coverage. Current-tree owner-assignment, workflow-DNS, Evolution missing-identity, and sequence-request bulk-bound findings are remediated with regression evidence; the template preview is sandboxed but full campaign expansion bounds, outbound email HTML sanitization, outbound consent policy, and analytics consent remain open. The local ignored `.env` APP_KEY still requires deployment rotation. Live provider checks remain blocked.
+- The standard Codex Security scan is complete for the captured revision with 7 medium findings and partial coverage. Current-tree owner-assignment, workflow-DNS, Evolution missing-identity, sequence-request and large-campaign expansion bounds, template preview/email HTML safety, and analytics consent are remediated with regression evidence. The remaining policy item is whether cold outbound without a recorded consent grant is permitted under an explicitly documented lawful basis. The local ignored `.env` APP_KEY still requires deployment rotation. Live provider checks remain blocked.
 
 ### Next verified task
 
-Resolve the remaining campaign-expansion and consent-policy decisions, then refresh release evidence while keeping live-provider verification and delivery blocked until credentials are configured.
+Resolve and document the outbound lawful-basis policy, then run the final release audit while keeping live-provider verification and delivery blocked until credentials are configured.
 
