@@ -52,6 +52,40 @@ function badgeVariant(
     return 'outline';
 }
 
+function valueLabel(run: EnrichmentRunRow): string | null {
+    if (!run.value) {
+        return null;
+    }
+
+    if (run.field !== 'crm_detection') {
+        return run.value;
+    }
+
+    try {
+        const detection = JSON.parse(run.value) as {
+            status?: string;
+            name?: string;
+            names?: string[];
+        };
+
+        if (detection.status === 'detected' && detection.name) {
+            return `Detected: ${detection.name}`;
+        }
+
+        if (detection.status === 'conflicting' && detection.names?.length) {
+            return `Conflicting signals: ${detection.names.join(', ')}`;
+        }
+
+        if (detection.status === 'not_detected') {
+            return 'No supported CRM signature detected in the checked website.';
+        }
+    } catch {
+        return run.value;
+    }
+
+    return run.value;
+}
+
 export default function EnrichmentPanel({
     action,
     runs = [],
@@ -113,9 +147,9 @@ export default function EnrichmentPanel({
                                     </span>
                                 ) : null}
                             </div>
-                            {run.value ? (
+                            {valueLabel(run) ? (
                                 <p className="mt-1 break-words text-[13px] text-ink">
-                                    {run.value}
+                                    {valueLabel(run)}
                                 </p>
                             ) : null}
                             {run.error ? (

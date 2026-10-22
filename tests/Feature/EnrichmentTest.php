@@ -85,6 +85,7 @@ it('persists website and places runs with confidence and auto-applies empty high
         ->and($runs->firstWhere('field', 'place_id')?->evidence_url)->toBe('https://maps.google.com/?cid=123')
         ->and($runs->firstWhere('field', 'address')?->value)->toContain('Alger')
         ->and($runs->firstWhere('field', 'currency_hint')?->value)->toBe('DZD')
+        ->and(json_decode((string) $runs->firstWhere('field', 'crm_detection')?->value, true)['status'] ?? null)->toBe('not_detected')
         ->and($company->fresh()->phone)->toBe('+21321000000');
 
     $brief = AiInsight::query()

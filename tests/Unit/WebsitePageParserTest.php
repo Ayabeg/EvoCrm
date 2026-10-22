@@ -33,3 +33,23 @@ it('does not invent an email when the page has none', function () {
 
     expect($parsed['emails'])->toBe([]);
 });
+
+it('detects supported CRM signatures without treating absence as proof', function () {
+    $detected = (new WebsitePageParser)->parse(
+        '<html><head><script src="https://js.hs-scripts.com/123.js"></script></head></html>',
+    );
+    $unknown = (new WebsitePageParser)->parse('<html><body>Clinic</body></html>');
+    $conflicting = (new WebsitePageParser)->parse(
+        '<script src="https://js.hs-scripts.com/123.js"></script><script src="https://pipedrive.com/widget.js"></script>',
+    );
+
+    expect($detected['crm_detection'])->toMatchArray([
+        'status' => 'detected',
+        'name' => 'HubSpot',
+        'evidence' => ['js.hs-scripts.com'],
+        'method' => 'website_signature',
+    ])
+        ->and($unknown['crm_detection']['status'])->toBe('not_detected')
+        ->and($conflicting['crm_detection']['status'])->toBe('conflicting')
+        ->and($conflicting['crm_detection']['names'])->toBe(['HubSpot', 'Pipedrive']);
+});

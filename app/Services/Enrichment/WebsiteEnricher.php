@@ -57,7 +57,32 @@ class WebsiteEnricher
             'description' => $parsed['description'],
             'emails' => $parsed['emails'],
             'phones' => $parsed['phones'],
+            'crm_detection' => $parsed['crm_detection'],
         ];
+
+        $crmDetection = $parsed['crm_detection'];
+        $crmStatus = (string) ($crmDetection['status'] ?? 'unknown');
+        $crmValue = json_encode($crmDetection, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        if (is_string($crmValue) && $crmValue !== '') {
+            $this->runs->persistProposal(
+                $workspace,
+                $targetType,
+                $target,
+                EnrichmentRun::SOURCE_WEBSITE,
+                'crm_detection',
+                $crmValue,
+                $crmStatus === 'detected' ? 0.9 : ($crmStatus === 'conflicting' ? 0.5 : 0.4),
+                $raw,
+                match ($crmStatus) {
+                    'detected' => EnrichmentRun::VERIFICATION_EVIDENCE_SUPPORTED,
+                    'conflicting' => EnrichmentRun::VERIFICATION_CONFLICTING,
+                    'not_detected' => EnrichmentRun::VERIFICATION_NOT_DETECTED,
+                    default => EnrichmentRun::VERIFICATION_UNKNOWN,
+                },
+                $url,
+            );
+        }
 
         if ($parsed['title']) {
             $this->runs->persistProposal(

@@ -14,7 +14,8 @@ final class WebsitePageParser
      *     title: ?string,
      *     description: ?string,
      *     emails: list<string>,
-     *     phones: list<string>
+     *     phones: list<string>,
+     *     crm_detection: array{status: string, name?: string, names?: list<string>, evidence: list<string>, method: string}
      * }
      */
     public function parse(string $html): array
@@ -27,6 +28,64 @@ final class WebsitePageParser
             'description' => $this->description($html),
             'emails' => $this->emails($stripped, $text),
             'phones' => $this->phones($stripped, $text),
+            'crm_detection' => $this->crmDetection($html),
+        ];
+    }
+
+    /**
+     * Detect only public, stable technology signatures. No signature is not
+     * proof that a business does not use a CRM.
+     *
+     * @return array{status: string, name?: string, names?: list<string>, evidence: list<string>, method: string}
+     */
+    private function crmDetection(string $html): array
+    {
+        $haystack = strtolower($html);
+        $signatures = [
+            'HubSpot' => ['hbspt.', 'js.hs-scripts.com', 'js.hsforms.net', 'hubspotutk'],
+            'Salesforce' => ['pardot.com', 'salesforce.com/embeddedservice', 'force.com/embeddedservice'],
+            'Zoho CRM' => ['zoho.com/crm', 'zohopublic.com', 'zohoforms.com'],
+            'Pipedrive' => ['pipedrive.com'],
+            'GoHighLevel' => ['leadconnectorhq.com', 'msgsndr.com', 'gohighlevel.com'],
+            'Freshsales' => ['freshsales.io'],
+        ];
+        $matches = [];
+        $evidence = [];
+
+        foreach ($signatures as $name => $needles) {
+            foreach ($needles as $needle) {
+                if (str_contains($haystack, $needle)) {
+                    $matches[] = $name;
+                    $evidence[] = $needle;
+                    break;
+                }
+            }
+        }
+
+        $matches = array_values(array_unique($matches));
+
+        if (count($matches) > 1) {
+            return [
+                'status' => 'conflicting',
+                'names' => $matches,
+                'evidence' => $evidence,
+                'method' => 'website_signature',
+            ];
+        }
+
+        if (count($matches) === 1) {
+            return [
+                'status' => 'detected',
+                'name' => $matches[0],
+                'evidence' => $evidence,
+                'method' => 'website_signature',
+            ];
+        }
+
+        return [
+            'status' => 'not_detected',
+            'evidence' => [],
+            'method' => 'website_signature',
         ];
     }
 

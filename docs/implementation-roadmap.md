@@ -49,5 +49,5 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 - **Provider semantics:** acceptance by a mail API is not delivery; catch-all and unknown email results remain conservative.
 - **Enrichment queueing:** bulk queueing is capped at 100 IDs per request, workspace-scoped, deduplicated by workspace/target type/record ID, rate-limited per workspace, protected against concurrent duplicate execution, and retryable from failed record history. Broader provider coverage remains open.
 - **Scheduled maintenance:** `leads:enrich` now defaults to a seven-day freshness window and excludes records with a recent queued, proposed, or applied run; the window is configurable with `--stale-hours` and remains workspace-scoped.
-- **Quality-based selection:** contact segments and campaign saved filters can now require a minimum persisted lead data-quality score; broader duplicate review and provider-backed verification remain open.
+- **Quality-based selection:** contact segments and campaign saved filters can now require a minimum persisted lead data-quality score; broader duplicate review and provider-backed verification remain open. Website CRM signatures are best-effort evidence only and never prove CRM absence.
 
