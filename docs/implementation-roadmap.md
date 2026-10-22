@@ -29,7 +29,7 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 | I1 | End-to-end outbound workflow | **in progress** | E3, O3 | Import → enrich → verify → score → select → preview → activate → send → event/reply → pipeline is integration-tested | L |
 | I2 | End-to-end inbound workflow | **in progress** | M3, E3 | Visit → use → submit → consent → shared record → permitted enrichment → delivery → demo request → analytics is integration-tested | M |
 | I3 | Data maintenance workflow | **in progress** | E3, O1, A3 | Stale records can be refreshed without replacing stronger evidence or reintroducing suppressed contacts | M |
-| Q1 | Security, privacy, and abuse review | planned | E3, O2, M3 | Authorization, validation, rate limits, secrets, PII logging, webhooks, XSS/SQLi protections, and suppression behavior reviewed with tests | M |
+| Q1 | Security, privacy, and abuse review | **in progress** | E3, O2, M3 | Authorization, validation, rate limits, secrets, PII logging, webhooks, XSS/SQLi protections, and suppression behavior reviewed with tests | M |
 | Q2 | Release readiness and operating documentation | planned | I1, I2, I3, Q1 | Run/test/configure/operate docs, migrations, external dependency blockers, and final verification report are current | M |
 
 ## Execution order
@@ -50,4 +50,5 @@ Status vocabulary: **planned**, **in progress**, **blocked**, **implemented**, a
 - **Enrichment queueing:** bulk queueing is capped at 100 IDs per request, workspace-scoped, deduplicated by workspace/target type/record ID, rate-limited per workspace, protected against concurrent duplicate execution, retryable from failed record history, and transient website/Places failures are rethrown after provenance is recorded so queue backoff is effective. Broader provider coverage remains open.
 - **Scheduled maintenance:** `leads:enrich` now defaults to a seven-day freshness window and excludes records with a recent queued, proposed, or applied run; the window is configurable with `--stale-hours` and remains workspace-scoped.
 - **Quality-based selection:** contact segments and campaign saved filters can now require a minimum persisted lead data-quality score; broader duplicate review and provider-backed verification remain open. Website CRM signatures are best-effort evidence only and never prove CRM absence.
+- **Security review:** the parent-only review confirmed and remediated unvalidated redirect SSRF in website enrichment/URL capture and spreadsheet formula injection in contact/deal exports. The current tree has regression coverage; full repository inventory, webhook-auth consistency, DNS rebinding controls, and live-provider verification remain open.
 

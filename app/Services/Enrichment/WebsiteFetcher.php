@@ -2,6 +2,8 @@
 
 namespace App\Services\Enrichment;
 
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\UriResolver;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 
@@ -20,16 +22,37 @@ final class WebsiteFetcher
             return ['ok' => false, 'error' => 'URL is not a public http(s) address.'];
         }
 
-        try {
-            $response = Http::timeout(8)
-                ->withHeaders([
-                    'User-Agent' => 'EvoSales-Enrich/1.0 (+https://evotechly.com)',
-                    'Accept' => 'text/html,application/xhtml+xml',
-                ])
-                ->withOptions(['allow_redirects' => ['max' => 2]])
-                ->get($normalized);
-        } catch (Throwable) {
-            return ['ok' => false, 'error' => 'Website fetch failed.', 'retryable' => true];
+        for ($redirect = 0; $redirect <= 2; $redirect++) {
+            try {
+                $response = Http::timeout(8)
+                    ->withHeaders([
+                        'User-Agent' => 'EvoSales-Enrich/1.0 (+https://evotechly.com)',
+                        'Accept' => 'text/html,application/xhtml+xml',
+                    ])
+                    // Validate every hop before following it. Letting Guzzle follow
+                    // redirects itself would validate only the user-supplied URL.
+                    ->withOptions(['allow_redirects' => false])
+                    ->get($normalized);
+            } catch (Throwable) {
+                return ['ok' => false, 'error' => 'Website fetch failed.', 'retryable' => true];
+            }
+
+            if (! in_array($response->status(), [301, 302, 303, 307, 308], true)) {
+                break;
+            }
+
+            $location = $response->header('Location');
+            $normalized = is_string($location)
+                ? $this->resolveRedirect($normalized, $location)
+                : null;
+
+            if ($normalized === null) {
+                return ['ok' => false, 'error' => 'Website redirect points to a blocked or invalid address.'];
+            }
+        }
+
+        if (in_array($response->status(), [301, 302, 303, 307, 308], true)) {
+            return ['ok' => false, 'error' => 'Website returned too many redirects.'];
         }
 
         if (! $response->successful()) {
@@ -46,6 +69,23 @@ final class WebsiteFetcher
         $body = substr((string) $response->body(), 0, 512_000);
 
         return ['ok' => true, 'body' => $body, 'status' => $response->status()];
+    }
+
+    private function resolveRedirect(string $base, string $location): ?string
+    {
+        $location = trim($location);
+
+        if ($location === '') {
+            return null;
+        }
+
+        try {
+            $resolved = UriResolver::resolve(new Uri($base), new Uri($location));
+
+            return $this->normalizeUrl((string) $resolved);
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     public function normalizeUrl(?string $raw): ?string

@@ -245,6 +245,23 @@ it('ingests a public url without inventing an email', function () {
         ->and($capture->company)->toBe('El Aurassi');
 });
 
+it('does not follow a public url redirect into a private host', function () {
+    Http::fake([
+        'https://clinic.example.test/start' => Http::response('', 302, ['Location' => 'http://127.0.0.1/admin']),
+    ]);
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post('/crm/leads/captures/url', [
+            'url' => 'https://clinic.example.test/start',
+        ])
+        ->assertRedirect();
+
+    expect(LeadCapture::query()->firstOrFail()->status)->toBe(LeadCapture::STATUS_ERROR);
+    Http::assertSentCount(1);
+});
+
 it('stores an operator maps search and the results they chose', function () {
     $user = User::factory()->create();
 

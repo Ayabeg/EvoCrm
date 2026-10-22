@@ -26,6 +26,7 @@ use App\Services\LeadOs\DealHealthScorer;
 use App\Services\LeadOs\NextMoveAdvisor;
 use App\Services\Operations\AuditLogger;
 use App\Support\CrmHub;
+use App\Support\CsvExport;
 use App\Support\StageCopy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -419,7 +420,7 @@ class DealController extends Controller
             fputcsv($out, ['id', 'title', 'amount_cents', 'currency', 'stage', 'contact', 'company', 'owner', 'source', 'close_date', 'created_at']);
 
             $query->orderBy('title')->each(function (Deal $deal) use ($out): void {
-                fputcsv($out, [
+                fputcsv($out, CsvExport::row([
                     $deal->id,
                     $deal->title,
                     $deal->amount_cents,
@@ -431,7 +432,7 @@ class DealController extends Controller
                     $deal->source,
                     $deal->close_date?->toDateString(),
                     $deal->created_at?->toDateTimeString(),
-                ]);
+                ]));
             });
 
             fclose($out);

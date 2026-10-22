@@ -16,6 +16,7 @@ use App\Models\Workflow;
 use App\Models\WorkflowExecution;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
+use App\Services\Enrichment\WebsiteFetcher;
 use App\Services\Outbound\QuietHoursGuard;
 use App\Services\Outbound\SequenceEnrollment;
 use Illuminate\Support\Facades\Http;
@@ -33,6 +34,7 @@ class WorkflowRunner
         private QuietHoursGuard $quietHours,
         private ProductAnalytics $analytics,
         private WorkflowExecutionRedactor $redactor,
+        private WebsiteFetcher $websiteFetcher,
     ) {}
 
     public function handleContactCreated(Contact $contact): void
@@ -654,7 +656,9 @@ class WorkflowRunner
     {
         $url = trim((string) ($config['url'] ?? ''));
 
-        if (! $this->webhookUrlAllowed($url)) {
+        $safeUrl = $this->websiteFetcher->normalizeUrl($url);
+
+        if ($safeUrl === null) {
             return [
                 'outcome' => 'action_did_not_apply',
                 'summary' => 'Webhook URL was not allowed.',
@@ -664,7 +668,10 @@ class WorkflowRunner
         $response = Http::timeout(8)
             ->acceptJson()
             ->asJson()
-            ->post($url, [
+            // A configured webhook is still an untrusted network destination;
+            // do not follow a redirect into a private or internal host.
+            ->withOptions(['allow_redirects' => false])
+            ->post($safeUrl, [
                 'source' => 'evosales',
                 'workflow_id' => $workflow->id,
                 'workflow' => $workflow->name,
@@ -701,17 +708,6 @@ class WorkflowRunner
             'outcome' => 'webhook_sent',
             'summary' => 'Webhook accepted (HTTP '.$response->status().').',
         ];
-    }
-
-    private function webhookUrlAllowed(string $url): bool
-    {
-        if ($url === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
-            return false;
-        }
-
-        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
-
-        return in_array($scheme, ['http', 'https'], true);
     }
 
     private function defaultTaskSubject(?Contact $contact, ?Deal $deal, ?Ticket $ticket = null): string

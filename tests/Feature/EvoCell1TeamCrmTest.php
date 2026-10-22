@@ -177,6 +177,25 @@ it('exports deals as csv', function () {
     expect($response->headers->get('content-type'))->toContain('text/csv');
 });
 
+it('neutralizes spreadsheet formulas in exported deal values', function () {
+    $user = User::factory()->create();
+    $pipeline = $user->workspace->defaultPipeline();
+
+    Deal::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'title' => '@SUM(1,1)',
+        'pipeline_id' => $pipeline->id,
+        'stage_id' => $pipeline->stages()->orderBy('position')->first()->id,
+    ]);
+
+    $csv = $this->actingAs($user)
+        ->get('/crm/deals/export')
+        ->assertOk()
+        ->streamedContent();
+
+    expect($csv)->toContain("'@SUM(1,1)");
+});
+
 it('lets admins create reorder and delete pipeline stages', function () {
     $user = User::factory()->create();
     $workspace = $user->workspace;

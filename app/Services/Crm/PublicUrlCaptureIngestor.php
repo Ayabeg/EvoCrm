@@ -5,32 +5,35 @@ namespace App\Services\Crm;
 use App\Models\LeadCapture;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Enrichment\WebsiteFetcher;
 use App\Support\AlgerianPhone;
 use App\Support\LeadCaptureNormalizer;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 
 class PublicUrlCaptureIngestor
 {
-    public function __construct(private LeadCaptureDeduper $deduper) {}
+    public function __construct(
+        private LeadCaptureDeduper $deduper,
+        private WebsiteFetcher $fetcher,
+    ) {}
 
     public function ingest(Workspace $workspace, User $actor, string $url): LeadCapture
     {
         $url = $this->assertPublicHttpUrl($url);
 
         try {
-            $response = Http::timeout(10)
-                ->withHeaders([
-                    'Accept' => 'text/html,application/xhtml+xml',
-                    'User-Agent' => 'EvoSales-Capture/1.0',
-                ])
-                ->get($url);
+            $fetched = $this->fetcher->get($url);
 
-            if (! $response->successful()) {
-                return $this->errorCapture($workspace, $actor, $url, 'Public URL returned HTTP '.$response->status().'.');
+            if (! $fetched['ok']) {
+                return $this->errorCapture(
+                    $workspace,
+                    $actor,
+                    $url,
+                    $fetched['error'] ?? 'Public URL fetch failed.',
+                );
             }
 
-            $html = (string) $response->body();
+            $html = (string) ($fetched['body'] ?? '');
             $extracted = $this->extractVisible($html);
 
             return $this->deduper->record(

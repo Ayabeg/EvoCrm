@@ -19,6 +19,7 @@ use App\Services\Crm\CrmFilter;
 use App\Services\Crm\CustomAttributes;
 use App\Services\Enrichment\EnrichmentService;
 use App\Support\CrmHub;
+use App\Support\CsvExport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -349,7 +350,7 @@ class ContactController extends Controller
             fputcsv($out, ['id', 'first_name', 'last_name', 'email', 'phone', 'company', 'owner', 'city', 'wilaya', 'source', 'source_detail', 'source_campaign', 'source_medium', 'created_at', 'last_activity_at']);
 
             $query->orderBy('first_name')->each(function (Contact $contact) use ($out): void {
-                fputcsv($out, [
+                fputcsv($out, CsvExport::row([
                     $contact->id,
                     $contact->first_name,
                     $contact->last_name,
@@ -365,7 +366,7 @@ class ContactController extends Controller
                     $contact->source_medium,
                     $contact->created_at?->toDateTimeString(),
                     $contact->last_activity_at?->toDateTimeString(),
-                ]);
+                ]));
             });
 
             fclose($out);

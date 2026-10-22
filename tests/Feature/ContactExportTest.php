@@ -38,3 +38,22 @@ it('exports contacts as csv on GET and honors the My view', function () {
         ->toContain('Export Co')
         ->not->toContain('ExportTheirs');
 });
+
+it('neutralizes spreadsheet formulas in exported contact values', function () {
+    $user = User::factory()->create();
+
+    Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'first_name' => '=HYPERLINK("https://example.test","open")',
+        'phone' => '+213550000000',
+    ]);
+
+    $csv = $this->actingAs($user)
+        ->get('/crm/contacts/export')
+        ->assertOk()
+        ->streamedContent();
+
+    expect($csv)
+        ->toContain("\"'=HYPERLINK(\"\"https://example.test\"\",\"\"open\"\")\"")
+        ->toContain("'+213550000000");
+});

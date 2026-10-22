@@ -362,6 +362,31 @@ it('posts a webhook when a deal is created', function () {
     });
 });
 
+it('does not post workflow data to a private webhook destination', function () {
+    Http::fake();
+
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    Workflow::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'trigger' => Workflow::TRIGGER_DEAL_CREATED,
+        'action' => Workflow::ACTION_SEND_WEBHOOK,
+        'action_config' => ['url' => 'http://127.0.0.1/admin'],
+    ]);
+
+    Deal::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'pipeline_id' => $user->workspace->defaultPipeline()->id,
+        'stage_id' => $user->workspace->defaultPipeline()->stageBySlug('new')->id,
+        'title' => 'Private destination blocked',
+        'currency' => 'DZD',
+    ]);
+
+    Http::assertNothingSent();
+});
+
 it('does not fail deal creation when the webhook is down', function () {
     Http::fake(['https://hooks.evotechly.dz/*' => Http::response('no', 500)]);
 
