@@ -134,6 +134,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Committed as `a561bdb0` (`fix: make subject funnel events race safe`).
 - Completed current acquisition diff-scoped Codex Security review `df528cd2-71b4-4b34-a846-e54a368f0cad` for `286f2634` through `5d125577`: complete coverage of the three changed security surfaces, zero reportable findings, and the historical duplicate-row migration preflight recorded as an operational limitation.
 - Added a non-destructive migration preflight: the funnel-event unique constraint now stops with an actionable error when historical subject-scoped duplicates exist, instead of failing later with an opaque database-index error. Existing duplicate recorder and full-suite regressions remain green.
+- Rechecked the migration follow-up with Codex Security scan `e1610fcd-062f-4485-b9c4-b4d08ee6ba00` for `5d125577` to `3d578579`: complete coverage of the migration surface and zero reportable findings.
 
 ### Remaining
 
