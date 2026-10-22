@@ -18,7 +18,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Previous complete focused acquisition regression: **207 tests / 1,440 assertions passed**.
 - Latest post-hardening acquisition integration subset: **181 tests / 1,254 assertions passed**, including lead-magnet engagement tracking, reply safety, imports, enrichment, provider events, and outbound execution.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
-- Current repository-wide regression: **1,335 tests; 1,321 passed; 13 existing UI/source-contract failures; 35,665 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- Latest repository-wide regression: **1,338 tests; 1,324 passed; 13 existing UI/source-contract failures; 35,678 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
 - `npm run types:check` passed.
 - `git diff --check` passed.
 - Current-tree Codex Security standard review `013e6eaf-f741-4d08-ad0f-5ab2bef6f61b`: zero reportable findings across seven reviewed acquisition surfaces; coverage is explicitly partial and limitations are recorded by the scan.
