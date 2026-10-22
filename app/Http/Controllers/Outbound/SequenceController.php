@@ -21,6 +21,8 @@ use Inertia\Response;
 
 class SequenceController extends Controller
 {
+    private const MAX_BULK_ENROLLMENT = 250;
+
     public function index(Request $request): Response
     {
         return Inertia::render('outbound/sequences/index', [
@@ -293,7 +295,7 @@ class SequenceController extends Controller
 
         $data = $request->validate([
             'contact_id' => ['nullable', 'integer'],
-            'contact_ids' => ['nullable', 'array'],
+            'contact_ids' => ['nullable', 'array', 'max:'.self::MAX_BULK_ENROLLMENT],
             'contact_ids.*' => ['integer'],
             'saved_filter_id' => ['nullable', 'integer'],
         ]);
@@ -313,6 +315,13 @@ class SequenceController extends Controller
             if ($filter) {
                 $query = Contact::query()->forWorkspace($workspace);
                 $crmFilter->apply('contact', $query, $crmFilter->fromSaved($filter));
+
+                if ($query->count() + $ids->count() > self::MAX_BULK_ENROLLMENT) {
+                    return back()->withErrors([
+                        'saved_filter_id' => 'Bulk sequence enrollment is limited to '.self::MAX_BULK_ENROLLMENT.' contacts per request.',
+                    ]);
+                }
+
                 $ids = $ids->merge($query->pluck('id'));
             }
         }

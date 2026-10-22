@@ -442,6 +442,21 @@ it('enrolls a whole CRM list into a sequence', function () {
     }
 });
 
+it('rejects oversized sequence enrollment requests', function () {
+    $user = User::factory()->create();
+    $sequence = Sequence::factory()->create(['workspace_id' => $user->workspace_id, 'channel' => 'email']);
+    $contacts = Contact::factory()->count(251)->create(['workspace_id' => $user->workspace_id]);
+
+    $this->actingAs($user)
+        ->post("/outbound/sequences/{$sequence->id}/enroll", [
+            'contact_ids' => $contacts->pluck('id')->all(),
+        ])
+        ->assertRedirect()
+        ->assertSessionHasErrors('contact_ids');
+
+    expect(Enrollment::query()->where('sequence_id', $sequence->id)->count())->toBe(0);
+});
+
 it('sends a sequence step through its pinned mailbox', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 
