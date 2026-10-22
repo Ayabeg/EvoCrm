@@ -101,11 +101,12 @@ Run the final release audit after the remaining UI/source-contract checks are re
 ### Completed / verified
 
 - Applied the next hardening slice: queue leases now exceed the longest mutating job timeout; stale outbound send claims are quarantined instead of automatically resent after an uncertain provider outcome; Meta processing leases can be reclaimed within the retry horizon; failed Lead OS nodes no longer advance the graph; nightly deal-health work and webhook payload/fan-out are bounded; tracking destinations require CRM-generated HMAC signatures with atomic counters; unsubscribe is confirmation-based and throttled; and CRM relationship IDs are validated against the active workspace.
-- The targeted hardening set passes 84 tests / 492 assertions. The full suite runs 1,335 tests with 1,321 passing, 13 unrelated UI/source-contract failures, 35,663 assertions, and 1 skipped.
+- The targeted hardening set passes 84 tests / 492 assertions, and the quote/import regression passes 22 tests / 203 assertions. The latest full suite runs 1,335 tests with 1,321 passing, 13 unrelated UI/source-contract failures, 35,665 assertions, and 1 skipped. The TypeScript check also passes.
 
-### In progress
+### Completed / verified
 
-- A fresh current-tree Codex Security review is running after the hardening changes. The earlier sealed scan remains partial and revision-bound; it is not used as evidence for the new changes until the current review completes.
+- The current-tree Codex Security review is sealed as scan 013e6eaf-f741-4d08-ad0f-5ab2bef6f61b with zero reportable findings across seven reviewed acquisition surfaces. Coverage is explicitly partial; the report records live-provider signature/delivery semantics, deployment secret rotation, legal review, and unrelated repository surfaces as limitations. The scan snapshot predates the quote/import follow-up and final documentation edits; those follow-ups have separate targeted regression evidence.
+- Committed the hardening slice as 46661ae7. The four unrelated user edits remain unstaged and untouched.
 
 ### Remaining
 

@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current revision: `1e61cd7c` (`main`)
+Current revision: `46661ae7` (`main`)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -17,10 +17,10 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 
 - Focused acquisition regression: **207 tests / 1,440 assertions passed**.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
-- Current repository-wide regression: **1,334 tests; 1,320 passed; 13 existing UI/source-contract failures; 35,658 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- Current repository-wide regression: **1,335 tests; 1,321 passed; 13 existing UI/source-contract failures; 35,665 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
 - `npm run types:check` passed.
 - `git diff --check` passed.
-- Current-tree Codex Security standard review `c38da5d1-4641-46e6-9a7c-7255f7d75f01`: no reportable findings in the reviewed acquisition surfaces; coverage is partial and limitations are recorded by the scan.
+- Current-tree Codex Security standard review `013e6eaf-f741-4d08-ad0f-5ab2bef6f61b`: zero reportable findings across seven reviewed acquisition surfaces; coverage is explicitly partial and limitations are recorded by the scan.
 
 ## Key implementation commits
 
@@ -29,11 +29,13 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `24e91025` — outbound HTML sanitization.
 - `0332daa5` — explicit outbound consent policy.
 - `02cac89f` — current release documentation and regression evidence.
+- `46661ae7` — reliability, public-endpoint, workspace-boundary, quote-token, and import concurrency hardening.
 
 ## Implemented but not fully verified
 
 - Live SMTP/IMAP, mail-stack, Google Places, email-verification, Evolution, and other provider behavior remains unverified without configured external accounts.
 - Full repository release verification remains non-green because of the 13 pre-existing UI/source-contract failures.
+- The sealed security review used the pre-follow-up hardening snapshot; the quote/import follow-up and final documentation edits were created afterward. Their targeted tests passed, but they are not represented by that scan snapshot.
 
 ## Deployment requirements and blockers
 
