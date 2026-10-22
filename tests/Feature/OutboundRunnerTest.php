@@ -214,6 +214,41 @@ it('recovers stale outbound send claims for a safe retry', function () {
         ->and($message->fresh()->failure_reason)->toContain('Provider outcome unknown');
 });
 
+it('does not resend a stale claim when the provider outcome is unknown', function () {
+    $user = User::factory()->create();
+    Mailbox::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'enabled' => true,
+    ]);
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $idempotencyKey = 'sequence:unknown-provider:contact:'.$contact->id;
+
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Unknown outcome',
+        'body' => 'Do not duplicate this message.',
+        'status' => 'sending',
+        'sending_at' => now()->subMinutes(16),
+        'idempotency_key' => $idempotencyKey,
+    ]);
+
+    $retried = app(OutboundDispatcher::class)->dispatch($user->workspace, $contact, [
+        'channel' => 'email',
+        'subject' => 'Unknown outcome',
+        'body' => 'Do not duplicate this message.',
+        'idempotency_key' => $idempotencyKey,
+    ]);
+
+    expect($retried->id)->toBe($message->id)
+        ->and($retried->fresh()->status)->toBe('failed')
+        ->and($retried->fresh()->failure_reason)->toBe(OutboundSendClaim::UNKNOWN_PROVIDER_OUTCOME)
+        ->and(OutboundMessage::query()->where('status', 'sent')->count())->toBe(0);
+});
+
 it('pauses and resumes enrollments from the UI', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);

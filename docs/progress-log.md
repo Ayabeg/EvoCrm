@@ -109,6 +109,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - A committed diff-scoped Codex Security review is also sealed as scan 8387f1e4-4aca-49d9-98e7-7621a3a338c1 for 29aad813 to 46661ae7, with zero reportable findings and complete coverage of five changed security surfaces. Live provider behavior, deployment secret rotation, and legal compliance remain external limitations.
 - Committed the hardening slice as 46661ae7. The four unrelated user edits remain unstaged and untouched.
 - Corrected the architecture, data-model, and production-process documentation to match the current two-minute Meta processing lease and the failed/quarantined handling of stale outbound SMTP claims.
+- Closed the stale-claim idempotency loophole: reusing the original outbound idempotency key now preserves the failed/unknown-provider state instead of automatically re-sending. The outbound runner and department regression set passes 32 tests / 187 assertions, and Pint passes.
 
 ### Remaining
 

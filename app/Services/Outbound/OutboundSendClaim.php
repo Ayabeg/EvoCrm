@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class OutboundSendClaim
 {
+    public const UNKNOWN_PROVIDER_OUTCOME = 'Provider outcome unknown after the send lease expired; manual reconciliation required.';
+
     private const STALE_AFTER_MINUTES = 15;
 
     public function claim(OutboundMessage $message): ?OutboundMessage
@@ -48,7 +50,7 @@ class OutboundSendClaim
             // SMTP delivery on automatic recovery.
             'status' => 'failed',
             'sending_at' => null,
-            'failure_reason' => 'Provider outcome unknown after the send lease expired; manual reconciliation required.',
+            'failure_reason' => self::UNKNOWN_PROVIDER_OUTCOME,
         ]);
     }
 }

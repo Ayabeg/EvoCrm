@@ -68,6 +68,10 @@ class OutboundDispatcher
         }
 
         if ($message->wasRecentlyCreated === false && $message->status !== 'queued') {
+            if ($message->failure_reason === OutboundSendClaim::UNKNOWN_PROVIDER_OUTCOME) {
+                return $message;
+            }
+
             $message->forceFill([
                 'status' => 'queued',
                 'sending_at' => null,
