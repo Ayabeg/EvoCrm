@@ -14,11 +14,14 @@ use App\Models\OutboundMessage;
  */
 class EmailHtml
 {
+    public function __construct(private EmailHtmlSanitizer $sanitizer) {}
+
     public function build(OutboundMessage $message, bool $preview = false): string
     {
         $html = filled($message->body_html)
             ? (string) $message->body_html
             : nl2br(e((string) $message->body));
+        $html = $this->sanitizer->clean($html);
 
         if (! $preview) {
             $html = $this->rewriteLinks($message, $html);

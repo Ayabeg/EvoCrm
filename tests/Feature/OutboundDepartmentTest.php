@@ -296,6 +296,30 @@ it('keeps the unsubscribe URL on the CRM host in rendered mail', function () {
     expect($html)->not->toContain('outbound.evotechly.com');
 });
 
+it('sanitizes executable and unsafe markup before rendering email HTML', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Safe HTML',
+        'body' => 'Fallback',
+        'body_html' => '<p onclick="alert(1)">Hello <a href="javascript:alert(1)">there</a></p><script>alert(2)</script><img src="data:text/html,evil">',
+        'status' => 'queued',
+    ]);
+
+    $html = app(EmailHtml::class)->build($message, preview: true);
+
+    expect($html)->toContain('<p>Hello <a>there</a></p>')
+        ->and($html)->not->toContain('onclick')
+        ->and($html)->not->toContain('javascript:')
+        ->and($html)->not->toContain('<script')
+        ->and($html)->not->toContain('data:text/html');
+});
+
 it('tracks link clicks through a CRM-host redirect and never rewrites unsubscribe', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
