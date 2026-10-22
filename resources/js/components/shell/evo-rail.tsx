@@ -100,7 +100,7 @@ export function EvoRail({
             type="button"
             data-chrome="search"
             data-command-trigger="search"
-            aria-label={t('Search')}
+            aria-label={t('Search EvoCRM…')}
             className={cn(
                 collapsed
                     ? iconTargetClass
@@ -110,7 +110,7 @@ export function EvoRail({
         >
             <MagnifyingGlass className="size-4 shrink-0" weight="regular" />
             {collapsed ? null : (
-                <span className="min-w-0 flex-1 truncate">{t('Search')}</span>
+                <span className="min-w-0 flex-1 truncate">{t('Search EvoCRM…')}</span>
             )}
             {collapsed ? null : (
                 <kbd className="text-[11px] text-[var(--evo-ink-faint)]">⌘K</kbd>
@@ -234,7 +234,7 @@ export function EvoRail({
                 <Tooltip delayDuration={300}>
                     <TooltipTrigger asChild>{searchControl}</TooltipTrigger>
                     <TooltipContent side="right">
-                        {t('Search')} · ⌘K
+                        {t('Search EvoCRM…')} · ⌘K
                     </TooltipContent>
                 </Tooltip>
                 <Tooltip delayDuration={300}>

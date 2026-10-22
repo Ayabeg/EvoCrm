@@ -179,3 +179,14 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live verification-provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open.
 
+## 2026-10-23 — shell search-label contract alignment
+
+### Completed / verified
+
+- Restored the localized `Search EvoCRM…` label in the live EvoRail's accessible name, visible control, and collapsed-rail tooltip. This matches the existing translation catalog and shell contract rather than the generic `Search` fallback.
+- The affected shell, locale, and Aurora contract set passes 38 tests / 475 assertions. `npm run types:check`, targeted ESLint, and `git diff --check` pass.
+
+### Remaining
+
+- A repository-wide regression is still required after this UI contract repair. Live verification-provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and any remaining unrelated UI/source-contract failures remain open.
+
