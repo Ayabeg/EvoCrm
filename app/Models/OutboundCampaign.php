@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'sent_at',
     'audience_count',
     'suppressed_count',
+    'expansion_cursor',
+    'expansion_error',
     'created_by',
 ])]
 class OutboundCampaign extends Model
@@ -43,6 +45,8 @@ class OutboundCampaign extends Model
 
     public const STATUS_SENDING = 'sending';
 
+    public const STATUS_EXPANDING = 'expanding';
+
     public const STATUS_SENT = 'sent';
 
     public const STATUS_CANCELLED = 'cancelled';
@@ -55,6 +59,7 @@ class OutboundCampaign extends Model
             'sent_at' => 'datetime',
             'audience_count' => 'integer',
             'suppressed_count' => 'integer',
+            'expansion_cursor' => 'integer',
         ];
     }
 
@@ -90,7 +95,7 @@ class OutboundCampaign extends Model
 
     public function cancellable(): bool
     {
-        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SCHEDULED, self::STATUS_SENDING], true);
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SCHEDULED, self::STATUS_SENDING, self::STATUS_EXPANDING], true);
     }
 
     /**

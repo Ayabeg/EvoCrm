@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\ExpandOutboundCampaign;
 use App\Models\Contact;
 use App\Models\Enrollment;
 use App\Models\Mailbox;
@@ -17,6 +18,7 @@ use App\Services\Outbound\SequenceEnrollment;
 use App\Services\Outbound\SuppressionService;
 use App\Services\Outbound\TemplateRenderer;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 
 function enabledMailbox(User $user, array $overrides = []): Mailbox
 {
@@ -225,6 +227,28 @@ it('expands an audience across bounded chunks', function () {
 
     expect($campaign->refresh()->audience_count)->toBe(251)
         ->and(OutboundMessage::query()->where('campaign_id', $campaign->id)->count())->toBe(251);
+});
+
+it('queues durable expansion for audiences larger than one thousand contacts', function () {
+    Bus::fake();
+
+    $user = User::factory()->create();
+    Contact::factory()->count(1001)->create(['workspace_id' => $user->workspace_id]);
+    $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    app(CampaignService::class)->expand($campaign);
+
+    expect($campaign->refresh()->status)->toBe(OutboundCampaign::STATUS_EXPANDING)
+        ->and($campaign->audience_count)->toBe(1001)
+        ->and(OutboundMessage::query()->where('campaign_id', $campaign->id)->count())->toBe(0);
+
+    Bus::assertDispatched(ExpandOutboundCampaign::class, fn (ExpandOutboundCampaign $job): bool => $job->campaignId === $campaign->id);
+
+    (new ExpandOutboundCampaign($campaign->id))->handle(app(CampaignService::class));
+
+    expect($campaign->refresh()->status)->toBe(OutboundCampaign::STATUS_EXPANDING)
+        ->and($campaign->expansion_cursor)->not->toBeNull()
+        ->and(OutboundMessage::query()->where('campaign_id', $campaign->id)->count())->toBe(250);
 });
 
 it('cancels a sending campaign and drops its queued messages', function () {

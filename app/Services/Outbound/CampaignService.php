@@ -2,6 +2,7 @@
 
 namespace App\Services\Outbound;
 
+use App\Jobs\ExpandOutboundCampaign;
 use App\Models\Contact;
 use App\Models\Mailbox;
 use App\Models\OutboundCampaign;
@@ -23,6 +24,8 @@ use Illuminate\Support\Str;
 class CampaignService
 {
     private const AUDIENCE_CHUNK_SIZE = 250;
+
+    private const MAX_SYNCHRONOUS_AUDIENCE = 1000;
 
     public function __construct(
         private SuppressionService $suppressions,
@@ -77,6 +80,7 @@ class CampaignService
         $workspace = $campaign->workspace;
         $audienceQuery = $this->audienceQuery($workspace, $campaign->savedFilter);
         $audienceCount = (clone $audienceQuery)->count();
+
         $reasons = [];
         $eligible = 0;
         $sample = [];
@@ -127,6 +131,22 @@ class CampaignService
         $workspace = $campaign->workspace;
         $audienceQuery = $this->audienceQuery($workspace, $campaign->savedFilter);
         $audienceCount = (clone $audienceQuery)->count();
+
+        if ($audienceCount > self::MAX_SYNCHRONOUS_AUDIENCE) {
+            $campaign->forceFill([
+                'status' => OutboundCampaign::STATUS_EXPANDING,
+                'started_at' => $campaign->started_at ?? now(),
+                'scheduled_at' => $campaign->scheduled_at ?? now(),
+                'audience_count' => $audienceCount,
+                'suppressed_count' => 0,
+                'expansion_cursor' => null,
+                'expansion_error' => null,
+            ])->save();
+
+            ExpandOutboundCampaign::dispatch($campaign->id);
+
+            return $campaign;
+        }
 
         $suppressed = 0;
         $queued = 0;
@@ -180,6 +200,97 @@ class CampaignService
         ], null, $workspace);
 
         return $campaign;
+    }
+
+    /**
+     * Materialize one bounded audience page for a durable large-campaign job.
+     * Returns true while another page remains.
+     */
+    public function expandChunk(OutboundCampaign $campaign): bool
+    {
+        if ($campaign->status !== OutboundCampaign::STATUS_EXPANDING) {
+            return false;
+        }
+
+        $workspace = $campaign->workspace;
+        $query = $this->audienceQuery($workspace, $campaign->savedFilter);
+
+        if ($campaign->expansion_cursor) {
+            $query->where('contacts.id', '>', $campaign->expansion_cursor);
+        }
+
+        $contacts = $query->limit(self::AUDIENCE_CHUNK_SIZE)->get();
+
+        if ($contacts->isEmpty()) {
+            $campaign->forceFill([
+                'status' => OutboundCampaign::STATUS_SENDING,
+                'expansion_cursor' => null,
+            ])->save();
+
+            $this->captureCampaignLaunched($campaign, (int) $campaign->messages()->where('status', 'queued')->count());
+
+            return false;
+        }
+
+        $suppressed = 0;
+
+        foreach ($contacts as $contact) {
+            if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
+                $suppressed++;
+
+                continue;
+            }
+
+            $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
+
+            if ($eligibilityReason !== null) {
+                OutboundMessage::query()->firstOrCreate(
+                    [
+                        'workspace_id' => $workspace->id,
+                        'idempotency_key' => $this->idempotencyKey($campaign, $contact),
+                    ],
+                    $this->messageAttributes($campaign, $contact, 'failed', $eligibilityReason),
+                );
+
+                continue;
+            }
+
+            OutboundMessage::query()->firstOrCreate(
+                [
+                    'workspace_id' => $workspace->id,
+                    'idempotency_key' => $this->idempotencyKey($campaign, $contact),
+                ],
+                $this->messageAttributes($campaign, $contact),
+            );
+        }
+
+        $campaign->forceFill([
+            'expansion_cursor' => $contacts->last()->id,
+            'suppressed_count' => (int) $campaign->suppressed_count + $suppressed,
+        ])->save();
+
+        if ($contacts->count() < self::AUDIENCE_CHUNK_SIZE) {
+            $campaign->forceFill([
+                'status' => OutboundCampaign::STATUS_SENDING,
+                'expansion_cursor' => null,
+            ])->save();
+
+            $this->captureCampaignLaunched($campaign, (int) $campaign->messages()->where('status', 'queued')->count());
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function captureCampaignLaunched(OutboundCampaign $campaign, int $queued): void
+    {
+        $this->analytics->capture(ProductAnalytics::CAMPAIGN_LAUNCHED, [
+            'campaign_id' => $campaign->id,
+            'audience_count' => $campaign->audience_count,
+            'queued' => $queued,
+            'suppressed' => $campaign->suppressed_count,
+        ], null, $campaign->workspace);
     }
 
     /**
