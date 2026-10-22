@@ -52,6 +52,7 @@
 - Closed the direct-PII analytics default: PostHog identity now sends only role plus a stable pseudonymous user ID unless `POSTHOG_IDENTIFY_PII=true` is explicitly configured. Backend privacy regression coverage passes and the changed frontend passes typecheck/lint.
 - Removed populated PostHog project keys from `.env.example`, `.env.production.example`, and checked-in UI evidence; templates keep provider values empty and default `POSTHOG_IDENTIFY_PII=false`. The local ignored `.env` remains an external secret-rotation item.
 - Re-read the supplied build brief and reviewed `Awaisali36/50k-lead-generation-system` as an implementation reference. Its staged acquisition/enrichment/qualification workflow informed the existing provider boundaries, bounded batch processing, provenance, and explainable scoring without importing its n8n/Airtable/Apify/Gemini assumptions. The complete focused acquisition regression set passes 194 tests / 1,371 assertions.
+- Hardened the public funnel visit beacon so UTM/source values are bounded and referrers/paths are stored without query strings, preventing unbounded attribution writes and accidental persistence of query-string PII. The focused funnel suite passes 6 tests / 13 assertions; the complete focused acquisition set passes 195 tests / 1,375 assertions. Commit: `94a5ed64`.
 
 ### In progress
 
@@ -70,10 +71,10 @@
 ### Blocked
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
-- Full-suite release verification is not green until the 14 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
+- Full-suite release verification is not green until the 13 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
 - The standard Codex Security scan is complete for the captured revision with 1 high and 2 medium findings. The DNS-rebinding and direct-PII analytics findings are remediated in the current tree with regression evidence; the local `.env` APP_KEY still requires deployment rotation. The scan also records that the repository changed while it ran; current-tree fixes for booking, click redirects, Evolution replay, Meta claims, unsubscribe isolation, redirect SSRF, CSV formula injection, bulk limits, and worker failure state have separate regression evidence. Live provider checks remain blocked.
 
 ### Next verified task
 
-Run the remaining security/privacy review and release checks, while keeping live-provider verification and delivery blocked until credentials are configured.
+Complete the current-tree security/privacy review and refresh the release evidence, while keeping live-provider verification and delivery blocked until credentials are configured.
 
