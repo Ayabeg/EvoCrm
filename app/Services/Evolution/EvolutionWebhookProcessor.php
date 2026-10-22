@@ -37,12 +37,13 @@ class EvolutionWebhookProcessor
         $data = is_array($payload['data'] ?? null) ? $payload['data'] : $payload;
         $providerMessageId = Arr::get($data, 'key.id') ?? Arr::get($data, 'id') ?? Arr::get($payload, 'message_id');
         $providerMessageId = filled($providerMessageId) ? (string) $providerMessageId : null;
+        $providerIdentity = $providerMessageId ?? $this->fallbackIdentity($workspace, $instance, $event, $payload);
 
         DB::table('evolution_events')->insertOrIgnore([
             'workspace_id' => $workspace->id,
             'instance' => $instance,
             'event' => $event,
-            'provider_event_id' => $providerMessageId,
+            'provider_event_id' => $providerIdentity,
             'payload' => json_encode($payload, JSON_THROW_ON_ERROR),
             'received_at' => now(),
             'created_at' => now(),
@@ -83,16 +84,14 @@ class EvolutionWebhookProcessor
         $isPhone = $kind === EvolutionCloudService::KIND_WHATSAPP;
         $provider = $isPhone ? 'evolution_whatsapp' : 'evolution_cloud';
 
-        if ($providerMessageId) {
-            $existing = Message::query()
-                ->where('workspace_id', $workspace->id)
-                ->where('provider', $provider)
-                ->where('provider_message_id', $providerMessageId)
-                ->first();
+        $existing = Message::query()
+            ->where('workspace_id', $workspace->id)
+            ->where('provider', $provider)
+            ->where('provider_message_id', $providerIdentity)
+            ->first();
 
-            if ($existing) {
-                return $existing;
-            }
+        if ($existing) {
+            return $existing;
         }
 
         $pushName = (string) (Arr::get($data, 'pushName') ?? Arr::get($payload, 'pushName') ?? 'WhatsApp');
@@ -126,18 +125,14 @@ class EvolutionWebhookProcessor
                 'body' => $this->extractBody($data),
                 'status' => 'received',
                 'provider' => $provider,
-                'provider_message_id' => $providerMessageId,
+                'provider_message_id' => $providerIdentity,
                 'payload' => $payload,
             ]);
         } catch (QueryException $exception) {
-            if (! $providerMessageId) {
-                throw $exception;
-            }
-
             $message = Message::query()
                 ->where('workspace_id', $workspace->id)
                 ->where('provider', $provider)
-                ->where('provider_message_id', $providerMessageId)
+                ->where('provider_message_id', $providerIdentity)
                 ->first();
 
             if (! $message) {
@@ -161,6 +156,41 @@ class EvolutionWebhookProcessor
         }
 
         return $message;
+    }
+
+    /**
+     * Providers occasionally omit a message ID. A stable payload identity
+     * keeps those deliveries idempotent without treating every NULL as new.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    protected function fallbackIdentity(Workspace $workspace, string $instance, string $event, array $payload): string
+    {
+        $canonical = $this->canonicalize($payload);
+
+        return 'payload:'.hash('sha256', json_encode([
+            'workspace_id' => $workspace->id,
+            'instance' => $instance,
+            'event' => $event,
+            'payload' => $canonical,
+        ], JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * @param  array<string, mixed>  $value
+     * @return array<string, mixed>
+     */
+    protected function canonicalize(array $value): array
+    {
+        foreach ($value as $key => $item) {
+            if (is_array($item)) {
+                $value[$key] = $this->canonicalize($item);
+            }
+        }
+
+        ksort($value);
+
+        return $value;
     }
 
     /**

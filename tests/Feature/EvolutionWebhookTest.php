@@ -56,6 +56,27 @@ it('returns the existing message when Evolution retries the same provider event'
         ->and(Message::query()->where('workspace_id', $workspace->id)->count())->toBe(1);
 });
 
+it('deduplicates Evolution retries when the provider omits a message id', function () {
+    $workspace = Workspace::factory()->create();
+    $payload = [
+        'event' => 'MESSAGES_UPSERT',
+        'instance' => 'evosales',
+        'data' => [
+            'remoteJid' => '213555000111@s.whatsapp.net',
+            'fromMe' => false,
+            'pushName' => 'Khaled',
+            'conversation' => 'Provider omitted the event id.',
+        ],
+    ];
+
+    $first = app(EvolutionWebhookProcessor::class)->handle($workspace, $payload);
+    $second = app(EvolutionWebhookProcessor::class)->handle($workspace, $payload);
+
+    expect($second?->id)->toBe($first?->id)
+        ->and($first?->provider_message_id)->toStartWith('payload:')
+        ->and(Message::query()->where('workspace_id', $workspace->id)->count())->toBe(1);
+});
+
 it('accepts the public webhook endpoint', function () {
     $workspace = Workspace::factory()->create();
     $endpoint = app(WebhookEndpointManager::class)->forWorkspace($workspace, 'evolution');
