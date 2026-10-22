@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Outbound;
 
+use App\Enums\EmailVerificationPolicy;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Enrollment;
@@ -45,6 +46,7 @@ class SequenceController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
             'channel' => ['required', 'in:email,whatsapp_cloud,sms'],
+            'email_verification_policy' => ['nullable', 'in:'.implode(',', array_column(EmailVerificationPolicy::cases(), 'value'))],
             'description' => ['nullable', 'string'],
             'origin' => ['nullable', 'in:scratch,template'],
         ]);
@@ -52,6 +54,7 @@ class SequenceController extends Controller
         $sequence = Sequence::query()->create([
             'name' => $data['name'],
             'channel' => $data['channel'],
+            'email_verification_policy' => $data['email_verification_policy'] ?? EmailVerificationPolicy::Strict->value,
             'description' => $data['description'] ?? null,
             'workspace_id' => $request->user()->workspace_id,
             'active' => false,
@@ -159,6 +162,7 @@ class SequenceController extends Controller
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
+            'email_verification_policy' => ['nullable', 'in:'.implode(',', array_column(EmailVerificationPolicy::cases(), 'value'))],
             'description' => ['nullable', 'string'],
         ]);
 

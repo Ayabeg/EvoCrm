@@ -32,7 +32,13 @@ class SequenceEnrollment
             ]);
         }
 
-        $eligibilityReason = $this->eligibility->reason($workspace, $contact, $sequence->channel, $sequence);
+        $eligibilityReason = $this->eligibility->reason(
+            $workspace,
+            $contact,
+            $sequence->channel,
+            $sequence,
+            $sequence->email_verification_policy,
+        );
 
         if ($eligibilityReason !== null) {
             throw ValidationException::withMessages([

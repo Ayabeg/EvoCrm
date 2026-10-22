@@ -46,6 +46,8 @@ The current `enrichment_runs` table is a candidate/evidence ledger, but the broa
 
 For email fields, the latest run also projects status, source, evidence URL, retrieval time, confidence, and run ID onto `contacts.meta.email_verification` so outbound eligibility consumes the same provenance without a competing verification table.
 
+Outbound email sequences and broadcast campaigns persist an `email_verification_policy` (`strict`, `allow_catch_all`, `allow_unknown`, or `allow_uncertain`). `strict` is the database default. A permissive target policy is not sufficient by itself: the deployment must also explicitly disable the matching global block, and invalid, temporary-failure, and unsupported results remain blocked.
+
 `lead_scores.data_quality` stores a separate 0–100 completeness score. Its factors are kept in the score breakdown with the `quality` pillar; it does not alter the existing qualification thresholds or commercial score.
 
 ### Eligibility and suppression

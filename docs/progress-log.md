@@ -191,3 +191,15 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - The remaining eight branding/design-system/automation contract failures are outside the acquisition systems. Live verification-provider semantics, deployment APP_KEY rotation, and legal sign-off for consentless cold outreach remain open.
 
+## 2026-10-23 — explicit uncertain-email campaign policy
+
+### Completed / verified
+
+- Added workspace-scoped persistence for an explicit email-verification policy on sequences and broadcast campaigns. `strict` is the database default; `allow_catch_all`, `allow_unknown`, and `allow_uncertain` are available only as deliberate target settings.
+- Routed the policy through enrollment, campaign preview/expansion, scheduled campaign sends, and sequence last-mile dispatch. The deployment-level `EVOSALES_BLOCK_CATCH_ALL_EMAIL` and `EVOSALES_BLOCK_UNKNOWN_EMAIL` guards remain fail-closed, so a target policy cannot override an environment that has not approved uncertain delivery.
+- Added policy controls to sequence and campaign creation/edit surfaces and regression coverage for sequence enrollment and campaign preview. The outbound regression set passes 43 tests / 215 assertions; Pint, TypeScript, targeted ESLint, and `git diff --check` pass.
+
+### Remaining
+
+- Live verification-provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+

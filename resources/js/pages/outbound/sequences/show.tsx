@@ -57,6 +57,7 @@ export default function SequenceShow({
         id: number;
         name: string;
         channel: string;
+        email_verification_policy?: string;
         active: boolean;
         description?: string | null;
         steps: SequenceStepRow[];
@@ -175,6 +176,14 @@ export default function SequenceShow({
                                     </Field>
                                     <Field label={t('Description')} className="md:col-span-2">
                                         <Input name="description" defaultValue={sequence.description ?? ''} />
+                                    </Field>
+                                    <Field label={t('Uncertain email policy')}>
+                                        <NativeSelect name="email_verification_policy" defaultValue={sequence.email_verification_policy ?? 'strict'}>
+                                            <option value="strict">{t('Strict — verified results only')}</option>
+                                            <option value="allow_catch_all">{t('Allow catch-all if deployment permits')}</option>
+                                            <option value="allow_unknown">{t('Allow unknown if deployment permits')}</option>
+                                            <option value="allow_uncertain">{t('Allow uncertain results if deployment permits')}</option>
+                                        </NativeSelect>
                                     </Field>
                                     <div className="flex items-end">
                                         <Button disabled={processing} size="sm">

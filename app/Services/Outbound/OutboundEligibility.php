@@ -2,6 +2,7 @@
 
 namespace App\Services\Outbound;
 
+use App\Enums\EmailVerificationPolicy;
 use App\Models\Contact;
 use App\Models\ContactConsent;
 use App\Models\Enrollment;
@@ -23,6 +24,7 @@ final class OutboundEligibility
         Contact $contact,
         string $channel,
         ?Sequence $sequence = null,
+        ?string $emailVerificationPolicy = null,
     ): ?string {
         if ((int) $contact->workspace_id !== (int) $workspace->id) {
             return 'Contact does not belong to this workspace.';
@@ -34,6 +36,8 @@ final class OutboundEligibility
 
         if ($channel === 'email') {
             $email = trim((string) $contact->email);
+            $policy = EmailVerificationPolicy::tryFrom($emailVerificationPolicy ?? EmailVerificationPolicy::Strict->value)
+                ?? EmailVerificationPolicy::Strict;
 
             if ($email === '') {
                 return 'Contact has no usable business email address.';
@@ -52,11 +56,13 @@ final class OutboundEligibility
                 };
             }
 
-            if ($verificationStatus === 'catch_all' && config('evosales.outbound.block_catch_all', true)) {
+            if ($verificationStatus === 'catch_all'
+                && (config('evosales.outbound.block_catch_all', true) || ! $policy->allowsCatchAll())) {
                 return 'Contact email verification marked this address catch-all.';
             }
 
-            if ($verificationStatus === 'unknown' && config('evosales.outbound.block_unknown_verification', true)) {
+            if ($verificationStatus === 'unknown'
+                && (config('evosales.outbound.block_unknown_verification', true) || ! $policy->allowsUnknown())) {
                 return 'Contact email verification is unknown.';
             }
         }

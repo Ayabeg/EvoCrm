@@ -125,6 +125,14 @@ export default function SequencesIndex({ sequences }: { sequences: SequenceRow[]
                                         <option value="whatsapp_cloud">{t('WhatsApp Cloud template')}</option>
                                     </NativeSelect>
                                 </Field>
+                                <Field label={t('Uncertain email policy')} htmlFor="sequence-email-policy">
+                                    <NativeSelect id="sequence-email-policy" name="email_verification_policy" defaultValue="strict">
+                                        <option value="strict">{t('Strict — verified results only')}</option>
+                                        <option value="allow_catch_all">{t('Allow catch-all if deployment permits')}</option>
+                                        <option value="allow_unknown">{t('Allow unknown if deployment permits')}</option>
+                                        <option value="allow_uncertain">{t('Allow uncertain results if deployment permits')}</option>
+                                    </NativeSelect>
+                                </Field>
                                 <div className="flex items-end">
                                     <Button disabled={processing}>{t('Create')}</Button>
                                 </div>

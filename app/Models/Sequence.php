@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['workspace_id', 'name', 'channel', 'active', 'description'])]
+#[Fillable(['workspace_id', 'name', 'channel', 'email_verification_policy', 'active', 'description'])]
 class Sequence extends Model
 {
     /** @use HasFactory<SequenceFactory> */

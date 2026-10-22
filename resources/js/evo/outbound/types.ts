@@ -33,6 +33,7 @@ export type CampaignRow = {
     id: number | string;
     name: string;
     status: string;
+    email_verification_policy?: string;
     subject?: string | null;
     scheduled_at?: string | null;
     sent_at?: string | null;
@@ -98,6 +99,7 @@ export type SequenceRow = {
     id: number | string;
     name: string;
     channel: string;
+    email_verification_policy?: string;
     active: boolean;
     description?: string | null;
     steps?: { id: number | string }[];

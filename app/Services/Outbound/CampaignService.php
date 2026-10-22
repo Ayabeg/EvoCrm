@@ -87,7 +87,13 @@ class CampaignService
 
         $audienceQuery->chunkById(self::AUDIENCE_CHUNK_SIZE, function (Collection $contacts) use ($campaign, $workspace, &$reasons, &$eligible, &$sample): void {
             foreach ($contacts as $contact) {
-                $reason = $this->eligibility->reason($workspace, $contact, 'email');
+                $reason = $this->eligibility->reason(
+                    $workspace,
+                    $contact,
+                    'email',
+                    null,
+                    $campaign->email_verification_policy,
+                );
 
                 if ($reason === null) {
                     $eligible++;
@@ -159,7 +165,13 @@ class CampaignService
                     continue;
                 }
 
-                $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
+                $eligibilityReason = $this->eligibility->reason(
+                    $workspace,
+                    $contact,
+                    'email',
+                    null,
+                    $campaign->email_verification_policy,
+                );
 
                 if ($eligibilityReason !== null) {
                     OutboundMessage::query()->firstOrCreate(
@@ -241,7 +253,13 @@ class CampaignService
                 continue;
             }
 
-            $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
+            $eligibilityReason = $this->eligibility->reason(
+                $workspace,
+                $contact,
+                'email',
+                null,
+                $campaign->email_verification_policy,
+            );
 
             if ($eligibilityReason !== null) {
                 OutboundMessage::query()->firstOrCreate(
@@ -343,7 +361,13 @@ class CampaignService
                 continue;
             }
 
-            $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
+            $eligibilityReason = $this->eligibility->reason(
+                $workspace,
+                $contact,
+                'email',
+                null,
+                $campaign->email_verification_policy,
+            );
 
             if ($eligibilityReason !== null) {
                 $message->forceFill([

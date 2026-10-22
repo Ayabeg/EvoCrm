@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'workspace_id',
     'name',
     'status',
+    'email_verification_policy',
     'saved_filter_id',
     'template_id',
     'mailbox_id',

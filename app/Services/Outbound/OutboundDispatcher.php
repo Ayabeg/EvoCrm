@@ -80,7 +80,15 @@ class OutboundDispatcher
             ])->save();
         }
 
-        $eligibilityReason = $this->eligibility->reason($workspace, $contact, $channel);
+        $eligibilityReason = $this->eligibility->reason(
+            $workspace,
+            $contact,
+            $channel,
+            null,
+            is_string($attributes['email_verification_policy'] ?? null)
+                ? $attributes['email_verification_policy']
+                : null,
+        );
 
         if ($eligibilityReason === null && $channel === 'email' && ! filter_var($to, FILTER_VALIDATE_EMAIL)) {
             $eligibilityReason = 'The outbound recipient address is invalid.';
@@ -143,6 +151,7 @@ class OutboundDispatcher
         return $this->dispatch($workspace, $contact, array_merge($attributes, [
             'sequence_id' => $sequence->id,
             'channel' => $attributes['channel'] ?? $sequence->channel,
+            'email_verification_policy' => $sequence->email_verification_policy,
         ]));
     }
 

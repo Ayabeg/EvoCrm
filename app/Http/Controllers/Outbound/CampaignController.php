@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Outbound;
 
+use App\Enums\EmailVerificationPolicy;
 use App\Http\Controllers\Controller;
 use App\Models\Mailbox;
 use App\Models\OutboundCampaign;
@@ -59,6 +60,7 @@ class CampaignController extends Controller
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
+            'email_verification_policy' => ['nullable', 'in:'.implode(',', array_column(EmailVerificationPolicy::cases(), 'value'))],
             'saved_filter_id' => ['nullable', 'integer'],
             'template_id' => ['nullable', 'integer'],
             'mailbox_id' => ['nullable', 'integer'],
@@ -94,6 +96,7 @@ class CampaignController extends Controller
             'workspace_id' => $workspace->id,
             'name' => $data['name'],
             'status' => OutboundCampaign::STATUS_DRAFT,
+            'email_verification_policy' => $data['email_verification_policy'] ?? EmailVerificationPolicy::Strict->value,
             'saved_filter_id' => $filter?->id,
             'template_id' => $template?->id,
             'mailbox_id' => $mailbox?->id,

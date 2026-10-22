@@ -64,3 +64,28 @@ it('allows a documented cold-outreach mode while still blocking explicit denial'
     expect(app(OutboundEligibility::class)->reason($user->workspace, $contact, 'email'))
         ->toBe('Contact has not granted marketing consent for this channel.');
 });
+
+it('applies the explicit campaign verification policy during preview', function () {
+    config([
+        'evosales.outbound.block_unknown_verification' => false,
+        'evosales.outbound.require_marketing_consent' => false,
+    ]);
+
+    $user = User::factory()->create();
+    Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'campaign-unknown@clinic.dz',
+        'meta' => ['email_verification' => ['status' => 'unknown']],
+    ]);
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email_verification_policy' => 'allow_unknown',
+    ]);
+
+    expect(app(CampaignService::class)->preview($campaign))
+        ->toMatchArray([
+            'audience_count' => 1,
+            'eligible_count' => 1,
+            'ineligible_count' => 0,
+        ]);
+});
