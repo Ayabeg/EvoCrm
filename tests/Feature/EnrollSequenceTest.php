@@ -88,6 +88,27 @@ it('refuses to enroll a contact with an unknown verification result by default',
         ->toThrow(ValidationException::class, 'verification is unknown');
 });
 
+it('fails closed when the unknown verification policy key is absent', function () {
+    config(['evosales.outbound' => [
+        'block_catch_all' => true,
+        'require_marketing_consent' => false,
+    ]]);
+
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'missing-policy@clinic.dz',
+        'meta' => ['email_verification' => ['status' => 'unknown']],
+    ]);
+    $sequence = Sequence::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'channel' => 'email',
+    ]);
+
+    expect(fn () => app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact))
+        ->toThrow(ValidationException::class, 'verification is unknown');
+});
+
 it('refuses a second active sequence on the same channel', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);

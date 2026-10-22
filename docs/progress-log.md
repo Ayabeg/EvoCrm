@@ -167,3 +167,14 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open. No external repository currently supplies code that removes those dependencies.
 
+## 2026-10-23 — fail-closed verification fallback
+
+### Completed / verified
+
+- Hardened `OutboundEligibility` so an absent `evosales.outbound.block_unknown_verification` configuration key still blocks `unknown` email-verification results instead of failing open.
+- Added a regression that removes the nested policy key while preserving the other outbound settings and verifies enrollment remains rejected. The focused enrollment test passes 7 tests / 15 assertions; the broader outbound safety set passes 44 tests / 219 assertions. Pint and `git diff --check` pass.
+
+### Remaining
+
+- Live verification-provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open.
+

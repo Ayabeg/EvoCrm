@@ -56,7 +56,7 @@ final class OutboundEligibility
                 return 'Contact email verification marked this address catch-all.';
             }
 
-            if ($verificationStatus === 'unknown' && config('evosales.outbound.block_unknown_verification', false)) {
+            if ($verificationStatus === 'unknown' && config('evosales.outbound.block_unknown_verification', true)) {
                 return 'Contact email verification is unknown.';
             }
         }
