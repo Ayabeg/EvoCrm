@@ -1,0 +1,52 @@
+# Acquisition systems release report
+
+Current revision: `02cac89f` (`main`)
+
+This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
+
+## Implemented and verified
+
+- Shared workspace-scoped CRM integration across companies, contacts, leads, activities, consent, suppression, enrichment provenance, outbound messages, and funnel events.
+- Dead Enrichment ingestion, incomplete-row retention, normalization, duplicate-safe re-imports, provider evidence, verification-state projection, CRM detection, explainable data-quality scoring, bounded queueing, retries, and retry actions.
+- EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
+- Durable campaign expansion for audiences over 1,000 contacts using resumable 250-contact cursor jobs and idempotent message creation.
+- Dead Magnet Lead Leakage Calculator, validation, duplicate-safe submission persistence, separate delivery/marketing/enrichment consent, shared CRM handoff, queued result delivery with honest failure states, demo handoff, booking attribution, and funnel analytics.
+- Public analytics consent gating and pseudonymous authenticated analytics identity.
+
+## Verification evidence
+
+- Focused acquisition regression: **207 tests / 1,440 assertions passed**.
+- Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
+- Current repository-wide regression: **1,334 tests; 1,320 passed; 13 existing UI/source-contract failures; 35,658 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- `npm run types:check` passed.
+- `git diff --check` passed.
+- Current-tree Codex Security standard review `c38da5d1-4641-46e6-9a7c-7255f7d75f01`: no reportable findings in the reviewed acquisition surfaces; coverage is partial and limitations are recorded by the scan.
+
+## Key implementation commits
+
+- `0764a179` — durable large-campaign expansion.
+- `c75b6c48` — public analytics consent and privacy hardening.
+- `24e91025` — outbound HTML sanitization.
+- `0332daa5` — explicit outbound consent policy.
+- `02cac89f` — current release documentation and regression evidence.
+
+## Implemented but not fully verified
+
+- Live SMTP/IMAP, mail-stack, Google Places, email-verification, Evolution, and other provider behavior remains unverified without configured external accounts.
+- Full repository release verification remains non-green because of the 13 pre-existing UI/source-contract failures.
+
+## Deployment requirements and blockers
+
+- Configure and deliberately test the required provider credentials and webhook contracts in a controlled environment before sending real outreach.
+- Rotate the local/deployment `APP_KEY` as part of deployment hygiene; the ignored local `.env` is not committed.
+- Keep `EVOSALES_REQUIRE_MARKETING_CONSENT=true` unless a documented lawful basis and legal review approve consentless cold outreach for the target market.
+- Resolve or explicitly accept the unrelated UI/source-contract failures before claiming a fully green repository-wide release.
+- Preserve the four unrelated user working-tree edits; they were not staged or modified by this work.
+
+## Operating references
+
+- [Implementation roadmap](./implementation-roadmap.md)
+- [Architecture](./architecture.md)
+- [Data model](./data-model.md)
+- [Testing and acceptance](./testing-and-acceptance.md)
+- [Progress log](./progress-log.md)
