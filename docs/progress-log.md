@@ -66,12 +66,15 @@
 - Gated public PostHog boot behind explicit visitor analytics consent and removed login email from the product analytics event. Analytics/privacy coverage passes 13 tests / 86 assertions; `npm run types:check` passes. Commit: `c75b6c48`.
 - Sanitized outbound HTML before delivery, link rewriting, and preview, removing executable tags, event handlers, unsafe URLs, and dangerous CSS. Outbound coverage passes 22 tests / 147 assertions. Commit: `24e91025`.
 - Final focused acquisition regression after the campaign, analytics, and HTML-safety changes passes 197 tests / 1,381 assertions.
+- Made outbound marketing consent policy explicit and safe by default: missing consent blocks eligibility unless a deployment explicitly documents a lawful basis for consentless cold outreach; explicit denial always blocks, and lead-magnet delivery remains separate. The policy regression set plus outbound lifecycle suites pass 39 tests / 216 assertions. Commit: `0332daa5`.
+- Final focused acquisition regression after the explicit consent-policy change passes 207 tests / 1,440 assertions. The repository typecheck remains green from the analytics/privacy change.
+- The latest repository-wide regression runs 1,334 tests with 1,320 passing, 13 existing UI/source-contract failures, 35,658 assertions, and 1 skipped. The failures remain outside the acquisition-system implementation; the two existing `InvalidArgumentException` import warnings are unchanged.
 
 ### In progress
 
 - Lead-magnet delivery/conversion completion (M3): inline result, queued result-email delivery, demo handoff, booking-to-pipeline analytics, and explicit enrichment consent are implemented; release-level integration and security review remain.
 - Shared provenance/verification/eligibility contract (A3, E1, O1).
-- Campaign audience policy for uncertain email states and provider-level delivery/idempotency verification remain for O1/O2; current local idempotency protects stable message creation, while live provider event semantics remain environment-dependent.
+- Provider-level delivery/idempotency verification remains environment-dependent; local idempotency protects stable message creation and the explicit outbound consent policy is now covered.
 - Exact gap analysis of existing enrichment, outbound eligibility, and lead-capture flows before adding migrations.
 - Enrichment orchestration (E3): the existing per-record actions now share a capped workspace-scoped bulk queue endpoint and Contacts exposes a Queue enrichment action for selected records. EnrichRecordJob is unique per workspace/target/type, retries transient failures up to three times with bounded backoff, and the focused suite passes 11 tests / 97 assertions.
 - Lead-magnet booking attribution (M3): the demo handoff now carries a same-workspace submission reference into the existing public booking form, and MeetingBooker records one meeting_booked funnel event with contact/lead/deal links and lead-magnet source attribution. Focused meeting/lead-magnet coverage passes 16 tests / 158 assertions.
@@ -85,9 +88,9 @@
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
 - Full-suite release verification is not green until the 13 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
-- The standard Codex Security scan is complete for the captured revision with 7 medium findings and partial coverage. Current-tree owner-assignment, workflow-DNS, Evolution missing-identity, sequence-request and large-campaign expansion bounds, template preview/email HTML safety, and analytics consent are remediated with regression evidence. The remaining policy item is whether cold outbound without a recorded consent grant is permitted under an explicitly documented lawful basis. The local ignored `.env` APP_KEY still requires deployment rotation. Live provider checks remain blocked.
+- The standard Codex Security scan is complete for the captured revision with 7 medium findings and partial coverage. Current-tree owner-assignment, workflow-DNS, Evolution missing-identity, sequence-request and large-campaign expansion bounds, template preview/email HTML safety, and analytics consent are remediated with regression evidence. Outbound consent is safe by default; disabling the requirement remains an explicit lawful-basis/legal-review gate. The local ignored `.env` APP_KEY still requires deployment rotation. Live provider checks remain blocked.
 
 ### Next verified task
 
-Resolve and document the outbound lawful-basis policy, then run the final release audit while keeping live-provider verification and delivery blocked until credentials are configured.
+Run the final release audit after the remaining UI/source-contract checks are resolved or accepted, while keeping live-provider verification and delivery blocked until credentials and legal/deployment sign-off are configured.
 

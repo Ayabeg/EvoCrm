@@ -55,6 +55,8 @@ Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `Sup
 
 Email verification provenance is projected from an `EnrichmentRun` onto the related contact's `meta.email_verification` record. Invalid, temporary-failure, and unsupported results are never auto-applied to an empty email field; catch-all and unknown states are governed by explicit outbound configuration.
 
+Marketing consent is required by default for outbound eligibility, and an explicit denial always suppresses that channel. The opt-out for consentless cold outreach is an explicit deployment configuration that requires a documented lawful basis and legal review; lead-magnet delivery remains separate from optional marketing consent and never auto-enrolls a submission into cold outreach.
+
 ### Dead Magnet
 
 Keep calculator math as a pure domain service with no HTTP or Eloquent dependencies. Persist the offer/submission/assumption result separately from the shared contact/lead record, then record attribution and consent using the existing CRM conventions. Delivery is transactional and separately observable from optional marketing eligibility.
