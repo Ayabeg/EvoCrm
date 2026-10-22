@@ -41,5 +41,6 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="EVOCRM_SIGNUP_MODE" value="open"/>
+        <env name="EVOSALES_REQUIRE_MARKETING_CONSENT" value="false"/>
     </php>
 </phpunit>

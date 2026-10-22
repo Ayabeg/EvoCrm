@@ -89,6 +89,9 @@ return [
     'outbound' => [
         'block_catch_all' => env('EVOSALES_BLOCK_CATCH_ALL_EMAIL', true),
         'block_unknown_verification' => env('EVOSALES_BLOCK_UNKNOWN_EMAIL', false),
+        // Safe default: missing marketing consent blocks outbound sends.
+        // Disable only when a documented lawful-basis policy applies.
+        'require_marketing_consent' => (bool) env('EVOSALES_REQUIRE_MARKETING_CONSENT', true),
     ],
 
     'enrichment' => [
