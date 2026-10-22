@@ -30,6 +30,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Latest acquisition diff review `8ec3adf4-f42c-4c05-b806-d79d4ddb1d45` for `46661ae7` to `286f2634`: zero reportable findings with complete coverage of seven changed security surfaces, including public lead-magnet tracking, outbound stale-claim handling, and reply branching.
 - Funnel/acquisition idempotency verification on `3d578579`: migration-focused funnel set **20 tests / 152 assertions passed**; broader inbound, lead-magnet, funnel, booking, and outbound regression set **58 tests / 368 assertions passed**; Pint and `git diff --check` passed.
 - Outbound verification-policy regression: **19 tests / 69 assertions passed**, including the default block for unknown verification results; Pint and `git diff --check` passed.
+- Security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
 - Current acquisition diff-scoped Codex Security review `df528cd2-71b4-4b34-a846-e54a368f0cad` for `286f2634` through `5d125577`: complete coverage of three changed security surfaces and zero reportable findings. The subsequent migration-only review is recorded below.
 - Migration follow-up security review `e1610fcd-062f-4485-b9c4-b4d08ee6ba00` for `5d125577` through `3d578579`: complete coverage of the migration preflight and zero reportable findings.
 

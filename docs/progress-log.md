@@ -153,4 +153,5 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live verification-provider semantics and any explicit policy allowing uncertain addresses remain environment/legal decisions; no real prospect messages are sent by local tests.
 - Latest full PHP regression after the conservative unknown-verification default: 1,340 tests, 1,326 passed, 13 existing UI/source-contract failures, 35,684 assertions, and 1 skipped. No acquisition-system PHP test failed; the two existing InvalidArgumentException warnings remain unchanged.
+- Completed security review `adf68552-9b4c-4de9-a9df-5c42735668c6` for the conservative verification-policy change from `3d578579` through `d1738420`: complete coverage of the changed eligibility configuration and zero reportable findings.
 
