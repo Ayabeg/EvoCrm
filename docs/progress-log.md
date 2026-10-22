@@ -142,3 +142,15 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - The unique migration now checks for historical duplicate subject-scoped rows and stops before schema changes when they exist; production still needs an explicit reconciliation decision before rerunning after such a failure. Live-provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open.
 
+## 2026-10-23 — conservative outbound verification policy
+
+### Completed / verified
+
+- Changed the outbound default so contacts with an `unknown` email-verification result are blocked from enrollment unless a deployment explicitly sets `EVOSALES_BLOCK_UNKNOWN_EMAIL=false` under a documented policy. The catch-all block remains enabled by default.
+- Added the policy to both environment templates, documented the behavior in the architecture contract, and added enrollment regression coverage. The outbound eligibility subset passes 19 tests / 69 assertions; Pint and `git diff --check` pass.
+
+### Remaining
+
+- Live verification-provider semantics and any explicit policy allowing uncertain addresses remain environment/legal decisions; no real prospect messages are sent by local tests.
+- Latest full PHP regression after the conservative unknown-verification default: 1,340 tests, 1,326 passed, 13 existing UI/source-contract failures, 35,684 assertions, and 1 skipped. No acquisition-system PHP test failed; the two existing InvalidArgumentException warnings remain unchanged.
+

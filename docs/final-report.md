@@ -9,6 +9,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Shared workspace-scoped CRM integration across companies, contacts, leads, activities, consent, suppression, enrichment provenance, outbound messages, and funnel events.
 - Dead Enrichment ingestion, incomplete-row retention, normalization, duplicate-safe re-imports, provider evidence, verification-state projection, CRM detection, explainable data-quality scoring, bounded queueing, retries, and retry actions.
 - EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
+- Conservative email-verification eligibility: invalid, temporary-failure, unsupported, catch-all, and unknown states are blocked by default, with explicit deployment configuration required to allow uncertain states.
 - Durable campaign expansion for audiences over 1,000 contacts using resumable 250-contact cursor jobs and idempotent message creation.
 - Dead Magnet Lead Leakage Calculator, validation, duplicate-safe submission persistence, separate delivery/marketing/enrichment consent, shared CRM handoff, queued result delivery with honest failure states, demo handoff, booking attribution, and persisted form-start, calculator-use, submission, demo-request, and booking funnel analytics.
 - Public analytics consent gating and pseudonymous authenticated analytics identity.
@@ -19,7 +20,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Previous complete focused acquisition regression: **207 tests / 1,440 assertions passed**.
 - Latest post-hardening acquisition integration subset: **181 tests / 1,254 assertions passed**, including lead-magnet engagement tracking, reply safety, imports, enrichment, provider events, and outbound execution.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
-- Latest repository-wide regression after the funnel migration preflight test: **1,339 tests; 1,325 passed; 13 existing UI/source-contract failures; 35,682 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- Latest repository-wide regression after the conservative unknown-verification default: **1,340 tests; 1,326 passed; 13 existing UI/source-contract failures; 35,684 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
 - Frontend Vitest suite: **27 test files / 97 tests passed**.
 - `npm run types:check` passed.
 - Local browser smoke test passed for the public Lead Leakage Calculator at desktop and 390px mobile widths: the optional contact fields render as text/email controls, the page has no horizontal overflow, an isolated submission rendered the result and linked the shared CRM record, and Reset inputs restored defaults and hid the prior result.
@@ -28,6 +29,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Committed hardening diff review `8387f1e4-4aca-49d9-98e7-7621a3a338c1` for `29aad813` to `46661ae7`: zero reportable findings with complete coverage of five changed security surfaces. Live provider behavior, deployment secret rotation, and legal compliance remain external limitations.
 - Latest acquisition diff review `8ec3adf4-f42c-4c05-b806-d79d4ddb1d45` for `46661ae7` to `286f2634`: zero reportable findings with complete coverage of seven changed security surfaces, including public lead-magnet tracking, outbound stale-claim handling, and reply branching.
 - Funnel/acquisition idempotency verification on `3d578579`: migration-focused funnel set **20 tests / 152 assertions passed**; broader inbound, lead-magnet, funnel, booking, and outbound regression set **58 tests / 368 assertions passed**; Pint and `git diff --check` passed.
+- Outbound verification-policy regression: **19 tests / 69 assertions passed**, including the default block for unknown verification results; Pint and `git diff --check` passed.
 - Current acquisition diff-scoped Codex Security review `df528cd2-71b4-4b34-a846-e54a368f0cad` for `286f2634` through `5d125577`: complete coverage of three changed security surfaces and zero reportable findings. The subsequent migration-only review is recorded below.
 - Migration follow-up security review `e1610fcd-062f-4485-b9c4-b4d08ee6ba00` for `5d125577` through `3d578579`: complete coverage of the migration preflight and zero reportable findings.
 

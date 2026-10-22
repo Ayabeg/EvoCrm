@@ -72,6 +72,22 @@ it('refuses to enroll a contact with a catch-all verification result by default'
         ->toThrow(ValidationException::class, 'catch-all');
 });
 
+it('refuses to enroll a contact with an unknown verification result by default', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'unknown@clinic.dz',
+        'meta' => ['email_verification' => ['status' => 'unknown']],
+    ]);
+    $sequence = Sequence::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'channel' => 'email',
+    ]);
+
+    expect(fn () => app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact))
+        ->toThrow(ValidationException::class, 'verification is unknown');
+});
+
 it('refuses a second active sequence on the same channel', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
