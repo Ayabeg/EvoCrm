@@ -83,8 +83,8 @@
             "report_builder": false
         },
         "posthog": {
-            "enabled": true,
-            "key": "phc_zQkT5Qx8pfPRocL9puxTC7PFaciL4Q77MmTWzytXXKK5",
+            "enabled": false,
+            "key": null,
             "host": "https://us.i.posthog.com",
             "distinct_id": "1"
         },

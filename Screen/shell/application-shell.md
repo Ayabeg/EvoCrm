@@ -48,7 +48,7 @@ Shared Inertia props from `HandleInertiaRequests::share()` `[CONFIRMED-CODE]`:
 | `simpleMode` | `true` | `SimpleMode::enabled` |
 | `nav` | 5 SIMPLE_NAV items, labels translated (`Accueil`, …) | |
 | `features` | all operator flags false | |
-| `posthog` | `enabled: true` in dashboard capture | key present in evidence |
+| `posthog` | disabled in checked-in dashboard capture | production enablement remains environment-configured |
 | `integrations` | meta unconfigured; google disconnected; smtp connected | lazy closure |
 | `sidebarOpen` | `true` | cookie missing or `sidebar_state=true` |
 | `evoOpenTaskCount` | `7` on dashboard/harness captures | open `Activity` rows, `done=false` |

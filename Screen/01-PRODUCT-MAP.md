@@ -74,7 +74,7 @@ See `Screen/03-ENTITY-MAP.md` and `docs/OBJECT_MODEL.md`. Headline objects: Work
 | Tasks overlay | Bell in header | Open incomplete `Activity` rows; count `evoOpenTaskCount`. |
 | i18n | `HandleInertiaRequests` chrome translations | Locale `fr` on local. |
 | Appearance | cookie `appearance` + localStorage | Light Cabinet vs Dark Cabinet. Cookie not encrypted (`appearance`, `sidebar_state`). |
-| PostHog | shared props | Enabled when key set; local crawl had key present. |
+| PostHog | shared props | Enabled only when configured; checked-in evidence keeps the key empty. |
 | List workspace | DataWorkspace + list-query URL contract | q, page, view, filter_id, filter_groups, sort, direction + chrome filters. |
 | Quick record / peek | `GET /crm/records/{type}/{id}/peek` | Drawer/harness. |
 
