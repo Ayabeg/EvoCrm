@@ -42,6 +42,49 @@ it('cannot read another workspace contact via ApiV1', function () {
         ->assertNotFound();
 });
 
+it('rejects foreign workspace owners when creating or updating contacts', function () {
+    $user = User::factory()->create();
+    $foreign = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'owner_id' => $user->id,
+    ]);
+
+    $this->withToken(apiToken($user))
+        ->postJson('/api/v1/contacts', [
+            'first_name' => 'New',
+            'owner_id' => $foreign->id,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('owner_id');
+
+    $this->withToken(apiToken($user))
+        ->putJson('/api/v1/contacts/'.$contact->id, [
+            'first_name' => 'Updated',
+            'owner_id' => $foreign->id,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('owner_id');
+
+    expect($contact->fresh()->owner_id)->toBe($user->id);
+});
+
+it('rejects foreign workspace owners when creating activities', function () {
+    $user = User::factory()->create();
+    $foreign = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+
+    $this->withToken(apiToken($user))
+        ->postJson('/api/v1/activities', [
+            'type' => 'note',
+            'body' => 'Should not be assigned cross-workspace.',
+            'owner_id' => $foreign->id,
+            'contact_id' => $contact->id,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('owner_id');
+});
+
 it('returns contact attribution, consent, relationships, and a unified timeline', function () {
     $user = User::factory()->create();
     $company = Company::factory()->create(['workspace_id' => $user->workspace_id]);

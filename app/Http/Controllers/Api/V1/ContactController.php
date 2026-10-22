@@ -11,6 +11,7 @@ use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\CustomAttributes;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ContactController extends Controller
 {
@@ -68,7 +69,11 @@ class ContactController extends Controller
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string', 'max:40'],
             'company_id' => ['nullable', 'integer'],
-            'owner_id' => ['nullable', 'integer'],
+            'owner_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('users', 'id')->where('workspace_id', $request->user()->workspace_id),
+            ],
             'city' => ['nullable', 'string', 'max:80'],
             'wilaya' => ['nullable', 'string', 'max:80'],
             'lead_status' => ['nullable', 'string', 'max:40'],
@@ -99,7 +104,11 @@ class ContactController extends Controller
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string', 'max:40'],
             'company_id' => ['nullable', 'integer'],
-            'owner_id' => ['nullable', 'integer'],
+            'owner_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('users', 'id')->where('workspace_id', $request->user()->workspace_id),
+            ],
             'city' => ['nullable', 'string', 'max:80'],
             'wilaya' => ['nullable', 'string', 'max:80'],
             'lead_status' => ['nullable', 'string', 'max:40'],

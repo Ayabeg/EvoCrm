@@ -12,6 +12,7 @@ use App\Models\Deal;
 use App\Services\Crm\ActivityRecorder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ActivityController extends Controller
 {
@@ -85,7 +86,11 @@ class ActivityController extends Controller
             'logged_at' => ['nullable', 'date'],
             'outcome' => ['nullable', 'string', 'max:80'],
             'direction' => ['nullable', 'in:inbound,outbound'],
-            'owner_id' => ['nullable', 'integer'],
+            'owner_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('users', 'id')->where('workspace_id', $request->user()->workspace_id),
+            ],
             'contact_id' => ['nullable', 'integer'],
             'deal_id' => ['nullable', 'integer'],
             'company_id' => ['nullable', 'integer'],
