@@ -50,6 +50,7 @@
 - Final full regression after the public-flow, webhook, and worker hardening ran 1,322 tests with 1,307 passing, 14 existing UI/source-contract failures, 35,609 assertions, and 1 skipped. The additional failure is in the already user-modified shell contract; focused acquisition, security, import, meeting, webhook, and Meta suites remain green.
 - Closed the DNS-rebinding gap in enrichment fetches: every resolvable A/AAAA answer is checked for public range and the first approved address is pinned with Guzzle’s `resolve` option while preserving hostname-based TLS/SNI. Existing redirect/SSRF regression tests pass and Pint passes.
 - Closed the direct-PII analytics default: PostHog identity now sends only role plus a stable pseudonymous user ID unless `POSTHOG_IDENTIFY_PII=true` is explicitly configured. Backend privacy regression coverage passes and the changed frontend passes typecheck/lint.
+- Removed the populated PostHog project key from `.env.production.example`; the production template now keeps provider values empty and defaults `POSTHOG_IDENTIFY_PII=false`. The local ignored `.env` remains an external secret-rotation item.
 
 ### In progress
 
