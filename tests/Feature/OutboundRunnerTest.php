@@ -8,6 +8,7 @@ use App\Models\QuietHours;
 use App\Models\Sequence;
 use App\Models\User;
 use App\Services\Outbound\OutboundDispatcher;
+use App\Services\Outbound\OutboundSendClaim;
 use App\Services\Outbound\SequenceEnrollment;
 use App\Services\Outbound\SuppressionService;
 use Illuminate\Support\Carbon;
@@ -162,6 +163,54 @@ it('reuses an outbound message when a dispatch is retried with the same idempote
 
     expect($second->id)->toBe($first->id)
         ->and(OutboundMessage::query()->where('idempotency_key', $attributes['idempotency_key'])->count())->toBe(1);
+});
+
+it('does not reset an active send claim during a duplicate dispatch', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Claimed',
+        'body' => 'Claimed body',
+        'status' => 'sending',
+        'sending_at' => now(),
+        'idempotency_key' => 'sequence:claim:contact:'.$contact->id,
+    ]);
+
+    $retried = app(OutboundDispatcher::class)->dispatch($user->workspace, $contact, [
+        'channel' => 'email',
+        'subject' => 'Claimed',
+        'body' => 'Claimed body',
+        'idempotency_key' => $message->idempotency_key,
+    ]);
+
+    expect($retried->id)->toBe($message->id)
+        ->and($retried->fresh()->status)->toBe('sending')
+        ->and($retried->fresh()->sending_at)->not->toBeNull();
+});
+
+it('recovers stale outbound send claims for a safe retry', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Stale',
+        'body' => 'Stale body',
+        'status' => 'sending',
+        'sending_at' => now()->subMinutes(16),
+    ]);
+
+    expect(app(OutboundSendClaim::class)->recoverStale($user->workspace))->toBe(1)
+        ->and($message->fresh()->status)->toBe('queued')
+        ->and($message->fresh()->sending_at)->toBeNull();
 });
 
 it('pauses and resumes enrollments from the UI', function () {

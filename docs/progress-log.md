@@ -38,6 +38,7 @@
 - Added an idempotent outbound provider-event ledger covering delivery, bounce, and complaint webhooks. Delivery timestamps and complaint timestamps are projected onto outbound messages; complaints and hard bounces suppress the address and pause the related active sequence enrollment. The combined outbound lifecycle regression passes 36 tests / 282 assertions; frontend typecheck, targeted ESLint, and Pint pass.
 - Bounded broadcast audience preview and expansion with 250-contact `chunkById` pages, preserving the existing idempotent message creation and eligibility checks for large lists. The campaign regression passes 18 tests / 130 assertions, including a 251-contact boundary case; Pint passes.
 - Hardened IMAP reply ingestion: provider message IDs and stable mailbox/UID fallbacks now deduplicate repeated polls, inbound identity has a database uniqueness constraint, and messages are marked seen only after CRM persistence. Reply/acquisition coverage passes 6 tests / 28 assertions; the post-migration reply subset passes 2 tests / 17 assertions and Pint passes.
+- Added database-backed outbound send claims for sequence and campaign workers. Fresh `sending` claims block concurrent provider calls, stale claims recover after 15 minutes, and terminal mailer paths clear the claim timestamp. Outbound runner/department/reply coverage passes 28 tests / 169 assertions; migration and Pint pass.
 
 ### In progress
 

@@ -24,6 +24,7 @@ use Illuminate\Support\Str;
     'body',
     'body_html',
     'status',
+    'sending_at',
     'failure_reason',
     'bounce_type',
     'bounced_at',
@@ -49,6 +50,7 @@ class OutboundMessage extends Model
     {
         return [
             'sent_at' => 'datetime',
+            'sending_at' => 'datetime',
             'delivered_at' => 'datetime',
             'replied_at' => 'datetime',
             'opened_at' => 'datetime',

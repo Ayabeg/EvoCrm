@@ -48,6 +48,7 @@ class SmtpMailboxMailer implements OutboundMailer
 
                 $message->forceFill([
                     'status' => 'sent',
+                    'sending_at' => null,
                     'sent_at' => now(),
                     'failure_reason' => null,
                 ])->save();
@@ -60,6 +61,7 @@ class SmtpMailboxMailer implements OutboundMailer
 
                 $message->forceFill([
                     'status' => 'sent',
+                    'sending_at' => null,
                     'sent_at' => now(),
                     'failure_reason' => null,
                     'message_id' => $sent?->getMessageId() ?: null,
@@ -68,6 +70,7 @@ class SmtpMailboxMailer implements OutboundMailer
         } catch (\Throwable $e) {
             $message->forceFill([
                 'status' => 'failed',
+                'sending_at' => null,
                 'failure_reason' => $e->getMessage(),
             ])->save();
         }

@@ -9,6 +9,7 @@ use App\Services\Crm\ActivityRecorder;
 use App\Services\Crm\WorkflowRunner;
 use App\Services\Outbound\CampaignService;
 use App\Services\Outbound\OutboundDispatcher;
+use App\Services\Outbound\OutboundSendClaim;
 use App\Services\Outbound\QuietHoursGuard;
 use App\Services\Outbound\SuppressionService;
 use Illuminate\Console\Command;
@@ -32,7 +33,10 @@ class RunOutboundSequences extends Command
         CampaignService $campaigns,
         WorkflowRunner $workflows,
         ActivityRecorder $activities,
+        OutboundSendClaim $sendClaims,
     ): int {
+        $sendClaims->recoverStale();
+
         $due = Enrollment::query()
             ->where('status', 'active')
             ->whereNotNull('next_run_at')
@@ -180,6 +184,10 @@ class RunOutboundSequences extends Command
                 }
 
                 $sent++;
+            } elseif ($message->status === 'sending') {
+                // Another worker owns the claim. Leave the enrollment intact
+                // and let that worker advance it after the provider call.
+                continue;
             } else {
                 // Honest retry: the failure stays visible in the outbox.
                 $enrollment->forceFill(['next_run_at' => now()->addHours(2)])->save();

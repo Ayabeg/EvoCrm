@@ -16,6 +16,7 @@ class DisabledMailer implements OutboundMailer
     {
         $message->forceFill([
             'status' => 'failed',
+            'sending_at' => null,
             'failure_reason' => 'No mailbox configured. SMTP send is disabled until a mailbox is added.',
         ])->save();
 

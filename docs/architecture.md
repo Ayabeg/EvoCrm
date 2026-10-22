@@ -45,7 +45,7 @@ Lead scoring keeps commercial qualification separate from data quality: the exis
 
 ### EvoCRM Outbound
 
-Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `SuppressionService`, `QuietHoursGuard`, `MailerFactory`, `ImapReplyPoller`, provider-event processing, tracking, and scheduler. Add missing eligibility/last-mile checks at the service boundary used by both campaign and sequence paths. Provider events are recorded idempotently before projecting delivery, bounce, or complaint state; hard bounces and complaints suppress the address and pause the related sequence enrollment. IMAP replies are persisted by provider message identity and marked seen only after CRM persistence succeeds.
+Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `SuppressionService`, `QuietHoursGuard`, `MailerFactory`, `ImapReplyPoller`, provider-event processing, tracking, and scheduler. Add missing eligibility/last-mile checks at the service boundary used by both campaign and sequence paths. Provider events are recorded idempotently before projecting delivery, bounce, or complaint state; hard bounces and complaints suppress the address and pause the related sequence enrollment. IMAP replies are persisted by provider message identity and marked seen only after CRM persistence succeeds. Outbound sends acquire a database-backed `sending` claim, recover stale claims after worker interruption, and only then call the provider.
 
 Email verification provenance is projected from an `EnrichmentRun` onto the related contact's `meta.email_verification` record. Invalid, temporary-failure, and unsupported results are never auto-applied to an empty email field; catch-all and unknown states are governed by explicit outbound configuration.
 

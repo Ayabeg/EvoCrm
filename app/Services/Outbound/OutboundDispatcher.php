@@ -21,6 +21,7 @@ class OutboundDispatcher
         private TemplateRenderer $templates,
         private ProductAnalytics $analytics,
         private AlgerianSms $sms,
+        private OutboundSendClaim $sendClaims,
     ) {}
 
     /**
@@ -28,6 +29,8 @@ class OutboundDispatcher
      */
     public function dispatch(Workspace $workspace, Contact $contact, array $attributes): OutboundMessage
     {
+        $this->sendClaims->recoverStale($workspace);
+
         $channel = $attributes['channel'] ?? 'email';
         $to = match ($channel) {
             'whatsapp_cloud', 'sms' => (string) $contact->phone_e164,
@@ -60,13 +63,14 @@ class OutboundDispatcher
             )
             : OutboundMessage::query()->create($messageAttributes);
 
-        if ($message->wasRecentlyCreated === false && $message->status === 'sent') {
+        if ($message->wasRecentlyCreated === false && in_array($message->status, ['sent', 'sending'], true)) {
             return $message;
         }
 
         if ($message->wasRecentlyCreated === false && $message->status !== 'queued') {
             $message->forceFill([
                 'status' => 'queued',
+                'sending_at' => null,
                 'failure_reason' => null,
                 'sent_at' => null,
             ])->save();
@@ -95,6 +99,12 @@ class OutboundDispatcher
 
             return $message;
         }
+
+        $claimed = $this->sendClaims->claim($message);
+        if (! $claimed) {
+            return $message->fresh() ?? $message;
+        }
+        $message = $claimed;
 
         if ($channel === 'whatsapp_cloud') {
             return $this->sendWhatsAppTemplate($message, $contact, $attributes);
@@ -142,6 +152,7 @@ class OutboundDispatcher
         if (! $template) {
             $message->forceFill([
                 'status' => 'failed',
+                'sending_at' => null,
                 'failure_reason' => 'WhatsApp template name is required. Session text is Desk-only.',
             ])->save();
 
@@ -151,6 +162,7 @@ class OutboundDispatcher
         if (! $this->evolution->configured()) {
             $message->forceFill([
                 'status' => 'failed',
+                'sending_at' => null,
                 'failure_reason' => 'Evolution Cloud is not connected.',
             ])->save();
 
@@ -165,6 +177,7 @@ class OutboundDispatcher
 
         $message->forceFill([
             'status' => $result['ok'] ? 'sent' : 'failed',
+            'sending_at' => null,
             'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'Template send failed'),
             'sent_at' => $result['ok'] ? now() : null,
         ])->save();
@@ -180,6 +193,7 @@ class OutboundDispatcher
 
         $message->forceFill([
             'status' => $result['ok'] ? 'sent' : 'failed',
+            'sending_at' => null,
             'failure_reason' => $result['ok'] ? null : ($result['error'] ?? 'SMS send failed'),
             'sent_at' => $result['ok'] ? now() : null,
             'to_address' => $result['e164'] ?: $message->to_address,

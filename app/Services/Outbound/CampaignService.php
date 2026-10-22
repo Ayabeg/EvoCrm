@@ -32,6 +32,7 @@ class CampaignService
         private OutboundEligibility $eligibility,
         private CrmFilter $crmFilter,
         private ProductAnalytics $analytics,
+        private OutboundSendClaim $sendClaims,
     ) {}
 
     /**
@@ -208,6 +209,8 @@ class CampaignService
      */
     public function sendDueMessages(int $limit = 100): array
     {
+        $this->sendClaims->recoverStale();
+
         $messages = OutboundMessage::query()
             ->where('direction', 'out')
             ->where('status', 'queued')
@@ -276,6 +279,12 @@ class CampaignService
             if ($mailbox && (int) $message->mailbox_id !== (int) $mailbox->id) {
                 $message->forceFill(['mailbox_id' => $mailbox->id])->save();
             }
+
+            $claimed = $this->sendClaims->claim($message);
+            if (! $claimed) {
+                continue;
+            }
+            $message = $claimed;
 
             $message->forceFill(['deferred_until' => null, 'defer_reason' => null])->save();
 
