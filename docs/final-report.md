@@ -18,7 +18,8 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Previous complete focused acquisition regression: **207 tests / 1,440 assertions passed**.
 - Latest post-hardening acquisition integration subset: **181 tests / 1,254 assertions passed**, including lead-magnet engagement tracking, reply safety, imports, enrichment, provider events, and outbound execution.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
-- Latest repository-wide regression after the calculator capture fix: **1,338 tests; 1,324 passed; 13 existing UI/source-contract failures; 35,678 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- Latest repository-wide regression after the calculator capture and reset fixes: **1,338 tests; 1,324 passed; 13 existing UI/source-contract failures; 35,678 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- Frontend Vitest suite: **27 test files / 97 tests passed**.
 - `npm run types:check` passed.
 - Local browser smoke test passed for the public Lead Leakage Calculator at desktop and 390px mobile widths: the optional contact fields render as text/email controls, the page has no horizontal overflow, an isolated submission rendered the result and linked the shared CRM record, and Reset inputs restored defaults and hid the prior result.
 - `git diff --check` passed.

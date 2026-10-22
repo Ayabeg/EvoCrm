@@ -117,6 +117,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Fixed a public calculator capture defect found by browser verification: optional Name and Clinic/Business fields now render as text inputs instead of inheriting the numeric calculator input type. The focused calculator/inbound suite passes 7 tests / 72 assertions; TypeScript, targeted ESLint, production Vite build, desktop browser submission, isolated shared-contact persistence, and 390px mobile no-overflow checks pass.
 - Re-ran the full repository regression after the calculator fix: 1,338 tests, 1,324 passed, 13 existing UI/source-contract failures, 35,678 assertions, and 1 skipped. No acquisition-system test failed; the two existing InvalidArgumentException warnings remain unchanged.
 - Added explicit lead-magnet reset behavior: the action restores all calculator assumptions and consent fields, clears validation errors, rotates the submission idempotency key, and hides the previous result. The focused calculator/inbound/domain suite passes 13 tests / 93 assertions; TypeScript, targeted ESLint, production Vite build, and browser reset verification pass.
+- Re-ran the full PHP and frontend suites on the reset revision: PHP remains at 1,338 tests with 1,324 passed, 13 existing UI/source-contract failures, 35,678 assertions, and 1 skipped; Vitest passes 27 files / 97 tests. No acquisition-system PHP test failed.
 
 ### Remaining
 
