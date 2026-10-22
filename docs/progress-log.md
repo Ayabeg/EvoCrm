@@ -53,6 +53,11 @@
 - Removed populated PostHog project keys from `.env.example`, `.env.production.example`, and checked-in UI evidence; templates keep provider values empty and default `POSTHOG_IDENTIFY_PII=false`. The local ignored `.env` remains an external secret-rotation item.
 - Re-read the supplied build brief and reviewed `Awaisali36/50k-lead-generation-system` as an implementation reference. Its staged acquisition/enrichment/qualification workflow informed the existing provider boundaries, bounded batch processing, provenance, and explainable scoring without importing its n8n/Airtable/Apify/Gemini assumptions. The complete focused acquisition regression set passes 194 tests / 1,371 assertions.
 - Hardened the public funnel visit beacon so UTM/source values are bounded and referrers/paths are stored without query strings, preventing unbounded attribution writes and accidental persistence of query-string PII. The focused funnel suite passes 6 tests / 13 assertions; the complete focused acquisition set passes 195 tests / 1,375 assertions. Commit: `94a5ed64`.
+- Completed a standard security/privacy review for the captured `f6693f2f` revision with 7 medium findings across tenant ownership, workflow SSRF, template preview HTML, outbound consent, bulk expansion, Evolution replay identity, and analytics consent. The scan is sealed with partial coverage and explicitly records that the repository changed while it ran.
+- Fixed cross-workspace API owner assignment for contacts and activities with workspace-scoped `Rule::exists` validation and regression tests for create/update rejection. Targeted API coverage passes 7 tests / 30 assertions. Commit: `a15645ca`.
+- Hardened trust boundaries after the security review: authenticated analytics events now ignore forged client distinct IDs; the OpenManus adapter fails closed with 503 when its bearer token is missing and 401 when invalid; outbound HTML previews use a sandboxed iframe. Targeted analytics/API/outbound coverage passes 34 tests / 214 assertions, Python AST parsing passes, and frontend type checking passes. Commit: `a65d66ba`.
+- Closed workflow webhook DNS rebinding by reusing public DNS validation and Guzzle address pinning before POST, with redirects disabled. Workflow/fetcher coverage passes 25 tests / 117 assertions. Commit: `6a76c1ba`.
+- Final focused acquisition regression after current-tree hardening passes 193 tests / 1,360 assertions. The scan's remaining open follow-ups are outbound consent policy, outbound bulk caps/queueing, Evolution payloads without provider identity, analytics consent, and full outbound-email HTML sanitization.
 
 ### In progress
 
@@ -72,9 +77,9 @@
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
 - Full-suite release verification is not green until the 13 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
-- The standard Codex Security scan is complete for the captured revision with 1 high and 2 medium findings. The DNS-rebinding and direct-PII analytics findings are remediated in the current tree with regression evidence; the local `.env` APP_KEY still requires deployment rotation. The scan also records that the repository changed while it ran; current-tree fixes for booking, click redirects, Evolution replay, Meta claims, unsubscribe isolation, redirect SSRF, CSV formula injection, bulk limits, and worker failure state have separate regression evidence. Live provider checks remain blocked.
+- The standard Codex Security scan is complete for the captured revision with 7 medium findings and partial coverage. Current-tree owner-assignment and workflow-DNS findings are remediated with regression evidence; the template preview is sandboxed but outbound email HTML sanitization remains open. The scan records open follow-ups for consent policy, outbound bulk bounds, Evolution payload identity, and analytics consent. The local ignored `.env` APP_KEY still requires deployment rotation. Live provider checks remain blocked.
 
 ### Next verified task
 
-Complete the current-tree security/privacy review and refresh the release evidence, while keeping live-provider verification and delivery blocked until credentials are configured.
+Resolve the highest-impact open security follow-up (Evolution missing-identity replay or outbound bulk bounds), then refresh release evidence while keeping live-provider verification and delivery blocked until credentials are configured.
 
