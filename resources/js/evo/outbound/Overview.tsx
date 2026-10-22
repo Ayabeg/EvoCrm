@@ -233,6 +233,8 @@ export function Overview({
                     { key: 'replies', label: t('Replies · 30d'), value: formatNumber(stats.replies_30d), href: '/outbound/replies' },
                     { key: 'suppressed', label: t('Suppressed'), value: formatNumber(stats.suppressed), href: '/outbound/suppressions' },
                     { key: 'failed', label: t('Failed · 30d'), value: formatNumber(stats.failed_30d), href: '/outbound/outbox?status=failed' },
+                    { key: 'delivered', label: t('Delivered · 30d'), value: formatNumber(stats.delivered_30d ?? 0), href: '/outbound/outbox' },
+                    { key: 'complaints', label: t('Complaints · 30d'), value: formatNumber(stats.complaints_30d ?? 0), href: '/outbound/suppressions' },
                     {
                         key: 'campaigns',
                         label: t('Campaigns'),

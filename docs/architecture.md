@@ -10,7 +10,7 @@ Dead Enrichment, EvoCRM Outbound, and Dead Magnet are capabilities inside the ex
 - Eloquent models and migrations are the source of truth for persistence.
 - Database-backed queue is the default local queue, with jobs and scheduled Artisan commands for durable work.
 - Existing authentication/authorization is workspace-aware; administrative screens must use the existing middleware and policies.
-- Existing outbound uses provider abstractions for SMTP/IMAP, campaign/sequence services, suppression, tracking, replies, and quiet hours.
+- Existing outbound uses provider abstractions for SMTP/IMAP, campaign/sequence services, suppression, tracking, replies, delivery/bounce/complaint events, and quiet hours.
 
 ## Bounded service responsibilities
 
@@ -45,7 +45,7 @@ Lead scoring keeps commercial qualification separate from data quality: the exis
 
 ### EvoCRM Outbound
 
-Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `SuppressionService`, `QuietHoursGuard`, `MailerFactory`, `ImapReplyPoller`, bounce processing, tracking, and scheduler. Add missing eligibility/last-mile checks at the service boundary used by both campaign and sequence paths.
+Use existing `CampaignService`, `SequenceEnrollment`, `OutboundDispatcher`, `SuppressionService`, `QuietHoursGuard`, `MailerFactory`, `ImapReplyPoller`, provider-event processing, tracking, and scheduler. Add missing eligibility/last-mile checks at the service boundary used by both campaign and sequence paths. Provider events are recorded idempotently before projecting delivery, bounce, or complaint state; hard bounces and complaints suppress the address and pause the related sequence enrollment.
 
 Email verification provenance is projected from an `EnrichmentRun` onto the related contact's `meta.email_verification` record. Invalid, temporary-failure, and unsupported results are never auto-applied to an empty email field; catch-all and unknown states are governed by explicit outbound configuration.
 

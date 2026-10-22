@@ -96,7 +96,7 @@ class OutboundCampaign extends Model
     /**
      * Live per-status message counts for the list/detail pages.
      *
-     * @return array{queued: int, deferred: int, sent: int, failed: int, opened: int, clicked: int, replied: int}
+     * @return array{queued: int, deferred: int, sent: int, failed: int, opened: int, clicked: int, replied: int, delivered: int, complained: int, bounced: int}
      */
     public function messageCounts(): array
     {
@@ -121,6 +121,9 @@ class OutboundCampaign extends Model
             'opened' => $this->messages()->where('direction', 'out')->whereNotNull('opened_at')->count(),
             'clicked' => $this->messages()->where('direction', 'out')->whereNotNull('clicked_at')->count(),
             'replied' => $this->messages()->where('direction', 'out')->whereNotNull('replied_at')->count(),
+            'delivered' => $this->messages()->where('direction', 'out')->whereNotNull('delivered_at')->count(),
+            'complained' => $this->messages()->where('direction', 'out')->whereNotNull('complained_at')->count(),
+            'bounced' => $this->messages()->where('direction', 'out')->where(fn ($query) => $query->where('status', 'bounced')->orWhereNotNull('bounced_at'))->count(),
         ];
     }
 }

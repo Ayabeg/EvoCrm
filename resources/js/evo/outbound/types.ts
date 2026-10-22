@@ -24,6 +24,9 @@ export type CampaignCounts = {
     opened: number;
     clicked: number;
     replied: number;
+    delivered?: number;
+    complained?: number;
+    bounced?: number;
 };
 
 export type CampaignRow = {
@@ -220,6 +223,8 @@ export type OverviewStats = {
     replies_30d: number;
     suppressed: number;
     failed_30d: number;
+    delivered_30d?: number;
+    complaints_30d?: number;
     campaigns_sending: number;
     campaigns_sent: number;
     domains: number;

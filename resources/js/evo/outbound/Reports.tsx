@@ -18,6 +18,9 @@ export type OutboundReportsProps = {
         sent: number;
         opened: number;
         replied: number;
+        delivered?: number;
+        complained?: number;
+        bounced?: number;
     }>;
     perCampaign: Array<{
         id: number | string;
@@ -27,6 +30,8 @@ export type OutboundReportsProps = {
         sent: number;
         opened: number;
         replied: number;
+        delivered?: number;
+        complained?: number;
         won_deals?: number;
         won_revenue_cents?: number;
     }>;
@@ -87,6 +92,18 @@ export function OutboundReports({
                     {formatNumber(row.original.replied)}
                 </span>
             ),
+        },
+        {
+            id: 'delivered',
+            header: t('Delivered'),
+            accessorFn: (row) => row.delivered ?? 0,
+            cell: ({ row }) => <span className="tabular-nums">{formatNumber(row.original.delivered ?? 0)}</span>,
+        },
+        {
+            id: 'complained',
+            header: t('Complaints'),
+            accessorFn: (row) => row.complained ?? 0,
+            cell: ({ row }) => <span className="tabular-nums">{formatNumber(row.original.complained ?? 0)}</span>,
         },
         {
             id: 'won_revenue',

@@ -27,6 +27,8 @@ use Illuminate\Support\Str;
     'failure_reason',
     'bounce_type',
     'bounced_at',
+    'delivered_at',
+    'complained_at',
     'provider_event_id',
     'idempotency_key',
     'deferred_until',
@@ -47,11 +49,13 @@ class OutboundMessage extends Model
     {
         return [
             'sent_at' => 'datetime',
+            'delivered_at' => 'datetime',
             'replied_at' => 'datetime',
             'opened_at' => 'datetime',
             'open_count' => 'integer',
             'clicked_at' => 'datetime',
             'bounced_at' => 'datetime',
+            'complained_at' => 'datetime',
             'click_count' => 'integer',
             'deferred_until' => 'datetime',
         ];
@@ -105,5 +109,10 @@ class OutboundMessage extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(OutboundMessage::class, 'in_reply_to');
+    }
+
+    public function providerEvents(): HasMany
+    {
+        return $this->hasMany(OutboundProviderEvent::class);
     }
 }

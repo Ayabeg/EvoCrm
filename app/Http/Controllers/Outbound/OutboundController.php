@@ -46,6 +46,8 @@ class OutboundController extends Controller
                     ->count(),
                 'suppressed' => Suppression::query()->forWorkspace($workspace)->count(),
                 'failed_30d' => (clone $outbound)->where('status', 'failed')->where('created_at', '>=', now()->subDays(30))->count(),
+                'delivered_30d' => (clone $outbound)->whereNotNull('delivered_at')->where('delivered_at', '>=', now()->subDays(30))->count(),
+                'complaints_30d' => (clone $outbound)->whereNotNull('complained_at')->where('complained_at', '>=', now()->subDays(30))->count(),
                 'campaigns_sending' => OutboundCampaign::query()->forWorkspace($workspace)->whereIn('status', [OutboundCampaign::STATUS_SCHEDULED, OutboundCampaign::STATUS_SENDING])->count(),
                 'campaigns_sent' => OutboundCampaign::query()->forWorkspace($workspace)->where('status', OutboundCampaign::STATUS_SENT)->count(),
                 'domains' => OutboundDomain::query()->forWorkspace($workspace)->count(),

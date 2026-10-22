@@ -56,6 +56,10 @@ class ProductAnalytics
 
     public const EMAIL_BOUNCED = 'email bounced';
 
+    public const EMAIL_DELIVERED = 'email delivered';
+
+    public const EMAIL_COMPLAINED = 'email complained';
+
     public const WHATSAPP_MESSAGE_RECEIVED = 'whatsapp message received';
 
     public const WHATSAPP_MESSAGE_SENT = 'whatsapp message sent';

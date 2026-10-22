@@ -56,7 +56,7 @@ Use the existing suppression tables and consent records as the enforcement sourc
 
 - All new records have `workspace_id` and a foreign key with the existing cascade/null-delete conventions.
 - Offer submissions have a workspace/offer/idempotency uniqueness rule so retries do not create duplicate contacts or delivery events.
-- Provider events have a provider/event-id uniqueness rule where the provider supplies an ID; otherwise use a deterministic event hash.
+- Provider events are stored in `outbound_provider_events` with workspace/provider/event-id uniqueness, normalized event type, received timestamp, raw bounded payload, and an optional outbound-message link. Outbound messages project delivery and complaint timestamps while retaining the legacy latest provider event ID for compatibility.
 - Evidence lookup is indexed by workspace, target, field, status, and recency.
 - List screens filter and paginate by workspace; no unbounded public or operator query is allowed.
 - Domain/email/phone normalization is deterministic and stored separately from display values when needed.

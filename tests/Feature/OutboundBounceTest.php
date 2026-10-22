@@ -3,9 +3,11 @@
 use App\Models\Contact;
 use App\Models\Enrollment;
 use App\Models\OutboundMessage;
+use App\Models\OutboundProviderEvent;
 use App\Models\Sequence;
 use App\Models\Suppression;
 use App\Models\User;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Webhooks\WebhookEndpointManager;
 use Illuminate\Support\Carbon;
 
@@ -85,6 +87,95 @@ it('records a soft bounce without suppressing', function () {
 
     expect($message->fresh()->bounce_type)->toBe('soft')
         ->and(Suppression::query()->forWorkspace($user->workspace)->count())->toBe(0);
+});
+
+it('records a delivery event idempotently without changing sent status', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'delivered@clinic.dz',
+    ]);
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => 'delivered@clinic.dz',
+        'subject' => 'Follow up',
+        'body' => 'Hello',
+        'status' => 'sent',
+        'sent_at' => now(),
+    ]);
+    $endpoint = app(WebhookEndpointManager::class)->forWorkspace(
+        $user->workspace,
+        WebhookEndpointManager::PROVIDER_OUTBOUND_BOUNCE,
+    );
+
+    $this->postJson("/webhooks/outbound/bounces/{$endpoint->key}", [
+        'event_id' => 'evt-delivered-1',
+        'message_id' => $message->id,
+        'type' => 'delivered',
+    ])->assertOk()->assertJson(['event_type' => 'delivered']);
+
+    $this->postJson("/webhooks/outbound/bounces/{$endpoint->key}", [
+        'event_id' => 'evt-delivered-1',
+        'message_id' => $message->id,
+        'type' => 'delivered',
+    ])->assertOk();
+
+    expect($message->fresh()->status)->toBe('sent')
+        ->and($message->fresh()->delivered_at)->not->toBeNull()
+        ->and(OutboundProviderEvent::query()->where('provider_event_id', 'evt-delivered-1')->count())->toBe(1)
+        ->and(app(ProductAnalytics::class)->eventNames())->toContain(ProductAnalytics::EMAIL_DELIVERED);
+});
+
+it('suppresses and pauses a sequence enrollment on a complaint', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'complaint@clinic.dz',
+    ]);
+    $sequence = Sequence::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'channel' => 'email',
+        'active' => true,
+    ]);
+    $enrollment = $sequence->enrollments()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'status' => 'active',
+        'next_step' => 1,
+        'next_run_at' => now()->addDay(),
+    ]);
+    $message = OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'sequence_id' => $sequence->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => 'complaint@clinic.dz',
+        'subject' => 'Follow up',
+        'body' => 'Hello',
+        'status' => 'sent',
+        'sent_at' => now(),
+    ]);
+    $endpoint = app(WebhookEndpointManager::class)->forWorkspace(
+        $user->workspace,
+        WebhookEndpointManager::PROVIDER_OUTBOUND_BOUNCE,
+    );
+
+    $this->postJson("/webhooks/outbound/bounces/{$endpoint->key}", [
+        'event_id' => 'evt-complaint-1',
+        'message_id' => $message->id,
+        'type' => 'spam_complaint',
+    ])->assertOk()->assertJson(['event_type' => 'complaint']);
+
+    expect($message->fresh()->status)->toBe('failed')
+        ->and($message->fresh()->complained_at)->not->toBeNull()
+        ->and($enrollment->fresh()->status)->toBe('paused')
+        ->and(Suppression::query()->forWorkspace($user->workspace)->where('value', 'complaint@clinic.dz')->value('reason'))->toBe('complaint')
+        ->and(OutboundProviderEvent::query()->where('provider_event_id', 'evt-complaint-1')->count())->toBe(1)
+        ->and(app(ProductAnalytics::class)->eventNames())->toContain(ProductAnalytics::EMAIL_COMPLAINED);
 });
 
 it('does not send again to a hard-bounced address', function () {

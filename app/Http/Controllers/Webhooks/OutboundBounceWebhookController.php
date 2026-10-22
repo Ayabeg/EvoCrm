@@ -17,13 +17,14 @@ class OutboundBounceWebhookController extends Controller
         WebhookEndpointManager $endpoints,
     ): JsonResponse {
         $endpoint = $endpoints->resolve(WebhookEndpointManager::PROVIDER_OUTBOUND_BOUNCE, $webhookKey);
-        $message = $processor->process($endpoint->workspace, $request->all());
-        $endpoints->markReceived($endpoint, (string) ($request->input('type') ?? 'bounce'));
+        $message = $processor->process($endpoint->workspace, $request->all(), $endpoint->provider);
+        $endpoints->markReceived($endpoint, (string) ($request->input('type') ?? $request->input('event_type') ?? 'bounce'));
 
         return response()->json([
             'ok' => true,
             'message_id' => $message->id,
             'bounce_type' => $message->bounce_type,
+            'event_type' => $message->providerEvents()->latest('id')->value('event_type') ?? 'bounced',
         ]);
     }
 }
