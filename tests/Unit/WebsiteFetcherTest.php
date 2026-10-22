@@ -36,3 +36,7 @@ it('follows a bounded relative redirect after normalizing it', function () {
 
     Http::assertSentCount(2);
 });
+
+it('rejects private webhook destinations before resolving or sending', function () {
+    expect(app(WebsiteFetcher::class)->publicRequestOptions('http://127.0.0.1/admin'))->toBeFalse();
+});

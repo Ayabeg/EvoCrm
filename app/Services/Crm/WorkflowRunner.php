@@ -656,9 +656,9 @@ class WorkflowRunner
     {
         $url = trim((string) ($config['url'] ?? ''));
 
-        $safeUrl = $this->websiteFetcher->normalizeUrl($url);
+        $request = $this->websiteFetcher->publicRequestOptions($url);
 
-        if ($safeUrl === null) {
+        if ($request === false) {
             return [
                 'outcome' => 'action_did_not_apply',
                 'summary' => 'Webhook URL was not allowed.',
@@ -668,10 +668,8 @@ class WorkflowRunner
         $response = Http::timeout(8)
             ->acceptJson()
             ->asJson()
-            // A configured webhook is still an untrusted network destination;
-            // do not follow a redirect into a private or internal host.
-            ->withOptions(['allow_redirects' => false])
-            ->post($safeUrl, [
+            ->withOptions($request['options'])
+            ->post($request['url'], [
                 'source' => 'evosales',
                 'workflow_id' => $workflow->id,
                 'workflow' => $workflow->name,

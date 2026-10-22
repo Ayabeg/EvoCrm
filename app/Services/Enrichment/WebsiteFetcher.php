@@ -23,19 +23,13 @@ final class WebsiteFetcher
         }
 
         for ($redirect = 0; $redirect <= 2; $redirect++) {
-            $resolve = $this->publicResolve($normalized);
+            $request = $this->publicRequestOptions($normalized);
 
-            if ($resolve === false) {
+            if ($request === false) {
                 return ['ok' => false, 'error' => 'Website address resolved to a blocked or invalid network.'];
             }
 
             try {
-                $options = ['allow_redirects' => false];
-
-                if ($resolve !== []) {
-                    $options['resolve'] = $resolve;
-                }
-
                 $response = Http::timeout(8)
                     ->withHeaders([
                         'User-Agent' => 'EvoSales-Enrich/1.0 (+https://evotechly.com)',
@@ -43,8 +37,8 @@ final class WebsiteFetcher
                     ])
                     // Validate every hop before following it. Letting Guzzle follow
                     // redirects itself would validate only the user-supplied URL.
-                    ->withOptions($options)
-                    ->get($normalized);
+                    ->withOptions($request['options'])
+                    ->get($request['url']);
             } catch (Throwable) {
                 return ['ok' => false, 'error' => 'Website fetch failed.', 'retryable' => true];
             }
@@ -81,6 +75,38 @@ final class WebsiteFetcher
         $body = substr((string) $response->body(), 0, 512_000);
 
         return ['ok' => true, 'body' => $body, 'status' => $response->status()];
+    }
+
+    /**
+     * Validate a public URL and pin its first public DNS answer for one
+     * outbound request. The hostname remains in the URL for TLS and Host.
+     *
+     * @return array{url: string, options: array<string, mixed>}|false
+     */
+    public function publicRequestOptions(string $url): array|false
+    {
+        $normalized = $this->normalizeUrl($url);
+
+        if ($normalized === null) {
+            return false;
+        }
+
+        $resolve = $this->publicResolve($normalized);
+
+        if ($resolve === false) {
+            return false;
+        }
+
+        $options = ['allow_redirects' => false];
+
+        if ($resolve !== []) {
+            $options['resolve'] = $resolve;
+        }
+
+        return [
+            'url' => $normalized,
+            'options' => $options,
+        ];
     }
 
     private function resolveRedirect(string $base, string $location): ?string
