@@ -32,7 +32,7 @@
 - Added conservative website CRM-signature detection with detected, not-detected, and conflicting states; results are stored in the existing enrichment provenance ledger and rendered in the record panel. Parser/enrichment/inbound coverage passes 18 tests / 140 assertions, with Pint, ESLint, and TypeScript passing.
 - Corrected transient enrichment retry semantics: website/Places 429, 5xx, and transport failures now persist a visible failed run and rethrow for `EnrichRecordJob` backoff; the focused enrichment/integration set passes 19 tests / 142 assertions.
 - Added stale-record selection to scheduled enrichment maintenance: `leads:enrich` defaults to seven days, excludes recent queued/proposed/applied runs, and supports an explicit `--stale-hours` window. The enrichment suite passes 12 tests / 106 assertions for this maintenance boundary.
-- Repository-wide `php artisan test --compact` was run after the acquisition changes and remains non-zero on pre-existing UI/source-contract failures, including `tests/Feature/P04AppShellTest.php:59`, which still expects the literal `Search EvoCRM` shell text while the current shell renders the translated `Search` label. These failures are outside the acquisition-system files. Acquisition-focused suites remain green, and the two existing InvalidArgumentException import warnings are unchanged.
+- Repository-wide `php artisan test --compact` currently runs 1,301 tests with 1,287 passing and 13 failures in pre-existing shell/source-contract tests, including `tests/Feature/P04AppShellTest.php:59`, which still expects the literal `Search EvoCRM` shell text while the current shell renders the translated `Search` label. These failures are outside the acquisition-system files. Acquisition-focused suites remain green; the two existing InvalidArgumentException import warnings are unchanged.
 
 ### In progress
 
@@ -46,14 +46,14 @@
 - Added the first full outbound workflow regression (I1): CSV import → website/Places enrichment → verified-email provenance → lead scoring and quality selection → campaign preview/activation → send → reply capture → pipeline deal linkage. The focused workflow test passes 1 test / 12 assertions.
 - End-to-end outbound workflow (I1) is in progress: the local path is covered; live provider delivery/event semantics and broader restart recovery remain environment-dependent.
 - Data maintenance (I3) is in progress: the scheduled enrichment command now has a tested stale-record boundary; stronger evidence preservation and suppression-safe outbound behavior remain under integration review.
-- Latest combined acquisition regression pass: 51 tests / 387 assertions passed across inbound workflow, lead-magnet delivery/conversion, funnel analytics, enrichment, and outbound campaign/sequence execution.
+- Latest combined acquisition regression pass: 65 tests / 456 assertions passed across inbound workflow, lead-magnet delivery/conversion, funnel analytics, enrichment, CRM detection, outbound campaign/sequence execution, provider events, and reply pausing.
 
 ### Blocked
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
-- Full-suite release verification is not green until the 15 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
+- Full-suite release verification is not green until the 13 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
 
 ### Next verified task
 
-Finish provider-limit/retry controls and the remaining outbound/data-maintenance integration gates, while keeping live-provider work blocked until credentials are configured.
+Run the remaining security/privacy review and release checks, while keeping live-provider verification and delivery blocked until credentials are configured.
 
