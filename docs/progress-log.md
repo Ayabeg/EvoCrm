@@ -203,3 +203,15 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Live verification-provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — strict verification-state semantics
+
+### Completed / verified
+
+- Closed the strict-policy gap for `evidence_supported`, `not_found`, `not_detected`, and `conflicting` email-verification states. These states are evidence or absence signals, not confirmed deliverability, and now fail outbound eligibility even when a target explicitly allows catch-all or unknown addresses.
+- Updated the outbound policy labels and architecture/data-model contracts to describe the actual semantics without claiming that missing verification metadata is proof of delivery.
+- The expanded outbound regression set passes 44 tests / 223 assertions; Pint, TypeScript, targeted ESLint, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider semantics, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+

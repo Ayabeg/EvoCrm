@@ -133,6 +133,32 @@ it('requires both deployment permission and an explicit sequence policy for unkn
         ->toBeTrue();
 });
 
+it('blocks non-deliverability verification states even under a permissive uncertain policy', function () {
+    config([
+        'evosales.outbound.block_catch_all' => false,
+        'evosales.outbound.block_unknown_verification' => false,
+        'evosales.outbound.require_marketing_consent' => false,
+    ]);
+
+    $user = User::factory()->create();
+
+    foreach (['evidence_supported', 'not_found', 'not_detected', 'conflicting'] as $index => $status) {
+        $contact = Contact::factory()->create([
+            'workspace_id' => $user->workspace_id,
+            'email' => "non-deliverable-{$index}@clinic.dz",
+            'meta' => ['email_verification' => ['status' => $status]],
+        ]);
+        $sequence = Sequence::factory()->create([
+            'workspace_id' => $user->workspace_id,
+            'channel' => 'email',
+            'email_verification_policy' => 'allow_uncertain',
+        ]);
+
+        expect(fn () => app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact))
+            ->toThrow(ValidationException::class, 'does not satisfy the sequence policy');
+    }
+});
+
 it('refuses a second active sequence on the same channel', function () {
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);

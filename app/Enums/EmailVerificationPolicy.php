@@ -18,4 +18,14 @@ enum EmailVerificationPolicy: string
     {
         return in_array($this, [self::AllowUnknown, self::AllowUncertain], true);
     }
+
+    public function allowsStatus(?string $status): bool
+    {
+        return match ($status) {
+            'verified' => true,
+            'catch_all' => $this->allowsCatchAll(),
+            'unknown' => $this->allowsUnknown(),
+            default => false,
+        };
+    }
 }

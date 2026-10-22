@@ -103,7 +103,7 @@ export default function CampaignsIndex({
                                 </div>
                                 <Field label={t('Uncertain email policy')}>
                                     <NativeSelect name="email_verification_policy" defaultValue="strict">
-                                        <option value="strict">{t('Strict — verified results only')}</option>
+                                        <option value="strict">{t('Strict — block uncertain results')}</option>
                                         <option value="allow_catch_all">{t('Allow catch-all if deployment permits')}</option>
                                         <option value="allow_unknown">{t('Allow unknown if deployment permits')}</option>
                                         <option value="allow_uncertain">{t('Allow uncertain results if deployment permits')}</option>

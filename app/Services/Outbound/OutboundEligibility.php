@@ -65,6 +65,10 @@ final class OutboundEligibility
                 && (config('evosales.outbound.block_unknown_verification', true) || ! $policy->allowsUnknown())) {
                 return 'Contact email verification is unknown.';
             }
+
+            if ($verificationStatus !== null && ! $policy->allowsStatus($verificationStatus)) {
+                return 'Contact email verification status does not satisfy the sequence policy.';
+            }
         }
 
         if ($channel === 'sms' && ! AlgerianPhone::isMobile($contact->phone_e164 ?? $contact->phone)) {
