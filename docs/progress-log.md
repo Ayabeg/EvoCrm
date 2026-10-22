@@ -36,6 +36,7 @@
 - Security review found and fixed unvalidated redirect handling in website enrichment and operator URL capture: redirects are now disabled at the HTTP client, each hop is normalized and checked, and the chain is capped at two hops. Workflow webhooks use the same public-host normalization and do not follow redirects. Redirect regression coverage passes in `tests/Unit/WebsiteFetcherTest.php`, `tests/Feature/LeadCaptureTest.php`, and `tests/Feature/CrmWorkflowsTest.php`.
 - Security review found and fixed spreadsheet formula injection in contact and deal CSV exports. String cells beginning with `=`, `+`, `-`, or `@` are prefixed before export while numeric values remain numeric; contact/deal export regression coverage passes 13 tests / 101 assertions.
 - Added an idempotent outbound provider-event ledger covering delivery, bounce, and complaint webhooks. Delivery timestamps and complaint timestamps are projected onto outbound messages; complaints and hard bounces suppress the address and pause the related active sequence enrollment. The combined outbound lifecycle regression passes 36 tests / 282 assertions; frontend typecheck, targeted ESLint, and Pint pass.
+- Bounded broadcast audience preview and expansion with 250-contact `chunkById` pages, preserving the existing idempotent message creation and eligibility checks for large lists. The campaign regression passes 18 tests / 130 assertions, including a 251-contact boundary case; Pint passes.
 
 ### In progress
 

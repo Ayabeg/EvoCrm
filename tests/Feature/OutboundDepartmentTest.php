@@ -212,6 +212,21 @@ it('previews campaign eligibility without materializing or sending messages', fu
         ->and($eligible->id)->toBeInt();
 });
 
+it('expands an audience across bounded chunks', function () {
+    $user = User::factory()->create();
+    Contact::factory()->count(251)->create(['workspace_id' => $user->workspace_id]);
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'subject' => 'Chunk {{first_name}}',
+        'body' => 'Body for {{first_name}}',
+    ]);
+
+    app(CampaignService::class)->expand($campaign);
+
+    expect($campaign->refresh()->audience_count)->toBe(251)
+        ->and(OutboundMessage::query()->where('campaign_id', $campaign->id)->count())->toBe(251);
+});
+
 it('cancels a sending campaign and drops its queued messages', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 

@@ -10,6 +10,7 @@ use App\Models\SavedFilter;
 use App\Models\Workspace;
 use App\Services\Analytics\ProductAnalytics;
 use App\Services\Crm\CrmFilter;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -21,6 +22,8 @@ use Illuminate\Support\Str;
  */
 class CampaignService
 {
+    private const AUDIENCE_CHUNK_SIZE = 250;
+
     public function __construct(
         private SuppressionService $suppressions,
         private QuietHoursGuard $quietHours,
@@ -39,6 +42,18 @@ class CampaignService
      */
     public function audience(Workspace $workspace, ?SavedFilter $filter): Collection
     {
+        return $this->audienceQuery($workspace, $filter)->get();
+    }
+
+    /**
+     * Build the reusable audience query without materializing the audience.
+     * Large broadcasts use chunkById below so a 50k-lead list does not become
+     * a single in-memory collection.
+     *
+     * @return Builder<Contact>
+     */
+    private function audienceQuery(Workspace $workspace, ?SavedFilter $filter): Builder
+    {
         $query = Contact::query()
             ->forWorkspace($workspace)
             ->whereNotNull('email')
@@ -48,7 +63,7 @@ class CampaignService
             $this->crmFilter->applyToContacts($query, $filter->filters ?? []);
         }
 
-        return $query->orderBy('id')->get();
+        return $query->orderBy('id');
     }
 
     /**
@@ -59,36 +74,39 @@ class CampaignService
     public function preview(OutboundCampaign $campaign): array
     {
         $workspace = $campaign->workspace;
-        $audience = $this->audience($workspace, $campaign->savedFilter);
+        $audienceQuery = $this->audienceQuery($workspace, $campaign->savedFilter);
+        $audienceCount = (clone $audienceQuery)->count();
         $reasons = [];
         $eligible = 0;
         $sample = [];
 
-        foreach ($audience as $contact) {
-            $reason = $this->eligibility->reason($workspace, $contact, 'email');
+        $audienceQuery->chunkById(self::AUDIENCE_CHUNK_SIZE, function (Collection $contacts) use ($campaign, $workspace, &$reasons, &$eligible, &$sample): void {
+            foreach ($contacts as $contact) {
+                $reason = $this->eligibility->reason($workspace, $contact, 'email');
 
-            if ($reason === null) {
-                $eligible++;
-            } else {
-                $reasons[$reason] = ($reasons[$reason] ?? 0) + 1;
-            }
+                if ($reason === null) {
+                    $eligible++;
+                } else {
+                    $reasons[$reason] = ($reasons[$reason] ?? 0) + 1;
+                }
 
-            if (count($sample) < 5) {
-                $sample[] = [
-                    'contact_id' => $contact->id,
-                    'email' => $contact->email,
-                    'eligible' => $reason === null,
-                    'reason' => $reason,
-                    'subject' => $this->templates->render($campaign->subject, $contact, $workspace),
-                    'body_preview' => Str::limit(strip_tags((string) $this->templates->render($campaign->body, $contact, $workspace)), 180),
-                ];
+                if (count($sample) < 5) {
+                    $sample[] = [
+                        'contact_id' => $contact->id,
+                        'email' => $contact->email,
+                        'eligible' => $reason === null,
+                        'reason' => $reason,
+                        'subject' => $this->templates->render($campaign->subject, $contact, $workspace),
+                        'body_preview' => Str::limit(strip_tags((string) $this->templates->render($campaign->body, $contact, $workspace)), 180),
+                    ];
+                }
             }
-        }
+        });
 
         return [
-            'audience_count' => $audience->count(),
+            'audience_count' => $audienceCount,
             'eligible_count' => $eligible,
-            'ineligible_count' => $audience->count() - $eligible,
+            'ineligible_count' => $audienceCount - $eligible,
             'reasons' => $reasons,
             'sample' => $sample,
         ];
@@ -106,53 +124,56 @@ class CampaignService
         }
 
         $workspace = $campaign->workspace;
-        $audience = $this->audience($workspace, $campaign->savedFilter);
+        $audienceQuery = $this->audienceQuery($workspace, $campaign->savedFilter);
+        $audienceCount = (clone $audienceQuery)->count();
 
         $suppressed = 0;
         $queued = 0;
 
-        foreach ($audience as $contact) {
-            if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
-                $suppressed++;
+        $audienceQuery->chunkById(self::AUDIENCE_CHUNK_SIZE, function (Collection $contacts) use ($campaign, $workspace, &$suppressed, &$queued): void {
+            foreach ($contacts as $contact) {
+                if ($this->suppressions->isSuppressed($workspace, $contact->email, $contact->phone_e164)) {
+                    $suppressed++;
 
-                continue;
-            }
+                    continue;
+                }
 
-            $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
+                $eligibilityReason = $this->eligibility->reason($workspace, $contact, 'email');
 
-            if ($eligibilityReason !== null) {
+                if ($eligibilityReason !== null) {
+                    OutboundMessage::query()->firstOrCreate(
+                        [
+                            'workspace_id' => $workspace->id,
+                            'idempotency_key' => $this->idempotencyKey($campaign, $contact),
+                        ],
+                        $this->messageAttributes($campaign, $contact, 'failed', $eligibilityReason),
+                    );
+
+                    continue;
+                }
+
                 OutboundMessage::query()->firstOrCreate(
                     [
                         'workspace_id' => $workspace->id,
                         'idempotency_key' => $this->idempotencyKey($campaign, $contact),
                     ],
-                    $this->messageAttributes($campaign, $contact, 'failed', $eligibilityReason),
+                    $this->messageAttributes($campaign, $contact),
                 );
-
-                continue;
+                $queued++;
             }
-
-            OutboundMessage::query()->firstOrCreate(
-                [
-                    'workspace_id' => $workspace->id,
-                    'idempotency_key' => $this->idempotencyKey($campaign, $contact),
-                ],
-                $this->messageAttributes($campaign, $contact),
-            );
-            $queued++;
-        }
+        });
 
         $campaign->forceFill([
             'status' => OutboundCampaign::STATUS_SENDING,
             'started_at' => $campaign->started_at ?? now(),
             'scheduled_at' => $campaign->scheduled_at ?? now(),
-            'audience_count' => $audience->count(),
+            'audience_count' => $audienceCount,
             'suppressed_count' => $suppressed,
         ])->save();
 
         $this->analytics->capture(ProductAnalytics::CAMPAIGN_LAUNCHED, [
             'campaign_id' => $campaign->id,
-            'audience_count' => $audience->count(),
+            'audience_count' => $audienceCount,
             'queued' => $queued,
             'suppressed' => $suppressed,
         ], null, $workspace);
