@@ -74,6 +74,7 @@ class HandleInertiaRequests extends Middleware
                     : null,
                 'host' => config('services.posthog.host', 'https://us.i.posthog.com'),
                 'distinct_id' => $user ? (string) $user->id : null,
+                'identify_pii' => (bool) config('services.posthog.identify_pii', false),
             ],
             'integrations' => fn () => Integrations::forWorkspace($workspace),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

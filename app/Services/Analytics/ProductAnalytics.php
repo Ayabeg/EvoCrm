@@ -124,14 +124,17 @@ class ProductAnalytics
 
         $workspace ??= $user->workspace;
 
+        $identity = ['role' => $user->role->value];
+
+        if (config('services.posthog.identify_pii', false)) {
+            $identity['email'] = $user->email;
+            $identity['name'] = $user->name;
+        }
+
         $payload = [
             'event' => '$identify',
             'distinctId' => (string) $user->id,
-            'properties' => PosthogPayload::redact(array_merge([
-                'email' => $user->email,
-                'name' => $user->name,
-                'role' => $user->role->value,
-            ], $properties)),
+            'properties' => PosthogPayload::redact(array_merge($identity, $properties)),
             'groups' => $this->groups($workspace),
         ];
 

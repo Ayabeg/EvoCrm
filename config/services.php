@@ -131,6 +131,7 @@ return [
     'posthog' => [
         'api_key' => env('POSTHOG_API_KEY', env('VITE_POSTHOG_KEY')),
         'host' => env('POSTHOG_HOST', env('VITE_POSTHOG_HOST', 'https://us.i.posthog.com')),
+        'identify_pii' => filter_var(env('POSTHOG_IDENTIFY_PII', false), FILTER_VALIDATE_BOOLEAN),
     ],
 
     'openmanus' => [

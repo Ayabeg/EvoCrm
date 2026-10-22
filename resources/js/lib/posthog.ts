@@ -6,6 +6,7 @@ type PosthogPageConfig = {
     key?: string | null;
     host?: string | null;
     distinct_id?: string | null;
+    identify_pii?: boolean;
 };
 
 type Identity = {
@@ -80,7 +81,11 @@ export function bootPosthog(config?: PosthogPageConfig | null): boolean {
     return true;
 }
 
-export function identifyWorkspaceUser(user?: Identity | null, workspace?: WorkspaceIdentity | null): void {
+export function identifyWorkspaceUser(
+    user?: Identity | null,
+    workspace?: WorkspaceIdentity | null,
+    identifyPii = false,
+): void {
     if (!posthog.__loaded) {
         return;
     }
@@ -92,8 +97,7 @@ export function identifyWorkspaceUser(user?: Identity | null, workspace?: Worksp
     }
 
     posthog.identify(String(user.id), {
-        email: user.email,
-        name: user.name,
+        ...(identifyPii ? { email: user.email, name: user.name } : {}),
         role: user.role,
     });
 

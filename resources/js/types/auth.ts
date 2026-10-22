@@ -26,6 +26,7 @@ export type PosthogShared = {
     key: string | null;
     host: string;
     distinct_id: string | null;
+    identify_pii?: boolean;
 };
 
 export type Auth = {

@@ -32,7 +32,7 @@ export function PosthogIdentity() {
             return;
         }
 
-        identifyWorkspaceUser(auth?.user, workspace);
+        identifyWorkspaceUser(auth?.user, workspace, posthog?.identify_pii === true);
     }, [posthog, auth?.user, workspace]);
 
     return null;

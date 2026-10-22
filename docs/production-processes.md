@@ -123,6 +123,8 @@ Before production deployment, rotate any local or copied `APP_KEY` through the d
 
 Enrichment and operator URL capture validate every redirect hop and pin public DNS answers for resolved hosts. Keep outbound egress filtering enabled at the reverse proxy/container network as a second control; the application still refuses literal or resolved private/reserved addresses.
 
+PostHog identity is pseudonymous by default. Set `POSTHOG_IDENTIFY_PII=true` only after confirming the privacy notice, legal basis/consent, retention, and processor configuration for sending user email/name to the analytics provider.
+
 The IMAP reply poller stores a conservative classification for each inbound reply. Explicit unsubscribe language creates a workspace suppression and stops follow-ups; `needs_review` and other non-suppression classifications are visible in Outbound → Replies for human handling. The poller marks mail seen only after CRM persistence and deduplicates provider message IDs/UID fallbacks. Public unsubscribe links are signed and workspace-bound; manually changing their email or workspace parameters is rejected.
 
 An `interested` classification also creates one CRM task titled `Review interested reply`, assigned to the contact owner when available. The task is keyed to the inbound message ID, so polling or replaying the same provider event does not create duplicate follow-up work.

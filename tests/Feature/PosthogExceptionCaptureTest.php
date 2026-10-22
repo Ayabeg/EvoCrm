@@ -56,3 +56,19 @@ it('does not boot the frontend client when inertia says disabled', function () {
         ->and($source)->toContain('capture_exceptions: true')
         ->and($source)->toContain('before_send');
 });
+
+it('does not send direct user identity PII unless explicitly enabled', function () {
+    $user = User::factory()->create(['name' => 'Private Owner', 'email' => 'owner@example.com']);
+    $analytics = app(ProductAnalytics::class);
+
+    $analytics->identify($user);
+    expect($analytics->last('$identify')['properties'])
+        ->not->toHaveKey('email')
+        ->not->toHaveKey('name');
+
+    config(['services.posthog.identify_pii' => true]);
+    $analytics->identify($user);
+
+    expect($analytics->last('$identify')['properties'])
+        ->toMatchArray(['email' => 'owner@example.com', 'name' => 'Private Owner']);
+});

@@ -49,6 +49,7 @@
 - Added a 1,000-record ceiling to privileged CRM bulk actions and terminal queue failure callbacks for import and bulk-action jobs, so oversized requests are rejected and worker failures do not leave durable runs falsely processing. Existing bulk/import coverage remains green and changed PHP passes Pint.
 - Final full regression after the public-flow, webhook, and worker hardening ran 1,322 tests with 1,307 passing, 14 existing UI/source-contract failures, 35,609 assertions, and 1 skipped. The additional failure is in the already user-modified shell contract; focused acquisition, security, import, meeting, webhook, and Meta suites remain green.
 - Closed the DNS-rebinding gap in enrichment fetches: every resolvable A/AAAA answer is checked for public range and the first approved address is pinned with Guzzle’s `resolve` option while preserving hostname-based TLS/SNI. Existing redirect/SSRF regression tests pass and Pint passes.
+- Closed the direct-PII analytics default: PostHog identity now sends only role plus a stable pseudonymous user ID unless `POSTHOG_IDENTIFY_PII=true` is explicitly configured. Backend privacy regression coverage passes and the changed frontend passes typecheck/lint.
 
 ### In progress
 
@@ -68,7 +69,7 @@
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
 - Full-suite release verification is not green until the 14 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
-- The standard Codex Security scan is complete for the captured revision with 1 high and 2 medium findings: local `.env` APP_KEY exposure/rotation, DNS-rebinding SSRF hardening, and PostHog PII consent/pseudonymization. The scan also records that the repository changed while it ran; current-tree fixes for booking, click redirects, Evolution replay, Meta claims, unsubscribe isolation, redirect SSRF, CSV formula injection, bulk limits, and worker failure state have separate regression evidence. Live provider checks remain blocked.
+- The standard Codex Security scan is complete for the captured revision with 1 high and 2 medium findings. The DNS-rebinding and direct-PII analytics findings are remediated in the current tree with regression evidence; the local `.env` APP_KEY still requires deployment rotation. The scan also records that the repository changed while it ran; current-tree fixes for booking, click redirects, Evolution replay, Meta claims, unsubscribe isolation, redirect SSRF, CSV formula injection, bulk limits, and worker failure state have separate regression evidence. Live provider checks remain blocked.
 
 ### Next verified task
 
