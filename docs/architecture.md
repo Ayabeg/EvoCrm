@@ -73,7 +73,7 @@ Completed bookings record a deduplicated meeting_booked funnel event against the
 
 - Every workspace-scoped write checks ownership and authorization.
 - Every cross-entity create/update that must remain consistent is transactional.
-- Unique keys and idempotency keys prevent duplicate imports, submissions, sends, and provider events.
+- Unique keys and idempotency keys prevent duplicate imports, submissions, sends, provider events, and subject-scoped funnel events. Funnel-event recording uses a database unique constraint plus `createOrFirst` so concurrent callbacks cannot pass a check-then-insert gap.
 - Long-running enrichment and outbound actions run through durable jobs/commands, not in-memory timers.
 - Campaign audiences over 1,000 contacts use `ExpandOutboundCampaign` cursor jobs in 250-contact pages; each page persists progress and reuses the workspace/idempotency boundary before the campaign becomes sendable.
 - Retries use bounded exponential backoff and preserve the original error and attempt history.

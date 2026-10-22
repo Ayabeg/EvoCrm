@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `9335676b` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `a561bdb0` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -12,13 +12,14 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Durable campaign expansion for audiences over 1,000 contacts using resumable 250-contact cursor jobs and idempotent message creation.
 - Dead Magnet Lead Leakage Calculator, validation, duplicate-safe submission persistence, separate delivery/marketing/enrichment consent, shared CRM handoff, queued result delivery with honest failure states, demo handoff, booking attribution, and persisted form-start, calculator-use, submission, demo-request, and booking funnel analytics.
 - Public analytics consent gating and pseudonymous authenticated analytics identity.
+- Database-backed idempotency for subject-scoped funnel events, with atomic recorder behavior and append-only subjectless visit tracking.
 
 ## Verification evidence
 
 - Previous complete focused acquisition regression: **207 tests / 1,440 assertions passed**.
 - Latest post-hardening acquisition integration subset: **181 tests / 1,254 assertions passed**, including lead-magnet engagement tracking, reply safety, imports, enrichment, provider events, and outbound execution.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
-- Latest repository-wide regression after the calculator capture and reset fixes: **1,338 tests; 1,324 passed; 13 existing UI/source-contract failures; 35,678 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
+- Latest repository-wide regression after the funnel-event uniqueness migration: **1,338 tests; 1,324 passed; 13 existing UI/source-contract failures; 35,680 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
 - Frontend Vitest suite: **27 test files / 97 tests passed**.
 - `npm run types:check` passed.
 - Local browser smoke test passed for the public Lead Leakage Calculator at desktop and 390px mobile widths: the optional contact fields render as text/email controls, the page has no horizontal overflow, an isolated submission rendered the result and linked the shared CRM record, and Reset inputs restored defaults and hid the prior result.
@@ -26,6 +27,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Current-tree Codex Security standard review `013e6eaf-f741-4d08-ad0f-5ab2bef6f61b`: zero reportable findings across seven reviewed acquisition surfaces; coverage is explicitly partial and limitations are recorded by the scan.
 - Committed hardening diff review `8387f1e4-4aca-49d9-98e7-7621a3a338c1` for `29aad813` to `46661ae7`: zero reportable findings with complete coverage of five changed security surfaces. Live provider behavior, deployment secret rotation, and legal compliance remain external limitations.
 - Latest acquisition diff review `8ec3adf4-f42c-4c05-b806-d79d4ddb1d45` for `46661ae7` to `286f2634`: zero reportable findings with complete coverage of seven changed security surfaces, including public lead-magnet tracking, outbound stale-claim handling, and reply branching.
+- Funnel/acquisition idempotency verification on `a561bdb0`: focused funnel set **18 tests / 139 assertions passed**; broader inbound, lead-magnet, funnel, booking, and outbound regression set **58 tests / 368 assertions passed**; Pint and `git diff --check` passed.
 
 ## Key implementation commits
 
@@ -39,11 +41,13 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `61223d06` — paused non-positive reply branches, including out-of-office handling.
 - `9335676b` — persisted lead-magnet form-start and calculator-use engagement events.
 - `286f2634` — recorded the latest full regression evidence.
+- `a561bdb0` — made subject-scoped funnel event recording race-safe with a database uniqueness constraint.
 
 ## Implemented but not fully verified
 
 - Live SMTP/IMAP, mail-stack, Google Places, email-verification, Evolution, and other provider behavior remains unverified without configured external accounts.
 - Full repository release verification remains non-green because of the 13 pre-existing UI/source-contract failures.
+- The new funnel-event uniqueness migration should be preceded by a production data check for historical duplicate subject-scoped rows; no destructive reconciliation policy was assumed locally.
 - The repository-wide review remains partial by design; the committed hardening diff review covers the quote/import follow-up and the full code change in `46661ae7`.
 
 ## Deployment requirements and blockers

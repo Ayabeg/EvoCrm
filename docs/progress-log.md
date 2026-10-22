@@ -118,8 +118,22 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Re-ran the full repository regression after the calculator fix: 1,338 tests, 1,324 passed, 13 existing UI/source-contract failures, 35,678 assertions, and 1 skipped. No acquisition-system test failed; the two existing InvalidArgumentException warnings remain unchanged.
 - Added explicit lead-magnet reset behavior: the action restores all calculator assumptions and consent fields, clears validation errors, rotates the submission idempotency key, and hides the previous result. The focused calculator/inbound/domain suite passes 13 tests / 93 assertions; TypeScript, targeted ESLint, production Vite build, and browser reset verification pass.
 - Re-ran the full PHP and frontend suites on the reset revision: PHP remains at 1,338 tests with 1,324 passed, 13 existing UI/source-contract failures, 35,678 assertions, and 1 skipped; Vitest passes 27 files / 97 tests. No acquisition-system PHP test failed.
+- Re-ran the full PHP suite after the funnel-event uniqueness migration: 1,338 tests, 1,324 passed, 13 existing UI/source-contract failures, 35,680 assertions, and 1 skipped. No acquisition-system PHP test failed; the two existing InvalidArgumentException warnings remain unchanged.
 
 ### Remaining
 
 - Resolve or explicitly accept the 13 unrelated UI/source-contract failures, configure and verify live providers, rotate deployment APP_KEY, and obtain legal sign-off before any consentless cold-outreach configuration.
+
+## 2026-10-23 — funnel event idempotency hardening
+
+### Completed / verified
+
+- Closed the shared funnel-event check-then-insert race: subject-scoped events now use a database unique key across workspace, funnel, event type, subject type, and subject ID, while `FunnelEventRecorder` uses Laravel's atomic `createOrFirst` path and reports whether a row was newly recorded. Null-subject visit beacons remain append-only.
+- Updated funnel fixtures that previously manually inserted rows already created by CRM observers, preserving the same reporting assertions under the new database invariant.
+- The focused funnel/acquisition set passes 18 tests / 139 assertions; the broader inbound, lead-magnet, funnel, booking, and outbound regression set passes 58 tests / 368 assertions. Pint and `git diff --check` pass.
+- Committed as `a561bdb0` (`fix: make subject funnel events race safe`).
+
+### Remaining
+
+- The unique migration assumes the existing ledger has no duplicate subject-scoped rows; production rollout should inspect and reconcile any historical duplicates before applying the constraint. Live-provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the 13 unrelated UI/source-contract failures remain open.
 
