@@ -137,7 +137,9 @@ Route::post('/book/{slug}', [MeetingBookController::class, 'store'])->middleware
 Route::get('/book/{slug}/done', [MeetingBookController::class, 'done'])->name('meetings.public.done');
 Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
 Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])->name('outbound.track.click');
-Route::get('/track/{slug}/visit.gif', [FunnelTrackingController::class, 'pixel'])->name('funnel.track.visit');
+Route::get('/track/{slug}/visit.gif', [FunnelTrackingController::class, 'pixel'])
+    ->middleware('throttle:60,1')
+    ->name('funnel.track.visit');
 
 Route::get('/webhooks/evolution/{webhookKey}', [EvolutionWebhookController::class, 'verify'])
     ->whereAlphaNumeric('webhookKey')

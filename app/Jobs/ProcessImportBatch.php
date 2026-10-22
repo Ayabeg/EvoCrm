@@ -7,6 +7,7 @@ use App\Services\Crm\ContactCsvImporter;
 use App\Services\Crm\DealCsvImporter;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Throwable;
 
 class ProcessImportBatch implements ShouldQueue
 {
@@ -43,5 +44,17 @@ class ProcessImportBatch implements ShouldQueue
             'error_summary' => 'Unsupported import type.',
             'finished_at' => now(),
         ])->save();
+    }
+
+    public function failed(?Throwable $exception): void
+    {
+        ImportBatch::query()
+            ->whereKey($this->batchId)
+            ->whereNotIn('status', [ImportBatch::STATUS_COMPLETED, ImportBatch::STATUS_FAILED])
+            ->update([
+                'status' => ImportBatch::STATUS_FAILED,
+                'finished_at' => now(),
+                'error_summary' => mb_substr($exception?->getMessage() ?: 'Import worker failed.', 0, 500),
+            ]);
     }
 }

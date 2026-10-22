@@ -9,6 +9,7 @@ use App\Services\Analytics\ProductAnalytics;
 use App\Services\Meta\MetaLeadAdsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
@@ -33,16 +34,33 @@ class ProcessMetaWebhookEvent implements ShouldQueue
 
     public function handle(LeadFormIngestor $ingestor, MetaLeadAdsService $leads, ProductAnalytics $analytics): void
     {
-        $event = MetaWebhookEvent::query()->with('workspace')->find($this->eventId);
+        $event = DB::transaction(function (): ?MetaWebhookEvent {
+            $event = MetaWebhookEvent::query()
+                ->with('workspace')
+                ->whereKey($this->eventId)
+                ->lockForUpdate()
+                ->first();
 
-        if (! $event || $event->isProcessed()) {
+            if (! $event || $event->isProcessed()) {
+                return null;
+            }
+
+            if ($event->status === MetaWebhookEvent::STATUS_PROCESSING
+                && $event->updated_at?->gt(now()->subMinutes(10))) {
+                return null;
+            }
+
+            $event->forceFill([
+                'status' => MetaWebhookEvent::STATUS_PROCESSING,
+                'attempts' => $event->attempts + 1,
+            ])->save();
+
+            return $event;
+        });
+
+        if (! $event) {
             return;
         }
-
-        $event->forceFill([
-            'status' => MetaWebhookEvent::STATUS_PROCESSING,
-            'attempts' => $event->attempts + 1,
-        ])->save();
 
         try {
             $payload = is_array($event->payload) ? $event->payload : [];

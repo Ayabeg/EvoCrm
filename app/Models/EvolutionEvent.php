@@ -6,7 +6,7 @@ use App\Models\Concerns\BelongsToWorkspace;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['workspace_id', 'instance', 'event', 'payload', 'received_at'])]
+#[Fillable(['workspace_id', 'instance', 'event', 'provider_event_id', 'payload', 'received_at'])]
 class EvolutionEvent extends Model
 {
     use BelongsToWorkspace;

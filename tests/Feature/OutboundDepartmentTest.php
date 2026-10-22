@@ -311,6 +311,12 @@ it('tracks link clicks through a CRM-host redirect and never rewrites unsubscrib
     $this->get("/outbound/c/{$message->track_token}?u={$evil}")->assertStatus(400);
 });
 
+it('does not turn an unknown click token into an open redirect', function () {
+    $target = rtrim(strtr(base64_encode('https://evotechly.com/evosales'), '+/', '-_'), '=');
+
+    $this->get('/outbound/c/not-a-message?u='.$target)->assertNotFound();
+});
+
 it('manages sending domains with a manual verification mark', function () {
     $user = User::factory()->create();
 

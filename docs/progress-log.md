@@ -45,6 +45,9 @@
 - Current full regression after the import and reply slices: 1,318 tests, 1,304 passed, 13 failures, 35,593 assertions, and 1 skipped. The failures remain the existing UI/source-contract failures outside these acquisition changes; the two existing InvalidArgumentException warnings are unchanged.
 - Added the interested-reply handoff: an `interested` inbound reply now creates one durable CRM task for human follow-up, keyed to the inbound message so repeated IMAP ingestion cannot duplicate the task. Reply/acquisition coverage passes 3 tests / 21 assertions for this handoff, and Pint passes.
 - Fixed a tenant-isolation issue in public unsubscribe links: raw workspace/address query parameters are now protected by Laravel signed URLs, the endpoint requires a real workspace, and tampered parameters are rejected. Suppression/outbound coverage passes 21 tests / 137 assertions; Pint passes.
+- Closed three public/retry security gaps found during the source-backed review: public meeting bookings now require an enabled weekday, configured working hours, and exact slot alignment while schedule-row locking prevents local double-booking races; click tracking requires a real outbound-message token before redirecting; Evolution message events and Meta webhook jobs now use durable provider identities/claims to prevent replay duplication. Meeting/outbound coverage passes 31 tests / 237 assertions, Evolution coverage passes 18 tests / 137 assertions, Meta/funnel coverage passes 21 tests / 85 assertions, and Pint passes.
+- Added a 1,000-record ceiling to privileged CRM bulk actions and terminal queue failure callbacks for import and bulk-action jobs, so oversized requests are rejected and worker failures do not leave durable runs falsely processing. Existing bulk/import coverage remains green and changed PHP passes Pint.
+- Final full regression after the public-flow, webhook, and worker hardening ran 1,322 tests with 1,307 passing, 14 existing UI/source-contract failures, 35,609 assertions, and 1 skipped. The additional failure is in the already user-modified shell contract; focused acquisition, security, import, meeting, webhook, and Meta suites remain green.
 
 ### In progress
 
@@ -63,8 +66,8 @@
 ### Blocked
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
-- Full-suite release verification is not green until the 13 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
-- Security review is partially complete in parent-only mode: the scanned revision has two documented findings (redirect SSRF and CSV formula injection), both remediated in the current tree and covered by regression tests. Delegated workers were unavailable, live provider checks remain blocked, and the remaining webhook-auth/source inventory is still open.
+- Full-suite release verification is not green until the 14 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
+- The standard Codex Security scan is complete for the captured revision with 1 high and 2 medium findings: local `.env` APP_KEY exposure/rotation, DNS-rebinding SSRF hardening, and PostHog PII consent/pseudonymization. The scan also records that the repository changed while it ran; current-tree fixes for booking, click redirects, Evolution replay, Meta claims, unsubscribe isolation, redirect SSRF, CSV formula injection, bulk limits, and worker failure state have separate regression evidence. Live provider checks remain blocked.
 
 ### Next verified task
 

@@ -21,6 +21,8 @@ class TrackingController extends Controller
             ->where('direction', 'out')
             ->first();
 
+        abort_unless($message, 404);
+
         if ($message) {
             $message->forceFill([
                 'opened_at' => $message->opened_at ?? now(),
@@ -53,14 +55,13 @@ class TrackingController extends Controller
         $decoded = base64_decode(strtr((string) $request->query('u'), '-_', '+/'), true);
         $url = is_string($decoded) ? $decoded : '';
 
+        abort_unless($message, 404);
         abort_unless(preg_match('#^https?://#i', $url) === 1, 400);
 
-        if ($message) {
-            $message->forceFill([
-                'clicked_at' => $message->clicked_at ?? now(),
-                'click_count' => $message->click_count + 1,
-            ])->save();
-        }
+        $message->forceFill([
+            'clicked_at' => $message->clicked_at ?? now(),
+            'click_count' => $message->click_count + 1,
+        ])->save();
 
         return redirect()->away($url);
     }

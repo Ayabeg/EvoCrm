@@ -6,6 +6,7 @@ use App\Models\BulkActionRun;
 use App\Services\Crm\BulkActionRunner;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Throwable;
 
 class ProcessBulkAction implements ShouldQueue
 {
@@ -24,5 +25,16 @@ class ProcessBulkAction implements ShouldQueue
         if ($run) {
             $runner->process($run);
         }
+    }
+
+    public function failed(?Throwable $exception): void
+    {
+        BulkActionRun::query()
+            ->whereKey($this->runId)
+            ->whereNotIn('status', [BulkActionRun::STATUS_COMPLETED, BulkActionRun::STATUS_FAILED])
+            ->update([
+                'status' => BulkActionRun::STATUS_FAILED,
+                'error_summary' => mb_substr($exception?->getMessage() ?: 'Bulk action worker failed.', 0, 500),
+            ]);
     }
 }

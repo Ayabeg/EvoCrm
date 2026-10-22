@@ -23,7 +23,7 @@ class BulkActionController extends Controller
     {
         $data = $request->validate([
             'action' => ['required', 'string'],
-            'ids' => ['required', 'array', 'min:1'],
+            'ids' => ['required', 'array', 'min:1', 'max:1000'],
             'ids.*' => ['integer'],
             'owner_id' => ['nullable', 'integer'],
             'sequence_id' => ['nullable', 'integer'],

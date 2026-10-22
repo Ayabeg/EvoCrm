@@ -107,11 +107,19 @@ Inbound webhooks resolve a workspace from a stored provider key, not “first wo
 - Evolution and Meta lead ingestion
 - Outbound delivery, bounce, and complaint events at `POST /webhooks/outbound/bounces/{webhookKey}`. The route name is retained for compatibility; the endpoint requires an event ID and records the normalized event in `outbound_provider_events` before projecting message state.
 
+Evolution message events carry a provider message identity into the event ledger and CRM message row. Replayed deliveries return the existing message, and the database uniqueness boundary prevents duplicate downstream ticket, activity, analytics, and AI follow-up work. Meta webhook workers claim a pending event under a row lock; a fresh processing claim is not processed concurrently, while stale claims can be recovered after ten minutes.
+
 The outbound event payload may identify the message with `message_id` or recipient `email`/`to`. Normalize `type` as `delivered`, `soft`, `hard`, or a complaint value such as `spam_complaint`. Provider acceptance is recorded separately from confirmed delivery. Duplicate event IDs are workspace/provider scoped and safe to retry.
+
+Public meeting booking validates the submitted time against the schedule’s enabled weekdays, working hours, slot duration, and slot boundary. The schedule row is locked while the CRM meeting is created so concurrent requests cannot reserve the same local slot twice. Public outbound click redirects require a valid outbound-message tracking token; malformed or unknown tokens return `404` instead of becoming open redirects.
 
 For manual enrichment maintenance, run `php artisan leads:enrich --stale-hours=168` from the web container. It queues stale contacts, companies, and leads for the database worker; use `--sync` only for controlled local verification. The worker must be running for queued enrichment, lead-magnet result delivery, and other background jobs.
 
 Contact CSV imports may contain incomplete business records. A row with a company or location signal is retained without fabricating contact data; after the import transaction, contacts missing email or phone are queued for enrichment. Re-imports use the stored import identity to avoid duplicating the same incomplete row. Blank or ambiguous rows remain in the import preview as row-level errors.
+
+Privileged contact/deal bulk actions accept at most 1,000 record IDs per request. Import and bulk-action queue jobs also mark their durable run failed when the queue exhausts retries, so operations can retry a visible failed run instead of treating an interrupted worker as active.
+
+Before production deployment, rotate any local or copied `APP_KEY` through the deployment secret manager, invalidate existing sessions, and rotate encrypted integration/mailbox credentials if the key may have been exposed. The repository’s `.env` is ignored by Git, but ignored does not mean safe to distribute.
 
 The IMAP reply poller stores a conservative classification for each inbound reply. Explicit unsubscribe language creates a workspace suppression and stops follow-ups; `needs_review` and other non-suppression classifications are visible in Outbound → Replies for human handling. The poller marks mail seen only after CRM persistence and deduplicates provider message IDs/UID fallbacks. Public unsubscribe links are signed and workspace-bound; manually changing their email or workspace parameters is rejected.
 

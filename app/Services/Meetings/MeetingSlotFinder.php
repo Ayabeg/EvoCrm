@@ -61,9 +61,35 @@ class MeetingSlotFinder
 
     public function isFree(MeetingSchedule $schedule, Carbon $start, Carbon $end): bool
     {
+        if (! $this->isBookableSlot($schedule, $start, $end)) {
+            return false;
+        }
+
         $busy = $this->busyBlocks($schedule, $start->copy()->subHour(), $end->copy()->addHour());
 
         return ! $this->overlaps($start, $end, $busy);
+    }
+
+    public function isBookableSlot(MeetingSchedule $schedule, Carbon $start, Carbon $end): bool
+    {
+        $tz = $schedule->timezone ?: MeetingSchedule::TIMEZONE;
+        $start = $start->copy()->timezone($tz);
+        $end = $end->copy()->timezone($tz);
+        $minutes = max(15, (int) $schedule->slot_minutes);
+
+        if ($start->second !== 0 || $end->second !== 0
+            || $start->isoWeekday() !== $end->isoWeekday()
+            || ! in_array($start->isoWeekday(), $schedule->weekdayList(), true)
+            || (int) abs($end->diffInMinutes($start)) !== $minutes) {
+            return false;
+        }
+
+        $opening = $start->copy()->setTimeFromTimeString($schedule->work_start);
+        $closing = $start->copy()->setTimeFromTimeString($schedule->work_end);
+
+        return $start->gte($opening)
+            && $end->lte($closing)
+            && (int) $start->diffInMinutes($opening) % $minutes === 0;
     }
 
     public function calendarConnected(MeetingSchedule $schedule): bool

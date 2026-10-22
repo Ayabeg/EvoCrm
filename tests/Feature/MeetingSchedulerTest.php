@@ -233,6 +233,28 @@ it('links an optional deal and refuses a taken slot or a missing phone', functio
     ]))->assertSessionHasErrors('starts_at');
 });
 
+it('rejects public bookings outside the published schedule or slot boundaries', function () {
+    $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
+    Mail::fake();
+
+    $user = meetingHost();
+    $schedule = MeetingSchedule::forUser($user);
+
+    foreach ([
+        ['2026-09-12 09:00:00', 'weekend'],
+        ['2026-09-10 08:30:00', 'before-opening'],
+        ['2026-09-10 09:15:00', 'unaligned'],
+        ['2026-09-10 17:00:00', 'after-closing'],
+    ] as $startsAt) {
+        $this->post('/book/'.$schedule->slug, bookPayload([
+            'starts_at' => Carbon::parse($startsAt[0], 'Africa/Algiers')->toIso8601String(),
+            'email' => $startsAt[1].'@clinic.dz',
+        ]))->assertSessionHasErrors('starts_at');
+    }
+
+    expect(Activity::query()->where('type', 'meeting')->exists())->toBeFalse();
+});
+
 it('returns 404 when the page is off and fires meeting.booked workflows', function () {
     $this->travelTo(Carbon::parse('2026-09-10 08:00:00', 'Africa/Algiers'));
     Mail::fake();

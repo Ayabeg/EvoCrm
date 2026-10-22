@@ -18,6 +18,8 @@ use Throwable;
 
 class BulkActionRunner
 {
+    public const MAX_IDS = 1000;
+
     public const ACTIONS = ['assign_owner', 'enroll_sequence', 'move_stage', 'delete'];
 
     public function __construct(private SequenceEnrollment $enrollment) {}
@@ -50,6 +52,12 @@ class BulkActionRunner
         if ($ids === []) {
             throw ValidationException::withMessages([
                 'ids' => 'Select at least one record.',
+            ]);
+        }
+
+        if (count($ids) > self::MAX_IDS) {
+            throw ValidationException::withMessages([
+                'ids' => 'Select no more than '.self::MAX_IDS.' records at a time.',
             ]);
         }
 

@@ -16,6 +16,7 @@ use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\WorkflowRunner;
 use App\Services\Funnels\FunnelEventRecorder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -44,49 +45,58 @@ class MeetingBooker
         $schedule->loadMissing(['user', 'workspace']);
 
         $tz = $schedule->timezone ?: MeetingSchedule::TIMEZONE;
-        $start = Carbon::parse($startsAt)->timezone($tz);
-        $end = $start->copy()->addMinutes((int) $schedule->slot_minutes);
+        [$schedule, $start, $end, $host, $contact, $activity] = DB::transaction(function () use ($schedule, $startsAt, $guest, $tz) {
+            $lockedSchedule = MeetingSchedule::query()
+                ->with(['user', 'workspace'])
+                ->whereKey($schedule->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $start = Carbon::parse($startsAt)->timezone($tz);
+            $end = $start->copy()->addMinutes((int) $lockedSchedule->slot_minutes);
 
-        if ($start->lte(now($tz)) || ! $this->slots->isFree($schedule, $start, $end)) {
-            throw ValidationException::withMessages([
-                'starts_at' => 'That time is no longer available.',
+            if ($start->lte(now($tz)) || ! $this->slots->isFree($lockedSchedule, $start, $end)) {
+                throw ValidationException::withMessages([
+                    'starts_at' => 'That time is no longer available.',
+                ]);
+            }
+
+            $host = $lockedSchedule->user ?? User::query()->findOrFail($lockedSchedule->user_id);
+            $contact = $this->contacts->findOrCreate($lockedSchedule->workspace, [
+                'first_name' => $guest['first_name'],
+                'last_name' => $guest['last_name'] ?? null,
+                'email' => $guest['email'],
+                'phone' => $guest['phone'],
+                'owner_id' => $host->id,
+                'source' => 'meeting',
             ]);
-        }
 
-        $host = $schedule->user ?? User::query()->findOrFail($schedule->user_id);
-        $contact = $this->contacts->findOrCreate($schedule->workspace, [
-            'first_name' => $guest['first_name'],
-            'last_name' => $guest['last_name'] ?? null,
-            'email' => $guest['email'],
-            'phone' => $guest['phone'],
-            'owner_id' => $host->id,
-            'source' => 'meeting',
-        ]);
+            $dealId = $this->resolveDealId($lockedSchedule, $contact, $guest['deal_id'] ?? null);
+            $activity = $this->activities->record($lockedSchedule->workspace, [
+                'type' => 'meeting',
+                'subject' => 'Meeting with '.$host->name,
+                'body' => trim((string) ($guest['note'] ?? '')) ?: null,
+                'due_at' => $start->clone()->utc(),
+                'owner_id' => $host->id,
+                'contact_id' => $contact->id,
+                'deal_id' => $dealId,
+                'company_id' => $contact->company_id,
+                'meta' => [
+                    'source' => 'booking',
+                    'schedule_id' => $lockedSchedule->id,
+                    'starts_at' => $start->toIso8601String(),
+                    'ends_at' => $end->toIso8601String(),
+                    'timezone' => $tz,
+                    'location_note' => $lockedSchedule->location_note,
+                    'guest_email' => $guest['email'],
+                    'guest_phone' => $guest['phone'],
+                    'guest_name' => $guest['first_name'],
+                ],
+            ], $host);
 
-        $dealId = $this->resolveDealId($schedule, $contact, $guest['deal_id'] ?? null);
+            return [$lockedSchedule, $start, $end, $host, $contact, $activity];
+        });
+
         $whenLabel = $start->timezone($tz)->format('D j M Y · H:i');
-
-        $activity = $this->activities->record($schedule->workspace, [
-            'type' => 'meeting',
-            'subject' => 'Meeting with '.$host->name,
-            'body' => trim((string) ($guest['note'] ?? '')) ?: null,
-            'due_at' => $start->clone()->utc(),
-            'owner_id' => $host->id,
-            'contact_id' => $contact->id,
-            'deal_id' => $dealId,
-            'company_id' => $contact->company_id,
-            'meta' => [
-                'source' => 'booking',
-                'schedule_id' => $schedule->id,
-                'starts_at' => $start->toIso8601String(),
-                'ends_at' => $end->toIso8601String(),
-                'timezone' => $tz,
-                'location_note' => $schedule->location_note,
-                'guest_email' => $guest['email'],
-                'guest_phone' => $guest['phone'],
-                'guest_name' => $guest['first_name'],
-            ],
-        ], $host);
 
         $this->funnelEvents->recordMeetingBooked(
             $activity,
