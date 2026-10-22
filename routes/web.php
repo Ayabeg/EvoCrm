@@ -119,9 +119,12 @@ Route::get('/lead-magnet/{workspace:slug}/demo', [LeadLeakageController::class, 
     ->middleware('throttle:30,1')
     ->name('lead-magnet.demo');
 
-Route::get('/unsubscribe', UnsubscribeController::class)
-    ->middleware('signed')
+Route::get('/unsubscribe', [UnsubscribeController::class, 'show'])
+    ->middleware(['signed', 'throttle:30,1'])
     ->name('unsubscribe');
+Route::post('/unsubscribe', [UnsubscribeController::class, 'store'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('unsubscribe.confirm');
 
 Route::get('/up/scheduler', SchedulerHeartbeatController::class)->name('up.scheduler');
 
@@ -135,8 +138,12 @@ Route::post('/q/{token}/accept', [QuoteAcceptanceController::class, 'accept'])->
 Route::get('/book/{slug}', [MeetingBookController::class, 'show'])->name('meetings.public.show');
 Route::post('/book/{slug}', [MeetingBookController::class, 'store'])->middleware('throttle:20,1')->name('meetings.public.store');
 Route::get('/book/{slug}/done', [MeetingBookController::class, 'done'])->name('meetings.public.done');
-Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])->name('outbound.track.open');
-Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])->name('outbound.track.click');
+Route::get('/outbound/t/{token}.gif', [TrackingController::class, 'open'])
+    ->middleware('throttle:120,1')
+    ->name('outbound.track.open');
+Route::get('/outbound/c/{token}', [TrackingController::class, 'click'])
+    ->middleware('throttle:120,1')
+    ->name('outbound.track.click');
 Route::get('/track/{slug}/visit.gif', [FunnelTrackingController::class, 'pixel'])
     ->middleware('throttle:60,1')
     ->name('funnel.track.visit');

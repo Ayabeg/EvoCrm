@@ -5,7 +5,7 @@ EvoSales runs three independent Laravel process responsibilities from the same r
 | Service | Responsibility | Command |
 |---|---|---|
 | `web` | HTTP application | `php artisan serve --host=0.0.0.0 --port=$PORT` |
-| `queue` | Consume queued jobs | `php artisan queue:work --sleep=3 --tries=3 --backoff=3 --timeout=90 --max-time=3600` |
+| `queue` | Consume queued jobs | `php artisan queue:work --sleep=3 --tries=3 --backoff=3 --timeout=300 --max-time=3600` |
 | `scheduler` | Evaluate Laravel schedules | `php artisan schedule:work` |
 
 The queue process is not called a scheduler worker. It consumes queued jobs. The scheduler process evaluates the schedule in `routes/console.php`.
@@ -54,7 +54,7 @@ Reference compose services (the Contabo project `evocrm` keeps its own Dockerfil
     restart: unless-stopped
     environment: *app-environment
     command: >
-      sh -c "php artisan queue:work --sleep=3 --tries=3 --backoff=3 --timeout=90 --max-time=3600"
+      sh -c "php artisan queue:work --sleep=3 --tries=3 --backoff=3 --timeout=300 --max-time=3600"
 
   scheduler:
     build: .

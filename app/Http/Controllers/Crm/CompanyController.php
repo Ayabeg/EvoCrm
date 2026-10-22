@@ -12,6 +12,7 @@ use App\Services\Enrichment\EnrichmentService;
 use App\Support\CrmHub;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -95,7 +96,7 @@ class CompanyController extends Controller
             'wilaya' => ['nullable', 'string', 'max:80'],
             'parent_company_id' => ['nullable', 'integer'],
             'account_type' => ['nullable', 'in:prospect,customer,partner,subsidiary'],
-            'owner_id' => ['nullable', 'integer'],
+            'owner_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
             'add_another' => ['sometimes', 'boolean'],
         ]);
 
@@ -128,7 +129,7 @@ class CompanyController extends Controller
             'parent_company_id' => ['nullable', 'integer'],
             'account_type' => ['nullable', 'in:prospect,customer,partner,subsidiary'],
             'notes' => ['nullable', 'string'],
-            'owner_id' => ['nullable', 'integer'],
+            'owner_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
             'attributes' => ['nullable', 'array'],
         ]);
 

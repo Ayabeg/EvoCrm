@@ -352,10 +352,19 @@ class ContactCsvImporter
     private function processRow(ImportBatch $batch, ImportRow $row): void
     {
         $workspace = $batch->workspace;
-        $decision = $this->decide($workspace, $row->raw ?? [], $batch->mapping ?? []);
 
         try {
-            $contact = DB::transaction(function () use ($batch, $row, $decision, $workspace): ?Contact {
+            $contact = DB::transaction(function () use ($batch, $row, $workspace): ?Contact {
+                $lockedRow = ImportRow::query()
+                    ->whereKey($row->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedRow || $lockedRow->status !== ImportRow::STATUS_PENDING) {
+                    return null;
+                }
+
+                $decision = $this->decide($workspace, $lockedRow->raw ?? [], $batch->mapping ?? []);
                 $status = $decision['action'];
                 $contact = $decision['contact'];
 
@@ -375,7 +384,7 @@ class ContactCsvImporter
                     $batch->increment('error_count');
                 }
 
-                $row->forceFill([
+                $lockedRow->forceFill([
                     'status' => $status,
                     'preview_action' => $decision['action'],
                     'error_message' => $decision['error'],

@@ -39,6 +39,7 @@ class MetaLeadWebhookController extends Controller
         $endpoint = $endpoints->resolve(WebhookEndpointManager::PROVIDER_META_LEADS, $webhookKey);
         $workspace = $endpoint->workspace;
         $raw = $request->getContent();
+        abort_if(strlen($raw) > 262144, 413, 'Webhook payload is too large.');
         $payload = $request->all();
         $official = isset($payload['entry']) || isset($payload['object']);
 
@@ -49,6 +50,7 @@ class MetaLeadWebhookController extends Controller
             );
         }
 
+        abort_if(count($webhooks->extractDeliveries($payload)) > 100, 413, 'Webhook fan-out is too large.');
         $events = $webhooks->accept($workspace, $endpoint, $payload);
         $endpoints->markReceived($endpoint, 'leadgen');
 

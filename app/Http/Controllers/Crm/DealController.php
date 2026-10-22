@@ -31,6 +31,7 @@ use App\Support\StageCopy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -305,7 +306,7 @@ class DealController extends Controller
             'amount_dzd' => ['nullable', 'numeric', 'min:0'],
             'stage_id' => ['nullable', 'integer'],
             'pipeline_id' => ['nullable', 'integer'],
-            'owner_id' => ['nullable', 'integer'],
+            'owner_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
             'source' => ['nullable', 'string', 'max:80'],
             'type' => ['nullable', 'string', 'max:40'],
             'priority' => ['nullable', 'string', 'max:40'],
@@ -370,7 +371,7 @@ class DealController extends Controller
             'amount_cents' => ['nullable', 'integer', 'min:0'],
             'amount_dzd' => ['nullable', 'numeric', 'min:0'],
             'next_activity_at' => ['nullable', 'date'],
-            'owner_id' => ['nullable', 'integer'],
+            'owner_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
             'source' => ['nullable', 'string', 'max:80'],
             'type' => ['nullable', 'string', 'max:40'],
             'priority' => ['nullable', 'string', 'max:40'],

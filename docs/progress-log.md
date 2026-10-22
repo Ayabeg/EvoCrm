@@ -96,3 +96,18 @@
 
 Run the final release audit after the remaining UI/source-contract checks are resolved or accepted, while keeping live-provider verification and delivery blocked until credentials and legal/deployment sign-off are configured.
 
+## 2026-10-22 — reliability and public-surface hardening
+
+### Completed / verified
+
+- Applied the next hardening slice: queue leases now exceed the longest mutating job timeout; stale outbound send claims are quarantined instead of automatically resent after an uncertain provider outcome; Meta processing leases can be reclaimed within the retry horizon; failed Lead OS nodes no longer advance the graph; nightly deal-health work and webhook payload/fan-out are bounded; tracking destinations require CRM-generated HMAC signatures with atomic counters; unsubscribe is confirmation-based and throttled; and CRM relationship IDs are validated against the active workspace.
+- The targeted hardening set passes 84 tests / 492 assertions. The full suite runs 1,335 tests with 1,321 passing, 13 unrelated UI/source-contract failures, 35,663 assertions, and 1 skipped.
+
+### In progress
+
+- A fresh current-tree Codex Security review is running after the hardening changes. The earlier sealed scan remains partial and revision-bound; it is not used as evidence for the new changes until the current review completes.
+
+### Remaining
+
+- Resolve or explicitly accept the 13 unrelated UI/source-contract failures, configure and verify live providers, rotate deployment APP_KEY, and obtain legal sign-off before any consentless cold-outreach configuration.
+

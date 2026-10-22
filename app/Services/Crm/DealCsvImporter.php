@@ -355,10 +355,19 @@ class DealCsvImporter
     private function processRow(ImportBatch $batch, ImportRow $row): void
     {
         $workspace = $batch->workspace;
-        $decision = $this->decide($workspace, $row->raw ?? [], $batch->mapping ?? []);
 
         try {
-            DB::transaction(function () use ($batch, $row, $decision, $workspace): void {
+            DB::transaction(function () use ($batch, $row, $workspace): void {
+                $lockedRow = ImportRow::query()
+                    ->whereKey($row->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedRow || $lockedRow->status !== ImportRow::STATUS_PENDING) {
+                    return;
+                }
+
+                $decision = $this->decide($workspace, $lockedRow->raw ?? [], $batch->mapping ?? []);
                 $status = $decision['action'];
                 $deal = $decision['deal'];
 
@@ -378,7 +387,7 @@ class DealCsvImporter
                     $batch->increment('error_count');
                 }
 
-                $row->forceFill([
+                $lockedRow->forceFill([
                     'status' => $status,
                     'preview_action' => $decision['action'],
                     'error_message' => $decision['error'],

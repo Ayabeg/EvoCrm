@@ -108,6 +108,18 @@ it('rejects expired revoked and foreign quote tokens', function () {
     $this->get('/q/missing-token')->assertNotFound();
     $this->post('/q/valid-token/accept')->assertRedirect();
     expect($valid->fresh()->accepted_at)->not->toBeNull();
+
+    $acceptedExpired = publicQuote($user, [
+        'public_token' => 'accepted-expired-token',
+        'token_expires_at' => now()->subMinute(),
+    ]);
+    $acceptedExpired->forceFill([
+        'status' => 'accepted',
+        'accepted_at' => now()->subMinute(),
+    ])->save();
+
+    $this->get('/q/accepted-expired-token')->assertNotFound();
+    $this->post('/q/accepted-expired-token/accept')->assertNotFound();
 });
 
 it('sends a WhatsApp confirmation when the phone channel is connected', function () {

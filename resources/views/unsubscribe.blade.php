@@ -22,7 +22,11 @@
         @if ($ok)
             <p>You have been added to the workspace suppression list. Evotechly will not send further automated outbound to this address or number.</p>
         @else
-            <p>Provide <code>?email=</code> or <code>?phone=</code> to be suppressed. Quiet hours and suppression apply to Outbound Center only.</p>
+            <p>Confirm below to stop further automated outbound to this address or number.</p>
+            <form method="POST" action="{{ $confirmUrl }}">
+                @csrf
+                <button type="submit">Unsubscribe</button>
+            </form>
         @endif
     </main>
 </body>

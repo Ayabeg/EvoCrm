@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Public\TrackingController;
 use App\Jobs\ExpandOutboundCampaign;
 use App\Models\Contact;
 use App\Models\Enrollment;
@@ -347,7 +348,8 @@ it('tracks link clicks through a CRM-host redirect and never rewrites unsubscrib
     expect($html)->toContain('href="'.$unsub.'"');
 
     $target = rtrim(strtr(base64_encode('https://evotechly.com/evosales'), '+/', '-_'), '=');
-    $response = $this->get("/outbound/c/{$message->track_token}?u={$target}");
+    $signature = TrackingController::destinationSignature($message->track_token, 'https://evotechly.com/evosales');
+    $response = $this->get("/outbound/c/{$message->track_token}?u={$target}&s={$signature}");
 
     $response->assertRedirect('https://evotechly.com/evosales');
     $message->refresh();
@@ -356,13 +358,16 @@ it('tracks link clicks through a CRM-host redirect and never rewrites unsubscrib
 
     // Non-http targets are refused.
     $evil = rtrim(strtr(base64_encode('javascript:alert(1)'), '+/', '-_'), '=');
-    $this->get("/outbound/c/{$message->track_token}?u={$evil}")->assertStatus(400);
+    $this->get("/outbound/c/{$message->track_token}?u={$evil}&s=invalid")->assertStatus(400);
+
+    $tampered = rtrim(strtr(base64_encode('https://attacker.example'), '+/', '-_'), '=');
+    $this->get("/outbound/c/{$message->track_token}?u={$tampered}&s={$signature}")->assertForbidden();
 });
 
 it('does not turn an unknown click token into an open redirect', function () {
     $target = rtrim(strtr(base64_encode('https://evotechly.com/evosales'), '+/', '-_'), '=');
 
-    $this->get('/outbound/c/not-a-message?u='.$target)->assertNotFound();
+    $this->get('/outbound/c/not-a-message?u='.$target.'&s=invalid')->assertNotFound();
 });
 
 it('manages sending domains with a manual verification mark', function () {

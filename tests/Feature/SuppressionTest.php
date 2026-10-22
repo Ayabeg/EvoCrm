@@ -37,6 +37,11 @@ it('writes suppression from the public unsubscribe URL', function () {
     $this->get($url)
         ->assertOk();
 
+    expect(app(SuppressionService::class)->isSuppressed($workspace, 'stop@evotechly.dz'))->toBeFalse();
+
+    $this->post($url)
+        ->assertOk();
+
     expect(app(SuppressionService::class)->isSuppressed($workspace, 'stop@evotechly.dz'))->toBeTrue();
 });
 

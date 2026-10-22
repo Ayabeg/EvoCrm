@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Activity;
+use App\Models\Company;
 use App\Models\Contact;
 use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
@@ -9,10 +10,12 @@ use App\Models\Enrollment;
 use App\Models\Sequence;
 use App\Models\User;
 use App\Models\Workflow;
+use App\Services\Crm\ContactIdentity;
 use App\Services\Crm\EvoWorkflowTemplates;
 use App\Services\Crm\WorkflowRunner;
 use App\Services\Outbound\SuppressionService;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 it('lists the automation page with the Evotechly templates', function () {
     $user = User::factory()->create();
@@ -116,6 +119,17 @@ it('creates a task when a contact is created', function () {
         ->and($task)->not->toBeNull()
         ->and($task->subject)->toBe('Introduce Evotechly to Amine Kaci')
         ->and($task->meta['source'] ?? null)->toBe('workflow');
+});
+
+it('rejects cross-workspace contact relationships at the shared identity boundary', function () {
+    $user = User::factory()->create();
+    $other = User::factory()->create();
+    $company = Company::factory()->create(['workspace_id' => $other->workspace_id]);
+
+    expect(fn () => app(ContactIdentity::class)->findOrCreate($user->workspace, [
+        'first_name' => 'Foreign',
+        'company_id' => $company->id,
+    ]))->toThrow(ValidationException::class);
 });
 
 it('creates a task when a deal moves to Qualified', function () {

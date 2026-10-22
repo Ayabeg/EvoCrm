@@ -18,6 +18,8 @@ class ProcessMetaWebhookEvent implements ShouldQueue
 {
     use Queueable;
 
+    private const PROCESSING_LEASE_MINUTES = 2;
+
     public int $tries = 5;
 
     public int $timeout = 60;
@@ -46,7 +48,7 @@ class ProcessMetaWebhookEvent implements ShouldQueue
             }
 
             if ($event->status === MetaWebhookEvent::STATUS_PROCESSING
-                && $event->updated_at?->gt(now()->subMinutes(10))) {
+                && $event->updated_at?->gt(now()->subMinutes(self::PROCESSING_LEASE_MINUTES))) {
                 return null;
             }
 

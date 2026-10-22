@@ -23,6 +23,7 @@ use App\Support\CsvExport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -195,8 +196,8 @@ class ContactController extends Controller
             'last_name' => ['nullable', 'string', 'max:120'],
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string', 'max:40'],
-            'company_id' => ['nullable', 'integer'],
-            'owner_id' => ['nullable', 'integer'],
+            'company_id' => ['nullable', 'integer', Rule::exists('companies', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
+            'owner_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
             'city' => ['nullable', 'string', 'max:80'],
             'wilaya' => ['nullable', 'string', 'max:80'],
             'source' => ['nullable', 'string', 'max:80'],
@@ -223,8 +224,8 @@ class ContactController extends Controller
             'last_name' => ['nullable', 'string', 'max:120'],
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string', 'max:40'],
-            'company_id' => ['nullable', 'integer'],
-            'owner_id' => ['nullable', 'integer'],
+            'company_id' => ['nullable', 'integer', Rule::exists('companies', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
+            'owner_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->where('workspace_id', $request->user()->workspace_id))],
             'city' => ['nullable', 'string', 'max:80'],
             'wilaya' => ['nullable', 'string', 'max:80'],
             'source' => ['nullable', 'string', 'max:80'],

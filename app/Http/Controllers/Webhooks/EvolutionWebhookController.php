@@ -37,6 +37,7 @@ class EvolutionWebhookController extends Controller
         EvolutionWebhookProcessor $processor,
         WebhookEndpointManager $endpoints,
     ): JsonResponse {
+        abort_if(strlen($request->getContent()) > 262144, 413, 'Webhook payload is too large.');
         $endpoint = $endpoints->resolve(WebhookEndpointManager::PROVIDER_EVOLUTION, $webhookKey);
         $workspace = $endpoint->workspace;
 

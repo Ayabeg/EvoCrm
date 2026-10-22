@@ -2,7 +2,9 @@
 
 namespace App\Services\Crm;
 
+use App\Models\Company;
 use App\Models\Contact;
+use App\Models\User;
 use App\Models\Workspace;
 use App\Support\AlgerianPhone;
 use Illuminate\Validation\ValidationException;
@@ -14,6 +16,8 @@ class ContactIdentity
      */
     public function findOrCreate(Workspace $workspace, array $attributes): Contact
     {
+        $this->assertWorkspaceRelationships($workspace, $attributes);
+
         $phone = AlgerianPhone::normalize($attributes['phone_e164'] ?? $attributes['phone'] ?? null);
         $email = isset($attributes['email']) ? strtolower(trim((string) $attributes['email'])) : null;
         $email = $email !== '' ? $email : null;
@@ -87,5 +91,31 @@ class ContactIdentity
         }
 
         return $this->findOrCreate($workspace, $attributes);
+    }
+
+    /**
+     * Relationship IDs arrive from public integrations as well as CRM forms.
+     * Validate them here so every caller gets the same workspace boundary.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    private function assertWorkspaceRelationships(Workspace $workspace, array $attributes): void
+    {
+        if (filled($attributes['company_id'] ?? null)
+            && ! Company::query()->forWorkspace($workspace)->whereKey($attributes['company_id'])->exists()) {
+            throw ValidationException::withMessages([
+                'company_id' => 'The selected company does not belong to this workspace.',
+            ]);
+        }
+
+        if (filled($attributes['owner_id'] ?? null)
+            && ! User::query()
+                ->where('workspace_id', $workspace->id)
+                ->whereKey($attributes['owner_id'])
+                ->exists()) {
+            throw ValidationException::withMessages([
+                'owner_id' => 'The selected owner does not belong to this workspace.',
+            ]);
+        }
     }
 }

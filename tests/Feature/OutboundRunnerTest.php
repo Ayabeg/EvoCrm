@@ -209,8 +209,9 @@ it('recovers stale outbound send claims for a safe retry', function () {
     ]);
 
     expect(app(OutboundSendClaim::class)->recoverStale($user->workspace))->toBe(1)
-        ->and($message->fresh()->status)->toBe('queued')
-        ->and($message->fresh()->sending_at)->toBeNull();
+        ->and($message->fresh()->status)->toBe('failed')
+        ->and($message->fresh()->sending_at)->toBeNull()
+        ->and($message->fresh()->failure_reason)->toContain('Provider outcome unknown');
 });
 
 it('pauses and resumes enrollments from the UI', function () {

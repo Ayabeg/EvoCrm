@@ -43,8 +43,12 @@ class OutboundSendClaim
         }
 
         return $query->update([
-            'status' => 'queued',
+            // A provider may have accepted the message before the worker
+            // crashed. Quarantine the outcome instead of risking a duplicate
+            // SMTP delivery on automatic recovery.
+            'status' => 'failed',
             'sending_at' => null,
+            'failure_reason' => 'Provider outcome unknown after the send lease expired; manual reconciliation required.',
         ]);
     }
 }

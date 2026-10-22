@@ -58,7 +58,7 @@ class QuoteAcceptanceController extends Controller
             ->where('public_token', $token)
             ->firstOrFail();
 
-        abort_unless($quote->tokenIsUsable() || $quote->accepted_at !== null, 404);
+        abort_unless($quote->tokenIsUsable(), 404);
 
         return $quote;
     }

@@ -7,6 +7,7 @@ use App\Models\OutboundMessage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\DB;
 
 class TrackingController extends Controller
 {
@@ -22,10 +23,12 @@ class TrackingController extends Controller
             ->first();
 
         if ($message) {
-            $message->forceFill([
-                'opened_at' => $message->opened_at ?? now(),
-                'open_count' => $message->open_count + 1,
-            ])->save();
+            DB::table('outbound_messages')
+                ->where('id', $message->id)
+                ->update([
+                    'opened_at' => DB::raw('COALESCE(opened_at, CURRENT_TIMESTAMP)'),
+                    'open_count' => DB::raw('COALESCE(open_count, 0) + 1'),
+                ]);
         }
 
         // 1x1 transparent GIF.
@@ -52,15 +55,24 @@ class TrackingController extends Controller
 
         $decoded = base64_decode(strtr((string) $request->query('u'), '-_', '+/'), true);
         $url = is_string($decoded) ? $decoded : '';
+        $signature = (string) $request->query('s');
 
         abort_unless($message, 404);
         abort_unless(preg_match('#^https?://#i', $url) === 1, 400);
+        abort_unless(hash_equals(self::destinationSignature($token, $url), $signature), 403);
 
-        $message->forceFill([
-            'clicked_at' => $message->clicked_at ?? now(),
-            'click_count' => $message->click_count + 1,
-        ])->save();
+        DB::table('outbound_messages')
+            ->where('id', $message->id)
+            ->update([
+                'clicked_at' => DB::raw('COALESCE(clicked_at, CURRENT_TIMESTAMP)'),
+                'click_count' => DB::raw('COALESCE(click_count, 0) + 1'),
+            ]);
 
         return redirect()->away($url);
+    }
+
+    public static function destinationSignature(string $token, string $url): string
+    {
+        return hash_hmac('sha256', $token.'|'.$url, (string) config('app.key'));
     }
 }

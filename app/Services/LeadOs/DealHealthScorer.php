@@ -21,6 +21,8 @@ use Illuminate\Support\Collection;
  */
 class DealHealthScorer
 {
+    public const MAX_OPEN_DEALS_PER_RUN = 500;
+
     public function __construct(private LlmClient $llm) {}
 
     /**
@@ -189,13 +191,14 @@ class DealHealthScorer
     /**
      * @return Collection<int, Deal>
      */
-    public function openDeals(Workspace $workspace): Collection
+    public function openDeals(Workspace $workspace, int $limit = self::MAX_OPEN_DEALS_PER_RUN): Collection
     {
         return Deal::query()
             ->forWorkspace($workspace)
             ->with(['stage', 'pipeline', 'contact'])
             ->whereHas('stage', fn ($query) => $query->where('is_won', false)->where('is_lost', false))
             ->orderBy('id')
+            ->limit(max(1, min($limit, self::MAX_OPEN_DEALS_PER_RUN)))
             ->get();
     }
 

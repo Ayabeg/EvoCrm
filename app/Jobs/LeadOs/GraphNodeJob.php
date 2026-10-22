@@ -44,8 +44,11 @@ abstract class GraphNodeJob implements ShouldQueue
 
         $run->recordNode($this->key(), GraphRun::NODE_PENDING);
 
+        $failed = false;
+
         try {
             $result = $this->runNode($workspace, $run);
+            $failed = ($result['status'] ?? GraphRun::NODE_FAILED) === GraphRun::NODE_FAILED;
             $run->recordNode(
                 $this->key(),
                 $result['status'] ?? GraphRun::NODE_FAILED,
@@ -53,7 +56,14 @@ abstract class GraphNodeJob implements ShouldQueue
                 $result['error'] ?? null,
             );
         } catch (Throwable $e) {
+            $failed = true;
             $run->recordNode($this->key(), GraphRun::NODE_FAILED, [], $e->getMessage());
+        }
+
+        if ($failed) {
+            $run->refresh()->finish();
+
+            return;
         }
 
         $next = $this->next();

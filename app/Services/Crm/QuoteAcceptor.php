@@ -26,6 +26,8 @@ class QuoteAcceptor
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            abort_unless($locked->tokenIsUsable(), 404);
+
             if ($locked->accepted_at) {
                 return null;
             }

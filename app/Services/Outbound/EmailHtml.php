@@ -2,6 +2,7 @@
 
 namespace App\Services\Outbound;
 
+use App\Http\Controllers\Public\TrackingController;
 use App\Models\OutboundMessage;
 
 /**
@@ -84,7 +85,8 @@ class EmailHtml
                 }
 
                 $tracked = route('outbound.track.click', $message->track_token)
-                    .'?u='.rtrim(strtr(base64_encode($url), '+/', '-_'), '=');
+                    .'?u='.rtrim(strtr(base64_encode($url), '+/', '-_'), '=')
+                    .'&s='.TrackingController::destinationSignature($message->track_token, $url);
 
                 return 'href="'.$tracked.'"';
             },
