@@ -58,6 +58,7 @@
 - Hardened trust boundaries after the security review: authenticated analytics events now ignore forged client distinct IDs; the OpenManus adapter fails closed with 503 when its bearer token is missing and 401 when invalid; outbound HTML previews use a sandboxed iframe. Targeted analytics/API/outbound coverage passes 34 tests / 214 assertions, Python AST parsing passes, and frontend type checking passes. Commit: `a65d66ba`.
 - Closed workflow webhook DNS rebinding by reusing public DNS validation and Guzzle address pinning before POST, with redirects disabled. Workflow/fetcher coverage passes 25 tests / 117 assertions. Commit: `6a76c1ba`.
 - Final focused acquisition regression after current-tree hardening passes 193 tests / 1,360 assertions. The scan's remaining open follow-ups are outbound consent policy, outbound bulk caps/queueing, Evolution payloads without provider identity, analytics consent, and full outbound-email HTML sanitization.
+- Closed the Evolution missing-identity replay gap: identity-less payloads now receive a canonical workspace/instance/event/payload hash before event and message persistence, so provider retries return the original message instead of repeating side effects. Evolution webhook coverage passes 4 tests / 13 assertions. Commit: `52470e36`.
 
 ### In progress
 
@@ -77,7 +78,7 @@
 
 - Live provider verification and live outbound delivery are blocked until the relevant external credentials/accounts are configured. Local adapters, validation, idempotency, and failure paths are not blocked.
 - Full-suite release verification is not green until the 13 existing UI/source-contract failures are resolved; none of the focused acquisition suites failed in the final verification.
-- The standard Codex Security scan is complete for the captured revision with 7 medium findings and partial coverage. Current-tree owner-assignment and workflow-DNS findings are remediated with regression evidence; the template preview is sandboxed but outbound email HTML sanitization remains open. The scan records open follow-ups for consent policy, outbound bulk bounds, Evolution payload identity, and analytics consent. The local ignored `.env` APP_KEY still requires deployment rotation. Live provider checks remain blocked.
+- The standard Codex Security scan is complete for the captured revision with 7 medium findings and partial coverage. Current-tree owner-assignment, workflow-DNS, and Evolution missing-identity findings are remediated with regression evidence; the template preview is sandboxed but outbound email HTML sanitization remains open. The scan records open follow-ups for consent policy, outbound bulk bounds, and analytics consent. The local ignored `.env` APP_KEY still requires deployment rotation. Live provider checks remain blocked.
 
 ### Next verified task
 
