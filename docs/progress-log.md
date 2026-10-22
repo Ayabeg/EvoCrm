@@ -132,6 +132,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Updated funnel fixtures that previously manually inserted rows already created by CRM observers, preserving the same reporting assertions under the new database invariant.
 - The focused funnel/acquisition set passes 18 tests / 139 assertions; the broader inbound, lead-magnet, funnel, booking, and outbound regression set passes 58 tests / 368 assertions. Pint and `git diff --check` pass.
 - Committed as `a561bdb0` (`fix: make subject funnel events race safe`).
+- Completed current acquisition diff-scoped Codex Security review `df528cd2-71b4-4b34-a846-e54a368f0cad` for `286f2634` through `5d125577`: complete coverage of the three changed security surfaces, zero reportable findings, and the historical duplicate-row migration preflight recorded as an operational limitation.
 
 ### Remaining
 
