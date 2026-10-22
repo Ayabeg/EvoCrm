@@ -113,6 +113,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - Tightened reply branching so only explicitly interested replies can take a configured positive branch; out-of-office and review-needed replies now pause the enrollment for human handling. The reply/runner/department regression set passes 35 tests / 199 assertions, and Pint passes.
 - Added bounded lead-magnet form-start analytics and an idempotent calculator-use event keyed to each submission. The public lead-magnet, inbound workflow, meeting attribution, and funnel-tracking subset passes 14 tests / 94 assertions; Pint, TypeScript, and the diff check pass.
 - Latest repository-wide regression after the outbound reply and lead-magnet analytics hardening: 1,338 tests, 1,324 passed, 13 unrelated UI/source-contract failures, 35,678 assertions, and 1 skipped. The acquisition integration subset remains green.
+- Completed acquisition diff-scoped Codex Security review `8ec3adf4-f42c-4c05-b806-d79d4ddb1d45` for `46661ae7` to `286f2634`: all seven changed security surfaces were reviewed with complete coverage and zero reportable findings. The scan covers public lead-magnet tracking, event persistence, stale outbound provider outcomes, reply automation branching, and the changed regression tests.
 
 ### Remaining
 

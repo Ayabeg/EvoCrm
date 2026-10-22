@@ -23,6 +23,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `git diff --check` passed.
 - Current-tree Codex Security standard review `013e6eaf-f741-4d08-ad0f-5ab2bef6f61b`: zero reportable findings across seven reviewed acquisition surfaces; coverage is explicitly partial and limitations are recorded by the scan.
 - Committed hardening diff review `8387f1e4-4aca-49d9-98e7-7621a3a338c1` for `29aad813` to `46661ae7`: zero reportable findings with complete coverage of five changed security surfaces. Live provider behavior, deployment secret rotation, and legal compliance remain external limitations.
+- Latest acquisition diff review `8ec3adf4-f42c-4c05-b806-d79d4ddb1d45` for `46661ae7` to `286f2634`: zero reportable findings with complete coverage of seven changed security surfaces, including public lead-magnet tracking, outbound stale-claim handling, and reply branching.
 
 ## Key implementation commits
 
@@ -35,6 +36,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `e8b37ceb` — quarantined unknown outbound provider outcomes across idempotent retries.
 - `61223d06` — paused non-positive reply branches, including out-of-office handling.
 - `9335676b` — persisted lead-magnet form-start and calculator-use engagement events.
+- `286f2634` — recorded the latest full regression evidence.
 
 ## Implemented but not fully verified
 
