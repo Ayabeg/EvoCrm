@@ -22,7 +22,7 @@ final class GooglePlacesClient
     }
 
     /**
-     * @return array{ok: bool, places?: list<array<string, mixed>>, error?: string, skipped?: bool}
+     * @return array{ok: bool, places?: list<array<string, mixed>>, error?: string, skipped?: bool, retryable?: bool}
      */
     public function searchText(string $query): array
     {
@@ -61,11 +61,17 @@ final class GooglePlacesClient
                     'pageSize' => 3,
                 ]);
         } catch (Throwable) {
-            return ['ok' => false, 'error' => 'Google Places request failed.'];
+            return ['ok' => false, 'error' => 'Google Places request failed.', 'retryable' => true];
         }
 
         if (! $response->successful()) {
-            return ['ok' => false, 'error' => 'Google Places returned HTTP '.$response->status().'.'];
+            $status = $response->status();
+
+            return [
+                'ok' => false,
+                'error' => 'Google Places returned HTTP '.$status.'.',
+                'retryable' => $status === 429 || $status >= 500,
+            ];
         }
 
         $places = $response->json('places');

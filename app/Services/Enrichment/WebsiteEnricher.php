@@ -47,6 +47,10 @@ class WebsiteEnricher
                 ['url' => $url],
             );
 
+            if (($fetched['retryable'] ?? false) === true) {
+                throw new TransientEnrichmentException($fetched['error'] ?? 'Website fetch failed.');
+            }
+
             return;
         }
 

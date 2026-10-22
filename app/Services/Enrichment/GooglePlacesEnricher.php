@@ -61,6 +61,10 @@ class GooglePlacesEnricher
                 ['query' => $query],
             );
 
+            if (($result['retryable'] ?? false) === true) {
+                throw new TransientEnrichmentException($result['error'] ?? 'Google Places lookup failed.');
+            }
+
             return;
         }
 

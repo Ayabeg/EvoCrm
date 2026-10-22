@@ -10,7 +10,7 @@ final class WebsiteFetcher
     /**
      * Fetch a public http(s) page. Private hosts are rejected (SSRF).
      *
-     * @return array{ok: bool, body?: string, error?: string, status?: int}
+     * @return array{ok: bool, body?: string, error?: string, status?: int, retryable?: bool}
      */
     public function get(string $url): array
     {
@@ -28,15 +28,18 @@ final class WebsiteFetcher
                 ])
                 ->withOptions(['allow_redirects' => ['max' => 2]])
                 ->get($normalized);
-        } catch (Throwable $e) {
-            return ['ok' => false, 'error' => 'Website fetch failed.'];
+        } catch (Throwable) {
+            return ['ok' => false, 'error' => 'Website fetch failed.', 'retryable' => true];
         }
 
         if (! $response->successful()) {
+            $status = $response->status();
+
             return [
                 'ok' => false,
-                'error' => 'Website returned HTTP '.$response->status().'.',
-                'status' => $response->status(),
+                'error' => 'Website returned HTTP '.$status.'.',
+                'status' => $status,
+                'retryable' => $status === 429 || $status >= 500,
             ];
         }
 

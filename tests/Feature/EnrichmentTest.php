@@ -9,6 +9,7 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Services\Enrichment\EnrichmentPersister;
 use App\Services\Enrichment\EnrichmentService;
+use App\Services\Enrichment\TransientEnrichmentException;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Http;
@@ -142,6 +143,33 @@ it('does not invent an email when the public page has none', function () {
 
     expect(EnrichmentRun::query()->where('field', 'email')->count())->toBe(0)
         ->and($company->fresh()->email ?? null)->toBeNull();
+});
+
+it('records transient provider failures and rethrows them for queue backoff', function () {
+    Http::preventStrayRequests();
+    Http::fake([
+        'https://clinic-atlas.dz' => Http::response('temporary outage', 503),
+        'https://clinic-atlas.dz/*' => Http::response('temporary outage', 503),
+    ]);
+
+    $user = User::factory()->create();
+    $company = Company::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'name' => 'Clinique Atlas',
+        'domain' => 'clinic-atlas.dz',
+    ]);
+
+    expect(fn () => app(EnrichmentService::class)->enrich(
+        $user->workspace,
+        EnrichmentRun::TARGET_COMPANY,
+        (int) $company->id,
+    ))->toThrow(TransientEnrichmentException::class);
+
+    expect(EnrichmentRun::query()
+        ->where('workspace_id', $user->workspace_id)
+        ->where('source', EnrichmentRun::SOURCE_WEBSITE)
+        ->where('status', EnrichmentRun::STATUS_FAILED)
+        ->value('error'))->toContain('HTTP 503');
 });
 
 it('does not overwrite a human-set field silently', function () {
