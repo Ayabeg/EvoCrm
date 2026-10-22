@@ -111,6 +111,10 @@ The outbound event payload may identify the message with `message_id` or recipie
 
 For manual enrichment maintenance, run `php artisan leads:enrich --stale-hours=168` from the web container. It queues stale contacts, companies, and leads for the database worker; use `--sync` only for controlled local verification. The worker must be running for queued enrichment, lead-magnet result delivery, and other background jobs.
 
+Contact CSV imports may contain incomplete business records. A row with a company or location signal is retained without fabricating contact data; after the import transaction, contacts missing email or phone are queued for enrichment. Re-imports use the stored import identity to avoid duplicating the same incomplete row. Blank or ambiguous rows remain in the import preview as row-level errors.
+
+The IMAP reply poller stores a conservative classification for each inbound reply. Explicit unsubscribe language creates a workspace suppression and stops follow-ups; `needs_review` and other non-suppression classifications are visible in Outbound → Replies for human handling. The poller marks mail seen only after CRM persistence and deduplicates provider message IDs/UID fallbacks.
+
 ## Environment requirements
 
 Required platform values:

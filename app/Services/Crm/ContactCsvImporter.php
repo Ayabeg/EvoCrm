@@ -2,9 +2,11 @@
 
 namespace App\Services\Crm;
 
+use App\Jobs\EnrichRecordJob;
 use App\Jobs\ProcessImportBatch;
 use App\Models\Company;
 use App\Models\Contact;
+use App\Models\EnrichmentRun;
 use App\Models\ImportBatch;
 use App\Models\ImportRow;
 use App\Models\User;
@@ -353,7 +355,7 @@ class ContactCsvImporter
         $decision = $this->decide($workspace, $row->raw ?? [], $batch->mapping ?? []);
 
         try {
-            DB::transaction(function () use ($batch, $row, $decision, $workspace): void {
+            $contact = DB::transaction(function () use ($batch, $row, $decision, $workspace): ?Contact {
                 $status = $decision['action'];
                 $contact = $decision['contact'];
 
@@ -381,7 +383,17 @@ class ContactCsvImporter
                 ])->save();
 
                 $batch->increment('processed_rows');
+
+                return $contact;
             });
+
+            if ($contact instanceof Contact && $this->needsEnrichment($contact)) {
+                EnrichRecordJob::dispatch(
+                    $workspace->id,
+                    EnrichmentRun::TARGET_CONTACT,
+                    (int) $contact->id,
+                );
+            }
         } catch (Throwable $exception) {
             $row->forceFill([
                 'status' => ImportRow::STATUS_ERROR,
@@ -442,12 +454,14 @@ class ContactCsvImporter
             return ['error' => 'Phone number could not be normalized.'];
         }
 
-        if ($email === null && $phone === null && $externalId === null) {
-            return ['error' => 'Row needs an email, phone, or external ID.'];
-        }
-
         $companyName = isset($values['company_name']) ? trim((string) $values['company_name']) : '';
         $ownerValue = isset($values['owner']) ? trim((string) $values['owner']) : '';
+        $city = filled($values['city'] ?? null) ? trim((string) $values['city']) : null;
+        $wilaya = filled($values['wilaya'] ?? null) ? trim((string) $values['wilaya']) : null;
+
+        if ($email === null && $phone === null && $externalId === null && $companyName === '' && $city === null && $wilaya === null) {
+            return ['error' => 'Row needs an email, phone, external ID, company name, city, or wilaya.'];
+        }
 
         return [
             'error' => null,
@@ -457,8 +471,8 @@ class ContactCsvImporter
             'email' => $email,
             'phone' => $phoneRaw !== '' ? $phoneRaw : $phone,
             'phone_e164' => $phone,
-            'city' => filled($values['city'] ?? null) ? trim((string) $values['city']) : null,
-            'wilaya' => filled($values['wilaya'] ?? null) ? trim((string) $values['wilaya']) : null,
+            'city' => $city,
+            'wilaya' => $wilaya,
             'source' => filled($values['source'] ?? null) ? trim((string) $values['source']) : 'import',
             'lead_status' => filled($values['lead_status'] ?? null) ? trim((string) $values['lead_status']) : null,
             'company_name' => $companyName !== '' ? $companyName : null,
@@ -515,10 +529,23 @@ class ContactCsvImporter
         }
 
         if (filled($values['phone_e164'] ?? null)) {
-            return Contact::query()
+            $match = Contact::query()
                 ->forWorkspace($workspace)
                 ->with('company')
                 ->where('phone_e164', $values['phone_e164'])
+                ->first();
+
+            if ($match) {
+                return $match;
+            }
+        }
+
+        $identity = $this->importIdentity($values);
+        if ($identity !== null) {
+            return Contact::query()
+                ->forWorkspace($workspace)
+                ->with('company')
+                ->where('meta->import_identity', $identity)
                 ->first();
         }
 
@@ -602,18 +629,29 @@ class ContactCsvImporter
         if ($contact) {
             $contact->fill($payload);
             $meta = $contact->meta ?? [];
+            $identity = $this->importIdentity($values);
+            if ($identity !== null) {
+                $meta['import_identity'] = $identity;
+            }
             if (filled($values['external_id'] ?? null)) {
                 $meta['external_id'] = $values['external_id'];
-                $contact->meta = $meta;
             }
+            $contact->meta = $meta !== [] ? $meta : null;
             $contact->save();
         } else {
+            $meta = [];
+            $identity = $this->importIdentity($values);
+            if ($identity !== null) {
+                $meta['import_identity'] = $identity;
+            }
+            if (filled($values['external_id'] ?? null)) {
+                $meta['external_id'] = $values['external_id'];
+            }
+
             $contact = Contact::query()->create([
                 ...$payload,
                 'workspace_id' => $workspace->id,
-                'meta' => filled($values['external_id'] ?? null)
-                    ? ['external_id' => $values['external_id']]
-                    : null,
+                'meta' => $meta !== [] ? $meta : null,
             ]);
         }
 
@@ -648,5 +686,38 @@ class ContactCsvImporter
                     ->orWhereRaw('lower(name) = ?', [$needle]);
             })
             ->first();
+    }
+
+    private function needsEnrichment(Contact $contact): bool
+    {
+        return blank($contact->email) || blank($contact->phone_e164);
+    }
+
+    /**
+     * Keep re-imports of incomplete rows idempotent without treating a name
+     * alone as a globally unique contact identity.
+     *
+     * @param  array<string, mixed>  $values
+     */
+    private function importIdentity(array $values): ?string
+    {
+        $identity = array_filter([
+            'external_id' => $values['external_id'] ?? null,
+            'email' => $values['email'] ?? null,
+            'phone' => $values['phone_e164'] ?? null,
+            'first_name' => $values['first_name'] ?? null,
+            'last_name' => $values['last_name'] ?? null,
+            'company_name' => $values['company_name'] ?? null,
+            'city' => $values['city'] ?? null,
+            'wilaya' => $values['wilaya'] ?? null,
+        ], fn ($value) => $value !== null && $value !== '');
+
+        if ($identity === []) {
+            return null;
+        }
+
+        ksort($identity);
+
+        return hash('sha256', json_encode($identity, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
 }

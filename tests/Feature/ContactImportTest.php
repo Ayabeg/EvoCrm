@@ -1,12 +1,16 @@
 <?php
 
 use App\Enums\WorkspaceRole;
+use App\Jobs\EnrichRecordJob;
 use App\Models\Contact;
 use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
+use App\Models\EnrichmentRun;
 use App\Models\ImportBatch;
 use App\Models\User;
+use App\Services\Crm\ContactCsvImporter;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 
 function contactImportCsv(string $contents, string $name = 'contacts.csv'): UploadedFile
 {
@@ -180,6 +184,67 @@ CSV;
 
     expect(Contact::query()->where('workspace_id', $owner->workspace_id)->count())->toBe(0)
         ->and($batch->fresh()->error_count)->toBe(1);
+});
+
+it('imports incomplete business rows and queues enrichment for missing contact data', function () {
+    Queue::fake();
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    $csv = <<<'CSV'
+First Name,Company Name,City
+Lina,Atlas Dental,Oran
+CSV;
+
+    $this->actingAs($owner)->post('/crm/contacts/import', [
+        'file' => contactImportCsv($csv),
+    ]);
+
+    $batch = ImportBatch::query()->first();
+
+    $this->actingAs($owner)
+        ->get("/crm/contacts/import/{$batch->id}")
+        ->assertInertia(fn ($page) => $page
+            ->where('batch.preview.created', 1)
+            ->where('batch.preview.errors', 0));
+
+    app(ContactCsvImporter::class)->process($batch);
+
+    $contact = Contact::query()
+        ->where('workspace_id', $owner->workspace_id)
+        ->where('first_name', 'Lina')
+        ->first();
+
+    expect($contact)->not->toBeNull()
+        ->and($contact->company?->name)->toBe('Atlas Dental')
+        ->and($contact->email)->toBeNull();
+
+    Queue::assertPushed(EnrichRecordJob::class, fn (EnrichRecordJob $job): bool => $job->workspaceId === $owner->workspace_id
+        && $job->targetType === EnrichmentRun::TARGET_CONTACT
+        && $job->targetId === $contact->id);
+});
+
+it('reimports the same incomplete business row without creating a duplicate', function () {
+    Queue::fake();
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    $csv = "First Name,Company Name,City\nLina,Atlas Dental,Oran\n";
+
+    $this->actingAs($owner)->post('/crm/contacts/import', [
+        'file' => contactImportCsv($csv),
+    ]);
+    $first = ImportBatch::query()->latest('id')->first();
+    app(ContactCsvImporter::class)->process($first);
+
+    $this->actingAs($owner)->post('/crm/contacts/import', [
+        'file' => contactImportCsv($csv),
+    ]);
+    $second = ImportBatch::query()->latest('id')->first();
+
+    expect($second->rows()->first()->preview_action)->toBe('skip');
+
+    app(ContactCsvImporter::class)->process($second);
+
+    expect(Contact::query()->where('workspace_id', $owner->workspace_id)->count())->toBe(1)
+        ->and($second->fresh()->created_count)->toBe(0)
+        ->and($second->fresh()->skipped_count)->toBe(1);
 });
 
 it('imports mapped custom attributes onto created contacts', function () {

@@ -23,6 +23,8 @@ class ImapReplyPoller
     public function __construct(
         private WorkflowRunner $workflows,
         private ProductAnalytics $analytics,
+        private ReplyClassifier $classifier,
+        private SuppressionService $suppressions,
     ) {}
 
     /**
@@ -143,6 +145,7 @@ class ImapReplyPoller
             ->first();
 
         $providerMessageId = trim((string) ($mail['message_id'] ?? ''));
+        $classification = $this->classifier->classify($mail['subject'] ?? null, $mail['body'] ?? null);
         $inbound = $providerMessageId !== ''
             ? OutboundMessage::query()
                 ->forWorkspace($mailbox->workspace_id)
@@ -165,7 +168,20 @@ class ImapReplyPoller
             'subject' => $mail['subject'] ?? null,
             'body' => mb_substr(trim((string) ($mail['body'] ?? '')), 0, 10000),
             'status' => 'received',
+            'reply_classification' => $classification['label'],
+            'reply_classification_confidence' => $classification['confidence'],
+            'reply_classified_at' => now(),
         ]);
+
+        if ($classification['label'] === ReplyClassifier::UNSUBSCRIBE && filled($contact->email)) {
+            $this->suppressions->suppress(
+                $mailbox->workspace,
+                'email',
+                (string) $contact->email,
+                'reply_unsubscribe',
+                'reply_classifier',
+            );
+        }
 
         if ($lastOutbound && ! $lastOutbound->replied_at) {
             $lastOutbound->forceFill(['replied_at' => now()])->save();
@@ -176,7 +192,9 @@ class ImapReplyPoller
                 'mailbox_id' => $mailbox->id,
             ], null, $contact->workspace ?? $mailbox->workspace);
 
-            if (! $this->branchEnrollmentOnReply($contact, $lastOutbound)) {
+            if ($classification['label'] === ReplyClassifier::UNSUBSCRIBE
+                || $classification['label'] === ReplyClassifier::NOT_INTERESTED
+                || ! $this->branchEnrollmentOnReply($contact, $lastOutbound)) {
                 $this->pauseEnrollmentOnReply($contact, $lastOutbound);
             }
         }

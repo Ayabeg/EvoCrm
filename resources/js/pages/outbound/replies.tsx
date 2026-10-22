@@ -13,6 +13,8 @@ type Reply = {
     id: number;
     subject?: string | null;
     body?: string | null;
+    reply_classification?: string | null;
+    reply_classification_confidence?: number | null;
     created_at: string;
     contact?: {
         id: number;
@@ -55,6 +57,13 @@ function replyContext(reply: Reply): CRMContextRecord | null {
         keyProperties: [
             { id: 'email', label: t('Email'), value: reply.contact.email ?? null },
             { id: 'subject', label: t('Subject'), value: reply.subject ?? null },
+            {
+                id: 'classification',
+                label: t('Classification'),
+                value: reply.reply_classification
+                    ? t(reply.reply_classification.replaceAll('_', ' '))
+                    : t('Needs review'),
+            },
             {
                 id: 'lead',
                 label: t('Lead'),
