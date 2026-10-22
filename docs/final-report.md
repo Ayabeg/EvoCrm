@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `46661ae7` (`main`; documentation follow-ups are in `22999dc3` and `500ca9b3`)
+Current implementation revision: `9335676b` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -10,12 +10,13 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Dead Enrichment ingestion, incomplete-row retention, normalization, duplicate-safe re-imports, provider evidence, verification-state projection, CRM detection, explainable data-quality scoring, bounded queueing, retries, and retry actions.
 - EvoCRM Outbound eligibility, suppression rechecks, explicit consent policy, template rendering, sanitized HTML, preview, campaign and sequence execution, quiet hours, mailbox caps, durable send claims, provider-event idempotency, reply classification, unsubscribe handling, and interested-reply tasks.
 - Durable campaign expansion for audiences over 1,000 contacts using resumable 250-contact cursor jobs and idempotent message creation.
-- Dead Magnet Lead Leakage Calculator, validation, duplicate-safe submission persistence, separate delivery/marketing/enrichment consent, shared CRM handoff, queued result delivery with honest failure states, demo handoff, booking attribution, and funnel analytics.
+- Dead Magnet Lead Leakage Calculator, validation, duplicate-safe submission persistence, separate delivery/marketing/enrichment consent, shared CRM handoff, queued result delivery with honest failure states, demo handoff, booking attribution, and persisted form-start, calculator-use, submission, demo-request, and booking funnel analytics.
 - Public analytics consent gating and pseudonymous authenticated analytics identity.
 
 ## Verification evidence
 
-- Focused acquisition regression: **207 tests / 1,440 assertions passed**.
+- Previous complete focused acquisition regression: **207 tests / 1,440 assertions passed**.
+- Latest post-hardening acquisition integration subset: **181 tests / 1,254 assertions passed**, including lead-magnet engagement tracking, reply safety, imports, enrichment, provider events, and outbound execution.
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
 - Current repository-wide regression: **1,335 tests; 1,321 passed; 13 existing UI/source-contract failures; 35,665 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
 - `npm run types:check` passed.
@@ -31,6 +32,9 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `0332daa5` — explicit outbound consent policy.
 - `02cac89f` — current release documentation and regression evidence.
 - `46661ae7` — reliability, public-endpoint, workspace-boundary, quote-token, and import concurrency hardening.
+- `e8b37ceb` — quarantined unknown outbound provider outcomes across idempotent retries.
+- `61223d06` — paused non-positive reply branches, including out-of-office handling.
+- `9335676b` — persisted lead-magnet form-start and calculator-use engagement events.
 
 ## Implemented but not fully verified
 
