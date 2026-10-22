@@ -20,6 +20,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Consent and outbound lifecycle regression: **39 tests / 216 assertions passed**.
 - Latest repository-wide regression: **1,338 tests; 1,324 passed; 13 existing UI/source-contract failures; 35,678 assertions; 1 skipped**. The 13 failures are outside the acquisition-system implementation.
 - `npm run types:check` passed.
+- Local browser smoke test passed for the public Lead Leakage Calculator at desktop and 390px mobile widths: the optional contact fields render as text/email controls, the page has no horizontal overflow, and the default calculator submission renders the result panel.
 - `git diff --check` passed.
 - Current-tree Codex Security standard review `013e6eaf-f741-4d08-ad0f-5ab2bef6f61b`: zero reportable findings across seven reviewed acquisition surfaces; coverage is explicitly partial and limitations are recorded by the scan.
 - Committed hardening diff review `8387f1e4-4aca-49d9-98e7-7621a3a338c1` for `29aad813` to `46661ae7`: zero reportable findings with complete coverage of five changed security surfaces. Live provider behavior, deployment secret rotation, and legal compliance remain external limitations.

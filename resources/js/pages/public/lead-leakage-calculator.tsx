@@ -155,9 +155,9 @@ export default function LeadLeakageCalculator({
                             <p className="text-sm font-medium text-ink">Optional: share this result with EvoCrm</p>
                             <p className="mt-1 text-xs leading-5 text-mute">This does not subscribe you to marketing. Marketing consent is a separate choice.</p>
                             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                                <Field label="Name" name="name" value={form.data.name} onChange={(value) => form.setData('name', value)} error={error('name')} required={false} />
+                                <Field label="Name" name="name" type="text" value={form.data.name} onChange={(value) => form.setData('name', value)} error={error('name')} required={false} />
                                 <Field label="Business email" name="email" type="email" value={form.data.email} onChange={(value) => form.setData('email', value)} error={error('email')} required={false} />
-                                <Field label="Clinic or business" name="company" value={form.data.company} onChange={(value) => form.setData('company', value)} error={error('company')} required={false} />
+                                <Field label="Clinic or business" name="company" type="text" value={form.data.company} onChange={(value) => form.setData('company', value)} error={error('company')} required={false} />
                             </div>
                             <label className="mt-4 flex items-start gap-2 text-xs leading-5 text-mute">
                                 <input
