@@ -141,7 +141,7 @@ class AppServiceProvider extends ServiceProvider
                 $analytics = app(ProductAnalytics::class);
                 $analytics->identify($user, $user->workspace);
                 $analytics->capture(ProductAnalytics::USER_LOGGED_IN, [
-                    'email' => $user->email,
+                    'role' => $user->role->value,
                 ], $user, $user->workspace);
                 if ($user->workspace) {
                     app(AuditLogger::class)->record(

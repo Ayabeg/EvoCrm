@@ -51,10 +51,13 @@ it('redacts secrets from posthog payloads', function () {
 
 it('does not boot the frontend client when inertia says disabled', function () {
     $source = file_get_contents(resource_path('js/lib/posthog.ts'));
+    $identity = file_get_contents(resource_path('js/components/posthog-identity.tsx'));
 
     expect($source)->toContain('config.enabled === false')
         ->and($source)->toContain('capture_exceptions: true')
-        ->and($source)->toContain('before_send');
+        ->and($source)->toContain('before_send')
+        ->and($identity)->toContain('evocrm.analytics_consent')
+        ->and($identity)->toContain("consent !== 'granted'");
 });
 
 it('does not send direct user identity PII unless explicitly enabled', function () {

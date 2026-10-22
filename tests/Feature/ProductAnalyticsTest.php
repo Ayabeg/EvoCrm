@@ -125,7 +125,8 @@ it('identifies the user and records login on the workspace group', function () {
     $login = $analytics->last(ProductAnalytics::USER_LOGGED_IN);
 
     expect($login['distinctId'])->toBe((string) $user->id)
-        ->and($login['groups']['workspace'])->toBe((string) $user->workspace_id);
+        ->and($login['groups']['workspace'])->toBe((string) $user->workspace_id)
+        ->and($login['properties'])->not->toHaveKey('email');
 });
 
 it('records workspace created when a workspace is provisioned', function () {
