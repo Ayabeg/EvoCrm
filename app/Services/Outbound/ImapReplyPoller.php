@@ -49,7 +49,7 @@ class ImapReplyPoller
             $mailboxDsn,
             (string) $mailbox->imap_username,
             (string) $mailbox->imap_password,
-            OP_READONLY,
+            0,
         );
 
         if (! $stream) {
@@ -80,6 +80,12 @@ class ImapReplyPoller
             }
 
             $this->recordReply($mailbox, $contact, $stream, $uid);
+            // Only mark a message seen after its CRM record is persisted. If
+            // the flag operation fails, the provider message ID/UID fallback
+            // still makes the next poll idempotent.
+            if (function_exists('imap_setflag_full')) {
+                @imap_setflag_full($stream, (string) $uid, '\\Seen', ST_UID);
+            }
             $replies++;
         }
 
@@ -111,6 +117,7 @@ class ImapReplyPoller
         $subject = isset($header->subject) ? $this->decodeHeader($header->subject) : null;
         $body = imap_body($stream, $uid, FT_UID | FT_PEEK);
         $messageId = isset($header->message_id) ? trim((string) $header->message_id) : null;
+        $messageId = $messageId !== '' ? $messageId : "imap:{$mailbox->id}:{$uid}";
 
         $this->recordContactReply($mailbox, $contact, [
             'subject' => $subject,
@@ -135,7 +142,17 @@ class ImapReplyPoller
             ->latest('sent_at')
             ->first();
 
-        $inbound = OutboundMessage::query()->create([
+        $providerMessageId = trim((string) ($mail['message_id'] ?? ''));
+        $inbound = $providerMessageId !== ''
+            ? OutboundMessage::query()
+                ->forWorkspace($mailbox->workspace_id)
+                ->where('mailbox_id', $mailbox->id)
+                ->where('direction', 'in')
+                ->where('message_id', $providerMessageId)
+                ->first()
+            : null;
+
+        $inbound ??= OutboundMessage::query()->create([
             'workspace_id' => $mailbox->workspace_id,
             'contact_id' => $contact->id,
             'mailbox_id' => $mailbox->id,
@@ -143,7 +160,7 @@ class ImapReplyPoller
             'channel' => 'email',
             'direction' => 'in',
             'to_address' => $mailbox->from_address,
-            'message_id' => $mail['message_id'] ?? null,
+            'message_id' => $providerMessageId !== '' ? $providerMessageId : null,
             'in_reply_to' => $lastOutbound?->id,
             'subject' => $mail['subject'] ?? null,
             'body' => mb_substr(trim((string) ($mail['body'] ?? '')), 0, 10000),

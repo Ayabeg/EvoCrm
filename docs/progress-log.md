@@ -37,6 +37,7 @@
 - Security review found and fixed spreadsheet formula injection in contact and deal CSV exports. String cells beginning with `=`, `+`, `-`, or `@` are prefixed before export while numeric values remain numeric; contact/deal export regression coverage passes 13 tests / 101 assertions.
 - Added an idempotent outbound provider-event ledger covering delivery, bounce, and complaint webhooks. Delivery timestamps and complaint timestamps are projected onto outbound messages; complaints and hard bounces suppress the address and pause the related active sequence enrollment. The combined outbound lifecycle regression passes 36 tests / 282 assertions; frontend typecheck, targeted ESLint, and Pint pass.
 - Bounded broadcast audience preview and expansion with 250-contact `chunkById` pages, preserving the existing idempotent message creation and eligibility checks for large lists. The campaign regression passes 18 tests / 130 assertions, including a 251-contact boundary case; Pint passes.
+- Hardened IMAP reply ingestion: provider message IDs and stable mailbox/UID fallbacks now deduplicate repeated polls, inbound identity has a database uniqueness constraint, and messages are marked seen only after CRM persistence. Reply/acquisition coverage passes 6 tests / 28 assertions; the post-migration reply subset passes 2 tests / 17 assertions and Pint passes.
 
 ### In progress
 

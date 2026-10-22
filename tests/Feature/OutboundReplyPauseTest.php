@@ -54,7 +54,13 @@ it('pauses the sequence enrollment when IMAP records a reply', function () {
         'sent_at' => now()->subHour(),
     ]);
 
-    app(ImapReplyPoller::class)->recordContactReply($mailbox, $contact, [
+    $reply = app(ImapReplyPoller::class)->recordContactReply($mailbox, $contact, [
+        'subject' => 'Re: Hello',
+        'body' => 'Thanks — interested.',
+        'message_id' => '<reply-1@clinic.dz>',
+    ]);
+
+    $duplicate = app(ImapReplyPoller::class)->recordContactReply($mailbox, $contact, [
         'subject' => 'Re: Hello',
         'body' => 'Thanks — interested.',
         'message_id' => '<reply-1@clinic.dz>',
@@ -62,9 +68,14 @@ it('pauses the sequence enrollment when IMAP records a reply', function () {
 
     expect($enrollment->refresh()->status)->toBe('paused')
         ->and($enrollment->next_run_at)->toBeNull()
+        ->and($duplicate->id)->toBe($reply->id)
         ->and(OutboundMessage::query()
             ->where('contact_id', $contact->id)
             ->where('direction', 'out')
             ->whereNotNull('replied_at')
-            ->exists())->toBeTrue();
+            ->exists())->toBeTrue()
+        ->and(OutboundMessage::query()
+            ->where('contact_id', $contact->id)
+            ->where('direction', 'in')
+            ->count())->toBe(1);
 });
