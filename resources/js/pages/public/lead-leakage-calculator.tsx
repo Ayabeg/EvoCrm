@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Button } from '@/evo/ui/button';
 import { Input } from '@/evo/ui/input';
@@ -37,6 +37,26 @@ function submissionKey(): string {
     return crypto.randomUUID();
 }
 
+function initialInputs(): Inputs {
+    return {
+        submission_key: submissionKey(),
+        monthly_inquiries: '40',
+        average_customer_value: '50000',
+        inquiry_to_customer_rate: '20',
+        missed_inquiry_rate: '10',
+        delayed_response_rate: '15',
+        follow_up_dropoff_rate: '20',
+        name: '',
+        email: '',
+        company: '',
+        marketing_consent: false,
+        enrichment_consent: false,
+        utm_source: '',
+        utm_medium: '',
+        utm_campaign: '',
+    };
+}
+
 function currency(value: number): string {
     return new Intl.NumberFormat('fr-DZ', {
         style: 'currency',
@@ -63,23 +83,8 @@ export default function LeadLeakageCalculator({
         delivery_error: string | null;
     } | null;
 }) {
-    const form = useForm<Inputs>({
-        submission_key: submissionKey(),
-        monthly_inquiries: '40',
-        average_customer_value: '50000',
-        inquiry_to_customer_rate: '20',
-        missed_inquiry_rate: '10',
-        delayed_response_rate: '15',
-        follow_up_dropoff_rate: '20',
-        name: '',
-        email: '',
-        company: '',
-        marketing_consent: false,
-        enrichment_consent: false,
-        utm_source: '',
-        utm_medium: '',
-        utm_campaign: '',
-    });
+    const form = useForm<Inputs>(initialInputs);
+    const [showResult, setShowResult] = useState(Boolean(result));
 
     const formStarted = useRef(false);
     const trackFormStart = () => {
@@ -98,8 +103,17 @@ export default function LeadLeakageCalculator({
         event.preventDefault();
         form.post(`/lead-magnet/${workspace.slug}/${offer.slug}`, {
             preserveScroll: true,
-            onSuccess: () => form.setData('submission_key', submissionKey()),
+            onSuccess: () => {
+                form.setData('submission_key', submissionKey());
+                setShowResult(true);
+            },
         });
+    };
+
+    const resetForm = () => {
+        form.clearErrors();
+        form.setData(initialInputs());
+        setShowResult(false);
     };
 
     const error = (field: keyof Inputs): string | undefined => form.errors[field];
@@ -179,14 +193,19 @@ export default function LeadLeakageCalculator({
                             </label>
                         </div>
 
-                        <Button type="submit" disabled={form.processing} className="w-full">
-                            {form.processing ? 'Calculating…' : 'Calculate my estimate'}
-                        </Button>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                            <Button type="button" variant="outline" disabled={form.processing} onClick={resetForm}>
+                                Reset inputs
+                            </Button>
+                            <Button type="submit" disabled={form.processing}>
+                                {form.processing ? 'Calculating…' : 'Calculate my estimate'}
+                            </Button>
+                        </div>
                         <p className="text-center text-[11px] leading-4 text-mute">Estimate only. Your inputs are assumptions, not measured results.</p>
                     </form>
                 </section>
 
-                {result ? (
+                {showResult && result ? (
                     <section className="mt-10 rounded-2xl border border-accent/30 bg-accent/5 p-5 sm:p-7" aria-live="polite">
                         <div className="flex flex-wrap items-start justify-between gap-4">
                             <div>
