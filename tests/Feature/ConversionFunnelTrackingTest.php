@@ -8,6 +8,7 @@ use App\Models\FunnelEvent;
 use App\Models\Lead;
 use App\Models\User;
 use App\Services\Funnels\FunnelEventRecorder;
+use Illuminate\Support\Facades\Schema;
 
 it('records order_placed when a deal is created', function () {
     $user = User::factory()->create();
@@ -169,4 +170,33 @@ it('dedupes funnel events for the same deal and event type', function () {
                 ->where('deal_id', $deal->id)
                 ->count()
         )->toBe(1);
+});
+
+it('fails the funnel uniqueness migration before changing schema when historical duplicates exist', function () {
+    $user = User::factory()->create();
+    $workspace = $user->workspace;
+    $funnel = $workspace->conversionFunnels()->where('is_default', true)->firstOrFail();
+    $identity = [
+        'workspace_id' => $workspace->id,
+        'conversion_funnel_id' => $funnel->id,
+        'event_type' => FunnelEvent::TYPE_CONFIRMED,
+        'subject_type' => Deal::class,
+        'subject_id' => 987654,
+    ];
+
+    Schema::table('funnel_events', function ($table): void {
+        $table->dropUnique('funnel_events_subject_event_unique');
+    });
+
+    FunnelEvent::query()->create(array_merge($identity, [
+        'occurred_at' => now(),
+    ]));
+    FunnelEvent::query()->create(array_merge($identity, [
+        'occurred_at' => now(),
+    ]));
+
+    $migration = include base_path('database/migrations/2026_10_22_190000_add_funnel_event_subject_unique.php');
+
+    expect(fn () => $migration->up())
+        ->toThrow(RuntimeException::class, 'duplicate subject-scoped funnel events exist');
 });
