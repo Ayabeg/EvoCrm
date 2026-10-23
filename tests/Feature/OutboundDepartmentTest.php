@@ -346,6 +346,23 @@ it('queues durable expansion for audiences larger than one thousand contacts', f
         ->and(OutboundMessage::query()->where('campaign_id', $campaign->id)->count())->toBe(250);
 });
 
+it('redacts terminal errors from durable campaign expansion', function () {
+    $user = User::factory()->create();
+    $campaign = OutboundCampaign::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'status' => OutboundCampaign::STATUS_EXPANDING,
+    ]);
+
+    (new ExpandOutboundCampaign($campaign->id))->failed(
+        new RuntimeException('Expansion failed for owner@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value'),
+    );
+
+    expect($campaign->fresh()->status)->toBe(OutboundCampaign::STATUS_CANCELLED)
+        ->and($campaign->fresh()->expansion_error)->not->toContain('owner@clinic.dz')
+        ->and($campaign->fresh()->expansion_error)->not->toContain('https://provider.example.test')
+        ->and($campaign->fresh()->expansion_error)->not->toContain('Bearer secret-value');
+});
+
 it('cancels a sending campaign and drops its queued messages', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\OutboundCampaign;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use App\Services\Outbound\CampaignService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -56,7 +57,9 @@ class ExpandOutboundCampaign implements ShouldBeUnique, ShouldQueue
             ->where('status', OutboundCampaign::STATUS_EXPANDING)
             ->update([
                 'status' => OutboundCampaign::STATUS_CANCELLED,
-                'expansion_error' => mb_substr($exception?->getMessage() ?: 'Campaign expansion worker failed.', 0, 500),
+                'expansion_error' => app(WorkflowExecutionRedactor::class)->redactError(
+                    $exception?->getMessage() ?: 'Campaign expansion worker failed.',
+                ),
             ]);
     }
 }

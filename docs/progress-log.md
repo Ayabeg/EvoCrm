@@ -1,5 +1,18 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — durable expansion diagnostic redaction
+
+### Completed / verified
+
+- Reused the shared workflow redaction contract for terminal `ExpandOutboundCampaign` failures, so 50k-scale cursor workers no longer persist recipient addresses, provider URLs, or authorization tokens in `expansion_error`.
+- Added a regression covering the terminal failure callback and the existing bounded 250-contact expansion path.
+- The focused outbound expansion/redaction gate passes **28 tests / 185 assertions**; Pint, PHP syntax, and `git diff --check` pass.
+- The connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **114 tests / 807 assertions**; `npm run types:check` and targeted Pint pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — evidence-aware outbound reporting
 
 ### Completed / verified
