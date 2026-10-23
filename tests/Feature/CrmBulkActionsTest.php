@@ -1,12 +1,16 @@
 <?php
 
 use App\Enums\WorkspaceRole;
+use App\Jobs\ProcessBulkAction;
+use App\Models\BulkActionRun;
 use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Enrollment;
 use App\Models\Sequence;
 use App\Models\User;
+use App\Services\Crm\BulkActionRunner;
 use App\Services\Identity\WorkspaceProvisioner;
+use Illuminate\Support\Facades\DB;
 
 function seedBulkWorkspace(User $user): void
 {
@@ -115,4 +119,45 @@ it('safely deletes only workspace-scoped records', function () {
 
     expect(Contact::query()->find($mine->id))->toBeNull()
         ->and(Contact::query()->find($other->id))->not->toBeNull();
+});
+
+it('redacts bulk worker and row diagnostics before persistence', function () {
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    $run = BulkActionRun::query()->create([
+        'workspace_id' => $owner->workspace_id,
+        'user_id' => $owner->id,
+        'entity' => 'contact',
+        'action' => 'delete',
+        'status' => BulkActionRun::STATUS_PROCESSING,
+        'total' => 1,
+        'payload' => ['ids' => [999]],
+    ]);
+    $exceptionMessage = 'Bulk action failed for owner@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value';
+
+    (new ProcessBulkAction($run->id))->failed(new RuntimeException($exceptionMessage));
+
+    expect($run->fresh()->error_summary)
+        ->not->toContain('owner@clinic.dz')
+        ->not->toContain('https://provider.example.test')
+        ->not->toContain('Bearer secret-value');
+
+    $rowRun = BulkActionRun::query()->create([
+        'workspace_id' => $owner->workspace_id,
+        'user_id' => $owner->id,
+        'entity' => 'contact',
+        'action' => 'delete',
+        'status' => BulkActionRun::STATUS_QUEUED,
+        'total' => 1,
+        'payload' => ['ids' => [999]],
+    ]);
+
+    DB::shouldReceive('transaction')->once()->andThrow(new RuntimeException($exceptionMessage));
+
+    app(BulkActionRunner::class)->process($rowRun);
+
+    $rowError = $rowRun->fresh()->rows()->first()->error_message;
+    expect($rowError)
+        ->not->toContain('owner@clinic.dz')
+        ->not->toContain('https://provider.example.test')
+        ->not->toContain('Bearer secret-value');
 });

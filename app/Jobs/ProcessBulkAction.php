@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\BulkActionRun;
 use App\Services\Crm\BulkActionRunner;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
@@ -34,7 +35,13 @@ class ProcessBulkAction implements ShouldQueue
             ->whereNotIn('status', [BulkActionRun::STATUS_COMPLETED, BulkActionRun::STATUS_FAILED])
             ->update([
                 'status' => BulkActionRun::STATUS_FAILED,
-                'error_summary' => mb_substr($exception?->getMessage() ?: 'Bulk action worker failed.', 0, 500),
+                'error_summary' => mb_substr(
+                    app(WorkflowExecutionRedactor::class)->redactError(
+                        $exception?->getMessage() ?: 'Bulk action worker failed.',
+                    ),
+                    0,
+                    500,
+                ),
             ]);
     }
 }
