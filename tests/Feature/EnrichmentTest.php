@@ -115,6 +115,31 @@ it('persists website and places runs with confidence and auto-applies empty high
         && str_contains((string) $request->body(), 'Clinique Atlas'));
 });
 
+it('redacts provider errors before persisting enrichment history', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'owner@clinic.dz',
+    ]);
+
+    $run = app(EnrichmentPersister::class)->persistFailure(
+        $user->workspace,
+        EnrichmentRun::TARGET_CONTACT,
+        $contact->id,
+        EnrichmentRun::SOURCE_EMAIL_VERIFICATION,
+        'email',
+        'Provider failed for owner@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value',
+        ['provider' => 'test'],
+        $contact->email,
+        EnrichmentRun::VERIFICATION_TEMPORARY_FAILURE,
+    );
+
+    expect($run->error)
+        ->not->toContain('owner@clinic.dz')
+        ->not->toContain('https://provider.example.test')
+        ->not->toContain('Bearer secret-value');
+});
+
 it('bounds queued enrichment and prevents duplicate record overlap', function () {
     $job = new EnrichRecordJob(17, EnrichmentRun::TARGET_COMPANY, 42);
     $middleware = $job->middleware();

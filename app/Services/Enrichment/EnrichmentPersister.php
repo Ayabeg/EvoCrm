@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\EnrichmentRun;
 use App\Models\Lead;
 use App\Models\Workspace;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use App\Support\AlgerianPhone;
 use App\Support\AlgerianWilaya;
 use Illuminate\Support\Carbon;
@@ -83,7 +84,7 @@ class EnrichmentPersister
             'evidence_url' => $evidenceUrl ?: $this->evidenceUrl($raw),
             'retrieved_at' => $retrievedAt ?? now(),
             'verified_at' => $verificationStatus === EnrichmentRun::VERIFICATION_VERIFIED ? ($retrievedAt ?? now()) : null,
-            'error' => $error,
+            'error' => $this->safeError($error),
         ]);
 
         if ($field === 'email') {
@@ -117,7 +118,7 @@ class EnrichmentPersister
             'status' => EnrichmentRun::STATUS_SKIPPED,
             'verification_status' => EnrichmentRun::VERIFICATION_UNKNOWN,
             'retrieved_at' => now(),
-            'error' => $error,
+            'error' => $this->safeError($error),
         ]);
     }
 
@@ -147,7 +148,7 @@ class EnrichmentPersister
             'status' => EnrichmentRun::STATUS_FAILED,
             'verification_status' => $this->normalizeVerificationStatus($verificationStatus),
             'retrieved_at' => now(),
-            'error' => $error,
+            'error' => $this->safeError($error),
         ]);
 
         if ($field === 'email' && $value !== null) {
@@ -165,6 +166,13 @@ class EnrichmentPersister
             EnrichmentRun::TARGET_LEAD => Lead::query()->forWorkspace($workspace)->with('contact')->findOrFail($targetId),
             default => throw new \InvalidArgumentException('Unknown enrichment target type.'),
         };
+    }
+
+    private function safeError(?string $error): ?string
+    {
+        return $error === null
+            ? null
+            : mb_substr(app(WorkflowExecutionRedactor::class)->redactError($error), 0, 500);
     }
 
     /**
