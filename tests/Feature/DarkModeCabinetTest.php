@@ -22,7 +22,7 @@ it('keeps the light cabinet lock and only paints the dark cabinet', function () 
 
     $evo = file_get_contents(resource_path('js/evo/tokens/evo.css'));
 
-    expect($evo)->toContain('--evo-primary: #ec6025')
+    expect($evo)->toContain('--evo-primary: #f05a28')
         ->and($evo)->toContain('--evo-teal: #0f4c5c')
         ->and($evo)->toContain('--evo-focus: #5eb0c0')
         ->and($shell)->toContain('background: var(--evo-canvas)');
@@ -46,7 +46,7 @@ it('ships a no-flash appearance script on the Blade root and design-lab', functi
         ->and($root)->toContain('classList.toggle(\'dark\'')
         ->and($root)->toContain("setAttribute('data-theme'")
         ->and($root)->toContain('html.dark')
-        ->and($root)->toContain('#0A0A0A');
+        ->and($root)->toContain('#050505');
 
     expect($lab)->toContain('localStorage.getItem(\'appearance\')')
         ->and($lab)->toContain('document.cookie.match')

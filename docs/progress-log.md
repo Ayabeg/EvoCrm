@@ -1,5 +1,19 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — repository-wide regression restored
+
+### Completed / verified
+
+- Synchronized the repository's branding, shell-frame, dark-cabinet, and canonical-token tests with the shipped EvoCRM shell redesign: `GlobalHeader`, the `#FBFBF9`/`#050505` cabinet palette, 224/56 rail sizing, and 36px navigation rows.
+- Replaced the remaining hardcoded `Facebook` and `Instagram` contact-source labels with the shared translation helper.
+- The full PHP suite is green at **1,382 tests; 1,381 passed; 36,054 assertions; 1 skipped**. The only output remains the two existing ineffective `InvalidArgumentException` import warnings.
+- The focused shell/design/localization regression passes **52 tests / 560 assertions**, the focused token/localization regression passes **28 tests / 19,923 assertions**, and Prettier, ESLint, Pint, and `git diff --check` pass.
+- The connected acquisition/inbound/enrichment/outbound/funnel/scoring gate remains green at **173 tests / 1,217 assertions**. The supplied 50k lead-generation repository remains reference-only; its n8n/Airtable/Apify/Gemini implementation was not imported.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, and legal sign-off for consentless cold outreach remain external release gates.
+
 ## 2026-10-23 — cumulative full regression audit
 
 ### Completed / verified

@@ -37,6 +37,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Lead-capture merge exceptions now use the same redaction contract before `LeadCapture.error` persistence.
 - Public URL-capture and Meta webhook worker exceptions now use the same redaction contract before persistence.
 - Scheduled-report delivery failures now use the same redaction contract before `ScheduledReport.last_error` persistence.
+- The repository-wide branding, shell-frame, dark-cabinet, canonical-token, and localization contracts now match the shipped EvoCRM shell; contact-source labels use the shared translation helper.
 
 ## Verification evidence
 
@@ -80,6 +81,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Current full PHP regression: **1,371 tests; 1,362 passed; 8 failures; 35,929 assertions; 1 skipped**. The 115-test acquisition gate remains green; the repository-wide suite is not yet release-green because of the known unrelated contract failures.
 - Latest full PHP regression after resumable import queue pages: **1,373 tests; 1,364 passed; 8 known unrelated branding/design-system/automation failures; 35,937 assertions; 1 skipped**. The two existing `InvalidArgumentException` import warnings remain unchanged; the connected acquisition gate remains green at **132 tests / 970 assertions**.
 - Latest cumulative full PHP regression after diagnostic hardening: **1,382 tests; 1,373 passed; 8 known unrelated branding/design-system/automation failures; 35,987 assertions; 1 skipped**. The two existing `InvalidArgumentException` import warnings remain unchanged; the connected acquisition gate remains green at **173 tests / 1,217 assertions**.
+- Latest full PHP regression after synchronizing the shipped shell/design contracts: **1,382 tests; 1,381 passed; 36,054 assertions; 1 skipped**. The two existing ineffective `InvalidArgumentException` import warnings remain unchanged; the connected acquisition gate remains green at **173 tests / 1,217 assertions**. Prettier, ESLint, Pint, and `git diff --check` also pass.
 - Contact/deal import diagnostics now redact terminal worker errors; the focused import/redaction gate passes **18 tests / 168 assertions**, and the connected acquisition gate including imports passes **131 tests / 966 assertions**.
 - Resumable import queue pages and diagnostic redaction: the focused import/redaction gate passes **23 tests / 192 assertions**, and the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **135 tests / 987 assertions**. Pint, PHP syntax, and `git diff --check` pass, including 101-row deal-import continuation, stale-worker replay, and row-level exception redaction.
 - Production Vite build passed after the outbound reporting and scoring UI changes; existing font fallback, chunk-size, and ineffective dynamic-import warnings remain.

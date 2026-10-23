@@ -24,7 +24,7 @@ it('renders login with the EvoCrm lockup', function () {
     $this->get(route('login'))
         ->assertOk()
         ->assertSee('/brand/evocrm/logo.svg', false)
-        ->assertSee('#F7F8F5', false);
+        ->assertSee('#FBFBF9', false);
 
     expect(file_get_contents(resource_path('js/pages/auth/auth-screen.tsx')))
         ->toContain('EvoCrm')

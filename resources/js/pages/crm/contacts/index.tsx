@@ -314,8 +314,8 @@ function ContactCreateForm({
                             <option value="">{t('Unknown')}</option>
                             <option value="website">{t('Website')}</option>
                             <option value="referral">{t('Referral')}</option>
-                            <option value="facebook">Facebook</option>
-                            <option value="instagram">Instagram</option>
+                            <option value="facebook">{t('Facebook')}</option>
+                            <option value="instagram">{t('Instagram')}</option>
                             <option value="whatsapp">WhatsApp</option>
                             <option value="phone">{t('Phone')}</option>
                             <option value="event">{t('Event')}</option>

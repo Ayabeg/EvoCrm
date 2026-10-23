@@ -6,12 +6,14 @@ it('does not mount .app-topbar in the live layout', function () {
     $layout = file_get_contents(resource_path('js/layouts/app/app-sidebar-layout.tsx'));
     $shell = file_get_contents(resource_path('js/components/shell/evo-shell.tsx'));
     $rail = file_get_contents(resource_path('js/components/shell/evo-rail.tsx'));
+    $header = file_get_contents(resource_path('js/components/shell/global-header.tsx'));
 
     expect($layout)->not->toContain('AppSidebarHeader')
         ->and($layout)->not->toContain('app-topbar')
         ->and($shell)->not->toContain('app-topbar')
         ->and($rail)->not->toContain('app-topbar')
-        ->and($shell)->toContain('evo-mobile-header');
+        ->and($shell)->toContain('<GlobalHeader />')
+        ->and($header)->toContain('<SidebarTrigger');
 });
 
 it('locks one width system: 224 expanded / 56 icon rail', function () {
@@ -21,8 +23,8 @@ it('locks one width system: 224 expanded / 56 icon rail', function () {
 
     expect($tokens)->toContain('--evo-rail: 224px')
         ->and($tokens)->toContain('--evo-rail-collapsed: 56px')
-        ->and($tokens)->toContain('--evo-sidebar: #f0f2ee')
-        ->and($tokens)->toContain('--evo-nav-item: 32px')
+        ->and($tokens)->toContain('--evo-sidebar: #ffffff')
+        ->and($tokens)->toContain('--evo-nav-item: 36px')
         ->and($css)->toContain('width: var(--evo-rail)')
         ->and($css)->toContain('width: var(--evo-rail-collapsed)')
         ->and($css)->not->toContain('width: 212px')
