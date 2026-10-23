@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `aaa61631` (`main`; release report is maintained in subsequent documentation commits)
+Current implementation revision: `a946078f` (`main`; release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -117,6 +117,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `45aae861` — redacted lead-magnet delivery diagnostics before persistence.
 - `94d08465` — redacted durable campaign-expansion diagnostics before persistence.
 - `aaa61631` — throttled public lead-magnet landing-page visits and added route coverage.
+- `a946078f` — redacted contact/deal import and import-worker diagnostics before persistence.
 
 ## Implemented but not fully verified
 
