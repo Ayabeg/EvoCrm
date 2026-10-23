@@ -1,5 +1,17 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — current full regression audit
+
+### Completed / verified
+
+- Re-ran the full PHP suite after the latest public-endpoint hardening: **1,371 tests; 1,362 passed; 8 failures; 35,929 assertions; 1 skipped**.
+- The connected acquisition/inbound/enrichment/outbound/funnel/scoring gate remains green at **115 tests / 808 assertions**, so the full-suite failures remain outside that acquisition gate and are recorded as repository-level release limitations.
+- The two existing `InvalidArgumentException` import warnings remain unchanged.
+
+### Remaining
+
+- Resolve the eight unrelated branding/design-system/automation contract failures before claiming a repository-wide green release; live provider verification, deployment APP_KEY rotation, and legal sign-off for consentless cold outreach also remain open.
+
 ## 2026-10-23 — lead-magnet visit abuse boundary
 
 ### Completed / verified
