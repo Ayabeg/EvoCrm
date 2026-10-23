@@ -33,6 +33,8 @@ class LeadScoreSettingsController extends Controller
         ];
 
         foreach (config('evosales.lead_score.rules', []) as $pillar => $points) {
+            $validationRules["rules.{$pillar}"] = ['sometimes', 'array'];
+
             foreach ($points as $key => $default) {
                 $validationRules["rules.{$pillar}.{$key}"] = ['sometimes', 'integer', 'min:0', 'max:100'];
             }

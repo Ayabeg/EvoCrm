@@ -59,6 +59,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Robots/enrichment regression: **7 tests / 27 assertions passed**; the combined website/provider/acquisition slice passed **78 tests / 439 assertions** with Pint.
 - Outbound report regression: **9 tests / 138 assertions passed**; targeted Pint, TypeScript, and `git diff --check` passed.
 - Lead-scoring regression: **13 tests / 80 assertions passed**; targeted Pint and TypeScript passed.
+- Score-settings input-shape hardening: **23 tests / 222 assertions passed** across lead scoring and outbound reporting; targeted Pint and `git diff --check` passed. Codex Security review `6dfb53e9-dcb2-4a99-a221-96759f29d7b3` completed with one low-severity finding remediated in the follow-up change.
 - Production Vite build passed after the outbound reporting and scoring UI changes; existing font fallback, chunk-size, and ineffective dynamic-import warnings remain.
 - Full PHP regression after robots enforcement: **1,363 tests; 1,354 passed; 8 existing branding/design-system/automation contract failures; 35,852 assertions; 1 skipped**. No acquisition test failed.
 - Full PHP regression after evidence-aware outbound reporting: **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition/report test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.

@@ -398,3 +398,18 @@ it('stores workspace scoring rules and uses the configured points', function () 
         ->and($result['timing'])->toBe(4)
         ->and($result['score'])->toBe(20);
 });
+
+it('rejects malformed score rule pillar shapes', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->from('/settings/qualify')
+        ->put('/settings/qualify', [
+            'hold' => 20,
+            'qualify' => 40,
+            'convert' => 80,
+            'rules' => ['fit' => 'not-an-array'],
+        ])
+        ->assertRedirect('/settings/qualify')
+        ->assertSessionHasErrors('rules.fit');
+});

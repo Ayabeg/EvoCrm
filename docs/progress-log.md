@@ -15,6 +15,18 @@
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — score-settings input-shape hardening
+
+### Completed / verified
+
+- Completed Codex Security diff review `6dfb53e9-dcb2-4a99-a221-96759f29d7b3` for `07618298` through `cf0268a1`, with complete coverage of the changed report, scoring, configuration, and settings-form surfaces.
+- The review found one low-severity malformed nested-input path in score settings: a scalar score-rule pillar could reach `array_key_exists` and fail the update request. Each configured pillar is now explicitly validated as an array before leaf validation.
+- The focused lead-scoring and outbound-report suites pass **23 tests / 222 assertions**; targeted Pint and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — configurable lead-scoring rules
 
 ### Completed / verified
