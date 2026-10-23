@@ -258,6 +258,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 - The campaign runner counts provider-accepted sends for the current day, defers excess queued messages with `campaign_daily_cap`, and resumes them after the next workspace day without dropping or failing them.
 - Added the limit to campaign create/edit surfaces, the design-lab fixture, the data model, and the operating documentation.
 - The outbound regression set passes **70 tests / 402 assertions**; Pint, targeted ESLint, TypeScript, and `git diff --check` pass.
+- The production Vite build passes after the cap fields were added; only the repository's existing optional-font, chunk-size, and dynamic-import warnings remain.
 - Repository-wide PHP regression after this increment: **1,349 tests, 1,340 passed, 8 existing branding/design-system/automation contract failures, 35,781 assertions, and 1 skipped**. No acquisition-system test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
 
 ### Remaining
