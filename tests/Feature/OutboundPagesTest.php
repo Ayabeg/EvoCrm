@@ -188,6 +188,45 @@ it('attributes outbound campaign reporting to won contact revenue', function () 
         );
 });
 
+it('scopes outbound detail metrics to the selected contact owner', function () {
+    $user = User::factory()->create();
+    $other = User::factory()->create(['workspace_id' => $user->workspace_id]);
+    $mailbox = Mailbox::factory()->create(['workspace_id' => $user->workspace_id, 'enabled' => false]);
+
+    foreach ([$user, $other] as $owner) {
+        $contact = Contact::factory()->create([
+            'workspace_id' => $user->workspace_id,
+            'owner_id' => $owner->id,
+        ]);
+        $campaign = OutboundCampaign::factory()->create([
+            'workspace_id' => $user->workspace_id,
+            'audience_count' => 1,
+        ]);
+
+        OutboundMessage::query()->create([
+            'workspace_id' => $user->workspace_id,
+            'contact_id' => $contact->id,
+            'mailbox_id' => $mailbox->id,
+            'campaign_id' => $campaign->id,
+            'channel' => 'email',
+            'direction' => 'out',
+            'to_address' => $contact->email,
+            'subject' => 'Owner report',
+            'body' => 'Body',
+            'status' => 'sent',
+            'sent_at' => now(),
+        ]);
+    }
+
+    $this->actingAs($user)
+        ->get('/reports/outbound?owner='.$user->id)
+        ->assertInertia(fn ($page) => $page
+            ->where('window.owner_id', $user->id)
+            ->where('outboundDetail.totals.sent', 1)
+            ->where('outboundDetail.tracking.selected.count', 1)
+            ->has('outboundDetail.perCampaign', 1));
+});
+
 it('edits draft and scheduled campaigns within the current workspace', function () {
     $user = User::factory()->create();
     $foreign = User::factory()->create();

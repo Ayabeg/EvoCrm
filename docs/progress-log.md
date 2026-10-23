@@ -15,6 +15,18 @@
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — owner-scoped outbound detail reporting
+
+### Completed / verified
+
+- Applied the report page's selected contact-owner filter to outbound detail totals, tracking metrics, campaign/sequence rows, funnel attribution, and positive-reply counts.
+- Added a cross-owner regression proving one owner's outbound report cannot include another owner's messages or campaign audience snapshot.
+- The focused outbound report suite passes **10 tests / 154 assertions**; the connected acquisition/inbound/enrichment/outbound/funnel gate passes **105 tests / 718 assertions**. PHP syntax, Pint, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — window-scoped outbound detail reporting
 
 ### Completed / verified

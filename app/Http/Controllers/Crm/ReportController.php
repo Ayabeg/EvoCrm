@@ -710,7 +710,7 @@ class ReportController extends Controller
 
     private function outboundDetail(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): array
     {
-        $out = OutboundMessage::query()
+        $out = $this->constrainContactOwner(OutboundMessage::query()
             ->forWorkspace($workspace)
             ->where('direction', 'out')
             ->where(function (Builder $query) use ($from, $to): void {
@@ -719,14 +719,14 @@ class ReportController extends Controller
                     ->orWhere(function (Builder $unsent) use ($from, $to): void {
                         $unsent->whereNull('sent_at')->whereBetween('created_at', [$from, $to]);
                     });
-            });
+            }));
         $totals = ['queued' => (clone $out)->where('status', 'queued')->count(), 'sent' => (clone $out)->where('status', 'sent')->count(), 'failed' => (clone $out)->where('status', 'failed')->count(), 'opened' => (clone $out)->whereNotNull('opened_at')->count(), 'clicked' => (clone $out)->whereNotNull('clicked_at')->count(), 'replied' => (clone $out)->whereNotNull('replied_at')->count(), 'delivered' => (clone $out)->whereNotNull('delivered_at')->count(), 'complained' => (clone $out)->whereNotNull('complained_at')->count(), 'bounced' => (clone $out)->where(fn ($query) => $query->where('status', 'bounced')->orWhereNotNull('bounced_at'))->count()];
         $campaignIds = (clone $out)->whereNotNull('campaign_id')->pluck('campaign_id')->filter()->unique()->values();
         $selected = $campaignIds->isEmpty()
             ? 0
             : (int) OutboundCampaign::query()->forWorkspace($workspace)->whereIn('id', $campaignIds)->sum('audience_count');
         $attempted = (clone $out)->where('status', '!=', 'queued')->count();
-        $positiveReplies = OutboundMessage::query()
+        $positiveReplies = $this->constrainContactOwner(OutboundMessage::query()
             ->forWorkspace($workspace)
             ->where('direction', 'in')
             ->where('reply_classification', 'interested')
@@ -743,7 +743,7 @@ class ReportController extends Controller
                             });
                     });
             })
-            ->count();
+        )->count();
         $campaignContactIds = (clone $out)->whereNotNull('campaign_id')->pluck('contact_id')->filter()->unique()->values();
         $openOpportunities = $campaignContactIds->isEmpty()
             ? 0
