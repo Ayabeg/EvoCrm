@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — lead-capture diagnostic redaction
+
+### Completed / verified
+
+- Redacted lead-capture merge exceptions before persisting `LeadCapture.error`, closing the public inbound capture error boundary alongside import, enrichment, outbound, and bulk-action diagnostics.
+- The focused inbound/enrichment/outbound/redaction gate passes **53 tests / 373 assertions**; the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate including lead captures and bulk actions passes **153 tests / 1,104 assertions**. Pint, PHP syntax, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — enrichment diagnostic redaction
 
 ### Completed / verified
