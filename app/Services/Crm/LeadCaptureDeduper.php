@@ -46,7 +46,11 @@ class LeadCaptureDeduper
         } catch (Throwable $exception) {
             $capture->forceFill([
                 'status' => LeadCapture::STATUS_ERROR,
-                'error' => mb_substr($exception->getMessage(), 0, 500),
+                'error' => mb_substr(
+                    app(WorkflowExecutionRedactor::class)->redactError($exception->getMessage()),
+                    0,
+                    500,
+                ),
             ])->save();
 
             return $capture->fresh() ?? $capture;

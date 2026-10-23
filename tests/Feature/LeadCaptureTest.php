@@ -7,8 +7,10 @@ use App\Models\LeadCapture;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Ads\LeadFormIngestor;
+use App\Services\Crm\LeadCaptureDeduper;
 use App\Services\Webhooks\WebhookEndpointManager;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 function captureCsv(string $contents, string $name = 'leads.csv'): UploadedFile
@@ -260,6 +262,20 @@ it('does not follow a public url redirect into a private host', function () {
 
     expect(LeadCapture::query()->firstOrFail()->status)->toBe(LeadCapture::STATUS_ERROR);
     Http::assertSentCount(1);
+});
+
+it('redacts lead-capture merge exceptions before persistence', function () {
+    $capture = LeadCapture::factory()->create();
+    $exceptionMessage = 'Capture merge failed for owner@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value';
+
+    DB::shouldReceive('transaction')->once()->andThrow(new RuntimeException($exceptionMessage));
+
+    app(LeadCaptureDeduper::class)->process($capture);
+
+    expect($capture->fresh()->error)
+        ->not->toContain('owner@clinic.dz')
+        ->not->toContain('https://provider.example.test')
+        ->not->toContain('Bearer secret-value');
 });
 
 it('stores an operator maps search and the results they chose', function () {
