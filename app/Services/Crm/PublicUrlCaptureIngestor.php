@@ -160,7 +160,11 @@ class PublicUrlCaptureIngestor
         );
 
         $capture->forceFill([
-            'error' => mb_substr($message, 0, 500),
+            'error' => mb_substr(
+                app(WorkflowExecutionRedactor::class)->redactError($message),
+                0,
+                500,
+            ),
         ])->save();
 
         return $capture;

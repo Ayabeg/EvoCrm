@@ -6,6 +6,7 @@ use App\Models\MetaWebhookEvent;
 use App\Models\Workspace;
 use App\Services\Ads\LeadFormIngestor;
 use App\Services\Analytics\ProductAnalytics;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use App\Services\Meta\MetaLeadAdsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -100,7 +101,11 @@ class ProcessMetaWebhookEvent implements ShouldQueue
             $event->forceFill([
                 'status' => MetaWebhookEvent::STATUS_FAILED,
                 'failed_at' => now(),
-                'error' => mb_substr($exception->getMessage(), 0, 500),
+                'error' => mb_substr(
+                    app(WorkflowExecutionRedactor::class)->redactError($exception->getMessage()),
+                    0,
+                    500,
+                ),
             ])->save();
 
             Log::warning('meta.webhook.failed', [

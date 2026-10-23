@@ -18,8 +18,10 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Ads\LeadFormIngestor;
 use App\Services\Ads\MetaAdsService;
+use App\Services\Analytics\ProductAnalytics;
 use App\Services\Meta\MetaConversionsService;
 use App\Services\Meta\MetaFieldMapper;
+use App\Services\Meta\MetaLeadAdsService;
 use App\Services\Webhooks\WebhookEndpointManager;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -200,6 +202,33 @@ it('is idempotent for duplicate Meta webhook deliveries', function () {
     expect(AdLead::query()->where('workspace_id', $workspace->id)->count())->toBe(1)
         ->and(Lead::query()->where('workspace_id', $workspace->id)->count())->toBe(1)
         ->and(MetaWebhookEvent::query()->where('workspace_id', $workspace->id)->count())->toBe(1);
+});
+
+it('redacts Meta webhook worker failures before persistence', function () {
+    $workspace = Workspace::factory()->create();
+    $event = MetaWebhookEvent::query()->create([
+        'workspace_id' => $workspace->id,
+        'provider_event_id' => 'meta-failure-1',
+        'event_type' => 'leadgen',
+        'payload' => ['fields' => ['email' => 'owner@clinic.dz']],
+        'status' => MetaWebhookEvent::STATUS_PENDING,
+        'attempts' => 0,
+    ]);
+    $ingestor = Mockery::mock(LeadFormIngestor::class);
+    $ingestor->shouldReceive('ingest')->once()->andThrow(new RuntimeException(
+        'Meta ingest failed for owner@clinic.dz at https://graph.example.test using Authorization: Bearer secret-value',
+    ));
+
+    expect(fn () => (new ProcessMetaWebhookEvent($event->id))->handle(
+        $ingestor,
+        app(MetaLeadAdsService::class),
+        app(ProductAnalytics::class),
+    ))->toThrow(RuntimeException::class);
+
+    expect($event->fresh()->status)->toBe(MetaWebhookEvent::STATUS_FAILED)
+        ->and($event->fresh()->error)->not->toContain('owner@clinic.dz')
+        ->and($event->fresh()->error)->not->toContain('https://graph.example.test')
+        ->and($event->fresh()->error)->not->toContain('Bearer secret-value');
 });
 
 it('matches a duplicate Meta lead onto the existing contact', function () {
