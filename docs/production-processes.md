@@ -119,6 +119,8 @@ For manual enrichment maintenance, run `php artisan leads:enrich --stale-hours=1
 
 Contact CSV imports may contain incomplete business records. A row with a company or location signal is retained without fabricating contact data; after the import transaction, contacts missing email or phone are queued for enrichment. Re-imports use the stored import identity to avoid duplicating the same incomplete row. Blank or ambiguous rows remain in the import preview as row-level errors.
 
+Contact and deal import workers process at most 100 pending rows per queue attempt. When rows remain, the worker dispatches a continuation and uses their pending status as the durable cursor; a worker failure leaves the batch visibly failed rather than silently reporting completion. Direct synchronous processing drains the same bounded pages for controlled local verification.
+
 Privileged contact/deal bulk actions accept at most 1,000 record IDs per request. Import and bulk-action queue jobs also mark their durable run failed when the queue exhausts retries, so operations can retry a visible failed run instead of treating an interrupted worker as active.
 
 Before production deployment, rotate any local or copied `APP_KEY` through the deployment secret manager, invalidate existing sessions, and rotate encrypted integration/mailbox credentials if the key may have been exposed. The repository’s `.env` is ignored by Git, but ignored does not mean safe to distribute.

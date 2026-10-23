@@ -83,6 +83,7 @@ Completed bookings record a deduplicated meeting_booked funnel event against the
 - Every cross-entity create/update that must remain consistent is transactional.
 - Unique keys and idempotency keys prevent duplicate imports, submissions, sends, provider events, and subject-scoped funnel events. Funnel-event recording uses a database unique constraint plus `createOrFirst` so concurrent callbacks cannot pass a check-then-insert gap.
 - Long-running enrichment and outbound actions run through durable jobs/commands, not in-memory timers.
+- Contact and deal imports run through durable 100-row worker pages. Pending import rows are the resumable cursor; each continuation is safe to replay, and a completed batch is not reopened by a stale duplicate worker.
 - Campaign audiences over 1,000 contacts use `ExpandOutboundCampaign` cursor jobs in 250-contact pages; each page persists progress and reuses the workspace/idempotency boundary before the campaign becomes sendable.
 - Broadcast campaigns persist a configurable daily send cap (20 messages by default). Messages beyond that cap remain queued with a durable `campaign_daily_cap` defer reason and become eligible after the next workspace-local day; the mailbox cap remains an independent lower bound. A shared runner groups cap counts by workspace before applying each workspace's local-day window.
 - Retries use bounded exponential backoff and preserve the original error and attempt history.

@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `a946078f` (`main`; release report is maintained in subsequent documentation commits)
+Current implementation revision: `6a794282` (`main`; release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -29,6 +29,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - External repository audit completed: the three Ayabeg repositories are public but empty (size `0`, no remote heads), so there was no implementation to import; the non-empty 50k lead-generation repository was used as a reference for workflow boundaries only.
 - Outbound reporting now exposes evidence-aware counts and rates for selection, attempts, mailer acceptance, provider delivery/bounce/complaint events, replies, positive replies, demo requests/bookings, suppression, CRM outcomes, and campaign errors. Every emitted rate includes its denominator; opens/clicks carry explicit caveats and are not treated as interest proof.
 - Lead scoring rule points are now configurable per workspace for fit, intent, timing, and data quality, with bounded defaults, fallback for omitted values, and persisted explainable score breakdowns.
+- Contact and deal imports now process through resumable 100-row queue pages, dispatching continuations while pending rows remain and refusing to reopen completed batches from stale duplicate workers.
 
 ## Verification evidence
 
@@ -71,6 +72,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Public lead-magnet landing-page visits are now throttled at 120 requests/minute; the focused lead-magnet/inbound gate passes **11 tests / 108 assertions**.
 - Current full PHP regression: **1,371 tests; 1,362 passed; 8 failures; 35,929 assertions; 1 skipped**. The 115-test acquisition gate remains green; the repository-wide suite is not yet release-green because of the known unrelated contract failures.
 - Contact/deal import diagnostics now redact terminal worker errors; the focused import/redaction gate passes **18 tests / 168 assertions**, and the connected acquisition gate including imports passes **131 tests / 966 assertions**.
+- Resumable import queue pages: the focused import/redaction gate passes **19 tests / 172 assertions**, and the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate passes **132 tests / 970 assertions**. Pint, PHP syntax, and `git diff --check` pass.
 - Production Vite build passed after the outbound reporting and scoring UI changes; existing font fallback, chunk-size, and ineffective dynamic-import warnings remain.
 - Full PHP regression after robots enforcement: **1,363 tests; 1,354 passed; 8 existing branding/design-system/automation contract failures; 35,852 assertions; 1 skipped**. No acquisition test failed.
 - Full PHP regression after evidence-aware outbound reporting: **1,364 tests; 1,355 passed; 8 existing branding/design-system/automation contract failures; 35,878 assertions; 1 skipped**. No acquisition/report test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
@@ -118,6 +120,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `94d08465` — redacted durable campaign-expansion diagnostics before persistence.
 - `aaa61631` — throttled public lead-magnet landing-page visits and added route coverage.
 - `a946078f` — redacted contact/deal import and import-worker diagnostics before persistence.
+- `6a794282` — made contact/deal imports resumable through bounded queue pages with stale-worker idempotency.
 
 ## Implemented but not fully verified
 
