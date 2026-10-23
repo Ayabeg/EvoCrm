@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\DeliverLeadMagnetSubmission;
 use App\Jobs\EnrichRecordJob;
 use App\Mail\LeadLeakageResultMail;
 use App\Models\Contact;
@@ -158,6 +159,34 @@ it('does not expose internal delivery errors through the public calculator contr
         ->assertInertia(fn ($page) => $page
             ->where('submission.delivery_status', 'failed')
             ->missing('submission.delivery_error'));
+});
+
+it('redacts delivery diagnostics before persisting them', function () {
+    Queue::fake();
+    $workspace = User::factory()->create()->workspace;
+    $key = (string) Str::uuid();
+
+    $this->post("/lead-magnet/{$workspace->slug}/lead-leakage-calculator", [
+        'submission_key' => $key,
+        'monthly_inquiries' => 20,
+        'average_customer_value' => 500,
+        'inquiry_to_customer_rate' => 10,
+        'missed_inquiry_rate' => 5,
+        'delayed_response_rate' => 5,
+        'follow_up_dropoff_rate' => 5,
+        'email' => 'owner@clinic-atlas.test',
+    ])->assertOk();
+
+    $submission = LeadMagnetSubmission::query()->where('idempotency_key', $key)->firstOrFail();
+
+    (new DeliverLeadMagnetSubmission($submission->id))->failed(
+        new RuntimeException('SMTP failed for owner@clinic.dz at https://smtp.example.com using Authorization: Bearer secret-value'),
+    );
+
+    expect($submission->fresh()->delivery_status)->toBe('failed')
+        ->and($submission->fresh()->delivery_error)->not->toContain('owner@clinic.dz')
+        ->and($submission->fresh()->delivery_error)->not->toContain('https://smtp.example.com')
+        ->and($submission->fresh()->delivery_error)->not->toContain('Bearer secret-value');
 });
 
 it('does not create a contact for an anonymous calculator use and is idempotent', function () {

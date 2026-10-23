@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Mail\LeadLeakageResultMail;
 use App\Models\LeadMagnetSubmission;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -58,7 +59,7 @@ class DeliverLeadMagnetSubmission implements ShouldBeUnique, ShouldQueue
         } catch (Throwable $exception) {
             $submission->forceFill([
                 'delivery_status' => 'queued',
-                'delivery_error' => mb_substr($exception->getMessage(), 0, 1000),
+                'delivery_error' => app(WorkflowExecutionRedactor::class)->redactError($exception->getMessage()),
             ])->save();
 
             throw $exception;
@@ -77,7 +78,7 @@ class DeliverLeadMagnetSubmission implements ShouldBeUnique, ShouldQueue
             ->whereKey($this->submissionId)
             ->update([
                 'delivery_status' => 'failed',
-                'delivery_error' => mb_substr($exception->getMessage(), 0, 1000),
+                'delivery_error' => app(WorkflowExecutionRedactor::class)->redactError($exception->getMessage()),
                 'updated_at' => now(),
             ]);
     }

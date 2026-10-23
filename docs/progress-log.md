@@ -23,6 +23,7 @@
 - Added regression coverage proving a stored provider error containing an authorization token is not exposed on an idempotent public submission response.
 - The public/inbound lead-magnet gate passes **8 tests / 90 assertions**; targeted Pint, TypeScript, and `git diff --check` pass.
 - The post-hardening connected acquisition/inbound/enrichment/outbound/funnel gate passes **112 tests / 798 assertions**.
+- Delivery diagnostics are also redacted before persistence; the public/inbound/acquisition/report/scoring subset passes **34 tests / 345 assertions** after this follow-up.
 
 ### Remaining
 
