@@ -10,6 +10,7 @@
 - The focused shell/design/localization regression passes **52 tests / 560 assertions**, the focused token/localization regression passes **28 tests / 19,923 assertions**, and Prettier, ESLint, Pint, and `git diff --check` pass.
 - `php artisan evocrm:product-ready` passes. It confirms QuoteAcceptor, Simple Mode, and the Sanctum `/api/v1` surface; it correctly warns that no `ProductionSafetyValidator` is present rather than inventing one.
 - `npm run types:check` and `npm run build` pass. The production build retains only the existing ineffective dynamic-import, optional-font, and chunk-size warnings.
+- `php artisan evocrm:mail-smoke` confirms the local boundary safely: `MAIL_MAILER=log` and the Resend key is empty, so no real message was sent; production transactional-mail verification remains external.
 - The connected acquisition/inbound/enrichment/outbound/funnel/scoring gate remains green at **173 tests / 1,217 assertions**. The supplied 50k lead-generation repository remains reference-only; its n8n/Airtable/Apify/Gemini implementation was not imported.
 
 ### Remaining
