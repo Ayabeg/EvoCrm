@@ -36,6 +36,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Enrichment proposal, skip, and failure diagnostics now use the same redaction contract before `EnrichmentRun.error` persistence.
 - Lead-capture merge exceptions now use the same redaction contract before `LeadCapture.error` persistence.
 - Public URL-capture and Meta webhook worker exceptions now use the same redaction contract before persistence.
+- Scheduled-report delivery failures now use the same redaction contract before `ScheduledReport.last_error` persistence.
 
 ## Verification evidence
 
@@ -136,6 +137,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `be408b57` — centralized redaction of persisted enrichment diagnostics.
 - `83288f63` — redacted persisted lead-capture merge diagnostics.
 - `39aa616d` — redacted persisted public URL-capture and Meta webhook diagnostics.
+- `0eca2b25` — redacted persisted scheduled-report transport diagnostics.
 
 ## Implemented but not fully verified
 

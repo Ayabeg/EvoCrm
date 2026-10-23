@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — scheduled-report diagnostic redaction
+
+### Completed / verified
+
+- Redacted scheduled-report SMTP/transport failures before persisting `ScheduledReport.last_error`, preserving safe report-delivery status without storing recipient addresses, provider URLs, or authorization tokens.
+- The targeted report/Meta/inbound/enrichment/outbound gate passes **89 tests / 565 assertions**; the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate including scheduled reports passes **173 tests / 1,217 assertions**. Pint, PHP syntax, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — capture and webhook diagnostic redaction
 
 ### Completed / verified
