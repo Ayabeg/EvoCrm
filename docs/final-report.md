@@ -32,6 +32,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Contact and deal imports now process through resumable 100-row queue pages, dispatching continuations while pending rows remain and refusing to reopen completed batches from stale duplicate workers.
 - SMTP transport failures are redacted before persistence in outbound message diagnostics, while safe operational context such as timeout text remains available to operators.
 - WhatsApp/SMS outbound and Desk SMS provider errors now use the same redaction contract before persistence.
+- Shared CRM bulk-action worker and per-record failures now use the same redaction contract before persistence, including sequence-enrollment operations.
 
 ## Verification evidence
 
@@ -128,6 +129,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `27980623` — redacted contact/deal row-level import exceptions before persistence.
 - `5439c977` — redacted persisted SMTP transport diagnostics.
 - `721d2645` — redacted persisted WhatsApp/SMS and Desk provider diagnostics.
+- `28ba56d3` — redacted terminal and row-level bulk-action diagnostics.
 
 ## Implemented but not fully verified
 
