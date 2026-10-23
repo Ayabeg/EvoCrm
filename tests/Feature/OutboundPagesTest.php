@@ -136,7 +136,7 @@ it('reports explicit outbound denominators and CRM outcomes', function () {
         'occurred_at' => now(),
     ]);
 
-    $this->actingAs($user)->get('/reports/outbound')->assertInertia(fn ($page) => $page
+    $this->actingAs($user)->get('/reports/outbound?from=2026-10-01&to=2026-10-23')->assertInertia(fn ($page) => $page
         ->where('outboundDetail.tracking.selected.count', 2)
         ->where('outboundDetail.tracking.sent.denominator', 1)
         ->where('outboundDetail.tracking.delivered.rate', 100)
