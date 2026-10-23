@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — outbound SMTP diagnostic redaction
+
+### Completed / verified
+
+- Redacted SMTP transport exception text before persisting `OutboundMessage.failure_reason`, preventing recipient addresses, credential-bearing authorization text, and provider URLs from entering the outbound message record while preserving safe timeout/context text.
+- The SMTP/runner/department/redactor gate passes **44 tests / 243 assertions**; Pint, PHP syntax, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — resumable import queue chunks
 
 ### Completed / verified
