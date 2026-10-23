@@ -264,7 +264,6 @@ class LeadLeakageController extends Controller
                 'contact_created' => $submission->contact_id !== null,
                 'marketing_consent_recorded' => $submission->marketing_consent && $submission->contact_id !== null,
                 'delivery_status' => $submission->delivery_status,
-                'delivery_error' => $submission->delivery_error,
                 'enrichment_queued' => $submission->enrichment_consent && $submission->contact_id !== null,
                 'booking_url' => $this->signedBookingUrlForSubmission($workspace, $submission),
             ],

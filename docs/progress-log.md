@@ -15,6 +15,18 @@
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — lead-magnet delivery error boundary
+
+### Completed / verified
+
+- Removed raw mailer exception text from the public lead-magnet Inertia payload. The calculator still reports a generic failed delivery state while internal delivery diagnostics remain server-side.
+- Added regression coverage proving a stored provider error containing an authorization token is not exposed on an idempotent public submission response.
+- The public/inbound lead-magnet gate passes **8 tests / 90 assertions**; targeted Pint, TypeScript, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — owner-scoped outbound detail reporting
 
 ### Completed / verified

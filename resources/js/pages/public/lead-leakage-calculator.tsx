@@ -80,7 +80,6 @@ export default function LeadLeakageCalculator({
         marketing_consent_recorded: boolean;
         enrichment_queued: boolean;
         delivery_status: string;
-        delivery_error: string | null;
         booking_url: string | null;
     } | null;
 }) {

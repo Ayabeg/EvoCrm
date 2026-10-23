@@ -132,6 +132,34 @@ it('persists a calculator submission, creates the shared lead, and records separ
     Mail::assertSent(LeadLeakageResultMail::class, fn (LeadLeakageResultMail $mail): bool => $mail->hasTo('owner@clinic-atlas.test'));
 });
 
+it('does not expose internal delivery errors through the public calculator contract', function () {
+    Queue::fake();
+    $workspace = User::factory()->create()->workspace;
+    $key = (string) Str::uuid();
+    $payload = [
+        'submission_key' => $key,
+        'monthly_inquiries' => 20,
+        'average_customer_value' => 500,
+        'inquiry_to_customer_rate' => 10,
+        'missed_inquiry_rate' => 5,
+        'delayed_response_rate' => 5,
+        'follow_up_dropoff_rate' => 5,
+        'email' => 'owner@clinic-atlas.test',
+    ];
+
+    $this->post("/lead-magnet/{$workspace->slug}/lead-leakage-calculator", $payload)->assertOk();
+    $submission = LeadMagnetSubmission::query()->where('idempotency_key', $key)->firstOrFail();
+    $submission->forceFill([
+        'delivery_status' => 'failed',
+        'delivery_error' => 'Authorization: Bearer internal-secret-value',
+    ])->save();
+
+    $this->post("/lead-magnet/{$workspace->slug}/lead-leakage-calculator", $payload)
+        ->assertInertia(fn ($page) => $page
+            ->where('submission.delivery_status', 'failed')
+            ->missing('submission.delivery_error'));
+});
+
 it('does not create a contact for an anonymous calculator use and is idempotent', function () {
     $workspace = User::factory()->create()->workspace;
     $key = (string) Str::uuid();
