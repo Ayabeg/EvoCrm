@@ -33,6 +33,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - SMTP transport failures are redacted before persistence in outbound message diagnostics, while safe operational context such as timeout text remains available to operators.
 - WhatsApp/SMS outbound and Desk SMS provider errors now use the same redaction contract before persistence.
 - Shared CRM bulk-action worker and per-record failures now use the same redaction contract before persistence, including sequence-enrollment operations.
+- Enrichment proposal, skip, and failure diagnostics now use the same redaction contract before `EnrichmentRun.error` persistence.
 
 ## Verification evidence
 
@@ -130,6 +131,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `5439c977` — redacted persisted SMTP transport diagnostics.
 - `721d2645` — redacted persisted WhatsApp/SMS and Desk provider diagnostics.
 - `28ba56d3` — redacted terminal and row-level bulk-action diagnostics.
+- `be408b57` — centralized redaction of persisted enrichment diagnostics.
 
 ## Implemented but not fully verified
 

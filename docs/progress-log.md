@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — enrichment diagnostic redaction
+
+### Completed / verified
+
+- Centralized redaction of enrichment proposal, skip, and failure errors before `EnrichmentRun.error` persistence, covering provider and DNS failure paths while retaining safe operator context.
+- The focused enrichment/import/outbound/redaction gate passes **80 tests / 540 assertions**; the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate including bulk actions passes **142 tests / 1,008 assertions**. Pint, PHP syntax, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — bulk-action diagnostic redaction
 
 ### Completed / verified
