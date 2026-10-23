@@ -74,6 +74,8 @@ it('renders the outbound overview, outbox, replies, and reports pages', function
 });
 
 it('reports explicit outbound denominators and CRM outcomes', function () {
+    $this->travelTo(Carbon::parse('2026-10-23 12:00:00', 'Africa/Algiers'));
+
     $user = User::factory()->create();
     $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
     $campaign = OutboundCampaign::factory()->create([
@@ -97,12 +99,34 @@ it('reports explicit outbound denominators and CRM outcomes', function () {
         'delivered_at' => now(),
         'replied_at' => now(),
     ]);
+    OutboundMessage::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'contact_id' => $contact->id,
+        'mailbox_id' => $mailbox->id,
+        'campaign_id' => $campaign->id,
+        'channel' => 'email',
+        'direction' => 'out',
+        'to_address' => $contact->email,
+        'subject' => 'Older message',
+        'body' => 'Older body',
+        'status' => 'sent',
+        'sent_at' => now()->subDays(60),
+        'created_at' => now()->subDays(60),
+        'updated_at' => now()->subDays(60),
+    ]);
     FunnelEvent::query()->create([
         'workspace_id' => $user->workspace_id,
         'event_type' => FunnelEvent::TYPE_DEMO_REQUESTED,
         'contact_id' => $contact->id,
         'source' => 'outbound',
         'occurred_at' => now(),
+    ]);
+    FunnelEvent::query()->create([
+        'workspace_id' => $user->workspace_id,
+        'event_type' => FunnelEvent::TYPE_DEMO_REQUESTED,
+        'contact_id' => $contact->id,
+        'source' => 'outbound',
+        'occurred_at' => now()->subDays(60),
     ]);
     FunnelEvent::query()->create([
         'workspace_id' => $user->workspace_id,
@@ -119,6 +143,7 @@ it('reports explicit outbound denominators and CRM outcomes', function () {
         ->where('outboundDetail.tracking.qualified_opportunities.denominator', null)
         ->where('outboundDetail.tracking.demo_requests.count', 1)
         ->where('outboundDetail.tracking.demos_booked.count', 1)
+        ->where('outboundDetail.perCampaign.0.sent', 1)
         ->where('outboundDetail.tracking.customers_won.source', 'crm_pipeline')
     );
 });

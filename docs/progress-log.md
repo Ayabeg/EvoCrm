@@ -15,6 +15,19 @@
 
 - Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
 
+## 2026-10-23 — window-scoped outbound detail reporting
+
+### Completed / verified
+
+- Aligned outbound report detail metrics with the selected report window instead of mixing all-time message, sequence, campaign, funnel-event, and daily data into a windowed overview.
+- Scoped campaign audience snapshots to campaigns represented by messages in the window, and preserved explicit caveats for contact-attributed CRM outcomes and funnel counts.
+- Added regression coverage for older outbound messages and funnel events being excluded from the current report window.
+- The connected acquisition/inbound/enrichment/outbound/funnel gate passes **104 tests / 704 assertions**; targeted Pint and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — score-settings input-shape hardening
 
 ### Completed / verified

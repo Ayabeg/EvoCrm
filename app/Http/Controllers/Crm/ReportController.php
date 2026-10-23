@@ -110,7 +110,7 @@ class ReportController extends Controller
 
         return Inertia::render('crm/reports', [
             'activeCategory' => $category ?? 'overview',
-            'outboundDetail' => $category === 'outbound' ? $this->outboundDetail($workspace) : null,
+            'outboundDetail' => $category === 'outbound' ? $this->outboundDetail($workspace, $from, $to) : null,
             'window' => [
                 'from' => $from->toDateString(),
                 'to' => $to->toDateString(),
@@ -708,18 +708,41 @@ class ReportController extends Controller
         ];
     }
 
-    private function outboundDetail(Workspace $workspace): array
+    private function outboundDetail(Workspace $workspace, CarbonInterface $from, CarbonInterface $to): array
     {
-        $out = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out');
+        $out = OutboundMessage::query()
+            ->forWorkspace($workspace)
+            ->where('direction', 'out')
+            ->where(function (Builder $query) use ($from, $to): void {
+                $query
+                    ->whereBetween('sent_at', [$from, $to])
+                    ->orWhere(function (Builder $unsent) use ($from, $to): void {
+                        $unsent->whereNull('sent_at')->whereBetween('created_at', [$from, $to]);
+                    });
+            });
         $totals = ['queued' => (clone $out)->where('status', 'queued')->count(), 'sent' => (clone $out)->where('status', 'sent')->count(), 'failed' => (clone $out)->where('status', 'failed')->count(), 'opened' => (clone $out)->whereNotNull('opened_at')->count(), 'clicked' => (clone $out)->whereNotNull('clicked_at')->count(), 'replied' => (clone $out)->whereNotNull('replied_at')->count(), 'delivered' => (clone $out)->whereNotNull('delivered_at')->count(), 'complained' => (clone $out)->whereNotNull('complained_at')->count(), 'bounced' => (clone $out)->where(fn ($query) => $query->where('status', 'bounced')->orWhereNotNull('bounced_at'))->count()];
-        $selected = (int) OutboundCampaign::query()->forWorkspace($workspace)->sum('audience_count');
+        $campaignIds = (clone $out)->whereNotNull('campaign_id')->pluck('campaign_id')->filter()->unique()->values();
+        $selected = $campaignIds->isEmpty()
+            ? 0
+            : (int) OutboundCampaign::query()->forWorkspace($workspace)->whereIn('id', $campaignIds)->sum('audience_count');
         $attempted = (clone $out)->where('status', '!=', 'queued')->count();
         $positiveReplies = OutboundMessage::query()
             ->forWorkspace($workspace)
             ->where('direction', 'in')
             ->where('reply_classification', 'interested')
             ->whereNotNull('in_reply_to')
-            ->whereHas('parent', fn (Builder $parent) => $parent->where('direction', 'out'))
+            ->whereHas('parent', function (Builder $parent) use ($workspace, $from, $to): void {
+                $parent
+                    ->forWorkspace($workspace)
+                    ->where('direction', 'out')
+                    ->where(function (Builder $query) use ($from, $to): void {
+                        $query
+                            ->whereBetween('sent_at', [$from, $to])
+                            ->orWhere(function (Builder $unsent) use ($from, $to): void {
+                                $unsent->whereNull('sent_at')->whereBetween('created_at', [$from, $to]);
+                            });
+                    });
+            })
             ->count();
         $campaignContactIds = (clone $out)->whereNotNull('campaign_id')->pluck('contact_id')->filter()->unique()->values();
         $openOpportunities = $campaignContactIds->isEmpty()
@@ -743,6 +766,7 @@ class ReportController extends Controller
             : FunnelEvent::query()
                 ->forWorkspace($workspace)
                 ->where('event_type', FunnelEvent::TYPE_DEMO_REQUESTED)
+                ->whereBetween('occurred_at', [$from, $to])
                 ->whereIn('contact_id', $campaignContactIds)
                 ->select('contact_id')
                 ->distinct()
@@ -752,6 +776,7 @@ class ReportController extends Controller
             : FunnelEvent::query()
                 ->forWorkspace($workspace)
                 ->where('event_type', FunnelEvent::TYPE_MEETING_BOOKED)
+                ->whereBetween('occurred_at', [$from, $to])
                 ->whereIn('contact_id', $campaignContactIds)
                 ->select('contact_id')
                 ->distinct()
@@ -791,10 +816,25 @@ class ReportController extends Controller
             'opted_out' => $metric($optedOut, $totals['sent'], 'actual', 'suppression_list', 'Unique recipient addresses currently present in the workspace email suppression list.'),
             'campaign_errors' => $metric($totals['failed'], $attempted, 'actual', 'outbound_message_state', 'Outbound messages in a failed state after leaving the queue.'),
         ];
-        $perSequence = Sequence::query()->forWorkspace($workspace)->withCount('enrollments')->get()->map(fn (Sequence $s) => ['id' => $s->id, 'name' => $s->name, 'enrollments' => $s->enrollments_count, 'sent' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->where('status', 'sent')->count(), 'opened' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('opened_at')->count(), 'replied' => OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('sequence_id', $s->id)->whereNotNull('replied_at')->count()]);
+        $perSequence = Sequence::query()
+            ->forWorkspace($workspace)
+            ->whereIn('id', (clone $out)->whereNotNull('sequence_id')->pluck('sequence_id')->filter()->unique())
+            ->get()
+            ->map(function (Sequence $sequence) use ($out, $from, $to): array {
+                $messages = (clone $out)->where('sequence_id', $sequence->id);
+
+                return [
+                    'id' => $sequence->id,
+                    'name' => $sequence->name,
+                    'enrollments' => $sequence->enrollments()->whereBetween('created_at', [$from, $to])->count(),
+                    'sent' => (clone $messages)->where('status', 'sent')->count(),
+                    'opened' => (clone $messages)->whereNotNull('opened_at')->count(),
+                    'replied' => (clone $messages)->whereNotNull('replied_at')->count(),
+                ];
+            });
         $campaignMessages = (clone $out)
             ->whereNotNull('campaign_id')
-            ->get(['campaign_id', 'contact_id', 'replied_at']);
+            ->get(['campaign_id', 'contact_id', 'status', 'deferred_until', 'replied_at', 'opened_at', 'clicked_at', 'delivered_at', 'complained_at', 'bounced_at']);
         $contactIds = $campaignMessages->pluck('contact_id')->filter()->unique()->values();
         $wonDealsByContact = $contactIds->isEmpty()
             ? collect()
@@ -804,23 +844,39 @@ class ReportController extends Controller
                 ->whereHas('stage', fn (Builder $stage) => $stage->where('is_won', true))
                 ->get(['id', 'contact_id', 'amount_cents'])
                 ->groupBy('contact_id');
-        $perCampaign = OutboundCampaign::query()->forWorkspace($workspace)->latest()->limit(20)->get()->map(function (OutboundCampaign $campaign) use ($campaignMessages, $wonDealsByContact): array {
-            $messages = $campaignMessages->where('campaign_id', $campaign->id);
-            $campaignContactIds = $messages->pluck('contact_id')->filter()->unique();
-            $wonDeals = $campaignContactIds
-                ->flatMap(fn ($contactId) => $wonDealsByContact->get($contactId, collect()))
-                ->unique('id');
+        $perCampaign = OutboundCampaign::query()
+            ->forWorkspace($workspace)
+            ->whereIn('id', $campaignIds)
+            ->latest()
+            ->limit(20)
+            ->get()
+            ->map(function (OutboundCampaign $campaign) use ($campaignMessages, $wonDealsByContact): array {
+                $messages = $campaignMessages->where('campaign_id', $campaign->id);
+                $campaignContactIds = $messages->pluck('contact_id')->filter()->unique();
+                $wonDeals = $campaignContactIds
+                    ->flatMap(fn ($contactId) => $wonDealsByContact->get($contactId, collect()))
+                    ->unique('id');
 
-            return array_merge([
-                'id' => $campaign->id,
-                'name' => $campaign->name,
-                'status' => $campaign->status,
-                'audience_count' => $campaign->audience_count,
-                'won_deals' => $wonDeals->count(),
-                'won_revenue_cents' => (int) $wonDeals->sum('amount_cents'),
-            ], $campaign->messageCounts());
-        });
-        $daily = OutboundMessage::query()->forWorkspace($workspace)->where('direction', 'out')->where('status', 'sent')->where('sent_at', '>=', now()->subDays(30))->selectRaw('DATE(sent_at) as day, COUNT(*) as sent')->groupBy('day')->orderBy('day')->get();
+                return array_merge([
+                    'id' => $campaign->id,
+                    'name' => $campaign->name,
+                    'status' => $campaign->status,
+                    'audience_count' => $campaign->audience_count,
+                    'won_deals' => $wonDeals->count(),
+                    'won_revenue_cents' => (int) $wonDeals->sum('amount_cents'),
+                    'queued' => $messages->where('status', 'queued')->count(),
+                    'deferred' => $messages->where('status', 'queued')->filter(fn (OutboundMessage $message) => $message->deferred_until?->isFuture())->count(),
+                    'sent' => $messages->where('status', 'sent')->count(),
+                    'failed' => $messages->where('status', 'failed')->count(),
+                    'opened' => $messages->whereNotNull('opened_at')->count(),
+                    'clicked' => $messages->whereNotNull('clicked_at')->count(),
+                    'replied' => $messages->whereNotNull('replied_at')->count(),
+                    'delivered' => $messages->whereNotNull('delivered_at')->count(),
+                    'complained' => $messages->whereNotNull('complained_at')->count(),
+                    'bounced' => $messages->filter(fn (OutboundMessage $message) => $message->status === 'bounced' || $message->bounced_at !== null)->count(),
+                ]);
+            });
+        $daily = (clone $out)->where('status', 'sent')->whereBetween('sent_at', [$from, $to])->selectRaw('DATE(sent_at) as day, COUNT(*) as sent')->groupBy('day')->orderBy('day')->get();
 
         return ['totals' => $totals, 'perSequence' => $perSequence, 'perCampaign' => $perCampaign, 'daily' => $daily, 'tracking' => $tracking];
     }
