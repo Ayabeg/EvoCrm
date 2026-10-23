@@ -1,6 +1,6 @@
 # Acquisition systems release report
 
-Current implementation revision: `ed59f1b5` (`main`; this release report is maintained in subsequent documentation commits)
+Current implementation revision: `93b93be9` (`main`; this release report is maintained in subsequent documentation commits)
 
 This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
 
@@ -86,12 +86,12 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `3d7798b2` — isolated campaign daily-cap counts by workspace in shared runner passes.
 - `58e83570` — signed lead-magnet booking attribution through the public meeting form.
 - `ed59f1b5` — modular email-verification provider contract, disabled fallback, optional DNS evidence, and cache coverage.
-- Next code increment — authenticated HTTP email-verification adapter, normalized provider response handling, and temporary-failure retry preservation; commit pending after the full regression.
+- `93b93be9` — authenticated HTTP email-verification adapter, normalized provider response handling, and temporary-failure retry preservation.
 
 ## Implemented but not fully verified
 
 - Live SMTP/IMAP, mail-stack, Google Places, provider-backed email-verification, Evolution, and other provider behavior remains unverified without configured external accounts. The local email-verification contract and disabled/DNS evidence paths are verified.
-- The HTTP adapter is locally verified against controlled fakes; live provider semantics and credentials remain an external release gate.
+- The HTTP adapter is locally verified against controlled fakes; live provider semantics and credentials remain an external release gate. The full PHP regression after this increment is **1,359 tests; 1,350 passed; 8 existing branding/design-system/automation contract failures; 35,837 assertions; 1 skipped**.
 - Full repository release verification remains non-green because of the 8 remaining branding/design-system/automation contract failures.
 - The funnel-event uniqueness migration performs a non-destructive preflight and stops with an actionable error if historical duplicate subject-scoped rows exist; no destructive reconciliation policy is assumed locally.
 - The repository-wide review remains partial by design; the committed hardening diff review covers the quote/import follow-up and the full code change in `46661ae7`.
