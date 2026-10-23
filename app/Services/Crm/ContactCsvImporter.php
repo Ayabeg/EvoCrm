@@ -21,6 +21,8 @@ use Throwable;
 
 class ContactCsvImporter
 {
+    private const PROCESS_CHUNK_SIZE = 100;
+
     public const FIELDS = [
         'external_id' => 'External ID',
         'first_name' => 'First name',
@@ -173,42 +175,48 @@ class ContactCsvImporter
 
     public function process(ImportBatch $batch): void
     {
+        do {
+            $hasMore = $this->processChunk($batch);
+        } while ($hasMore);
+    }
+
+    /**
+     * Process one bounded page for the durable queue worker.
+     *
+     * @return bool Whether another page of pending rows remains.
+     */
+    public function processChunk(ImportBatch $batch): bool
+    {
+        if ($batch->status === ImportBatch::STATUS_COMPLETED) {
+            return false;
+        }
+
         $batch->forceFill([
             'status' => ImportBatch::STATUS_PROCESSING,
             'started_at' => $batch->started_at ?? now(),
         ])->save();
 
         try {
-            $batch->rows()
+            $rows = $batch->rows()
                 ->where('status', ImportRow::STATUS_PENDING)
                 ->orderBy('row_number')
-                ->chunkById(100, function ($rows) use ($batch): void {
-                    foreach ($rows as $row) {
-                        $this->processRow($batch->fresh() ?? $batch, $row);
-                    }
-                });
+                ->limit(self::PROCESS_CHUNK_SIZE)
+                ->get();
+
+            foreach ($rows as $row) {
+                $this->processRow($batch->fresh() ?? $batch, $row);
+            }
 
             $batch->refresh();
-            $batch->forceFill([
-                'status' => ImportBatch::STATUS_COMPLETED,
-                'finished_at' => now(),
-                'processed_rows' => $batch->total_rows,
-            ])->save();
+            $hasMore = $batch->rows()
+                ->where('status', ImportRow::STATUS_PENDING)
+                ->exists();
 
-            if ($batch->workspace) {
-                app(AuditLogger::class)->record(
-                    $batch->workspace,
-                    'import.completed',
-                    'Contact import '.$batch->filename.' finished',
-                    $batch->user,
-                    $batch,
-                    [
-                        'created' => $batch->created_count,
-                        'updated' => $batch->updated_count,
-                        'filename' => $batch->filename,
-                    ],
-                );
+            if (! $hasMore) {
+                $this->complete($batch);
             }
+
+            return $hasMore;
         } catch (Throwable $exception) {
             $batch->forceFill([
                 'status' => ImportBatch::STATUS_FAILED,
@@ -217,6 +225,30 @@ class ContactCsvImporter
             ])->save();
 
             throw $exception;
+        }
+    }
+
+    private function complete(ImportBatch $batch): void
+    {
+        $batch->forceFill([
+            'status' => ImportBatch::STATUS_COMPLETED,
+            'finished_at' => now(),
+            'processed_rows' => $batch->total_rows,
+        ])->save();
+
+        if ($batch->workspace) {
+            app(AuditLogger::class)->record(
+                $batch->workspace,
+                'import.completed',
+                'Contact import '.$batch->filename.' finished',
+                $batch->user,
+                $batch,
+                [
+                    'created' => $batch->created_count,
+                    'updated' => $batch->updated_count,
+                    'filename' => $batch->filename,
+                ],
+            );
         }
     }
 

@@ -28,15 +28,19 @@ class ProcessImportBatch implements ShouldQueue
             return;
         }
 
-        if ($batch->type === ImportBatch::TYPE_CONTACTS) {
-            $contacts->process($batch);
+        $hasMore = match ($batch->type) {
+            ImportBatch::TYPE_CONTACTS => $contacts->processChunk($batch),
+            ImportBatch::TYPE_DEALS => $deals->processChunk($batch),
+            default => null,
+        };
+
+        if ($hasMore === true) {
+            self::dispatch($batch->id);
 
             return;
         }
 
-        if ($batch->type === ImportBatch::TYPE_DEALS) {
-            $deals->process($batch);
-
+        if ($hasMore === false) {
             return;
         }
 

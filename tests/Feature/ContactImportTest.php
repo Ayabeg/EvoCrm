@@ -10,7 +10,9 @@ use App\Models\EnrichmentRun;
 use App\Models\ImportBatch;
 use App\Models\User;
 use App\Services\Crm\ContactCsvImporter;
+use App\Services\Crm\DealCsvImporter;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 
 function contactImportCsv(string $contents, string $name = 'contacts.csv'): UploadedFile
@@ -65,6 +67,32 @@ it('redacts terminal import worker diagnostics', function () {
         ->and($batch->fresh()->error_summary)->not->toContain('owner@clinic.dz')
         ->and($batch->fresh()->error_summary)->not->toContain('https://provider.example.test')
         ->and($batch->fresh()->error_summary)->not->toContain('Bearer secret-value');
+});
+
+it('continues large contact imports through bounded queue chunks', function () {
+    Bus::fake();
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    $rows = collect(range(1, 101))
+        ->map(fn (int $number): string => "contact{$number}@example.test,Contact {$number}")
+        ->prepend('Email,First Name')
+        ->implode("\n");
+
+    $batch = app(ContactCsvImporter::class)->createBatch(
+        $owner->workspace,
+        $owner,
+        contactImportCsv($rows),
+    );
+
+    (new ProcessImportBatch($batch->id))->handle(
+        app(ContactCsvImporter::class),
+        app(DealCsvImporter::class),
+    );
+
+    expect($batch->fresh()->status)->toBe(ImportBatch::STATUS_PROCESSING)
+        ->and($batch->fresh()->processed_rows)->toBe(100)
+        ->and($batch->fresh()->rows()->where('status', 'pending')->count())->toBe(1);
+
+    Bus::assertDispatched(ProcessImportBatch::class, fn (ProcessImportBatch $job): bool => $job->batchId === $batch->id);
 });
 
 it('lets an owner preview a HubSpot contact export and commit mapped creates', function () {
