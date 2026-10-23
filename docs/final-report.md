@@ -2,7 +2,7 @@
 
 Current implementation revision: `6a794282` (`main`; release report is maintained in subsequent documentation commits)
 
-This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers or the unrelated repository UI contracts are production-ready.
+This report records the current verified state of Dead Enrichment, EvoCRM Outbound, and Dead Magnet. It is a release-readiness report, not a claim that live providers, deployment secrets, or legal approvals are complete.
 
 ## Implemented and verified
 
@@ -146,7 +146,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 
 - Live SMTP/IMAP, mail-stack, Google Places, provider-backed email-verification, Evolution, and other provider behavior remains unverified without configured external accounts. The local email-verification contract and disabled/DNS evidence paths are verified.
 - The HTTP adapter is locally verified against controlled fakes; live provider semantics and credentials remain an external release gate. The full PHP regression after this increment is **1,359 tests; 1,350 passed; 8 existing branding/design-system/automation contract failures; 35,837 assertions; 1 skipped**.
-- Full repository release verification remains non-green because of the 8 remaining branding/design-system/automation contract failures.
+- The repository-wide PHP suite and `php artisan evocrm:product-ready` are green. The product-ready gate correctly warns that no `ProductionSafetyValidator` is present rather than inventing one.
 - The funnel-event uniqueness migration performs a non-destructive preflight and stops with an actionable error if historical duplicate subject-scoped rows exist; no destructive reconciliation policy is assumed locally.
 - The repository-wide review remains partial by design; the committed hardening diff review covers the quote/import follow-up and the full code change in `46661ae7`.
 
@@ -155,7 +155,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Configure and deliberately test the required provider credentials and webhook contracts in a controlled environment before sending real outreach.
 - Rotate the local/deployment `APP_KEY` as part of deployment hygiene; the ignored local `.env` is not committed.
 - Keep `EVOSALES_REQUIRE_MARKETING_CONSENT=true` unless a documented lawful basis and legal review approve consentless cold outreach for the target market.
-- Resolve or explicitly accept the unrelated UI/source-contract failures before claiming a fully green repository-wide release.
+- Live provider verification remains pending; deployment APP_KEY rotation and legal sign-off are still required before production outreach.
 - Preserve the four unrelated user working-tree edits; they were not staged or modified by this work.
 
 ## Operating references
