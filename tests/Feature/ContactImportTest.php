@@ -2,6 +2,7 @@
 
 use App\Enums\WorkspaceRole;
 use App\Jobs\EnrichRecordJob;
+use App\Jobs\ProcessImportBatch;
 use App\Models\Contact;
 use App\Models\CustomAttributeDefinition;
 use App\Models\CustomAttributeValue;
@@ -41,6 +42,29 @@ it('blocks members without import permission from the contact import surface', f
 
     expect(ImportBatch::query()->count())->toBe(0)
         ->and(Contact::query()->count())->toBe(0);
+});
+
+it('redacts terminal import worker diagnostics', function () {
+    $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
+    $batch = ImportBatch::query()->create([
+        'workspace_id' => $owner->workspace_id,
+        'user_id' => $owner->id,
+        'type' => ImportBatch::TYPE_CONTACTS,
+        'status' => ImportBatch::STATUS_PROCESSING,
+        'filename' => 'contacts.csv',
+        'source_hash' => hash('sha256', 'contacts.csv'),
+        'headers' => [],
+        'total_rows' => 1,
+    ]);
+
+    (new ProcessImportBatch($batch->id))->failed(
+        new RuntimeException('Import failed for owner@clinic.dz at https://provider.example.test using Authorization: Bearer secret-value'),
+    );
+
+    expect($batch->fresh()->status)->toBe(ImportBatch::STATUS_FAILED)
+        ->and($batch->fresh()->error_summary)->not->toContain('owner@clinic.dz')
+        ->and($batch->fresh()->error_summary)->not->toContain('https://provider.example.test')
+        ->and($batch->fresh()->error_summary)->not->toContain('Bearer secret-value');
 });
 
 it('lets an owner preview a HubSpot contact export and commit mapped creates', function () {

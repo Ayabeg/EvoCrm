@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — import diagnostic redaction
+
+### Completed / verified
+
+- Applied the shared workflow redaction contract to contact/deal CSV importer failures and the terminal `ProcessImportBatch` callback, preventing recipient addresses, provider URLs, and authorization tokens from being stored in `error_summary`.
+- The focused import/redaction gate passes **18 tests / 168 assertions**; the connected acquisition gate including both import suites passes **131 tests / 966 assertions**. Pint, PHP syntax, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — current full regression audit
 
 ### Completed / verified

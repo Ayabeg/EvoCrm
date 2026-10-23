@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\ImportBatch;
 use App\Services\Crm\ContactCsvImporter;
 use App\Services\Crm\DealCsvImporter;
+use App\Services\Crm\WorkflowExecutionRedactor;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
@@ -54,7 +55,9 @@ class ProcessImportBatch implements ShouldQueue
             ->update([
                 'status' => ImportBatch::STATUS_FAILED,
                 'finished_at' => now(),
-                'error_summary' => mb_substr($exception?->getMessage() ?: 'Import worker failed.', 0, 500),
+                'error_summary' => app(WorkflowExecutionRedactor::class)->redactError(
+                    $exception?->getMessage() ?: 'Import worker failed.',
+                ),
             ]);
     }
 }

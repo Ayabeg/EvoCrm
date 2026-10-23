@@ -213,7 +213,7 @@ class ContactCsvImporter
             $batch->forceFill([
                 'status' => ImportBatch::STATUS_FAILED,
                 'finished_at' => now(),
-                'error_summary' => mb_substr($exception->getMessage(), 0, 500),
+                'error_summary' => app(WorkflowExecutionRedactor::class)->redactError($exception->getMessage()),
             ])->save();
 
             throw $exception;
