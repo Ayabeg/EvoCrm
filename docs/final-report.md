@@ -31,6 +31,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - Lead scoring rule points are now configurable per workspace for fit, intent, timing, and data quality, with bounded defaults, fallback for omitted values, and persisted explainable score breakdowns.
 - Contact and deal imports now process through resumable 100-row queue pages, dispatching continuations while pending rows remain and refusing to reopen completed batches from stale duplicate workers.
 - SMTP transport failures are redacted before persistence in outbound message diagnostics, while safe operational context such as timeout text remains available to operators.
+- WhatsApp/SMS outbound and Desk SMS provider errors now use the same redaction contract before persistence.
 
 ## Verification evidence
 
@@ -126,6 +127,7 @@ This report records the current verified state of Dead Enrichment, EvoCRM Outbou
 - `b84aab2d` — covered 101-row deal-import continuation and stale completed-worker behavior.
 - `27980623` — redacted contact/deal row-level import exceptions before persistence.
 - `5439c977` — redacted persisted SMTP transport diagnostics.
+- `721d2645` — redacted persisted WhatsApp/SMS and Desk provider diagnostics.
 
 ## Implemented but not fully verified
 

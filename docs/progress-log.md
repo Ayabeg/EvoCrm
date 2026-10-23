@@ -1,5 +1,16 @@
 # EvoCRM acquisition systems progress log
 
+## 2026-10-23 — provider failure diagnostic redaction
+
+### Completed / verified
+
+- Applied the shared redaction contract to WhatsApp/SMS outbound failure reasons and Desk SMS failure reasons, so provider-returned errors cannot persist recipient addresses, authorization tokens, or credential-bearing URLs in CRM message records.
+- The targeted outbound/Desk/provider gate passes **52 tests / 277 assertions**; the connected acquisition/inbound/enrichment/outbound/funnel/scoring gate remains green at **135 tests / 987 assertions**. Pint, PHP syntax, and `git diff --check` pass.
+
+### Remaining
+
+- Live provider verification, deployment APP_KEY rotation, legal sign-off for consentless cold outreach, and the eight unrelated branding/design-system/automation contract failures remain open.
+
 ## 2026-10-23 — outbound SMTP diagnostic redaction
 
 ### Completed / verified
