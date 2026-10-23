@@ -194,7 +194,7 @@ it('enrolls a new contact in the first outbound sequence', function () {
         'action_config' => ['sequence_id' => null],
     ]);
 
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'email' => 'sara@evotechly.dz',
     ]);
@@ -541,14 +541,14 @@ it('branches on contact wilaya then enrolls or creates a task', function () {
         'else_action_config' => ['subject' => 'Confirm wilaya for {{contact}}'],
     ]);
 
-    $alger = Contact::factory()->create([
+    $alger = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'first_name' => 'Sara',
         'last_name' => 'Khelifi',
         'wilaya' => 'Alger',
         'email' => 'sara.khelifi@evotechly.dz',
     ]);
-    $oran = Contact::factory()->create([
+    $oran = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'first_name' => 'Karim',
         'last_name' => 'Benali',

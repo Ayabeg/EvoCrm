@@ -52,7 +52,7 @@ it('assigns an owner only to workspace contacts', function () {
 
 it('enrolls selected contacts into a workspace sequence', function () {
     $owner = User::factory()->create(['role' => WorkspaceRole::Owner]);
-    $contact = Contact::factory()->create(['workspace_id' => $owner->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $owner->workspace_id]);
     $sequence = Sequence::factory()->create([
         'workspace_id' => $owner->workspace_id,
         'name' => 'Welcome',

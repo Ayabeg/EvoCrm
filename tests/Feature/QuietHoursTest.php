@@ -27,7 +27,7 @@ it('blocks automated outbound during Africa/Algiers quiet hours', function () {
 
     $this->travelTo(Carbon::parse('2026-08-22 22:15:00', 'Africa/Algiers'));
 
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $workspace->id,
         'email' => 'night@example.dz',
     ]);
@@ -51,7 +51,7 @@ it('skips a sequence send during default Africa/Algiers quiet hours', function (
         'workspace_id' => $user->workspace_id,
         'enabled' => true,
     ]);
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'email' => 'night-seq@example.dz',
     ]);

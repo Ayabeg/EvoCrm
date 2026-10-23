@@ -191,6 +191,7 @@ class MailboxController extends Controller
             'channel' => 'email',
             'mailbox_id' => $mailbox->id,
             'to_address' => $data['to'],
+            'explicit_test_send' => true,
             'subject' => 'EvoSales mailbox test — '.$mailbox->name,
             'body' => "This is a test send from the EvoSales mailbox {$mailbox->name}. If you see it, SMTP works.",
         ]);

@@ -36,8 +36,8 @@ it('creates a broadcast campaign and expands it into logged messages', function 
     $user = User::factory()->create();
     $mailbox = enabledMailbox($user);
 
-    $contacts = Contact::factory()->count(3)->create(['workspace_id' => $user->workspace_id]);
-    $noEmail = Contact::factory()->create(['workspace_id' => $user->workspace_id, 'email' => null]);
+    $contacts = Contact::factory()->withVerifiedEmail()->count(3)->create(['workspace_id' => $user->workspace_id]);
+    $noEmail = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id, 'email' => null]);
 
     app(SuppressionService::class)->suppress($user->workspace, 'email', $contacts[2]->email);
 
@@ -76,7 +76,7 @@ it('expands a scheduled campaign only when due', function () {
 
     $user = User::factory()->create();
     enabledMailbox($user);
-    Contact::factory()->count(2)->create(['workspace_id' => $user->workspace_id]);
+    Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $user->workspace_id]);
 
     $this->actingAs($user)->post('/outbound/campaigns', [
         'name' => 'Scheduled blast',
@@ -112,7 +112,7 @@ it('defers campaign messages during quiet hours and sends after', function () {
     ]);
 
     enabledMailbox($user);
-    Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
 
     $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
     app(CampaignService::class)->expand($campaign);
@@ -138,7 +138,7 @@ it('defers campaign messages when the mailbox hits its daily cap', function () {
 
     $user = User::factory()->create();
     enabledMailbox($user, ['daily_limit' => 1]);
-    Contact::factory()->count(2)->create(['workspace_id' => $user->workspace_id]);
+    Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $user->workspace_id]);
 
     $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
     app(CampaignService::class)->expand($campaign);
@@ -158,7 +158,7 @@ it('fails a campaign message honestly when the contact is suppressed after expan
 
     $user = User::factory()->create();
     enabledMailbox($user);
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
 
     $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
     app(CampaignService::class)->expand($campaign);
@@ -177,7 +177,7 @@ it('keeps an invalid campaign recipient visible as ineligible', function () {
 
     $user = User::factory()->create();
     enabledMailbox($user);
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'email' => 'not-an-email',
     ]);
@@ -197,8 +197,8 @@ it('keeps an invalid campaign recipient visible as ineligible', function () {
 
 it('previews campaign eligibility without materializing or sending messages', function () {
     $user = User::factory()->create();
-    $eligible = Contact::factory()->create(['workspace_id' => $user->workspace_id, 'email' => 'ok@clinic.dz']);
-    $invalid = Contact::factory()->create(['workspace_id' => $user->workspace_id, 'email' => 'not-an-email']);
+    $eligible = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id, 'email' => 'ok@clinic.dz']);
+    $invalid = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id, 'email' => 'not-an-email']);
     $campaign = OutboundCampaign::factory()->create([
         'workspace_id' => $user->workspace_id,
         'subject' => 'Hello {{first_name}}',
@@ -217,7 +217,7 @@ it('previews campaign eligibility without materializing or sending messages', fu
 
 it('expands an audience across bounded chunks', function () {
     $user = User::factory()->create();
-    Contact::factory()->count(251)->create(['workspace_id' => $user->workspace_id]);
+    Contact::factory()->withVerifiedEmail()->count(251)->create(['workspace_id' => $user->workspace_id]);
     $campaign = OutboundCampaign::factory()->create([
         'workspace_id' => $user->workspace_id,
         'subject' => 'Chunk {{first_name}}',
@@ -234,7 +234,7 @@ it('queues durable expansion for audiences larger than one thousand contacts', f
     Bus::fake();
 
     $user = User::factory()->create();
-    Contact::factory()->count(1001)->create(['workspace_id' => $user->workspace_id]);
+    Contact::factory()->withVerifiedEmail()->count(1001)->create(['workspace_id' => $user->workspace_id]);
     $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
 
     app(CampaignService::class)->expand($campaign);
@@ -257,7 +257,7 @@ it('cancels a sending campaign and drops its queued messages', function () {
 
     $user = User::factory()->create();
     enabledMailbox($user);
-    Contact::factory()->count(2)->create(['workspace_id' => $user->workspace_id]);
+    Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $user->workspace_id]);
 
     $campaign = OutboundCampaign::factory()->create(['workspace_id' => $user->workspace_id]);
     app(CampaignService::class)->expand($campaign);
@@ -270,7 +270,7 @@ it('cancels a sending campaign and drops its queued messages', function () {
 
 it('keeps the unsubscribe URL on the CRM host in rendered mail', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
 
     $url = app(TemplateRenderer::class)->render('Se désabonner : {{unsub}}', $contact, $user->workspace);
 
@@ -299,7 +299,7 @@ it('keeps the unsubscribe URL on the CRM host in rendered mail', function () {
 
 it('sanitizes executable and unsafe markup before rendering email HTML', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     $message = OutboundMessage::query()->create([
         'workspace_id' => $user->workspace_id,
         'contact_id' => $contact->id,
@@ -323,7 +323,7 @@ it('sanitizes executable and unsafe markup before rendering email HTML', functio
 
 it('tracks link clicks through a CRM-host redirect and never rewrites unsubscribe', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
 
     $message = OutboundMessage::query()->create([
         'workspace_id' => $user->workspace_id,
@@ -435,7 +435,7 @@ it('edits a mailbox without re-entering passwords', function () {
 
 it('edits a template and previews it rendered against a CRM contact', function () {
     $user = User::factory()->create();
-    Contact::factory()->create([
+    Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'first_name' => 'Nadia',
         'email' => 'nadia@example.dz',
@@ -469,8 +469,8 @@ it('enrolls a whole CRM list into a sequence', function () {
     $user = User::factory()->create();
     $sequence = Sequence::factory()->create(['workspace_id' => $user->workspace_id, 'channel' => 'email']);
 
-    $alger = Contact::factory()->count(2)->create(['workspace_id' => $user->workspace_id, 'city' => 'Alger']);
-    Contact::factory()->create(['workspace_id' => $user->workspace_id, 'city' => 'Oran']);
+    $alger = Contact::factory()->withVerifiedEmail()->count(2)->create(['workspace_id' => $user->workspace_id, 'city' => 'Alger']);
+    Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id, 'city' => 'Oran']);
 
     $filter = SavedFilter::query()->create([
         'workspace_id' => $user->workspace_id,
@@ -498,7 +498,7 @@ it('enrolls a whole CRM list into a sequence', function () {
 it('rejects oversized sequence enrollment requests', function () {
     $user = User::factory()->create();
     $sequence = Sequence::factory()->create(['workspace_id' => $user->workspace_id, 'channel' => 'email']);
-    $contacts = Contact::factory()->count(251)->create(['workspace_id' => $user->workspace_id]);
+    $contacts = Contact::factory()->withVerifiedEmail()->count(251)->create(['workspace_id' => $user->workspace_id]);
 
     $this->actingAs($user)
         ->post("/outbound/sequences/{$sequence->id}/enroll", [
@@ -531,7 +531,7 @@ it('sends a sequence step through its pinned mailbox', function () {
         'body' => 'Via the pinned mailbox',
     ]);
 
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact);
 
     $this->artisan('outbound:run')->assertSuccessful();

@@ -40,7 +40,7 @@ it('sends the due step, renders variables, and advances the enrollment', functio
     $user = User::factory()->create();
     Mailbox::factory()->create(['workspace_id' => $user->workspace_id, 'enabled' => true]);
 
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'first_name' => 'Amine',
         'email' => 'amine@example.dz',
@@ -80,7 +80,7 @@ it('defers sends during quiet hours instead of dispatching', function () {
 
     Mailbox::factory()->create(['workspace_id' => $user->workspace_id, 'enabled' => true]);
 
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     $sequence = makeActiveSequence($user);
     $enrollment = app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact);
 
@@ -99,7 +99,7 @@ it('cancels the enrollment when the contact lands on the suppression list', func
     $user = User::factory()->create();
     Mailbox::factory()->create(['workspace_id' => $user->workspace_id, 'enabled' => true]);
 
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'email' => 'blocked@example.dz',
     ]);
@@ -119,7 +119,7 @@ it('fails honestly in the outbox when no mailbox is enabled', function () {
     $this->travelTo(Carbon::parse('2026-08-23 10:00:00', 'Africa/Algiers'));
 
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     $sequence = makeActiveSequence($user);
     app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact);
 
@@ -132,7 +132,7 @@ it('fails honestly in the outbox when no mailbox is enabled', function () {
 
 it('fails a direct dispatch with an invalid recipient address', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'email' => 'not-an-email',
     ]);
@@ -149,7 +149,7 @@ it('fails a direct dispatch with an invalid recipient address', function () {
 
 it('reuses an outbound message when a dispatch is retried with the same idempotency key', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
 
     $attributes = [
         'channel' => 'email',
@@ -167,7 +167,7 @@ it('reuses an outbound message when a dispatch is retried with the same idempote
 
 it('does not reset an active send claim during a duplicate dispatch', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     $message = OutboundMessage::query()->create([
         'workspace_id' => $user->workspace_id,
         'contact_id' => $contact->id,
@@ -195,7 +195,7 @@ it('does not reset an active send claim during a duplicate dispatch', function (
 
 it('recovers stale outbound send claims for a safe retry', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     $message = OutboundMessage::query()->create([
         'workspace_id' => $user->workspace_id,
         'contact_id' => $contact->id,
@@ -220,7 +220,7 @@ it('does not resend a stale claim when the provider outcome is unknown', functio
         'workspace_id' => $user->workspace_id,
         'enabled' => true,
     ]);
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     $idempotencyKey = 'sequence:unknown-provider:contact:'.$contact->id;
 
     $message = OutboundMessage::query()->create([
@@ -251,7 +251,7 @@ it('does not resend a stale claim when the provider outcome is unknown', functio
 
 it('pauses and resumes enrollments from the UI', function () {
     $user = User::factory()->create();
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
     $sequence = Sequence::factory()->create(['workspace_id' => $user->workspace_id]);
 
     $enrollment = Enrollment::query()->create([

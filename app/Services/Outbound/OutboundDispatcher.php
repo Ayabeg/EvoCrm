@@ -88,6 +88,7 @@ class OutboundDispatcher
             is_string($attributes['email_verification_policy'] ?? null)
                 ? $attributes['email_verification_policy']
                 : null,
+            (bool) ($attributes['explicit_test_send'] ?? false),
         );
 
         if ($eligibilityReason === null && $channel === 'email' && ! filter_var($to, FILTER_VALIDATE_EMAIL)) {

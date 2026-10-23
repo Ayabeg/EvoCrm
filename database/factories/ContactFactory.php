@@ -11,6 +11,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ContactFactory extends Factory
 {
+    public function withVerifiedEmail(): static
+    {
+        return $this->state(fn (): array => [
+            'meta' => [
+                'email_verification' => [
+                    'status' => 'verified',
+                    'source' => 'test_fixture',
+                ],
+            ],
+        ]);
+    }
+
     public function definition(): array
     {
         $local = fake()->unique()->numerify('05########');

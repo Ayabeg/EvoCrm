@@ -40,7 +40,7 @@ it('assigns A/B variant at enrollment when steps have variant keys', function ()
         'variant_key' => 'b',
     ]);
 
-    $contact = Contact::factory()->create(['workspace_id' => $user->workspace_id]);
+    $contact = Contact::factory()->withVerifiedEmail()->create(['workspace_id' => $user->workspace_id]);
 
     $enrollment = app(SequenceEnrollment::class)->enroll($user->workspace, $sequence, $contact);
 

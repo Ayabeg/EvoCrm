@@ -25,6 +25,7 @@ final class OutboundEligibility
         string $channel,
         ?Sequence $sequence = null,
         ?string $emailVerificationPolicy = null,
+        bool $allowExplicitTestSend = false,
     ): ?string {
         if ((int) $contact->workspace_id !== (int) $workspace->id) {
             return 'Contact does not belong to this workspace.';
@@ -47,7 +48,14 @@ final class OutboundEligibility
                 return 'Contact has an invalid business email address.';
             }
 
+            if ($allowExplicitTestSend) {
+                return null;
+            }
+
             $verificationStatus = data_get($contact->meta, 'email_verification.status');
+            $verificationStatus = is_string($verificationStatus) && trim($verificationStatus) !== ''
+                ? trim($verificationStatus)
+                : 'unknown';
             if (in_array($verificationStatus, ['invalid', 'temporary_failure', 'unsupported'], true)) {
                 return match ($verificationStatus) {
                     'temporary_failure' => 'Contact email verification is temporarily unavailable.',

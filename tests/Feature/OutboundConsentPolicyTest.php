@@ -14,7 +14,7 @@ it('blocks outbound enrollment and campaign eligibility without consent by defau
     config(['evosales.outbound.require_marketing_consent' => true]);
 
     $user = User::factory()->create();
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'email' => 'prospect@example.dz',
     ]);
@@ -44,7 +44,7 @@ it('allows a documented cold-outreach mode while still blocking explicit denial'
     config(['evosales.outbound.require_marketing_consent' => false]);
 
     $user = User::factory()->create();
-    $contact = Contact::factory()->create([
+    $contact = Contact::factory()->withVerifiedEmail()->create([
         'workspace_id' => $user->workspace_id,
         'email' => 'prospect@example.dz',
     ]);

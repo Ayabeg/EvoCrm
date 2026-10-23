@@ -7,6 +7,7 @@ use App\Models\OutboundCampaign;
 use App\Models\OutboundMessage;
 use App\Models\OutboundTemplate;
 use App\Models\User;
+use App\Services\Outbound\OutboundDispatcher;
 use Illuminate\Support\Carbon;
 
 it('renders the outbound overview, outbox, replies, and reports pages', function () {
@@ -164,6 +165,24 @@ it('creates mailboxes disabled and sends a test through the dispatcher', functio
     expect($message->status)->toBe('sent');
     expect($message->to_address)->toBe('owner@evotechly.dz');
     expect($mailbox->refresh()->last_tested_at)->not->toBeNull();
+});
+
+it('keeps ordinary dispatcher sends fail-closed when the contact is unverified', function () {
+    $user = User::factory()->create();
+    $contact = Contact::factory()->create([
+        'workspace_id' => $user->workspace_id,
+        'email' => 'unverified@example.dz',
+        'meta' => [],
+    ]);
+
+    $message = app(OutboundDispatcher::class)->dispatch($user->workspace, $contact, [
+        'channel' => 'email',
+        'subject' => 'Should not send',
+        'body' => 'Verification required',
+    ]);
+
+    expect($message->status)->toBe('failed')
+        ->and($message->failure_reason)->toContain('verification is unknown');
 });
 
 it('marks outbound messages opened through the tracking pixel', function () {
