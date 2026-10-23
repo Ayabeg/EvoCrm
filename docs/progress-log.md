@@ -221,6 +221,7 @@ Run the final release audit after the remaining UI/source-contract checks are re
 
 - Re-read the complete build brief and audited the current roadmap, architecture, data model, testing contract, release report, working tree, and latest implementation revision.
 - Re-ran the repository-wide PHP regression: 1,344 tests, 1,335 passed, 8 existing branding/design-system/automation contract failures, 35,756 assertions, and 1 skipped. No acquisition-system test failed; the two existing `InvalidArgumentException` import warnings remain unchanged.
+- Re-ran the broader acquisition integration gate across imports, enrichment, lead-magnet capture and funnel attribution, outbound lifecycle, suppression, and CRM filtering: 129 tests / 879 assertions passed.
 - Confirmed the four pre-existing user edits remain unstaged and outside this acquisition-system work.
 - Aligned the roadmap and release report with the authoritative current revision (`77f1edbc`) and current full-suite baseline.
 
